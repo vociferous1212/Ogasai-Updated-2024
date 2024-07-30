@@ -142,7 +142,7 @@ function script_grindEX:doChecks()
 				script_nav:saveTargetLocation(script_grind.enemyObj, script_grind.enemyObj:GetLevel());
 			end
 			if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
-				or (script_grind:isTargetBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
+				or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
 				or script_grind.enemyObj:IsDead()) then
 					script_grind.enemyObj = nil;
 					ClearTarget();

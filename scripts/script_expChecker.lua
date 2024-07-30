@@ -88,7 +88,7 @@ function script_expChecker:targetLevels()
         targetObj = script_grind.enemyObj;
 
         -- if we have rested exp do the following.... else...
-        if (GetXPExhaustion() ~= nil) then		   
+        if (GetXPExhaustion() ~= nil) and (targetObj ~= 0 and targetObj ~= nil) then		   
 
             -- same level mob rested EXP
             if (GetLocalPlayer():GetLevel() == targetObj:GetLevel()) then
@@ -229,7 +229,7 @@ function script_expChecker:targetLevels()
         end
     
         -- not rested exp calculation per mob
-        if (GetXPExhaustion() == nil or restR == 0) then
+        if (GetXPExhaustion() == nil or restR == 0) and (targetObj ~= nil and targetObj ~= 0) then
 
                 -- same level mob No rested EXP
             if (GetLocalPlayer():GetLevel() == targetObj:GetLevel()) then

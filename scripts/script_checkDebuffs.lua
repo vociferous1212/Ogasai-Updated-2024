@@ -42,6 +42,7 @@ function script_checkDebuffs:hasPoison()
 		or (player:HasDebuff("Bottle of Poison"))
 		or (player:HasDebuff("Venom Sting"))
 		or (player:HasDebuff("Touch of Zanzil"))
+		or (player:HasDebuff("Webwood Lurker's Poison"))
 
 		then
 

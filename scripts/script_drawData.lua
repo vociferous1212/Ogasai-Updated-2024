@@ -81,7 +81,7 @@ function script_drawData:drawMonsterDataOnScreen(target)
 			and (not script_grind:isTargetHardBlacklisted(target:GetGUID())) then
 
 			-- draw text avoiding
-			DrawText("(Avoiding)", tX, tY-20, 255, 0, 0);
+			DrawText("(Adds Nearby)", tX, tY-20, 255, 0, 0);
 		end
 
 		-- draw hard blacklisted targets

@@ -197,8 +197,10 @@ Separator();
 		if (script_druid.useCat) and (HasSpell("Cat Form")) then
 			if (CollapsingHeader("|+| Cat Form Options")) then
 				wasClicked, script_druid.useStealth = Checkbox("Use Stealth", script_druid.useStealth);
-				Text("Stealth Opener");
-				script_druid.stealthOpener = InputText("Opener", script_druid.stealthOpener);
+				if (script_druid.useStealth) then
+					Text("Stealth Opener");
+					script_druid.stealthOpener = InputText("Opener", script_druid.stealthOpener);
+				end
 			end
 		end
 
@@ -226,7 +228,7 @@ Separator();
 			script_druid.rejuvenationHealth = SliderInt("RHP%", 25, 100, script_druid.rejuvenationHealth);
 		end
 		if (HasSpell("Regrowth")) then
-			Text("Regrwoth below HP percentage");
+			Text("Regrowth below HP percentage");
 			script_druid.regrowthHealth = SliderInt("Regrowth below HP%", 15, 99, script_druid.regrowthHealth);
 		end
 

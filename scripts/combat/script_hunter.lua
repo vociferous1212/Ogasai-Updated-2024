@@ -35,7 +35,7 @@ script_hunter = {
 	useMark = true,
 	useMultiShot = false,
 	--useScorpidSting = false,
-	waitAfterCombat = true,
+	waitAfterCombat = false,
 
 }	
 
@@ -79,6 +79,11 @@ function script_hunter:setup()
 
 	if (GetLocalPlayer():GetLevel() < 3) then
 		self.buyWhenQuiverEmpty = false;
+	end
+	
+	if (GetLocalPlayer():GetLevel() <= 6) then
+		self.drinkMana = 25;
+		self.eatHealth = 35;
 	end
 
 	self.isSetup = true;
@@ -403,6 +408,21 @@ function script_hunter:run(targetGUID)
 				if (not script_checkDebuffs:petDebuff()) then
 					PetFollow();
 				end
+			end
+
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
+			-- war stomp targets until level 6 then save for interrupts
+			if (IsInCombat()) and (targetObj:GetHealthPercentage() >= 10) and (HasSpell("War Stomp")) and (not IsSpellOnCD("War Stomp")) and (not localObj:IsStunned()) and (targetObj:GetDistance() <= 8) and (not targetObj:IsStunned()) and (not IsMoving()) then
+				CastSpellByName("War Stomp");
 			end
 
 			-- force auto shot if in combat
@@ -815,7 +835,7 @@ function script_hunter:rest()
 	-- Check hunter bags if they are full
 	local inventoryFull = true;
 	-- Check bags 1-4, except the quiver bag (quiverBagNr)
-	for i=1,4 do 
+	for i=1,5 do 
 		if (i ~= self.quiverBagNr) then 
 			for y=1,GetContainerNumSlots(i-1) do 
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);

@@ -44,7 +44,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
           			-- druid heals
           			if (self.enableHeals) and (partyMember:GetGUID() ~= localObj:GetGUID()) and (partyMemberHP > 4) then
 
-					if (HasSpell("Mark of the Wild")) and (not IsSpellOnCD("Mark of the Wild")) then
+					if (HasSpell("Mark of the Wild")) and (not IsSpellOnCD("Mark of the Wild")) and (not HasForm()) then
 						if (not partyMember:HasBuff("Mark of the Wild")) and (localMana >= 30) then
 							if (Cast("Mark of the Wild", partyMember)) then
 								return true;
@@ -53,7 +53,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
 					end
 
                		-- druid swiftmend
-                	if (HasSpell("Swiftmend")) and (not IsSpellOnCD("Swiftmend")) then
+                	if (HasSpell("Swiftmend")) and (not IsSpellOnCD("Swiftmend")) and (not HasForm()) then
                 		if (partyMember:HasBuff("Regrowth")) or (partyMember:HasBuff("Rejuvenation")) then
 					if (partyMemberHP < 30) then
                             			if (CastHeal("Swiftmend", partyMember)) then
@@ -64,7 +64,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
                		end
                 
                 	-- natures swiftness
-                	if (HasSpell("Nature's Swiftness")) and (not localObj:HasBuff("Nature's Swiftness")) and (leaderObj:GetHealthPercentage() < 30) then
+                	if (HasSpell("Nature's Swiftness")) and (not localObj:HasBuff("Nature's Swiftness")) and (leaderObj:GetHealthPercentage() < 30)   and (not HasForm()) then
                 		if (not IsSpellOnCD("Nature's Swiftness")) and (localMana > 10) then
                 	        	if (not partyMember:IsInLineOfSight()) then 											script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
                 	        	    return true;
@@ -77,7 +77,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
                 	end
 
                 	-- regrowth
-                	if (self.clickRegrowth) then
+                	if (self.clickRegrowth) and (not HasForm()) then
                 		if (HasSpell("Regrowth")) and (not partyMember:HasBuff("Regrowth")) and (partyMemberHP < self.regrowthHealth) and (localMana > self.regrowthMana) then
                        			if (not partyMember:IsInLineOfSight()) then 											script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
                         	    		return true;
@@ -90,7 +90,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
                 	end
 
                 	-- rejuvenation
-                	if (HasSpell("Rejuvenation")) and (not partyMember:HasBuff("Rejuvenation")) and (partyMemberHP < self.rejuvenationHealth) and (localMana > self.rejuvenationMana) then
+                	if (HasSpell("Rejuvenation")) and (not partyMember:HasBuff("Rejuvenation")) and (partyMemberHP < self.rejuvenationHealth) and (localMana > self.rejuvenationMana) and (not HasForm()) then
                 		if (not partyMember:IsInLineOfSight()) then 											script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
                 	                return true;
                 	    	end -- move to member
@@ -102,7 +102,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
 
                 	-- healing touch if has regrowth
 			if (self.clickHealingTouch) then
-				if (HasSpell("Healing Touch")) and (partyMember:HasBuff("Regrowth")) and (partyMemberHP < self.healingTouchHealth) and (localMana > self.healingTouchMana) then
+				if (HasSpell("Healing Touch")) and (partyMember:HasBuff("Regrowth")) and (partyMemberHP < self.healingTouchHealth) and (localMana > self.healingTouchMana) and (not HasForm()) then
 					if (not partyMember:IsInLineOfSight()) then 											script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
                 	        	    return true;
 					end -- move to member
@@ -114,7 +114,7 @@ function script_druidFollowerHeals:HealsAndBuffs()
 			end
 
 			-- low level healing touch
-			if (not HasSpell("Regrowth")) then
+			if (not HasSpell("Regrowth")) and (not HasForm()) then
 				if (partyMemberHP < self.healingTouchHealth) and (localMana > self.healingTouchMana) then
 					if (not partyMember:IsInLineOfSight()) then 											script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
                 	        		return true;

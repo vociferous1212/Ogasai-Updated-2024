@@ -47,7 +47,6 @@ script_mage = {
 	waitTimer = GetTimeEX(),	-- set wait timer variable. probably not needed?
 	rangeDistance = 38,
 	moveAwayRest = false,
-
 }
 
 function script_mage:window()
@@ -116,6 +115,7 @@ function script_mage:isAddPolymorphed() -- check polymorph
 				return true; 
 			else
 				script_mage.addPolymorphed = false;
+				return false;
 			end
 		end
 		currentObj, typeObj = GetNextObject(currentObj); 
@@ -153,7 +153,7 @@ end
 -- Run backwards if the target is within range
 function script_mage:runBackwards(targetObj, range) 
 	local localObj = GetLocalPlayer();
-	script_grind.tickRate = 135;
+	script_grind.tickRate = 75;
  	if targetObj ~= 0 then
  		local xT, yT, zT = targetObj:GetPosition();
  		local xP, yP, zP = localObj:GetPosition();
@@ -169,7 +169,7 @@ function script_mage:runBackwards(targetObj, range)
  			if (script_navEX:moveToTarget(localObj, moveX, moveY, moveZ)) then
  				return true;
 			end
-		return true;
+		return;
 		end
 	end
 
@@ -366,9 +366,9 @@ function script_mage:run(targetGUID)
 		and (not IsChanneling())
 		and (not localObj:IsStunned())
 	then
-		if (script_checkDebuffs:hasSilence()
-			or IsSpellOnCD("Frostbolt")
-			or IsSpellOnCD("Fireball")) 
+		if (script_checkDebuffs:hasSilence())
+			and (IsSpellOnCD("Frostbolt")
+			or IsSpellOnCD("Fireball")) and (not IsMoving())
 		then
 			if (targetObj ~= 0)
 				and (targetObj ~= nil)
@@ -381,7 +381,7 @@ function script_mage:run(targetGUID)
 			end
 		end
 	end
-		
+
 	-- dismount before combat
 	if (IsMounted()) then
 		DisMount();
@@ -390,7 +390,7 @@ function script_mage:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (targetObj ~= nil) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) then
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not PlayerHasTarget()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				return;
@@ -482,6 +482,16 @@ function script_mage:run(targetGUID)
 			-- check racial spells
 			CheckRacialSpells();
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
 			-- blink on movement stop debuffs
 			if (HasSpell("Blink")) and (not IsSpellOnCD("Blink")) then
 				if (script_checkDebuffs:hasDisabledMovement()) then
@@ -516,8 +526,8 @@ function script_mage:run(targetGUID)
 					if (not IsSpellOnCD("Fire Blast")) then
 						CastSpellByName("Fire Blast", targetObj);
 						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 1500;
-						script_grind:setWaitTimer(1600);
+						self.waitTimer = GetTimeEX() + 1750;
+						script_grind:setWaitTimer(1750);
 						return 0;
 					end
 				end
@@ -566,6 +576,7 @@ function script_mage:run(targetGUID)
 			if (GetNumPartyMembers() < 1) and (self.useFrostNova) then
 				if (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova")) and (targetHealth > 10 or localHealth < 35) and (not localObj:HasBuff('Evocation')) and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (targetObj:IsInLineOfSight()) then
 					script_grind.tickRate = 0;
+					self.tickRate = 250;
 
 					if (script_mage:runBackwards(targetObj, 8)) then -- Moves if the target is closer than 7 yards
 
@@ -574,7 +585,7 @@ function script_mage:run(targetGUID)
 							CastSpellByName("Frost Nova");
 							return;
 						end
-						if (targetObj:GetDistance() > 7) and (not IsMoving()) then
+						if (targetObj:GetDistance() >= 8) and (not IsMoving()) then
 							targetObj:FaceTarget();
 						end
 					return 4;
@@ -767,7 +778,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Wand if mana or target health is low
-			if (self.useWand and localObj:HasRangedWeapon()) and (localMana <= self.useWandMana or targetHealth <= self.useWandHealth) and (not IsChanneling()) and (not localObj:IsStunned()) then
+			if (self.useWand and localObj:HasRangedWeapon()) and (localMana <= self.useWandMana or targetHealth <= self.useWandHealth) and (not IsChanneling()) and (not localObj:IsStunned()) and (not IsMoving()) then
 				self.message = "Using wand...";
 				if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) then
 					targetObj:FaceTarget();
@@ -801,15 +812,17 @@ function script_mage:run(targetGUID)
 			end
 			
 					-- check range
-					if (not targetObj:IsSpellInRange("Frostbolt")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
+					if (not targetObj:IsSpellInRange("Frostbolt")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) and not (targetObj:HasDebuff("Polymorph")) then
 						return 3;
 					end
 
-					if (CastSpellByName("Frostbolt", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1500;
-						return 0;
+					if (not IsMoving()) then
+						if (CastSpellByName("Frostbolt", targetObj)) then
+							self.waitTimer = GetTimeEX() + 1850;
+							script_grind:setWaitTimer(1850);
+							return 0;
+						end
 					end
-			
 				end	
 			end
 
@@ -871,8 +884,8 @@ function script_mage:run(targetGUID)
 				
 				-- cast frostbolt
 				if (CastSpellByName("Frostbolt", targetObj)) then
-					script_grind:setWaitTimer(1500);
-					self.waitTimer = GetTimeEX() + 1500;
+					script_grind:setWaitTimer(1650);
+					self.waitTimer = GetTimeEX() + 1650;
 					return 0;
 				end
 			end
@@ -886,7 +899,7 @@ function script_mage:run(targetGUID)
 				local tickRandom = random(350, 650);
 
 			if (IsMoving()) or (not IsInCombat()) and (not localObj:IsCasting()) then
-				script_grind.tickRate = 135;
+				script_grind.tickRate = 155;
 			elseif (not IsInCombat()) and (not IsMoving()) or (localObj:IsCasting()) then
 				script_grind.tickRate = tickRandom
 			elseif (IsInCombat()) and (not IsMoving()) or (localObj:IsCasting()) then
@@ -1013,7 +1026,7 @@ if (not IsMounted()) then
 				return true;
 			end
 	
-			if (not IsStanding()) then
+			if (not IsStanding()) and (not IsInCombat()) then
 				JumpOrAscendStart();
 			end
 
@@ -1184,7 +1197,9 @@ if (not IsMounted()) then
 	if (IsDrinking() and localMana >= 95 and not IsEating())
 	or (IsEating() and localHealth >= 95 and not IsDrinking())
 	or (IsDrinking() and IsEating() and localHealth >= 95 and localMana >= 95) then
-		JumpOrAscendStart();
+		if (not IsInCombat()) then
+			JumpOrAscendStart();
+		end
 	end
 	
 	if (IsDrinking() or IsEating()) then

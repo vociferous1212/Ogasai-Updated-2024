@@ -347,8 +347,8 @@ function script_helper:drinkWater()
 	for i=0,self.numWater do
 		if (HasItem(self.water[i])) then
 			if (UseItem(self.water[i])) then
-				self.waitTimer = GetTimeEX() + 1200;
-				script_grind:setWaitTimer(1200);
+				self.waitTimer = GetTimeEX() + 1600;
+				script_grind:setWaitTimer(1600);
 				return true;
 			end
 		end

@@ -24,6 +24,7 @@ script_rotation = {
 	meleeDistance = 4,
 	aggroRangeTank = 50,
 	adjustTickRate = false,
+	drawChests = true,
 }
 
 function script_rotation:setup()
@@ -32,30 +33,28 @@ function script_rotation:setup()
 	self.isSetup = true;
 end
 
-function script_rotation:window()
-
+function script_rotation:window() -- stuff here runs continous
 	EndWindow();
-
 	if(NewWindow("Rotation", 320, 300)) then 
 		script_rotationMenu:menu(); 
+	end
+	-- draw chests
+	if (self.drawChests) then
+		script_gather:drawChestNodes();
+	end
+	if (self.useExpChecker) then
+		script_expChecker:menu();
 	end
 end
 
 function script_rotation:run()
-	
 	if (not self.isSetup) then 
 		script_rotation:setup(); 
 	end
-
 	if (script_rotationMenu.pause) then 
 		self.message = "Paused by user..."; 
 		return; 
 	end
-
-	if (self.useExpChecker) then
-		script_expChecker:menu();
-	end
-	
 	local partyMana = GetLocalPlayer():GetManaPercentage();
 	local partyHealth = GetLocalPlayer():GetHealthPercentage();
 	for i = 1, GetNumPartyMembers()+1 do
@@ -64,19 +63,14 @@ function script_rotation:run()
 			then partyMember = GetLocalPlayer();
 		end
 	end
-	
 	localObj = GetLocalPlayer();
-
 	if (IsCasting() or IsChanneling()) then 
 		return; 
 	end
-	
 	if(self.timer > GetTimeEX()) then
 		return;
 	end
-
 	self.timer = GetTimeEX() + self.tickRate;
-	
 	if (not self.adjustTickRate) then
 			local tickRotationRandom = random(400, 1200);
 		if (not GetLocalPlayer():GetUnitsTarget() == 0) or (IsMoving()) then

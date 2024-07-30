@@ -54,7 +54,7 @@ script_warlock = {
 	useDeathCoil = false,
 	hasHealthstone = false,
 	varUsed = false,
-	waitAfterCombat = true,
+	waitAfterCombat = false,
 	feelingLucky = false,
 	howLucky = 3,
 }
@@ -328,6 +328,12 @@ function script_warlock:run(targetGUID)
 	-- don't attack dead targets
 	if (localObj:IsDead()) then
 		return 0;
+	end
+
+	-- wait for pet health low level
+	if (HasPet() and GetPet():GetHealthPercentage() > 1 and GetPet():GetHealthPercentage() < 75) and (not IsInCombat()) and (not HasSpell("Health Funnel")) then
+		self.message = "Waiting for pet health > 75";
+		return 4;
 	end
 
 	-- force bot to attack pets target
@@ -671,6 +677,16 @@ function script_warlock:run(targetGUID)
 		local petHasTarget = GetPet():GetUnitsTarget();
 	end
 		local playerHasTarget = GetLocalPlayer():GetUnitsTarget();
+
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
 
 	-- force bot to attack pets target
 	if (GetNumPartyMembers() == 0) and (self.waitAfterCombat) and (IsInCombat()) and (GetPet() ~= 0 and GetPet():GetHealthPercentage() > 1) and (playerHasTarget == 0) and (self.hasPet) then

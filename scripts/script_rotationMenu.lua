@@ -86,5 +86,7 @@ function script_rotationMenu:menu()
 		Text("Aggro Circle Range");
 		script_rotation.aggroRangeTank = SliderInt("AR", 36, 300, script_rotation.aggroRangeTank);
 	end
+
+	wasClicked, script_rotation.drawChests = Checkbox("Draw Chests", script_rotation.drawChests);
 		
 end

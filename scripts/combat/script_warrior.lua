@@ -394,6 +394,16 @@ function script_warrior:run(targetGUID)	-- main content of script
 			return 0;
 			end
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
 			-- Check move into melee range
 			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
 				return 3;

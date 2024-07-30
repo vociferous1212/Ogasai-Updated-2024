@@ -283,12 +283,14 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				PetFollow();
 			end
 
-		return;
+		return true;
 		end
-	currentObj, typeObj = GetNextObject(currentObj);
+		currentObj, typeObj = GetNextObject(currentObj);
+		return true;
 
 
 	end
+	currentObj, typeObj = GetNextObject(currentObj);
 	return false;
 end
 

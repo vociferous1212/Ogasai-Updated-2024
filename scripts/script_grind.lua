@@ -22,7 +22,7 @@ script_grind = {
 	drawStatusScript = include("scripts\\script_drawStatus.lua"),
 	omLoaded = include("scripts\\script_om.lua"),
 	jump = true,	-- enable jumping out of combat
-	jumpRandomFloat = 96,	-- jump > than 
+	jumpRandomFloat = 98,	-- jump > than 
 	useVendor = true,	-- use vendor
 	repairWhenYellow = true,	-- repair when yellow
 	stopWhenFull = false,	-- stop when bags are full
@@ -33,7 +33,7 @@ script_grind = {
 	enemyObj = nil,	-- enemyObj stops a bug
 	lootObj = nil,	-- lootObj stops a bug
 	timer = GetTimeEX(),	-- blacklist timer
-	tickRate = 100,		-- reaction time / speed of scripts
+	tickRate = 1550,		-- reaction time / speed of scripts
 	waitTimer = GetTimeEX(),	-- wait timer
 	pullDistance = 225,	-- find target distance
 	avoidElite = true,	-- avoid elites ( currently not working )
@@ -136,6 +136,7 @@ script_grind = {
 	hotspotReachedDistance = 50,
 	nodeTimer = GetTimeEX(),
 	useRandomNode = true,
+	drawChests = true,
 }
 
 function script_grind:setup()
@@ -160,6 +161,14 @@ function script_grind:setup()
 		self.drawUnits = false;
 		self.useExpChecker = false;
 		
+	end
+
+	if (strfind("Hunter", class)) then
+		script_hunter.waitAfterCombat = true;
+	end
+
+	if (strfind("Warlock", class)) then
+		script_warlock.waitAfterCombat = true;
 	end
 	
 	-- No refill as mage or at level 1
@@ -252,16 +261,16 @@ function script_grind:setup()
 		script_checkAdds.addsRange = 15;
 	end
 	if (level >= 10) and (level < 20) then
-		script_checkAdds.addsRange = 18;
+		script_checkAdds.addsRange = 20;
 	end
 	if (level >= 20) and (level < 40) then
-		script_checkAdds.addsRange = 21;
+		script_checkAdds.addsRange = 23;
 	end
 	if (level > 40) then
-		script_checkAdds.addsRange = 24;
+		script_checkAdds.addsRange = 25;
 	end
 	if (level == 60) then
-		script_checkAdds.addsRange = 27;
+		script_checkAdds.addsRange = 28;
 	end
 
 end
@@ -334,6 +343,11 @@ function script_grind:run()
 	-- display exp checker
 	if (self.useExpChecker) and (IsInCombat()) then
 		script_expChecker:menu();
+	end
+	
+	-- draw chests
+	if (self.drawChests) then
+		script_gather:drawChestNodes();
 	end
 
 	-- logout timer
@@ -469,13 +483,28 @@ function script_grind:run()
 			script_grind.tickRate = 0;
 			script_grind.waitTimer = GetTimeEX();
 			self.message = "Moving away from target...";
-			if (GetLocalPlayer():GetUnitsTarget():GetDistance() > 7) and (not IsMoving()) then
+			if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
 				GetLocalPlayer():GetUnitsTarget():FaceTarget();
 			end
 		return;
 		end
 	end
 	end
+	-- run backwards target has entangling roots
+	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetManaPercentage() >= 25) then
+		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Entangling Roots")) and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
+		if (script_druid:runBackwards(targetObj, 10)) then -- Moves if the target is closer than 7 yards
+			script_grind.tickRate = 0;
+			script_grind.waitTimer = GetTimeEX();
+			self.message = "Moving away from target...";
+			if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
+				GetLocalPlayer():GetUnitsTarget():FaceTarget();
+			end
+		return;
+		end
+	end
+	end
+
 
 	-- delete items
 	if (script_helper:deleteItem()) then
@@ -650,14 +679,17 @@ function script_grind:run()
 		end
 		
 		-- Gather
-		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) then
+		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) then
 			if (script_gather:gather()) then
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 135;
 				end
 
 				self.message = 'Gathering ' .. script_gather:currentGatherName() .. '...';
-				return;
+				if (IsLooting()) then
+					script_grind:setWaitTimer(1500);
+				end
+			return true;
 			end
 		end
 
@@ -740,18 +772,18 @@ function script_grind:run()
 				self.enemyObj:AutoAttack();
 			end
 			-- Fix bug, when not targeting correctly
-			if (self.lastTarget ~= self.enemyObj:GetGUID()) then
+			if (self.lastTarget ~= self.enemyObj:GetGUID()) and (not IsMoving()) then
 				self.newTargetTime = GetTimeEX();
 				ClearTarget();
 			-- blacklist the target if we had it for a long time and hp is high
 			elseif (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime and self.enemyObj:GetHealthPercentage() > 92) then
 				script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
+				self.newTargetTime = 10000;
 				ClearTarget();
-				return;
 			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
 			end
-
+			-- we are stuck trying to target a mob. let's force move until we can find another target
 			if (not IsMoving()) and (not IsInCombat()) and (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime) then
 			local mx, my, mz = GetLocalPlayer():GetPosition();
 			Move(mx+5, my+5, mz);
@@ -802,6 +834,18 @@ function script_grind:run()
 			self.message = "waiting after combat - stuck in combat";
 			return;
 		end
+		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 or not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 10) then
+			self.message = "Waiting after combat - stuck in combat";
+			if (IsMoving()) then
+				StopMoving();
+			end
+			--ClearTarget();
+			--self.enemyObj = nil;
+			script_grind:setWaitTimer(1000);
+			return;
+		end
+
+
 		-- Finish loot before we engage new targets or navigate - return
 		if (self.lootObj ~= nil and not IsInCombat()) then
 			return; 
@@ -850,7 +894,7 @@ function script_grind:run()
 
 
 	-- in combat phase or we have an enemy
-		if (self.enemyObj ~= nil or IsInCombat()) then
+		if (self.enemyObj ~= nil or self.enemyObj ~= 0) then
 
 			-- don't avoid our current target check adds script
 			self.lastAvoidTarget = self.enemyObj;
@@ -925,7 +969,7 @@ function script_grind:run()
 			end
 
 			-- monster kill variable on and off
-			if (self.enemyObj ~= nil) and (not self.useAnotherVar) then
+			if (self.enemyObj ~= nil and self.enemyObj ~= 0) and (not self.useAnotherVar) then
 				if (self.enemyObj:GetHealthPercentage() <= 20 or self.enemyObj:IsDead()) then
 					self.monsterKillCount = self.monsterKillCount + 1;
 					self.useAnotherVar = true;
@@ -933,6 +977,11 @@ function script_grind:run()
 			end
 
 		-- check return combat errors
+
+			-- clear own player if targeted for some reason
+			if (PlayerHasTarget()) and (IsInCombat()) and (GetLocalPlayer():GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID()) then
+				ClearTarget();
+			end
 			
 			-- In range: attack the target, combat script returns 0 STOP MOVING
 			if (self.combatError == 0) then
@@ -970,8 +1019,8 @@ function script_grind:run()
 				local localObj = GetLocalPlayer();
 
 				-- adjust tick rate to make targeting and movement quicker
-				if (not script_grind.adjustTickRate) and (PlayerHasTarget()) then
-					script_grind.tickRate = 75;
+				if (not script_grind.adjustTickRate) and (PlayerHasTarget() and (script_grind:isTargetingMe(self.enemyObj) or targetObj:GetHealthPercentage() < 20)) then
+					script_grind.tickRate = 50;
 				end
 
 				-- if we have a valid position coordinates
@@ -1287,7 +1336,7 @@ function script_grind:assignTarget()
 		if (GetTarget() ~= 0) then
 
 			-- need to check for loot first...
-			--script_grind.tickRate = 100;
+			script_grind.tickRate = 100;
 
 			-- return target
 			return GetTarget();
@@ -1444,7 +1493,7 @@ function script_grind:enemyIsValid(i)
 		end
 
 	-- add target to blacklist not a safe pull from aggro script
-		if (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) then	
+		if (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) then	
 			script_grind:addTargetToBlacklist(i:GetGUID());
 		end
 		
@@ -1530,6 +1579,7 @@ function script_grind:enemyIsValid(i)
 			if (not i:IsDead() and i:CanAttack() and not i:IsCritter()
 			and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
 			and i:GetDistance() < self.pullDistance and (not i:IsTapped() or i:IsTappedByMe())
+			and not (script_grind:isTargetHardBlacklisted(i:GetGUID()))
 			and not (self.skipUnknown and i:GetCreatureType() == 'Not specified')
 			and not (self.skipHumanoid and i:GetCreatureType() == 'Humanoid')
 			and not (self.skipDemon and i:GetCreatureType() == 'Demon')
@@ -1678,7 +1728,7 @@ function script_grind:doLoot(localObj)
 	local localObj = GetLocalPlayer();
 
 		if (not self.adjustTickRate) then
-			script_grind.tickRate = 135;
+			script_grind.tickRate = 105;
 		end
 
 
@@ -1776,7 +1826,7 @@ function script_grind:doLoot(localObj)
 	-- move to loot object
 	self.message = "Moving to loot...";		
 	script_navEX:moveToTarget(localObj, _x, _y, _z);	
-	script_grind:setWaitTimer(self.nextToNodeDist * 10);
+	script_grind:setWaitTimer(self.nextToNodeDist * 5);
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
@@ -1882,7 +1932,7 @@ function script_grind:runRest()
 
 		-- set tick rate for resting
 		if (not script_grind.adjustTickRate) then
-			local randomRestTick = math.random(1200, 1600);
+			local randomRestTick = math.random(600, 1200);
 			script_grind.tickRate = randomRestTick;
 		end
 

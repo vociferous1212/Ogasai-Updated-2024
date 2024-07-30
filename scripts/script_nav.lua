@@ -186,7 +186,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	script_grind.tickRate = 135;
 
 	script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-	
+
 	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
 

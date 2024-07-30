@@ -13,7 +13,7 @@ script_grindMenu = {
 	grindPartyMenuIncluded = include("scripts\\script_grindPartyMenu.lua"),
 	counterMenuIncluded = include("scripts\\script_counterMenu.lua"),
 	debugMenuIncluded = include("scripts\\script_debugMenu.lua"),
-
+	showIDD = false,
 	debugMenu = false,
 	useHotSpotArea = true,
 	selectedWalkPath = false,
@@ -293,6 +293,8 @@ function script_grindMenu:menu()
 		wasClicked, script_grind.drawAutoPath = Checkbox('Display Auto-Path Nodes', script_grind.drawAutoPath);
 		wasClicked, script_grind.drawPath = Checkbox('Display Move Path', script_grind.drawPath);
 		wasClicked, script_grind.drawGather = Checkbox('Display Gather Nodes', script_grind.drawGather);
+			SameLine();
+			wasClicked, self.showIDD = Checkbox("Show Item ID's", self.showIDD);
 		wasClicked, self.debugMenu = Checkbox("Display Debug Stuff", self.debugMenu);
 	end
 
@@ -303,5 +305,8 @@ function script_grindMenu:menu()
 	end
 
 	script_counterMenu:menu();
+
+	wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
+
 	
 end

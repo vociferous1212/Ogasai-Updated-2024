@@ -476,6 +476,16 @@ function script_priest:run(targetGUID)
 			-- Dismount
 			if (IsMounted()) then DisMount(); end
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
 			if (targetObj:IsInLineOfSight() and not IsMoving()) then
 				if (targetObj:GetDistance() <= 32) and (targetObj:IsInLineOfSight()) and (script_grind:isTargetingMe(targetObj)) then
 					targetObj:FaceTarget();

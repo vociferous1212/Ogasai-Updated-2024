@@ -18,9 +18,36 @@ script_gather = {
 	blacklistedNode = {},
 	blacklistedNum = 0,
 	blacklistTime = GetTimeEX(),
-	timerSet = false;
+	timerSet = false,
 	nodeGUID = 0,
+	chests = {},
+	numChests = 0,
+	lock = {},
+	numLock = 0,
+	fish = {},
+	numFish = 0,
 }
+
+function script_gather:addChest(name, id)
+	self.chests[self.numChests] = {};
+	self.chests[self.numChests][0] = name;
+	self.chests[self.numChests][1] = id;
+	self.numChests = self.numChests + 1;
+end
+
+function script_gather:addLock(name, id)
+	self.lock[self.numLock] = {};
+	self.lock[self.numLock][0] = name;
+	self.lock[self.numLock][1] = id;
+	self.numLock = self.numLock + 1;
+end
+
+function script_gather:addFish(name, id)
+	self.fish[self.numFish] = {};
+	self.fish[self.numFish][0] = name;
+	self.fish[self.numFish][1] = id;
+	self.numFish = self.numFish + 1;
+end
 
 function script_gather:addHerb(name, id, use, req)
 	self.herbs[self.numHerbs] = {}
@@ -87,6 +114,47 @@ function script_gather:setup()
 	script_gather:addMineral('Dark Iron Deposit', 2571, false, 230);
 	script_gather:addMineral('Small Thorium Vein', 3951, false, 230);
 	script_gather:addMineral('Rich Thorium Vein', 3952, false, 255);
+
+	script_gather:addChest("Duskwood Chest", 123214);
+	script_gather:addChest("Adamantite Bound Chest", 181802);
+	script_gather:addChest("Battered Chest", 259);
+	script_gather:addChest("Battered Chest", 2843);
+	script_gather:addChest("Battered Chest", 2844);
+	script_gather:addChest("Battered Chest", 2849);
+	script_gather:addChest("Battered Chest", 106318);
+	script_gather:addChest("Battered Chest", 106319);
+	script_gather:addChest("Primitive Chest", 184793);
+	script_gather:addChest("Large Iron Bound Chest", 74447);
+	script_gather:addChest("Large Iron Bound Chest", 75297);
+	script_gather:addChest("Large Iron Bound Chest", 75296);
+	script_gather:addChest("Large Iron Bound Chest", 75295);
+	script_gather:addChest("Bound Fel Iron Chest", 184934);
+	script_gather:addChest("Bound Fel Iron Chest", 184932);
+	script_gather:addChest("Bound Fel Iron Chest", 184931);
+	script_gather:addChest("Large Mithril Bound Chest", 153468);
+	script_gather:addChest("Large Mithril Bound Chest", 153469);
+	script_gather:addChest("Large Mithril Bound Chest", 131978);
+	script_gather:addChest("Bound Adamantite Chest", 184940);
+	script_gather:addChest("Bound Adamantite Chest", 184938);
+	script_gather:addChest("Bound Adamantite Chest", 184936);
+	script_gather:addChest("Fel Iron Chest", 181798);
+	script_gather:addChest("Heavy Fel Iron Chest", 181800);
+	script_gather:addChest("Large Battered Chest", 75293);
+	script_gather:addChest("Large Duskwood Chest", 131979);
+	script_gather:addChest("Large Solid Chest", 74448);
+	script_gather:addChest("Large Solid Chest", 75298);
+	script_gather:addChest("Large Solid Chest", 75299);
+	script_gather:addChest("Large Solid Chest", 75300);
+	script_gather:addChest("Large Solid Chest", 153462);
+	script_gather:addChest("Large Solid Chest", 153463);
+	script_gather:addChest("Large Solid Chest", 153464);
+
+	script_gather:addLock("Battered Footlocker", 5743);
+
+	script_gather:addFish("Floating Wreckage", 6434);
+	script_gather:addFish("Safefish School", 6435);
+	script_gather:addFish("Firefin Snapper School", 6482);
+	script_gather:addFish("Oily Blackmouth School", 6291);
 
 	
 	self.timer = GetTimeEX();
@@ -167,29 +235,95 @@ function script_gather:GetNode()
 	return bestTarget;
 end
 
+function script_gather:drawChestNodes()
+
+	local targetObj, targetType = GetFirstObject();
+	while targetObj ~= 0 do
+		if (targetType == 5) then 
+			local id = targetObj:GetObjectDisplayID();
+			local chestName = "";
+			local _x, _y, _z = targetObj:GetPosition();
+			local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);
+			local dist = math.floor(targetObj:GetDistance());
+
+			if(onScreen) then
+
+				-- show chests by name
+				for i=0,self.numChests - 1 do
+					if (self.chests[i][1] == id) then
+						chestName = "*"..self.chests[i][0].."*";
+						local this = ""..dist.." yd";
+						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
+					end
+				end
+	
+				-- draw chests by name
+				DrawText(chestName, _tX-25, _tY, 0, 255, 0);
+
+			end
+		end
+	targetObj, targetType = GetNextObject(targetObj);
+	end
+end
+
 function script_gather:drawGatherNodes()
 
 local targetObj, targetType = GetFirstObject();
 	while targetObj ~= 0 do
-		if (targetType == 5 and targetObj:IsGatherNode()) then 
+		if (targetType == 5) then 
 			local id = targetObj:GetObjectDisplayID();
-			local name = 'Gather Node';
+			local name = "";
+			local chestName = "";
 			local _x, _y, _z = targetObj:GetPosition();
 			local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);
+			local dist = math.floor(targetObj:GetDistance());
+
 			if(onScreen) then
 				for i=0,self.numHerbs - 1 do
 					if (self.herbs[i][1] == id) then
 						name = self.herbs[i][0];
+						local this = ""..dist.." yd";
+						DrawText(this, _tX-10, _tY+12, 255, 255, 0);
 					end
 				end
 
 				for i=0,self.numMinerals - 1 do
 					if (self.minerals[i][1] == id) then
 						name = self.minerals[i][0];
+						local this = ""..dist.." yd";
+						DrawText(this, _tX-10, _tY+12, 255, 255, 0);
+				
 					end
 				end
-					
+
+				-- show chests by name
+				for i=0,self.numChests - 1 do
+					if (self.chests[i][1] == id) then
+						chestName = "*"..self.chests[i][0].."*";
+						local this = ""..dist.." yd";
+						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
+					end
+				end
+
+				-- armor crates
+				--if (id == 335) then
+				--	local this = ""..dist.." yd";
+				--	local crateName = "Armor Crate";
+				--	DrawText(crateName, _tX-10, _tY, 0, 255, 0);
+				--	DrawText(this, _tX-10, _tY+12, 0, 255, 0);
+				--end
+	
+				-- draw herbs and minerals by name
 				DrawText(name, _tX-10, _tY, 255, 255, 0);
+				-- draw chests by name
+				DrawText(chestName, _tX-25, _tY, 0, 255, 0);
+
+				if (script_grindMenu.showIDD) then
+					if (id ~= 192) and (id ~= 0) and (id ~= 386) then
+						local idd = "ID - "..id.."";
+						DrawText(idd, _tX-10, _tY-12, 255, 255, 0);
+					end
+				end
 			end
 		end
 		targetObj, targetType = GetNextObject(targetObj);
@@ -243,31 +377,33 @@ function script_gather:gather()
 		--self.nodeGUID = self.nodeObj:GetGUID();
 
 
-		if(dist <= self.lootDistance) then
-			if(IsMoving()) then
+		if (dist < self.lootDistance) then
+			if (IsMoving()) then
 				StopMoving();
 				self.timer = GetTimeEX() + 950;
 				return true;
 			end
 
-			if(not IsLooting() and not IsChanneling()) and (not IsMoving()) then
+			if (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
 				self.nodeObj:GameObjectInteract();
 				self.timer = GetTimeEX() + 1650;
 				return true;
 			end
 
-			if (not LootTarget()) and (self.nodeObj:GameObjectInteract()) and (not IsMoving()) then
+			if (not LootTarget()) and (self.nodeObj:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
 				self.timer = GetTimeEX() + 4550;
+				script_grind:setWaitTimer(5000);
 			end
 
 			if (IsLooting()) then
-				if (LootTarget()) then
+				self.waitTimer = GetTimeEX() + 2500;
+				if (LootTarget()) or (IsLooting()) then
 					if (self.collectHerbs) then
-						self.waitTimer = GetTimeEX() + 1200;
+						self.waitTimer = GetTimeEX() + 2500;
 						script_grind:setWaitTimer(5000);
 					end
 				end
-				LootTarget();
+				
 
 				--if (self.timerSet) then
 				--	self.timerSet = false;

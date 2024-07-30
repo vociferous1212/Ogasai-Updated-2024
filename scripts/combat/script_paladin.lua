@@ -246,6 +246,16 @@ function script_paladin:run(targetGUID)
 				DisMount();
 			end
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
 			if (not targetObj:IsFleeing()) and (targetObj:GetDistance() < self.meleeDistance) then
 				if (IsMoving()) then
 					StopMoving();

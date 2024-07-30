@@ -578,6 +578,16 @@ function script_shaman:run(targetGUID)
 	
 			self.message = "Killing " .. targetObj:GetUnitName() .. "...";
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+						ClearTarget();
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
 			-- Check if we are in melee range
 			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
 				return 3;

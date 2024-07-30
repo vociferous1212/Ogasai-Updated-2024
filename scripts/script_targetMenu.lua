@@ -46,7 +46,7 @@ function script_targetMenu:menu()
 			if (UnitClass('player') ~= "Shaman") then
 				
 				Text("Move Away From Adds In Combat Range");
-				script_checkAdds.addsRange = SliderInt("Distance", 15, 40, script_checkAdds.addsRange);
+				script_checkAdds.addsRange = SliderInt("Distance", 7, 40, script_checkAdds.addsRange);
 
 			elseif (UnitClass('player') == "Shaman")
 				and (not script_shaman.useEarthTotem)
@@ -55,7 +55,7 @@ function script_targetMenu:menu()
 				and (not script_shaman.useAirTotem) then
 
 				Text("Move Away From Adds In Combat Range");
-				script_checkAdds.addsRange = SliderInt("Add Range", 15, 40, script_checkAdds.addsRange);
+				script_checkAdds.addsRange = SliderInt("Add Range", 10, 40, script_checkAdds.addsRange);
 			end
 			if (UnitClass('player') == "Shaman") then
 				if (script_shaman.useEarthTotem)
