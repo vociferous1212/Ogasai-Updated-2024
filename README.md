@@ -1,6 +1,8 @@
  # oGasai Scripts for WoW Classic
  Ogasaism
 
+ Current known bugs - druid double casts heals, checkbox to avoid blacklisted targets causes bot to walk circles around the target with no clear path to continue grinding, no ability to blacklist herbs or minerals when gathering, sometimes when creating a new hotspot (while moving) the bot does not understand you are at a hotspot and need to manually move out of range or change hotspots to resolve
+
 A good idea to get a decent injector.
  https://remotedll.en.lo4d.com/windows
 
