@@ -305,10 +305,12 @@ function script_druid:healsAndBuffs()
 			script_grind:setWaitTimer(1550);
 			return true;
 		end
-		if (CastSpellByName("Healing Touch", localObj)) then
-			self.waitTimer = GetTimeEX() + 3000;
-			script_grind:setWaitTimer(3000);
-			return true;
+		if (not IsCasting()) and (not IsChanneling()) then
+			CastSpellByName("Healing Touch", localObj);
+				self.waitTimer = GetTimeEX() + 3000;
+				script_grind:setWaitTimer(3000);
+				return true;
+			
 		end
 		return;
 	end
@@ -324,10 +326,11 @@ function script_druid:healsAndBuffs()
 			script_grind:setWaitTimer(500);
 			return true;
 		end
-		if (CastSpellByName("Healing Touch", localObj)) then
-			self.waitTimer = GetTimeEX() + 2700;
-			script_grind:setWaitTimer(2700);
-			return true;
+		if (not IsCasting()) and (not IsChanneling()) then
+			CastSpellByName("Healing Touch", localObj);
+				self.waitTimer = GetTimeEX() + 2700;
+				script_grind:setWaitTimer(2700);
+				return true;
 		end
 	end
 
@@ -439,10 +442,12 @@ function script_druid:healsAndBuffs()
 		-- Healing Touch
 		if (HasSpell("Healing Touch")) and (not IsLooting()) and (IsStanding()) then
 			if (localHealth <= self.healingTouchHealth) and (localMana >= 25) and (not IsSpellOnCD("Healing Touch")) then
-				if (CastHeal("Healing Touch", localObj)) then
-					self.waitTimer = GetTimeEX() + 2300;
-					script_grind:setWaitTimer(2300);
-					return true;
+				if (not IsCasting()) and (not IsChanneling()) then
+					if (CastHeal("Healing Touch", localObj)) then
+						self.waitTimer = GetTimeEX() + 2300;
+						script_grind:setWaitTimer(2300);
+						return true;
+					end
 				end
 			end
 		end
@@ -494,19 +499,22 @@ function script_druid:healsAndBuffs()
 
 	-- if we have regrowth and rejuvenation and 2 or more targets are attacking us then cast healing touch
 	if (HasSpell("Regrowth")) and (hasRegrowth) and (hasRejuv) and (script_grind:enemiesAttackingUs(10) > 2) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < self.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
+		if (not IsCasting()) and (not IsChanneling()) then
 
-		if (CastSpellByName("Healing Touch", localObj)) then
-			self.waitTimer = GetTimeEX() + 2700;
-			script_grind:setWaitTimer(2700);
+				CastSpellByName("Healing Touch", localObj);
+				self.waitTimer = GetTimeEX() + 2700;
+				script_grind:setWaitTimer(2700);
 		end
 	end
 
 	-- force healing touch in combat??
 	if (not HasSpell("Regrowth")) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < self.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
 
-		if (CastSpellByName("Healing Touch", localObj)) then
-			self.waitTimer = GetTimeEX() + 2700;
-			script_grind:setWaitTimer(2700);
+		if (not IsCasting()) and (not IsChanneling()) then
+			CastSpellByName("Healing Touch", localObj);
+				self.waitTimer = GetTimeEX() + 2700;
+				script_grind:setWaitTimer(2700);
+			
 		end
 	end
 
@@ -595,6 +603,14 @@ function script_druid:run(targetGUID)
 		return 4;
 	end
 
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM();
+				return true;
+			end
+		end
+
+
 	-- run backwards if target is entangled
 				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) then
 					if (script_druid:runBackwards(targetObj, 12)) then
@@ -627,10 +643,10 @@ function script_druid:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				return;
+				return true;
 			end
 		end
 
@@ -1452,6 +1468,14 @@ function script_druid:run(targetGUID)
 				if (targetObj:GetDistance() < 30) and (not IsMoving()) then
 					targetObj:FaceTarget();
 				end
+
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM();
+				return true;
+			end
+		end
+
 			
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() <= .5) then 
@@ -1562,7 +1586,7 @@ function script_druid:run(targetGUID)
 			end -- end of if not bear or cat... no form attacks
 			
 			-- auto attack condition for melee
-			if (localMana <= 30 or IsBearForm() or IsCatForm()) then
+			if (localMana <= 40 or IsBearForm() or IsCatForm()) and (not targetObj:HasDebuff("Entangling Roots")) then
 				if (targetObj:GetDistance() <= self.meleeDistance) then
 					if (not IsMoving()) then
 						targetObj:FaceTarget();

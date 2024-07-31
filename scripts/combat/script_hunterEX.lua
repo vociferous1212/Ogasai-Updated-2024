@@ -222,29 +222,53 @@ function script_hunterEX:menu()
 
 		if (GetLocalPlayer():GetLevel() >= 10) then
 			wasClicked, script_hunter.hasPet = Checkbox("Use Pet", script_hunter.hasPet);
+			if (script_grindMenu.helpMenu) then
+				Text("*Use hunter class without pet enabled*");
+			end
 		end
 
 		if (self.menuBandages) then
 			SameLine();
 			wasClicked, script_hunter.useBandage = Checkbox("Use Bandages", script_hunter.useBandage);
+			if (script_grindMenu.helpMenu) then
+				Text("*Use bandaged instead of food*")
+			end
 		end
 
 		if (HasSpell("Aspect of the Cheetah")) then
 			Separator();
 			wasClicked, script_hunter.useCheetah = Checkbox("Use Cheetah", script_hunter.useCheetah);
+			if (script_grindMenu.helpMenu) then
+				Text("*Use Aspect of Cheetah between combat phases*")
+				Separator();
+			end
 		end
 
 		SameLine();
 		if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
 			wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat);
+			if (script_grindMenu.helpMenu) then
+				Text("*Pet will hang in combat phase - choose to force bot to wait*")
+				Separator();
+			end
+
 		end
 		Separator();
 
 		Text('Drink below mana percentage');
 		script_hunter.drinkMana = SliderInt("M%", 1, 100, script_hunter.drinkMana);
+			if (script_grindMenu.helpMenu) then
+				Text("*Choose to drink when mana is at or below this percent*")
+				Separator();
+			end
+
 
 		Text('Eat below health percentage');
 		script_hunter.eatHealth = SliderInt("H%", 1, 100, script_hunter.eatHealth);
+			if (script_grindMenu.helpMenu) then
+				Text("**")
+			end
+
 
 		Text('Use health potions below percentage');
 		script_hunter.potionHealth = SliderInt("HP%", 1, 99, script_hunter.potionHealth);

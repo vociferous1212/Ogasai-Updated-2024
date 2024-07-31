@@ -18,6 +18,7 @@ function script_targetMenu:menu()
 		if (Button("Blacklist Target - GUID")) then
 			if UnitExists("target") then
 				script_grind:addTargetToHardBlacklist(GetTarget():GetGUID());
+				script_grind.newTargetTime = GetTimeEX();
 			end
 		end
 		

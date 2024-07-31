@@ -12,7 +12,7 @@ script_checkAdds = {
 function script_checkAdds:checkAdds()
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
-	if(script_grind:enemiesWithinRange() <= 3) then
+	if(script_grind:enemiesWithinRange() <= 4) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
 			-- use unstuck script
@@ -28,7 +28,7 @@ function script_checkAdds:checkAdds()
 
 			self.message = "Moving away from adds...";
 	
-		return;
+		return true;
 		end
 	end
 return false;
@@ -283,14 +283,12 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				PetFollow();
 			end
 
-		return true;
+		return;
 		end
-		currentObj, typeObj = GetNextObject(currentObj);
-		return true;
+	currentObj, typeObj = GetNextObject(currentObj);
 
 
 	end
-	currentObj, typeObj = GetNextObject(currentObj);
 	return false;
 end
 

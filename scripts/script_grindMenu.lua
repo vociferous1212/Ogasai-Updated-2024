@@ -17,6 +17,7 @@ script_grindMenu = {
 	debugMenu = false,
 	useHotSpotArea = true,
 	selectedWalkPath = false,
+	helpMenu = false,
 
 }
 
@@ -94,6 +95,11 @@ function script_grindMenu:menu()
 	SameLine();
 	Text(""..GetTimeStamp());
 
+		SameLine();
+		Text("  ");
+		SameLine();
+		wasClicked, self.helpMenu = Checkbox("Help Menu", self.helpMenu);
+	
 	local wasClicked = false;
 	-- Load combat menu by class
 	local class = UnitClass("player");
@@ -119,7 +125,10 @@ function script_grindMenu:menu()
 	if (CollapsingHeader("Talents, Paranoia & Misc Options")) then
 
 		if (GetLocalPlayer():GetLevel() >= 40) then
-			wasClicked, script_grind.useMount = Checkbox("Use Mount", script_grind.useMount); 
+			wasClicked, script_grind.useMount = Checkbox("Use Mount", script_grind.useMount);
+			if (self.helpMenu) then
+			Text("Use mounts above level 40");
+			end
 			Separator();
 		end
 
@@ -129,11 +138,17 @@ function script_grindMenu:menu()
 		if (script_grind.autoTalent) then
 			Text("Spending Next Talent Point In: " .. (script_talent:getNextTalentName() or " "));
 		end
+		if (self.helpMenu) then
+			Text("*Choose to auto select talent points*");
+		end
 		--wasClicked, script_grind.getSpells = Checkbox("Get Spells (IN PROCESS DO NOT USE)", script_grind.getSpells);
 		
 		script_paranoiaMenu:menu();
 
 		wasClicked, script_grind.adjustTickRate = Checkbox("Adjust Script Speed", script_grind.adjustTickRate);
+			if (self.helpMenu) then
+				Text("*Determines the mili-second interval for script to run each pass*")
+			end
 		if (script_grind.adjustTickRate) then
 			Text("Script Tick Rate - How Fast The Scripts Run"); script_grind.tickRate = SliderInt("TR (ms)", 0, 3000, script_grind.tickRate);	
 		end

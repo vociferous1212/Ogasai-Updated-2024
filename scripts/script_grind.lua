@@ -699,7 +699,7 @@ function script_grind:run()
 		end
 
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
-		if (not script_grind.hotspotReached) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_vendor:getStatus() == 0) and
+		if ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_vendor:getStatus() == 0) and
 			(script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX())) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
 				self.hotSpotTimer = GetTimeEX() + 20000;
@@ -778,8 +778,9 @@ function script_grind:run()
 			-- blacklist the target if we had it for a long time and hp is high
 			elseif (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime and self.enemyObj:GetHealthPercentage() > 92) then
 				script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
-				self.newTargetTime = 10000;
+				self.newTargetTime = GetTimeEX();
 				ClearTarget();
+				script_grind:setWaitTimer(2500);
 			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
 			end
@@ -1493,7 +1494,7 @@ function script_grind:enemyIsValid(i)
 		end
 
 	-- add target to blacklist not a safe pull from aggro script
-		if (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) then	
+		if (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) and (i:GetDistance() <= 65) then	
 			script_grind:addTargetToBlacklist(i:GetGUID());
 		end
 		
@@ -1541,9 +1542,9 @@ function script_grind:enemyIsValid(i)
 
 	-- blacklisted target is polymorphed or feared
 		-- bot tries to skip poly and feared targets...	
-		--if (script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) then
-		--	return true;
-		--end
+		if (script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) and (script_grind:enemiesAttackingUs() < 2) and (GetNumPartyMembers() <= 1) then
+			return true;
+		end
 
 	-- attacking pet
 		if (script_grind:isTargetingPet(i)) and (i:IsInLineOfSight()) then
