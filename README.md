@@ -11,7 +11,7 @@ A good idea to get a decent injector.
  - find dll
  - inject dll
  - log into game
- - 
+ - OR use oGasaiLoader.exe and find WoW.exe in your WoW folder
 This bot will not PvP. This can be adjusted to PvP but I will not do it. The bot "may" choose to attack a player for defensive purposes on a PvP server only. Like with any WoW bot, you can change the bot to do PvP, but this can be extremely detrimental to any community and the purpose of this bot is not to harm any server. My choice of using this bot over others is to learn coding from a basic language like LUA.
 
 # Casters - Obtain a wand ASAP. Can be used level 5+.
