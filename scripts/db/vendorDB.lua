@@ -92,7 +92,12 @@ function vendorDB:setup()
 	vendorDB:addVendor("Drake Lindgren", 0, 0, 12, false, false, false, false, true, -9483.1, -1356.25, 46.95);
 
 	-- Mulgore
-
+	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, false, false, false, false, -2940.85, -245.96, 53.81);
+	vendorDB:addVendor("Marjak Keenblade", 1, 1, 215, true, false, false, false, false, -2926.33, -215.72, 54.17);
+	vendorDB:addVendor("Kawnie Softbreeze", 1, 1, 215, false, false, false, true, false, -2893.72, -279.34, 53.91);
+	vendorDB:addVendor("Kawnie Softbreeze", 1, 1, 215, false, false, false, false, true, -2893.72, -279.34, 53.91);
+	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, false, true, false, false, -2940.85, -245.96, 53.81);
+	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, true, false, false, false, -2940.85, -245.96, 53.81);
 
 	-- Tirisfal Glades
 

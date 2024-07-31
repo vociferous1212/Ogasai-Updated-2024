@@ -69,6 +69,8 @@ function script_grindMenu:menu()
 		end
 	end
 
+	-- only show bot menu when navmesh has completed loading
+	if (qqq == 100) then
 	if (not script_grind.pause) then
 		if (Button("Pause Bot")) then
 			script_paranoia.currentTime = GetTimeEX() + (45*1000);
@@ -99,9 +101,17 @@ function script_grindMenu:menu()
 		Text("  ");
 		SameLine();
 		wasClicked, self.helpMenu = Checkbox("Help Menu", self.helpMenu);
+
+	if (self.helpMenu) then
+		Text("HELP *press tab key to change settings on this screen");
+		Text("	 click back on WoW screen to regain focus");
+		Text("	 helpful info is listed about each control available below*");
+		Separator();
+	end
 	
 	local wasClicked = false;
 	-- Load combat menu by class
+
 	local class = UnitClass("player");
 	if (class == 'Mage') then
 		script_mageEX:menu();
@@ -127,9 +137,9 @@ function script_grindMenu:menu()
 		if (GetLocalPlayer():GetLevel() >= 40) then
 			wasClicked, script_grind.useMount = Checkbox("Use Mount", script_grind.useMount);
 			if (self.helpMenu) then
-			Text("Use mounts above level 40");
+				Text("HELP *Use mounts above level 40*");
+				Separator();
 			end
-			Separator();
 		end
 
 		wasClicked, script_grind.autoTalent = Checkbox("Spend Talent Points  ", script_grind.autoTalent);
@@ -139,7 +149,8 @@ function script_grindMenu:menu()
 			Text("Spending Next Talent Point In: " .. (script_talent:getNextTalentName() or " "));
 		end
 		if (self.helpMenu) then
-			Text("*Choose to auto select talent points*");
+			Text("HELP *Choose to auto select talent points*");
+		Separator();
 		end
 		--wasClicked, script_grind.getSpells = Checkbox("Get Spells (IN PROCESS DO NOT USE)", script_grind.getSpells);
 		
@@ -147,10 +158,15 @@ function script_grindMenu:menu()
 
 		wasClicked, script_grind.adjustTickRate = Checkbox("Adjust Script Speed", script_grind.adjustTickRate);
 			if (self.helpMenu) then
-				Text("*Determines the mili-second interval for script to run each pass*")
+				Text("HELP *Determines the mili-second interval for script to run each pass*")
 			end
+		Separator();
 		if (script_grind.adjustTickRate) then
-			Text("Script Tick Rate - How Fast The Scripts Run"); script_grind.tickRate = SliderInt("TR (ms)", 0, 3000, script_grind.tickRate);	
+			Text("Script Tick Rate - How Fast The Scripts Run"); script_grind.tickRate = SliderInt("TR (ms)", 0, 3000, script_grind.tickRate);
+			if (self.helpMenu) then
+				Text("HELP *Determined in mili-seconds. Faster will skip crucial timers*");
+				Separator();
+			end	
 		end
 
 	end
@@ -192,7 +208,7 @@ function script_grindMenu:menu()
 			end
 		-- distance from hotspot slider
 			Text('Distance To Move From Hotspot');
-			script_grind.distToHotSpot = SliderInt("DHS (yd)", 1, 2500, script_grind.distToHotSpot); Separator();
+			script_grind.distToHotSpot = SliderInt("DHS (yd)", 100, 2500, script_grind.distToHotSpot); Separator();
 		end
 
 		-- if not use hotspot then show rest of pathing
@@ -322,6 +338,10 @@ function script_grindMenu:menu()
 	script_counterMenu:menu();
 
 	wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
+	if (self.helpMenu) then
+		Text("HELP *Show chests and lootable boxes on screen");
+	end
 
 	
+end
 end

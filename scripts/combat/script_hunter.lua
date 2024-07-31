@@ -223,6 +223,7 @@ function script_hunter:run(targetGUID)
 			if (script_hunter:runBackwards(targetObj, 25)) then
 				script_grind.tickRate = 100;
 				script_rotation.tickRate = 135;
+				self.waitTimer = GetTimeEX() + 2000;
 				PetAttack();
 				self.message = "Moving away from target for range attacks...";
 				return 4;
@@ -556,6 +557,7 @@ function script_hunter:run(targetGUID)
 						if (script_hunter:runBackwards(targetObj, 25)) then
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
+						self.waitTimer = GetTimeEX() + 2000;
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
 						return 4;
@@ -570,6 +572,7 @@ function script_hunter:run(targetGUID)
 					if (script_hunter:runBackwards(targetObj, 25)) then
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
+						self.waitTimer = GetTimeEX() + 2000;
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
 					return 4;
@@ -677,6 +680,7 @@ function script_hunter:run(targetGUID)
 					if (script_hunter:runBackwards(targetObj, 25)) then
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
+						self.waitTimer = GetTimeEX() + 2000;
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
 						return 4;

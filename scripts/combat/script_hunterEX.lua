@@ -24,14 +24,14 @@ function script_hunterEX:chooseAspect(targetObj)
 			script_hunter.waitTimer = GetTimeEX() + 1550;
 			return true; 
 		end	
-	elseif (hasMonkey) and (targetObj ~= nil) and (not targetObj ~= 0) then
+	elseif (hasMonkey) and (targetObj ~= nil) and (targetObj ~= 0) then
 		if (targetObj:GetDistance() <= 5) and (IsInCombat()) and (localHealth <= 50) then
 			if (not localObj:HasBuff('Aspect of the Monkey')) then  
 				CastSpellByName('Aspect of the Monkey'); 
 				script_hunter.waitTimer = GetTimeEX() + 1550;
 				return true; 
 			end
-		else
+		elseif (targetObj ~= 0) and (targetObj ~= nil) then
 			if (hasHawk) and (targetObj:GetDistance() <= 37) and (not targetObj:IsDead()) and (targetObj:CanAttack()) then 
 				if (not localObj:HasBuff('Aspect of the Hawk')) then 
 					CastSpellByName('Aspect of the Hawk'); 
@@ -244,15 +244,14 @@ function script_hunterEX:menu()
 			end
 		end
 
-		SameLine();
-		if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
-			wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat);
-			if (script_grindMenu.helpMenu) then
-				Text("*Pet will hang in combat phase - choose to force bot to wait*")
-				Separator();
-			end
-
-		end
+		--SameLine();
+		--if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
+		--	wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat);
+		--	if (script_grindMenu.helpMenu) then
+		--		Text("*Pet will hang in combat phase - choose to force bot to wait*")
+		--		Separator();
+		--	end
+		--end
 		Separator();
 
 		Text('Drink below mana percentage');

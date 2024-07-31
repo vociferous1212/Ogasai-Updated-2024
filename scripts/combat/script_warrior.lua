@@ -33,6 +33,7 @@ script_warrior = {
 	hasBandages = false,
 	lastStandHealth = 8,
 	useBow = false,
+	heroicStrikeRage = 15,
 
 	-- note. the checkbox in the menu controls battle, defensive, berserker stance. all spells have arguments for which
 	-- stance they apply to and can be used in. if the palyer does not click defensive stance in-game then the bot
@@ -62,7 +63,6 @@ function script_warrior:setup()
 	if (HasSpell("Rend")) then
 		self.enableRend = true;
 	end
-
 end
 
 function script_warrior:spellAttack(spellName, target) -- used in Core files to control casting
@@ -268,6 +268,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
+				self.waitTimer = GetTimeEX() + 2500;
 				return;
 			end
 		end
@@ -341,6 +342,12 @@ function script_warrior:run(targetGUID)	-- main content of script
 			targetObj:AutoAttack();
 		end
 
+		if (targetObj:GetDistance() <= self.meleeDistance) and (targetObj:IsInLineOfSight()) and (IsAutoCasting("Attack")) and (PlayerHasTarget())(script_grind:enemiesAttackingUs() == 0 or not IsInCombat()) then
+				StopMoving();
+			self.waitTimer = GetTimeEX() + 1000;
+			script_grind:setWaitTimer(1000);
+		end
+
 		if (not IsInCombat()) and (not self.runOnce) and (targetObj:GetManaPercentage() < 1) then
 			self.runOnce = true;
 		end
@@ -349,14 +356,11 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (self.enableCharge and self.battleStance) then
 				if (HasSpell("Charge")) and (not IsSpellOnCD("Charge")) and (targetObj:IsSpellInRange("Charge")) 
 					and (targetObj:GetDistance() >= 12) and (targetObj:IsInLineOfSight()) then
+					script_nav:resetNavPos();
 					targetObj:FaceTarget();
-					if (Cast("Charge", targetObj)) then 
-						targetObj:AutoAttack();
-						script_nav:resetNavPos();
-						script_nav:resetPath();
-						script_nav:resetNavigate();
-					return 0;
-					end
+					targetObj:AutoAttack();
+					Cast("Charge", targetObj);
+				return 4;
 				end
 			end	
 
@@ -416,7 +420,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	
 			-- Run backwards if we are too close to the target
 			if (targetObj:GetDistance() <= .4) then 
-				if (script_warrior:runBackwards(targetObj,3)) then 
+				if (script_warrior:runBackwards(targetObj,1)) then 
 					return 4; 
 				end 
 			end
@@ -461,7 +465,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 			-- melee Skill: Heroic Strike if we got 15 rage battle stance
 			if (self.battleStance) and (not IsMoving()) then
-				if (localRage >= 15) and (targetHealth <= 80) then 
+				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
 					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
 						CastSpellByName('Heroic Strike', targetObj);
@@ -717,6 +721,15 @@ function script_warrior:run(targetGUID)	-- main content of script
 					script_grind.tickRate = 50;
 				end
 
+				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						self.waitTimer = GetTimeEX() + 2500;
+						return;
+					end
+				end
+
+
 				if (not IsMoving()) then
 					targetObj:FaceTarget();
 				end
@@ -806,7 +819,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 				-- melee Skill: Heroic Strike if we got 15 rage battle stance
 				if (self.battleStance) then
-					if (localRage >= 15) then 
+					if (localRage >= self.heroicStrikeRage) then 
 						targetObj:FaceTarget();
 						if (targetObj:GetDistance() <= self.meleeDistance) then
 							CastSpellByName('Heroic Strike', targetObj);
@@ -890,15 +903,17 @@ function script_warrior:rest()
 	-- if has bandage then use bandages
 	if (self.eatHealth >= 35) and (self.hasBandages) and (self.useBandage) and (not IsMoving()) and (localHealth >= 35) then
 		if (not localObj:HasDebuff("Creeping Mold")) and (not IsEating()) and (localHealth <= self.eatHealth) and (not localObj:HasDebuff("Recently Bandaged")) and (not localObj:HasDebuff("Poison")) then
+			self.tickRate = 1500;
 		if (IsMoving()) then
 			StopMoving();
 		end
 			self.waitTimer = GetTimeEX() + 1200;
 		if (IsStanding()) and (not IsInCombat()) and (not IsMoving()) and (not localObj:HasDebuff("Recently Bandaged")) then
-			script_helper:useBandage()		
+			script_helper:useBandage();		
 			self.waitTimer = GetTimeEX() + 6000;
+			script_grind:setWaitTimer(6000);
 		end
-		return 0;
+		return true;
 		end
 	end
 

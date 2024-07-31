@@ -205,7 +205,7 @@ function script_runner:avoidToBlacklist(safeMargin)
 	while currentObj ~= 0 do
  		if typeObj == 3 then
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 23;
-			local range = aggro + safeMargin;
+			local range = aggro + safeMargin+10;
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range and script_grind:isTargetBlacklisted(currentObj:GetGUID()) and (not script_grind:isTargetingMe(currentObj)) then
 				if (closestEnemy == 0) and (not GetLocalPlayer():GetUnitsTarget() ~= 0 and enemy:GetGUID() ~= currentObj:GetGUID()) then
 					closestEnemy = currentObj;
@@ -228,18 +228,19 @@ function script_runner:avoidToBlacklist(safeMargin)
 
  			local xP, yP, zP = localObj:GetPosition();
 
-			local safeRange = safeMargin+1;
+			local safeRange = safeMargin+8;
 			local intersectMob = script_runner:aggroIntersect(closestEnemy);
 			if (intersectMob ~= nil) then
-				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + aggro; 
+				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + aggro+5; 
 				local x, y, z = closestEnemy:GetPosition();
 				local xx, yy, zz = intersectMob:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
-				script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange);
+				script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange+5);
 			else
-				script_runner:avoid(xT, yT, zP, aggro, safeRange);
+				script_runner:avoid(xT, yT, zP, aggro, safeRange+5);
 			end
 
+script_nav:navigate(localObj)
 			return true;
 	end
 

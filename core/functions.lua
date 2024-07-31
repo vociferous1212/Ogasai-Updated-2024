@@ -113,6 +113,15 @@ function PlayerHasTarget()
 return false;
 end
 
+function HasPet()
+	if (GetPet() ~= 0) then
+		if (GetPet():GetHealthPercentage() > 0) then
+			return true;
+		end
+	end
+return false;
+end
+
 function CallPet()
 
 	if (GetPet() == 0) then

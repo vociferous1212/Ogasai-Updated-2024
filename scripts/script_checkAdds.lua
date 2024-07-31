@@ -202,6 +202,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:IsCritter())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
+				and (currentObj:GetHealthPercentage() >= 20)
 			then
 					local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -279,7 +280,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange*2);
 				PetFollow();
 			else
-				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2);
+				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2.5);
 				PetFollow();
 			end
 
@@ -515,7 +516,7 @@ function script_checkAdds:avoidToAggro2(safeMargin)
 
 			else
 
-				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2);
+				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2.5);
 				PetFollow();
 			end
 

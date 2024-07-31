@@ -200,7 +200,8 @@ function script_helper:setup()
 	script_helper:addFood("Roasted Quail");
 	script_helper:addFood("Tough Jerky");
 	script_helper:addFood("Wild Hog Shank");
-	
+	script_helper:addFood("Leg Meat");
+
 	-- Vendor cheese
 	script_helper:addFood("Alterac Swiss");
 	script_helper:addFood("Fine Aged Cheddar");

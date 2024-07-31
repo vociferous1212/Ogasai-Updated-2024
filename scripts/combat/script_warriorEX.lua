@@ -165,6 +165,11 @@ if (script_warrior.battleStance) or (script_warrior.defensiveStance) or (script_
 		end
 		Text("Melee Range Distance");
 		script_warrior.meleeDistance = SliderFloat("MR (yd)", 1, 8, script_warrior.meleeDistance);	-- melee distance range
+
+		if (CollapsingHeader("|+| Heroic Strike Options")) then
+			Text("Rage cost of Heroic Strike");
+			script_warrior.heroicStrikeRage = SliderInt("HSR %", 10, 25, script_warrior.heroicStrikeRage);
+		end
 	end
 end
 end

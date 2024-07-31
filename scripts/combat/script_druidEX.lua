@@ -149,6 +149,10 @@ Separator();
 				SameLine();
 				wasClicked, script_druid.useMoonkin = Checkbox("Moonkin Form", script_druid.useMoonkin);
 			end
+			if (script_grindMenu.helpMenu) then
+				Text("HELP *Choose form for combat phases. The bot will auto");
+				Text("	 switch between forms in combat for add control*");
+			end
 
 		end
 	end
@@ -159,14 +163,25 @@ Separator();
 		
 		if (HasSpell("Entangling Roots")) and (not script_druid.useCat) and (not script_druid.useBear) then
 			wasClicked, script_druid.useEntanglingRoots = Checkbox("Attempt to root after pull", script_druid.useEntanglingRoots);
+			if (script_grindMenu.helpMenu) then
+				Text("HELP *use entangling root then run backwards in combat*");
+			Separator();	
+			end
 		end
 		
 		wasClicked, script_druid.stopIfMHBroken = Checkbox("Stop bot if main hand is broken (red)...", script_druid.stopIfMHBroken);
+		if (script_grindMenu.helpMenu) then
+			Text("HELP *stop and close bot when weapon is broken*");
+		end
 
 		Separator();
 			
 		Text("Melee Range to target");
 		script_druid.meleeDistance = SliderFloat("Melee range", 1, 8, script_druid.meleeDistance);
+		if (script_grindMenu.helpMenu) then
+			Text("HELP *Distance to attack target in melee range");
+			Text("	 Change this if bot has trouble attacking melee range*");
+		end
 
 		Separator();
 

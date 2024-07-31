@@ -65,7 +65,7 @@ function script_paranoiaMenu:menu()
 	end
 
 	Separator();
-	Text("The bot will force stop on x deaths or close the game.");
+	Text("The bot will force stop on " ..script_paranoia.counted.. " deaths or close the game.");
 	
 	Text("Stop Bot On "..script_paranoia.counted.. " Deaths    "); 
 

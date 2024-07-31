@@ -286,10 +286,10 @@ function script_druid:healsAndBuffs()
 	end
 	-- heal - we left form out of combat regrowth
 	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not HasForm()) and (localHealth <= 60) and (localMana >= 35) and (not hasRegrowth) and (not IsMoving()) and (IsStanding()) and (not IsMounted()) and (not IsCasting()) then
-		CastSpellByName("Regrowth", localObj);
 		self.waitTimer = GetTimeEX() + 2700;
 		script_grind:setWaitTimer(2500);
 		self.tickRate = 2500;
+		CastSpellByName("Regrowth", localObj);
 		return true;
 	end
 
@@ -307,12 +307,10 @@ function script_druid:healsAndBuffs()
 		end
 		if (not IsCasting()) and (not IsChanneling()) then
 			CastSpellByName("Healing Touch", localObj);
-				self.waitTimer = GetTimeEX() + 3000;
-				script_grind:setWaitTimer(3000);
-				return true;
+			self.waitTimer = GetTimeEX() + 3000;
+			script_grind:setWaitTimer(3000);
 			
 		end
-		return;
 	end
 
 	-- shapeshift out of cat form to heal - already have rejuve and regrowth
@@ -328,9 +326,8 @@ function script_druid:healsAndBuffs()
 		end
 		if (not IsCasting()) and (not IsChanneling()) then
 			CastSpellByName("Healing Touch", localObj);
-				self.waitTimer = GetTimeEX() + 2700;
-				script_grind:setWaitTimer(2700);
-				return true;
+			self.waitTimer = GetTimeEX() + 2700;
+			script_grind:setWaitTimer(2700);
 		end
 	end
 
@@ -380,7 +377,7 @@ function script_druid:healsAndBuffs()
 		-- Thorns
 		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) then
 			if (localHealth >= self.healthToShift) and (not IsMounted()) then
-				if (CastSpellByName("Thorns", localObj)) then
+				if not (CastSpellByName("Thorns", localObj)) then
 					self.waitTimer = GetTimeEX() + 2550;
 					script_grind:setWaitTimer(2050);
 					self.tickRate = 1500;
@@ -414,9 +411,9 @@ function script_druid:healsAndBuffs()
 					if (IsMoving()) then
 						StopMoving();
 					end
-					if (CastSpellByName("Regrowth", localObj)) then
 						script_grind.tickRate = 2550;
 						self.tickRate = 2550;
+					if (CastSpellByName("Regrowth", localObj)) then
 						self.waitTimer = GetTimeEX() + 2550
 						script_grind:setWaitTimer(2550);
 						return true;
@@ -443,11 +440,9 @@ function script_druid:healsAndBuffs()
 		if (HasSpell("Healing Touch")) and (not IsLooting()) and (IsStanding()) then
 			if (localHealth <= self.healingTouchHealth) and (localMana >= 25) and (not IsSpellOnCD("Healing Touch")) then
 				if (not IsCasting()) and (not IsChanneling()) then
-					if (CastHeal("Healing Touch", localObj)) then
-						self.waitTimer = GetTimeEX() + 2300;
-						script_grind:setWaitTimer(2300);
-						return true;
-					end
+					CastHeal("Healing Touch", localObj);
+					self.waitTimer = GetTimeEX() + 2300;
+					script_grind:setWaitTimer(2300);
 				end
 			end
 		end
@@ -498,12 +493,12 @@ function script_druid:healsAndBuffs()
 	end
 
 	-- if we have regrowth and rejuvenation and 2 or more targets are attacking us then cast healing touch
-	if (HasSpell("Regrowth")) and (hasRegrowth) and (hasRejuv) and (script_grind:enemiesAttackingUs(10) > 2) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < self.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
+	if (HasSpell("Regrowth")) and (hasRegrowth or hasRejuv) and (script_grind:enemiesAttackingUs(10) > 2) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < self.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
 		if (not IsCasting()) and (not IsChanneling()) then
-
 				CastSpellByName("Healing Touch", localObj);
 				self.waitTimer = GetTimeEX() + 2700;
 				script_grind:setWaitTimer(2700);
+				return true;
 		end
 	end
 
@@ -512,9 +507,8 @@ function script_druid:healsAndBuffs()
 
 		if (not IsCasting()) and (not IsChanneling()) then
 			CastSpellByName("Healing Touch", localObj);
-				self.waitTimer = GetTimeEX() + 2700;
-				script_grind:setWaitTimer(2700);
-			
+			self.waitTimer = GetTimeEX() + 2700;
+			script_grind:setWaitTimer(2700);
 		end
 	end
 
@@ -648,6 +642,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 				script_om:FORCEOM();
 				return true;
 			end
+		end
+
+		-- cast rejuvenaton before entering combat if have no form
+		if (HasSpell("Rejuventation")) and (not localObj:HasBuff("Rejuvenation")) and (targetObj:GetDistance() <= 45) and (localMana >= self.shapeshiftMana + 15) and (not HasForm()) and (not IsInCombat()) then
+			CastSpellByName("Rejuvenation", localObj);
+			self.waitTimer = GetTimeEX() + 1500;
+			return 0;
 		end
 
 		-- Cant Attack dead targets
@@ -1109,14 +1110,14 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 			end
 		end
 
--- Check: Do we have the right target (in UI) ??
-				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
-						ClearTarget();
-						targetObj = 0;
-						return 0;
-					end
-				end
+		-- Check: Do we have the right target (in UI) ??
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+			if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+				ClearTarget();
+				targetObj = 0;
+				return 0;
+			end
+		end
 
 
 		if (self.usePowerShift) then
@@ -1219,9 +1220,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 				end
 
 				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() <= 0.8) then 
-					if (script_druid:runBackwards(targetObj,2)) then 
-						self.waitTimer = GetTimeEX() + 1850;
+				if (targetObj:GetDistance() <= 0.4) then 
+					if (script_druid:runBackwards(targetObj,1)) then 
+						self.waitTimer = GetTimeEX() + 550;
 						return 0;
 					end 
 				end
@@ -1689,7 +1690,7 @@ function script_druid:rest()
 	end	
 
 	-- shift to drink - in bear form
-	if (IsBearForm()) and (not IsInCombat()) then
+	if (IsBearForm()) and (not IsInCombat()) and (self.shiftToDrink) then
 		if (localMana <= self.drinkMana - 15 and self.shiftToDrink) 
 		or (localMana <= 15)
 		then

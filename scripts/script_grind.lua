@@ -542,7 +542,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") then	
+	if (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -768,13 +768,15 @@ function script_grind:run()
 
 		
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) then
+			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (IsMoving()) then
 				self.enemyObj:AutoAttack();
 			end
 			-- Fix bug, when not targeting correctly
-			if (self.lastTarget ~= self.enemyObj:GetGUID()) and (not IsMoving()) then
-				self.newTargetTime = GetTimeEX();
-				ClearTarget();
+			if (self.lastTarget ~= self.enemyObj:GetGUID()) then
+				if (not IsMoving()) then
+					self.newTargetTime = GetTimeEX();
+					ClearTarget();
+				end
 			-- blacklist the target if we had it for a long time and hp is high
 			elseif (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime and self.enemyObj:GetHealthPercentage() > 92) then
 				script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
@@ -825,30 +827,32 @@ function script_grind:run()
 			end
 
 			-- check and do move away from adds during combat
-			if (script_checkAdds:checkAdds()) then
+			if (script_checkAdds:checkAdds()) and (GetTimeEX() > self.omTimer) then
 				script_om:FORCEOM();
+				self.omTimer = GetTimeEX() + 5000;
 				return;
 			end
-		end
+		end	
 		
+		-- wait after combat phase - stuck in combat
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "waiting after combat - stuck in combat";
 			return;
 		end
-		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 or not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 10) then
+		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 or not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting after combat - stuck in combat";
 			if (IsMoving()) then
 				StopMoving();
 			end
 			--ClearTarget();
 			--self.enemyObj = nil;
-			script_grind:setWaitTimer(1000);
+			script_grind:setWaitTimer(500);
 			return;
 		end
 
 
 		-- Finish loot before we engage new targets or navigate - return
-		if (self.lootObj ~= nil and not IsInCombat()) then
+		if (self.lootObj ~= nil and (not IsInCombat() or script_grind:enemiesAttackingUs() ==0)) then
 			return; 
 		else
 
@@ -871,18 +875,19 @@ function script_grind:run()
 
 					-- do blacklist avoid
 					if (not IsEating()) and (not IsDrinking()) then
-						if (script_runner:avoidToBlacklist(5)) then
+						if (script_runner:avoidToBlacklist(8)) then
 							return true;
 						end
 
 					-- avoid if we are drinking or eating
 					elseif (IsEating() or IsDrinking()) then
-						if (script_runner:avoidToBlacklist(13)) then
+						if (script_runner:avoidToBlacklist(10)) then
 							return true;
 						end
 					end
 				return true;
-				end	
+				end
+	
 			end
 
 	-- Run the combat script and retrieve combat script status if we have a valid target
@@ -1080,8 +1085,9 @@ function script_grind:run()
 				script_om:FORCEOM2();
 				end
 				-- check and avoid adds
-				if (script_checkAdds:checkAdds()) then
+				if (script_checkAdds:checkAdds()) and (GetTimeEX() > self.omTimer) then
 					script_om:FORCEOM();
+					self.omTimer = GetTimeEX() + 5000;
 					return;
 				end
 
@@ -1156,7 +1162,7 @@ function script_grind:run()
 			-- continue to hotspot until we find a valid enemy...
 				-- move to a diff location if no valid enemies around?
 					-- run autopath nodes?
-			if (script_nav:getDistanceToHotspot() < 20 and not self.hotspotReached) then
+			if (script_nav:getDistanceToHotspot() < 20 and self.hotspotReached) then
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
@@ -1739,6 +1745,7 @@ function script_grind:doLoot(localObj)
 		end
 
 	-- Loot checking/reset target
+	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then
 	if (GetTimeEX() > self.lootCheck['timer']) then
 		if (self.lootCheck['target'] == self.lootObj:GetGUID()) then
 			self.lootObj = nil; -- reset lootObj
@@ -1752,6 +1759,7 @@ function script_grind:doLoot(localObj)
 			self.lootCheck['target'] = 0;
 		end
 		return;
+	end
 	end
 
 	-- close enough to loot range then do these

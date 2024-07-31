@@ -66,11 +66,12 @@ end
 
 function StoneForm()
 
-	if (HasSpell("Stone Form")) and (not IsSpellOnCD("Stone Form")) and (not GetLocalPlayer():HasBuff("Stone Form")) then
-		if (not IsCasting()) and (not IsChanneling()) and (not GetLocalPlayer():IsStunned()) then
+	if (HasSpell("Stoneform")) and (not IsSpellOnCD("Stoneform")) and (not GetLocalPlayer():HasBuff("Stoneform")) then
+		if (not GetLocalPlayer():IsStunned()) then
 			CastSpellByName("Stone Form", GetLocalPlayer());
 			return true;
 		end
+		return;
 	end
 
 return false;

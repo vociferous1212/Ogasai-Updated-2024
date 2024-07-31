@@ -123,8 +123,8 @@ function script_nav:moveToHotspot(localObj)
 				end
 			return;
 			end
-
-			return "Moving to hotspot " .. self.currentHotSpotName .. '...';
+			
+		return "Moving to hotspot " .. self.currentHotSpotName .. '...';
 	else
 		return "No hotspot has been loaded...";
 	end
@@ -164,7 +164,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- Let's get at least 2 path nodes around the hot spot before we navigate through them
-	if (self.numSavedLocation < 2) then
+	if (self.numSavedLocation < 3) then
 		return script_nav:moveToHotspot(localObj);
 	end
 

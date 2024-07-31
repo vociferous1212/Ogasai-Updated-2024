@@ -67,6 +67,8 @@ function script_rotationMenu:menu()
 		wasClicked, script_rotation.drawEnabled = Checkbox('Show status window', script_rotation.drawEnabled);
 
 		wasClicked, script_rotation.drawGather = Checkbox('Show gather nodes', script_rotation.drawGather);
+		SameLine();
+		wasClicked, script_grindMenu.showIDD = Checkbox("Show Item ID's", script_grindMenu.showIDD);
 
 		wasClicked, script_rotation.drawUnits = Checkbox("Show unit info on screen", script_rotation.drawUnits);
 
