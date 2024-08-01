@@ -135,12 +135,12 @@ end
 function CastStealth()
 
 	if (HasSpell("Stealth")) or (HasSpell("Prowl")) then
-		if (HasSpell("Stealth")) then
+		if (HasSpell("Stealth")) and (script_rogue.useStealth) then
 			if (not IsSpellOnCD("Stealth")) then
 				CastSpellByName("Stealth", GetLocalPlayer());
 				return true;
 			end
-		elseif (HasSpell("Prowl")) then
+		elseif (HasSpell("Prowl")) and (script_druid.useStealth) then
 			if (not HasForm()) then
 				if (HasSpell("Cat Form")) then
 					CastSpellByName("Cat Form");

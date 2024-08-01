@@ -139,7 +139,7 @@ function script_warrior:runBackwards(targetObj, range)
  		local moveX, moveY, moveZ = xT + xUV*5, yT + yUV*5, zT + zUV;		
  		if (distance <= range) then 
  			Move(moveX, moveY, moveZ);
-			self.waitTimer = GetTimeEX() + 750;
+			self.waitTimer = GetTimeEX() + 350;
  			return true;
  		end
 	end

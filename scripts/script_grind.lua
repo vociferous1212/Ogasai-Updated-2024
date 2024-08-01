@@ -39,7 +39,7 @@ script_grind = {
 	avoidElite = true,	-- avoid elites ( currently not working )
 	avoidRange = 40,	-- aboid elites range
 	findLootDistance = 45,
-	lootDistance = 2.8,
+	lootDistance = 2.65,
 	skipLooting = false,
 	lootCheck = {},
 	minLevel = GetLocalPlayer():GetLevel()-5,
@@ -201,6 +201,7 @@ function script_grind:setup()
 	-- setup gather script
 	script_gather:setup();
 
+
 	-- vendor database script loaded
 	vendorDB:setup();
 
@@ -212,9 +213,6 @@ function script_grind:setup()
 
 	-- navigation script loaded
 	script_nav:setup();
-
-	-- we are setup don't reload these items here
-	self.isSetup = true;
 
 	-- safer min level for low level botting
 	if (GetLocalPlayer():GetLevel() < 20) then
@@ -259,6 +257,8 @@ function script_grind:setup()
 
 	if (level < 10) then
 		script_checkAdds.addsRange = 15;
+		self.paranoidRange = 25;
+		self.paranoidSetTimer = 3;
 	end
 	if (level >= 10) and (level < 20) then
 		script_checkAdds.addsRange = 20;
@@ -272,6 +272,9 @@ function script_grind:setup()
 	if (level == 60) then
 		script_checkAdds.addsRange = 28;
 	end
+
+	-- we are setup don't reload these items here
+	self.isSetup = true;
 
 end
 
@@ -407,7 +410,7 @@ function script_grind:run()
 	end
 
 	if (IsIndoors()) then
-		script_nav:setNextToNodeDist(4); NavmeshSmooth(16);
+		script_nav:setNextToNodeDist(3.5); NavmeshSmooth(16);
 	else
 		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist);
 	end
@@ -450,12 +453,12 @@ function script_grind:run()
 
 	--random node dist
 	if (self.useRandomNode) and (not IsGhost() and not localObj:IsDead() and not HasForm() and not IsMounted() and not IsIndoors()) then
-		local randomNodeDist = math.random(4, 9);
+		local randomNodeDist = math.random(4, 8);
 		if (IsMoving()) and (GetTimeEX() > self.nodeTimer) then
 			self.nextToNodeDist = randomNodeDist;
 			script_nav.nextNavNodeDistance = randomNodeDist;
 			script_nav.nextPathNodeDistance = randomNodeDist;
-			self.nodeTimer = GetTimeEX() + 1000;
+			self.nodeTimer = GetTimeEX() + 600;
 		end
 	end
 
@@ -467,6 +470,9 @@ function script_grind:run()
 		script_grind.newTargetTime = GetTimeEX();
 		return;
 	end
+
+	-- delete items
+	script_helper:deleteItem();
 
 	-- Check: Spend talent points
 	if (not IsInCombat() and not GetLocalPlayer():IsDead() and self.autoTalent) then
@@ -503,13 +509,6 @@ function script_grind:run()
 		return;
 		end
 	end
-	end
-
-
-	-- delete items
-	if (script_helper:deleteItem()) then
-		self.waitTimer = GetTimeEX() + 1500;
-		return;
 	end
 
 
@@ -603,9 +602,7 @@ function script_grind:run()
 	end
 
 	-- delete items 
-	if (script_helper:deleteItem()) then
-		return;
-	end	
+	script_helper:deleteItem();	
 	
 	if (IsInCombat()) and (not IsMoving()) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -768,8 +765,10 @@ function script_grind:run()
 
 		
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (IsMoving()) then
-				self.enemyObj:AutoAttack();
+			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (IsMoving()) and (self.hotspotReached) then
+				if (not GetLocalPlayer():HasBuff("Stealth")) then
+					self.enemyObj:AutoAttack();
+				end
 			end
 			-- Fix bug, when not targeting correctly
 			if (self.lastTarget ~= self.enemyObj:GetGUID()) then
@@ -827,9 +826,8 @@ function script_grind:run()
 			end
 
 			-- check and do move away from adds during combat
-			if (script_checkAdds:checkAdds()) and (GetTimeEX() > self.omTimer) then
+			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				self.omTimer = GetTimeEX() + 5000;
 				return;
 			end
 		end	
@@ -1020,6 +1018,8 @@ function script_grind:run()
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 
+				LootTarget();
+
 				-- check positions
 				local _x, _y, _z = self.enemyObj:GetPosition();
 				local localObj = GetLocalPlayer();
@@ -1085,9 +1085,8 @@ function script_grind:run()
 				script_om:FORCEOM2();
 				end
 				-- check and avoid adds
-				if (script_checkAdds:checkAdds()) and (GetTimeEX() > self.omTimer) then
+				if (script_checkAdds:checkAdds()) then
 					script_om:FORCEOM();
-					self.omTimer = GetTimeEX() + 5000;
 					return;
 				end
 
@@ -1174,7 +1173,7 @@ function script_grind:run()
 
 
 				-- check stealth rogue
-				if (script_rogue.useStealth) and (HasSpell("Stealth")) and (not IsSpellOnCD("Stealth")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
+				if (script_rogue.useStealth) and (HasSpell("Stealth")) and (not IsSpellOnCD("Stealth")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) and (script_rogue.useStealth) then
 					CastSpellByName("Stealth", localObj);
 					self.waitTimer = GetTimeEX() + 1200;
 				end
@@ -1505,12 +1504,12 @@ function script_grind:enemyIsValid(i)
 		end
 		
 	-- add elite to blacklist
-		if (self.skipElites) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) then	
+		if (self.skipElites) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetDistance() <= 65) then	
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
 		end
 
 	-- add above maxLevel to blacklist
-		if (self.skipHardPull) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > self.maxLevel) then
+		if (self.skipHardPull) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > self.maxLevel) and (i:GetDistance() <= 65) then
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
 		end
 
@@ -1532,29 +1531,17 @@ function script_grind:enemyIsValid(i)
 		if (script_grind:isTargetingMe(i)
 			or (script_grind:isTargetingPet(i) and (i:IsTappedByMe() or not i:IsTapped())) 
 			or (script_grindParty.forceTarget and script_grind:isTargetingGroup(i) and (i:IsTappedByMe() or not i:IsTapped())) 
-			or (i:IsTappedByMe() and not i:IsDead())) then 
+			or (i:IsTappedByMe() and not i:IsDead()))
+			-- avoided target is attacking us
+			or ((script_grind:isTargetBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)))
+			-- blacklisted target is attacking us
+			or ((script_grind:isTargetHardBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)) and (i:IsInLineOfSight()))
+			-- blacklisted target is polymorphed or feared
+			-- bot tries to skip poly and feared targets...	
+			or ((script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) and (script_grind:enemiesAttackingUs() < 2) and (GetNumPartyMembers() <= 1))
+			-- attacking pet
+			or ((script_grind:isTargetingPet(i)) and (i:IsInLineOfSight())) then
 				return true; 
-		end
-
-	-- avoided target is attacking us
-		if (script_grind:isTargetBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)) then
-			return true;
-		end
-
-	-- blacklisted target is attacking us
-		if (script_grind:isTargetHardBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)) and (i:IsInLineOfSight()) then
-			return true;
-		end
-
-	-- blacklisted target is polymorphed or feared
-		-- bot tries to skip poly and feared targets...	
-		if (script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) and (script_grind:enemiesAttackingUs() < 2) and (GetNumPartyMembers() <= 1) then
-			return true;
-		end
-
-	-- attacking pet
-		if (script_grind:isTargetingPet(i)) and (i:IsInLineOfSight()) then
-			return true;
 		end
 
 	-- don't use avoid targets and don't recheck aggro range targets only skip hard pulls
@@ -1746,20 +1733,20 @@ function script_grind:doLoot(localObj)
 
 	-- Loot checking/reset target
 	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then
-	if (GetTimeEX() > self.lootCheck['timer']) then
-		if (self.lootCheck['target'] == self.lootObj:GetGUID()) then
-			self.lootObj = nil; -- reset lootObj
-			ClearTarget();
-			self.message = 'Reseting loot target...';
+		if (GetTimeEX() > self.lootCheck['timer']) then
+			if (self.lootCheck['target'] == self.lootObj:GetGUID()) then
+				self.lootObj = nil; -- reset lootObj
+				ClearTarget();
+				self.message = 'Reseting loot target...';
+			end
+			self.lootCheck['timer'] = GetTimeEX() + 10000; -- 10 sec
+			if (self.lootObj ~= nil) then 
+				self.lootCheck['target'] = self.lootObj:GetGUID();
+			else
+				self.lootCheck['target'] = 0;
+			end
+			return;
 		end
-		self.lootCheck['timer'] = GetTimeEX() + 10000; -- 10 sec
-		if (self.lootObj ~= nil) then 
-			self.lootCheck['target'] = self.lootObj:GetGUID();
-		else
-			self.lootCheck['target'] = 0;
-		end
-		return;
-	end
 	end
 
 	-- close enough to loot range then do these

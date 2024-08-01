@@ -57,6 +57,10 @@ function script_rogueEX:menu()
 			if (HasSpell("Stealth")) then
 				wasClicked, script_rogue.useStealth = Checkbox("Use Stealth", script_rogue.useStealth);
 			end
+			if (HasSpell("Pick Pocket")) and (script_rogue.useStealth) then
+				SameLine();
+				wasClicked, script_rogue.usePickPocket = Checkbox("Pick Pocket", script_rogue.usePickPocket);
+			end
 			if (HasSpell("Slice and Dice")) then
 				SameLine();
 				wasClicked, script_rogue.useSliceAndDice = Checkbox("Use Slice & Dice", script_rogue.useSliceAndDice);

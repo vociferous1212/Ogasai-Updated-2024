@@ -61,6 +61,11 @@ function script_rogueEX2:rotationMenu()
 			script_rogue.eatHealth = SliderInt('EHP %', 1, 50, script_rogue.eatHealth);
 			Text("Potion below health percent");
 			script_rogue.potionHealth = SliderInt('PHP %', 1, 50, script_rogue.potionHealth);
+			Separator();
+			Text("Melee Range to target");
+			script_rogue.meleeDistance = SliderFloat('MR (yd)', 1, 6, script_rogue.meleeDistance);
+			Separator();
+
 
 			if (HasSpell("Riposte")) then
 				if (CollapsingHeader("|+| Riposte Skill Options")) then

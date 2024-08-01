@@ -18,7 +18,7 @@ script_rogue = {
 	adrenRushComboHP = 40,
 	throwOpener = false,
 	isSetup = false,
-	useStealth = true,
+	useStealth = false,
 	usePoison = true,
 	useSliceAndDice = true,
 	stopIfMHBroken = true,
@@ -38,15 +38,19 @@ script_rogue = {
 	useExposeArmor = false,
 	useRupture = false,
 	ruptureStacks = 2,
+	pickpocketUsed = false,
+	usePickPocket = true,
 }
 
 function script_rogue:setup()
 
 	-- no more bugs first time we run the bot
-	self.waitTimer = GetTimeEX(); 
+	self.waitTimer = GetTimeEX();
+
+	self.useStealth = true; 
 
 	--set backstab as opener
-	if (GetLocalPlayer():GetLevel() < 10) then
+	if (GetLocalPlayer():GetLevel() < 10) and (HasSpell("Backstab")) then
 		self.stealthOpener = "Backstab";
 	end
 	if (not HasSpell("Ambush")) and (HasSpell("Garrote")) and (GetLocalPlayer():GetLevel() >= 10) then
@@ -81,6 +85,10 @@ function script_rogue:setup()
 
 	-- Set the energy cost for the CP builder ability (does not recognize talent e.g. imp. sinister strike)
 	_, _, _, _, self.cpGeneratorCost = GetSpellInfo(self.cpGenerator);
+
+	if (GetLocalPlayer():GetLevel() < 6) then
+		self.eatHealth = 55;
+	end
 
 	self.isSetup = true;
 end
@@ -294,6 +302,27 @@ function script_rogue:run(targetGUID)
 				return 4;
 			end
 
+-- pickpocket
+				if (targetObj:GetDistance() <= 5 and self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) then
+					if (GetTarget() == 0) then
+						TargetNearestEnemy();
+					end
+					if (IsMoving()) then
+						StopMoving();
+					return;
+					end
+					self.tickRate = 0;
+					CastSpellByName("Pick Pocket", targetObj);
+					LootTarget();
+					self.waitTimer = GetTimeEX() + 250;
+					if (IsLooting()) then
+						LootTarget();
+						self.pickpocketUsed = true;
+					return 3;
+					end
+					return;
+				end
+
 			-- Check: if we target player pets/totems
 			if (GetTarget() ~= 0) then
 				if (GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
@@ -316,10 +345,10 @@ function script_rogue:run(targetGUID)
 				self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 
 				-- Auto Attack
-				if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) then
+				if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) and (not self.useStealth) then
 					targetObj:AutoAttack();
 				-- stops spamming auto attacking while moving to target
-				elseif (targetObj:GetDistance() <= 8) and (not IsAutoCasting("Attack")) then
+				elseif (targetObj:GetDistance() <= 8) and (not IsAutoCasting("Attack")) and (not self.useStealth) then
 					targetObj:AutoAttack();
 				end
 
@@ -332,22 +361,25 @@ function script_rogue:run(targetGUID)
 					if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) and (IsStealth()) then
 						CastSpellByName("Sprint");
 					end
-				end
+				end	
 
 				-- Open with stealth opener
-				if (targetObj:GetDistance() <= 5 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) then
+				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) then
+					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
 						return 0;
 					end
 				end
 
 				-- Check if we are in melee range
-				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) then
+				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsStealth()) then
+					LootTarget();
 					return 3;
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) then
+					LootTarget();
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					return 0;
 				end
@@ -361,6 +393,8 @@ function script_rogue:run(targetGUID)
 
 				local localCP = GetComboPoints("player", "target");
 
+				LootTarget();
+				self.pickpocketUsed = false;
 
 				-- Dismount
 				if (IsMounted()) then
@@ -369,6 +403,7 @@ function script_rogue:run(targetGUID)
 
 				-- Check if we are in melee range
 				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) then
+					LootTarget();
 					return 3;
 				end
 
@@ -686,7 +721,7 @@ function script_rogue:run(targetGUID)
 
 				local localCP = GetComboPoints("player", "target");
 
-				script_checkRacials();
+				CheckRacialSpells();
 	
 				-- Combat Rotation 2 COMBAT ROTATION 2
 				if (self.rotationTwo) then

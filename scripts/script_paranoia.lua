@@ -112,13 +112,13 @@ function script_paranoia:checkParanoia()
 
 						-- send message in chat
 					elseif (otherEmote < 35) then
-						SendChatMessage("need something?");
+						SendChatMessage(" ");
 						script_paranoia.doEmote = false;
 						script_paranoia.didEmote = true;
 
 						-- send message in chat
 					elseif (otherEmote < 50) then
-						SendChatMessage("hello");
+						DoEmote("Roar", script_grind.paranoidTargetName);
 						script_paranoia.doEmote = false;
 						script_paranoia.didEmote = true;
 

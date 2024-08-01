@@ -3,7 +3,7 @@ script_gather = {
 	useVendor = false,
 	useMount = true,
 	nodeObj = nil,
-	gatherDistance = 65,
+	gatherDistance = 85,
 	message = 'Gather...',
 	collectMinerals = true,
 	collectHerbs = true,
@@ -463,19 +463,21 @@ function script_gather:menu()
 			Separator();
 			Text('Minerals');
 			
-			for i=0,self.numMinerals - 1 do
+			-- -14 for some reason double counts each mineral from above
+			for i=0,self.numMinerals - 14 do
 				wasClicked, self.minerals[i][2] = Checkbox(self.minerals[i][0], self.minerals[i][2]);
-				SameLine(); Text('(' .. self.minerals[i][3] .. ')');
+				SameLine(); Text('(' .. self.minerals[i][3] .. ') Req Level');
 			end
 		end
 		
+		-- -29 for some reason double counts each herb from above
 		if(self.collectHerbs and not script_gather.gatherAllPossible) then
 			Separator();
 			Text('Herbs');
 			
-			for i=0,self.numHerbs - 1 do
+			for i=0,self.numHerbs - 29 do
 				wasClicked, self.herbs[i][2] = Checkbox(self.herbs[i][0], self.herbs[i][2]);
-				SameLine(); Text('(' .. self.herbs[i][3] .. ')');
+				SameLine(); Text('(' .. self.herbs[i][3] .. ') Req Level');
 			end
 		end
 	end

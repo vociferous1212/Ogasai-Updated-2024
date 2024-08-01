@@ -138,6 +138,7 @@ function script_helper:setup()
 	script_helper:addHealthPotion("Healing Potion");
 	script_helper:addHealthPotion("Superior Healing Potion");
 	script_helper:addHealthPotion("Major Healing Potion");
+	script_helper:addHealthPotion("Minor Rejuvenation Potion");
 
 	-- Add Mana Potions
 	script_helper:addManaPotion("Minor Mana Potion");
@@ -145,6 +146,7 @@ function script_helper:setup()
 	script_helper:addManaPotion("Mana Potion");
 	script_helper:addManaPotion("Superior Mana Potion");
 	script_helper:addManaPotion("Major Mana Potion");
+	script_helper:addManaPotion("Minor Rejuvenation Potion");
 
 	-- Vendor water
 	script_helper:addWater("Morning Glory Dew");
@@ -325,8 +327,8 @@ function script_helper:setup()
 	script_helper:addItem("Blasted Boar Lung");
 	script_helper:addItem("Snickerfang Jowl");
 	script_helper:addItem("Imperfect Draenethyst Fragment");
+	script_helper:addItem("Hearthstone");
 
-	return true;
 end
 
 function script_helper:eat()
@@ -380,6 +382,7 @@ function script_helper:deleteItem()
 			return true;
 		end
 	end
+return false;
 end
 
 function script_helper:useMount()
