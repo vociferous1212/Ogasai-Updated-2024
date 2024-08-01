@@ -40,6 +40,7 @@ script_rogue = {
 	ruptureStacks = 2,
 	pickpocketUsed = false,
 	usePickPocket = true,
+	openerUsed = 0,
 }
 
 function script_rogue:setup()
@@ -311,14 +312,14 @@ function script_rogue:run(targetGUID)
 						StopMoving();
 					return;
 					end
-					self.tickRate = 0;
-					CastSpellByName("Pick Pocket", targetObj);
-					LootTarget();
-					self.waitTimer = GetTimeEX() + 250;
+						self.tickRate = 0;
+						self.pickpocketUsed = true;
+						CastSpellByName("Pick Pocket", targetObj);
+						LootTarget();
+						self.waitTimer = GetTimeEX() + 250;
 					if (IsLooting()) then
 						LootTarget();
-						self.pickpocketUsed = true;
-					return 3;
+						return 3;
 					end
 					return;
 				end
@@ -364,7 +365,7 @@ function script_rogue:run(targetGUID)
 				end	
 
 				-- Open with stealth opener
-				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) then
+				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and (self.openerUsed < 2) then
 					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
 						return 0;
@@ -378,7 +379,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 2) then
 					LootTarget();
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					return 0;
@@ -395,6 +396,7 @@ function script_rogue:run(targetGUID)
 
 				LootTarget();
 				self.pickpocketUsed = false;
+				self.openerUsed = 0;
 
 				-- Dismount
 				if (IsMounted()) then
