@@ -26,6 +26,7 @@ script_gather = {
 	numLock = 0,
 	fish = {},
 	numFish = 0,
+	collectChests = false,
 }
 
 function script_gather:addChest(name, id)
@@ -128,9 +129,6 @@ function script_gather:setup()
 	script_gather:addChest("Large Iron Bound Chest", 75297);
 	script_gather:addChest("Large Iron Bound Chest", 75296);
 	script_gather:addChest("Large Iron Bound Chest", 75295);
-	script_gather:addChest("Bound Fel Iron Chest", 184934);
-	script_gather:addChest("Bound Fel Iron Chest", 184932);
-	script_gather:addChest("Bound Fel Iron Chest", 184931);
 	script_gather:addChest("Large Mithril Bound Chest", 153468);
 	script_gather:addChest("Large Mithril Bound Chest", 153469);
 	script_gather:addChest("Large Mithril Bound Chest", 131978);
@@ -156,9 +154,7 @@ function script_gather:setup()
 	script_gather:addFish("Firefin Snapper School", 6482);
 	script_gather:addFish("Oily Blackmouth School", 6291);
 
-	
 	self.timer = GetTimeEX();
-
 	self.isSetup = true;
 end
 
@@ -172,7 +168,6 @@ function script_gather:getHerbSkill()
 			herbSkill = skillRank;
 		end
 	end
-
 	return herbSkill;
 end
 
@@ -186,30 +181,33 @@ function script_gather:getMiningSkill()
 			miningSkill = skillRank;
 		end
 	end
-
 	return miningSkill;
 end
 
 
 function script_gather:ShouldGather(id)
-
 	local herbSkill = script_gather:getHerbSkill();
 	local miningSkill = script_gather:getMiningSkill();
-
 	if(self.collectMinerals) then
 		for i=0,self.numMinerals - 1 do
-			if(self.minerals[i][1] == id and (self.minerals[i][2] or ((self.minerals[i][3] <= miningSkill) and self.gatherAllPossible))) then			
+			if(self.minerals[i][1] == id and (self.minerals[i][2] or ((self.minerals[i][3] <= miningSkill) and self.gatherAllPossible))) then
 				return true;		
 			end
 		end
 	end
-	
 	if(self.collectHerbs) then
 		for i=0,self.numHerbs - 1 do
-			if(self.herbs[i][1] == id and (self.herbs[i][2]or ((self.herbs[i][3] <= herbSkill) and self.gatherAllPossible))) then			
+			if(self.herbs[i][1] == id and (self.herbs[i][2]or ((self.herbs[i][3] <= herbSkill) and self.gatherAllPossible))) then		
 				return true;		
 			end
 		end	
+	end
+	if (self.collectChests) then
+		for i=0,self.numChests - 1 do
+			if (self.chests[i][1] == id) then
+				return true;
+			end
+		end
 	end
 end
 
@@ -344,6 +342,11 @@ function script_gather:currentGatherName()
 				name = self.minerals[i][0];
 			end
 		end
+		for i=0, self.numChests -1 do
+			if (self.chests[i][1] == self.nodeID) then
+				name = self.chests[i][0];
+			end
+		end
 	end
 
 	return name;
@@ -413,19 +416,6 @@ function script_gather:gather()
 		else
 			if (_x ~= 0) then
 
-				--if (IsMoving()) then
-					--if (self.timerSet) then
-					--	self.timerSet = false;
-					--end
-				--end
-
-		--if (self.nodeObj ~= nil) and (self.nodeObj ~= 0) and (self.timerSet) then
-		--	if (GetTimeEX() > self.blacklistTime) then
-		--		script_gather:addNodeToBlacklist(self.nodeGUID);
-		--		self.timerSet = false;
-		--		return false;
-		--	end
-		--end
 				MoveToTarget(_x, _y, _z);
 				self.timer = GetTimeEX() + 250;
 			end
@@ -451,6 +441,8 @@ function script_gather:menu()
 		wasClicked, self.collectMinerals = Checkbox("Mining", self.collectMinerals);
 		SameLine();
 		wasClicked, self.collectHerbs = Checkbox("Herbalism", self.collectHerbs);
+		SameLine();
+		wasClicked, self.collectChests = Checkbox("Chests", self.collectChests);
 
 		Text('Gather Search Distance');
 		self.gatherDistance = SliderFloat("GSD", 1, 250, self.gatherDistance);
@@ -481,22 +473,4 @@ function script_gather:menu()
 			end
 		end
 	end
-end
-
-function script_gather:addNodeToBlacklist(nodeGUID)
-	nodeGUID = self.nodeGUID;
-	if (self.nodeID ~= nil and self.nodeID ~= 0 and self.nodeID ~= '') then	
-		self.blacklistedNode[self.blacklistedNum] = self.nodeGUID;
-		self.blacklistedNum = self.blacklistedNum + 1;
-	end
-end
-
-function script_gather:isNodeBlacklisted(nodeGUID) 
-	nodeGUID = self.nodeGUID;
-	for i=0,self.blacklistedNum do
-		if (self.nodeGUID == self.blacklistedNode[i]) then
-			return true;
-		end
-	end
-	return false;
 end

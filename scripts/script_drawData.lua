@@ -70,10 +70,10 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		DrawText(target:GetCreatureType() .. ' - ' .. target:GetLevel(), tX, tY-10, 255, 255, 0);
 
 		-- if target is target
-		if (GetTarget() == target) then 
+		if (GetTarget() == target) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj == target) or (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == target:GetGUID()) then 
 
 			-- draw text targeted
-			DrawText('(targeted)', tX, tY-20, 255, 0, 0); 
+			DrawText('(TARGETED)', tX, tY-40, 255, 0, 0); 
 		end
 
 		-- draw avoiding targets
@@ -81,14 +81,14 @@ function script_drawData:drawMonsterDataOnScreen(target)
 			and (not script_grind:isTargetHardBlacklisted(target:GetGUID())) then
 
 			-- draw text avoiding
-			DrawText("(Adds Nearby)", tX, tY-20, 255, 0, 0);
+			DrawText("(Adds)", tX, tY-20, 255, 0, 0);
 		end
 
 		-- draw hard blacklisted targets
 		if (script_grind:isTargetHardBlacklisted(target:GetGUID())) then
 
 			-- draw text blacklisted
-			DrawText('(blacklisted)', tX, tY-20, 255, 150, 150);
+			DrawText('(Blacklisted)', tX, tY-20, 255, 150, 150);
 		end
 
 		-- draw unit HP

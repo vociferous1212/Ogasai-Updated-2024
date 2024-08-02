@@ -81,7 +81,7 @@ script_grind = {
 	hotSpotTimer = GetTimeEX(),	-- timer to hotspot
 	currentLevel = GetLocalPlayer():GetLevel(),	-- current player level
 	skinning = false,	-- use skinning
-	gather = false,		-- use gatherer script
+	gather = true,		-- use gatherer script
 	lastTarget = 0,		-- last target targeted
 	newTargetTime = GetTimeEX(),	-- set new target wait time
 	blacklistTime = 45,	-- time to blacklist mobs
@@ -183,9 +183,14 @@ function script_grind:setup()
 		self.vendorRefill = false;
 	end
 
+	if (UnitClass("Player") == "Rogue") then
+		self.blacklistTime = 60;
+	end
+
 	-- don't skip hard pulls when we are at starter zones
 	if (GetLocalPlayer():GetLevel() <= 5) then
 		self.skipHardPull = false;
+		self.blacklistTime = 20;
 	end
 
 	-- enable drawing unit info on screen
@@ -412,7 +417,7 @@ function script_grind:run()
 	end
 
 	if (IsIndoors()) then
-		script_nav:setNextToNodeDist(3.5); NavmeshSmooth(16);
+		script_nav:setNextToNodeDist(2.5); NavmeshSmooth(8);
 	else
 		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist);
 	end
@@ -682,6 +687,10 @@ function script_grind:run()
 		-- Gather
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) then
 			if (script_gather:gather()) then
+					-- bot was blacklisting targets after gathering
+					self.newTargetTime = GetTimeEX();
+					CastStealth();
+
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 135;
 				end

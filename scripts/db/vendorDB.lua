@@ -100,7 +100,14 @@ function vendorDB:setup()
 	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, true, false, false, false, -2940.85, -245.96, 53.81);
 
 	-- Tirisfal Glades
-
+	vendorDB:addVendor("Archibald Kava", 1, 0, 85, true, false, false, false, false, 1859.39, 1568.81, 94.31);
+	vendorDB:addVendor("Archibald Kava", 1, 0, 85, false, false, false, false, false, 1859.39, 1568.81, 94.31);
+	vendorDB:addVendor("Eliza Callen", 1, 0, 85, true, false, false, false, false, 2246.33, 308.23, 35.18);
+	vendorDB:addVendor("Eliza Callen", 1, 0, 85, false, false, false, false, false, 2246.33, 308.23, 35.18);
+	vendorDB:addVendor("Innkeeper Renee", 1, 0, 85, false, true, false, false, false, 2269.51, 244.94, 34.25);
+	vendorDB:addVendor("Innkeeper Renee", 1, 0, 85, false, false, true, false, false, 2269.51, 244.94, 34.25);
+	vendorDB:addVendor("Mrs. Winters", 1, 0, 85, false, false, false, true, false, 2253.34, 270.22, 34.26);
+	vendorDB:addVendor("Mrs. Winters", 1, 0, 85, false, false, false, false, true, 2253.34, 270.22, 34.26);
 
 	-- Durotar
 

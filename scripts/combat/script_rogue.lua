@@ -42,6 +42,9 @@ script_rogue = {
 	pickpocketUsed = false,
 	usePickPocket = true,
 	openerUsed = 0,
+	pickpocketMoney = 0,
+	ppMoney = GetMoney(),
+	ppVarUsed = false,
 }
 
 function script_rogue:setup()
@@ -272,9 +275,8 @@ function script_rogue:run(targetGUID)
 		--Valid Enemy
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-			if (IsLooting()) and (targetObj:GetDistance() < 6) then
+			if (IsLooting()) then
 				LootTarget();
-				return;
 			end
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
@@ -311,28 +313,33 @@ function script_rogue:run(targetGUID)
 			end
 
 -- pickpocket
-				if (targetObj:GetDistance() <= 5 and self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
-					if (GetTarget() == 0) then
-						TargetNearestEnemy();
-					end
-					if (IsMoving()) then
-						StopMoving();
-					return;
-					end
-						self.tickRate = 0;
-						self.pickpocketUsed = true;
-						CastSpellByName("Pick Pocket", targetObj);
-						LootTarget();
-						--self.waitTimer = GetTimeEX() + 750;
-						--script_grind:setWaitTimer(750);
-					if (IsLooting()) then
-						LootTarget();
-						return;
-					end
+				if (targetObj:GetDistance() <= 5) then
+					if (self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
+						if (GetTarget() == 0) then
+							TargetNearestEnemy();
+						end
+						if (IsMoving()) and (targetObj:GetDistance() < 5) then
+							StopMoving();
+						return true;
+						end
+							self.tickRate = 0;
+							self.pickpocketUsed = true;
+							CastSpellByName("Pick Pocket", targetObj);
+							self.ppMoney = GetMoney();
+							self.ppVarUsed = false;
+							LootTarget();
+							--self.waitTimer = GetTimeEX() + 750;
+							--script_grind:setWaitTimer(750);
+						if (IsLooting()) and (targetObj:GetDistance() <= 5) then
+							LootTarget();
+							return;
+						end
 					LootTarget();
 					return;
+					end
+				elseif (IsLooting()) then
+					LootTarget();
 				end
-
 			-- Check: if we target player pets/totems
 			if (GetTarget() ~= 0) then
 				if (GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
@@ -344,7 +351,7 @@ function script_rogue:run(targetGUID)
 			end 
 
 			--stuck in combat
-			if (not PlayerHasTarget()) and (IsInCombat()) and (script_grind.enemiesAttackingUs() == 0) and (GetNumPartyMembers() < 1) then
+			if (not PlayerHasTarget()) and (IsInCombat()) and (script_grind.enemiesAttackingUs() == 0 and (not targetObj:HasDebuff("Gouge"))) and (GetNumPartyMembers() < 1) then
 				self.message = "Stuck in combat... Waiting...";
 				return;
 			end
@@ -417,13 +424,18 @@ function script_rogue:run(targetGUID)
 
 				local localCP = GetComboPoints("player", "target");
 
+				-- recheck pickpocketing
 				if (IsLooting()) then
 					LootTarget();
-					return;
+					return true;
 				end
 				LootTarget();
 				self.pickpocketUsed = false;
 				self.openerUsed = 0;
+				if (self.ppMoney ~= GetMoney()) and (not self.ppVarUsed) and (IsInCombat()) then
+					self.pickpocketMoney = self.pickpocketMoney + (GetMoney() - self.ppMoney);
+					self.ppVarUsed = true;
+				end
 
 				-- Dismount
 				if (IsMounted()) then
@@ -518,13 +530,14 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				-- Gouge if target casting
 				if (HasSpell("Gouge")) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) then
 					if (CastSpellByName("Gouge", targetObj)) then
+						CastSpellByName("Attack", targetObj);
 						self.waitTimer = GetTimeEX() + 250;
 						return 0;
 					end
 				end
 
 				if (not IsAutoCasting("Attack")) and (targetObj:HasDebuff("Gouge")) then
-					targetObj:AutoAttack();
+					CastSpellByName("Attack", targetObj);
 				end
 
 				-- Gouge then bandage

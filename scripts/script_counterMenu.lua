@@ -61,5 +61,42 @@ function script_counterMenu:menu()
 		
 		-- show paranoia counter
 		Text("Paranoia Used : " ..paranoiaCounter);
-		
+
+
+
+-- show pick pocket money obtained
+		-- get copper amount
+		local money = script_rogue.pickpocketMoney;
+
+		-- get silver amount from copper
+		local moneySilver = math.floor(money / 100);
+
+		-- get gold amount from copper
+		local moneyGold = math.floor(money / 10000);
+
+		-- silver from copper when we have gold
+		local ppTest = (money - moneySilver * 100);
+
+		-- copper from gold when we have gold??
+	
+		if (HasSpell("Stealth")) then
+			-- less than 100 copper
+			if (money < 100) then
+	
+				-- show copper only
+				Text("Money Obtained PickPocketing : " ..money.. " Copper");
+	
+			-- more than 100 copper but less than 10000 copper
+			elseif (money > 100) and (money < 10000) then
+	
+				-- show silver and copper
+				Text("Money Obtained PickPocketing : " ..moneySilver .. " Silver " ..ppTest.. " Copper");
+	
+			-- more than 1000 copper then we have 1 gold!
+			elseif (money >= 1000) then
+	
+				-- show gold and silver
+				Text("Money Obtained PickPocketing : " ..moneyGold.. " Gold " ..ppTest.. " Silver");
+			end
+		end
 end
