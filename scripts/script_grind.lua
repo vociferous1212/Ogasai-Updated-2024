@@ -138,6 +138,7 @@ script_grind = {
 	useRandomNode = true,
 	drawChests = true,
 	deleteItems = true,
+	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
 }
 
 function script_grind:setup()
@@ -472,9 +473,6 @@ function script_grind:run()
 		return;
 	end
 
-	-- delete items
-	script_helper:deleteItem();
-
 	-- Check: Spend talent points
 	if (not IsInCombat() and not GetLocalPlayer():IsDead() and self.autoTalent) then
 		if (script_talent:learnTalents()) then
@@ -542,7 +540,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
+	if (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) and (self.hotspotReached) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -650,12 +648,12 @@ function script_grind:run()
 			end
 		end
 
--- delete items 
-	if (not IsInCombat()) and (self.deleteItems) then
-		if (script_helper:deleteItem()) then
-			script_grind:setWaitTimer(500);
+		-- delete items 
+		if (not IsInCombat()) and (self.deleteItems) then
+			if (script_helper:deleteItem()) then
+				script_grind:setWaitTimer(500);
+			end
 		end
-	end
 		
 
 		--Mount up
@@ -768,12 +766,21 @@ function script_grind:run()
 		end
 
 		self.enemyObj = script_grind:assignTarget();
+		
+		if (IsInCombat()) then
+			self.stealthRanOnce = false;
+		end
 
 		
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (IsMoving()) and (self.hotspotReached) then
 				if (not GetLocalPlayer():HasBuff("Stealth")) then
 					self.enemyObj:AutoAttack();
+				end
+				if (GetLocalPlayer():HasBuff("Stealth")) and (not self.stealthRanOnce) then
+					self.enemyObj:AutoAttack();
+					CastSpellByName("Attack");
+					self.stealthRanOnce = true;
 				end
 			end
 			-- Fix bug, when not targeting correctly

@@ -33,6 +33,7 @@ function script_rogueEX2:rotationMenu()
 			if (HasSpell("Stealth")) then
 				SameLine();
 				wasClicked, script_rogue.useStealth = Checkbox("Use Stealth", script_rogue.useStealth);
+				script_rogueEX3:menu();
 			end
 			wasClicked, script_rogue.enableFaceTarget = Checkbox("Auto Face Target", script_rogue.enableFaceTarget);
 			if (HasSpell("Blade Flurry")) then

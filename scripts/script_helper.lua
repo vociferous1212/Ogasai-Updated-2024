@@ -28,7 +28,6 @@ function script_helper:deleteItem()
 	DeleteItem("Blasted Boar Lung");
 	DeleteItem("Snickerfang Jowl");
 	DeleteItem("Imperfect Draenethyst Fragment");
-	DeleteItem("Stringy Wolf Meat");
 return false;
 end
 

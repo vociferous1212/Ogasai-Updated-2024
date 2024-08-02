@@ -2,6 +2,7 @@ script_rogue = {
 	message = 'Rogue Combat Script',
 	rogueMenu = include("scripts\\combat\\script_rogueEX.lua"),
 	rogueMenu2 = include("scripts\\combat\\script_rogueEX2.lua"),
+	rogueMenu3 = include("scripts\\combat\\script_rogueEX3.lua"),
 	mainhandPoison = "Instant Poison",
 	offhandPoison = "Instant Poison",
 	cpGenerator = 'Sinister Strike',
@@ -379,8 +380,8 @@ function script_rogue:run(targetGUID)
 					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
 						LootTarget();
-						self.waitTimer = GetTimeEX() + 1350;
-						script_grind:setWaitTimer(1350);
+						self.waitTimer = GetTimeEX() + 1550;
+						script_grind:setWaitTimer(1550);
 						self.openerUsed = self.openerUsed + 1;
 						return 0;
 					end
@@ -398,6 +399,12 @@ function script_rogue:run(targetGUID)
 					LootTarget();
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					self.openerUsed = 0;
+					return 0;
+				end
+
+				-- no stealth  enabled and we need to intiate combat phase
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (not self.useStealth) then
+					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					return 0;
 				end
 				
@@ -674,10 +681,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 		
 			-- Auto Attack
-			if (targetObj:GetDistance() < 40) and (not IsMoving()) then
+			if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) and (not self.useStealth) then
 				targetObj:AutoAttack();
 			-- stops spamming auto attacking while moving to target
-			elseif (targetObj:GetDistance() < self.meleeDistance) then
+			elseif (targetObj:GetDistance() <= 8) and (not IsAutoCasting("Attack")) and (not self.useStealth) then
 				targetObj:AutoAttack();
 			end
 			
@@ -704,60 +711,97 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end 
 
+-- pickpocket
+				if (targetObj:GetDistance() <= 5 and self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
+					if (GetTarget() == 0) then
+						TargetNearestEnemy();
+					end
+					if (IsMoving()) then
+						StopMoving();
+					return;
+					end
+						self.tickRate = 0;
+						self.pickpocketUsed = true;
+						CastSpellByName("Pick Pocket", targetObj);
+						LootTarget();
+						self.waitTimer = GetTimeEX() + 750;
+					if (IsLooting()) then
+						LootTarget();
+						return;
+					end
+					LootTarget();
+					return;
+				end
+
+
 			-- Opener ROTATION
 			
+-- Opener
 			if (not IsInCombat()) then
 				self.targetObjGUID = targetObj:GetGUID();
 				self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
-			
+
 				-- Stealth in range if enabled
 				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) and (script_grind.lootObj == nil) then
-					if (not IsStealth() and not IsSpellOnCD("Stealth")) then
+					if (not IsStealth()) then
 						CastStealth();
 					end
-					-- why break stealth??
-					--elseif (not self.useStealth and IsStealth()) then
-					--CastSpellByName("Stealth");
-				end
+					-- Use sprint (when stealthed for pull)
+					if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) and (IsStealth()) then
+						CastSpellByName("Sprint");
+					end
+				end	
+
+				LootTarget();
 
 				-- Open with stealth opener
-				if (targetObj:GetDistance() < 6 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) then
+				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and ((self.openerUsed < 3 and self.usePickPocket) or (not self.usePickPocket and self.openerUsed < 2)) and (not IsLooting()) then
+					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
+						LootTarget();
+						self.waitTimer = GetTimeEX() + 1350;
+						script_grind:setWaitTimer(1350);
+						self.openerUsed = self.openerUsed + 1;
 						return 0;
 					end
-						-- if we are stealthed for some reason
-				elseif (targetObj:GetDistance() < 6) and (not self.useStealth) and (HasSpell(self.stealthOpener)) and (IsStealth()) then
-					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
-						return 0;
-					end
+					LootTarget();
 				end
-			
+
 				-- Check if we are in melee range
-				if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) then
-					return 3;
+				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsStealth()) then
+					LootTarget();
 				end
 
 				-- Use CP generator attack 
-				if ((localEnergy >= self.cpGeneratorCost) and HasSpell(self.cpGenerator)) then
-					if(CastSpellByName(self.cpGenerator, targetObj)) then
-						return 0;
-					end
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and ((self.openerUsed >= 3 and self.usePickPocket) or (not self.usePickPocket and self.openerUsed >= 2)) and (not IsLooting()) then
+					LootTarget();
+					script_rogue:spellAttack(self.cpGenerator, targetObj);
+					self.openerUsed = 0;
+					return 0;
 				end
- 
-				-- Use CP generator attack  (in combat)
-				if (IsInCombat()) then
-					if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
-						if(CastSpellByName(self.cpGenerator, targetObj)) then
-							return 0;
-						end
-					end
-				end
+				
+				
 
-				-- Combat  ROTATION NOW IN COMBAT 
-
+				-- now in Combat
 			else	
 
+				self.message = "Killing " .. targetObj:GetUnitName() .. "...";
+
 				local localCP = GetComboPoints("player", "target");
+
+				if (IsLooting()) then
+					LootTarget();
+					return;
+				end
+				LootTarget();
+				self.pickpocketUsed = false;
+				self.openerUsed = 0;
+
+				-- Dismount
+				if (IsMounted()) then
+					DisMount();
+				end
+
 
 				CheckRacialSpells();
 	
