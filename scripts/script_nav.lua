@@ -108,6 +108,7 @@ function script_nav:moveToHotspot(localObj)
 			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) then
 				CastStealth();
 				CastGhostWolf();
+				CastSprint();
 			end
 			if (not IsInCombat()) and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) then
 				if (IsMoving()) then

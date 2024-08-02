@@ -203,6 +203,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
 				and (currentObj:GetHealthPercentage() >= 20)
+				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 			then
 					local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -238,6 +239,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:IsCritter())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
+				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 			then
 						local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -313,6 +315,7 @@ function script_checkAdds:aggroIntersect(target)
 				and (currentObj:GetGUID() ~= self.closestEnemy:GetGUID())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
+				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 			then
 				
 				local xx, yy, zz = currentObj:GetPosition();

@@ -15,7 +15,7 @@ script_rogue = {
 	stealthRange = 100,
 	waitTimer = 0,
 	vanishHealth = 8,
-	evasionHealth = 50,
+	evasionHealth = 65,
 	adrenRushComboHP = 40,
 	throwOpener = false,
 	isSetup = false,
@@ -336,7 +336,7 @@ function script_rogue:run(targetGUID)
 							--script_grind:setWaitTimer(750);
 						if (IsLooting()) and (targetObj:GetDistance() <= 5) then
 							LootTarget();
-							return;
+							return true;
 						end
 					LootTarget();
 					return;
@@ -476,7 +476,7 @@ function script_rogue:run(targetGUID)
 
 				-- Check: Do we have the right target (in UI) ??
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
+				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
 						ClearTarget();
 						targetObj = 0;
 						return 0;

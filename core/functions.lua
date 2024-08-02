@@ -157,10 +157,15 @@ end
 
 function IsStealth()
 
-	if (GetLocalPlayer():HasBuff("Stealth"))
-		or (GetLocalPlayer():HasBuff("Prowl"))
-	
-	then
+	if (GetLocalPlayer():HasBuff("Stealth")) or (GetLocalPlayer():HasBuff("Prowl")) then
+		return true;
+	end
+return false;
+end
+
+function CastSprint()
+	if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) then
+		CastSpellByName("Sprint");
 		return true;
 	end
 return false;

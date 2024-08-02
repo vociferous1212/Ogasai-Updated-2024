@@ -69,10 +69,10 @@ function script_aggro:safePull(target)
  		if (typeObj == 3)  then
 
 			-- target aggro based on level
-			aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 19.5);
+			aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
@@ -115,16 +115,16 @@ function script_aggro:enemiesNearMe()
 			-- acceptable targets
 			if (not currentObj:GetGUID() == target:GetGUID()) then
 				if (currentObj:CanAttack()) and (not currentObj:IsDead())
-					and (not currentObj:IsCritter()) then
+					and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 
 					-- acceptable target aggro based on level
-					aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 19.5);		
+					aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);		
 					-- acceptable target aggro based on distance
 					cx, cy, cz = currentObj:GetPosition();
 
 					-- check distance
 					if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro)
-					or (currentObj:GetDistance() <= 25) then
+					or (currentObj:GetDistance() <= 20) then
 
 						-- acceptable targets in range	
 						countUnitsInRange = countUnitsInRange + 1;
@@ -162,7 +162,7 @@ function script_aggro:safePullRecheck(target)
  		if (typeObj == 3) then
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then	
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then	
 
 				-- aggro range is aggro addsRange slider
 				aggro = script_checkAdds.addsRange - 5;
@@ -171,7 +171,7 @@ function script_aggro:safePullRecheck(target)
 				cx, cy, cz = currentObj:GetPosition();
 
 				-- acceptable range
-				if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) then
+				if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) or (currentObj:GetDistance() <= aggro - 5)  then
 
 					-- acceptable targets in range
 					countUnitsInRange = countUnitsInRange + 1;
@@ -208,7 +208,7 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
  		if typeObj == 3 then
 
 			-- acceptable targets
-			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() then
+			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and (currentObj:GetDistance() < 65) then
 
 				-- set safe res distances based on level
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21;
@@ -289,6 +289,7 @@ function script_aggro:closeToBlacklistedTargets()
 			and (not currentObj:HasDebuff("Polymorph"))
 			and (not currentObj:HasDebuff("Fear"))
 			and (currentObj:GetGUID() ~= script_grind.lastAvoidTarget:GetGUID())
+			and (currentObj:GetDistance() < 65)
 		then
 			-- set aggro range based on current level
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 23.5;

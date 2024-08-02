@@ -140,6 +140,7 @@ script_grind = {
 	deleteItems = true,
 	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
 	recheckTimer = 0,	-- used for rechecking add ranges outside of combat to find a valid target
+	needRest = false,
 }
 
 function script_grind:setup()
@@ -548,7 +549,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) and (self.hotspotReached) then	
+	if (self.hotspotReached) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -688,7 +689,7 @@ function script_grind:run()
 		end
 		
 		-- Gather
-		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) then
+		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
 			if (script_gather:gather()) then
 					-- bot was blacklisting targets after gathering
 					self.newTargetTime = GetTimeEX();
@@ -1298,7 +1299,7 @@ function script_grind:assignTarget()
 		if (targetType == 3) then
 		
 			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) then
+			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 				
 				-- run another object manager
 				if (script_grind:isTargetingGroup(i)) then
@@ -1620,10 +1621,10 @@ function script_grind:enemyIsValid(i)
 			end
 		end
 
-	-- RECHECK TARGETS
+-- RECHECK TARGETS
 	-- target blacklisted moved away from other targets
 	-- bot can target blacklisted targets under these conditions
-		if (self.skipHardPull) and (GetTimeEX() > self.recheckTimer)
+		if (self.skipHardPull) 
 			and (self.extraSafe)
 			and (script_grind:isTargetBlacklisted(i:GetGUID())
 			and script_aggro:safePullRecheck(i)) then
@@ -1648,8 +1649,8 @@ function script_grind:enemyIsValid(i)
 				--if (posZ < 9) and (posZ > -9) then
 				) then
 					-- force bot to keep this target and not recheck safepull over and over again
-					script_grind.enemyObj = currentObj;
 					self.recheckTimer = GetTimeEX() + 5000;
+					script_grind.enemyObj = currentObj;
 			return true;
 			end
 		end
@@ -1680,7 +1681,8 @@ function script_grind:enemyIsValid(i)
 			) then
 			return true;
 		end
-	
+
+
 	end
 	return false;
 end
@@ -1707,7 +1709,7 @@ function script_grind:enemiesWithinRange() -- returns number of enemies within r
 	while currentObj ~= 0 do 
     	if (typeObj == 3) and (PlayerHasTarget()) then
 		if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
-                	if (currentObj:GetDistance() < GetLocalPlayer():GetUnitsTarget():GetDistance() + script_checkAdds.addsRange) then 
+                	if (currentObj:GetDistance() < GetLocalPlayer():GetUnitsTarget():GetDistance() + script_checkAdds.addsRange - 20) then 
                 		unitsInRange = unitsInRange + 1; 
                 	end 
             	end 
@@ -1942,6 +1944,8 @@ function script_grind:runRest()
 			self.moneyObtainedCount = myMoney - self.currentMoney;
 		end
 
+		self.needRest = true;
+
 		-- check for pet to stop bugs
 		local pet = GetPet();
 		if (pet ~= 0) then
@@ -2007,6 +2011,7 @@ function script_grind:runRest()
 		end
 	return true;	
 	end
+	self.needRest = false;
 return false;
 end
 
