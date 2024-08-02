@@ -16,6 +16,22 @@ script_helper = {
 	
 }
 
+function script_helper:deleteItem()
+	-- add new items here to be delete. the bot does not understand checking for HasItem("").
+	--DeleteItem("NEW ITEM NAME HERE");
+	--DeleteItem("");
+	DeleteItem("OOX-22/FE Distress Beacon");
+	DeleteItem("OOX-17/TN Distress Beacon");
+	DeleteItem("OOX-09/HL Distress Beacon");
+	DeleteItem("Mangled Journal");
+	DeleteItem("Vulture Gizzard");
+	DeleteItem("Blasted Boar Lung");
+	DeleteItem("Snickerfang Jowl");
+	DeleteItem("Imperfect Draenethyst Fragment");
+	DeleteItem("Stringy Wolf Meat");
+return false;
+end
+
 function script_helper:enemiesAttackingUs(range) -- returns number of enemies attacking us within range
     local unitsAttackingUs = 0; 
     local currentObj, typeObj = GetFirstObject(); 
@@ -315,20 +331,6 @@ function script_helper:setup()
 	script_helper:addMount("Reins of the Striped Frostsaber");
 	script_helper:addMount("Reins of the Striped Nightsaber");
 
-
-
-	-- add new items here that need to be deleted
-
-	script_helper:addItem("OOX-22/FE Distress Beacon");
-	script_helper:addItem("OOX-17/TN Distress Beacon");
-	script_helper:addItem("OOX-09/HL Distress Beacon");
-	script_helper:addItem("Mangled Journal");
-	script_helper:addItem("Vulture Gizzard");
-	script_helper:addItem("Blasted Boar Lung");
-	script_helper:addItem("Snickerfang Jowl");
-	script_helper:addItem("Imperfect Draenethyst Fragment");
-	script_helper:addItem("Hearthstone");
-
 end
 
 function script_helper:eat()
@@ -359,30 +361,6 @@ function script_helper:drinkWater()
 	self.waitTimer = GetTimeEX() + 1200;
 	script_grind:setWaitTimer(1200);
 	return false;
-end
-
-function script_helper:addItem()
-	self.items[self.numItems] = name;
-	self.numItems = self.numItems +1;
-end
-
-function script_helper:deleteItem()
-
-	---- Search for items
-	local itemIndex = -1;
-	for i=0,self.numItems do
-		if (HasItem(self.items[i])) then
-			itemIndex = i;
-			break;
-		end
-	end
-		
-	if(HasItem(self.items[itemIndex])) then
-		if (DeleteItem(self.items[itemIndex])) then
-			return true;
-		end
-	end
-return false;
 end
 
 function script_helper:useMount()

@@ -117,21 +117,22 @@ function script_grindMenu:menu()
 		script_mageEX:menu();
 	elseif (class == 'Hunter') then
 		script_hunterEX:menu();
-	elseif (class == 'Warlock') then
-		script_warlockEX:menu();
-	elseif (class == 'Paladin') then
-		script_paladinEX:menu();
+	elseif (class == 'Rogue') then
+		script_rogueEX:menu();
 	elseif (class == 'Druid') then
 		script_druidEX:menu();
+	elseif (class == 'Warlock') then
+		script_warlockEX:menu();
 	elseif (class == 'Priest') then
 		script_priestEX:menu();
 	elseif (class == 'Warrior') then
 		script_warriorEX:menu();
-	elseif (class == 'Rogue') then
-		script_rogueEX:menu();
+	elseif (class == 'Paladin') then
+		script_paladinEX:menu();
 	elseif (class == 'Shaman') then
 		script_shamanEX:menu();
 	end	
+
 	if (CollapsingHeader("Talents, Paranoia & Misc Options")) then
 
 		if (GetLocalPlayer():GetLevel() >= 40) then
@@ -153,6 +154,7 @@ function script_grindMenu:menu()
 		Separator();
 		end
 		--wasClicked, script_grind.getSpells = Checkbox("Get Spells (IN PROCESS DO NOT USE)", script_grind.getSpells);
+		wasClicked, script_grind.deleteItems = Checkbox("Delete Items - add new items in helper script", script_grind.deleteItems);
 		
 		script_paranoiaMenu:menu();
 

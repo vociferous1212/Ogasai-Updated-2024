@@ -137,6 +137,7 @@ script_grind = {
 	nodeTimer = GetTimeEX(),
 	useRandomNode = true,
 	drawChests = true,
+	deleteItems = true,
 }
 
 function script_grind:setup()
@@ -600,9 +601,6 @@ function script_grind:run()
 		script_grind.undoAFK = false;
 		return true;
 	end
-
-	-- delete items 
-	script_helper:deleteItem();	
 	
 	if (IsInCombat()) and (not IsMoving()) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -651,6 +649,14 @@ function script_grind:run()
 				JumpOrAscendStart();
 			end
 		end
+
+-- delete items 
+	if (not IsInCombat()) and (self.deleteItems) then
+		if (script_helper:deleteItem()) then
+			script_grind:setWaitTimer(500);
+		end
+	end
+		
 
 		--Mount up
 		if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())

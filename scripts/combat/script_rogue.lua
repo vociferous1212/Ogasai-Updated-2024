@@ -49,6 +49,7 @@ function script_rogue:setup()
 	self.waitTimer = GetTimeEX();
 
 	self.useStealth = true; 
+	
 
 	--set backstab as opener
 	if (GetLocalPlayer():GetLevel() < 10) and (HasSpell("Backstab")) then
@@ -217,7 +218,7 @@ function script_rogue:run(targetGUID)
 	if (localObj:IsDead()) then 
 		return 0; 
 	end
-
+		
 	-- Check: If Mainhand is broken stop bot
 	isMainHandBroken = GetInventoryItemBroken("player", 16);
 	
@@ -270,6 +271,11 @@ function script_rogue:run(targetGUID)
 		--Valid Enemy
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+			if (IsLooting()) and (targetObj:GetDistance() < 6) then
+				LootTarget();
+				return;
+			end
+
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
@@ -304,7 +310,7 @@ function script_rogue:run(targetGUID)
 			end
 
 -- pickpocket
-				if (targetObj:GetDistance() <= 5 and self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) then
+				if (targetObj:GetDistance() <= 5 and self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
 					if (GetTarget() == 0) then
 						TargetNearestEnemy();
 					end
@@ -316,11 +322,13 @@ function script_rogue:run(targetGUID)
 						self.pickpocketUsed = true;
 						CastSpellByName("Pick Pocket", targetObj);
 						LootTarget();
-						self.waitTimer = GetTimeEX() + 250;
+						--self.waitTimer = GetTimeEX() + 750;
+						--script_grind:setWaitTimer(750);
 					if (IsLooting()) then
 						LootTarget();
-						return 3;
+						return;
 					end
+					LootTarget();
 					return;
 				end
 
@@ -364,12 +372,19 @@ function script_rogue:run(targetGUID)
 					end
 				end	
 
+				LootTarget();
+
 				-- Open with stealth opener
-				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and (self.openerUsed < 2) then
+				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and (self.openerUsed < 3) and (not IsLooting()) then
 					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
+						LootTarget();
+						self.waitTimer = GetTimeEX() + 1350;
+						script_grind:setWaitTimer(1350);
+						self.openerUsed = self.openerUsed + 1;
 						return 0;
 					end
+					LootTarget();
 				end
 
 				-- Check if we are in melee range
@@ -379,9 +394,10 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 2) then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 3) and (not IsLooting()) then
 					LootTarget();
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
+					self.openerUsed = 0;
 					return 0;
 				end
 				
@@ -394,6 +410,10 @@ function script_rogue:run(targetGUID)
 
 				local localCP = GetComboPoints("player", "target");
 
+				if (IsLooting()) then
+					LootTarget();
+					return;
+				end
 				LootTarget();
 				self.pickpocketUsed = false;
 				self.openerUsed = 0;
@@ -402,6 +422,14 @@ function script_rogue:run(targetGUID)
 				if (IsMounted()) then
 					DisMount();
 				end
+
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM();
+				return;
+			end
+		end
+
 
 				-- Check if we are in melee range
 				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) then
@@ -614,7 +642,15 @@ function script_rogue:run(targetGUID)
 					if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
 						return 0;
 					end
-				end			
+				end
+
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM();
+				return;
+			end
+		end
+			
 			end
 		end
 	end -- end of if self.enablegrind
