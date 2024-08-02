@@ -141,6 +141,7 @@ script_grind = {
 	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
 	recheckTimer = 0,	-- used for rechecking add ranges outside of combat to find a valid target
 	needRest = false,
+	attackTimer = 0,
 }
 
 function script_grind:setup()
@@ -193,6 +194,7 @@ function script_grind:setup()
 	if (GetLocalPlayer():GetLevel() <= 5) then
 		self.skipHardPull = false;
 		self.blacklistTime = 20;
+		script_gather.collectChests = true;
 	end
 
 	-- enable drawing unit info on screen
@@ -260,6 +262,7 @@ function script_grind:setup()
 	self.paranoidRange = randomRange;
 
 	self.nodeTimer = GetTimeEX();
+	self.attackTimer = GetTimeEX();
 
 	-- why was this not iterated before?
 	local level = GetLocalPlayer():GetLevel();
@@ -780,22 +783,20 @@ function script_grind:run()
 
 		self.enemyObj = script_grind:assignTarget();
 		
-		if (IsInCombat()) then
+		if (IsInCombat()) or (not PlayerHasTarget()) then
 			self.stealthRanOnce = false;
 		end
 
-		
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (IsMoving()) and (self.hotspotReached) then
-				if (not GetLocalPlayer():HasBuff("Stealth")) then
+			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (self.hotspotReached) then
+				if (not GetLocalPlayer():HasBuff("Stealth") and not GetLocalPlayer():HasBuff("Prowl")) then
 					self.enemyObj:AutoAttack();
 				end
-				local attackTimer = 0;
-				if (GetLocalPlayer():HasBuff("Stealth")) and (not self.stealthRanOnce) and (GetTimeEX() > attackTimer) then
+				if (GetLocalPlayer():HasBuff("Stealth") or GetLocalPlayer():HasBuff("Prowl")) and (not self.stealthRanOnce) and (GetTimeEX() > self.attackTimer) then
 					self.enemyObj:AutoAttack();
-					attackTimer = GetTimeEX() + 10000;
 					self.stealthRanOnce = true;
 					CastSpellByName("Attack");
+					self.attackTimer = GetTimeEX() + 5000;
 				end
 			end
 			-- Fix bug, when not targeting correctly
@@ -831,7 +832,7 @@ function script_grind:run()
 		end
 
 		-- Dont pull if more than 1 add will be pulled check SafePull aggro
-		if (self.enemyObj ~= nil and self.enemyObj ~= 0 and self.skipHardPull) then
+		if (self.enemyObj ~= nil and self.enemyObj ~= 0 and self.skipHardPull) and (self.hotspotReached) then
 			if (not script_aggro:safePull(self.enemyObj)) and (not IsInCombat())
 			and (not script_grind:isTargetingMe2(self.enemyObj)) then
 				script_grind:addTargetToBlacklist(self.enemyObj:GetGUID());
@@ -892,7 +893,7 @@ function script_grind:run()
 			self.combatError = nil; 
 
 			-- avoid blacklisted and avoided targets
-			if (script_grindEX.avoidBlacklisted) then
+			if (script_grindEX.avoidBlacklisted) and (self.hotspotReached) then
 
 				-- check blacklisted targets around me
 				if (script_aggro:closeToBlacklistedTargets()
@@ -1530,7 +1531,7 @@ function script_grind:enemyIsValid(i)
 		end
 
 	-- add target to blacklist not a safe pull from aggro script
-		if (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) and (i:GetDistance() <= 65) then	
+		if (self.hotspotReached) and (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) and (i:GetDistance() <= 65) then	
 			script_grind:addTargetToBlacklist(i:GetGUID());
 		end
 		
@@ -1624,10 +1625,10 @@ function script_grind:enemyIsValid(i)
 -- RECHECK TARGETS
 	-- target blacklisted moved away from other targets
 	-- bot can target blacklisted targets under these conditions
-		if (self.skipHardPull) 
+		if (self.skipHardPull)
 			and (self.extraSafe)
 			and (script_grind:isTargetBlacklisted(i:GetGUID())
-			and script_aggro:safePullRecheck(i)) then
+			and script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
 			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
 				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
 				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
@@ -1643,19 +1644,14 @@ function script_grind:enemyIsValid(i)
 				and not (skipGiant and i:GetCreatureType() == 'Giant') 
 				and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
 				and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
-				--local tarPosX, tarPosY, tarPosZ = i:GetPosition();
-				--local myPosX, myPosY, myPosZ = GetLocalPlayer():GetPosition();
-				--local posZ = tarPosZ - myPosZ;
-				--if (posZ < 9) and (posZ > -9) then
 				) then
 					-- force bot to keep this target and not recheck safepull over and over again
-					self.recheckTimer = GetTimeEX() + 5000;
 					script_grind.enemyObj = currentObj;
 			return true;
 			end
 		end
 
-	-- RECHECK TARGETS - these are targets that are not avoided or blacklisted
+	-- These are targets that are not avoided or blacklisted
 	-- valid enemies if we skip hard pulls and recheck targets
 		if (self.skipHardPull) and (self.extraSafe)
 			and (not script_grind:isTargetBlacklisted(i:GetGUID()))

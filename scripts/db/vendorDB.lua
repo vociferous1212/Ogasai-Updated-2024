@@ -91,7 +91,7 @@ function vendorDB:setup()
 	vendorDB:addVendor("Drake Lindgren", 0, 0, 12, false, false, true, false, false, -9483.1, -1356.25, 46.95);
 	vendorDB:addVendor("Drake Lindgren", 0, 0, 12, false, false, false, false, true, -9483.1, -1356.25, 46.95);
 
-	-- Mulgore
+	-- Mulgore - Horde
 	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, false, false, false, false, -2940.85, -245.96, 53.81);
 	vendorDB:addVendor("Marjak Keenblade", 1, 1, 215, true, false, false, false, false, -2926.33, -215.72, 54.17);
 	vendorDB:addVendor("Kawnie Softbreeze", 1, 1, 215, false, false, false, true, false, -2893.72, -279.34, 53.91);
@@ -99,7 +99,7 @@ function vendorDB:setup()
 	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, false, true, false, false, -2940.85, -245.96, 53.81);
 	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, true, false, false, false, -2940.85, -245.96, 53.81);
 
-	-- Tirisfal Glades
+	-- Tirisfal Glades - Horde
 	vendorDB:addVendor("Archibald Kava", 1, 0, 85, true, false, false, false, false, 1859.39, 1568.81, 94.31);
 	vendorDB:addVendor("Archibald Kava", 1, 0, 85, false, false, false, false, false, 1859.39, 1568.81, 94.31);
 	vendorDB:addVendor("Eliza Callen", 1, 0, 85, true, false, false, false, false, 2246.33, 308.23, 35.18);
@@ -108,10 +108,18 @@ function vendorDB:setup()
 	vendorDB:addVendor("Innkeeper Renee", 1, 0, 85, false, false, true, false, false, 2269.51, 244.94, 34.25);
 	vendorDB:addVendor("Mrs. Winters", 1, 0, 85, false, false, false, true, false, 2253.34, 270.22, 34.26);
 	vendorDB:addVendor("Mrs. Winters", 1, 0, 85, false, false, false, false, true, 2253.34, 270.22, 34.26);
+	vendorDB:addVendor("Constance Brisboise", 1, 0, 85, false, false, false, false, false, 2157.34, 656.66, 34.54);
+	vendorDB:addVendor("Constance Brisboise", 1, 0, 85, true, false, false, false, false, 2157.34, 656.66, 34.54);
 
-	-- Durotar
+	-- Durotar - Horde
 
-
+	-- Silverpine Forest - Horde
+	vendorDB:addVendor("Nadia Vernon", 1, 0, 130, true, false, false, false, false, 566.3, 1559.59, 132.51);
+	vendorDB:addVendor("Nadia Vernon", 1, 0, 130, false, false, false, false, false, 566.3, 1559.59, 132.51);
+	vendorDB:addVendor("Gwyn Farrow", 1, 0, 130, false, true, false, false, false, 553.08, 1600.14, 129.12);
+	vendorDB:addVendor("Edwin Harly", 1, 0, 130, false, false, true, false, false, 549.58, 1602.98, 128.48);
+	vendorDB:addVendor("Edwin Harly", 1, 0, 130, false, false, false, false, true, 549.58, 1602.98, 128.48);
+	vendorDB:addVendor("Nadia Vernon", 1, 0, 130, false, false, false, true, false, 566.3, 1559.59, 132.51);	
 
 	-- Ashenvale - Horde
 	vendorDB:addVendor("Wik'Tar", 1, 1, 331, false, false, false, false, false, 3362.22, 1024.83, 2.87);

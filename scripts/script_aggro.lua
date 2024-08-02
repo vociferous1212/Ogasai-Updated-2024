@@ -115,7 +115,7 @@ function script_aggro:enemiesNearMe()
 			-- acceptable targets
 			if (not currentObj:GetGUID() == target:GetGUID()) then
 				if (currentObj:CanAttack()) and (not currentObj:IsDead())
-					and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+					and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:IsInLineOfSight()) then
 
 					-- acceptable target aggro based on level
 					aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);		

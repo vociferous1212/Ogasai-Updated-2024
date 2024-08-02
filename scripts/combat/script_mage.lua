@@ -866,9 +866,10 @@ function script_mage:run(targetGUID)
 				if (not targetObj:IsSpellInRange("Fireball")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
 					return 3;
 				end	
-				
+				FaceTarget();
 				-- cast fireball
 				if (CastSpellByName("Fireball", targetObj)) then
+					FaceTarget();
 					script_grind:setWaitTimer(1500);
 					self.waitTimer = GetTimeEX() + 1500;
 					return 0;
@@ -1244,6 +1245,9 @@ function script_mage.fireMagePull(targetObj)
 	else
 		if (IsMoving()) then
 			StopMoving();
+		end
+		if (PlayerHasTarget()) then
+			targetObj:FaceTarget();
 		end
 		if (HasSpell("Pyroblast")) then
 			if (CastSpellByName("Pyroblast", targetObj)) then

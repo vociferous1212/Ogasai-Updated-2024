@@ -79,7 +79,7 @@ function script_counterMenu:menu()
 
 		-- copper from gold when we have gold??
 	
-		if (HasSpell("Stealth")) then
+		if (HasSpell("Stealth") and script_rogue.useStealth) then
 			-- less than 100 copper
 			if (money < 100) then
 	

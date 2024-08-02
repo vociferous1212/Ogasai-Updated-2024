@@ -857,7 +857,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 			if (lastError ~= 51) then
 					local tX, tY, tZ = targetObj:GetPosition();
 				if (IsCatForm()) and (self.useCat) and (self.useStealth) and (IsStealth()) then
-					if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 6) then
+					if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 5) then
 						if (CastSpellByName(self.stealthOpener)) then
 							if (not IsMoving()) then
 								targetObj:FaceTarget();

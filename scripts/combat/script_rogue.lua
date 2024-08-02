@@ -11,7 +11,7 @@ script_rogue = {
 	eatHealth = 60,
 	potionHealth = 7,
 	cpGeneratorCost = 45,
-	meleeDistance = 3.2,
+	meleeDistance = 3.4,
 	stealthRange = 100,
 	waitTimer = 0,
 	vanishHealth = 8,
@@ -35,8 +35,8 @@ script_rogue = {
 	useBandage = true,
 	hasBandages = false,
 	riposteActionBarSlot = 8,
-	exposeArmorStacks = 2,
-	useExposeArmor = false,
+	exposeArmorStacks = 1,
+	useExposeArmor = true,
 	useRupture = false,
 	ruptureStacks = 2,
 	pickpocketUsed = false,
@@ -235,7 +235,9 @@ function script_rogue:run(targetGUID)
 	targetObj = GetGUIDObject(targetGUID);
 
 	if (IsLooting()) then
-		LootTarget();	
+		if (not LootTarget()) then
+			LootTarget();
+		end	
 	end
 
 	if(targetObj == 0 or targetObj == nil) then
@@ -280,7 +282,9 @@ function script_rogue:run(targetGUID)
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
 			if (IsLooting()) then
-				LootTarget();
+				if (not LootTarget()) then
+					LootTarget();
+				end
 			end
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
@@ -316,8 +320,19 @@ function script_rogue:run(targetGUID)
 				return 4;
 			end
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
+						ClearTarget();
+						self.pickpocketUsed = false;
+						targetObj = 0;
+						return 0;
+					end
+				end
+
+
 -- pickpocket
-				if (targetObj:GetDistance() < 5) then
+				if (targetObj:GetDistance() <= 4) then
 					if (self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
 						if (GetTarget() == 0) then
 							TargetNearestEnemy();
@@ -335,15 +350,24 @@ function script_rogue:run(targetGUID)
 							--self.waitTimer = GetTimeEX() + 750;
 							--script_grind:setWaitTimer(750);
 						if (IsLooting()) and (targetObj:GetDistance() <= 5) then
-							LootTarget();
+							if (not LootTarget()) then
+								LootTarget();
+								self.waitTimer = GetTimeEX() + 350;
+								return;
+							end
 							return true;
 						end
-					LootTarget();
-					return;
+					if (not LootTarget()) then
+						LootTarget();
+						self.waitTimer = GetTimeEX() + 350;
+						return;
+					end
+					return true;
 					end
 				elseif (IsLooting()) then
 					if (not LootTarget()) then
 						LootTarget();
+					return;
 					end
 				end
 			-- Check: if we target player pets/totems
@@ -386,7 +410,9 @@ function script_rogue:run(targetGUID)
 					end
 				end	
 
-				LootTarget();
+				if (not LootTarget()) then
+					LootTarget();
+				end
 
 				-- Open with stealth opener
 				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and (self.openerUsed < 3) and (not IsLooting()) then
@@ -627,7 +653,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- expose armor
-				if (self.useExposeArmor) and (HasSpell("Expose Armor")) and (not IsSpellOnCD("Expose Armor")) and (not targetObj:HasDebuff("Expose Armor")) and (not targetObj:HasDebuff("Sunder Armor")) then
+				if (self.useExposeArmor) and (HasSpell("Expose Armor")) and (not IsSpellOnCD("Expose Armor")) and (not targetObj:HasDebuff("Expose Armor")) and (not targetObj:HasDebuff("Sunder Armor")) and (targetHealth >= 40) then
 					if (localCP >= self.exposeArmorStacks) and (localEnergy >= 25) then
 						if (CastSpellByName("Expose Armor")) then
 							self.waitTimer = GetTimeEX() + 1050;
@@ -1140,7 +1166,7 @@ function script_rogue:rest()
 	end
 
 	-- Eat something
-	if (not IsEating() and localHealth < self.eatHealth) then
+	if (not IsEating() and localHealth < self.eatHealth) and (not IsInCombat()) then
 		script_grind:setWaitTimer(1500);
 		self.waitTimer = GetTimeEX() + 2000;
 		self.message = "Need to eat...";
@@ -1157,7 +1183,10 @@ function script_rogue:rest()
 			return true; 
 		else 
 			self.message = "No food! (or food not included in script_helper)";
-		end		
+			return;
+		end
+	ClearTarget();
+	return;		
 	end
 
 	-- Stealth when we eat
