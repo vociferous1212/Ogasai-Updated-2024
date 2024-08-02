@@ -2,7 +2,7 @@
  Ogasaism
 
  Current known bugs - 
- - druid double casts heals
+ - druid double casts healing touch and can waste mana in clutch situations
  - checkbox to avoid blacklisted targets causes bot to walk circles around the target with no clear path to continue grinding
  - no ability to blacklist herbs or minerals when gathering
  - sometimes when creating a new hotspot (while moving) the bot does not understand you are at a hotspot and need to manually move out of range or change hotspots to resolve
