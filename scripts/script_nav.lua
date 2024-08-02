@@ -37,7 +37,6 @@ end
 
 function script_nav:loadHotspotDB(id)
 	local hotspot = hotspotDB:getHotSpotByID(id)
-
 	if (hotspot ~= nil and hotspot ~= -1) then
 		if (self.currentHotSpotName ~= hotspot['name']) then
 			script_grind.hotspotReached = false;
@@ -47,24 +46,19 @@ function script_nav:loadHotspotDB(id)
 		end
 		self.currentHotSpotX , self.currentHotSpotY, self.currentHotSpotZ, self.currentHotSpotName =
 			hotspot['pos']['x'], hotspot['pos']['y'], hotspot['pos']['z'], hotspot['name'];
-			
 			return true;
 	end
-
 	return false;
 end
 
 function script_nav:updateHotSpot(currentLevel, factionNr, useStaticHotSpot)
-	
 	if (useStaticHotSpot) then 
 		local race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
 		local id = hotspotDB:getHotspotID(race, level);
-
 		if (script_nav:loadHotspotDB(id)) then 
 			return true; 
 		end
 	end
-
 	-- If there is no static hotspot and no hotspot loaded: Use our current position as a hot spot
 	if (self.currentHotSpotName == 0) then
 		local localObj = GetLocalPlayer();
@@ -98,7 +92,6 @@ end
 function script_nav:getDistanceToHotspot()
 	local localObj = GetLocalPlayer();
 	local _lx, _ly, _lz = localObj:GetPosition();
-
 	if (self.currentHotSpotName ~= '') then
 		return math.sqrt((self.currentHotSpotX-_lx)^2+(self.currentHotSpotY-_ly)^2);
 	else
@@ -111,9 +104,7 @@ function script_nav:moveToHotspot(localObj)
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
-
 		script_navEX:moveToTarget(localObj, self.currentHotSpotX, self.currentHotSpotY, self.currentHotSpotZ); 
-
 			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) then
 				CastStealth();
 				CastGhostWolf();
@@ -125,8 +116,11 @@ function script_nav:moveToHotspot(localObj)
 				end
 			return;
 			end
-			
-		return "Moving to hotspot " .. self.currentHotSpotName .. '...';
+			local hsDist = 0;
+			if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
+				hsDist = math.floor(script_nav:getDistanceToHotspot());
+			end
+		return "Moving to hotspot " .. self.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 	else
 		return "No hotspot has been loaded...";
 	end
@@ -134,10 +128,8 @@ end
 
 function script_nav:saveTargetLocation(target, mobLevel)
 	local _tx, _ty, _tz = target:GetPosition();
-
 	-- Check: Don't save if we are outside the hotspot distance
 	if (script_nav:getDistanceToHotspot() > self.hotSpotDist) then return; end
-
 	-- Check: Don't save if we already saved a location within 60 yd
 	local saveLocation = true;
 	if (self.numSavedLocation > 0) then
@@ -148,14 +140,8 @@ function script_nav:saveTargetLocation(target, mobLevel)
 			end
 		end
 	end
-	
 	if (saveLocation) then
-		self.savedLocations[self.numSavedLocation] = {};
-		self.savedLocations[self.numSavedLocation]['x'] = _tx;
-		self.savedLocations[self.numSavedLocation]['y'] = _ty;
-		self.savedLocations[self.numSavedLocation]['z'] = _tz;
-		self.savedLocations[self.numSavedLocation]['level'] = mobLevel;
-		self.numSavedLocation = self.numSavedLocation + 1;
+		self.savedLocations[self.numSavedLocation] = {}; self.savedLocations[self.numSavedLocation]['x'] = _tx; self.savedLocations[self.numSavedLocation]['y'] = _ty; self.savedLocations[self.numSavedLocation]['z'] = _tz; self.savedLocations[self.numSavedLocation]['level'] = mobLevel; self.numSavedLocation = self.numSavedLocation + 1;
 	end
 end
 
@@ -184,11 +170,8 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		self.currentGoToLocation = self.currentGoToLocation + 1;
 		return "Changing go to location...";
 	end
-
 	script_grind.tickRate = 135;
-
 	script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-
 	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
 
@@ -224,7 +207,6 @@ end
 
 function script_nav:moveToNav(localObj, _x, _y, _z)
 
-	-- Please load and enable the nav mesh
 	if (not IsUsingNavmesh() and self.useNavMesh) then
 		return "Please load and and enable the nav mesh...";
 	end
@@ -255,18 +237,14 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		self.lastpathnavIndex = -1; 
 	end
-
 	if (not script_grind.adjustTickRate) then
 		script_grind.tickRate = 0;
 	end	
-
 	if (not IsPathLoaded(5)) then
 		return "Generating path...";
 	end
-	
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastpathnavIndex);
-
 	-- When dead use 2D distance
 	if (localObj:IsDead()) then
 		if (math.sqrt((_lx - _ix)^2 + (_ly - _iy)^2) < self.nextNavNodeDistance) then

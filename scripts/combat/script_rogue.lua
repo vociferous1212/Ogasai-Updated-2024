@@ -241,7 +241,7 @@ function script_rogue:run(targetGUID)
 	if(targetObj == 0 or targetObj == nil) then
 		return 2;
 	end
-
+	
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
 		return 4;
@@ -281,7 +281,6 @@ function script_rogue:run(targetGUID)
 
 			if (IsLooting()) then
 				LootTarget();
-				return;
 			end
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
@@ -318,7 +317,7 @@ function script_rogue:run(targetGUID)
 			end
 
 -- pickpocket
-				if (targetObj:GetDistance() <= 5) then
+				if (targetObj:GetDistance() < 5) then
 					if (self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
 						if (GetTarget() == 0) then
 							TargetNearestEnemy();
@@ -343,7 +342,9 @@ function script_rogue:run(targetGUID)
 					return;
 					end
 				elseif (IsLooting()) then
-					LootTarget();
+					if (not LootTarget()) then
+						LootTarget();
+					end
 				end
 			-- Check: if we target player pets/totems
 			if (GetTarget() ~= 0) then
@@ -367,10 +368,10 @@ function script_rogue:run(targetGUID)
 				self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 
 				-- Auto Attack
-				if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) and (not self.useStealth) then
+				if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) and (not IsStealth()) then
 					targetObj:AutoAttack();
 				-- stops spamming auto attacking while moving to target
-				elseif (targetObj:GetDistance() <= 8) and (not IsAutoCasting("Attack")) and (not self.useStealth) then
+				elseif (targetObj:GetDistance() <= 8) and (not IsAutoCasting("Attack")) and (not IsStealth()) then
 					targetObj:AutoAttack();
 				end
 
@@ -401,8 +402,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Check if we are in melee range
-				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsStealth()) and (not IsLooting()) then
-					LootTarget();
+				if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) and (not IsLooting()) then
 					return 3;
 				end
 
@@ -456,8 +456,7 @@ function script_rogue:run(targetGUID)
 
 
 				-- Check if we are in melee range
-				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) then
-					LootTarget();
+				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsLooting()) then
 					return 3;
 				end
 
@@ -477,7 +476,7 @@ function script_rogue:run(targetGUID)
 
 				-- Check: Do we have the right target (in UI) ??
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
+				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
 						ClearTarget();
 						targetObj = 0;
 						return 0;

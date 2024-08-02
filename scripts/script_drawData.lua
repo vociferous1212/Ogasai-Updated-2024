@@ -70,7 +70,7 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		DrawText(target:GetCreatureType() .. ' - ' .. target:GetLevel(), tX, tY-10, 255, 255, 0);
 
 		-- if target is target
-		if (GetTarget() == target) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj == target) or (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == target:GetGUID()) then 
+		if (GetTarget() == target) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetGUID() == target:GetGUID()) or (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == target:GetGUID())then 
 
 			-- draw text targeted
 			DrawText('(TARGETED)', tX, tY-40, 255, 0, 0); 

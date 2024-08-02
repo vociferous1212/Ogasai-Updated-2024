@@ -210,7 +210,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro)
 				then
 					self.closestEnemy = currentObj;	
-				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) then
+				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) and (not currentObj:IsCritter()) then
 
 					local dist = currentObj:GetDistance();
 
@@ -245,7 +245,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro)
 				then
 					self.closestEnemy = currentObj;	
-				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) then
+				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) and (not currentObj:IsCritter()) then
 
 					local dist = currentObj:GetDistance();
 
@@ -257,7 +257,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 			typeObj = GetNextObject(currentObj);
 			end
 		end
-	currentObj, typeObj = GetNextObject(currentObj);
+	--currentObj, typeObj = GetNextObject(currentObj);
 				
 
 		-- avoid the closest mob

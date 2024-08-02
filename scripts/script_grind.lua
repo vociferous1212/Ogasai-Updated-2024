@@ -789,10 +789,12 @@ function script_grind:run()
 				if (not GetLocalPlayer():HasBuff("Stealth")) then
 					self.enemyObj:AutoAttack();
 				end
-				if (GetLocalPlayer():HasBuff("Stealth")) and (not self.stealthRanOnce) then
+				local attackTimer = 0;
+				if (GetLocalPlayer():HasBuff("Stealth")) and (not self.stealthRanOnce) and (GetTimeEX() > attackTimer) then
 					self.enemyObj:AutoAttack();
-					CastSpellByName("Attack");
+					attackTimer = GetTimeEX() + 10000;
 					self.stealthRanOnce = true;
+					CastSpellByName("Attack");
 				end
 			end
 			-- Fix bug, when not targeting correctly
@@ -1704,7 +1706,7 @@ function script_grind:enemiesWithinRange() -- returns number of enemies within r
 	local currentObj, typeObj = GetFirstObject(); 
 	while currentObj ~= 0 do 
     	if (typeObj == 3) and (PlayerHasTarget()) then
-		if (currentObj:CanAttack()) and (not currentObj:IsDead()) then
+		if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
                 	if (currentObj:GetDistance() < GetLocalPlayer():GetUnitsTarget():GetDistance() + script_checkAdds.addsRange) then 
                 		unitsInRange = unitsInRange + 1; 
                 	end 
