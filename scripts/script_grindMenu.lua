@@ -293,6 +293,9 @@ function script_grindMenu:menu()
 		Text('Loot Corpse Distance');
 		script_grind.lootDistance = SliderFloat("LCD (yd)", 1, 5, script_grind.lootDistance);
 
+		Text("Blacklist Loot Time");
+		script_grind.blacklistLootTimeVar = SliderInt("BL (sec)", 10, 60, script_grind.blacklistLootTimeVar);
+
 	end
 	
 	script_gather:menu();

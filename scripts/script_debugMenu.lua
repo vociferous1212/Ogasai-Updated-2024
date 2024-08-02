@@ -87,6 +87,9 @@ function script_debugMenu:menu()
 			local g = (GetTimeEX()-gg)/1000;
 			Text("Blacklist time : " ..g.. " sec");
 
+			Separator();
+			Text("Blacklist Loot Time : " ..(script_grind.blacklistLootTime/1000).. " sec");
+			Text("Time Left : " ..((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000).. " sec");
 			-- separator for next menu - counter menu
 		Separator();
 	end

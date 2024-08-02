@@ -216,6 +216,8 @@ Separator();
 					Text("Stealth Opener");
 					script_druid.stealthOpener = InputText("Opener", script_druid.stealthOpener);
 				end
+				Separator();
+				script_druidEX2:menuOne();
 			end
 		end
 

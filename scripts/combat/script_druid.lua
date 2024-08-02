@@ -1,6 +1,7 @@
 script_druid = {
 	message = 'Druid',
 	menuIncluded = include("scripts\\combat\\script_druidEX.lua"),
+	menu2Included = include("scripts\\combat\\script_druidEX2.lua"),
 	eatHealth = 35,
 	drinkMana = 50,
 	rejuvenationHealth = 80,	-- use rejuvenation below this health
@@ -31,6 +32,8 @@ script_druid = {
 	usePowerShift = false,
 	hasRegrowth = false,
 	thornsTimer = 0,
+	clawEnergy = 45,
+	rakeEnergy = 40,
 }
 
 
@@ -114,18 +117,24 @@ function script_druid:setup()
 	local level = GetLocalPlayer():GetLevel();
 	if level == 10 then
 		self.maulRage = 14;
+		self.clawEnergy = 44
 	end
 	if level == 11 then
 		self.maulRage = 13;
+		self.clawEnergy = 43;
 	end
 	if level == 12 then
 		self.maulRage = 12;
+		self.clawEnergy = 42;
 	end
 	if level == 13 then
 		self.maulRage = 11;
+		self.clawEnergy = 41;
 	end
 	if (HasSpell("Feral Charge")) or (level >= 14) then
 		self.maulRage = 10;
+		self.clawEnergy = 40;
+		self.rakeEnergy = 35;
 	end
 
 	if (not HasSpell("Bear Form")) then
@@ -1497,7 +1506,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 				end
 
 				-- keep rake up
-				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= 35) and (not targetObj:GetCreatureType() == "Elemental") then
+				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (not targetObj:GetCreatureType() == "Elemental") then
 					if (CastSpellByName("Rake", targetObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						return 0;
@@ -1505,7 +1514,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 				end
 
 				-- Use Claw
-				if (localCP < 5) and (localEnergy >= 40) then
+				if (localCP < 5) and (localEnergy >= self.clawEnergy) then
 					if (CastSpellByName("Claw")) then
 						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1600;

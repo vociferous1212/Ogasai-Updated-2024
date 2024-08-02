@@ -120,7 +120,9 @@ script_grind = {
 	playerName = "",	-- paranoid player name
 	otherName = player,	-- paranoid player name
 	playerPos = 0,	-- paranoid player pos
-	blacklistLootTime = GetTimeEX() + 25000,	-- blacklist loot time
+	blacklistLootTime = 0,	-- blacklist loot time
+	blacklistLootTimeCheck = 0,
+	blacklistLootTimeVar = 30,
 	timerSet = false,	-- blacklist loot timer set
 	messageOnce = true,	-- message once blacklist loot obj
 	perHasTarget = false,	-- used to check pet target during rest
@@ -263,6 +265,8 @@ function script_grind:setup()
 
 	self.nodeTimer = GetTimeEX();
 	self.attackTimer = GetTimeEX();
+	self.blacklistLootTime = GetTimeEX();
+	self.blacklistLootTimeCheck = GetTimeEX();
 
 	-- why was this not iterated before?
 	local level = GetLocalPlayer():GetLevel();
@@ -611,13 +615,17 @@ function script_grind:run()
 		script_grind.undoAFK = false;
 		return true;
 	end
-	
+
 	if (IsInCombat()) and (not IsMoving()) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (self.enemyObj:GetDistance() <= 30) then
 				self.enemyObj:FaceTarget();
 			end
 		end
+	end
+
+	if (not IsInCombat()) and (not IsLooting()) then
+		self.blacklistLootTime = GetTimeEX();
 	end
 
 	-- set tick rate for scripts
@@ -1046,8 +1054,6 @@ function script_grind:run()
 				self.message = "Moving to target...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
-
-				LootTarget();
 
 				-- check positions
 				local _x, _y, _z = self.enemyObj:GetPosition();
@@ -1759,9 +1765,15 @@ function script_grind:doLoot(localObj)
 
 
 		if (not self.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
-			self.blacklistLootTime = GetTimeEX() + 25000;
+			self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 			self.timerSet = true;
 		end
+
+if (self.lootObj ~= nil) then
+		if (script_grind:isTargetHardBlacklisted(self.lootObj:GetGUID())) then
+			self.lootObj = nil; -- don't loot blacklisted targets	
+		end
+	end
 
 	-- Loot checking/reset target
 	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then
@@ -1840,12 +1852,12 @@ function script_grind:doLoot(localObj)
 
 	-- blacklisting loot after x time
 	if (IsStanding()) and (not IsInCombat()) then
-		if (GetTimeEX() >= self.blacklistLootTime) then
+		if (self.blacklistLootTime >= self.blacklistLootTimeCheck) then
 			-- add to blacklist
 			script_grind:addTargetToHardBlacklist(self.lootObj:GetGUID());
 			-- variable on/off to stop spamming message
 			if (self.messageOnce) then
-			self.blacklistLootTime = GetTimeEX() + 25000;
+			self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 			self.messageOnce = false;
 			end
 		end
@@ -1896,7 +1908,7 @@ function script_grind:lootAndSkin()
 		self.lootObj = nil;
 	end
 	if (self.lootObj ~= nil) then
-		if (script_grind:isTargetHardBlacklisted(self.lootObj:GetGUID()) and self.lootObj:GetDistance() > 10) then
+		if (script_grind:isTargetHardBlacklisted(self.lootObj:GetGUID())) then
 			self.lootObj = nil; -- don't loot blacklisted targets	
 		end
 	end
@@ -1958,7 +1970,7 @@ function script_grind:runRest()
 	-- run the rest script for grind/combat
 	if(RunRestScript()) then
 		-- reset blacklist looting time
-		script_grind.blacklistLootTime = GetTimeEX() + 30000;
+		script_grind.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 
 		-- set tick rate for resting
 		if (not script_grind.adjustTickRate) then
