@@ -234,6 +234,10 @@ function script_rogue:run(targetGUID)
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
 
+	if (IsLooting()) then
+		LootTarget();	
+	end
+
 	if(targetObj == 0 or targetObj == nil) then
 		return 2;
 	end
@@ -277,6 +281,7 @@ function script_rogue:run(targetGUID)
 
 			if (IsLooting()) then
 				LootTarget();
+				return;
 			end
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
@@ -370,7 +375,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Stealth in range if enabled
-				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) and (script_grind.lootObj == nil) then
+				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasMagic()) and (script_grind.lootObj == nil) then
 					if (not IsStealth()) then
 						CastStealth();
 					end
@@ -396,7 +401,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Check if we are in melee range
-				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsStealth()) then
+				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsStealth()) and (not IsLooting()) then
 					LootTarget();
 					return 3;
 				end
@@ -442,12 +447,12 @@ function script_rogue:run(targetGUID)
 					DisMount();
 				end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return;
-			end
-		end
+				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return;
+					end
+				end
 
 
 				-- Check if we are in melee range
@@ -1179,7 +1184,7 @@ function script_rogue:rest()
 
 	local vendorStatus = script_vendor:getStatus();
 
-	if (HasSpell("Stealth")) and (not IsStealth()) and (IsSpellOnCD("Stealth")) and (self.useStealth) and (not IsLooting()) and (script_grind.lootObj == nil) and (vendorStatus ~= 1) and (vendorStatus ~= 2) and (vendorStatus ~= 3) and (vendorStatus ~= 4) then
+	if (HasSpell("Stealth")) and (not IsStealth()) and (IsSpellOnCD("Stealth")) and (self.useStealth) and (not IsLooting()) and (script_grind.lootObj == nil) and (vendorStatus ~= 1) and (vendorStatus ~= 2) and (vendorStatus ~= 3) and (vendorStatus ~= 4) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
 		self.message = "Waiting for Stealth cooldown...";
 		ClearTarget();
 		return 4;

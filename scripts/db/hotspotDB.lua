@@ -225,8 +225,8 @@ function hotspotDB:setup()
 	hotspotDB:addHotspot("Deathknell 1 - 3", "Undead", 1, 3, 1920.98, 1656.87, 80.98);
 	hotspotDB:addHotspot("Deathknell 2 - 4", "Undead", 2, 4, 2115.48, 1691.57, 73.04);
 	hotspotDB:addHotspot("Deathknell 3 - 5", "Undead", 3, 5, 1888.2, 1299.41, 95.87);
-	hotspotDB:addHotspot("Deathknell 4 - 6", "Undead", 4, 6, 1870.24, 1387.63, 78.07);
-	hotspotDB:addHotspot("Night Web's Hollow 5 - 7", "Undead", 5, 7, 2049.17, 1819.51, 106.76);
+	hotspotDB:addHotspot("Deathknell 4 - 5", "Undead", 4, 5, 1870.24, 1387.63, 78.07);
+	hotspotDB:addHotspot("Night Web's Hollow 4 - 5", "Undead", 4, 5, 2049.17, 1819.51, 106.76);
 	hotspotDB:addHotspot("Tirisfal Glades 8 - 10", "Undead", 8, 10, 2534.28, 1057.37, 84.39);
 	hotspotDB:addHotspot("Stillwater Pond 7 - 9", "Undead", 7, 9, 2361.71, 763.79, 38.95);
 	hotspotDB:addHotspot("Tirisfal Glades 6 - 8", "Undead", 6, 8, 2645, 221.65, 33.31);

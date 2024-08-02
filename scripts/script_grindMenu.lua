@@ -202,6 +202,7 @@ function script_grindMenu:menu()
 			if (Button("Save Current Location As Hotspot")) then script_nav:newHotspot(GetMinimapZoneText() .. ' ' .. GetLocalPlayer():GetLevel() .. ' - ' .. GetLocalPlayer():GetLevel()+2);
 				script_grind.staticHotSpot = false;
 				script_grindMenu:printHotspot(); 
+				script_grind.hotspotReached = true;
 			end
 
 			if (not script_grind.hotspotReached) then

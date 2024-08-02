@@ -89,6 +89,7 @@ function script_checkDebuffs:hasMagic()
 		or (player:HasDebuff("Fear"))
 		or (player:HasDebuff("Entangling Roots"))
 		or (player:HasDebuff("Sonic Burst"))
+		or (player:HasDebuff("Shadow Word: Pain"))
 
 	
 	then

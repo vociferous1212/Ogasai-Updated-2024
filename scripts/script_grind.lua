@@ -139,6 +139,7 @@ script_grind = {
 	drawChests = true,
 	deleteItems = true,
 	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
+	recheckTimer = 0,	-- used for rechecking add ranges outside of combat to find a valid target
 }
 
 function script_grind:setup()
@@ -279,6 +280,8 @@ function script_grind:setup()
 	if (level == 60) then
 		script_checkAdds.addsRange = 28;
 	end
+
+	self.recheckTimer = GetTimeEX();
 
 	-- we are setup don't reload these items here
 	self.isSetup = true;
@@ -1056,7 +1059,10 @@ function script_grind:run()
 
 
 				-- move to target
-				self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+				--self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+				self.message = "Moving To Target - " ..self.enemyObj:GetUnitName().. " " ..math.floor(self.enemyObj:GetDistance()).. " (yd)"
+					MoveToTarget(_x, _y, _z);
+
 
 					-- set wait timer to move clicks
 					if (IsMoving()) then
@@ -1615,7 +1621,7 @@ function script_grind:enemyIsValid(i)
 	-- RECHECK TARGETS
 	-- target blacklisted moved away from other targets
 	-- bot can target blacklisted targets under these conditions
-		if (self.skipHardPull)
+		if (self.skipHardPull) and (GetTimeEX() > self.recheckTimer)
 			and (self.extraSafe)
 			and (script_grind:isTargetBlacklisted(i:GetGUID())
 			and script_aggro:safePullRecheck(i)) then
@@ -1641,6 +1647,7 @@ function script_grind:enemyIsValid(i)
 				) then
 					-- force bot to keep this target and not recheck safepull over and over again
 					script_grind.enemyObj = currentObj;
+					self.recheckTimer = GetTimeEX() + 5000;
 			return true;
 			end
 		end
