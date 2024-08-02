@@ -9,9 +9,9 @@ script_rogue = {
 	throwName = "Heavy Throwing Dagger",
 	stealthOpener = "Sinister Strike",
 	eatHealth = 60,
-	potionHealth = 7,
+	potionHealth = 10,
 	cpGeneratorCost = 45,
-	meleeDistance = 3.4,
+	meleeDistance = 3.8,
 	stealthRange = 100,
 	waitTimer = 0,
 	vanishHealth = 8,
@@ -1183,10 +1183,10 @@ function script_rogue:rest()
 			return true; 
 		else 
 			self.message = "No food! (or food not included in script_helper)";
-			return;
+			return true;
 		end
 	ClearTarget();
-	return;		
+	return true;		
 	end
 
 	-- Stealth when we eat

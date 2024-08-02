@@ -278,7 +278,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange*2);
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange/2.5);
 				PetFollow();
 			else
 				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2.5);
@@ -513,7 +513,7 @@ function script_checkAdds:avoidToAggro2(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange*2);
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange/2.5);
 				PetFollow();
 
 			else

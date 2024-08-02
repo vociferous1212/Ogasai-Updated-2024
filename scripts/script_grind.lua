@@ -1576,6 +1576,37 @@ function script_grind:enemyIsValid(i)
 				return true; 
 		end
 
+-- RECHECK TARGETS
+	-- target blacklisted moved away from other targets
+	-- bot can target blacklisted targets under these conditions
+		if (self.skipHardPull)
+			and (self.extraSafe)
+			and (script_grind:isTargetBlacklisted(i:GetGUID())
+			and script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
+			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
+				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
+				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
+				and i:GetDistance() < self.pullDistance and (not i:IsTapped() or i:IsTappedByMe())
+				and not (self.skipUnknown and i:GetCreatureType() == 'Not specified')
+				and not (self.skipHumanoid and i:GetCreatureType() == 'Humanoid')
+				and not (self.skipDemon and i:GetCreatureType() == 'Demon')
+				and not (self.skipBeast and i:GetCreatureType() == 'Beast')
+				and not (self.skipElemental and i:GetCreatureType() == 'Elemental')
+				and not (self.skipUndead and i:GetCreatureType() == 'Undead') 
+				and not (skipAberration and i:GetCreatureType() == 'Abberration') 
+				and not (skipDragonkin and i:GetCreatureType() == 'Dragonkin') 
+				and not (skipGiant and i:GetCreatureType() == 'Giant') 
+				and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
+				and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
+				) then
+					-- force bot to keep this target and not recheck safepull over and over again
+					script_grind.enemyObj = currentObj;
+			return true;
+			end
+			-- force bot to return this target if it was able to attack it once before...
+			return;
+		end
+
 	-- don't use avoid targets and don't recheck aggro range targets only skip hard pulls
 		-- normal targeting logitechs style
 		if (self.skipHardPull) and (not self.extraSafe) and (not script_grindEX.avoidBlacklisted)
@@ -1622,34 +1653,6 @@ function script_grind:enemyIsValid(i)
 			end
 		end
 
--- RECHECK TARGETS
-	-- target blacklisted moved away from other targets
-	-- bot can target blacklisted targets under these conditions
-		if (self.skipHardPull)
-			and (self.extraSafe)
-			and (script_grind:isTargetBlacklisted(i:GetGUID())
-			and script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
-			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
-				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
-				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
-				and i:GetDistance() < self.pullDistance and (not i:IsTapped() or i:IsTappedByMe())
-				and not (self.skipUnknown and i:GetCreatureType() == 'Not specified')
-				and not (self.skipHumanoid and i:GetCreatureType() == 'Humanoid')
-				and not (self.skipDemon and i:GetCreatureType() == 'Demon')
-				and not (self.skipBeast and i:GetCreatureType() == 'Beast')
-				and not (self.skipElemental and i:GetCreatureType() == 'Elemental')
-				and not (self.skipUndead and i:GetCreatureType() == 'Undead') 
-				and not (skipAberration and i:GetCreatureType() == 'Abberration') 
-				and not (skipDragonkin and i:GetCreatureType() == 'Dragonkin') 
-				and not (skipGiant and i:GetCreatureType() == 'Giant') 
-				and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
-				and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
-				) then
-					-- force bot to keep this target and not recheck safepull over and over again
-					script_grind.enemyObj = currentObj;
-			return true;
-			end
-		end
 
 	-- These are targets that are not avoided or blacklisted
 	-- valid enemies if we skip hard pulls and recheck targets
@@ -2007,7 +2010,7 @@ function script_grind:runRest()
 		end
 	return true;	
 	end
-	self.needRest = false;
+self.needRest = false;
 return false;
 end
 

@@ -47,7 +47,7 @@ function script_rogueEX:menu()
 			Text('Eat below health percent');
 			script_rogue.eatHealth = SliderInt('EHP %', 1, 100, script_rogue.eatHealth);
 			Text("Potion below health percent");
-			script_rogue.potionHealth = SliderInt('PHP %', 2, 10, script_rogue.potionHealth);
+			script_rogue.potionHealth = SliderInt('PHP %', 7, 15, script_rogue.potionHealth);
 			Separator();
 			Text("Melee Range to target");
 			script_rogue.meleeDistance = SliderFloat('MR (yd)', 1, 6, script_rogue.meleeDistance);
