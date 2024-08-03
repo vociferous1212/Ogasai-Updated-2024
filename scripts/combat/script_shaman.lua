@@ -279,8 +279,8 @@ function script_shaman:healsAndBuffs()
 	if (not IsCasting()) and (not IsChanneling()) and (localHealth < self.healHealth) and (localMana >= self.healMana) then 
 		if (CastHeal(self.healingSpell, localObj)) then
 			if (self.healingSpell ~= "Lesser Healing Wave") then
-				self.waitTimer = GetTimeEX() + 4000;
-				script_grind:setWaitTimer(4000);
+				self.waitTimer = GetTimeEX() + 4500;
+				script_grind:setWaitTimer(4500);
 			end
 		return false;
 		end
@@ -423,10 +423,10 @@ function script_shaman:run(targetGUID)
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) and (targetObj:GetHealthPercentage() >= 20) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				return true;
+				return;
 			end
 		end
 

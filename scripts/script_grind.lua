@@ -23,6 +23,7 @@ script_grind = {
 	omLoaded = include("scripts\\script_om.lua"),
 	jump = true,	-- enable jumping out of combat
 	jumpRandomFloat = 98,	-- jump > than 
+	jumpCheck = false,
 	useVendor = true,	-- use vendor
 	repairWhenYellow = true,	-- repair when yellow
 	stopWhenFull = false,	-- stop when bags are full
@@ -726,6 +727,13 @@ function script_grind:run()
 		-- Gather
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
 			if (script_gather:gather()) then
+					script_nav.lastnavIndex = 1;
+
+					-- turn off jump fo gathering...
+					if (self.jump) then
+						self.jumpCheck = true;
+						self.jump = false;
+					end
 					-- bot was blacklisting targets after gathering
 					self.newTargetTime = GetTimeEX();
 					CastStealth();
@@ -740,6 +748,11 @@ function script_grind:run()
 				end
 			return true;
 			end
+		end
+		
+		if (self.jumpCheck) then
+			self.jump = true;
+			self.jumpCheck = false;
 		end
 
 		-- hotspot reached distance
@@ -888,7 +901,7 @@ function script_grind:run()
 			end
 
 			-- check and do move away from adds during combat
-			if (script_checkAdds:checkAdds()) then
+			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
 				script_om:FORCEOM();
 				return;
 			end
@@ -1094,9 +1107,12 @@ function script_grind:run()
 
 
 				-- move to target
-				--self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-				self.message = "Moving To Target - " ..self.enemyObj:GetUnitName().. " " ..math.floor(self.enemyObj:GetDistance()).. " (yd)"
+				if (IsInCombat()) or (not IsMoving()) then
+					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+				else
+					self.message = "Moving To Target - " ..self.enemyObj:GetUnitName().. " " ..math.floor(self.enemyObj:GetDistance()).. " (yd)"
 					MoveToTarget(_x, _y, _z);
+				end
 
 
 					-- set wait timer to move clicks
@@ -1149,7 +1165,7 @@ function script_grind:run()
 				script_om:FORCEOM2();
 				end
 				-- check and avoid adds
-				if (script_checkAdds:checkAdds()) then
+				if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
 					script_om:FORCEOM();
 					return;
 				end
@@ -1830,36 +1846,30 @@ function script_grind:doLoot(localObj)
 		-- stand if we are sitting
 		if(not IsStanding()) then
 			StopMoving();
-			self.waitTimer = GetTimeEX() + 450;
-			script_grind:setwaitTimer(450);
+			self.waitTimer = GetTimeEX() + 350;
 			return;
 		end
 
 		-- Dismount
 		if (IsMounted()) then
 			DisMount();
-			self.waitTimer = GetTimeEX() + 450;
-			script_grind:setwaitTimer(450);
+			self.waitTimer = GetTimeEX() + 350;
 			return;
 		end
 
 		-- interact with object if we are not looting
 		if(not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
-			self.waitTimer = GetTimeEX() + 1750;
-			script_grind:setWaitTimer(1750);
-
+			self.waitTimer = GetTimeEX() + 750;
 			return;
 		end
 	
 		-- if looting and not moving then wait
 		if (not LootTarget()) and (not IsMoving()) then
-			script_grind:setWaitTimer(450);
-			self.waitTimer = GetTimeEX() + 450;
+			self.waitTimer = GetTimeEX() + 350;
 			return;
 		else
 			-- we looted so reset variables
-			self.waitTimer = GetTimeEX() + 450;
-			script_grind:setWaitTimer(450);
+			self.waitTimer = GetTimeEX() + 350;
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
 			return;
@@ -1893,9 +1903,13 @@ function script_grind:doLoot(localObj)
 	end
 
 	-- move to loot object
-	self.message = "Moving to loot...";		
-	script_navEX:moveToTarget(localObj, _x, _y, _z);	
-	script_grind:setWaitTimer(self.nextToNodeDist * 5);
+	self.message = "Moving to loot...";
+	 if (not IsMoving()) then
+		self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+	else
+		MoveToTarget(_x, _y, _z);
+		script_grind:setWaitTimer(self.nextToNodeDist * 2);
+	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then

@@ -426,9 +426,13 @@ function script_gather:gather()
 			self.waitTimer = GetTimeEX() + 450;
 		else
 			if (_x ~= 0) then
+				if (not IsMoving()) then
+					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 
-				MoveToTarget(_x, _y, _z);
-				self.timer = GetTimeEX() + 250;
+				else
+					MoveToTarget(_x, _y, _z);
+					self.timer = GetTimeEX() + 250;
+				end
 			end
 		end
 
