@@ -1859,7 +1859,7 @@ function script_grind:doLoot(localObj)
 		else
 			-- we looted so reset variables
 			self.waitTimer = GetTimeEX() + 450;
-			script_grind:setwaitTimer(450);
+			script_grind:setWaitTimer(450);
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
 			return;
