@@ -17,13 +17,13 @@ function script_debugMenu:menu()
 			
 			-- true we are indoors
 			local a = "true";
-			Text("Are we indoors? - " ..a);
+			Text("IsIndoors() - " ..a);
 	
 		else
 
 			-- false we are indoors
 			local a = "false";
-			Text("Are we indoors? - " ..a);
+			Text("IsIndoors() - " ..a);
 		end
 
 		-- target has ranged weapon?
@@ -32,12 +32,12 @@ function script_debugMenu:menu()
 
 				-- true target has weapon
 				local b = "true";
-				Text("Target has ranged weapon? - " ..b);
+				Text("target:HasRangedWeapon() - " ..b);
 			else
 			
 				-- false target has weapon
 				local b = "false";
-				Text("Target has ranged weapon? - " ..b);
+				Text("target:HasRangedWeapon() - " ..b);
 			end
 		
 			-- true target is casting
@@ -45,18 +45,26 @@ function script_debugMenu:menu()
 
 				-- true target is casting
 				local c = "true";
-				Text("Target is casting? - " ..c);
+				Text("target:IsCasting() - " ..c);
 			else
 
 				-- false target is casting
 				local c = "false";
-				Text("Target is casting? - " ..c);
+				Text("target:IsCasting() - " ..c);
 			end
 		else
 
 			-- show the text is casting or has ranged weapon
-			Text("Target has ranged weapon? - No Target!");
-			Text("Target is casting? - No Target!");
+			Text("target:HasRangedWeapon() - No Target!");
+			Text("target:IsCasting() - No Target!");
+		end
+
+		-- get target classification
+		if (GetTarget() ~= 0) then
+			local targetClass = GetTarget():GetClassification();
+			Text("target:GetClassification() - " ..targetClass.. "");
+		else
+			Text("target:GetClassification() - No Target!");
 		end
 
 		-- show grinder enemy object name and distance

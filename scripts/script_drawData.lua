@@ -69,13 +69,18 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		-- draw creature level
 		DrawText(target:GetCreatureType() .. ' - ' .. target:GetLevel(), tX, tY-10, 255, 255, 0);
 
-		-- if target is target
-		if (GetTarget() == target) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetGUID() == target:GetGUID()) or (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == target:GetGUID())then 
+		-- draw my target TARGETED
+		if (GetTarget() == target) or (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == target:GetGUID()) then 
 
 			-- draw text targeted
 			DrawText('(TARGETED)', tX, tY-40, 255, 0, 0); 
+		else
+		-- grinder target TARGETED
+		if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetGUID() == target:GetGUID()) then
+			-- draw text targeted
+			DrawText('(Grinder Target)', tX, tY-40, 255, 0, 0); 
 		end
-
+		end
 		-- draw avoiding targets
 		if (script_grind:isTargetBlacklisted(target:GetGUID())) and (script_grind.skipHardPull)
 			and (not script_grind:isTargetHardBlacklisted(target:GetGUID())) then
@@ -94,8 +99,10 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		end
 
 		-- draw rares
-		if (target:GetClassification() == 2) then
-			DrawText("RARE", tx, ty-30, 255, 255, 255);
+		if (target:GetClassification() == 4) then
+			DrawText("(Rare)", tX, tY-25, 255, 255, 255);
+		elseif (target:GetClassification() == 1) then
+			DrawText("(Elite)", tX, tY-25, 255, 255, 255);
 		end
 
 		-- draw unit HP

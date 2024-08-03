@@ -126,7 +126,7 @@ script_grind = {
 	playerPos = 0,	-- paranoid player pos
 	blacklistLootTime = 0,	-- blacklist loot time
 	blacklistLootTimeCheck = 0,
-	blacklistLootTimeVar = 30,
+	blacklistLootTimeVar = 45,
 	timerSet = false,	-- blacklist loot timer set
 	messageOnce = true,	-- message once blacklist loot obj
 	perHasTarget = false,	-- used to check pet target during rest
@@ -582,6 +582,8 @@ function script_grind:run()
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
 				script_grind:setWaitTimer(3850);
+				-- reset blacklist timer
+				self.newTargetTime = GetTimeEX();
 			
 			-- if player is within distance <= 30 then do this
 			if (script_grind.playerParanoidDistance <= 30) and (script_grind:playersTargetingUs() >= 1) and (not IsInCombat()) then
@@ -893,6 +895,8 @@ function script_grind:run()
 			and (not self.enemyObj:IsCasting())
 			and (not self.enemyObj:IsFleeing())
 			and (not script_shamanEX2:usingTotems())
+			and (self.enemyObj:GetHealthPercentage() >= 20)
+			--and (not self.enemyObj:HasRangedWeapon())
 		 then
 		
 			-- force reset of closestEnemy
@@ -1110,7 +1114,7 @@ function script_grind:run()
 				if (IsInCombat()) or (not IsMoving()) then
 					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 				else
-					self.message = "Moving To Target - " ..self.enemyObj:GetUnitName().. " " ..math.floor(self.enemyObj:GetDistance()).. " (yd)"
+					self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					MoveToTarget(_x, _y, _z);
 				end
 
@@ -1158,6 +1162,8 @@ function script_grind:run()
 				and (not self.enemyObj:IsCasting())
 				and (not self.enemyObj:IsFleeing())
 				and (not script_shamanEX2:usingTotems())
+				and (self.enemyObj:GetHealthPercentage() >= 20)
+				--and (not self.enemyObj:HasRangedWeapon())
 			then
 
 				if (self.enemyObj ~= nil) then
@@ -1348,7 +1354,7 @@ function script_grind:assignTarget()
 		if (targetType == 3) then
 		
 			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 				
 				-- run another object manager
 				if (script_grind:isTargetingGroup(i)) then

@@ -82,7 +82,7 @@ function script_vendor:deleteKeepItem(itemNr)
 	self.keepItems = {};
 	local x = 0;
 	local y = 0;
-	for i=0, self.keepNum-1 do
+	for i=0, self.keepNum - 1 do
 		if (i ~= itemNr) then
 			self.keepItems[x] = tempList[y];
 			x = x+1;

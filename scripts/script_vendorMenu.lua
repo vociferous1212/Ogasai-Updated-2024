@@ -50,7 +50,7 @@ function script_vendorMenu:menu()
 		Text("Unique Keep Items:");
 		wasClicked, script_vendor.selectedKeepItemNr = ComboBox("", script_vendor.selectedKeepItemNr, unpack(script_vendor.keepItems));
 		if Button("Remove") then
-			script_vendor:deleteKeepItem(script_vendor.selectedKeepItemNr-1);
+			script_vendor:deleteKeepItem(script_vendor.selectedKeepItemNr+1);
 		end
 		SameLine();
 		Text(" - Removes Selected Item From The Keep List...");

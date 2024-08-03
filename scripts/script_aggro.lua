@@ -72,7 +72,7 @@ function script_aggro:safePull(target)
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4) then
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4) and (not currentObj:IsCasting()) then
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
@@ -115,7 +115,7 @@ function script_aggro:enemiesNearMe()
 			-- acceptable targets
 			if (not currentObj:GetGUID() == target:GetGUID()) then
 				if (currentObj:CanAttack()) and (not currentObj:IsDead())
-					and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:IsInLineOfSight()) then
+					and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:IsInLineOfSight()) and (not currentObj:IsCasting()) then
 
 					-- acceptable target aggro based on level
 					aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);		
@@ -162,7 +162,7 @@ function script_aggro:safePullRecheck(target)
  		if (typeObj == 3) then
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then	
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
 
 				-- aggro range is aggro addsRange slider
 				aggro = script_checkAdds.addsRange - 5;
@@ -290,6 +290,7 @@ function script_aggro:closeToBlacklistedTargets()
 			and (not currentObj:HasDebuff("Fear"))
 			and (currentObj:GetGUID() ~= script_grind.lastAvoidTarget:GetGUID())
 			and (currentObj:GetDistance() < 65)
+			and (not currentObj:IsCasting())
 		then
 			-- set aggro range based on current level
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 23.5;

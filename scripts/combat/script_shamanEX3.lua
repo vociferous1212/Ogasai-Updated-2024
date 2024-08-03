@@ -68,17 +68,21 @@ function script_shamanEX3:alternateTotemMenuEarth()
 
 	-- show checkboxes
 	if (z) then
+		-- if a
 		if not (b) and not (c) and not (d) and (aa) then
 			wasClicked, self.stoneskinTotem = Checkbox("Stoneskin", self.stoneskinTotem);
 			SameLine();
 		end
+		-- if b
 		if not (a) and not (c) and not (d) and (bb) then
 			wasClicked, self.strengthOfEarthTotem = Checkbox("Strength of Earth", self.strengthOfEarthTotem);
 		end
+		-- if c
 		if not (a) and not (b) and not (d) and (cc) then
 			wasClicked, self.stoneclawTotem = Checkbox("Stoneclaw", self.stoneclawTotem);
 		SameLine();
 		end
+		-- if d
 		if not (a) and not (b) and not (c) and (dd) then
 			wasClicked, self.earthbindTotem = Checkbox("Earthbind", self.earthbindTotem);
 		end

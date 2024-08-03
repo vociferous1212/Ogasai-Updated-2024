@@ -287,10 +287,10 @@ function script_rogue:run(targetGUID)
 				end
 			end
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				return;
+				return true;
 			end
 		end
 
@@ -474,14 +474,6 @@ function script_rogue:run(targetGUID)
 				if (IsMounted()) then
 					DisMount();
 				end
-
-				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-					if (script_checkAdds:checkAdds()) then
-						script_om:FORCEOM();
-						return;
-					end
-				end
-
 
 				-- Check if we are in melee range
 				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsLooting()) then
@@ -689,19 +681,19 @@ function script_rogue:run(targetGUID)
 					return 0; -- return until we use Eviscerate
 				end
 
+				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return true;
+					end
+				end
+
 				-- Use CP generator attack 
 				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
 					if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
 						return 0;
 					end
 				end
-
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return;
-			end
-		end
 			
 			end
 		end
@@ -1168,7 +1160,7 @@ function script_rogue:rest()
 	end
 
 	-- Eat something
-	if (not IsEating() and localHealth < self.eatHealth) and (not IsInCombat()) then
+	if (not IsEating() and localHealth < self.eatHealth) and (not IsInCombat()) and (not IsSwimming()) then
 		script_grind:setWaitTimer(1500);
 		self.waitTimer = GetTimeEX() + 2000;
 		self.message = "Need to eat...";
