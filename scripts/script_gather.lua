@@ -29,6 +29,7 @@ script_gather = {
 	collectChests = false,
 	dist = 0,
 	messageToGrinder = "",
+	gathering = false,
 }
 
 function script_gather:addChest(name, id)
@@ -279,6 +280,7 @@ function script_gather:gather()
 	if(not self.isSetup) then
 		script_gather:setup();
 	end
+	self.gathering = true;
 
 	if (self.timer > GetTimeEX()) then
 		return true;
@@ -291,7 +293,9 @@ function script_gather:gather()
 	local tempNode = script_gather:GetNode();
 	local newNode = (self.nodeObj == tempNode);
 	self.nodeObj = script_gather:GetNode();
-	--self.nodeGUID = self.nodeObj:GetGUID();
+	if (self.nodeObj ~= 0 and self.nodeObj ~= nil) then
+		self.nodeGUID = self.nodeObj:GetGUID();
+	end
 	
 	if(self.nodeObj ~= nil and self.nodeObj ~= 0) then
 	-- and (not script_gather:isNodeBlacklisted(self.nodeGUID))
@@ -304,7 +308,7 @@ function script_gather:gather()
 		self.dist = self.nodeObj:GetDistance();
 
 		-- start to blacklist by nodeID?
-		--self.nodeGUID = self.nodeObj:GetGUID();
+		self.nodeGUID = self.nodeObj:GetGUID();
 
 
 		if (dist < self.lootDistance) then
@@ -365,53 +369,6 @@ function script_gather:gather()
 		end
 		return true;
 	end
+	self.gathering = false;
 	return false;
-end
-
-function script_gather:menu()
-
-	if(not self.isSetup) then
-		script_gather:setup();
-	end
-
-	local wasClicked = false;
-	
-	if (CollapsingHeader("Gather options")) then
-		wasClicked, script_grind.gather = Checkbox("Gather on/off", script_grind.gather);
-		
-		wasClicked, self.collectMinerals = Checkbox("Mining", self.collectMinerals);
-		SameLine();
-		wasClicked, self.collectHerbs = Checkbox("Herbalism", self.collectHerbs);
-		SameLine();
-		wasClicked, self.collectChests = Checkbox("Chests", self.collectChests);
-
-		Text('Gather Search Distance');
-		self.gatherDistance = SliderFloat("GSD", 1, 250, self.gatherDistance);
-		
-		if (script_gather.collectMinerals or script_gather.collectHerbs) then
-			wasClicked, script_gather.gatherAllPossible = Checkbox("Gather All Possible", script_gather.gatherAllPossible);
-		end
-
-		if(self.collectMinerals and not script_gather.gatherAllPossible) then
-			Separator();
-			Text('Minerals');
-			
-			-- -14 for some reason double counts each mineral from above
-			for i=0,self.numMinerals - 14 do
-				wasClicked, self.minerals[i][2] = Checkbox(self.minerals[i][0], self.minerals[i][2]);
-				SameLine(); Text('(' .. self.minerals[i][3] .. ') Req Level');
-			end
-		end
-		
-		-- -29 for some reason double counts each herb from above
-		if(self.collectHerbs and not script_gather.gatherAllPossible) then
-			Separator();
-			Text('Herbs');
-			
-			for i=0,self.numHerbs - 29 do
-				wasClicked, self.herbs[i][2] = Checkbox(self.herbs[i][0], self.herbs[i][2]);
-				SameLine(); Text('(' .. self.herbs[i][3] .. ') Req Level');
-			end
-		end
-	end
 end

@@ -298,7 +298,7 @@ function script_grindMenu:menu()
 
 	end
 	
-	script_gather:menu();
+	script_gatherMenu:menu();
 		local wasClicked = false;
 
 	if (CollapsingHeader('Display Options')) then

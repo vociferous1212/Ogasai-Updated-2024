@@ -11,6 +11,7 @@ script_grind = {
 	grindMenu = include("scripts\\script_grindMenu.lua"),
 	getSpellsLoaded = include("scripts\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
+	gatherMenuLoaded = include("scripts\\script_gatherMenu.lua"),
 	getSpells = false,
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	grindPartyOptionsLoaded = include("scripts\\script_grindParty.lua"),
@@ -21,6 +22,7 @@ script_grind = {
 	radarLoaded = include("scripts\\script_radar.lua"),
 	debuffCheck = include("scripts\\script_checkDebuffs.lua"),
 	drawStatusScript = include("scripts\\script_drawStatus.lua"),
+	drawStatusEXScript = include("scripts\\script_drawStatusEX.lua"),
 	omLoaded = include("scripts\\script_om.lua"),
 	jump = true,	-- enable jumping out of combat
 	jumpRandomFloat = 98,	-- jump > than 
@@ -218,7 +220,6 @@ function script_grind:setup()
 
 	-- setup gather script
 	script_gather:setup();
-
 
 	-- vendor database script loaded
 	vendorDB:setup();
@@ -925,9 +926,8 @@ function script_grind:run()
 			if (IsMoving()) then
 				StopMoving();
 			end
-			--ClearTarget();
+			ClearTarget();
 			--self.enemyObj = nil;
-			script_grind:setWaitTimer(500);
 			return;
 		end
 
@@ -1796,7 +1796,7 @@ function script_grind:getDistanceDif()
 end
 
 function script_grind:drawStatus()
-	script_drawStatus:drawSetup();
+	script_drawStatusEX:drawSetup();
 	script_drawStatus:draw();
 end
 
