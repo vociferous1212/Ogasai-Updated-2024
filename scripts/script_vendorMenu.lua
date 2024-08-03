@@ -31,7 +31,8 @@ function script_vendorMenu:menu()
 	if (script_vendor.status ~= 0) then 
 		if Button("Cancel Current Vendor Action") then 
 			script_vendor.message = "Idle..."; 
-			script_vendor.status = 0; 
+			script_vendor.status = 0;
+			script_grind.bagsFull = false;
 		end 
 	end
 

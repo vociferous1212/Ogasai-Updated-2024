@@ -72,7 +72,7 @@ function script_aggro:safePull(target)
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4) then
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();

@@ -682,6 +682,8 @@ function script_warlock:run(targetGUID)
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
 						ClearTarget();
+						self.waitTimer = GetTimeEX() + 1500;
+						script_grind:setWaitTimer(1500);
 						targetObj = 0;
 						return 0;
 					end

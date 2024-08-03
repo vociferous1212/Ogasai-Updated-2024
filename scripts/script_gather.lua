@@ -381,6 +381,17 @@ function script_gather:gather()
 
 
 		if (dist < self.lootDistance) then
+			if (HasForm()) and (self.collectChests) then
+				if (IsCatForm()) then
+					script_druidEX:removeCatForm();
+				end
+				if (IsBearForm()) then
+					script_druidEX:removeBearForm();
+				end
+				if (IsTravelForm) then
+					script_druidEX:removeTravelForm();
+				end
+			end		
 			if (IsMoving()) then
 				StopMoving();
 				self.timer = GetTimeEX() + 950;

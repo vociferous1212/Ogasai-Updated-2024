@@ -1,13 +1,13 @@
 script_shaman = {
 	message = "Shaman Combat Script",
 	shamanMenu = include("scripts\\combat\\script_shamanEX.lua"),
-	eatHealth = 70,
-	drinkMana = 50,
+	eatHealth = 50,
+	drinkMana = 35,
 	healHealth = 55,
 	potionHealth = 10,
 	potionMana = 20,
 	isSetup = false,
-	meleeDistance = 4.10,
+	meleeDistance = 4.50,
 	waitTimer = 0,
 	stopIfMHBroken = true,
 	enhanceWeapon = "no weapon enhancement yet",
@@ -25,7 +25,7 @@ script_shaman = {
 	useFireTotem = false,
 	useWaterTotem = false,
 	useAirTotem = false,
-	earthShockMana = 40,
+	earthShockMana = 60,
 	flameShockMana = 70,
 	lightningBoltMana = 25,
 	pullLightningBolt = false,
@@ -104,6 +104,9 @@ function script_shaman:setup()
 		self.totem3Buff = "Healing Stream";
 	end
 
+	if (localLevel < 6) then
+		self.drinkMana = 25;
+	end
 	if (localLevel >= 10) then
 		self.drinkMana = 40;
 	end
@@ -265,22 +268,15 @@ function script_shaman:healsAndBuffs()
 	end
 
 	-- Check: Healing
-	if (not IsCasting()) and (not IsChanneling()) then
-		if (localHealth < self.healHealth) then
-			if (localMana >= self.healMana) then 
-				if (not CastSpellByName(self.healingSpell, localObj)) then
-					if (self.healingSpell ~= "Lesser Healing Wave") then
-						self.waitTimer = GetTimeEX() + 4000;
-						script_grind:setWaitTimer(4000);
-						return 4;
-					else
-						self.waitTimer = GetTimeEX() + 2500;
-						script_grind:setWaitTimer(2500);
-						return 4;
-					end
-				end
+	if (not IsCasting()) and (not IsChanneling()) and (localHealth < self.healHealth) and (localMana >= self.healMana) then 
+		if (CastHeal(self.healingSpell, localObj)) then
+			if (self.healingSpell ~= "Lesser Healing Wave") then
+				self.waitTimer = GetTimeEX() + 4000;
+				script_grind:setWaitTimer(4000);
 			end
+		return false;
 		end
+	return false;		
 	end
 
 	-- check cure poison
@@ -405,17 +401,6 @@ function script_shaman:run(targetGUID)
 		return 4;
 	end
 
-	-- stop bot from moving target to target when stuck in combat and we need to rest
-	if (IsInCombat()) and (localObj:GetUnitsTarget() == 0) then
-		if (script_shaman:healsAndBuffs()) then
-			script_grind:setWaitTimer(2750);
-			return true;
-		else
-			self.message = "Waiting! Stuck in combat phase!";
-			return 4;
-		end
-	end
-
 	-- dismount before combat
 	if (IsMounted()) then
 		DisMount();
@@ -430,7 +415,7 @@ function script_shaman:run(targetGUID)
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				return true;
@@ -485,12 +470,12 @@ function script_shaman:run(targetGUID)
 						StopMoving();
 						return true;
 					end
-					CastSpellByName("Lightning Bolt", targetObj);
-					self.waitTimer = GetTimeEX() + 3500;
-					script_grind:setWaitTimer(3500);
-					targetObj:FaceTarget();
-					return true;
-				
+					if (not CastSpellByName("Lightning Bolt", targetObj)) then
+						self.waitTimer = GetTimeEX() + 2500;
+						script_grind:setWaitTimer(2500);
+						targetObj:FaceTarget();
+						return 4;
+					end
 				end
 			end
 
@@ -511,8 +496,8 @@ function script_shaman:run(targetGUID)
 
 			-- run backwards can't see target but close enough to attack
 			if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance) and (not targetObj:IsInLineOfSight()) then
-				if (targetObj:GetDistance() <= self.meleeDistance + 1) then 
-					if (script_shaman:runBackwards(targetObj,6)) then 
+				if (targetObj:GetDistance() <= .3) then 
+					if (script_shaman:runBackwards(targetObj,1)) then 
 						return 4; 
 					end 
 				end
@@ -557,7 +542,7 @@ function script_shaman:run(targetGUID)
 			end
 
 			-- stop moving if we get close enough to target and not in combat yet
-			if (not IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance)
+			if (not IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance + .5)
 				and (targetHealth >= 80) then
 				if (IsMoving()) then
 					StopMoving();
@@ -582,6 +567,8 @@ function script_shaman:run(targetGUID)
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
 						ClearTarget();
+						self.waitTimer = GetTimeEX() + 1500;
+						script_grind:setWaitTimer(1500);
 						targetObj = 0;
 						return 0;
 					end
@@ -594,7 +581,7 @@ function script_shaman:run(targetGUID)
 			end
 				
 			-- stop moving if we get close enough to target
-			if (targetObj:GetDistance() <= self.meleeDistance) and (targetHealth >= 80) then
+			if (targetObj:GetDistance() <= self.meleeDistance + .5) and (targetHealth >= 80) then
 				if (IsMoving()) then
 					StopMoving();
 				end
@@ -604,7 +591,7 @@ function script_shaman:run(targetGUID)
 			if (IsMounted()) then DisMount(); end
 
 			-- stop moving if we get close enough to target and not in combat yet
-			if (not IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance)
+			if (not IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance +.5)
 				and (targetHealth >= 80) then
 				if (IsMoving()) then
 					StopMoving();
@@ -791,7 +778,7 @@ function script_shaman:run(targetGUID)
 				end
 
 				-- stop moving if we get close enough to target
-				if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance)
+				if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance+.5)
 					and (targetHealth >= 80) then
 					if (IsMoving()) then
 						StopMoving();

@@ -176,13 +176,13 @@ function hotspotDB:setup()
 
 	-- Mulgore
 	
-	hotspotDB:addHotspot("Red Cloud Mesa 1 - 3", "Tauren", 1, 3, -2889.91, -418.89, 48.47);
-	hotspotDB:addHotspot("Red Cloud Mesa 2 - 4", "Tauren", 2, 4, -3488.8, -215.55, 87.16);
-	hotspotDB:addHotspot("Red Cloud Mesa 3 - 5", "Tauren", 3, 5, -3385.37, -713.98, 72.89);
-	hotspotDB:addHotspot("Red Cloud Mesa 4 - 6", "Tauren", 4, 6, -3271.87, -1050.56, 114.52);
-	hotspotDB:addHotspot("Brambleblade Ravine 5 - 7", "Tauren", 5, 7, -2965.81, -947.1, 57.73);
-	hotspotDB:addHotspot("Mulgore 6 - 8", "Tauren", 6, 8, -2617.18, -507.52, -4.55);
-	hotspotDB:addHotspot("Mulgore 6 - 8", "Tauren", 6, 8, -2212.96, -3.77, 13.95);
+	hotspotDB:addHotspot("Red Cloud Mesa 1 - 2", "Tauren", 1, 2, -2889.91, -418.89, 48.47);
+	hotspotDB:addHotspot("Red Cloud Mesa 2 - 3", "Tauren", 2, 3, -3488.8, -215.55, 87.16);
+	hotspotDB:addHotspot("Red Cloud Mesa 3 - 4", "Tauren", 3, 4, -3385.37, -713.98, 72.89);
+	hotspotDB:addHotspot("Red Cloud Mesa 4 - 5", "Tauren", 4, 5, -3271.87, -1050.56, 114.52);
+	hotspotDB:addHotspot("Brambleblade Ravine 4 - 5", "Tauren", 4, 5, -2965.81, -947.1, 57.73);
+	hotspotDB:addHotspot("Mulgore 6 - 7", "Tauren", 6, 7, -2617.18, -507.52, -4.55);
+	hotspotDB:addHotspot("Mulgore 7 - 8", "Tauren", 7, 8, -2212.96, -3.77, 13.95);
 	hotspotDB:addHotspot("Mulgore 8 - 10", "Tauren", 8, 10, -1714.66, 148.69, 3.22);
 	hotspotDB:addHotspot("The Golden Plains 8 - 10", "Tauren", 8, 10, -1540.09, -302.32, -33.12);
 	hotspotDB:addHotspot("The Golden Plains 9 - 11", "Tauren", 9, 11, -1202.89, -721.11, -55.54);
@@ -258,6 +258,8 @@ function hotspotDB:setup()
 	hotspotDB:addHotspot("The Barrens 10 - 12", "Horde", 10, 12, -611.31, -2775.74, 92.92);
 	hotspotDB:addHotspot("The Barrens 12 - 14", "Horde", 12, 14, 217.77, -3269.73, 65.09);
 	hotspotDB:addHotspot("The Barrens 17 - 19", "Horde", 17, 19, -1159.64, -3259.29, 91.68);
+	hotspotDB:addHotspot("The Barrens 16 - 19", "Horde", 16, 19, 805.92, -2945.67, 91.66);
+
 	hotspotDB:addHotspot("Southern Barrens 17 - 19", "Horde", 17, 19, -1747.7, -2894.05, 93.87);
 	hotspotDB:addHotspot("Bramblescar 19 - 21", "Horde", 19, 21, -2088.87, -2442.84, 94.16);
 	hotspotDB:addHotspot("Agama'gor 18 - 20", "Horde", 18, 20, -1720.4, -2053.41, 92.1);

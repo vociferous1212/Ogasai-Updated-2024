@@ -25,7 +25,7 @@ function script_shamanEX:menu()
 		wasClicked, script_shaman.useLightningBolt = Checkbox("Lightning Bolt In Combat", script_shaman.useLightningBolt);
 
 		if (script_shaman.useLightningBolt) then
-			Text("Use Lightning Bolt Above Mana");
+			Text("Use Lightning Bolt Above Mana Percent");
 			script_shaman.lightningBoltMana = SliderInt("LBM%", 5, 90, script_shaman.lightningBoltMana);
 		end
 		Separator();
@@ -89,7 +89,7 @@ function script_shamanEX:menu()
 		end
 
 		-- totem menu
-		if (HasItem("Earth Totem")) then
+		if (HasItem("Earth Totem")) and (script_shamanEX2:usingTotems()) then
 
 			if (CollapsingHeader("|+| Totem Options")) then
 

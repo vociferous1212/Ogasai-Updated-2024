@@ -69,6 +69,8 @@ script_grind = {
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
 	hardBlacklistedNum = 0,	-- number of blacklisted targets
+	lootBlacklistedTargets = {},
+	lootBlacklistedNum = 0,
 	isSetup = false,	-- is setup function run
 	drawUnits = true,	-- draw unit data on screen
 	Name = "", -- set to e.g. "paths\1-5 Durator.xml" for auto load at startup
@@ -100,6 +102,7 @@ script_grind = {
 	blacklistAdds = 1,	-- blacklist targets when there are x adds
 	blacklistedNameNum = 0,	-- number of blacklisted targets
 	hardBlacklistedNameNum = 0,	-- number of blacklisted targets
+	lootBlacklistedNameNum = 0,
 	useExpChecker = true,	-- run exp checker
 	paranoidSetTimer = 22,	-- time to wait after paranoia has needed
 	useString = true,	-- message to send to log players in range run once
@@ -335,10 +338,27 @@ function script_grind:addTargetToHardBlacklist(targetGUID)
 	end
 end
 
+function script_grind:addTargetToLootBlacklist(targetGUID)
+	if (targetGUID ~= nil and targetGUID ~= 0 and targetGUID ~= '') then	
+		self.lootBlacklistedTargets[self.lootBlacklistedNum] = targetGUID;
+		self.lootBlacklistedNum = self.lootBlacklistedNum + 1;
+	end
+end
+
 -- check if target is hard blacklisted by table GUID
 function script_grind:isTargetHardBlacklisted(targetGUID) 
 	for i=0,self.hardBlacklistedNum do
 		if (targetGUID == self.hardBlacklistedTargets[i]) then
+			return true;
+		end
+	end
+	return false;
+end
+
+-- check if target is loot blacklisted by table GUID
+function script_grind:isTargetLootBlacklisted(targetGUID) 
+	for i=0,self.lootBlacklistedNum do
+		if (targetGUID == self.lootBlacklistedTargets[i]) then
 			return true;
 		end
 	end
@@ -628,6 +648,10 @@ function script_grind:run()
 		self.blacklistLootTime = GetTimeEX();
 	end
 
+	if (not self.hotspotReached) then
+		self.newTargetTime = GetTimeEX();
+	end
+
 	-- set tick rate for scripts
 	if (self.waitTimer > GetTimeEX() + self.tickRate) then
 		return;
@@ -855,6 +879,7 @@ function script_grind:run()
 			and (self.enemyObj:IsInLineOfSight())
 			and (not self.enemyObj:IsCasting())
 			and (not self.enemyObj:IsFleeing())
+			and (not script_shamanEX2:usingTotems())
 		 then
 		
 			-- force reset of closestEnemy
@@ -974,7 +999,7 @@ function script_grind:run()
 					end
 				end
 			end
-			if (HasSpell("Lightning Bolt")) and (IsInCombat()) and (script_grind:enemiesAttackingUs() == 0) then
+			if (HasSpell("Lightning Bolt")) and (IsInCombat()) and (script_grind:enemiesAttackingUs() == 0) and (not PlayerHasTarget()) then
 				self.message = "Stuck in combat! WAITING!";
 				if (IsMoving()) then
 					StopMoving();
@@ -1116,6 +1141,7 @@ function script_grind:run()
 				and (self.enemyObj:IsInLineOfSight())
 				and (not self.enemyObj:IsCasting())
 				and (not self.enemyObj:IsFleeing())
+				and (not script_shamanEX2:usingTotems())
 			then
 
 				if (self.enemyObj ~= nil) then
@@ -1582,37 +1608,6 @@ function script_grind:enemyIsValid(i)
 				return true; 
 		end
 
--- RECHECK TARGETS
-	-- target blacklisted moved away from other targets
-	-- bot can target blacklisted targets under these conditions
-		if (self.skipHardPull)
-			and (self.extraSafe)
-			and (script_grind:isTargetBlacklisted(i:GetGUID())
-			and script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
-			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
-				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
-				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
-				and i:GetDistance() < self.pullDistance and (not i:IsTapped() or i:IsTappedByMe())
-				and not (self.skipUnknown and i:GetCreatureType() == 'Not specified')
-				and not (self.skipHumanoid and i:GetCreatureType() == 'Humanoid')
-				and not (self.skipDemon and i:GetCreatureType() == 'Demon')
-				and not (self.skipBeast and i:GetCreatureType() == 'Beast')
-				and not (self.skipElemental and i:GetCreatureType() == 'Elemental')
-				and not (self.skipUndead and i:GetCreatureType() == 'Undead') 
-				and not (skipAberration and i:GetCreatureType() == 'Abberration') 
-				and not (skipDragonkin and i:GetCreatureType() == 'Dragonkin') 
-				and not (skipGiant and i:GetCreatureType() == 'Giant') 
-				and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
-				and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
-				) then
-					-- force bot to keep this target and not recheck safepull over and over again
-					script_grind.enemyObj = currentObj;
-			return true;
-			end
-			-- force bot to return this target if it was able to attack it once before...
-			return;
-		end
-
 	-- don't use avoid targets and don't recheck aggro range targets only skip hard pulls
 		-- normal targeting logitechs style
 		if (self.skipHardPull) and (not self.extraSafe) and (not script_grindEX.avoidBlacklisted)
@@ -1685,6 +1680,35 @@ function script_grind:enemyIsValid(i)
 			--if (posZ < 9) and (posZ > -9) then
 			) then
 			return true;
+		end
+
+-- RECHECK TARGETS
+	-- target blacklisted moved away from other targets
+	-- bot can target blacklisted targets under these conditions
+		if (self.skipHardPull)
+			and (self.extraSafe)
+			and (script_grind:isTargetBlacklisted(i:GetGUID())
+			and script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
+			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
+				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
+				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
+				and i:GetDistance() < self.pullDistance and (not i:IsTapped() or i:IsTappedByMe())
+				and not (self.skipUnknown and i:GetCreatureType() == 'Not specified')
+				and not (self.skipHumanoid and i:GetCreatureType() == 'Humanoid')
+				and not (self.skipDemon and i:GetCreatureType() == 'Demon')
+				and not (self.skipBeast and i:GetCreatureType() == 'Beast')
+				and not (self.skipElemental and i:GetCreatureType() == 'Elemental')
+				and not (self.skipUndead and i:GetCreatureType() == 'Undead') 
+				and not (skipAberration and i:GetCreatureType() == 'Abberration') 
+				and not (skipDragonkin and i:GetCreatureType() == 'Dragonkin') 
+				and not (skipGiant and i:GetCreatureType() == 'Giant') 
+				and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
+				and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
+				) then
+					-- force bot to keep this target and not recheck safepull over and over again
+					script_grind.enemyObj = currentObj;
+			return true;
+			end
 		end
 
 
@@ -1769,11 +1793,11 @@ function script_grind:doLoot(localObj)
 			self.timerSet = true;
 		end
 
-if (self.lootObj ~= nil) then
-		if (script_grind:isTargetHardBlacklisted(self.lootObj:GetGUID())) then
-			self.lootObj = nil; -- don't loot blacklisted targets	
+		if (self.lootObj ~= nil) then
+			if (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
+				self.lootObj = nil; -- don't loot blacklisted targets	
+			end
 		end
-	end
 
 	-- Loot checking/reset target
 	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then
@@ -1845,7 +1869,7 @@ if (self.lootObj ~= nil) then
 	-- Blacklist loot target if swimming or we are close to aggro blacklisted targets and not close to loot target
 	if (self.lootObj ~= nil) then
 		if (IsSwimming()) and (not script_grindEX.allowSwim) and (script_aggro:closeToBlacklistedTargets() and self.lootObj:GetDistance() > 5) then
-			script_grind:addTargetToHardBlacklist(self.lootObj:GetGUID());
+			script_grind:addTargetToLootBlacklist(self.lootObj:GetGUID());
 			return;
 		end
 	end
@@ -1854,7 +1878,7 @@ if (self.lootObj ~= nil) then
 	if (IsStanding()) and (not IsInCombat()) then
 		if (self.blacklistLootTime >= self.blacklistLootTimeCheck) then
 			-- add to blacklist
-			script_grind:addTargetToHardBlacklist(self.lootObj:GetGUID());
+			script_grind:addTargetToLootBlacklist(self.lootObj:GetGUID());
 			-- variable on/off to stop spamming message
 			if (self.messageOnce) then
 			self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
@@ -1908,7 +1932,7 @@ function script_grind:lootAndSkin()
 		self.lootObj = nil;
 	end
 	if (self.lootObj ~= nil) then
-		if (script_grind:isTargetHardBlacklisted(self.lootObj:GetGUID())) then
+		if (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
 			self.lootObj = nil; -- don't loot blacklisted targets	
 		end
 	end

@@ -79,9 +79,11 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		-- draw avoiding targets
 		if (script_grind:isTargetBlacklisted(target:GetGUID())) and (script_grind.skipHardPull)
 			and (not script_grind:isTargetHardBlacklisted(target:GetGUID())) then
+				if (UnitClass('player') ~= "Shaman") or (UnitClass('player') == "Shaman" and not script_shamanEX2.usingTotems()) then
 
-			-- draw text avoiding
-			DrawText("(Adds)", tX, tY-20, 255, 0, 0);
+					-- draw text avoiding
+					DrawText("(Adds)", tX, tY-20, 255, 0, 0);
+				end
 		end
 
 		-- draw hard blacklisted targets

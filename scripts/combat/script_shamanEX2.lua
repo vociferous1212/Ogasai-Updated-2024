@@ -82,6 +82,13 @@ function script_shamanEX2:ghostWolf()
 return false;
 end
 
+function script_shamanEX2:usingTotems()
+	if (script_shaman.useEarthTotem) or (script_shaman.useWaterTotem) or (script_shaman.useFireTotem) or (script_shaman.useAirTotem) then
+		return true;
+	end
+return false;
+end
+
 function script_shamanEX2:menu()
 
 	if (CollapsingHeader("Shaman Heal Options")) then

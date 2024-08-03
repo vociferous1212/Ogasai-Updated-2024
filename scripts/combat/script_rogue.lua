@@ -325,6 +325,8 @@ function script_rogue:run(targetGUID)
 				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
 						ClearTarget();
 						self.pickpocketUsed = false;
+						self.waitTimer = GetTimeEX() + 1500;
+						script_grind:setWaitTimer(1500);
 						targetObj = 0;
 						return 0;
 					end
@@ -405,7 +407,7 @@ function script_rogue:run(targetGUID)
 						CastStealth();
 					end
 					-- Use sprint (when stealthed for pull)
-					if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) and (IsStealth()) then
+					if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) and (IsStealth()) and (targetObj:GetDistance() >= 15) then
 						CastSpellByName("Sprint");
 					end
 				end	
