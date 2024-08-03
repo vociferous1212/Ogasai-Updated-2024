@@ -1,6 +1,7 @@
 script_shamanEX = {
 
 		healsMenuLoaded = include("scripts\\combat\\script_shamanEX2.lua"),
+		extraMenuLoaded = include("scripts\\combat\\script_shamanEX3.lua"),
 
 }
 
@@ -65,7 +66,6 @@ function script_shamanEX:menu()
 
 		Separator();
 
-
 		-- use totems
 		if (HasItem("Earth Totem")) then
 			wasClicked, script_shaman.useEarthTotem = Checkbox("Use Earth Totems", script_shaman.useEarthTotem);
@@ -83,6 +83,8 @@ function script_shamanEX:menu()
 		-- weapon enhancement menu
 		if (HasSpell("Rockbiter Weapon")) then
 			if (CollapsingHeader("|+| Weapon Enhancement Options")) then
+				script_shamanEX3:alternateEnhanceMenu();
+				Separator();
 				Text("Weapon Enhancement");
 				script_shaman.enhanceWeapon = InputText("Enhancement", script_shaman.enhanceWeapon);
 			end
@@ -92,12 +94,13 @@ function script_shamanEX:menu()
 		if (HasItem("Earth Totem")) and (script_shamanEX2:usingTotems()) then
 
 			if (CollapsingHeader("|+| Totem Options")) then
-
+				script_shamanEX3:alternateTotemMenuEarth();
 				if (script_shaman.useEarthTotem) then
 					Text("Earth Totem");
 						script_shaman.totem = InputText("Earth", script_shaman.totem);
 				end
-
+				Separator();
+				script_shamanEX3:alternateTotemMenuFire();
 				if (script_shaman.useFireTotem) then
 					Separator();
 					Text("Fire Totem");
@@ -105,7 +108,8 @@ function script_shamanEX:menu()
 						script_shaman.totem2 = InputText("Fire", script_shaman.totem2);	
 						end
 				end
-		
+				Separator();
+				script_shamanEX3:alternateTotemMenuWater();
 				if (script_shaman.useWaterTotem) then
 					Text("Water Totem");
 						if (HasItem("Water Totem")) then

@@ -110,7 +110,5 @@ function script_shamanEX2:menu()
 		script_shaman.healMana = SliderInt("Heal Mana %", 5, 99, script_shaman.healMana);
 		Text("Healing Spell");
 		script_shaman.healingSpell = InputText("Heal Spell", script_shaman.healingSpell);
-
 	end
-
 end

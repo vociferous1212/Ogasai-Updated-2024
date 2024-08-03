@@ -93,6 +93,11 @@ function script_drawData:drawMonsterDataOnScreen(target)
 			DrawText('(Blacklisted)', tX, tY-20, 255, 150, 150);
 		end
 
+		-- draw rares
+		if (target:GetClassification() == 2) then
+			DrawText("RARE", tx, ty-30, 255, 255, 255);
+		end
+
 		-- draw unit HP
 		DrawText('HP: ' .. math.floor(target:GetHealthPercentage()) .. '%', tX, tY, 255, 0, 0);
 

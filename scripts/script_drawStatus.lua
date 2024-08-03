@@ -57,7 +57,9 @@ function script_drawStatus:draw()
 			DrawText('Blacklisting target after ' .. script_grind.blacklistTime .. " s. (If above 92% HP.)", x, y+18, 0, 255, 120); 
 		end
 		if (script_grind.enemyObj == 0 or script_grind.enemyObj == nil) then
-			DrawText("Blacklist Loot Timer (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+3, 0, 255, 120);
+			if (script_grind.hotspotReached) then
+			DrawText("Blacklist Loot Timer (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+17, 0, 255, 120);
+			end
 		else
 		DrawText("Blacklist Loot Timer (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+35, 0, 255, 120);
 

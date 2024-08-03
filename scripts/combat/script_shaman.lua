@@ -11,6 +11,9 @@ script_shaman = {
 	waitTimer = 0,
 	stopIfMHBroken = true,
 	enhanceWeapon = "no weapon enhancement yet",
+	useRock = false,
+	useFlame = false,
+	useWind = false,
 	totem = "no totem yet",	-- used for totem1
 	totemBuff = "",		-- used for totem1
 	totem2 = "no totem yet",	-- used for totem2
@@ -45,10 +48,13 @@ function script_shaman:setup()
 	-- Set weapon enhancement
 	if (HasSpell("Windfury Weapon")) then
 		self.enhanceWeapon = "Windfury Weapon";
-	--elseif (HasSpell("Flametongue Weapon")) then
-	--	self.enhanceWeapon = "Flametongue Weapon";
+		self.useWind = true;
+	elseif (HasSpell("Flametongue Weapon")) then
+		self.enhanceWeapon = "Flametongue Weapon";
+		self.useFlame = true;
 	elseif (HasSpell("Rockbiter Weapon")) then
 		self.enhanceWeapon = "Rockbiter Weapon";
+		self.useWind = true;
 	end
 
 	if (localLevel >= 20) then
@@ -82,12 +88,14 @@ function script_shaman:setup()
 	if (HasSpell("Stoneskin Totem")) and (not HasSpell("Strength of Earth Totem")) and (HasItem("Earth Totem")) then
 		self.totem = "Stoneskin Totem";
 		self.totemBuff = "Stoneskin";
+		script_shamanEX3.stoneskinTotem = true;
 	end
 
 	-- strength of earth totem
 	if (HasSpell("Strength of Earth Totem") and HasItem("Earth Totem")) then
 		self.totem = "Strength of Earth Totem";
 		self.totemBuff = "Strength of Earth";
+		script_shamanEX3.strengthOfEarthTotem = true;
 	elseif (HasSpell("Grace of Air Totem") and HasItem("Air Totem")) then
 		self.totem = "Grace of Air Totem";
 		self.totemBuff = "Grace of Air";

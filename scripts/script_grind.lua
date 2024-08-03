@@ -1830,7 +1830,8 @@ function script_grind:doLoot(localObj)
 		-- stand if we are sitting
 		if(not IsStanding()) then
 			StopMoving();
-			self.waitTimer = GetTimeEX() + 550;
+			self.waitTimer = GetTimeEX() + 450;
+			script_grind:setwaitTimer(450);
 			return;
 		end
 
@@ -1838,23 +1839,27 @@ function script_grind:doLoot(localObj)
 		if (IsMounted()) then
 			DisMount();
 			self.waitTimer = GetTimeEX() + 450;
+			script_grind:setwaitTimer(450);
 			return;
 		end
 
 		-- interact with object if we are not looting
-		if(not self.lootObj:UnitInteract() and not IsLooting()) then
-			self.waitTimer = GetTimeEX() + 1050;
+		if(not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
+			self.waitTimer = GetTimeEX() + 1750;
+			script_grind:setWaitTimer(1750);
+
 			return;
 		end
 	
 		-- if looting and not moving then wait
 		if (not LootTarget()) and (not IsMoving()) then
-			script_grind:setWaitTimer(400);
+			script_grind:setWaitTimer(450);
 			self.waitTimer = GetTimeEX() + 450;
 			return;
 		else
 			-- we looted so reset variables
-			self.waitTimer = GetTimeEX() + 600;
+			self.waitTimer = GetTimeEX() + 450;
+			script_grind:setwaitTimer(450);
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
 			return;
