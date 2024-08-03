@@ -1114,9 +1114,9 @@ function script_grind:run()
 
 
 				-- move to target
-				if (IsInCombat()) or (not IsMoving()) then
+				if (not IsMoving()) or (IsInCombat()) then
 					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-				else
+				elseif (not IsInCombat()) or (IsMoving()) then
 					self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					MoveToTarget(_x, _y, _z);
 				end
@@ -1870,7 +1870,7 @@ function script_grind:doLoot(localObj)
 
 		-- interact with object if we are not looting
 		if(not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
-			self.waitTimer = GetTimeEX() + 750;
+			self.waitTimer = GetTimeEX() + 450;
 			return;
 		end
 	
@@ -1915,18 +1915,16 @@ function script_grind:doLoot(localObj)
 
 	-- move to loot object
 	self.message = "Moving to loot...";
-	 if (not IsMoving()) then
+	 if (not IsPathLoaded(5)) then
 		self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 	else
 		MoveToTarget(_x, _y, _z);
-		script_grind:setWaitTimer(self.nextToNodeDist * 2);
 	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
 		self.waitTimer = GetTimeEX() + 750;
 	end
-		
 end
 
 function script_grind:getSkinTarget(lootRadius)
