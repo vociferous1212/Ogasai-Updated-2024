@@ -1,7 +1,7 @@
 script_checkAdds = {
 
 	addsRange = 35,	-- range circles from from adds
-	checkAddsRange = 5,	-- safe margin move from adds
+	checkAddsRange = 3,	-- safe margin move from adds
 
 		-- these are global so we can rerun object manager from om script
 	closestEnemy = 0,	-- set closest enemy
@@ -282,11 +282,11 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange/2.5);
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/4, self.checkAddsRange/3.5);
 				PetFollow();
 				return;
 			else
-				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2.5);
+				script_checkAdds:avoid(xT, yT, zP, aggro/4, self.checkAddsRange/3.5);
 				PetFollow();
 				return;
 			end

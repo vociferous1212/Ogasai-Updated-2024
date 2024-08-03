@@ -27,6 +27,7 @@ script_gather = {
 	fish = {},
 	numFish = 0,
 	collectChests = false,
+	dist = 0,
 }
 
 function script_gather:addChest(name, id)
@@ -377,6 +378,11 @@ function script_gather:gather()
 		local _x, _y, _z = self.nodeObj:GetPosition();
 		local dist = self.nodeObj:GetDistance();	
 		self.nodeID = self.nodeObj:GetObjectDisplayID();
+
+		--self.dist to use node dist in other scripts...
+		self.dist = self.nodeObj:GetDistance();
+
+		-- start to blacklist by nodeID?
 		--self.nodeGUID = self.nodeObj:GetGUID();
 
 

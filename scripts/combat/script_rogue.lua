@@ -237,6 +237,7 @@ function script_rogue:run(targetGUID)
 	if (IsLooting()) then
 		if (not LootTarget()) then
 			LootTarget();
+			return true;
 		end	
 	end
 
@@ -284,6 +285,7 @@ function script_rogue:run(targetGUID)
 			if (IsLooting()) then
 				if (not LootTarget()) then
 					LootTarget();
+					return true;
 				end
 			end
 
@@ -343,34 +345,37 @@ function script_rogue:run(targetGUID)
 							StopMoving();
 						return true;
 						end
-							self.tickRate = 0;
-							self.pickpocketUsed = true;
-							CastSpellByName("Pick Pocket", targetObj);
-							self.ppMoney = GetMoney();
-							self.ppVarUsed = false;
-							LootTarget();
-							--self.waitTimer = GetTimeEX() + 750;
-							--script_grind:setWaitTimer(750);
+						self.tickRate = 0;
+						self.pickpocketUsed = true;
+						CastSpellByName("Pick Pocket", targetObj);
+						self.ppMoney = GetMoney();
+						self.ppVarUsed = false;
+						LootTarget();
+						--self.waitTimer = GetTimeEX() + 750;
+						--script_grind:setWaitTimer(750);
 						if (IsLooting()) and (targetObj:GetDistance() <= 5) then
 							if (not LootTarget()) then
 								LootTarget();
 								self.waitTimer = GetTimeEX() + 350;
-								return;
+								return true;
 							end
-							return true;
+						elseif (IsLooting()) and (targetObj:GetDistance() > 5) then
+							return 3;
 						end
 					if (not LootTarget()) then
 						LootTarget();
 						self.waitTimer = GetTimeEX() + 350;
-						return;
+						return true;
 					end
 					return true;
 					end
-				elseif (IsLooting()) then
+				elseif (IsLooting()) and (targetObj:GetDistance() < 5) then
 					if (not LootTarget()) then
 						LootTarget();
-					return;
+					return true;
 					end
+				elseif (self.pickpocketUsed) and (targetObj:GetDistance() > 5) then
+					return 3;
 				end
 			-- Check: if we target player pets/totems
 			if (GetTarget() ~= 0) then
@@ -468,6 +473,13 @@ function script_rogue:run(targetGUID)
 				if (self.ppMoney ~= GetMoney()) and (not self.ppVarUsed) and (IsInCombat()) then
 					self.pickpocketMoney = self.pickpocketMoney + (GetMoney() - self.ppMoney);
 					self.ppVarUsed = true;
+				end
+
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return true;
+					end
 				end
 
 				-- Dismount
@@ -679,13 +691,6 @@ function script_rogue:run(targetGUID)
 				if (targetHealth <= (10*localCP)) and (localEnergy >= 35) then
 					CastSpellByName("Eviscerate", targetObj);
 					return 0; -- return until we use Eviscerate
-				end
-
-				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
-					if (script_checkAdds:checkAdds()) then
-						script_om:FORCEOM();
-						return true;
-					end
 				end
 
 				-- Use CP generator attack 

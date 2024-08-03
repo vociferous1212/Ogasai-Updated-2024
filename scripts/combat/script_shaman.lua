@@ -69,6 +69,9 @@ function script_shaman:setup()
 		self.pullLightningBolt = true;
 		self.useLightningBolt = true;
 	end
+	if (GetLocalPlayer():GetLevel() >= 6) then
+		self.pullLightningBolt = true;
+	end
 	if (HasSpell("Flame Shock")) then
 		self.useFlameShock = true;
 	end
@@ -423,10 +426,10 @@ function script_shaman:run(targetGUID)
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) and (targetObj:GetHealthPercentage() >= 20) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				return;
+				return true;
 			end
 		end
 
@@ -581,6 +584,15 @@ function script_shaman:run(targetGUID)
 						return 0;
 					end
 				end
+
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM();
+				return true;
+			end
+		end
+
+
 
 
 			-- Check if we are in melee range

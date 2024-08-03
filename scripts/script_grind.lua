@@ -492,7 +492,7 @@ function script_grind:run()
 
 	--random node dist
 	if (self.useRandomNode) and (not IsGhost() and not localObj:IsDead() and not HasForm() and not IsMounted() and not IsIndoors()) then
-		local randomNodeDist = math.random(4, 8);
+		local randomNodeDist = math.random(4, 14);
 		if (IsMoving()) and (GetTimeEX() > self.nodeTimer) then
 			self.nextToNodeDist = randomNodeDist;
 			script_nav.nextNavNodeDistance = randomNodeDist;
@@ -675,6 +675,7 @@ function script_grind:run()
 			if (status ~= nil) then 
 				if (status >= 3 and script_grind.repairWhenYellow and script_grind.useVendor and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
 					script_vendor:repair(); 
+					self.newTargetTime = GetTimeEX();
 					return true;
 				end
 			end
@@ -738,7 +739,9 @@ function script_grind:run()
 					end
 					-- bot was blacklisting targets after gathering
 					self.newTargetTime = GetTimeEX();
-					CastStealth();
+					if (script_gather.dist ~= 0 and script_gather.dist ~= nil and script_gather.dist > 20) then
+						CastStealth();
+					end
 
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 135;
@@ -751,14 +754,14 @@ function script_grind:run()
 			return true;
 			end
 		end
-		
+		-- turn jump back on once gathering is done
 		if (self.jumpCheck) then
 			self.jump = true;
 			self.jumpCheck = false;
 		end
 
 		-- hotspot reached distance
-		if (script_nav:getDistanceToHotspot() <= self.hotspotReachedDistance) then
+		if (script_nav:getDistanceToHotspot() <= self.hotspotReachedDistance) or (script_nav:getDistanceToHotspot() <= 0) or (script_nav:getDistanceToHotspot() == nil) then
 			self.hotspotReached = true;
 		end
 
@@ -1820,6 +1823,8 @@ function script_grind:doLoot(localObj)
 				self.lootObj = nil; -- don't loot blacklisted targets	
 			end
 		end
+
+		script_nav.lastnavIndex = 1;
 
 	-- Loot checking/reset target
 	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then

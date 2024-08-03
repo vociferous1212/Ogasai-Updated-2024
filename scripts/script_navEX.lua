@@ -29,6 +29,11 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 
 	if (not IsPathLoaded(5)) then
+		if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+			local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
+			Move(x, y, z);
+			return "NavEX - we are stuck out of navmap boundary";
+		end
 		return "Generating path...";
 	end
 
@@ -52,5 +57,12 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
-	return "Moving to target...";
+	return "Moving to target... NavEX";
+end
+
+function script_navEX:resetPath()
+	script_nav.lastnavIndex = 0;
+	script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z'] = 0, 0, 0;
+	local x, y, z = GetLocalPlayer():GetPosition();
+	GeneratePath(x, y, z, x+1, y+1, z);
 end

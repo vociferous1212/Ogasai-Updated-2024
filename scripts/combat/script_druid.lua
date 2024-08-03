@@ -665,12 +665,12 @@ function script_druid:run(targetGUID)
 		return 4;
 	end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return true;
-			end
-		end
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return true;
+					end
+				end
 
 
 	-- run backwards if target is entangled
@@ -705,12 +705,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return true;
-			end
-		end
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return true;
+					end
+				end
 
 		-- cast rejuvenaton before entering combat if have no form
 		if (HasSpell("Rejuventation")) and (not localObj:HasBuff("Rejuvenation")) and (targetObj:GetDistance() <= 45) and (localMana >= self.shapeshiftMana + 15) and (not HasForm()) and (not IsInCombat()) then
@@ -1175,6 +1175,15 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 		return true;
 		end
 
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return true;
+					end
+				end
+			
+
+
 		-- Check: Do we have the right target (in UI) ??
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 			if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
@@ -1537,14 +1546,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1)
 					targetObj:FaceTarget();
 				end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() < 1) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return true;
-			end
-		end
-
-			
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() <= .5) then 
 					if (script_druid:runBackwards(targetObj,2)) then 

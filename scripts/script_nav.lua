@@ -28,13 +28,6 @@ function script_nav:drawPullRange(range)
 	local localObj = GetLocalPlayer();
 end
 
-function script_nav:resetPath()
-	self.lastnavIndex = 0;
-	self.navPosition['x'], self.navPosition['y'], self.navPosition['z'] = 0, 0, 0;
-	local x, y, z = GetLocalPlayer():GetPosition();
-	GeneratePath(x, y, z, x+1, y+1, z);
-end
-
 function script_nav:loadHotspotDB(id)
 	local hotspot = hotspotDB:getHotSpotByID(id)
 	if (hotspot ~= nil and hotspot ~= -1) then
@@ -121,6 +114,7 @@ function script_nav:moveToHotspot(localObj)
 			if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
 				hsDist = math.floor(script_nav:getDistanceToHotspot());
 			end
+			
 		return "Moving to hotspot " .. self.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 	else
 		return "No hotspot has been loaded...";
@@ -237,11 +231,13 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		self.navPathPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		self.lastpathnavIndex = -1; 
-	end
-	if (not script_grind.adjustTickRate) then
-		script_grind.tickRate = 0;
 	end	
 	if (not IsPathLoaded(5)) then
+		if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+			local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
+			Move(x, y, z);
+			return "Nav - we are stuck out of navmap boundary";
+		end
 		return "Generating path...";
 	end
 	-- Get the current path node's coordinates
@@ -266,7 +262,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 
 	-- Check: If the move to coords are too far away, something wrong don't use those
 	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 45) then
-		return "Moving to target...";
+		return "Moving to target... Nav";
 	end
 
 	-- Move to the next destination in the path
