@@ -10,6 +10,7 @@ script_grind = {
 	extraFunctionsLoaded = include("scripts\\script_extraFunctions.lua"),
 	grindMenu = include("scripts\\script_grindMenu.lua"),
 	getSpellsLoaded = include("scripts\\script_getSpells.lua"),
+	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	getSpells = false,
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	grindPartyOptionsLoaded = include("scripts\\script_grindParty.lua"),
@@ -747,7 +748,7 @@ function script_grind:run()
 					script_grind.tickRate = 135;
 				end
 
-				self.message = 'Gathering ' .. script_gather:currentGatherName() .. '...';
+				self.message = 'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder.."";
 				if (IsLooting()) then
 					script_grind:setWaitTimer(1500);
 				end

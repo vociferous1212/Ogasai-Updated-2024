@@ -402,7 +402,10 @@ function script_druid:healsAndBuffs()
 		if (HasSpell("Mark of the Wild")) and (not IsMounted()) and (not localObj:HasBuff("Mark of the Wild")) and (localHealth >= self.healthToShift) and (not IsSpellOnCD("Mark of the Wild")) then
 			if (IsInCombat() and script_grind.enemiesAttackingUs(10) < 2 and localMana >= 30) 
 			or (not IsInCombat() and localMana >= 25) then
-				if (CastSpellByName("Mark of the Wild", localObj)) then
+				if (GetTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
+					ClearTarget();
+				end
+				if (not CastSpellByName("Mark of the Wild", localObj)) then
 					self.waitTimer = GetTimeEX() + 2500;
 					script_grind:setWaitTimer(1600);
 					return true;
@@ -413,6 +416,9 @@ function script_druid:healsAndBuffs()
 		-- thorns if timer is about to end by 2 minutes
 		if (localMana > 15) and (HasSpell("Thorns")) and (GetTimeEX() > self.thornsTimer - 120) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) then
 			if (localHealth >= self.healthToShift) and (not IsMounted()) then
+				if (GetTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
+					ClearTarget();
+				end
 				if not (CastSpellByName("Thorns", localObj)) then
 					self.waitTimer = GetTimeEX() + 2550;
 					script_grind:setWaitTimer(2050);
@@ -426,6 +432,9 @@ function script_druid:healsAndBuffs()
 		-- Thorns
 		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) then
 			if (localHealth >= self.healthToShift) and (not IsMounted()) then
+				if (GetTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
+					ClearTarget();
+				end
 				if not (CastSpellByName("Thorns", localObj)) then
 					self.waitTimer = GetTimeEX() + 2550;
 					script_grind:setWaitTimer(2050);
