@@ -19,6 +19,19 @@ function script_gatherMenu:menu()
 
 		Text('Gather Search Distance');
 		script_gather.gatherDistance = SliderFloat("GSD", 1, 250, script_gather.gatherDistance);
+
+		if (script_gather.nodeGUID ~= 0) then
+			if (Button("Add Node To Blacklist By GUID")) then
+				
+				script_gather:addNodeToBlacklist(script_gather.nodeGUID);
+			end
+			if (script_gather.nodeObj ~= nil and script_gather.nodeObj ~= 0) then
+				Text("Current Gather Node - "..script_gather.nodeObj:GetUnitName().." " ..math.floor(script_gather.nodeObj:GetDistance()).." (yd)");
+			end
+		end
+		Separator();
+		Text("Blacklist Gather Node Time - Seconds");
+		script_gather.blacklistSetTime = SliderInt("BLT", 1, 120, script_gather.blacklistSetTime);
 		
 		if (script_gather.collectMinerals or script_gather.collectHerbs) then
 			wasClicked, script_gather.gatherAllPossible = Checkbox("Gather All Possible", script_gather.gatherAllPossible);

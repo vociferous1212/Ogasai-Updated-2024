@@ -15,9 +15,6 @@ script_gather = {
 	timer = 0,
 	nodeID = 0,
 	gatherAllPossible = true,
-	blacklistedNode = {},
-	blacklistedNum = 0,
-	blacklistTime = GetTimeEX(),
 	timerSet = false,
 	nodeGUID = 0,
 	chests = {},
@@ -30,7 +27,30 @@ script_gather = {
 	dist = 0,
 	messageToGrinder = "",
 	gathering = false,
+	blacklistedNodes = {},
+	blacklistedNodesNum = 0,
+	blacklistedNodesNameNum = 0,
+	blacklistTime = 0,
+	blacklistSetTime = 45,
 }
+
+-- add node to blacklist table by GUID
+function script_gather:addNodeToBlacklist(nodeGUID)
+	if (nodeGUID ~= nil and nodeGUID ~= 0 and nodeGUID ~= '') then	
+		self.blacklistedNodes[self.blacklistedNodesNum] = nodeGUID;
+		self.blacklistedNodesNum = self.blacklistedNodesNum + 1;
+	end
+end
+
+-- check if node is blacklisted by table GUID
+function script_gather:isNodeBlacklisted(nodeGUID) 
+	for i=0,self.blacklistedNodesNum do
+		if (nodeGUID == self.blacklistedNodes[i]) then
+			return true;
+		end
+	end
+	return false;
+end
 
 function script_gather:addChest(name, id)
 	self.chests[self.numChests] = {};
@@ -78,6 +98,7 @@ function script_gather:setup()
 	
 	script_gatherEX:setup();
 
+	self.blacklistTime = GetTimeEX();
 	self.timer = GetTimeEX();
 	self.isSetup = true;
 end
@@ -141,13 +162,15 @@ function script_gather:GetNode()
 	local bestTarget = nil;
 	while targetObj ~= 0 do
 		if (targetType == 5) then --GameObject
-			if(script_gather:ShouldGather(targetObj:GetObjectDisplayID()))  then
-				local dist = targetObj:GetDistance();
-				if(dist < self.gatherDistance and bestDist > dist) then
-					local _x, _y, _z = targetObj:GetPosition();
-					if(not IsNodeBlacklisted(_x, _y, _z, 5)) then
-						bestDist = dist;
-						bestTarget = targetObj;
+			if (script_gather:ShouldGather(targetObj:GetObjectDisplayID())) then
+				if (not script_gather:isNodeBlacklisted(targetObj:GetGUID())) then
+					local dist = targetObj:GetDistance();
+					if(dist < self.gatherDistance and bestDist > dist) then
+						local _x, _y, _z = targetObj:GetPosition();
+						if(not IsNodeBlacklisted(_x, _y, _z, 5)) then
+							bestDist = dist;
+							bestTarget = targetObj;
+						end
 					end
 				end
 			end
@@ -285,10 +308,10 @@ function script_gather:gather()
 	if (self.timer > GetTimeEX()) then
 		return true;
 	end
-	--if (not self.timerSet) then
-	--self.blacklistTime = GetTimeEX() + 5000;
-	--self.timerSet = true;
-	--end
+	if (not self.timerSet) then
+		self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
+		self.timerSet = true;
+	end
 	
 	local tempNode = script_gather:GetNode();
 	local newNode = (self.nodeObj == tempNode);
@@ -297,8 +320,7 @@ function script_gather:gather()
 		self.nodeGUID = self.nodeObj:GetGUID();
 	end
 	
-	if(self.nodeObj ~= nil and self.nodeObj ~= 0) then
-	-- and (not script_gather:isNodeBlacklisted(self.nodeGUID))
+	if (self.nodeObj ~= nil and self.nodeObj ~= 0) and (not script_gather:isNodeBlacklisted(self.nodeGUID)) then
 
 		local _x, _y, _z = self.nodeObj:GetPosition();
 		local dist = self.nodeObj:GetDistance();	
@@ -310,6 +332,11 @@ function script_gather:gather()
 		-- start to blacklist by nodeID?
 		self.nodeGUID = self.nodeObj:GetGUID();
 
+		if (GetTimeEX() > self.blacklistTime) then
+			script_gather:addNodeToBlacklist(script_gather.nodeGUID);
+			self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
+			self.timerSet = false;
+		end
 
 		if (dist < self.lootDistance) then
 			if (HasForm()) and (self.collectChests) then
@@ -350,9 +377,10 @@ function script_gather:gather()
 				end
 				
 
-				--if (self.timerSet) then
-				--	self.timerSet = false;
-				--end
+				if (self.timerSet) then
+					self.timerSet = false;
+					self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
+				end
 			end
 			self.waitTimer = GetTimeEX() + 450;
 		else

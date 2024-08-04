@@ -53,7 +53,8 @@ function script_drawStatus:draw()
 		DrawText("Blacklist Loot After (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+35, 0, 255, 120);
 		end
 		if (script_gather.gathering) then
-			DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': 0 Sec', x, y+50, 0, 255, 120); 
+			local nodeTimer = ((GetTimeEX() - script_gather.blacklistTime) / 1000);
+			DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': ' ..nodeTimer..' Sec', x, y+50, 0, 255, 120); 
 			local nGUID = script_gather.nodeGUID;
 			DrawText("Node GUID - " ..nGUID..  "", x, y+65, 0, 255, 120);
 		end

@@ -17,11 +17,11 @@ script_paladin = {
 	potionHealth = 15,
 	potionMana = 20,
 	consecrationMana = 50,
-	meleeDistance = 3.85,
+	meleeDistance = 3.05,
 	useSealOfCrusader = true,
 	useJudgement = true,
 	useFlashOfLightCombat = false,
-	useBubbleHearth = true,
+	useBubbleHearth = false,
 }
 
 function script_paladin:setup()
@@ -223,10 +223,10 @@ function script_paladin:run(targetGUID)
 			if (targetObj:GetDistance() <= self.meleeDistance) then
 				if (not IsAutoCasting("Attack")) then
 					targetObj:AutoAttack();
-					if (IsMoving()) then
-						StopMoving();
-						return;
-					end
+					targetObj:FaceTarget();
+					self.waitTimer = GetTimeEX() + 1000;
+					script_grind:setWaitTimer(1000);
+					return 0;
 				end
 			end
 				

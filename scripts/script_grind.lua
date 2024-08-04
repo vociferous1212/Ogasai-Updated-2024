@@ -728,13 +728,15 @@ function script_grind:run()
 		then
 			return;
 		end
+
+		--script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime;
 		
 		-- Gather
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
 			if (script_gather:gather()) then
 					script_nav.lastnavIndex = 1;
 
-					-- turn off jump fo gathering...
+					-- turn off jump for gathering...
 					if (self.jump) then
 						self.jumpCheck = true;
 						self.jump = false;

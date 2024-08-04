@@ -266,18 +266,22 @@ function script_paladinEX:menu()
 
 			Separator();
 
-			script_paladin.holyLightHealth = SliderInt("Holy Light when below HP % (in combat)", 1, 99, script_paladin.holyLightHealth);
+			Text("Holy Light Below Self HP Percent")
+			script_paladin.holyLightHealth = SliderInt("HL (in combat)", 1, 99, script_paladin.holyLightHealth);
 			
 			if (HasSpell("Flash of Light")) then
-				script_paladin.flashOfLightHP = SliderInt("Flash of Light when below HP %", 1, 99, script_paladin.flashOfLightHP);
+				Text("Flash of Light Below Self HP Percent")
+				script_paladin.flashOfLightHP = SliderInt("FL", 1, 99, script_paladin.flashOfLightHP);
 			end
 
 			if (HasSpell("Lay on Hands")) then
-				script_paladin.lohHealth = SliderInt("Lay on Hands below HP %", 5, 15, script_paladin.lohHealth);
+				Text("Lay on Hands Below Self HP Percent")
+				script_paladin.lohHealth = SliderInt("LH", 5, 15, script_paladin.lohHealth);
 			end
 
 			if (HasSpell("Blessing of Protection")) then
-				script_paladin.shieldHealth = SliderInt("Shield below HP %", 1, 20, script_paladin.shieldHealth);
+				Text("Blessing of Protection Below Self HP Percent")
+				script_paladin.shieldHealth = SliderInt("SBOP", 1, 20, script_paladin.shieldHealth);
 			end
 		end
 	end
