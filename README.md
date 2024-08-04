@@ -55,6 +55,7 @@ Required to use the bot:
   Changes are too numerous to report. The original design, combat, rest and targeting system, is based on Logitechs original scripts. 
 
 
-google drive link here -
+https://drive.google.com/file/d/1meo7nDiRBILQMiNJ19h-CTrsam8mfqSV/view?usp=sharing
+
 Edit NavMesh by clicked "edit tiles". Click a tile holder until you see it 'light up' (the circle will become larger) - zoom in camera if needed... Hold 'ctrl' and left click where you want to place the new tile holder marker. Press the 'alt' key to undo last tile holder marker movement. Anything INSIDE the white tiles is an acceptable move path. Anything inside blue tiles is not an acceptable move path. Change as needed. 
 ![oGasai](https://github.com/vociferous1212/Ogasai-pic/blob/main/mmaps.png?raw=true)
