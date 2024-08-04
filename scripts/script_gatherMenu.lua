@@ -10,6 +10,8 @@ function script_gatherMenu:menu()
 	
 	if (CollapsingHeader("Gather options")) then
 		wasClicked, script_grind.gather = Checkbox("Gather on/off", script_grind.gather);
+		SameLine();
+		wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
 		
 		wasClicked, script_gather.collectMinerals = Checkbox("Mining", script_gather.collectMinerals);
 		SameLine();

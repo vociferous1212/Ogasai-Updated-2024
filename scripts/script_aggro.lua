@@ -259,8 +259,11 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 			rTime = GetTimeEX();
 
 			-- move to point
-			Move (rX, rY, rZ);			
-
+			if (not IsPathLoaded(5)) then
+				script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);
+			else
+				Move(rX, rY, rZ);	
+			end		
 		return true;
 	end
 

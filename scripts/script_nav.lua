@@ -97,7 +97,9 @@ function script_nav:moveToHotspot(localObj)
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
-		script_navEX:moveToTarget(localObj, self.currentHotSpotX, self.currentHotSpotY, self.currentHotSpotZ); 
+		-- move to coords
+		script_navEX:moveToHotspotCoords();
+
 			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) then
 				CastStealth();
 				CastGhostWolf();

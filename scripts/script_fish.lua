@@ -1,4 +1,6 @@
 script_fish = {
+	gatherLoaded = include("scripts\\script_gather.lua"),
+	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	PoleName = 'Fishing Pole', 
 	useVendor = true,
 	wasInCombat = false,
@@ -13,6 +15,7 @@ script_fish = {
 	displayRadar = true,
 	useFishRandom = false,
 	fishRandomFloat = 2.2,
+	drawFishNodes = true,
 }
 
 function script_fish:GetBobber()
@@ -75,6 +78,7 @@ function script_fish:run()
 
 	if (not self.setup) then
 		script_vendor:setup();
+		script_gatherEX:setup();
 	
 	-- set lure name from inventory items
 	if (HasItem("Aquadynamic Fish Attractor")) then
@@ -93,6 +97,10 @@ function script_fish:run()
 	
 	local localObj = GetLocalPlayer();
 	local isInCombat = IsInCombat();
+
+	if (self.drawFishNodes) then
+		script_gatherEX:drawFishNodes();
+	end
 
 	if (self.pause) then
 		self.message = "Paused by user...";
@@ -281,6 +289,8 @@ function script_fish:menu()
 		local wasClicked = false;
 		
 		wasClicked, self.useVendor = Checkbox("Use Vendor", self.useVendor);
+		SameLine();
+		wasClicked, self.drawFishNodes = Checkbox("Draw Fishing Pools", self.drawFishNodes);
 
 		if (self.useVendor) then
 

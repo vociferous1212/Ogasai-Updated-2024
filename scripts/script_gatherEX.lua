@@ -1,5 +1,6 @@
-script_gatherEX = {}
+script_gatherEX = {drawFishingPools = false,}
 
+--gather setup function
 function script_gatherEX:setup()
 	script_gather:addHerb('Peacebloom', 269, false, 1);
 	script_gather:addHerb('Silverleaf', 270, false, 1);
@@ -81,4 +82,35 @@ function script_gatherEX:setup()
 	script_gather:addFish("Safefish School", 6435);
 	script_gather:addFish("Firefin Snapper School", 6482);
 	script_gather:addFish("Oily Blackmouth School", 6291);
+end
+
+function script_gatherEX:drawFishNodes()
+
+	local targetObj, targetType = GetFirstObject();
+	while targetObj ~= 0 do
+		if (targetType == 5) then 
+			local id = targetObj:GetObjectDisplayID();
+			local fishName = "";
+			local _x, _y, _z = targetObj:GetPosition();
+			local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);
+			local dist = math.floor(targetObj:GetDistance());
+
+			if(onScreen) then
+
+				-- show fishing pools by name
+				for i=0,script_gather.numFish - 1 do
+					if (script_gather.fish[i][1] == id) then
+						fishName = "*"..script_gather.fish[i][0].."*";
+						local this = ""..dist.." yd";
+						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
+					end
+				end
+	
+				-- draw fishing pool by name
+				DrawText(fishName, _tX-25, _tY, 0, 255, 0);
+
+			end
+		end
+	targetObj, targetType = GetNextObject(targetObj);
+	end
 end

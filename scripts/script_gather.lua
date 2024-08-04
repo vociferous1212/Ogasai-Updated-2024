@@ -170,6 +170,7 @@ function script_gather:GetNode()
 						if(not IsNodeBlacklisted(_x, _y, _z, 5)) then
 							bestDist = dist;
 							bestTarget = targetObj;
+							self.nodeGUID = targetObj:GetGUID();
 						end
 					end
 				end
@@ -219,6 +220,7 @@ local targetObj, targetType = GetFirstObject();
 			local id = targetObj:GetObjectDisplayID();
 			local name = "";
 			local chestName = "";
+			local fishName = "";
 			local _x, _y, _z = targetObj:GetPosition();
 			local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);
 			local dist = math.floor(targetObj:GetDistance());
@@ -250,6 +252,14 @@ local targetObj, targetType = GetFirstObject();
 					end
 				end
 
+				for i=0,self.numFish - 1 do
+					if (self.fish[i][1] == id) then
+						fishName = "*"..self.fish[i][0].."*";
+						local this = ""..dist.." yd";
+						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
+					end
+				end
+
 				-- armor crates
 				--if (id == 335) then
 				--	local this = ""..dist.." yd";
@@ -262,7 +272,7 @@ local targetObj, targetType = GetFirstObject();
 				DrawText(name, _tX-10, _tY, 255, 255, 0);
 				-- draw chests by name
 				DrawText(chestName, _tX-25, _tY, 0, 255, 0);
-
+				DrawText(fishName, _tX-25, _tY, 0, 255, 0);
 				if (script_grindMenu.showIDD) then
 					if (id ~= 192) and (id ~= 0) and (id ~= 386) then
 						local idd = "ID - "..id.."";
@@ -320,7 +330,7 @@ function script_gather:gather()
 		self.nodeGUID = self.nodeObj:GetGUID();
 	end
 	
-	if (self.nodeObj ~= nil and self.nodeObj ~= 0) and (not script_gather:isNodeBlacklisted(self.nodeGUID)) then
+	if (self.nodeObj ~= 0 and self.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(self.nodeGUID)) then
 
 		local _x, _y, _z = self.nodeObj:GetPosition();
 		local dist = self.nodeObj:GetDistance();	
@@ -386,12 +396,15 @@ function script_gather:gather()
 		else
 			if (_x ~= 0) then
 				local nDist = math.floor(self.nodeObj:GetDistance());
-				if (not IsPathLoaded(5)) then
-					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-					self.messageToGrinder = "" ..nDist.. " (yd) - NavEX Script Move";
-				else
+				if (nDist <= 10) and (not IsMoving()) then
+					Move(_x, _y, _z);
+				end
+				if (IsMoving()) then
 					MoveToTarget(_x, _y, _z);
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
+				else
+					Move(_x, _y, _z);
+					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move - no nav path";
 				end
 			end
 		end

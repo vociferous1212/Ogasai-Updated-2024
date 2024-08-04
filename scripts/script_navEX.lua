@@ -66,3 +66,15 @@ function script_navEX:resetPath()
 	local x, y, z = GetLocalPlayer():GetPosition();
 	GeneratePath(x, y, z, x+1, y+1, z);
 end
+
+function script_navEX:moveToHotspotCoords()
+
+	if (IsPathLoaded(5)) and (IsMoving()) then
+			script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
+		else
+			MoveToTarget(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+		end
+		if (not IsMoving()) and (not IsPathLoaded(5)) then
+			Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+		end
+end

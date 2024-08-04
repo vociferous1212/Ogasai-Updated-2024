@@ -393,6 +393,10 @@ function script_grind:run()
 	if (self.drawChests) then
 		script_gather:drawChestNodes();
 	end
+	-- draw fishing pools
+	if (script_gatherEX.drawFishingPools) then
+		script_gatherEX:drawFishNodes();
+	end
 
 	-- logout timer
 	if (self.useLogoutTimer) then
@@ -494,11 +498,12 @@ function script_grind:run()
 
 	--random node dist
 	if (self.useRandomNode) and (not IsGhost() and not localObj:IsDead() and not HasForm() and not IsMounted() and not IsIndoors()) then
-		local randomNodeDist = math.random(4, 14);
+		local randomNodeDist = math.random(4, 9);
 		if (IsMoving()) and (GetTimeEX() > self.nodeTimer) then
 			self.nextToNodeDist = randomNodeDist;
 			script_nav.nextNavNodeDistance = randomNodeDist;
 			script_nav.nextPathNodeDistance = randomNodeDist;
+			NavmeshSmooth(randomNodeDist*2.4)
 			self.nodeTimer = GetTimeEX() + 600;
 		end
 	end
@@ -936,7 +941,9 @@ function script_grind:run()
 			--self.enemyObj = nil;
 			return;
 		end
-
+		if (GetLocalPlayer():HasBuff("Blood Rage")) and (script_grind:enemiesAttackUs() == 0 or not script_grind:isAnyTargetTargetingMe()) then
+			self.message = "Waiting for bloodrage to end - stuck in combat";
+		end
 
 		-- Finish loot before we engage new targets or navigate - return
 		if (self.lootObj ~= nil and (not IsInCombat() or script_grind:enemiesAttackingUs() ==0)) then
@@ -1922,11 +1929,11 @@ function script_grind:doLoot(localObj)
 
 	-- move to loot object
 	self.message = "Moving to loot...";
-	 if (not IsPathLoaded(5)) then
-		self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-	else
+	-- if (IsPathLoaded(5)) and (IsMoving()) then
+	--	self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+	--else
 		MoveToTarget(_x, _y, _z);
-	end
+	--end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then

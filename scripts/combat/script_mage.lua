@@ -393,7 +393,7 @@ function script_mage:run(targetGUID)
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not PlayerHasTarget()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				return;
+				return true;
 			end
 		end
 
@@ -679,7 +679,7 @@ function script_mage:run(targetGUID)
 				if (script_checkAdds:checkAdds()) then
 					self.message = "moving away from adds...";
 					script_om:FORCEOM();
-					return;
+					return true;
 				end
 			end
 
@@ -809,7 +809,7 @@ function script_mage:run(targetGUID)
 				if (script_checkAdds:checkAdds()) then
 					self.message = "moving away from adds...";
 					script_om:FORCEOM();
-					return;
+					return true;
 				end
 			end
 			

@@ -296,6 +296,10 @@ function script_rogue:run(targetGUID)
 			end
 		end
 
+		if (targetObj:GetDistance() <= self.meleeDistance) and (not IsAutoCasting("Attack")) then
+			targetObj:AutoAttack();
+		end
+
 		-- Set Slice and Dice level 10 or greater
 			if not (HasSpell("Slice and Dice")) then
 				self.useSliceAndDice = false;

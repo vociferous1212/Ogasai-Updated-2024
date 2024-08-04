@@ -54,9 +54,11 @@ function script_drawStatus:draw()
 		end
 		if (script_gather.gathering) then
 			local nodeTimer = ((GetTimeEX() - script_gather.blacklistTime) / 1000);
-			DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': ' ..nodeTimer..' Sec', x, y+50, 0, 255, 120); 
-			local nGUID = script_gather.nodeGUID;
-			DrawText("Node GUID - " ..nGUID..  "", x, y+65, 0, 255, 120);
+			DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': ' ..nodeTimer..' Sec', x, y+50, 0, 255, 120);
+			if (script_grindMenu.debugMenu) then
+				local nGUID = script_gather.nodeGUID;
+				DrawText("Node GUID - " ..nGUID..  "", x, y+65, 0, 255, 120);
+			end
 		end
 		end
 	end
