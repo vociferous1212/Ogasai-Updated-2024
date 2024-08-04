@@ -284,7 +284,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/4, self.addsRange/7);
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/4, 9);
 				PetFollow();
 				return;
 			else
@@ -307,7 +307,7 @@ function script_checkAdds:aggroIntersect(target)
 	self.intersectEnemy = nil;
 	while currentObj ~= 0 do
  		if (typeObj == 3)
-			and (currentObj:GetDistance() <= 35)
+			and (currentObj:GetDistance() <= 45)
 			and (currentObj:IsInLineOfSight())
 		then
 			if (currentObj:CanAttack())

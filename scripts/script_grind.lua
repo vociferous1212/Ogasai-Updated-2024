@@ -42,7 +42,7 @@ script_grind = {
 	pullDistance = 225,	-- find target distance
 	avoidElite = true,	-- avoid elites ( currently not working )
 	avoidRange = 40,	-- aboid elites range
-	findLootDistance = 45,
+	findLootDistance = 75,
 	lootDistance = 2.65,
 	skipLooting = false,
 	lootCheck = {},
@@ -744,7 +744,7 @@ function script_grind:run()
 		-- Gather
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
 			if (script_gather:gather()) then
-					script_nav.lastnavIndex = 1;
+					script_nav.lastnavIndex = 2;
 
 					-- turn off jump for gathering...
 					if (self.jump) then
@@ -937,6 +937,7 @@ function script_grind:run()
 			self.message = "Waiting after combat - stuck in combat";
 			if (IsMoving()) then
 				StopMoving();
+				return;
 			end
 			ClearTarget();
 			--self.enemyObj = nil;
@@ -1131,7 +1132,7 @@ function script_grind:run()
 				-- move to target
 				if (IsMoving()) or (IsInCombat()) then
 					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-				elseif (not IsInCombat()) or (not IsMoving()) then
+				elseif (not IsMoving()) and (PlayerHasTarget()) then
 					self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					MoveToTarget(_x, _y, _z);
 				end

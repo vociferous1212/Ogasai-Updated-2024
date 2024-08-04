@@ -1,6 +1,12 @@
 vendorDB = {
 	vendorList = {},
-	numVendors = 0	
+	numVendors = 0,
+	includeVendorDB_1_10 = include("scripts\\db\\vendorDB_1_10.lua"),
+	includeVendorDB_10_20 = include("scripts\\db\\vendorDB_10_20.lua"),
+	includeVendorDB_20_30 = include("scripts\\db\\vendorDB_20_30.lua"),
+	includeVendorDB_30_40 = include("scripts\\db\\vendorDB_30_40.lua"),
+	includeVendorDB_40_50 = include("scripts\\db\\vendorDB_40_50.lua"),
+	includeVendorDB_50_60 = include("scripts\\db\\vendorDB_50_60.lua"),
 }
 
 --[[
@@ -33,83 +39,93 @@ function vendorDB:addVendor(name, faction, continentID, mapID, canRepair, hasFoo
 	self.numVendors = self.numVendors + 1;
 end
 
+function vendorDB:GetVendorByID(id)
+	return self.vendorList[id];
+end
+
+function vendorDB:GetVendor(faction, continentID, mapID, canRepair, needFood, needWater, needArrow, needBullet, posX, posY, posZ, race)
+	local bestDist = 10000;
+	local bestIndex = -1;
+	
+	for i=0,self.numVendors - 1 do
+		if (self.vendorList[i]['faction'] == faction and self.vendorList[i]['continentID'] == continentID) then	
+			if((needFood and self.vendorList[i]['hasFood'] or not needFood) and (needWater and self.vendorList[i]['hasWater'] or not needWater)
+			and (needArrow and self.vendorList[i]['hasArrow'] or not needArrow) and (needBullet and self.vendorList[i]['hasBullet'] or not needBullet)
+			and (canRepair and self.vendorList[i]['canRepair'] or not canRepair)) then
+				local _dist = GetDistance3D(posX, posY, posZ, self.vendorList[i]['pos']['x'], self.vendorList[i]['pos']['y'], self.vendorList[i]['pos']['z']);
+				if(_dist < bestDist) then
+					bestDist = _dist;
+					bestIndex = i;
+				end
+			end
+		end
+	end
+	return bestIndex;
+end
+
+function vendorDB:loadDBVendors()
+	local localObj = GetLocalPlayer();
+	local x, y, z = localObj:GetPosition();
+	local factionID = 1; -- horde
+	local factionNr = GetFaction();
+	if (factionNr == 1 or factionNr == 3 or factionNr == 4 or factionNr == 115 or factionNr == 614 or factionNr == 1610) then
+		factionID = 0; -- alliance
+	end
+	
+	local repID, sellID, foodID, drinkID, arrowID, bulletID = -1, -1, -1, -1, -1, -1;
+
+	repID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), true, false, false, false, false, x, y, z, race);
+	-- turn first false to true (must search for repair vendor) to force bot to use 1 vendor
+	sellID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, false, false, x, y, z, race);
+	foodID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, true, false, false, false, x, y, z, race);
+	drinkID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, true, false, false, x, y, z, race);
+	arrowID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, true, false, x, y, z, race);
+	bulletID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, false, true, x, y, z, race);
+
+	if (repID ~= -1) then
+		script_vendor.repairVendor = vendorDB:GetVendorByID(repID);
+		--DEFAULT_CHAT_FRAME:AddMessage('Repair vendor ' .. script_vendor.repairVendor['name'] .. ' loaded from DB...');
+	end
+
+	if (sellID ~= -1) then
+		script_vendor.sellVendor = vendorDB:GetVendorByID(sellID);
+		--DEFAULT_CHAT_FRAME:AddMessage('Sell vendor ' .. script_vendor.sellVendor['name'] .. ' loaded from DB...');
+	end
+
+	if (foodID ~= -1) then
+		script_vendor.foodVendor = vendorDB:GetVendorByID(foodID);
+		--DEFAULT_CHAT_FRAME:AddMessage('Food vendor ' .. script_vendor.foodVendor['name'] .. ' loaded from DB...');
+	end
+
+	if (drinkID ~= -1) then
+		script_vendor.drinkVendor = vendorDB:GetVendorByID(drinkID);
+		--DEFAULT_CHAT_FRAME:AddMessage('Drink vendor ' .. script_vendor.drinkVendor['name'] .. ' loaded from DB...');
+	end
+
+	if (arrowID ~= -1) then
+		script_vendor.arrowVendor = vendorDB:GetVendorByID(arrowID);
+		--DEFAULT_CHAT_FRAME:AddMessage('Arrow vendor ' .. script_vendor.arrowVendor['name'] .. ' loaded from DB...');
+	end
+
+	if (bulletID ~= -1) then
+		script_vendor.bulletVendor = vendorDB:GetVendorByID(bulletID);
+		--DEFAULT_CHAT_FRAME:AddMessage('Bullet vendor ' .. script_vendor.bulletVendor['name'] .. ' loaded from DB...');
+	end
+
+	if (repID == -1 and sellID == -1 and foodID == -1 and drinkID == -1 and arrowID == -1 and bulletID == -1) then
+		--DEFAULT_CHAT_FRAME:AddMessage('No Vendor found close to our location in vendorDB...');
+	end 
+end
 function vendorDB:setup()
 
----		(name, faction, continentID, mapID, canRepair, hasFood, hasWater, hasArrow, 
-	---  hasBullet, posX, posY, posZ, race)
+	--- (name, faction, continentID, mapID, canRepair, hasFood, hasWater, hasArrow, hasBullet, posX, posY, posZ, race)
 
-	-- dun morogh
-	vendorDB:addVendor("Rybrad Coldbank", 0, 0, 1, true, false, false, false, false, -6101.11, 390.56, 395.54);
-	vendorDB:addVendor("Rybrad Coldbank", 0, 0, 1, false, false, false, false, false, -6101.11, 390.56, 395.54);
-	vendorDB:addVendor("Adlin Pridedrift", 0, 0, 1, false, true, false, false, false, -6226.67, 320.05, 383.11);
-	vendorDB:addVendor("Adlin Pridedrift", 0, 0, 1, false, false, true, false, false, -6226.67, 320.05, 383.11);
-	vendorDB:addVendor("Adlin Pridedrift", 0, 0, 1, false, false, false, true, false, -6226.67, 320.05, 383.11);
-	vendorDB:addVendor("Adlin Pridedrift", 0, 0, 1, false, false, false, false, true, -6226.67, 320.05, 383.11);
-	vendorDB:addVendor("Kreg Bilmn", 0, 0, 1, false, false, false, true, false, -5597.67, -521.86, 399.65);
-	vendorDB:addVendor("Kreg Bilmn", 0, 0, 1, false, false, false, false, true, -5597.67, -521.86, 399.65);
-	vendorDB:addVendor("Kreg Bilmn", 0, 0, 1, false, true, false, false, false, -5597.67, -521.86, 399.65);
-	vendorDB:addVendor("Kreg Bilmn", 0, 0, 1, false, false, true, false, false, -5597.67, -521.86, 399.65);
-	vendorDB:addVendor("Grawn Thromwyn", 0, 0, 1, true, false, false, false, false, -5590.67, -428.42, 397.32);
-	vendorDB:addVendor("Grawn Thromwyn", 0, 0, 1, false, false, false, false, false, -5590.67, -428.42, 397.32);
-	vendorDB:addVendor("Frast Dokner", 0, 0, 1, true, false, false, false, false, -5712.23, -1596.21, 383.2);
-	vendorDB:addVendor("Frast Dokner", 0, 0, 1, false, false, false, false, false, -5712.23, -1596.21, 383.2);
-	vendorDB:addVendor("Kazan Mogosh", 0, 0, 1, false, true, false, false, false, -5665.09, -1567.93, 383.2);
-	vendorDB:addVendor("Kazan Mogosh", 0, 0, 1, false, false, true, false, false, -5665.09, -1567.93, 383.2);
-
-	-- Teldrassil
-	vendorDB:addVendor("Keina", 0, 1, 141, true, false, false, false, false, 10436.7, 794.83, 1322.7);
-	vendorDB:addVendor("Keina", 0, 1, 141, false, false, false, false, false, 10436.7, 794.83, 1322.7);
-	vendorDB:addVendor("Dellylah", 0, 1, 141, false, true, false, false, false, 10450.2, 779.85, 1322.66);
-	vendorDB:addVendor("Dellylah", 0, 1, 141, false, false, true, false, false, 10450.2, 779.85, 1322.66);
-	vendorDB:addVendor("Keina", 0, 1, 141, false, false, false, true, false, 10436.7, 794.83, 1322.7);
-	vendorDB:addVendor("Lyrai", 0, 1, 141, false, false, false, false, true, 10442.9, 783.98, 1337.28);
-	vendorDB:addVendor("Meri Ironweave", 0, 1, 141, true, false, false, false, false, 9815.88, 948.6, 1308.76);
-	vendorDB:addVendor("Meri Ironweave", 0, 1, 141, false, false, false, false, false, 9815.88, 948.6, 1308.76);
-	vendorDB:addVendor("Innkeeper Keldamyr", 0, 1, 141, false, false, true, false, false, 9802.2, 982.6, 1313.89);
-	vendorDB:addVendor("Innkeeper Keldamyr", 0, 1, 141, false, true, false, false, false, 9802.2, 982.6, 1313.89);
-	vendorDB:addVendor("Jeena Featherbow", 0, 1, 141, false, false, false, true, false, 9821.98, 968.83, 1308.77);
-	vendorDB:addVendor("Danlyia", 0, 1, 141, false, true, false, false, false, 9890.16, 994.67, 1313.83);
-	vendorDB:addVendor("Danlyia", 0, 1, 141, false, false, true, false, false, 9890.16, 994.67, 1313.83);
-	vendorDB:addVendor("Aldia", 0, 1, 141, false, false, false, false, true, 9891.87, 988.3, 1327.56);
-
-
-	-- Elwynn Forest	
-	vendorDB:addVendor("Brother Danil", 0, 0, 12, false, false, false, false, true, -8901.59, -112.72, 81.85);
-	vendorDB:addVendor("Brother Danil", 0, 0, 12, false, false, false, true, false, -8901.59, -112.72, 81.85);
-	vendorDB:addVendor("Godric Rothgar", 0, 0, 12, false, false, false, false, false, -8898.24, -119.84, 81.83);
-	vendorDB:addVendor("Godric Rothgar", 0, 0, 12, true, false, false, false, false, -8898.24, -119.84, 81.83);
-	vendorDB:addVendor("Brother Danil", 0, 0, 12, false, true, false, false, false, -8901.59, -112.72, 81.85);
-	vendorDB:addVendor("Brother Danil", 0, 0, 12, false, false, true, false, false, -8901.59, -112.72, 81.85);
-	vendorDB:addVendor("Kurran Steele", 0, 0, 12, true, false, false, false, false, -9457.64, 99.68, 58.34);
-	vendorDB:addVendor("Kurran Steele", 0, 0, 12, false, false, false, false, false, -9457.64, 99.68, 58.34);
-	vendorDB:addVendor("Barkeep Dobbins", 0, 0, 12, false, true, false, false, false, -9459.99, 8.41, 56.96);
-	vendorDB:addVendor("Barkeep Dobbins", 0, 0, 12, false, false, true, false, false, -9459.99, 8.41, 56.96);
-	vendorDB:addVendor("Rallic Finn", 0, 0, 12, true, false, false, false, false, -9469.29, -1355.24, 47.2);
-	vendorDB:addVendor("Rallic Finn", 0, 0, 12, false, false, false, false, false, -9469.29, -1355.24, 47.2);
-	vendorDB:addVendor("Rallic Finn", 0, 0, 12, false, false, false, true, false, -9469.29, -1355.24, 47.2);
-	vendorDB:addVendor("Drake Lindgren", 0, 0, 12, false, true, false, false, false, -9483.1, -1356.25, 46.95);
-	vendorDB:addVendor("Drake Lindgren", 0, 0, 12, false, false, true, false, false, -9483.1, -1356.25, 46.95);
-	vendorDB:addVendor("Drake Lindgren", 0, 0, 12, false, false, false, false, true, -9483.1, -1356.25, 46.95);
-
-	-- Mulgore - Horde
-	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, false, false, false, false, -2940.85, -245.96, 53.81);
-	vendorDB:addVendor("Marjak Keenblade", 1, 1, 215, true, false, false, false, false, -2926.33, -215.72, 54.17);
-	vendorDB:addVendor("Kawnie Softbreeze", 1, 1, 215, false, false, false, true, false, -2893.72, -279.34, 53.91);
-	vendorDB:addVendor("Kawnie Softbreeze", 1, 1, 215, false, false, false, false, true, -2893.72, -279.34, 53.91);
-	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, false, true, false, false, -2940.85, -245.96, 53.81);
-	vendorDB:addVendor("Moodan Sungrain", 1, 1, 215, false, true, false, false, false, -2940.85, -245.96, 53.81);
-
-	-- Tirisfal Glades - Horde
-	vendorDB:addVendor("Archibald Kava", 1, 0, 85, true, false, false, false, false, 1859.39, 1568.81, 94.31);
-	vendorDB:addVendor("Archibald Kava", 1, 0, 85, false, false, false, false, false, 1859.39, 1568.81, 94.31);
-	vendorDB:addVendor("Eliza Callen", 1, 0, 85, true, false, false, false, false, 2246.33, 308.23, 35.18);
-	vendorDB:addVendor("Eliza Callen", 1, 0, 85, false, false, false, false, false, 2246.33, 308.23, 35.18);
-	vendorDB:addVendor("Innkeeper Renee", 1, 0, 85, false, true, false, false, false, 2269.51, 244.94, 34.25);
-	vendorDB:addVendor("Innkeeper Renee", 1, 0, 85, false, false, true, false, false, 2269.51, 244.94, 34.25);
-	vendorDB:addVendor("Mrs. Winters", 1, 0, 85, false, false, false, true, false, 2253.34, 270.22, 34.26);
-	vendorDB:addVendor("Mrs. Winters", 1, 0, 85, false, false, false, false, true, 2253.34, 270.22, 34.26);
-	vendorDB:addVendor("Constance Brisboise", 1, 0, 85, false, false, false, false, false, 2157.34, 656.66, 34.54);
-	vendorDB:addVendor("Constance Brisboise", 1, 0, 85, true, false, false, false, false, 2157.34, 656.66, 34.54);
+	vendorDB_1_10:setup();
+ 	vendorDB_10_20:setup();
+ 	vendorDB_20_30:setup();
+ 	vendorDB_30_40:setup();
+ 	vendorDB_40_50:setup();
+ 	vendorDB_50_60:setup();
 
 	-- Durotar - Horde
 
@@ -119,7 +135,12 @@ function vendorDB:setup()
 	vendorDB:addVendor("Gwyn Farrow", 1, 0, 130, false, true, false, false, false, 553.08, 1600.14, 129.12);
 	vendorDB:addVendor("Edwin Harly", 1, 0, 130, false, false, true, false, false, 549.58, 1602.98, 128.48);
 	vendorDB:addVendor("Edwin Harly", 1, 0, 130, false, false, false, false, true, 549.58, 1602.98, 128.48);
-	vendorDB:addVendor("Nadia Vernon", 1, 0, 130, false, false, false, true, false, 566.3, 1559.59, 132.51);	
+	vendorDB:addVendor("Nadia Vernon", 1, 0, 130, false, false, false, true, false, 566.3, 1559.59, 132.51);
+
+	-- Darkshore - Alliance
+	vendorDB:addVendor("Ullanna", 0, 1, 148, false, false, false, false, false, 4998.97, 72.87, 52.7);
+	vendorDB:addVendor("Tiyani", 0, 1, 148, false, true, false, false, false, 4986.99, 80.03, 52.74);
+	vendorDB:addVendor("Tiyani", 0, 1, 148, false, false, true, false, false, 4986.99, 80.03, 52.74);	
 
 	-- Ashenvale - Horde
 	vendorDB:addVendor("Wik'Tar", 1, 1, 331, false, false, false, false, false, 3362.22, 1024.83, 2.87);
@@ -181,13 +202,6 @@ function vendorDB:setup()
 	  -- Eeastern Plaguelands
 	  vendorDB:addVendor("Jase Farlane", 0, 0, 139, true, false, false, false, false, 2313.87, -5305, 81.99);
 	   vendorDB:addVendor("Jase Farlane", 1, 0, 139, true, false, false, false, false, 2313.87, -5305, 81.99);
-
-	-- Ally: Human
-	vendorDB:addVendor('Brother Danil', 0, 0, 12, false, true, true, true, true, -8901.59, -112.72, 81.85);
-	vendorDB:addVendor("Godric Rothgar", 0, 0, 12, true, false, false, false, false, -8898.23, -119.84, 81.83); -- Repair -- 
-	vendorDB:addVendor("Innkeeper Farley", 0, 0, 12, false, true, false, false, false, -9462.67, 16.19, 56.96); -- bread goldshire
-	vendorDB:addVendor("Innkeeper Farley", 0, 0, 12, false, false, true, false, false, -9462.67, 16.19, 56.96); -- drinks goldshire
-	vendorDB:addVendor("Andrew Krighton", 0, 0, 12, true, false, false, false, false, -9462.3, 87.81, 58.33); -- Repair Goldshire
 	
 	-- Barrens - Horde
 	vendorDB:addVendor("Zlagk", 1, 1, 14, true, false, false, false, false, -560.13, -4217.21, 41.59);
@@ -212,9 +226,6 @@ function vendorDB:setup()
 	vendorDB:addVendor("Jazzik", 0, 1, 17, false, false, false, false, true, -1008.67, -3651.95, 20.06);
 	vendorDB:addVendor("Innkeeper Wiley", 0, 1, 17, false, false, true, false, false, -1050.05, -3664.81, 23.88);
 	vendorDB:addVendor("Innkeeper Wiley", 0, 1, 17, false, true, false, false, false, -1050.05, -3664.81, 23.88);
-
-
-
 
 	-- Hillsbrad Foothills - Horde
 	vendorDB:addVendor("Ott", 1, 0, 267, false, false, false, false, false, -158.53, -867.18, 56.89);
@@ -275,93 +286,9 @@ function vendorDB:setup()
 	vendorDB:addVendor('Vikki Lonsav', 0, 0, 45, false, false, true, true, true, -1274.51, -2537.41, 21.43); -- General Trade for Ammo & Drinks
 
 	-- Winterspring - Ally + Horde
-	vendorDB:addVendor('Wixxrak', 0, 1, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37); -- Repair Vendor
-	vendorDB:addVendor('Wixxrak', 1, 1, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37); -- Repair Vendor
-	vendorDB:addVendor('Himmik', 0, 1, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71); -- Food + Drink Vendor
-	vendorDB:addVendor('Himmik', 1, 1, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71); -- Food + Drink Vendor 
+	vendorDB:addVendor('Wixxrak', 0, 1, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37);
+	vendorDB:addVendor('Wixxrak', 1, 1, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37);
+	vendorDB:addVendor('Himmik', 0, 1, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71);
+	vendorDB:addVendor('Himmik', 1, 1, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71);
 
-	-- Add new additions here!!
-
-
-
-
-
-
-end
-
-function vendorDB:GetVendorByID(id)
-	return self.vendorList[id];
-end
-
-function vendorDB:GetVendor(faction, continentID, mapID, canRepair, needFood, needWater, needArrow, needBullet, posX, posY, posZ, race)
-	local bestDist = 10000;
-	local bestIndex = -1;
-	
-	for i=0,self.numVendors - 1 do
-		if (self.vendorList[i]['faction'] == faction and self.vendorList[i]['continentID'] == continentID) then	
-			if((needFood and self.vendorList[i]['hasFood'] or not needFood) and (needWater and self.vendorList[i]['hasWater'] or not needWater)
-			and (needArrow and self.vendorList[i]['hasArrow'] or not needArrow) and (needBullet and self.vendorList[i]['hasBullet'] or not needBullet)
-			and (canRepair and self.vendorList[i]['canRepair'] or not canRepair)) then
-				local _dist = GetDistance3D(posX, posY, posZ, self.vendorList[i]['pos']['x'], self.vendorList[i]['pos']['y'], self.vendorList[i]['pos']['z']);
-				if(_dist < bestDist) then
-					bestDist = _dist;
-					bestIndex = i;
-				end
-			end
-		end
-	end
-	return bestIndex;
-end
-
-function vendorDB:loadDBVendors()
-	local localObj = GetLocalPlayer();
-	local x, y, z = localObj:GetPosition();
-	local factionID = 1; -- horde
-	local factionNr = GetFaction();
-	if (factionNr == 1 or factionNr == 3 or factionNr == 4 or factionNr == 115 or factionNr == 614 or factionNr == 1610) then
-		factionID = 0; -- alliance
-	end
-	
-	local repID, sellID, foodID, drinkID, arrowID, bulletID = -1, -1, -1, -1, -1, -1;
-
-	repID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), true, false, false, false, false, x, y, z, race);
-	sellID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), true, false, false, false, false, x, y, z, race);
-	foodID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, true, false, false, false, x, y, z, race);
-	drinkID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, true, false, false, x, y, z, race);
-	arrowID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, true, false, x, y, z, race);
-	bulletID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, false, true, x, y, z, race);
-
-	if (repID ~= -1) then
-		script_vendor.repairVendor = vendorDB:GetVendorByID(repID);
-		--DEFAULT_CHAT_FRAME:AddMessage('Repair vendor ' .. script_vendor.repairVendor['name'] .. ' loaded from DB...');
-	end
-
-	if (sellID ~= -1) then
-		script_vendor.sellVendor = vendorDB:GetVendorByID(sellID);
-		--DEFAULT_CHAT_FRAME:AddMessage('Sell vendor ' .. script_vendor.sellVendor['name'] .. ' loaded from DB...');
-	end
-
-	if (foodID ~= -1) then
-		script_vendor.foodVendor = vendorDB:GetVendorByID(foodID);
-		--DEFAULT_CHAT_FRAME:AddMessage('Food vendor ' .. script_vendor.foodVendor['name'] .. ' loaded from DB...');
-	end
-
-	if (drinkID ~= -1) then
-		script_vendor.drinkVendor = vendorDB:GetVendorByID(drinkID);
-		--DEFAULT_CHAT_FRAME:AddMessage('Drink vendor ' .. script_vendor.drinkVendor['name'] .. ' loaded from DB...');
-	end
-
-	if (arrowID ~= -1) then
-		script_vendor.arrowVendor = vendorDB:GetVendorByID(arrowID);
-		--DEFAULT_CHAT_FRAME:AddMessage('Arrow vendor ' .. script_vendor.arrowVendor['name'] .. ' loaded from DB...');
-	end
-
-	if (bulletID ~= -1) then
-		script_vendor.bulletVendor = vendorDB:GetVendorByID(bulletID);
-		--DEFAULT_CHAT_FRAME:AddMessage('Bullet vendor ' .. script_vendor.bulletVendor['name'] .. ' loaded from DB...');
-	end
-
-	if (repID == -1 and sellID == -1 and foodID == -1 and drinkID == -1 and arrowID == -1 and bulletID == -1) then
-		--DEFAULT_CHAT_FRAME:AddMessage('No Vendor found close to our location in vendorDB...');
-	end 
 end

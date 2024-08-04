@@ -674,7 +674,7 @@ function script_druid:run(targetGUID)
 		return 4;
 	end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift) and (not IsCasting()) and (not IsChanneling()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;
@@ -714,7 +714,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift) and (not IsCasting()) and (not IsChanneling()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;
@@ -1184,7 +1184,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		return true;
 		end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift) and (not IsCasting()) and (not IsChanneling()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;

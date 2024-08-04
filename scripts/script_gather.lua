@@ -396,7 +396,7 @@ function script_gather:gather()
 		else
 			if (_x ~= 0) then
 				local nDist = math.floor(self.nodeObj:GetDistance());
-				if (nDist <= 10) and (not IsMoving()) then
+				if (nDist <= 10) and (not IsMoving()) and (self.nodeObj:IsInLineOfSight()) then
 					Move(_x, _y, _z);
 				end
 				if (IsMoving()) then
