@@ -514,6 +514,7 @@ function script_grind:run()
 		script_paranoia.paranoiaUsed = false;
 		--reset new target time for blacklisting
 		script_grind.newTargetTime = GetTimeEX();
+		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 		return;
 	end
 
@@ -937,11 +938,11 @@ function script_grind:run()
 			self.message = "Waiting after combat - stuck in combat";
 			if (IsMoving()) then
 				StopMoving();
-				return;
+				return true;
 			end
 			ClearTarget();
 			--self.enemyObj = nil;
-			return;
+			return true;
 		end
 		if (GetLocalPlayer():HasBuff("Blood Rage")) and (script_grind:enemiesAttackUs() == 0 or not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting for bloodrage to end - stuck in combat";
@@ -1611,11 +1612,15 @@ function script_grind:enemyIsValid(i)
 	-- add elite to blacklist
 		if (self.skipElites) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetDistance() <= 65) then	
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
+			DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Elite " .. self.enemyObj:GetUnitName() .. "");
+
 		end
 
 	-- add above maxLevel to blacklist
 		if (self.skipHardPull) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > self.maxLevel) and (i:GetDistance() <= 65) then
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
+			DEFAULT_CHAT_FRAME:AddMessage('Blacklisting ' .. self.enemyObj:GetUnitName() .. ', too high level...');
+
 		end
 
 	-- try to skip units below us or above us (in water or structure)
@@ -1920,6 +1925,9 @@ function script_grind:doLoot(localObj)
 	if (IsStanding()) and (not IsInCombat()) then
 		if (self.blacklistLootTime >= self.blacklistLootTimeCheck) then
 			-- add to blacklist
+			if (self.lootObj ~= nil and self.loobObj ~= 0) then
+			DEFAULT_CHAT_FRAME:AddMessage("Blacklisting loot - " ..self.lootObj:GetUnitName().. " " ..math.floor(self.lootObj:GetDistance()).. " (yd)");
+			end
 			script_grind:addTargetToLootBlacklist(self.lootObj:GetGUID());
 			-- variable on/off to stop spamming message
 			if (self.messageOnce) then

@@ -22,6 +22,12 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:IsCritter())
 			and (not currentObj:IsDead())
 			and (currentObj:CanAttack())
+			and (not currentObj:GetCreatureType() == 'Not specified')
+			and (not currentObj:IsCasting())
+			and (not currentObj:HasDebuff("Polymorph"))
+			and (not currentObj:HasDebuff("Fear"))
+
+
 		then
 				script_checkAdds.closestEnemy = currentObj;
 		else
@@ -37,6 +43,10 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 				and (currentObj:CanAttack())
 				and (not script_grind:isTargetingMe3(currentObj))
 				and (not script_grind:isTargetingPet(currentObj))
+				and (not currentObj:GetCreatureType() == 'Not specified')
+				and (not currentObj:IsCasting())
+				and (not currentObj:HasDebuff("Polymorph"))
+				and (not currentObj:HasDebuff("Fear"))
 			then
 	
 				local dist = currentObj:GetDistance();
@@ -62,6 +72,10 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:IsCritter())
 			and (not currentObj:IsDead())
 			and (currentObj:CanAttack())
+			and (not currentObj:GetCreatureType() == 'Not specified')
+			and (not currentObj:IsCasting())
+			and (not currentObj:HasDebuff("Polymorph"))
+			and (not currentObj:HasDebuff("Fear"))
 		then
 				script_checkAdds.closestEnemy = currentObj;
 		else
@@ -77,6 +91,10 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 				and (currentObj:CanAttack())
 				and (not script_grind:isTargetingMe3(currentObj))
 				and (not script_grind:isTargetingPet(currentObj))
+				and (not currentObj:GetCreatureType() == 'Not specified')
+				and (not currentObj:IsCasting())
+				and (not currentObj:HasDebuff("Polymorph"))
+				and (not currentObj:HasDebuff("Fear"))
 			then
 
 				local dist = currentObj:GetDistance();
@@ -110,6 +128,10 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:IsCritter())
 			and (not currentObj:IsDead())
 			and (currentObj:CanAttack())
+			and (not currentObj:GetCreatureType() == 'Not specified')
+			and (not currentObj:IsCasting())
+			and (not currentObj:HasDebuff("Polymorph"))
+			and (not currentObj:HasDebuff("Fear"))
 		then		
 				script_checkAdds.closestEnemy = currentObj;
 		typeObj = GetNextObject(currentObj);
