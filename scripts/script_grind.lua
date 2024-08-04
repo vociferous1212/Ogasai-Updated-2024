@@ -729,7 +729,11 @@ function script_grind:run()
 			return;
 		end
 
-		--script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime;
+		-- reset gather blacklist timer if we enter combat
+		if (IsInCombat()) then
+			script_gather.blacklistTime = GetTimeEX()*2;
+			script_gather.timerSet = false;
+		end
 		
 		-- Gather
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then

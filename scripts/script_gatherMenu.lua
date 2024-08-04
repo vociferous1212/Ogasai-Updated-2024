@@ -30,8 +30,8 @@ function script_gatherMenu:menu()
 			end
 		end
 		Separator();
-		Text("Blacklist Gather Node Time - Seconds");
-		script_gather.blacklistSetTime = SliderInt("BLT", 1, 120, script_gather.blacklistSetTime);
+		Text("Blacklist Gather Node Time - Seconds - 300 = 5 minutes");
+		script_gather.blacklistSetTime = SliderInt("BLT", 1, 300, script_gather.blacklistSetTime);
 		
 		if (script_gather.collectMinerals or script_gather.collectHerbs) then
 			wasClicked, script_gather.gatherAllPossible = Checkbox("Gather All Possible", script_gather.gatherAllPossible);
