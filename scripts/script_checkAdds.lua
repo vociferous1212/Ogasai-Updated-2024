@@ -206,6 +206,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 				and (not currentObj:IsCasting())
 				and (not script_grind.enemyObj:IsCasting())
+				and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4)
 			then
 					local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -243,6 +244,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 				and (not script_grind.enemyObj:IsCasting())
 				and (not currentObj:IsCasting())
+				and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4)
 			then
 						local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -282,7 +284,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/4, self.addsRange/3.5);
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/4, self.addsRange/7);
 				PetFollow();
 				return;
 			else

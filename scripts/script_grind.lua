@@ -650,6 +650,7 @@ function script_grind:run()
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (self.enemyObj:GetDistance() <= 30) then
 				self.enemyObj:FaceTarget();
+				self.blacklistLootTime = GetTimeEX();
 			end
 		end
 	end
@@ -1128,9 +1129,9 @@ function script_grind:run()
 
 
 				-- move to target
-				if (not IsMoving()) or (IsInCombat()) then
+				if (IsMoving()) or (IsInCombat()) then
 					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-				elseif (not IsInCombat()) or (IsMoving()) then
+				elseif (not IsInCombat()) or (not IsMoving()) then
 					self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					MoveToTarget(_x, _y, _z);
 				end
@@ -1320,7 +1321,7 @@ function script_grind:getTargetAttackingUs()
     		if typeObj == 3 then
 	
 			-- acceptable targets
-			if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:IsInLineOfSight()) then
+			if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:IsInLineOfSight()) and (not currentObj:IsCritter()) then
 
 			-- get targets target - target of target
 			local localObj = GetLocalPlayer();
