@@ -10,6 +10,8 @@
  - no clear path to avoid elites and will sometimes get stuck until a new target is acquired
  - runner script, which was not functional to begin with, has been repurposed for aggro checking during combat and needs to be removed from script options
 
+![oGasai](https://github.com/vociferous121/Ogasai_pic/blob/main/blacklist.jpg?raw=true)
+
 A good idea to get a decent injector.
  https://remotedll.en.lo4d.com/windows
 
