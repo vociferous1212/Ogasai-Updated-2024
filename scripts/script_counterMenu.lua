@@ -4,6 +4,8 @@ script_counterMenu = {
 
 function script_counterMenu:menu()
 
+	Separator();
+
 	-- show text since last reload
 	Text("Counters Since Last Reload - ");
 

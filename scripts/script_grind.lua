@@ -652,6 +652,7 @@ function script_grind:run()
 			if (self.enemyObj:GetDistance() <= 30) then
 				self.enemyObj:FaceTarget();
 				self.blacklistLootTime = GetTimeEX();
+				self.blacklistLootTimeCheck = GetTimeEX();
 			end
 		end
 	end
@@ -662,6 +663,11 @@ function script_grind:run()
 
 	if (not self.hotspotReached) then
 		self.newTargetTime = GetTimeEX();
+	end
+
+	-- reset vendor message after selling/repairing
+	if (script_vendor.status == 0) and (self.hotspotReached) then
+		script_vendor.message = "idle...";
 	end
 
 	-- set tick rate for scripts
@@ -744,6 +750,7 @@ function script_grind:run()
 		
 		-- Gather
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
+				script_gather.gathering = true;
 			if (script_gather:gather()) then
 					script_nav.lastnavIndex = 2;
 
@@ -773,6 +780,7 @@ function script_grind:run()
 		if (self.jumpCheck) then
 			self.jump = true;
 			self.jumpCheck = false;
+			script_gather.gathering = false;
 		end
 
 		-- hotspot reached distance
@@ -934,15 +942,16 @@ function script_grind:run()
 			self.message = "waiting after combat - stuck in combat";
 			return;
 		end
-		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 or not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
+
+		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting after combat - stuck in combat";
+			ClearTarget();
+			self.enemyObj = nil;
 			if (IsMoving()) then
 				StopMoving();
-				return true;
+				return;
 			end
-			ClearTarget();
-			--self.enemyObj = nil;
-			return true;
+		return;
 		end
 		if (GetLocalPlayer():HasBuff("Blood Rage")) and (script_grind:enemiesAttackUs() == 0 or not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting for bloodrage to end - stuck in combat";

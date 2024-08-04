@@ -101,7 +101,8 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		-- draw rares
 		if (target:GetClassification() == 4) then
 			DrawText("(Rare)", tX, tY-25, 255, 255, 255);
-		elseif (target:GetClassification() == 1) then
+		-- draw elites if not in dungeon group (party members less than 3)
+		elseif (target:GetClassification() == 1) and (GetNumPartyMembers() > 4) then
 			DrawText("(Elite)", tX, tY-25, 255, 255, 255);
 		end
 

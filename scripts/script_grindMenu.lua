@@ -23,8 +23,7 @@ script_grindMenu = {
 
 function script_grindMenu:printHotspot()
 
-	DEFAULT_CHAT_FRAME:AddMessage('Add hotspot to database by adding the following line in hotspotDB.');
-	DEFAULT_CHAT_FRAME:AddMessage('Line to copy added to log files.');
+	DEFAULT_CHAT_FRAME:AddMessage('Add hotspot to database by copy/paste the following line in hotspotDB. Added line to log files.');
 	local race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
 	local x, y, z = GetLocalPlayer():GetPosition();
 	local hx, hy, hz = math.floor(x*100)/100, math.floor(y*100)/100, math.floor(z*100)/100;
@@ -286,20 +285,30 @@ function script_grindMenu:menu()
 	if (CollapsingHeader("Loot Options")) then
 		local wasClicked = false;
 		wasClicked, script_grind.skipLooting = Checkbox("Skip Looting", script_grind.skipLooting);
-		
-		SameLine();
+		if (not script_grind.skipLooting) then
+			SameLine();
+			wasClicked, script_grind.skinning = Checkbox("Use Skinning", script_grind.skinning);
 
-		wasClicked, script_grind.skinning = Checkbox("Use Skinning", script_grind.skinning);
+			Text('Search For Loot Distance');
+			script_grind.findLootDistance = SliderFloat("SFL (yd)", 1, 100, script_grind.findLootDistance);
 
-		Text('Search For Loot Distance');
-		script_grind.findLootDistance = SliderFloat("SFL (yd)", 1, 100, script_grind.findLootDistance);
+			Text('Loot Corpse Distance');
+			script_grind.lootDistance = SliderFloat("LCD (yd)", 1, 5, script_grind.lootDistance);
 
-		Text('Loot Corpse Distance');
-		script_grind.lootDistance = SliderFloat("LCD (yd)", 1, 5, script_grind.lootDistance);
-
-		Text("Blacklist Loot Time");
-		script_grind.blacklistLootTimeVar = SliderInt("BL (sec)", 10, 60, script_grind.blacklistLootTimeVar);
-
+			Text("Blacklist Loot Time");
+			script_grind.blacklistLootTimeVar = SliderInt("BL (sec)", 10, 60, script_grind.blacklistLootTimeVar);
+			if (Button("Add Target To Loot Blacklist")) then
+				if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+					script_grind:addTargetToLootBlacklist(GetLocalPlayer():GetUnitsTarget():GetGUID());
+				DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. GetLocalPlayer():GetUnitsTarget():GetUnitName() .. "");	
+				elseif (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
+					script_grind:addTargetToLootBlacklist(script_grind.lootObj:GetGUID());
+					DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. script_grind.lootObj:GetUnitName() .. "");
+				elseif (GetLocalPlayer():GetUnitsTarget() == 0) and (script_grind.lootObj == 0 or script_grind.lootObj == nil) then
+					DEFAULT_CHAT_FRAME:AddMessage("No target to blacklist loot!");
+				end
+			end
+		end
 	end
 	
 	script_gatherMenu:menu();
@@ -309,14 +318,18 @@ function script_grindMenu:menu()
 
 		local wasClicked = false;
 
-		wasClicked, script_grind.drawEnabled = Checkbox('Display Status Window', script_grind.drawEnabled);
-
-			if (script_grind.drawEnabled) then
-				if (CollapsingHeader("|+| Move Status Window")) then
-					script_grind.adjustX = SliderInt("adjust X scale", -300, 300, script_grind.adjustX);
-					script_grind.adjustY = SliderInt("adjust Y scale", -300, 300, script_grind.adjustY);
-				end
+		if (script_grind.drawEnabled) then
+			if (CollapsingHeader("|+| Move Status Window")) then
+				script_grind.adjustX = SliderInt("adjust X scale", -300, 300, script_grind.adjustX);
+				script_grind.adjustY = SliderInt("adjust Y scale", -300, 300, script_grind.adjustY);
 			end
+		end
+		if (CollapsingHeader("|+| Draw Radar")) then
+			local wasClicked = false;
+			script_radar:menu()
+		end
+
+		wasClicked, script_grind.drawEnabled = Checkbox('Display Status Window', script_grind.drawEnabled);
 		
 		if (GetLocalPlayer():GetLevel() < 60) then
 		
@@ -324,12 +337,6 @@ function script_grindMenu:menu()
 		end
 
 		wasClicked, script_grind.drawAggro = Checkbox('Display Aggro Range', script_grind.drawAggro);
-
-		if (CollapsingHeader("|+| Draw Radar")) then
-		local wasClicked = false;
-				script_radar:menu()
-		end
-
 		wasClicked, script_grind.drawUnits = Checkbox("Display Unit Info On Screen", script_grind.drawUnits);
 		wasClicked, script_grind.drawAutoPath = Checkbox('Display Auto-Path Nodes', script_grind.drawAutoPath);
 		wasClicked, script_grind.drawPath = Checkbox('Display Move Path', script_grind.drawPath);
@@ -351,6 +358,9 @@ function script_grindMenu:menu()
 	if (self.helpMenu) then
 		Text("HELP *Show chests and lootable boxes on screen");
 	end
+
+	wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
+
 
 	
 end

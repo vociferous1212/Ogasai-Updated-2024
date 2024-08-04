@@ -313,11 +313,11 @@ function script_gather:gather()
 	if(not self.isSetup) then
 		script_gather:setup();
 	end
-	self.gathering = true;
 
 	if (self.timer > GetTimeEX()) then
 		return true;
 	end
+
 	if (not self.timerSet) then
 		self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
 		self.timerSet = true;
@@ -331,6 +331,9 @@ function script_gather:gather()
 	end
 	
 	if (self.nodeObj ~= 0 and self.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(self.nodeGUID)) then
+	
+	self.gathering = true;
+
 
 		local _x, _y, _z = self.nodeObj:GetPosition();
 		local dist = self.nodeObj:GetDistance();	
@@ -396,9 +399,6 @@ function script_gather:gather()
 		else
 			if (_x ~= 0) then
 				local nDist = math.floor(self.nodeObj:GetDistance());
-				if (nDist <= 10) and (not IsMoving()) and (self.nodeObj:IsInLineOfSight()) then
-					Move(_x, _y, _z);
-				end
 				if (IsMoving()) then
 					MoveToTarget(_x, _y, _z);
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
