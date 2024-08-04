@@ -14,6 +14,7 @@ function hotspotDB_10_20:setup()
 	hotspotDB:addHotspot("Darkshore 16 - 18", "Alliance", 16, 18, 5314.11, 368.79, 28.98);
 	hotspotDB:addHotspot("Twilight Vale 16 - 18", "Alliance", 16, 18, 5317.5, 150.43, 33.17);
 	hotspotDB:addHotspot("Twilight Vale 17 - 19", "Alliance", 17, 19, 4731.28, 321.74, 52.64);
+	hotspotDB:addHotspot("Twilight Vale 18 - 20", "Alliance", 18, 20, 4969.39, 375.73, 31.67);
 	hotspotDB:addHotspot("Twilight Vale 19 - 21", "Alliance", 19, 21, 4244.09, 489.34, 62.46);
 	hotspotDB:addHotspot("Darkshore 19 - 21", "Alliance", 19, 21, 4832.35, 423.87, 36.13);
 

@@ -935,7 +935,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- check melee distance
-			if (IsBearForm() or IsCatForm()) and (targetObj:GetDistance() > self.meleeDistance) and not (IsInCombat()) then
+			if (IsBearForm() or IsCatForm()) and (targetObj:GetDistance() > self.meleeDistance) then
 				return 3;
 			end
 
@@ -990,7 +990,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		or ( (targetObj:GetLevel() > (localObj:GetLevel() + 2) and IsInCombat() ) and (not IsBearForm()) and (not IsCatForm()) and (localMana > self.shapeshiftMana) and (localHealth > self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) )
 		
 		-- or hasregrowth and has rejuv and is in combat
-		or ( (self.useBear or script_grind.enemiesAttackingUs(10) >= 2) and (hasRegrowth) and (hasRejuv) and (IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth > self.healthToShift) )
+		or ( (self.useBear or script_grind.enemiesAttackingUs(10) >= 2) and (hasRegrowth or hasRejuv) and (IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth > self.healthToShift) )
 
 		-- or if not has regrwoth yet and has rejuvenation and health/mana correct
 		or ( (not HasSpell("Regrowth")) and (hasRejuv) and (IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth > self.healthToShift) and (HasSpell("Bear Form")) and (self.useBear) )
@@ -1357,6 +1357,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 
+				-- move to target...
 				if (IsBearForm()) and (targetObj:GetDistance() > self.meleeDistance) then
 					return 3;
 				end
