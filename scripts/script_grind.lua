@@ -1171,10 +1171,10 @@ function script_grind:run()
 						self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						MoveToTarget(_x, _y, _z);
 					end
-					if (not IsMoving()) and (script_grind.enemyObj:GetDistance() > 8) then
-						Move(_x, _y, _z);
-						self.message = "Forcing movement return 3";
-					end
+					--if (not IsMoving()) andand (script_grind.enemyObj:GetDistance() > 8) then
+					--	Move(_x, _y, _z);
+					--	self.message = "Forcing movement return 3";
+					--end
 
 					-- set wait timer to move clicks
 					if (IsMoving()) then
