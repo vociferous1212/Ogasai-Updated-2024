@@ -69,12 +69,12 @@ end
 
 function script_navEX:moveToHotspotCoords()
 
-	if (IsPathLoaded(5)) and (IsMoving()) then
+	if (IsPathLoaded(5)) then
 			script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
 		else
 			MoveToTarget(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		end
-		if (not IsMoving()) and (not IsPathLoaded(5)) then
+		if (not IsMoving()) or (not IsPathLoaded(5)) then
 			Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		end
 end

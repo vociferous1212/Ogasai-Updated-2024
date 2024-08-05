@@ -246,7 +246,6 @@ function script_vendor:repair()
 					return true;
 				end
 			else
-
 				if (CanMerchantRepair()) then
 					RepairAllItems(); 
 					self.message = 'Finished repairing...';

@@ -172,8 +172,9 @@ script_grind = {
 	recheckTimer = 0,	-- used for rechecking add ranges outside of combat to find a valid target
 	needRest = false,
 	attackTimer = 0,
-	useAutoHotspotDist = false,
-	autoSelectTargets = false,
+	useAutoHotspotDist = false,	-- auto hotspot distance for each area
+	autoSelectTargets = false,	-- auto select target type for each area
+	autoSelectVendors = true,	-- auto select vendors when moving to new areas
 }
 
 function script_grind:setup()
@@ -397,12 +398,8 @@ function script_grind:run()
 	-- show grinder window
 	script_grind:window();
 
-	if (self.getSpells) then
-	if (script_getSpells.getSpellsStatus ~= 3) then
-	if (script_getSpells:run()) then
-	end
-	end
-	end
+	if (self.getSpells) then if (script_getSpells.getSpellsStatus ~= 3) then if (script_getSpells:run()) then end end end
+
 	-- display radar
 	if (script_radar.showRadar) then
 		script_radar:draw()
@@ -777,7 +774,7 @@ function script_grind:run()
 		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
 				script_gather.gathering = true;
 			if (script_gather:gather()) then
-					script_nav.lastnavIndex = 2;
+					script_nav.lastPathIndex = -1;
 
 					-- turn off jump for gathering...
 					if (self.jump) then
@@ -2126,6 +2123,11 @@ function script_grind:runRest()
 			DisMount();
 			return true;
 		end
+
+		if (script_grind.autoSelectVendors) then
+			vendorDB:loadDBVendors();
+		end
+
 	return true;	
 	end
 self.needRest = false;

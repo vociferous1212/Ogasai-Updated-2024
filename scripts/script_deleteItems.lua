@@ -11,6 +11,7 @@ script_deleteItems = {
 function script_deleteItems:setup()
 
 	-- add new items to delete here
+	script_deleteItems:addDeleteItem("Flute of Xavaric");
 	script_deleteItems:addDeleteItem("OOX-22/FE Distress Beacon");
 	script_deleteItems:addDeleteItem("OOX-17/TN Distress Beacon");
 	script_deleteItems:addDeleteItem("OOX-09/HL Distress Beacon");
