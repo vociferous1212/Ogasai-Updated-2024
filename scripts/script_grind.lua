@@ -42,6 +42,7 @@ script_grind = {
 	miscMenuIncluded = include("scripts\\menu\\script_miscMenu.lua"),
 	displayOptionsMenuIncluded = include("scripts\\menu\\script_displayOptionsMenu.lua"),
 	vendorMenuIncluded = include("scripts\\menu\\script_vendorMenu.lua"),
+	pathMenuIncluded = include("scripts\\menu\\script_pathMenu.lua"),
 
 
 	getSpells = false,
@@ -178,6 +179,7 @@ script_grind = {
 	myLastX = 0,		-- set coords for auto reload vendors DB. can cause lag with continous reloading...
 	myLastY = 0,		-- set coords
 	myLastZ = 0,		-- set coords
+	vendorMessageSent = false,	-- send message to chat frame - vendors loaded from DB...
 }
 
 function script_grind:setup()
@@ -770,7 +772,7 @@ function script_grind:run()
 		end
 
 		-- reset gather blacklist timer if we enter combat
-		if (IsInCombat()) then
+		if (IsInCombat()) or (script_vendor:getStatus() > 0) then
 			script_gather.blacklistTime = GetTimeEX()*2;
 			script_gather.timerSet = false;
 		end
@@ -1163,13 +1165,15 @@ function script_grind:run()
 
 
 					-- move to target
-					if (IsMoving() or IsInCombat()) and (IsPathLoaded(5)) then
+					if (IsMoving() or IsInCombat()) then
 						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 					else
 						self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						MoveToTarget(_x, _y, _z);
-					--elseif (not IsMoving()) and (script_grind.enemyObj:GetDistance() > 8) then
-					--	Move(_x, _y, _z);
+					end
+					if (not IsMoving()) and (script_grind.enemyObj:GetDistance() > 8) then
+						Move(_x, _y, _z);
+						self.message = "Forcing movement return 3";
 					end
 
 					-- set wait timer to move clicks
@@ -1933,6 +1937,7 @@ function script_grind:doLoot(localObj)
 			return;
 		else
 			-- we looted so reset variables
+			self.vendorMessageSent = false;
 			self.waitTimer = GetTimeEX() + 350;
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
@@ -1969,24 +1974,34 @@ function script_grind:doLoot(localObj)
 		end
 	end
 
+					script_nav.lastPathIndex = 1;
+
+
 	-- move to loot object
 	self.message = "Moving to loot...";
-	-- if (IsPathLoaded(5)) and (IsMoving()) then
+	--if (IsPathLoaded(5)) or (IsMoving()) then
 	--	self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-	--else
+	--elseif (not IsPathLoaded(5)) or (not IsMoving()) then
+	if (IsMoving()) then
 		MoveToTarget(_x, _y, _z);
-	--end
+	else
+		Move(_x, _y, _z);
+	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
 		self.waitTimer = GetTimeEX() + 750;
 	end
 
-	if (self.autoSelectVendors) then
+	if (self.autoSelectVendors) and (not IsMoving()) then
 		local bX, bY, bZ = GetLocalPlayer():GetPosition();
-		if (GetDistance3D(bX, bY, bZ, myLastX, myLastY, myLastZ) > 200) then
+		if (GetDistance3D(myLastX, myLastY, myLastZ, bX, bY, bZ) > 200) then
+			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
 			vendorDB:loadDBVendors();
-			self.myLastX, self.myLastY, self.myLastZ = bX, bY, bZ;
+			if (not self.vendorMessageSent) then
+				DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
+				self.vendorMessageSent = true;
+			end
 		end
 	end
 end

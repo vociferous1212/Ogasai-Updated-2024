@@ -28,7 +28,9 @@ function script_drawData:drawSavedTargetLocations()
 
 		-- if locations are on screen then draw text
 		if (onScreen) then
-			DrawText('HOTSPOT: ' .. script_nav.currentHotSpotName, tX, tY, 0, 255, 255);
+			local x, y, z = GetLocalPlayer():GetPosition();
+			local hsDist = math.floor(GetDistance3D(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ, x, y, z));
+			DrawText('HOTSPOT: ' .. script_nav.currentHotSpotName.. " | " ..hsDist.. " (yd)", tX, tY, 0, 255, 255);
 		end
 	end
 end

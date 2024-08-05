@@ -9,8 +9,12 @@ script_deleteItems = {
 }
 
 function script_deleteItems:setup()
+	script_deleteItems:addDeleteItem(" ");	-- this is a blank space. combo boxes are errors...
+	-- keep this blank space here  ^^^^^^ .....
+
 
 	-- add new items to delete here
+
 	script_deleteItems:addDeleteItem("Flute of Xavaric");
 	script_deleteItems:addDeleteItem("OOX-22/FE Distress Beacon");
 	script_deleteItems:addDeleteItem("OOX-17/TN Distress Beacon");
@@ -20,7 +24,9 @@ function script_deleteItems:setup()
 	script_deleteItems:addDeleteItem("Blasted Boar Lung");
 	script_deleteItems:addDeleteItem("Snickerfang Jowl");
 	script_deleteItems:addDeleteItem("Imperfect Draenethyst Fragment");
+	script_deleteItems:addDeleteItem("Wooden Key");
 	--script_deleteItems:addDeleteItem("");
+
 
 	self.selectionList[self.deleteNum] = name;
 	self.selectedListItem = 0;

@@ -195,7 +195,7 @@ function script_vendor:repair()
 	local vendor = nil;
 	local vendorID = -1;
 
-	if (self.repairVendor ~= 0) then
+	if (self.repairVendor ~= 0) and (not script_grind.autoSelectVendors) then
 		vendor = self.repairVendor;
 	else
 		local vendorID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), true, false, false, false, false, x, y, z);
@@ -305,7 +305,7 @@ function script_vendor:sell()
 	local vendor = nil;
 	local vendorID = -1;
 
-	if (self.sellVendor ~= 0) then
+	if (self.sellVendor ~= 0) and (not script_grind.autoSelectVendors) then
 		vendor = self.sellVendor;
 	else
 		local vendorID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, false, false, x, y, z);
@@ -398,9 +398,9 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	local vendorID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, itemIsArrow, not itemIsArrow, x, y, z);
 	local vendor = nil;
 
-	if (itemIsArrow and self.arrowVendor ~= 0) then
+	if (itemIsArrow and self.arrowVendor ~= 0) and (not script_grind.autoSelectVendors) then
 		vendor = self.arrowVendor;
-	elseif (not itemIsArrow and self.bulletVendor ~= 0) then
+	elseif (not itemIsArrow and self.bulletVendor ~= 0) and (not script_grind.autoSelectVendors) then
 		vendor = self.bulletVendor;
 	else
 		if (vendorID ~= -1) then
@@ -521,9 +521,9 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 	
 	local vendor = nil;
 
-	if (isFood and self.foodVendor ~= 0) then
+	if (isFood and self.foodVendor ~= 0) and (not script_grind.autoSelectVendors) then
 		vendor = self.foodVendor;
-	elseif (isDrink and self.drinkVendor ~= 0) then
+	elseif (isDrink and self.drinkVendor ~= 0) and (not script_grind.autoSelectVendors) then
 		vendor = self.drinkVendor;
 	else
 		-- Fetch a food/drink vendor
