@@ -175,9 +175,14 @@ script_grind = {
 	useAutoHotspotDist = false,	-- auto hotspot distance for each area
 	autoSelectTargets = false,	-- auto select target type for each area
 	autoSelectVendors = true,	-- auto select vendors when moving to new areas
+	myLastX = 0,		-- set coords for auto reload vendors DB. can cause lag with continous reloading...
+	myLastY = 0,		-- set coords
+	myLastZ = 0,		-- set coords
 }
 
 function script_grind:setup()
+
+	myLastX, myLastY, myLastZ = GetLocalPlayer():GetPosition();
 
 	self.lootCheck['target'] = 0;
 	self.lootCheck['timer'] = GetTimeEX();
@@ -1157,21 +1162,21 @@ function script_grind:run()
 				if (_x ~= 0 and x ~= 0) then
 
 
-				-- move to target
-				if (IsMoving() or IsInCombat()) and (IsPathLoaded(5)) then
-					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-				elseif (not IsMoving() and PlayerHasTarget()) and (script_grind.enemyObj:GetDistance() >= 8) then
-					self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-					MoveToTarget(_x, _y, _z);
-				elseif (not IsMoving()) and (script_grind.enemyObj:GetDistance() > 8) then
-					Move(_x, _y, _z);
-				end
+					-- move to target
+					if (IsMoving() or IsInCombat()) and (IsPathLoaded(5)) then
+						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+					else
+						self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						MoveToTarget(_x, _y, _z);
+					--elseif (not IsMoving()) and (script_grind.enemyObj:GetDistance() > 8) then
+					--	Move(_x, _y, _z);
+					end
 
-				-- set wait timer to move clicks
-				if (IsMoving()) then
-					script_grind:setWaitTimer(100);
-				end
-				return;
+					-- set wait timer to move clicks
+					if (IsMoving()) then
+						script_grind:setWaitTimer(100);
+					end
+					
 				end
 			return;
 			end
@@ -1976,6 +1981,14 @@ function script_grind:doLoot(localObj)
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
 		self.waitTimer = GetTimeEX() + 750;
 	end
+
+	if (self.autoSelectVendors) then
+		local bX, bY, bZ = GetLocalPlayer():GetPosition();
+		if (GetDistance3D(bX, bY, bZ, myLastX, myLastY, myLastZ) > 200) then
+			vendorDB:loadDBVendors();
+			self.myLastX, self.myLastY, self.myLastZ = bX, bY, bZ;
+		end
+	end
 end
 
 function script_grind:getSkinTarget(lootRadius)
@@ -2122,10 +2135,6 @@ function script_grind:runRest()
 		if (IsMounted()) then
 			DisMount();
 			return true;
-		end
-
-		if (script_grind.autoSelectVendors) then
-			vendorDB:loadDBVendors();
 		end
 
 	return true;	
