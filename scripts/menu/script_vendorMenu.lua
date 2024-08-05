@@ -1,6 +1,6 @@
 script_vendorMenu = {
 	quiverBag = 4,
-	ammoName = ""
+	ammoName = "",
 }
 
 function script_vendorMenu:printAddVendor(canRepair, hasFood, hasWater, hasArrow, hasBullet)
@@ -65,132 +65,154 @@ function script_vendorMenu:menu()
 	end
 
 	if (CollapsingHeader("Vendor NPC And Buy Options")) then
-		Text("Repair Vendor:");
-		if (script_vendor.repairVendor ~= 0) then
-			SameLine();
-			Text('' .. script_vendor.repairVendor['name'] .. ' loaded.');
-			if Button("Repair Now") then script_vendor.status = 1; end
-		end
+		wasClicked, script_grind.autoSelectVendors = Checkbox("Auto Load New Vendors", script_grind.autoSelectVendors);
+			Separator();
 
-		if Button("Set Current Target As Repair Vendor") then 
-			script_vendorMenu:setRepairVendor(); 
-			script_vendorMenu:printAddVendor(true, false, false, false, false); 
-		end
-
-		Separator();
-		Text("Sell Vendor:");
-		if (script_vendor.sellVendor ~= 0) then
-			SameLine();
-			Text('' .. script_vendor.sellVendor['name'] .. ' loaded.');
-			if Button("Sell Now") then script_vendor.status = 2; end
-		end
-		if Button("Set Current Target As Sell Vendor") then 
-			script_vendorMenu:setSellVendor(); 
-			script_vendorMenu:printAddVendor(false, false, false, false, false); 
-		end
-
-		Separator();
-		Text("Buy Food Vendor:");
-		if (script_vendor.foodVendor ~= 0) then
-			SameLine();
-			Text('' .. script_vendor.foodVendor['name'] .. ' loaded.');
-			if Button("Buy Food Now") then 
-				script_vendor.status = 4;
-				script_vendor.itemName = script_vendor.foodName;
-				script_vendor.itemNum = script_vendor.foodNr;
-				script_vendor.itemIsFood = true;
-				script_vendor.itemIsDrink = false;
-				script_vendor.itemIsAmmo = false;
-			end
-
-			SameLine();
-			if Button("Cancel Buy Food") then script_vendor.message = "Idle..."; script_vendor.status = 0; end
-		end
-				
-		Text("Input Food Name And Number Of Stacks:");
-		script_vendor.foodName = InputText("Food", script_vendor.foodName); 
-		SameLine(); script_vendor.foodNr = InputText("FX", script_vendor.foodNr);
-		
-		if Button("Set Current Target As Food Vendor") then 
-			script_vendorMenu:setFoodVendor(); 
-			script_vendorMenu:printAddVendor(false, true, false, false, false); 
-		end
-
-		Separator();
-		Text("Buy Drink Vendor:");
-		if (script_vendor.drinkVendor ~= 0) then
-			SameLine();
-			Text('' .. script_vendor.drinkVendor['name'] .. ' loaded.');
-			if Button("Buy Drink Now") then 
-				script_vendor.status = 4;
-				script_vendor.itemName = script_vendor.drinkName;
-				script_vendor.itemNum = script_vendor.drinkNr;
-				script_vendor.itemIsFood = false;
-				script_vendor.itemIsDrink = true;
-				script_vendor.itemIsAmmo = false;
-			end
-			SameLine();
-			if Button("Cancel Buy Drinks") then script_vendor.message = "Idle..."; script_vendor.status = 0; end
-		end
-
-		Text("Input Drink Name And Number Of Stacks:");
-		
-		script_vendor.drinkName = InputText("Drink", script_vendor.drinkName); 
-		
-		SameLine(); script_vendor.drinkNr = InputText("DX", script_vendor.drinkNr);
-		
-		if Button("Set Current Target As Drink Vendor") then 
-			script_vendorMenu:setDrinkVendor(); 
-			script_vendorMenu:printAddVendor(false, false, true, false, false); 
-		end
-
-		Separator();
-		if (script_vendor.arrowVendor ~= 0) then
-			Text("Buy Ammo Vendor:");
-			SameLine();
-			Text('' .. script_vendor.arrowVendor['name'] .. ' loaded.');
-		end
-			if (script_vendor.bulletVendor ~= 0) then
-				Text("Buy Bullet Vendor:");
+			Text("Repair Vendor:");
+				if (script_vendor.repairVendor ~= 0) then
+					SameLine();
+					Text('' .. script_vendor.repairVendor['name'] .. ' loaded.');
+					if Button("Repair Now") then script_vendor.status = 1; end
+				end
+				if (not script_grind.autoSelectVendors) then
+					if Button("Set Current Target As Repair Vendor") then 
+						script_vendorMenu:setRepairVendor(); 
+						script_vendorMenu:printAddVendor(true, false, false, false, false); 
+					end
+				end
+			Separator();
+			Text("Sell Vendor:");
+			if (script_vendor.sellVendor ~= 0) then
 				SameLine();
-				Text('' .. script_vendor.bulletVendor['name'] .. ' loaded.'); 
+				Text('' .. script_vendor.sellVendor['name'] .. ' loaded.');
+				if Button("Sell Now") then script_vendor.status = 2; end
 			end
-		if (script_vendor.bulletVendor ~= 0 or script_vendor.arrowVendor ~= 0) then
-			wasClicked, script_vendor.itemIsArrow = Checkbox("Ammo Is 'Arrows'", script_vendor.itemIsArrow);
-			if Button("Buy Ammo Now") then 
-				script_vendor.status = 3; 
-				script_vendor.ammoName = self.ammoName;
-				script_vendor.itemIsBullet = not script_vendor.itemIsArrow;
-				script_vendor.quiverBag = self.quiverBag-1;
+			if (not script_grind.autoSelectVendors) then
+				if Button("Set Current Target As Sell Vendor") then 
+					script_vendorMenu:setSellVendor(); 
+					script_vendorMenu:printAddVendor(false, false, false, false, false); 
+				end
 			end
-			
+				Separator();
+			Text("Buy Food Vendor:");
+			if (script_vendor.foodVendor ~= 0) then
+				SameLine();
+				Text('' .. script_vendor.foodVendor['name'] .. ' loaded.');
+				if (not script_grind.autoSelectVendors) then
+					if Button("Buy Food Now") then 
+						script_vendor.status = 4;
+						script_vendor.itemName = script_vendor.foodName;
+						script_vendor.itemNum = script_vendor.foodNr;
+						script_vendor.itemIsFood = true;
+						script_vendor.itemIsDrink = false;
+						script_vendor.itemIsAmmo = false;
+					end
+					SameLine();
+					if Button("Cancel Buy Food") then
+						script_vendor.message = "Idle...";
+						script_vendor.status = 0;
+					end
+				end
+			end
+					
+			Text("Input Food Name And Number Of Stacks:");
+			script_vendor.foodName = InputText("Food", script_vendor.foodName); 
 			SameLine();
+			script_vendor.foodNr = InputText("FX", script_vendor.foodNr);
 			
-			if Button("Cancel Buy Ammo") then 
-				script_vendor.message = "Idle..."; 
-				script_vendor.status = 0; 
+			if (not script_grind.autoSelectVendors) then
+				if Button("Set Current Target As Food Vendor") then 
+					script_vendorMenu:setFoodVendor(); 
+					script_vendorMenu:printAddVendor(false, true, false, false, false); 
+				end
+			end
+
+			Separator();
+				Text("Buy Drink Vendor:");
+				if (script_vendor.drinkVendor ~= 0) then
+				SameLine();
+				Text('' .. script_vendor.drinkVendor['name'] .. ' loaded.');
+				if (not script_grind.autoSelectVendors) then
+					if Button("Buy Drink Now") then 
+						script_vendor.status = 4;
+						script_vendor.itemName = script_vendor.drinkName;
+						script_vendor.itemNum = script_vendor.drinkNr;
+						script_vendor.itemIsFood = false;
+						script_vendor.itemIsDrink = true;
+						script_vendor.itemIsAmmo = false;
+					end
+					SameLine();
+					if Button("Cancel Buy Drinks") then
+						script_vendor.message = "Idle...";
+						script_vendor.status = 0;
+					end
+				end
+			end
+		
+			Text("Input Drink Name And Number Of Stacks:");
+			
+			script_vendor.drinkName = InputText("Drink", script_vendor.drinkName); 
+			
+			SameLine(); script_vendor.drinkNr = InputText("DX", script_vendor.drinkNr);
+
+			if (not script_grind.autoSelectVendors) then
+				if Button("Set Current Target As Drink Vendor") then 
+					script_vendorMenu:setDrinkVendor(); 
+					script_vendorMenu:printAddVendor(false, false, true, false, false); 
+				end
+			end
+	
+			Separator();
+			if (script_vendor.arrowVendor ~= 0) then
+				Text("Buy Ammo Vendor:");
+				SameLine();
+				Text('' .. script_vendor.arrowVendor['name'] .. ' loaded.');
+			end
+				if (script_vendor.bulletVendor ~= 0) then
+					Text("Buy Bullet Vendor:");
+					SameLine();
+					Text('' .. script_vendor.bulletVendor['name'] .. ' loaded.'); 
+				end
+			if (script_vendor.bulletVendor ~= 0 or script_vendor.arrowVendor ~= 0) then
+				wasClicked, script_vendor.itemIsArrow = Checkbox("Ammo Is 'Arrows'", script_vendor.itemIsArrow);
+
+					if Button("Buy Ammo Now") then 
+						script_vendor.status = 3; 
+						script_vendor.ammoName = self.ammoName;
+						script_vendor.itemIsBullet = not script_vendor.itemIsArrow;
+						script_vendor.quiverBag = self.quiverBag-1;
+					end
+				
+					SameLine();
+				
+					if Button("Cancel Buy Ammo") then 
+						script_vendor.message = "Idle..."; 
+						script_vendor.status = 0; 
+					end
+				
+			end
+	
+				Text("Input Ammo Name:");
+			
+			self.ammoName = InputText("Ammo", self.ammoName); 
+			
+			Text("Input Quiver Bag Number:");
+			self.quiverBag = InputText("Bag Number 1-5", self.quiverBag);
+	
+			if (not script_grind.autoSelectVendors) then
+				if Button("Set Current Target As Arrow Vendor") then 
+					script_vendorMenu:setArrowVendor();
+					script_vendor.itemIsArrow = true;
+					script_vendorMenu:printAddVendor(false, false, false, true, false); 
+				end
+				
+				if Button("Set Current Target As Bullet Vendor") then 
+					script_vendorMenu:setBulletVendor(); 
+					script_vendor.itemIsArrow = false;
+					script_vendorMenu:printAddVendor(false, false, false, false, true); 
+				end
 			end
 		end
-
-		Text("Input Ammo Name:");
-		
-		self.ammoName = InputText("Ammo", self.ammoName); 
-		
-		Text("Input Quiver Bag Number:");
-		self.quiverBag = InputText("Bag Number 1-5", self.quiverBag);
-
-		if Button("Set Current Target As Arrow Vendor") then 
-			script_vendorMenu:setArrowVendor();
-			script_vendor.itemIsArrow = true;
-			script_vendorMenu:printAddVendor(false, false, false, true, false); 
-		end
-		
-		if Button("Set Current Target As Bullet Vendor") then 
-			script_vendorMenu:setBulletVendor(); 
-			script_vendor.itemIsArrow = false;
-			script_vendorMenu:printAddVendor(false, false, false, false, true); 
-		end
-	end
 end
 
 function script_vendorMenu:setRepairVendor()
@@ -344,7 +366,7 @@ function script_vendorMenu:sellLogic()
 
 	--reset new target time for blacklisting
 		script_grind.newTargetTime = GetTimeEX();
-		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 
 	for i = script_vendor.currentBag,4 do 
 		for y=script_vendor.currentSlot,GetContainerNumSlots(i) do 
