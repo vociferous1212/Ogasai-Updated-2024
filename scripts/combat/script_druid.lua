@@ -21,7 +21,7 @@ script_druid = {
 	waitTimer = GetTimeEX(),
 	useStealth = true,
 	stealthOpener = "Ravage",
-	shiftToDrink = true,	-- shapeshift out of form to drink
+	shiftToDrink = false,	-- shapeshift out of form to drink
 	useCharge = true,
 	useRest = false,		-- rest in shapeshift form
 	maulRage = 15,
@@ -286,7 +286,7 @@ function script_druid:healsAndBuffs()
 
 	-- shapeshift out of cat form to heal
 	if ( (IsCatForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and (not hasRejuv) and (not hasRegrowth) )
-	or ( (IsCatForm()) and (localHealth <= 65) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
+	or ( (IsCatForm()) and (localHealth <= self.healthToShift) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
 
 		if (not script_grind.adjustTickRate) then
@@ -430,7 +430,7 @@ function script_druid:healsAndBuffs()
 		end
 
 		-- Thorns
-		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) and (script_vendor:getStatus() == 0) and (not GetLocalPlayer():GetUnitsTarget():HasBuff("Thorns")) then
+		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetUnitsTarget() == 0 or (GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Thorns"))) then
 			if (localHealth >= self.healthToShift) and (not IsMounted()) then
 
 				-- bot is still targeting vendors...
@@ -482,10 +482,11 @@ function script_druid:healsAndBuffs()
 						return false;
 					end
 					if (not self.hasRegrowth) then
-						CastHeal("Regrowth", localObj);
+						if (not CastHeal("Regrowth", localObj)) then
 							self.waitTimer = GetTimeEX() + 2050
 							script_grind:setWaitTimer(2050);
 							self.hasRegrowth = true;
+						end
 					end
 				return false;
 				end
@@ -630,7 +631,7 @@ function script_druid:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(350, 550);
+		local tickRandom = math.random(450, 750);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -664,6 +665,16 @@ function script_druid:run(targetGUID)
 		return 2;
 	end
 
+-- Check: Do we have the right target (in UI) ??
+		if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
+			if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= targetObj:GetGUID()) then
+				ClearTarget();
+				self.waitTimer = GetTimeEX() + 1500;
+				script_grind:setWaitTimer(1500);
+				targetObj = 0;
+			end
+		end
+
 	-- Check: if we target player pets/totems
 	if (GetTarget() ~= 0) then
 		if (GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
@@ -678,20 +689,31 @@ function script_druid:run(targetGUID)
 	if (IsInCombat()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsBearForm())
 		and (IsCasting()) or (IsChanneling()) and (not IsAutoCasting("Attack")) then
 			CastSpellByName("Attack");
-		end
+	end
 
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
 		return 4;
 	end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift) and (not IsCasting()) and (not IsChanneling()) then
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;
 					end
 				end
 
+		-- check heals and buffs
+		if (not IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (not HasForm()) then
+			if (script_druid:healsAndBuffs()) then
+				if (IsMoving()) then
+					StopMoving();
+				return true;
+				end
+			return true;
+			end
+		end
+	
 
 	-- run backwards if target is entangled
 				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) then
@@ -725,7 +747,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift) and (not IsCasting()) and (not IsChanneling()) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;
@@ -736,7 +758,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (HasSpell("Rejuventation")) and (not localObj:HasBuff("Rejuvenation")) and (targetObj:GetDistance() <= 45) and (localMana >= self.shapeshiftMana + 15) and (not HasForm()) and (not IsInCombat()) then
 			CastSpellByName("Rejuvenation", localObj);
 			self.waitTimer = GetTimeEX() + 1500;
-			return 0;
 		end
 
 		-- Cant Attack dead targets
@@ -754,7 +775,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (CastSpellByName("Rejuvenation")) then
 			self.waitTimer = GetTimeEX() + 1650;
 			script_grind:setWaitTimer(1650);
-			return 0;
 		end
 	end
 
@@ -799,7 +819,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (script_grind.jump) then
 				JumpOrAscendStart();
 			end
-			return 0;
 		end
 	
 		-- face target
@@ -828,11 +847,14 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 		end
 
+				local hasRegrowth = GetLocalPlayer():HasBuff("Regrowth");
+				local hasRejuv = localObj:HasBuff("Rejuvenation"); 
+
 		-- stay in cat form - placed here to allow faster movement and stealth to target
 		-- not in cat form
 			-- not if enemies attack us greater than 1
 				-- not if in form  -  not if enemy level greater than 2
-		if (script_grind.enemiesAttackingUs(12) < 2) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (localHealth >= self.healthToShift) and (localMana >= self.shapeshiftMana) and (targetObj:GetLevel() <= localObj:GetLevel() +2) and (not IsDrinking()) and (not IsEating()) then
+		if (IsInCombat()) and (script_grind.enemiesAttackingUs() == 1) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (localHealth >= self.healthToShift + 10 or hasRegrowth or hasRejuv) and (localMana >= self.shapeshiftMana) and (targetObj:GetLevel() <= localObj:GetLevel() +2) and (not IsDrinking()) and (not IsEating()) then
 			if (HasSpell("Cat Form")) then
 				CastSpellByName("Cat Form");
 			end
@@ -880,7 +902,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (lastError ~= 51) then
 					local tX, tY, tZ = targetObj:GetPosition();
 				if (IsCatForm()) and (self.useCat) and (self.useStealth) and (IsStealth()) then
-					if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 5) then
+					if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 4) then
 						if (not CastSpellByName(self.stealthOpener)) then
 							if (not IsMoving()) then
 								targetObj:FaceTarget();
@@ -917,14 +939,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (HasSpell("Dash")) and (IsCatForm()) and (not IsSpellOnCD("Dash")) and (targetObj:GetDistance() >= 20) and (IsStealth()) then
 				if (CastSpellByName("Dash", localObj)) then
 					self.waitTimer = GetTimeEX() + 300;
-					return 0;
 				end
 			end
 
 			-- enrage if has charge
 			if (IsBearForm()) and (HasSpell("Feral Charge")) and (HasSpell("Enrage")) and (not IsSpellOnCD("Enrage")) and (not IsSpellOnCD("Feral Charge")) and (targetObj:GetDistance() <= 45) then
 				if (CastSpellByName("Enrage", localObj)) then
-					return 0;
 				end
 			end
 
@@ -934,7 +954,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 						targetObj:FaceTarget();
 					if (CastSpellByName("Feral Charge")) then
 						targetObj:FaceTarget();
-						return 0;
 					end
 				end
 			end
@@ -1013,7 +1032,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- Enrage
 			if (HasSpell("Enrage")) and (not IsSpellOnCD("Enrage")) and (targetObj:GetDistance() < 45) and (localHealth > self.healthToShift + 25) then
 				if (CastSpellByName("Enrage")) then
-					return 0;
 				end
 			end
 
@@ -1046,7 +1064,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		-- not in cat form and conditions right then stay in cat form
 			-- not if enemies attack us greater than 1 and mana/health set correct
 				-- not if enemy level greater than 2
-		if (script_grind.enemiesAttackingUs(12) < 2) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (localHealth >= self.healthToShift) and (localMana >= self.shapeshiftMana) and (targetObj:GetLevel() <= (localObj:GetLevel() + 2)) and (not IsDrinking()) and (not IsEating())
+		if (script_grind.enemiesAttackingUs() == 1) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (localHealth >= self.healthToShift) and (localMana >= self.shapeshiftMana) and (targetObj:GetLevel() <= (localObj:GetLevel() + 2)) and (not IsDrinking()) and (not IsEating())
 		-- or is in combat and has heals already and mana/health correct
 		or ( (IsInCombat()) and (hasRegrowth) and (hasRejuv) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (localHealth < self.healthToShift) and (localMana >= self.shapeshiftMana) )
 
@@ -1189,25 +1207,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		return true;
 		end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift) and (not IsCasting()) and (not IsChanneling()) then
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;
 					end
 				end
-			
-
-
-		-- Check: Do we have the right target (in UI) ??
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-			if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
-				ClearTarget();
-				self.waitTimer = GetTimeEX() + 1500;
-				script_grind:setWaitTimer(1500);
-				targetObj = 0;
-				return 0;
-			end
-		end
 
 
 		if (self.usePowerShift) then
@@ -1256,8 +1261,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 100;
 				end
+				script_druid:healsAndBuffs();
 				if (script_druidEX:bearForm()) then
-					self.waitTimer = GetTimeEX() + 1500;
+					self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
 
@@ -1266,9 +1272,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 100;
 				end
+				script_druid:healsAndBuffs();
 				if (HasSpell("Cat Form")) then
 					CastSpellByName("Cat Form");
-					self.waitTimer = GetTimeEX() + 1500;
+					self.waitTimer = GetTimeEX() + 1000;
 					return 0;
 				end
 			end
@@ -1466,6 +1473,14 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
+					if (script_checkAdds:checkAdds()) then
+						script_om:FORCEOM();
+						return true;
+					end
+				end
+
+
 			-- do these attacks only in cat form
 			if (IsCatForm()) and (not IsBearForm()) then
 
@@ -1500,19 +1515,19 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					return 0;
 				end
 
+				-- Rip with 3 CPs
+				if (localCP >= 3) and (localEnergy >= 30) and (not HasSpell("Ferocious Bite")) and (not targetObj:HasDebuff("Rip")) and (targetObj:GetCreatureType() ~= "Elemental") then
+					if (script_druidEX2:castRip("Rip")) then
+						self.waitTimer = GetTimeEX() + 1000;
+						return 0;
+					end
+				end
+
 		-- Ferocious Bite with 5 CPs
 				if (localCP > 4) and (localEnergy >= 35) and (HasSpell("Ferocious Bite")) then
 					if (CastSpellByName("Ferocious Bite", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1600;
 						return 0;
-					end
-				end
-
-				-- Rip with 3 CPs
-				if (localCP >= 3) and (targetHealth <= 50) and (localEnergy >= 30) and (not HasSpell("Ferocious Bite")) and (not targetObj:HasDebuff("Rip")) and (not targetObj:GetCreatureType() == "Elemental") then
-					if (CastSpellByName("Rip", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1000;
-						return;
 					end
 				end
 			
@@ -1541,7 +1556,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Use Claw
-				if (localCP < 5) and (localEnergy >= self.clawEnergy) then
+				if (localEnergy >= self.clawEnergy) then
 					if (not CastSpellByName("Claw")) then
 						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1600;
@@ -1690,7 +1705,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		-- set tick rate for script to run
 		if (not script_grind.adjustTickRate) then
 	
-			local tickRandom = math.random(350, 550);
+			local tickRandom = math.random(450, 750);
 		
 			if (IsMoving()) or (not IsInCombat()) then
 				script_grind.tickRate = 135;

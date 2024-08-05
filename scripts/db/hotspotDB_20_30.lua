@@ -26,6 +26,7 @@ function hotspotDB_20_30:setup()
 
 -- Ashenvale
 
+	hotspotDB:addHotspot("Astranaar 20 - 23", "Alliance", 20, 23, 2819.65, -116.68, 103.22);
 	hotspotDB:addHotspot("Ashenvale 22 - 24", "All", 22, 24, 2647.01, 168.43, 92.14);
 	hotspotDB:addHotspot("Ashenvale 23 - 24", "All", 22, 27, 2873.68, -910.45, 197.96);
 	hotspotDB:addHotspot("Ashenvale 25 - 26", "All", 24, 28, 2046.75, -1739.65, 75.40);
