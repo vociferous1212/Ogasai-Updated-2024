@@ -10,7 +10,9 @@ script_grindMenu = {
 }
 
 function script_grindMenu:printHotspot()
-
+	if (script_grind.autoSelectVendors) then
+		DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB.");
+	end
 	DEFAULT_CHAT_FRAME:AddMessage('Add hotspot to database by copy/paste the following line in hotspotDB. Added line to log files.');
 	local race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
 	local x, y, z = GetLocalPlayer():GetPosition();
@@ -19,7 +21,6 @@ function script_grindMenu:printHotspot()
 					.. '", ' .. level .. ', ' .. level+2 .. ', ' .. hx .. ', ' .. hy .. ', ' .. hz .. ');'	
 	DEFAULT_CHAT_FRAME:AddMessage(addString);
 	ToFile(addString);
-
 end
 
 function script_grindMenu:menu()

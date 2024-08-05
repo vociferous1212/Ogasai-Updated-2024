@@ -294,8 +294,8 @@ function script_druid:healsAndBuffs()
 		end
 		if (IsCatForm()) then
 			CastSpellByName("Cat Form");
-			self.waitTimer = GetTimeEX() + 700;
-			return true;
+			self.waitTimer = GetTimeEX() + 1200;
+			script_grind:setWaitTimer(1200);
 		end
 	end
 
@@ -370,7 +370,7 @@ function script_druid:healsAndBuffs()
 ------------------------
 
 	-- Force Thorns in combat
-	if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not isMoonkin) and (GetLocalPlayer():GetHealthPercentage() >= 65) then
+	if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not isMoonkin) and (GetLocalPlayer():GetHealthPercentage() >= 65) and (GetLocalPlayer():GetUnitsTarget() == 0 or GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Thorns")) then
 		if (CastSpellByName("Thorns", localObj)) then
 			self.waitTimer = GetTimeEX() + 2550;
 			self.thornsTimer = GetTimeEX() + 600000;
@@ -399,13 +399,9 @@ function script_druid:healsAndBuffs()
 		--end
 
 		-- Mark of the Wild
-		if (HasSpell("Mark of the Wild")) and (not IsMounted()) and (not localObj:HasBuff("Mark of the Wild")) and (localHealth >= self.healthToShift) and (not IsSpellOnCD("Mark of the Wild")) then
-			if (IsInCombat() and script_grind.enemiesAttackingUs(10) < 2 and localMana >= 30) 
-			or (not IsInCombat() and localMana >= 25) then
-				if (GetTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
-					ClearTarget();
-				end
-				if (not CastSpellByName("Mark of the Wild", localObj)) then
+		if (HasSpell("Mark of the Wild")) and (not IsMounted()) and (not localObj:HasBuff("Mark of the Wild")) and (localHealth >= self.healthToShift) and (not IsSpellOnCD("Mark of the Wild")) and (GetLocalPlayer():GetUnitsTarget() == 0 or GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Mark of the Wild")) then
+			if (IsInCombat() and script_grind.enemiesAttackingUs(10) < 2 and localMana >= 30) or (not IsInCombat() and localMana >= 25) then
+				if (not CastHeal("Mark of the Wild", localObj)) then
 					self.waitTimer = GetTimeEX() + 2500;
 					script_grind:setWaitTimer(1600);
 					return true;
@@ -414,11 +410,15 @@ function script_druid:healsAndBuffs()
 		end
 	
 		-- thorns if timer is about to end by 2 minutes
-		if (localMana > 15) and (HasSpell("Thorns")) and (GetTimeEX() > self.thornsTimer - 120) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) then
-			if (localHealth >= self.healthToShift) and (not IsMounted()) then
-				if (GetTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
-					ClearTarget();
-				end
+		if (localMana > 15) and (HasSpell("Thorns")) and (GetTimeEX() > self.thornsTimer - 120) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetUnitsTarget() == 0 or (GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Thorns"))) then
+
+		-- bot is still targeting vendors...
+			if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
+				ClearTarget();
+			end
+			if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID()) then
+
+
 				if not (CastSpellByName("Thorns", localObj)) then
 					self.waitTimer = GetTimeEX() + 2550;
 					script_grind:setWaitTimer(2050);
@@ -430,17 +430,22 @@ function script_druid:healsAndBuffs()
 		end
 
 		-- Thorns
-		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) then
+		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) and (script_vendor:getStatus() == 0) and (not GetLocalPlayer():GetUnitsTarget():HasBuff("Thorns")) then
 			if (localHealth >= self.healthToShift) and (not IsMounted()) then
-				if (GetTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
+
+				-- bot is still targeting vendors...
+				if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
 					ClearTarget();
 				end
-				if not (CastSpellByName("Thorns", localObj)) then
-					self.waitTimer = GetTimeEX() + 2550;
-					script_grind:setWaitTimer(2050);
-					self.tickRate = 1500;
-					self.thornsTimer = GetTimeEX() + 600000;
-					return true;
+				if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID()) then
+
+					if not (CastHeal("Thorns", localObj)) then
+						self.waitTimer = GetTimeEX() + 2550;
+						script_grind:setWaitTimer(2050);
+						self.tickRate = 1500;
+						self.thornsTimer = GetTimeEX() + 600000;
+						return true;
+					end
 				end
 			end
 		end
@@ -776,7 +781,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- not if enemy level greater than 2
 	if (script_grind.enemiesAttackingUs(10) < 2) and (HasSpell("Cat Form")) and (self.useCat)
 		and (not IsCatForm()) and (not self.useBear) and (not IsBearForm())
-		and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift)
+		and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift or HasRegrowth)
 		and (IsStanding()) and (not IsDrinking()) and (not IsEating())
 		and (targetObj:GetLevel() <= localObj:GetLevel() + 2)
 	then
@@ -876,7 +881,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					local tX, tY, tZ = targetObj:GetPosition();
 				if (IsCatForm()) and (self.useCat) and (self.useStealth) and (IsStealth()) then
 					if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 5) then
-						if (CastSpellByName(self.stealthOpener)) then
+						if (not CastSpellByName(self.stealthOpener)) then
 							if (not IsMoving()) then
 								targetObj:FaceTarget();
 							end
@@ -1448,10 +1453,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 				local hasRegrowth = GetLocalPlayer():HasBuff("Regrowth");
+
 			--stay in form
 				-- not if enemies attacking us greater than 1
 					-- not if enemy level greater than 2
-			if (script_grind.enemiesAttackingUs(12) < 2) and (self.useCat and not IsCatForm()) and (not self.useBear and not IsBearForm()) and (localHealth >= self.healthToShift or hasRegrowth) and (localMana >= self.shapeshiftMana) and (IsStanding()) and (targetObj:GetLevel() <= (localObj:GetLevel() + 2) ) then	
+			if (script_grind.enemiesAttackingUs() < 2) and (self.useCat and not IsCatForm()) and (not self.useBear and not IsBearForm()) and (localHealth >= self.healthToShift or hasRegrowth) and (localMana >= self.shapeshiftMana) and (IsStanding()) and (targetObj:GetLevel() <= (localObj:GetLevel() + 2) ) then	
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 100;
 				end
@@ -1536,7 +1542,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- Use Claw
 				if (localCP < 5) and (localEnergy >= self.clawEnergy) then
-					if (CastSpellByName("Claw")) then
+					if (not CastSpellByName("Claw")) then
 						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1600;
 						return 0;

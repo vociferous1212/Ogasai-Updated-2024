@@ -65,7 +65,7 @@ function script_vendorMenu:menu()
 	end
 
 	if (CollapsingHeader("Vendor NPC And Buy Options")) then
-		wasClicked, script_grind.autoSelectVendors = Checkbox("Auto Load New Vendors", script_grind.autoSelectVendors);
+		wasClicked, script_grind.autoSelectVendors = Checkbox("Auto Load Closest Vendors", script_grind.autoSelectVendors);
 			Separator();
 
 			Text("Repair Vendor:");
