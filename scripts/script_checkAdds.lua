@@ -141,7 +141,7 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 		end
 
 		if (not IsMoving()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			if (script_grind.enemyObj:GetDistance() <= 8) then
+			if (script_grind.enemyObj:GetDistance() <= 6.5) then
 				script_grind.enemyObj:FaceTarget();
 			end
 		end
@@ -193,7 +193,8 @@ function script_checkAdds:avoidToAggro(safeMargin)
 			and (currentObj:GetDistance() <= self.addsRange)
 			and (currentObj:IsInLineOfSight())
 		then
-			if (script_grind.enemyObj ~= nil)
+			if (script_grind.enemyObj ~= nil and self.enemyObj ~= 0)
+				and (script_grind.enemyObj:GetHealthPercentage() >= 20)
 				and (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID())
 				and (not script_grind:isTargetingMe(currentObj))
 				and (not script_grind:isTargetingPet(currentObj))
@@ -202,7 +203,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:IsCritter())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
-				and (currentObj:GetHealthPercentage() >= 20)
+				--and (currentObj:GetHealthPercentage() >= 20)
 				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 				and (not currentObj:IsCasting())
 				and (not script_grind.enemyObj:IsCasting())
@@ -233,7 +234,8 @@ function script_checkAdds:avoidToAggro(safeMargin)
 		if (typeObj == 3)
 			and (currentObj:GetDistance() <= self.addsRange)
 		then
-			if (script_grind.enemyObj ~= nil)
+			if (script_grind.enemyObj ~= nil and self.enemyObj ~= 0)
+				and (script_grind.enemyObj:GetHealthPercentage() >= 20)
 				and (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID())
 				and (not script_grind:isTargetingMe(currentObj))
 				and (not script_grind:isTargetingPet(currentObj))
@@ -313,7 +315,9 @@ function script_checkAdds:aggroIntersect(target)
 			and (currentObj:GetDistance() <= 45)
 			and (currentObj:IsInLineOfSight())
 		then
-			if (currentObj:CanAttack())
+			if (script_grind.enemyObj ~= nil and self.enemyObj ~= 0)
+				and (script_grind.enemyObj:GetHealthPercentage() >= 20)
+				and (currentObj:CanAttack())
 				and (not currentObj:IsDead())
 				and (not currentObj:IsCritter())
 				and (not script_grind:isTargetingMe(currentObj))

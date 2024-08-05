@@ -156,7 +156,7 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 		end
 		CastHeal("Holy Light", localObj);
 		script_grind:setWaitTimer(3250);
-		return 0;
+		return 4;
 	end
 
 	-- Flash of Light in combat
@@ -171,6 +171,7 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 			script_paladin.message = "Flash of Light enabled - Healing!";
 			if (localMana > 8) then
 				CastSpellByName("Flash of Light", localObj);
+			return 4;
 			end			
 		end
 	return;	
@@ -235,8 +236,9 @@ function script_paladinEX:menu()
 		end
 		Separator();
 
-		wasClicked, script_paladin.useJudgement = Checkbox("Use Judgement", script_paladin.useJudgement);
-
+		if (HasSpell("Judgement")) then
+			wasClicked, script_paladin.useJudgement = Checkbox("Use Judgement", script_paladin.useJudgement);
+		end
 		if (HasSpell("Seal of the Crusader")) then
 			SameLine();
 			wasClicked, script_paladin.useSealOfCrusader = Checkbox("Use Crusader Seal", script_paladin.useSealOfCrusader);
@@ -247,12 +249,15 @@ function script_paladinEX:menu()
 			script_paladin.consecrationMana = SliderFloat("Consecration above Mana %", 1, 99, script_paladin.consecrationMana);
 		end
 
-		if (CollapsingHeader("|+| Auras and Blessings")) then
-
-			Text("Aura and Blessing options:");
-			script_paladin.aura = InputText("Aura", script_paladin.aura);
-			script_paladin.blessing = InputText("Blessing", script_paladin.blessing);
-
+		if (HasSpell("Devotion Aura")) then
+			if (CollapsingHeader("|+| Auras and Blessings")) then
+				Text("Aura options:");
+				script_paladin.aura = InputText("Aura", script_paladin.aura);
+				if (HasSpell("Blessing of Might")) then
+					Text("Blessing Options");
+					script_paladin.blessing = InputText("Blessing", script_paladin.blessing);
+				end
+			end
 		end
 
 		if (CollapsingHeader("|+| Heal Options")) then

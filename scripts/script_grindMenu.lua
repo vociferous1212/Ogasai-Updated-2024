@@ -1,18 +1,6 @@
 script_grindMenu = {
 
 	selectedHotspotID = 0,
-	targetMenu = include("//scripts//script_targetMenu.lua"),
-	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
-	warlockMenu = include("scripts\\combat\\script_warlockEX.lua"),
-	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
-	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
-	rogueMenu = include("scripts\\combat\\script_rogueEX.lua"),
-	paladinMenu = include("scripts\\combat\\script_paladinEX.lua"),
-	shamanMenu = include("scripts\\combat\\script_shamanEX.lua"),
-	druidMenu = include("scripts\\combat\\script_druidEX.lua"),
-	grindPartyMenuIncluded = include("scripts\\script_grindPartyMenu.lua"),
-	counterMenuIncluded = include("scripts\\script_counterMenu.lua"),
-	debugMenuIncluded = include("scripts\\script_debugMenu.lua"),
 	showIDD = false,
 	debugMenu = false,
 	useHotSpotArea = true,
@@ -153,7 +141,6 @@ function script_grindMenu:menu()
 		Separator();
 		end
 		--wasClicked, script_grind.getSpells = Checkbox("Get Spells (IN PROCESS DO NOT USE)", script_grind.getSpells);
-		wasClicked, script_grind.deleteItems = Checkbox("Delete Items - add new items in helper script", script_grind.deleteItems);
 		
 		script_paranoiaMenu:menu();
 
@@ -193,7 +180,13 @@ function script_grindMenu:menu()
 		-- checkbox use auto hotspots
 		wasClicked, script_grindMenu.useHotSpotArea = Checkbox("Use Auto Hotspots", script_grindMenu.useHotSpotArea);
 		if (script_grindMenu.useHotSpotArea) then
-		wasClicked, script_grind.staticHotSpot = Checkbox("Auto Load Hotspots From - HotspotDB.lua", script_grind.staticHotSpot);
+			-- choose to auto set distance from hotspot areas
+			SameLine();
+			wasClicked, script_grind.useAutoHotspotDist = Checkbox("(TODO) Auto Dist From Hotspot", script_grind.useAutoHotspotDist);
+
+			wasClicked, script_grind.autoSelectTargets = Checkbox("(TODO) Auto Select Hotspot Enemies", script_grind.autoSelectTargets);
+
+			wasClicked, script_grind.staticHotSpot = Checkbox("Auto Load Hotspots From - HotspotDB.lua", script_grind.staticHotSpot);
 		end
 		
 		-- show auto hotspot button
@@ -207,14 +200,14 @@ function script_grindMenu:menu()
 				script_grindMenu:printHotspot(); 
 				script_grind.hotspotReached = true;
 			end
-
-			if (not script_grind.hotspotReached) then
+			
+			if (not script_grind.hotspotReached) and (not script_grind.useAutoHotspotDist) then
 				Text("Distance To Hotspot Reached");
 				script_grind.hotspotReachedDistance = SliderInt("HSD", 10, 100, script_grind.hotspotReachedDistance);
 			end
 		-- distance from hotspot slider
 			Text('Distance To Move From Hotspot');
-			script_grind.distToHotSpot = SliderInt("DHS (yd)", 100, 2500, script_grind.distToHotSpot); Separator();
+			script_grind.distToHotSpot = SliderInt("DHS (yd)", 100, 2500, script_grind.distToHotSpot);
 		end
 
 		-- if not use hotspot then show rest of pathing
@@ -244,13 +237,17 @@ function script_grindMenu:menu()
 
 				if Button("Load") then script_grind.staticHotSpot = false; script_nav:loadHotspotDB(self.selectedHotspotID+1);
 				end
+				Text('Distance To Move From Hotspot');
+				script_grind.distToHotSpot = SliderInt("DHS (yd)", 100, 2500, script_grind.distToHotSpot);
 			end
 
 				-- select walk path input text box
 				if (script_grindMenu.selectedWalkPath) then
 					Separator();
 
-					Text("Current Walk Path"); Text("E.g. paths\\1-5 Durotar.xml"); script_grind.pathName = InputText(' ', script_grind.pathName);
+					Text("Current Walk Path");
+					Text("E.g. paths\\1-5 Durotar.xml");
+					script_grind.pathName = InputText(' ', script_grind.pathName);
 				
 					Separator();
 
@@ -284,10 +281,33 @@ function script_grindMenu:menu()
 
 	if (CollapsingHeader("Loot Options")) then
 		local wasClicked = false;
+
+		if (script_grind.deleteItems) then
+			if (CollapsingHeader("|+| Items To Delete")) then
+				--for i=0, script_deleteItems.deleteNum -1 do
+				--	Text(script_deleteItems.deleteItems[i]);
+				--end
+				wasClicked, script_deleteItems.selectedListItem = ComboBox("", script_deleteItems.selectedListItem, unpack(script_deleteItems.deleteItems));
+				script_deleteItems.addDeleteItemByName = InputText("Add Item", script_deleteItems.addDeleteItemByName);
+				if (Button("Add Delete Item")) then
+					script_deleteItems:addDeleteItem(script_deleteItems.addDeleteItemByName);	
+				end
+				SameLine();
+				if (Button("Remove Delete Item")) then
+					script_deleteItems:removeDeleteItem(script_deleteItems.selectedListItem+1);
+				end
+				Text(" add new items in deleteItems script setup");
+				Separator();
+			end
+		end
+
 		wasClicked, script_grind.skipLooting = Checkbox("Skip Looting", script_grind.skipLooting);
 		if (not script_grind.skipLooting) then
 			SameLine();
 			wasClicked, script_grind.skinning = Checkbox("Use Skinning", script_grind.skinning);
+
+			wasClicked, script_grind.deleteItems = Checkbox("Delete Items", script_grind.deleteItems);
+			Separator();
 
 			Text('Search For Loot Distance');
 			script_grind.findLootDistance = SliderFloat("SFL (yd)", 1, 100, script_grind.findLootDistance);

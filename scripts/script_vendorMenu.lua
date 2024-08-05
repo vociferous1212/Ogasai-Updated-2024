@@ -342,6 +342,10 @@ function script_vendorMenu:sellLogic()
 	-- Update sell quality rule
 	script_vendor:setSellQuality(script_vendor.sellPoor, script_vendor.sellCommon, script_vendor.sellUncommon, script_vendor.sellRare, script_vendor.sellEpic);
 
+	--reset new target time for blacklisting
+		script_grind.newTargetTime = GetTimeEX();
+		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+
 	for i = script_vendor.currentBag,4 do 
 		for y=script_vendor.currentSlot,GetContainerNumSlots(i) do 
 

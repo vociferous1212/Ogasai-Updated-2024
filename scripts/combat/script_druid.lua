@@ -645,6 +645,12 @@ function script_druid:run(targetGUID)
 		return 0; 
 	end
 
+	-- stop bot from moving target to target when stuck in combat and we need to rest
+	if (IsInCombat()) and (PlayerHasTarget()) and (not script_grind:isAnyTargetTargetingMe()) and (script_grind.enemiesAttackingUs() == 0) and (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() >= 99) then
+		self.message = "Waiting! Stuck in combat phase!";
+		return 4;
+	end
+
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
 	
@@ -856,12 +862,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			return true;
 			end
 		end
-
-		-- stop bot from moving target to target when stuck in combat and we need to rest
-		--if (IsInCombat()) and (localObj:GetUnitsTarget() == 0) then
-		--	self.message = "Waiting! Stuck in combat phase!";
-		--	return 4;
-		--end
 		
 		----------
 		----- OPENER 

@@ -1,4 +1,15 @@
 script_grind = {
+	aggroLoaded = include("scripts\\script_aggro.lua"),
+	grindPartyOptionsLoaded = include("scripts\\script_grindParty.lua"),
+	expExtra = include("scripts\\script_expChecker.lua"),
+	unstuckLoaded = include("scripts\\script_unstuck.lua"),
+	paranoiaLoaded = include("scripts\\script_paranoia.lua"),
+	paranoiaMenuLoaded = include("scripts\\script_paranoiaMenu.lua"),
+	radarLoaded = include("scripts\\script_radar.lua"),
+	debuffCheck = include("scripts\\script_checkDebuffs.lua"),
+	drawStatusScript = include("scripts\\script_drawStatus.lua"),
+	drawStatusEXScript = include("scripts\\script_drawStatusEX.lua"),
+	omLoaded = include("scripts\\script_om.lua"),
 	navFunctionsLoaded = include("scripts\\script_nav.lua"),
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
@@ -12,18 +23,21 @@ script_grind = {
 	getSpellsLoaded = include("scripts\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	gatherMenuLoaded = include("scripts\\script_gatherMenu.lua"),
+	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
+	targetMenu = include("//scripts//script_targetMenu.lua"),
+	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
+	warlockMenu = include("scripts\\combat\\script_warlockEX.lua"),
+	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
+	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
+	rogueMenu = include("scripts\\combat\\script_rogueEX.lua"),
+	paladinMenu = include("scripts\\combat\\script_paladinEX.lua"),
+	shamanMenu = include("scripts\\combat\\script_shamanEX.lua"),
+	druidMenu = include("scripts\\combat\\script_druidEX.lua"),
+	grindPartyMenuIncluded = include("scripts\\script_grindPartyMenu.lua"),
+	counterMenuIncluded = include("scripts\\script_counterMenu.lua"),
+	debugMenuIncluded = include("scripts\\script_debugMenu.lua"),
+
 	getSpells = false,
-	aggroLoaded = include("scripts\\script_aggro.lua"),
-	grindPartyOptionsLoaded = include("scripts\\script_grindParty.lua"),
-	expExtra = include("scripts\\script_expChecker.lua"),
-	unstuckLoaded = include("scripts\\script_unstuck.lua"),
-	paranoiaLoaded = include("scripts\\script_paranoia.lua"),
-	paranoiaMenuLoaded = include("scripts\\script_paranoiaMenu.lua"),
-	radarLoaded = include("scripts\\script_radar.lua"),
-	debuffCheck = include("scripts\\script_checkDebuffs.lua"),
-	drawStatusScript = include("scripts\\script_drawStatus.lua"),
-	drawStatusEXScript = include("scripts\\script_drawStatusEX.lua"),
-	omLoaded = include("scripts\\script_om.lua"),
 	jump = true,	-- enable jumping out of combat
 	jumpRandomFloat = 98,	-- jump > than 
 	jumpCheck = false,
@@ -151,9 +165,12 @@ script_grind = {
 	recheckTimer = 0,	-- used for rechecking add ranges outside of combat to find a valid target
 	needRest = false,
 	attackTimer = 0,
+	useAutoHotspotDist = false,
+	autoSelectTargets = false,
 }
 
 function script_grind:setup()
+
 	self.lootCheck['target'] = 0;
 	self.lootCheck['timer'] = GetTimeEX();
 
@@ -273,8 +290,8 @@ function script_grind:setup()
 	self.attackTimer = GetTimeEX();
 	self.blacklistLootTime = GetTimeEX();
 	self.blacklistLootTimeCheck = GetTimeEX();
+	self.deleteCheckTimer = GetTimeEX();
 
-	-- why was this not iterated before?
 	local level = GetLocalPlayer():GetLevel();
 
 	if (level < 10) then
@@ -556,8 +573,10 @@ function script_grind:run()
 	end
 
 
-	if (IsInCombat()) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (self.skipHardPull) and (self.enemyObj ~= nil) then
-		script_om:FORCEOM();
+	if (IsInCombat()) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (self.skipHardPull) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+		if (self.enemyObj:GetHealthPercentage() >= 20) then
+			script_om:FORCEOM();
+		end
 	end
 
 	-- check paranoia	
@@ -679,9 +698,11 @@ function script_grind:run()
 			return;
 		end
 
-		if (IsInCombat()) and (GetTimeEX() > self.omTimer) then
-			script_om:FORCEOM();
-			self.omTimer = GetTimeEX() + 5000;
+		if (IsInCombat()) and (GetTimeEX() > self.omTimer) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+			if (self.enemyObj:GetHealthPercentage() >= 20) then
+				script_om:FORCEOM();
+				self.omTimer = GetTimeEX() + 5000;
+			end
 		end
 
 		-- Check: If our gear is yellow
@@ -713,12 +734,9 @@ function script_grind:run()
 
 		-- delete items 
 		if (not IsInCombat()) and (self.deleteItems) then
-			if (script_helper:deleteItem()) then
-				script_grind:setWaitTimer(500);
-			end
+			script_deleteItems:checkDeleteItems();
 		end
 		
-
 		--Mount up
 		if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
@@ -942,15 +960,11 @@ function script_grind:run()
 			self.message = "waiting after combat - stuck in combat";
 			return;
 		end
-
 		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting after combat - stuck in combat";
-			ClearTarget();
 			self.enemyObj = nil;
-			if (IsMoving()) then
-				StopMoving();
-				return;
-			end
+			ClearTarget();
+			StopMoving();
 		return;
 		end
 		if (GetLocalPlayer():HasBuff("Blood Rage")) and (script_grind:enemiesAttackUs() == 0 or not script_grind:isAnyTargetTargetingMe()) then
@@ -1140,18 +1154,19 @@ function script_grind:run()
 
 
 				-- move to target
-				if (IsMoving()) or (IsInCombat()) then
+				if (IsMoving() or IsInCombat()) and (IsPathLoaded(5)) then
 					self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-				elseif (not IsMoving()) and (PlayerHasTarget()) then
+				elseif (not IsMoving() and PlayerHasTarget()) and (script_grind.enemyObj:GetDistance() >= 8) then
 					self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					MoveToTarget(_x, _y, _z);
+				elseif (not IsMoving()) and (script_grind.enemyObj:GetDistance() > 8) then
+					Move(_x, _y, _z);
 				end
 
-
-					-- set wait timer to move clicks
-					if (IsMoving()) then
-						script_grind:setWaitTimer(100);
-					end
+				-- set wait timer to move clicks
+				if (IsMoving()) then
+					script_grind:setWaitTimer(100);
+				end
 				return;
 				end
 			return;
@@ -1619,10 +1634,9 @@ function script_grind:enemyIsValid(i)
 		end
 		
 	-- add elite to blacklist
-		if (self.skipElites) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetDistance() <= 65) then	
+		if (self.skipElites) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetDistance() <= 65) then
+			DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Elite " .. i:GetUnitName() .. "");	
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
-			DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Elite " .. self.enemyObj:GetUnitName() .. "");
-
 		end
 
 	-- add above maxLevel to blacklist

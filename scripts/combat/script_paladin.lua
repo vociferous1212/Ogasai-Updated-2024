@@ -114,6 +114,13 @@ function script_paladin:run(targetGUID)
 		return 6;
 	end
 
+	-- stop bot from moving target to target when stuck in combat and we need to rest
+	if (IsInCombat()) and (PlayerHasTarget()) and (not script_grind:isAnyTargetTargetingMe()) and (script_grind.enemiesAttackingUs() == 0) and (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() >= 99) then
+		self.message = "Waiting! Stuck in combat phase!";
+		return 4;
+	end
+
+
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
 

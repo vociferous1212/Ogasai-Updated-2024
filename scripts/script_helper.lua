@@ -13,124 +13,8 @@ script_helper = {
 	numBandage = 0,
 	items = {},
 	numItems = 0,
-	
+
 }
-
-function script_helper:deleteItem()
-	-- add new items here to be delete. the bot does not understand checking for HasItem("").
-	--DeleteItem("NEW ITEM NAME HERE");
-	--DeleteItem("");
-	DeleteItem("OOX-22/FE Distress Beacon");
-	DeleteItem("OOX-17/TN Distress Beacon");
-	DeleteItem("OOX-09/HL Distress Beacon");
-	DeleteItem("Mangled Journal");
-	DeleteItem("Vulture Gizzard");
-	DeleteItem("Blasted Boar Lung");
-	DeleteItem("Snickerfang Jowl");
-	DeleteItem("Imperfect Draenethyst Fragment");
-return false;
-end
-
-function script_helper:enemiesAttackingUs(range) -- returns number of enemies attacking us within range
-    local unitsAttackingUs = 0; 
-    local currentObj, typeObj = GetFirstObject(); 
-    while currentObj ~= 0 do 
-    	if typeObj == 3 then
-			if (currentObj:CanAttack() and not currentObj:IsDead()) then
-               	if (script_grind:isTargetingMe(currentObj) and currentObj:GetDistance() <= range) then 
-                	unitsAttackingUs = unitsAttackingUs + 1; 
-               	end 
-			end
-       	end
-        currentObj, typeObj = GetNextObject(currentObj); 
-    end
-    return unitsAttackingUs;
-end
-
-function script_helper:addBandage(name)
-	self.bandage[self.numBandage] = name;
-	self.numBandage = self.numBandage +1;
-end
-
-function script_helper:addHealthPotion(name)
-	self.healthPotion[self.numHealthPotion] = name;
-	self.numHealthPotion = self.numHealthPotion + 1;
-end
-
-function script_helper:addManaPotion(name)
-	self.manaPotion[self.numManaPotion] = name;
-	self.numManaPotion = self.numManaPotion + 1;
-end
-
-function script_helper:useBandage()
-
-	---- Search for bandage
-	local bandageIndex = -1;
-	for i=0,self.numBandage do
-		if (HasItem(self.bandage[i])) then
-			bandageIndex = i;
-			break;
-		end
-	end
-		
-	if(HasItem(self.bandage[bandageIndex])) then
-		if (UseItem(self.bandage[bandageIndex])) then
-			return true;
-		end
-	end
-end
-
-
-function script_helper:useHealthPotion()
-
-	-- Search for potion
-	local potionIndex = -1;
-	for i=0,self.numHealthPotion do
-		if (HasItem(self.healthPotion[i])) then
-			potionIndex = i;
-			break;
-		end
-	end
-		
-	if(HasItem(self.healthPotion[potionIndex])) then
-		if (UseItem(self.healthPotion[potionIndex])) then
-			return true;
-		end
-	end
-end
-
-function script_helper:useManaPotion()
-
-	-- Search for potion
-	local potionIndex = -1;
-	for i=0,self.numManaPotion do
-		if (HasItem(self.manaPotion[i])) then
-			potionIndex = i;
-			break;
-		end
-	end
-		
-	if(HasItem(self.manaPotion[potionIndex])) then
-		if (UseItem(self.manaPotion[potionIndex])) then
-			return true;
-		end
-	end
-end
-
-function script_helper:addWater(name)
-	self.water[self.numWater] = name;
-	self.numWater = self.numWater + 1;
-end
-
-function script_helper:addFood(name)
-	self.food[self.numFood] = name;
-	self.numFood = self.numFood + 1;
-end
-
-function script_helper:addMount(name)
-	self.myMounts[self.numMounts] = name;
-	self.numMounts = self.numMounts + 1;
-end
 
 function script_helper:setup()
 
@@ -330,6 +214,108 @@ function script_helper:setup()
 	script_helper:addMount("Reins of the Striped Frostsaber");
 	script_helper:addMount("Reins of the Striped Nightsaber");
 
+	script_deleteItems:setup();
+end
+
+function script_helper:enemiesAttackingUs(range) -- returns number of enemies attacking us within range
+    local unitsAttackingUs = 0; 
+    local currentObj, typeObj = GetFirstObject(); 
+    while currentObj ~= 0 do 
+    	if typeObj == 3 then
+			if (currentObj:CanAttack() and not currentObj:IsDead()) then
+               	if (script_grind:isTargetingMe(currentObj) and currentObj:GetDistance() <= range) then 
+                	unitsAttackingUs = unitsAttackingUs + 1; 
+               	end 
+			end
+       	end
+        currentObj, typeObj = GetNextObject(currentObj); 
+    end
+    return unitsAttackingUs;
+end
+
+function script_helper:addBandage(name)
+	self.bandage[self.numBandage] = name;
+	self.numBandage = self.numBandage +1;
+end
+
+function script_helper:addHealthPotion(name)
+	self.healthPotion[self.numHealthPotion] = name;
+	self.numHealthPotion = self.numHealthPotion + 1;
+end
+
+function script_helper:addManaPotion(name)
+	self.manaPotion[self.numManaPotion] = name;
+	self.numManaPotion = self.numManaPotion + 1;
+end
+
+function script_helper:useBandage()
+
+	---- Search for bandage
+	local bandageIndex = -1;
+	for i=0,self.numBandage do
+		if (HasItem(self.bandage[i])) then
+			bandageIndex = i;
+			break;
+		end
+	end
+		
+	if(HasItem(self.bandage[bandageIndex])) then
+		if (UseItem(self.bandage[bandageIndex])) then
+			return true;
+		end
+	end
+end
+
+
+function script_helper:useHealthPotion()
+
+	-- Search for potion
+	local potionIndex = -1;
+	for i=0,self.numHealthPotion do
+		if (HasItem(self.healthPotion[i])) then
+			potionIndex = i;
+			break;
+		end
+	end
+		
+	if(HasItem(self.healthPotion[potionIndex])) then
+		if (UseItem(self.healthPotion[potionIndex])) then
+			return true;
+		end
+	end
+end
+
+function script_helper:useManaPotion()
+
+	-- Search for potion
+	local potionIndex = -1;
+	for i=0,self.numManaPotion do
+		if (HasItem(self.manaPotion[i])) then
+			potionIndex = i;
+			break;
+		end
+	end
+		
+	if(HasItem(self.manaPotion[potionIndex])) then
+		if (UseItem(self.manaPotion[potionIndex])) then
+			return true;
+		end
+	end
+end
+
+function script_helper:addWater(name)
+	self.water[self.numWater] = name;
+	self.numWater = self.numWater + 1;
+end
+
+function script_helper:addFood(name)
+	self.food[self.numFood] = name;
+	self.numFood = self.numFood + 1;
+end
+
+function script_helper:addMount(name)
+	self.myMounts[self.numMounts] = name;
+	self.numMounts = self.numMounts + 1;
 end
 
 function script_helper:eat()
