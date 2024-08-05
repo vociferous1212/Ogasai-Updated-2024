@@ -134,7 +134,7 @@ end
 
 function CastStealth()
 
-	if (HasSpell("Stealth")) or (HasSpell("Prowl")) then
+	if (HasSpell("Stealth")) or (HasSpell("Prowl")) and (not script_checkDebuffs:hasMagic()) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasCurse()) then
 		if (HasSpell("Stealth")) and (script_rogue.useStealth) then
 			if (not IsSpellOnCD("Stealth")) then
 				CastSpellByName("Stealth", GetLocalPlayer());
