@@ -314,11 +314,8 @@ function script_grind:setup()
 		self.paranoidRange = 25;
 		self.paranoidSetTimer = 3;
 	end
-	if (level >= 10) and (level < 20) then
+	if (level >= 10) and (level < 40) then
 		script_checkAdds.addsRange = 20;
-	end
-	if (level >= 20) and (level < 40) then
-		script_checkAdds.addsRange = 23;
 	end
 	if (level > 40) then
 		script_checkAdds.addsRange = 25;
@@ -1167,7 +1164,7 @@ function script_grind:run()
 					-- move to target
 					if (IsMoving() or IsInCombat()) then
 						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-					else
+					elseif (not IsMoving()) then
 						self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						MoveToTarget(_x, _y, _z);
 					end
@@ -1655,7 +1652,7 @@ function script_grind:enemyIsValid(i)
 	-- add above maxLevel to blacklist
 		if (self.skipHardPull) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > self.maxLevel) and (i:GetDistance() <= 65) then
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
-			DEFAULT_CHAT_FRAME:AddMessage('Blacklisting ' .. self.enemyObj:GetUnitName() .. ', too high level...');
+			DEFAULT_CHAT_FRAME:AddMessage('Blacklisting ' .. i:GetUnitName() .. ', too high level...');
 
 		end
 
@@ -1901,6 +1898,8 @@ function script_grind:doLoot(localObj)
 		end
 	end
 
+	local _x, _y, _z = self.lootObj:GetPosition();
+
 	-- close enough to loot range then do these
 	if(dist <= self.lootDistance) then
 		self.message = "Looting...";
@@ -1937,7 +1936,7 @@ function script_grind:doLoot(localObj)
 			return;
 		else
 			-- we looted so reset variables
-			self.vendorMessageSent = false;
+			--self.vendorMessageSent = false;
 			self.waitTimer = GetTimeEX() + 350;
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
@@ -1974,14 +1973,14 @@ function script_grind:doLoot(localObj)
 		end
 	end
 
-					script_nav.lastPathIndex = 1;
-
-
 	-- move to loot object
 	self.message = "Moving to loot...";
-	--if (IsPathLoaded(5)) or (IsMoving()) then
 	--	self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-	--elseif (not IsPathLoaded(5)) or (not IsMoving()) then
+
+	script_nav.lastPathIndex = 1;
+	script_nav.lastnavIndex = 1;
+	script_nav.lastpathnavIndex = 1;
+
 	if (IsMoving()) then
 		MoveToTarget(_x, _y, _z);
 	else
@@ -1994,13 +1993,17 @@ function script_grind:doLoot(localObj)
 	end
 
 	if (self.autoSelectVendors) and (not IsMoving()) then
-		local bX, bY, bZ = GetLocalPlayer():GetPosition();
-		if (GetDistance3D(myLastX, myLastY, myLastZ, bX, bY, bZ) > 200) then
+			local bX, bY, bZ = GetLocalPlayer():GetPosition();
+		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 250) then
 			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
-			vendorDB:loadDBVendors();
 			if (not self.vendorMessageSent) then
-				DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
+			DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
 				self.vendorMessageSent = true;
+				script_grind:setWaitTimer(2500);
+				if (self.vendorMessageSent) then
+					vendorDB:loadDBVendors();
+					self.vendorMessageSent = false;
+				end
 			end
 		end
 	end

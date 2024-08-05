@@ -108,6 +108,13 @@ function script_grindEX:doChecks()
 				if (script_helper:useMount()) then
 				end
 			end
+			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) then
+				if (not HasSpell("Travel Form")) then
+					script_druidEX2:catForm();
+				elseif (HasSpell("Travel Form")) then
+					script_druidEX:travelForm();
+				end
+			end
 		end
 
 		if (not IsInCombat() or IsMounted()) then

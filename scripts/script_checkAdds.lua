@@ -208,7 +208,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:IsCasting())
 				and (not script_grind.enemyObj:IsCasting())
 				and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4)
-				and (not currentObj:GetCreatureType() == 'Not specified')
+				and (currentObj:GetCreatureType() ~= 'Not specified')
 			then
 					local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -248,7 +248,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not script_grind.enemyObj:IsCasting())
 				and (not currentObj:IsCasting())
 				and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4)
-				and (not currentObj:GetCreatureType() == 'Not specified')
+				and (currentObj:GetCreatureType() ~= 'Not specified')
 
 			then
 						local tarX, tarY, tarZ = currentObj:GetPosition();
@@ -329,7 +329,7 @@ function script_checkAdds:aggroIntersect(target)
 				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
 				and (not currentObj:IsCasting())
 				and (not script_grind.enemyObj:IsCasting())
-				and (not currentObj:GetCreatureType() == 'Not specified')
+				and (currentObj:GetCreatureType() ~= 'Not specified')
 
 			then
 				
