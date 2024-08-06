@@ -165,16 +165,17 @@ function script_aggro:safePullRecheck(target)
 			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
 
 				-- aggro range is aggro addsRange slider
-				aggro = script_checkAdds.addsRange - 5;
+				aggro = script_checkAdds.addsRange + 3;
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
 
 				-- acceptable range
-				if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) or (currentObj:GetDistance() <= aggro - 5)  then
+				if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) or (currentObj:GetDistance() <= aggro)  then
 
 					-- acceptable targets in range
 					countUnitsInRange = countUnitsInRange + 1;
+					script_grind.enemyObj = currentObj;
 				end
  			end
  		end
@@ -184,10 +185,12 @@ function script_aggro:safePullRecheck(target)
  	end
 
 	-- avoid pull if more than 1 add
+	-- not a safe pull return false
 	if (countUnitsInRange > 1) then
 		return false;
 	end
 
+	-- if a safe pull then return true
 	return true;
 end
 

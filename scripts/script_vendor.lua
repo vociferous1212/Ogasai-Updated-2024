@@ -228,8 +228,12 @@ function script_vendor:repair()
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			return true;
 		end
-
-		script_vendor:removeShapeShift();
+		
+		if (HasForm()) then
+			if (script_vendor:removeShapeShift()) then
+				return 4;
+			end
+		end
 	
 		local vendorTarget = nil;
 		TargetByName(vendor['name']);
@@ -331,7 +335,11 @@ function script_vendor:sell()
 			return true;
 		end
 
-		script_vendor:removeShapeShift();
+		if (HasForm()) then
+			if (script_vendor:removeShapeShift()) then
+				return 4;
+			end
+		end
 
 		local vendorTarget = nil;
 		TargetByName(vendor['name']);
@@ -423,7 +431,11 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 			return true;
 		end
 
-		script_vendor:removeShapeShift();
+		if(HasForm()) then
+			if (script_vendor:removeShapeShift()) then
+				return 4;
+			end
+		end
 
 		-- Get Vendor Target
 		local vendorTarget = nil;
@@ -550,7 +562,11 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 			return true;
 		end
 
-		script_vendor:removeShapeShift();
+		if(HasForm()) then
+			if (script_vendor:removeShapeShift()) then
+				return 4;
+			end
+		end
 
 		-- Get Vendor Target
 		local vendorTarget = nil;
@@ -611,10 +627,25 @@ end
 function script_vendor:removeShapeShift()
 		local localObj = GetLocalPlayer();
 	if (localObj:HasBuff('Bear Form')) then
-		CastSpellByName('Bear Form');
+		if (script_druidEX:removeBearForm()) then
+			return true;
+		end
 	elseif (localObj:HasBuff('Cat Form')) then
-		CastSpellByName('Cat Form');
+		if (script_druidEX:removeCatForm()) then
+			return true;
+		end
 	elseif (localObj:HasBuff('Travel Form')) then
-		CastSpellByName('Travel Form');
+		if (script_druidEX:removeTravelForm()) then
+			return true;
+		end
+	elseif (localObj:HasBuff("Moonkin Form")) then
+		if (script_druidEX:removeMoonkinForm()) then
+			return true;
+		end
+	elseif (localObj:HasBuff("Ghost Wolf")) then
+		if (script_shamanEX2:removeGhostWolf()) then
+			return true;
+		end
 	end
+return false;
 end

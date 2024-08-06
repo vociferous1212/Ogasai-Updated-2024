@@ -404,7 +404,7 @@ function script_gather:gather()
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
 				else
 					Move(_x, _y, _z);
-					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move - no nav path";
+					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Force Move - no nav path!";
 				end
 			end
 		end

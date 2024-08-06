@@ -170,7 +170,6 @@ script_grind = {
 	drawChests = true,
 	deleteItems = true,
 	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
-	recheckTimer = 0,	-- used for rechecking add ranges outside of combat to find a valid target
 	needRest = false,
 	attackTimer = 0,
 	useAutoHotspotDist = false,	-- auto hotspot distance for each area
@@ -180,6 +179,7 @@ script_grind = {
 	myLastY = 0,		-- set coords
 	myLastZ = 0,		-- set coords
 	vendorMessageSent = false,	-- send message to chat frame - vendors loaded from DB...
+	safePullAvoidTargets = false,	-- TODO try to safe pull avoided targets with adds nearby...
 }
 
 function script_grind:setup()
@@ -227,7 +227,7 @@ function script_grind:setup()
 		self.vendorRefill = false;
 	end
 
-	if (UnitClass("Player") == "Rogue") then
+	if (UnitClass("Player") == "Rogue" and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
 		self.blacklistTime = 60;
 	end
 
@@ -323,8 +323,6 @@ function script_grind:setup()
 	if (level == 60) then
 		script_checkAdds.addsRange = 28;
 	end
-
-	self.recheckTimer = GetTimeEX();
 
 	-- we are setup don't reload these items here
 	self.isSetup = true;
@@ -977,6 +975,9 @@ function script_grind:run()
 		end
 		if (GetLocalPlayer():HasBuff("Blood Rage")) and (script_grind:enemiesAttackUs() == 0 or not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting for bloodrage to end - stuck in combat";
+			StopMoving();
+			ClearTarget();
+			return;
 		end
 
 		-- Finish loot before we engage new targets or navigate - return
@@ -1164,8 +1165,10 @@ function script_grind:run()
 					-- move to target
 					if (IsMoving() or IsInCombat()) then
 						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+						self.message = "Moving To Target NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+
 					elseif (not IsMoving()) then
-						self.message = "Moving To Target - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						self.message = "Moving To Target Nav -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						MoveToTarget(_x, _y, _z);
 					end
 					--if (not IsMoving()) andand (script_grind.enemyObj:GetDistance() > 8) then
@@ -1761,7 +1764,7 @@ function script_grind:enemyIsValid(i)
 			return true;
 		end
 
--- RECHECK TARGETS
+	-- RECHECK TARGETS
 	-- target blacklisted moved away from other targets
 	-- bot can target blacklisted targets under these conditions
 		if (self.skipHardPull)
@@ -1790,7 +1793,33 @@ function script_grind:enemyIsValid(i)
 			end
 		end
 
-
+-- RECHECK TARGETS
+-- allow bot to try to pull avoid targets from a safe range
+		if (self.skipHardPull)
+			and (self.extraSafe)
+			and (script_grind:isTargetBlacklisted(i:GetGUID()))
+			and (self.safePullAvoidTargets) and (not script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
+			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
+				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
+				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))
+				and i:GetDistance() < self.pullDistance and (not i:IsTapped() or i:IsTappedByMe())
+				and not (self.skipUnknown and i:GetCreatureType() == 'Not specified')
+				and not (self.skipHumanoid and i:GetCreatureType() == 'Humanoid')
+				and not (self.skipDemon and i:GetCreatureType() == 'Demon')
+				and not (self.skipBeast and i:GetCreatureType() == 'Beast')
+				and not (self.skipElemental and i:GetCreatureType() == 'Elemental')
+				and not (self.skipUndead and i:GetCreatureType() == 'Undead') 
+				and not (skipAberration and i:GetCreatureType() == 'Abberration') 
+				and not (skipDragonkin and i:GetCreatureType() == 'Dragonkin') 
+				and not (skipGiant and i:GetCreatureType() == 'Giant') 
+				and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
+				and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
+				) then
+					-- force bot to keep this target and not recheck safepull over and over again
+					script_grind.enemyObj = currentObj;
+			return true;
+			end
+		end
 	end
 	return false;
 end
@@ -1878,8 +1907,6 @@ function script_grind:doLoot(localObj)
 			end
 		end
 
-		script_nav.lastnavIndex = 1;
-
 	-- Loot checking/reset target
 	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then
 		if (GetTimeEX() > self.lootCheck['timer']) then
@@ -1944,7 +1971,7 @@ function script_grind:doLoot(localObj)
 		end
 
 		-- If we reached the loot object, reset the nav path
-		--script_nav:resetNavigate();
+		script_nav:resetNavigate();
 		--self.waitTimer = GetTimeEX() + 550;
 		
 	end
@@ -1965,6 +1992,7 @@ function script_grind:doLoot(localObj)
 			DEFAULT_CHAT_FRAME:AddMessage("Blacklisting loot - " ..self.lootObj:GetUnitName().. " " ..math.floor(self.lootObj:GetDistance()).. " (yd)");
 			end
 			script_grind:addTargetToLootBlacklist(self.lootObj:GetGUID());
+			self.lootObj = nil;
 			-- variable on/off to stop spamming message
 			if (self.messageOnce) then
 			self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
@@ -1975,26 +2003,34 @@ function script_grind:doLoot(localObj)
 
 	-- move to loot object
 	self.message = "Moving to loot...";
-	--	self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 
-	script_nav.lastPathIndex = 1;
-	script_nav.lastnavIndex = 1;
-	script_nav.lastpathnavIndex = 1;
+
+	local _x, _y, _z = self.lootObj:GetPosition();
+	script_nav.lastPathIndex = 0;
+	script_nav.lastnavIndex = 0;
+	script_nav.lastpathnavIndex = 0;
 
 	if (IsMoving()) then
-		MoveToTarget(_x, _y, _z);
+
+		script_navEX:moveToTarget(localObj, _x, _y, _z);
+		--MoveToTarget(_x, _y, _z);
+		self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+
 	else
-		Move(_x, _y, _z);
+		MoveToTarget(_x, _y, _z);
+		self.message = "Moving To Target Loot FORCED - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+
 	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
 		self.waitTimer = GetTimeEX() + 750;
+		script_nav:resetNavigate();
 	end
 
 	if (self.autoSelectVendors) and (not IsMoving()) then
 			local bX, bY, bZ = GetLocalPlayer():GetPosition();
-		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 250) then
+		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
 			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
 			if (not self.vendorMessageSent) then
 			DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
