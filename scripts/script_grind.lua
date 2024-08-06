@@ -610,7 +610,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (self.hotspotReached) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
+	if (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -857,7 +857,7 @@ function script_grind:run()
 
 		-- move to hotspot location
 		self.message = script_nav:moveToHotspot(localObj);
-		script_grind:setWaitTimer(self.nextToNodeDist * 10);
+		script_grind:setWaitTimer(self.nextToNodeDist * 2);
 		return true;
 		end
 
@@ -968,7 +968,6 @@ function script_grind:run()
 		end
 		if (GetLocalPlayer():HasBuff("Bloodrage") and not PlayerHasTarget() and script_grind.enemiesAttackingUs() == 0) or ((IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20)) then
 			self.message = "Waiting after combat - stuck in combat";
-			StopMoving();
 		return;
 		end
 
@@ -1157,11 +1156,11 @@ function script_grind:run()
 
 
 					-- move to target
-					if (IsMoving() or IsInCombat()) then
+					if (IsMoving()) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
 						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 
-					elseif (not IsMoving()) then
+					elseif (not IsMoving()) or (IsInCombat() and self.enemyObj:GetDistance() > 8) then
 						self.message = "Moving To Target Nav -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						MoveToTarget(_x, _y, _z);
 					end
@@ -1171,9 +1170,9 @@ function script_grind:run()
 					--end
 
 					-- set wait timer to move clicks
-					if (IsMoving()) then
-						script_grind:setWaitTimer(100);
-					end
+					--if (IsMoving()) then
+					--	script_grind:setWaitTimer(100);
+					--end
 					
 				end
 			return;
@@ -1306,7 +1305,7 @@ function script_grind:run()
 
 				-- move to saved locations
 				self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
-				script_grind:setWaitTimer(self.nextToNodeDist * 10);
+				script_grind:setWaitTimer(self.nextToNodeDist * 2);
 
 
 				-- check stealth rogue
@@ -2004,14 +2003,13 @@ function script_grind:doLoot(localObj)
 	if (IsPathLoaded(5)) then
 		script_navEX:moveToTarget(localObj, _x, _y, _z);
 		self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-	else
+	elseif (not IsPathLoaded(5)) and (self.loobObj:GetDistance() > self.lootDistance) then
 		MoveToTarget(_x, _y, _z);
 	end
 
-
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
-		self.waitTimer = GetTimeEX() + 750;
+		self.waitTimer = GetTimeEX() + 250;
 		script_nav:resetNavigate();
 	end
 
@@ -2088,12 +2086,6 @@ function script_grind:lootAndSkin()
 		if (not AreBagsFull() and not self.bagsFull and self.lootObj ~= nil) and (not IsMoving()) then
 			-- do loot
 			if (script_grind:doLoot(localObj)) then
-				-- check for skinning error (probably doesn't work)
-				local __, lastError = GetLastError();
-				if (lastError ~= 77) then
-					self.waitTimer = GetTimeEX() + 1200;
-					return false;
-				end
 				return;
 			end
 		end

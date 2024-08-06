@@ -31,7 +31,7 @@ script_gather = {
 	blacklistedNodesNum = 0,
 	blacklistedNodesNameNum = 0,
 	blacklistTime = 0,
-	blacklistSetTime = 180,
+	blacklistSetTime = 60,
 }
 
 -- add node to blacklist table by GUID

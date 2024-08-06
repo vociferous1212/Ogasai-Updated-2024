@@ -17,7 +17,6 @@ script_shaman = {
 	totem = "no totem yet",	-- used for totem1
 	totemBuff = "",		-- used for totem1
 	totem2 = "no totem yet",	-- used for totem2
-	totemUsed = false,		-- used for totem2
 	totem3 = "no totem yet",
 	totem4 = "no totem yet",
 	totem4Buff = "",
@@ -107,6 +106,7 @@ function script_shaman:setup()
 	-- fire totems
 	if (HasSpell("Searing Totem")) and (HasItem("Fire Totem")) then
 		self.totem2 = "Searing Totem";
+		script_shamanEX3.searingTotem = true;
 	end
 
 	-- water totems
@@ -241,7 +241,6 @@ function script_shaman:healsAndBuffs()
 	local localObj = GetLocalPlayer();
 	local localMana = localObj:GetManaPercentage();
 	local localHealth = localObj:GetHealthPercentage();
-	local hasTarget = localObj:GetUnitsTarget();
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
@@ -274,18 +273,19 @@ function script_shaman:healsAndBuffs()
 		CastSpellByName("Ghost Wolf");
 	end
 
-	if (hasTarget ~= 0) and (not IsAutoCasting("Attack")) then
-		targetObj:AutoAttack();
+	if (PlayerHasTarget()) and (not IsAutoCasting("Attack")) and (IsInCombat()) then
+		GetLocalPlayer():GetUnitsTarget():AutoAttack();
 	end
 
 	-- Check: Healing
-	if (not IsCasting()) and (not IsChanneling()) and (localHealth < self.healHealth) and (localMana >= self.healMana) then 
-		if (CastHeal(self.healingSpell, localObj)) then
-			if (self.healingSpell ~= "Lesser Healing Wave") then
-				self.waitTimer = GetTimeEX() + 4500;
-				script_grind:setWaitTimer(4500);
+	if (localHealth < self.healHealth) then
+		if (not IsCasting()) and (not IsChanneling()) then
+			if (localMana >= self.healMana) then 
+				CastHeal(self.healingSpell, localObj);
+				self.waitTimer = GetTimeEX() + 1500;
+			return 4;
 			end
-		return false;
+		return 4;
 		end
 	return false;		
 	end
@@ -313,7 +313,7 @@ function script_shaman:healsAndBuffs()
 	end
 
 	-- purge enemy of magic
-	if (HasSpell("Purge")) and (script_checkDebuffs:enemyBuff()) and (hasTarget ~= 0) then
+	if (HasSpell("Purge")) and (script_checkDebuffs:enemyBuff()) and (PlayerHasTarget()) then
 		if (localMana >= 20) then
 			if (CastSpellByName("Purge", targetObj)) then
 				self.waitTimer = GetTimeEX() + 1500;
@@ -516,15 +516,12 @@ function script_shaman:run(targetGUID)
 
 			-- DO NOT TOUCH CASTING FIRE TOTEMS
 			if (self.useFireTotem) and (targetObj:GetDistance() <= 18 or ( self.pullLightningBolt and targetObj:GetDistance() <= 12) ) then
-				if (not script_shaman.totemUsed) then
-					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) then
-						if (localMana >= 15) and (targetObj:IsTargetingMe()) then
-							CastSpellByName(self.totem2);
-							targetObj:FaceTarget();
-							script_shaman.totemUsed = true;
-							self.waitTimer = GetTimeEX() + 1750;
-							return true;
-						end
+				if (not script_shamanEX3:isFireTotemAlive()) then
+					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) then
+						CastSpellByName(self.totem2);
+						targetObj:FaceTarget();
+						self.waitTimer = GetTimeEX() + 1750;
+						return true;
 					end
 				end
 			end
@@ -621,17 +618,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- DO NOT TOUCH CASTING FIRE TOTEMS
-			if (self.useFireTotem) then
-				if (not script_shaman.totemUsed) then
-					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) then
-						if (localMana >= 15) and (targetObj:IsTargetingMe()) then
-							CastSpellByName(self.totem2);
-							targetObj:FaceTarget();
-							script_shaman.totemUsed = true;
-							script_grind.tickRate = 150;
-							return true;
-						end
-					end
+			if (self.useFireTotem) and (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) then
+				if (not script_shamanEX3:isFireTotemAlive()) then
+					CastSpellByName(self.totem2);
+					targetObj:FaceTarget();
+					script_grind.tickRate = 150;
+					return true;
 				end
 			end
 
@@ -871,11 +863,6 @@ function script_shaman:rest()
 		elseif (IsInCombat()) and (not IsMoving()) then
 			script_grind.tickRate = tickRandom;
 		end
-	end
-
-	-- reset fire totem
-	if (not IsInCombat()) and (script_shaman.totemUsed) and (GetLocalPlayer():GetUnitsTarget() == 0) then
-		script_shaman.totemUsed = false;
 	end
 
 	-- Stop moving before we can rest

@@ -94,27 +94,27 @@ function script_shamanEX:menu()
 		if (HasItem("Earth Totem")) and (script_shamanEX2:usingTotems()) then
 
 			if (CollapsingHeader("|+| Totem Options")) then
-				script_shamanEX3:alternateTotemMenuEarth();
 				if (script_shaman.useEarthTotem) then
+				script_shamanEX3:alternateTotemMenuEarth();
 					Text("Earth Totem");
-						script_shaman.totem = InputText("Earth", script_shaman.totem);
+					script_shaman.totem = InputText("Earth", script_shaman.totem);
 				end
-				Separator();
-				script_shamanEX3:alternateTotemMenuFire();
+
 				if (script_shaman.useFireTotem) then
 					Separator();
+				script_shamanEX3:alternateTotemMenuFire();
 					Text("Fire Totem");
-						if (HasItem("Fire Totem")) then
-						script_shaman.totem2 = InputText("Fire", script_shaman.totem2);	
-						end
+					if (HasItem("Fire Totem")) then
+					script_shaman.totem2 = InputText("Fire", script_shaman.totem2);	
+					end
 				end
-				Separator();
-				script_shamanEX3:alternateTotemMenuWater();
 				if (script_shaman.useWaterTotem) then
+					Separator();
+					script_shamanEX3:alternateTotemMenuWater();
 					Text("Water Totem");
-						if (HasItem("Water Totem")) then
-						script_shaman.totem3 = InputText("Water", script_shaman.totem3);
-						end
+					if (HasItem("Water Totem")) then
+					script_shaman.totem3 = InputText("Water", script_shaman.totem3);
+					end
 				end
 			end
 		end
