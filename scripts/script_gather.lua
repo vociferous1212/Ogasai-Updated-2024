@@ -399,11 +399,11 @@ function script_gather:gather()
 		else
 			if (_x ~= 0) then
 				local nDist = math.floor(self.nodeObj:GetDistance());
-				if (IsMoving()) then
-					MoveToTarget(_x, _y, _z);
+				if (IsPathLoaded(5)) then
+					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
 				else
-					Move(_x, _y, _z);
+					MoveToTarget(_x, _y, _z);
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Force Move - no nav path!";
 				end
 			end

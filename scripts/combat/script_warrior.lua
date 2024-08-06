@@ -268,8 +268,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				self.waitTimer = GetTimeEX() + 2500;
-				return;
+				return true;
 			end
 		end
 
@@ -342,8 +341,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 			targetObj:AutoAttack();
 		end
 
-		if (targetObj:GetDistance() <= self.meleeDistance) and (targetObj:IsInLineOfSight()) and (IsAutoCasting("Attack")) and (PlayerHasTarget())(script_grind:enemiesAttackingUs() == 0 or not IsInCombat()) then
-				StopMoving();
+		if (targetObj:GetDistance() <= self.meleeDistance) and (targetObj:IsInLineOfSight()) and (IsAutoCasting("Attack")) and (PlayerHasTarget()) and (script_grind:enemiesAttackingUs() == 0 or not IsInCombat()) then
+			StopMoving();
 			self.waitTimer = GetTimeEX() + 1000;
 			script_grind:setWaitTimer(1000);
 		end
@@ -726,8 +725,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
-						self.waitTimer = GetTimeEX() + 2500;
-						return;
+						return true;
 					end
 				end
 

@@ -4,7 +4,7 @@ script_aggro = {
 	rY = 0,			-- res position
 	rZ = 0,			-- res position
 	rTime = 0,		-- res time
-	adjustAggro = 3,	-- adjust blacklist distance range
+	adjustAggro = 2.5,	-- adjust blacklist distance range
 	tarDist = 0,		-- target distance checked with run away from adds range
 }
 
@@ -165,7 +165,7 @@ function script_aggro:safePullRecheck(target)
 			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
 
 				-- aggro range is aggro addsRange slider
-				aggro = script_checkAdds.addsRange + 3;
+				aggro = script_checkAdds.addsRange - 5;
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();

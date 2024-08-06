@@ -1126,9 +1126,9 @@ function script_rogue:rest()
 		self.useBandage = false;
 	end
 
-	if (IsMounted()) then
-		Dismount();
-	end
+	--if (IsMounted()) then
+	--	Dismount();
+	--end
 
 	-- if has bandage then use bandages
 	if (self.eatHealth >= 35) and (self.hasBandages) and (self.useBandage) and (not IsMoving()) and (localHealth < self.eatHealth) then

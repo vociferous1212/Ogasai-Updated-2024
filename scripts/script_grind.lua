@@ -966,18 +966,10 @@ function script_grind:run()
 			self.message = "waiting after combat - stuck in combat";
 			return;
 		end
-		if (IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
+		if (GetLocalPlayer():HasBuff("Bloodrage") and not PlayerHasTarget() and script_grind.enemiesAttackingUs() == 0) or ((IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20)) then
 			self.message = "Waiting after combat - stuck in combat";
-			self.enemyObj = nil;
-			ClearTarget();
 			StopMoving();
 		return;
-		end
-		if (GetLocalPlayer():HasBuff("Blood Rage")) and (script_grind:enemiesAttackUs() == 0 or not script_grind:isAnyTargetTargetingMe()) then
-			self.message = "Waiting for bloodrage to end - stuck in combat";
-			StopMoving();
-			ClearTarget();
-			return;
 		end
 
 		-- Finish loot before we engage new targets or navigate - return
@@ -1157,6 +1149,8 @@ function script_grind:run()
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget() and (script_grind:isTargetingMe(self.enemyObj) or targetObj:GetHealthPercentage() < 20)) then
 					script_grind.tickRate = 50;
 				end
+
+				script_nav:resetNavigate();
 
 				-- if we have a valid position coordinates
 				if (_x ~= 0 and x ~= 0) then
@@ -2006,21 +2000,14 @@ function script_grind:doLoot(localObj)
 
 
 	local _x, _y, _z = self.lootObj:GetPosition();
-	script_nav.lastPathIndex = 0;
-	script_nav.lastnavIndex = 0;
-	script_nav.lastpathnavIndex = 0;
-
-	if (IsMoving()) then
-
+	
+	if (IsPathLoaded(5)) then
 		script_navEX:moveToTarget(localObj, _x, _y, _z);
-		--MoveToTarget(_x, _y, _z);
 		self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-
 	else
 		MoveToTarget(_x, _y, _z);
-		self.message = "Moving To Target Loot FORCED - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-
 	end
+
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
