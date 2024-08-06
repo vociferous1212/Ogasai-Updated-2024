@@ -89,6 +89,15 @@ function script_shamanEX2:usingTotems()
 return false;
 end
 
+function script_shamanEX2:removeGhostWolf()
+	if (GetLocalPlayer():HasBuff("Ghost Wolf")) then
+		CastSpellByName("Ghost Wolf");
+		script_grind:setWaitTimer(1500);
+		return true;
+	end
+return false;
+end
+
 function script_shamanEX2:menu()
 
 	if (CollapsingHeader("Shaman Heal Options")) then

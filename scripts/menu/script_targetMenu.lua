@@ -45,12 +45,13 @@ function script_targetMenu:menu()
 	
 			if (script_grind.skipHardPull) then
 	
-				local a = script_checkAdds.addsRange-3;
+				local a = script_checkAdds.addsRange + 3;
 				wasClicked, script_grind.extraSafe = Checkbox("Recheck Avoid Targets " ..a.." (yds)", script_grind.extraSafe);
+				Separator();
 	
 				if (UnitClass('player') ~= "Shaman") then
 					
-					Text("Move Away From Adds In Combat Range");
+					Text("Avoid/Move Away From Adds In Combat Range");
 					script_checkAdds.addsRange = SliderInt("Distance", 7, 40, script_checkAdds.addsRange);
 	
 				elseif (UnitClass('player') == "Shaman") and (not script_shamanEX2.usingTotems()) then
