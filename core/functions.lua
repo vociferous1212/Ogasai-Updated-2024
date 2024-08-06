@@ -134,10 +134,11 @@ end
 
 function CastStealth()
 
-	if (HasSpell("Stealth")) or (HasSpell("Prowl")) and (not script_checkDebuffs:hasMagic()) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasCurse()) then
+	if (HasSpell("Stealth")) or (HasSpell("Prowl")) and (not script_checkDebuffs:hasMagic()) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasCurse()) and (not IsStealth()) then
 		if (HasSpell("Stealth")) and (script_rogue.useStealth) then
 			if (not IsSpellOnCD("Stealth")) then
 				CastSpellByName("Stealth", GetLocalPlayer());
+				script_grind:setWaitTimer(1500);
 				return true;
 			end
 		elseif (HasSpell("Prowl")) and (script_druid.useStealth) then
@@ -148,6 +149,7 @@ function CastStealth()
 				end
 			elseif (not IsSpellOnCD("Prowl")) and (IsCatForm()) then
 				CastSpellByName("Prowl", GetLocalPlayer());
+				script_grind:setWaitTimer(1500);
 				return true;
 			end
 		end
