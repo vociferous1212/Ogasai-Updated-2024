@@ -112,13 +112,7 @@ function vendorDB_1_10:setup()
 	vendorDB:addVendor("Argent Quartermaster Hasana", 1, 0, 85, true, false, false, false, false, 1784.71, -729.11, 59.38);
 
 -- Durotar
-	vendorDB:addVendor("Duokna", 1, 1, 14, false, false, false, false, false, -565.43, -4214.21, 41.59);
-	vendorDB:addVendor("Duokna", 1, 1, 14, false, true, false, false, false, -565.43, -4214.21, 41.59);
-	vendorDB:addVendor("Duokna", 1, 1, 14, false, false, true, false, false, -565.43, -4214.21, 41.59);
-	vendorDB:addVendor("Duokna", 1, 1, 14, false, false, false, true, false, -565.43, -4214.21, 41.59);
-	vendorDB:addVendor("Duokna", 1, 1, 14, false, false, false, false, true, -565.43, -4214.21, 41.59);
-	vendorDB:addVendor("Huklah", 1, 1, 14, true, false, false, false, false, -581.74, -4109.51, 43.52);
-	vendorDB:addVendor("Huklah", 1, 1, 14, false, false, false, false, false, -581.74, -4109.51, 43.52);
+	vendorDB:addVendor("Duokna", 1, 1, 14, true, true, true, true, true, -565.43, -4214.21, 41.59);
 	vendorDB:addVendor("Hai'zan", 1, 1, 14, false, false, false, false, false, -786.56, -4903.8, 19.6);
 	vendorDB:addVendor("Hai'zan", 1, 1, 14, false, true, false, false, false, -786.56, -4903.8, 19.6);
 	vendorDB:addVendor("K'waii", 1, 1, 14, false, false, false, false, false, -779.04, -4938.94, 22.24);

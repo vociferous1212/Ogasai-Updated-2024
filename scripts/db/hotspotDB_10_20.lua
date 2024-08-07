@@ -60,19 +60,18 @@ function hotspotDB_10_20:setup()
 	hotspotDB:addHotspot("Silverpine Forest 10 - 12", "Horde", 10, 12, 1533.23, 652.43, 44.5);
 
 -- Barrens
-
+	hotspotDB:addHotspot("The Barrens 10 - 12", "Horde", 10, 12, -611.31, -2775.74, 92.92);
+	hotspotDB:addHotspot("The Barrens 10 - 12", "Horde", 10, 12, -506.16, -2507.57, 94.28);
+	hotspotDB:addHotspot("The Barrens 12 - 13", "Horde", 12, 13, 257.04, -2593.1, 94.02);
+	hotspotDB:addHotspot("The Barrens 12 - 13", "Horde", 12, 13, -75.67, -2105.67, 91.66);
+	hotspotDB:addHotspot("The Barrens 12 - 14", "Horde", 12, 14, 217.77, -3269.73, 65.09);
 	hotspotDB:addHotspot("The Barrens 14 - 16", "Horde", 14, 16, -309.52, -3747.47, 30.29);
 	hotspotDB:addHotspot("The Barrens 14 - 16", "Horde", 14, 16, -472.32, -3811.34, 29.41);
-	hotspotDB:addHotspot("The Barrens 19 - 21", "Horde", 19, 21, -1476.2, -1976.99, 90.51);
-	hotspotDB:addHotspot("The Barrens 12 - 14", "Horde", 12, 14, 257.04, -2593.1, 94.02);
-	hotspotDB:addHotspot("The Barrens 12 - 14", "Horde", 12, 14, -480.23, -2883.45, 91.67);
-	hotspotDB:addHotspot("The Barrens 10 - 12", "Horde", 10, 12, -506.16, -2507.57, 94.28);
-	hotspotDB:addHotspot("The Barrens 12 - 14", "Horde", 12, 14, -75.67, -2105.67, 91.66);
-	hotspotDB:addHotspot("The Barrens 10 - 12", "Horde", 10, 12, -611.31, -2775.74, 92.92);
-	hotspotDB:addHotspot("The Barrens 12 - 14", "Horde", 12, 14, 217.77, -3269.73, 65.09);
-	hotspotDB:addHotspot("The Barrens 17 - 19", "Horde", 17, 19, -1159.64, -3259.29, 91.68);
 	hotspotDB:addHotspot("The Barrens 16 - 19", "Horde", 16, 19, 805.92, -2945.67, 91.66);
+	hotspotDB:addHotspot("The Barrens 19 - 21", "Horde", 19, 21, -1476.2, -1976.99, 90.51);
+	hotspotDB:addHotspot("The Barrens 17 - 19", "Horde", 17, 19, -1159.64, -3259.29, 91.68);
 	hotspotDB:addHotspot("Southern Barrens 17 - 19", "Horde", 17, 19, -1747.7, -2894.05, 93.87);
+	hotspotDB:addHotspot("Southern Barrens 19 - 21", "Horde", 19, 21, -2149.74, -2242.58, 94.75);
 	hotspotDB:addHotspot("Bramblescar 19 - 21", "Horde", 19, 21, -2088.87, -2442.84, 94.16);
 	hotspotDB:addHotspot("Agama'gor 18 - 20", "Horde", 18, 20, -1720.4, -2053.41, 92.1);
 	hotspotDB:addHotspot("Southern Barrens 20 - 22", "Horde", 20, 22, -2890.69, -2012.02, 91.69);

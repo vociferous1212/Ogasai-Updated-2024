@@ -83,10 +83,9 @@ function script_shamanEX:menu()
 		-- weapon enhancement menu
 		if (HasSpell("Rockbiter Weapon")) then
 			if (CollapsingHeader("|+| Weapon Enhancement Options")) then
+				Text("Weapon Enhancement");
 				script_shamanEX3:alternateEnhanceMenu();
 				Separator();
-				Text("Weapon Enhancement");
-				script_shaman.enhanceWeapon = InputText("Enhancement", script_shaman.enhanceWeapon);
 			end
 		end
 
@@ -95,26 +94,22 @@ function script_shamanEX:menu()
 
 			if (CollapsingHeader("|+| Totem Options")) then
 				if (script_shaman.useEarthTotem) then
-				script_shamanEX3:alternateTotemMenuEarth();
 					Text("Earth Totem");
-					script_shaman.totem = InputText("Earth", script_shaman.totem);
+
+				script_shamanEX3:alternateTotemMenuEarth();
 				end
 
 				if (script_shaman.useFireTotem) then
 					Separator();
-				script_shamanEX3:alternateTotemMenuFire();
 					Text("Fire Totem");
-					if (HasItem("Fire Totem")) then
-					script_shaman.totem2 = InputText("Fire", script_shaman.totem2);	
-					end
+					script_shamanEX3:alternateTotemMenuFire();
+					Separator();
+					
 				end
 				if (script_shaman.useWaterTotem) then
 					Separator();
-					script_shamanEX3:alternateTotemMenuWater();
 					Text("Water Totem");
-					if (HasItem("Water Totem")) then
-					script_shaman.totem3 = InputText("Water", script_shaman.totem3);
-					end
+					script_shamanEX3:alternateTotemMenuWater();
 				end
 			end
 		end

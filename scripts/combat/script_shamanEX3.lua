@@ -10,16 +10,88 @@ script_shamanEX3 = {
 
 }
 
+-- run object manager to find if we have STONECLAW totem placed...
+function script_shamanEX3:isStoneclawTotemAlive()
+	local i, t = GetFirstObject(); 
+
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() <= 18) then
+				if (i:GetUnitName() == "Stoneclaw Totem") then
+				return true;
+				end
+			end
+		end
+	i, t = GetNextObject(i); 
+	end
+return false;
+end
+
+-- run object manager to find if we have EARTHBIND totem placed...
+function script_shamanEX3:isEarthbindTotemAlive()
+	local i, t = GetFirstObject(); 
+
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() <= 18) then
+				if (i:GetUnitName() == "Earthbind Totem") then
+				return true;
+				end
+			end
+		end
+	i, t = GetNextObject(i); 
+	end
+return false;
+end
+
 -- run object manager to find if we have a totem placed...
 function script_shamanEX3:isFireTotemAlive()
 	local i, t = GetFirstObject(); 
 
 	while i ~= 0 do
 		if t == 3 then
-			if (i:GetDistance() <= 20) then
+			if (i:GetDistance() <= 18) then
 				if (i:GetUnitName() == "Searing Totem") or (i:GetUnitName() == "Fire Nova Totem")
 				--or (i:GetUnitName() == "Searing Totem")
 				--or (i:GetUnitName() == "Searing Totem")
+				then
+
+				return true;
+				end
+			end
+		end
+	i, t = GetNextObject(i); 
+	end
+return false;
+end
+
+-- run object manager to find if we have a totem placed...
+function script_shamanEX3:isEarthTotemAlive()
+	local i, t = GetFirstObject(); 
+
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() <= 20) then
+				if (i:GetUnitName() == "Stoneskin Totem") or (i:GetUnitName() == "Strength of Earth Totem") or (i:GetUnitName() == "Earthbind Totem") or (i:GetUnitName() == "Stoneclaw Totem") then
+					return true;
+				end
+			end
+		end
+	i, t = GetNextObject(i); 
+	end
+return false;
+end
+
+-- run object manager to find if we have a totem placed...
+function script_shamanEX3:isWaterTotemAlive()
+	local i, t = GetFirstObject(); 
+
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() <= 20) then
+				if (i:GetUnitName() == "Healing Stream Totem") or (i:GetUnitName() == "Mana Spring Totem") 
+				--or (i:GetUnitName() == "Earthbind Totem")
+				--or (i:GetUnitName() == "Stoneclaw Totem")
 				then
 					return true;
 				end
@@ -140,10 +212,10 @@ local z = HasItem("Fire Totem"); local aa = HasSpell("Searing Totem"); local bb 
 		-- if a
 		if not (b) and not (c) and not (d) and (aa) then
 			wasClicked, self.searingTotem = Checkbox("Searing", self.searingTotem);
-			SameLine();
 		end
 		-- if b
 		if not (a) and not (c) and not (d) and (bb) then
+			SameLine();
 			wasClicked, self.fireNovaTotem = Checkbox("Fire Nova", self.fireNovaTotem);
 		end
 		-- if c
@@ -156,8 +228,6 @@ local z = HasItem("Fire Totem"); local aa = HasSpell("Searing Totem"); local bb 
 		--	wasClicked, self. = Checkbox("", self.);
 		--end
 	end
-
-Separator();
 end
 
 function script_shamanEX3:alternateTotemMenuWater()

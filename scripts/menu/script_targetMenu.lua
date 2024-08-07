@@ -45,7 +45,7 @@ function script_targetMenu:menu()
 	
 			if (script_grind.skipHardPull) then
 	
-				local a = script_checkAdds.addsRange + 3;
+				local a = script_checkAdds.addsRange - 5;
 				wasClicked, script_grind.extraSafe = Checkbox("Recheck Avoid Targets " ..a.." (yds)", script_grind.extraSafe);
 				Separator();
 	
@@ -67,7 +67,7 @@ function script_targetMenu:menu()
 	
 				Text("Blacklist Target-to-Target Distance (~ 10yds per tick)");
 	
-				script_aggro.adjustAggro = SliderInt("Aggro Distance", 1, 5, script_aggro.adjustAggro);
+				script_aggro.adjustAggro = SliderFloat("Aggro Distance", 1, 5, script_aggro.adjustAggro);
 			end
 		end
 

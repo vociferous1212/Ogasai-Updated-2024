@@ -6,6 +6,7 @@ script_grindMenu = {
 	useHotSpotArea = true,
 	selectedWalkPath = false,
 	helpMenu = false,
+	showGarbageBox = true,
 
 }
 
@@ -35,8 +36,20 @@ function script_grindMenu:menu()
 	end
 
 	--garbage collection info
-	--local a = gcinfo();
-	--Text("Garbage Data Lost " ..a);
+	local a = gcinfo();
+	if (self.showGarbageBox) then
+		Text("Garbage Data Lost " ..a);
+	end
+	wasClicked, self.showGarbageBox = Checkbox("Force Garbage Collection", self.showGarbageBox);
+	if (self.showGarbageBox) then
+		SameLine();
+		Text(" - Can Cause Lag!");
+	end
+		--show help menu checkbox
+		--SameLine();
+		--Text("  ");
+		--SameLine();
+		--wasClicked, script_grindMenu.helpMenu = Checkbox("Help Menu", script_grindMenu.helpMenu);
 
 	--OM timer...
 	--local qwq = (script_grind.omTimer - GetTimeEX()) / 1000;
@@ -84,11 +97,6 @@ function script_grindMenu:menu()
 
 	SameLine();
 	Text(""..GetTimeStamp());
-
-		SameLine();
-		Text("  ");
-		SameLine();
-		wasClicked, script_grindMenu.helpMenu = Checkbox("Help Menu", script_grindMenu.helpMenu);
 
 	if (script_grindMenu.helpMenu) then
 		Text("HELP *press tab key to change settings on this screen");

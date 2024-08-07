@@ -21,14 +21,10 @@ function hotspotDB_1_10:setup()
 
 	hotspotDB:addHotspot('North Shire 1 - 2', "Human", 1, 2, -8903.322, -69.84078, 86.58018);
 	hotspotDB:addHotspot('North Shire 2 - 3', "Human", 2, 3, -8724.425, -137.0334, 86.89613);
-	hotspotDB:addHotspot('North Shire 4 - 6', "Human", 4, 6, -9005.23, -316.80, 74.46);
-	hotspotDB:addHotspot('Elwynn Forest 7 - 9', "Alliance", 7, 9, -9202.76, 62.19, 77.55);
-	hotspotDB:addHotspot("Northshire Valley 4 - 6", "Alliance", 4, 6, -9075.13, -216.88, 70.93);
-	hotspotDB:addHotspot("Northshire Valley 1 - 3", "Human", 1, 3, -8900.33, -29.73, 90.25);
 	hotspotDB:addHotspot("Echo Ridge Mine 2 - 4", "Alliance", 2, 4, -8721.64, -106.24, 86.92);
-	hotspotDB:addHotspot("Northshire Valley 3 - 5", "Human", 3, 5, -8754.72, -303.78, 78.99);
-	hotspotDB:addHotspot("Northshire Valley 5 - 7", "Human", 5, 7, -8863.01, -416.01, 66.07);
+	hotspotDB:addHotspot("Northshire Valley 4 - 6", "Human", 4, 6, -8863.01, -416.01, 66.07);
 	hotspotDB:addHotspot("Crystal Lake 6 - 8", "Alliance", 6, 8, -9351.64, -382.51, 65.25);
+	hotspotDB:addHotspot('Elwynn Forest 7 - 9', "Alliance", 7, 9, -9202.76, 62.19, 77.55);
 	hotspotDB:addHotspot("Elwynn Forest 7 - 9", "Alliance", 7, 9, -9342.09, -832.4, 64.71);
 	hotspotDB:addHotspot("Elwynn Forest 10 - 12", "Alliance", 10, 12, -9459.37, -1122.34, 52.69);
 	hotspotDB:addHotspot("Ridgepoint Tower 10 - 12", "Alliance", 10, 12, -9866.62, -1350.71, 37.85);

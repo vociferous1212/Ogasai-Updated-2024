@@ -15,12 +15,9 @@ script_shaman = {
 	useFlame = false,
 	useWind = false,
 	totem = "no totem yet",	-- used for totem1
-	totemBuff = "",		-- used for totem1
 	totem2 = "no totem yet",	-- used for totem2
 	totem3 = "no totem yet",
 	totem4 = "no totem yet",
-	totem4Buff = "",
-	totem3Buff = "",
 	healingSpell = "Healing Wave",
 	isChecked = true,
 	useEarthTotem = false,
@@ -68,9 +65,9 @@ function script_shaman:setup()
 		self.pullLightningBolt = true;
 		self.useLightningBolt = true;
 	end
-	if (GetLocalPlayer():GetLevel() >= 6) then
-		self.pullLightningBolt = true;
-	end
+	--if (GetLocalPlayer():GetLevel() >= 6) then
+	--	self.pullLightningBolt = true;
+	--end
 	if (HasSpell("Flame Shock")) then
 		self.useFlameShock = true;
 	end
@@ -89,18 +86,15 @@ function script_shaman:setup()
 	-- stoneskin totem when we do not have strength of earth totem
 	if (HasSpell("Stoneskin Totem")) and (not HasSpell("Strength of Earth Totem")) and (HasItem("Earth Totem")) then
 		self.totem = "Stoneskin Totem";
-		self.totemBuff = "Stoneskin";
 		script_shamanEX3.stoneskinTotem = true;
 	end
 
 	-- strength of earth totem
 	if (HasSpell("Strength of Earth Totem") and HasItem("Earth Totem")) then
 		self.totem = "Strength of Earth Totem";
-		self.totemBuff = "Strength of Earth";
 		script_shamanEX3.strengthOfEarthTotem = true;
 	elseif (HasSpell("Grace of Air Totem") and HasItem("Air Totem")) then
 		self.totem = "Grace of Air Totem";
-		self.totemBuff = "Grace of Air";
 	end
 
 	-- fire totems
@@ -245,7 +239,7 @@ function script_shaman:healsAndBuffs()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(750, 1250);
+		local tickRandom = random(350, 650);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -278,13 +272,11 @@ function script_shaman:healsAndBuffs()
 	end
 
 	-- Check: Healing
-	if (localHealth < self.healHealth) then
-		if (not IsCasting()) and (not IsChanneling()) then
-			if (localMana >= self.healMana) then 
-				CastHeal(self.healingSpell, localObj);
-				self.waitTimer = GetTimeEX() + 1500;
-			return 4;
-			end
+	if (not IsCasting()) and (not IsChanneling()) and (localMana >= self.healMana) then
+		if (localHealth < self.healHealth) then
+			CastSpellByName(self.healingSpell, localObj);
+			self.waitTimer = GetTimeEX() + 5000;
+			script_grind:setWaitTimer(2500);
 		return 4;
 		end
 	return false;		
@@ -366,8 +358,6 @@ function script_shaman:run(targetGUID)
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();	
 
-	script_shamanEX2:setTotemBuffs();
-
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
@@ -395,9 +385,7 @@ function script_shaman:run(targetGUID)
 	end
 
 	if (script_shaman:healsAndBuffs()) then
-		self.waitTimer = GetTimeEX() + 2750;
-		script_grind:setWaitTimer(2750);
-		return true;
+		return 4;
 	end
 
 	-- Assign the target 
@@ -517,7 +505,7 @@ function script_shaman:run(targetGUID)
 			-- DO NOT TOUCH CASTING FIRE TOTEMS
 			if (self.useFireTotem) and (targetObj:GetDistance() <= 18 or ( self.pullLightningBolt and targetObj:GetDistance() <= 12) ) then
 				if (not script_shamanEX3:isFireTotemAlive()) then
-					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) then
+					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) and (targetHealth >= 10) then
 						CastSpellByName(self.totem2);
 						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1750;
@@ -541,12 +529,11 @@ function script_shaman:run(targetGUID)
 			if (not IsAutoCasting("Attack")) and (not IsMoving()) then
 				targetObj:AutoAttack();
 			end
-
-			if (script_shamanEX2:useTotem()) and (not localObj:HasBuff(self.totemBuff))
-				and (not localObj:HasBuff(self.totem3Buff)) and (targetHealth >= 35) then
-				script_shamanEX2:setTotemBuffs();
-				self.waitTimer = GetTimeEX() + 1750;
-				return;
+			
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+				if (script_shamanEX2:useTotem()) then
+					return;
+				end
 			end
 
 			-- stop moving if we get close enough to target and not in combat yet
@@ -590,8 +577,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		end
 
 
-
-
 			-- Check if we are in melee range
 			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
 				return 3;
@@ -601,6 +586,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (targetObj:GetDistance() <= self.meleeDistance + .5) and (targetHealth >= 80) then
 				if (IsMoving()) then
 					StopMoving();
+				end
+			end
+
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+				if (script_shamanEX2:useTotem()) then
+					return;
 				end
 			end
 
@@ -618,7 +609,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- DO NOT TOUCH CASTING FIRE TOTEMS
-			if (self.useFireTotem) and (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) then
+			if (self.useFireTotem) and (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) and (targetHealth >= 10) then
 				if (not script_shamanEX3:isFireTotemAlive()) then
 					CastSpellByName(self.totem2);
 					targetObj:FaceTarget();
@@ -642,7 +633,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (not IsAutoCasting("Attack")) and (targetObj:GetDistance() <= self.meleeDistance) then 
 				targetObj:AutoAttack();
 			end
-
 
 
 			-- Check: Use Healing Potion 
@@ -678,11 +668,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 			-- Earth Shock
-			if (HasSpell("Earth Shock")) then
+			if (HasSpell("Earth Shock")) and (self.useEarthShock) then
 				if (targetObj:IsCasting())
 				or (not HasSpell("Flame Shock") and targetHealth >= 30)
 				or (targetObj:IsFleeing() and not HasSpell("Frost Shock"))
-				or (self.useEarthShock)
 				then
 					if (targetObj:GetDistance() <= 20) and
 						( (localMana >= self.earthShockMana)
@@ -701,9 +690,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			if (script_shaman:healsAndBuffs()) then
-				self.waitTimer = GetTimeEX() + 2750;
-				script_grind:setWaitTimer(2750);
-				return true;
+				return 4;
 			end
 
 			-- flame shock
@@ -751,11 +738,22 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (script_shamanEX2:useTotem()) and (not localObj:HasBuff(self.totemBuff))
-				and (not localObj:HasBuff(self.totem3Buff)) and (targetHealth >= 35) then
-				script_shamanEX2:setTotemBuffs();
-				self.waitTimer = GetTimeEX() + 1750;
-				return;
+			-- earthbind totem if target is running away
+			if (targetObj:GetHealthPercentage() <= 20) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanEX3:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
+				CastSpellByName("Earthbind Totem");
+				return 3;
+			end
+
+			-- stoneclaw totem if we have more than 1 target
+			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanEX3:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) then
+				CastSpellByName("Stoneclaw Totem");
+				return 0;
+			end
+
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+				if (script_shamanEX2:useTotem()) then
+					return;
+				end
 			end
 
 			-- cast lightning bolt in combat
@@ -771,9 +769,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			if (script_shaman:healsAndBuffs()) then
-				self.waitTimer = GetTimeEX() + 2750;
-				script_grind:setWaitTimer(2750);
-				return true;
+				return 4;
 			end
 
 			-- Check: If we are in melee range, do melee attacks
@@ -784,9 +780,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				if (script_shaman:healsAndBuffs()) then
-					self.waitTimer = GetTimeEX() + 2750;
-					script_grind:setWaitTimer(2750);
-					return true;
+					return 4;
 				end
 
 				-- stop moving if we get close enough to target
@@ -807,13 +801,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 				
-				if (script_shamanEX2:useTotem()) and (not localObj:HasBuff(self.totemBuff))
-				and (not localObj:HasBuff(self.totem3Buff)) and (targetHealth >= 35) then
-					script_shamanEX2:setTotemBuffs();
-					self.waitTimer = GetTimeEX() + 1750;
-					return;
+				if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+					if (script_shamanEX2:useTotem()) then
+						return;
+					end
 				end
-
 
 				-- Stormstrike
 				if (HasSpell("Stormstrike") and not IsSpellOnCD("Stormstrike")) then
@@ -828,7 +820,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(350, 750);
+		local tickRandom = random(350, 450);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
