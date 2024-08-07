@@ -6,8 +6,10 @@ function script_paranoiaMenu:menu()
 
 	Separator();
 
-	wasClicked, script_grind.useRandomNode = Checkbox("Randomize Node Dist", script_grind.useRandomNode);
-	SameLine();
+	-- set move node dist
+	Text("Distance to create a new path node");
+	script_grind.nextToNodeDist = SliderFloat("Node Dist", 2, 10, script_grind.nextToNodeDist);
+	Separator();
 	wasClicked, script_grind.jump = Checkbox("Random Jump", script_grind.jump);
 	
 	if (script_grind.jump) then

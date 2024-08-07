@@ -236,6 +236,10 @@ function script_shaman:healsAndBuffs()
 	local localMana = localObj:GetManaPercentage();
 	local localHealth = localObj:GetHealthPercentage();
 
+	if (self.waitTimer > GetTimeEX()) then
+		return;
+	end
+
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
@@ -254,29 +258,41 @@ function script_shaman:healsAndBuffs()
 		JumpOrAscendStart();
 	end
 
+if (IsCasting()) or (IsChanneling()) then
+		return;
+	end
+
+
 	if (IsSwimming()) and (localObj:HasBuff("Water Breathing")) and (HasItem("Shiny Fish Scales")) 
 		and (not localObj:HasBuff("Water Breathing")) then
 		if (CastSpellByName("Water Breathing", localObj)) then
 			self.waitTimer = GetTimeEX() + 1750;
 			script_grind:setWaitTimer(1750);
+			return false;
 		end
 	end
 
 	-- remove ghost wolf before combat
 	if (localObj:HasBuff("Ghost Wolf")) then
 		CastSpellByName("Ghost Wolf");
+			return false;
+
 	end
 
 	if (PlayerHasTarget()) and (not IsAutoCasting("Attack")) and (IsInCombat()) then
 		GetLocalPlayer():GetUnitsTarget():AutoAttack();
 	end
 
+	if (IsCasting()) or (IsChanneling()) then
+		return;
+	end
+
 	-- Check: Healing
-	if (not IsCasting()) and (not IsChanneling()) and (localMana >= self.healMana) then
-		if (localHealth < self.healHealth) then
+	if (not IsCasting()) and (not IsChanneling()) and (localMana >= self.healMana) and (not IsMoving()) then
+		if (localHealth < self.healHealth) and (not IsSpellOnCD(self.healingSpell)) then
 			CastSpellByName(self.healingSpell, localObj);
-			self.waitTimer = GetTimeEX() + 5000;
-			script_grind:setWaitTimer(2500);
+				self.waitTimer = GetTimeEX() + 5000;
+				script_grind:setWaitTimer(3000);
 		return 4;
 		end
 	return false;		
@@ -384,8 +400,10 @@ function script_shaman:run(targetGUID)
 		return 6;
 	end
 
-	if (script_shaman:healsAndBuffs()) then
-		return 4;
+	if (not IsCasting()) and (not IsChanneling()) then
+		if (script_shaman:healsAndBuffs()) then
+			return 4;
+		end
 	end
 
 	-- Assign the target 
@@ -689,9 +707,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (script_shaman:healsAndBuffs()) then
-				return 4;
-			end
+			if (not IsCasting()) and (not IsChanneling()) then
+		if (script_shaman:healsAndBuffs()) then
+			return 4;
+		end
+	end
 
 			-- flame shock
 			if (self.useFlameShock) then
@@ -768,9 +788,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (script_shaman:healsAndBuffs()) then
-				return 4;
-			end
+			if (not IsCasting()) and (not IsChanneling()) then
+		if (script_shaman:healsAndBuffs()) then
+			return 4;
+		end
+	end
 
 			-- Check: If we are in melee range, do melee attacks
 			if (targetObj:GetDistance() <= self.meleeDistance and targetObj:IsInLineOfSight()) then
@@ -779,9 +801,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					targetObj:AutoAttack();
 				end
 
-				if (script_shaman:healsAndBuffs()) then
-					return 4;
-				end
+				if (not IsCasting()) and (not IsChanneling()) then
+		if (script_shaman:healsAndBuffs()) then
+			return 4;
+		end
+	end
 
 				-- stop moving if we get close enough to target
 				if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance+.5)

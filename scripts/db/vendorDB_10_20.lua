@@ -62,4 +62,16 @@ function vendorDB_10_20:setup()
 	vendorDB:addVendor("Denni'ka", 1, 1, 406, false, false, false, false, false, -188.43, -347.65, 8.79);
 	vendorDB:addVendor("Denni'ka", 1, 1, 406, false, true, false, false, false, -188.43, -347.65, 8.79);
 
+-- Loch Modan - Alliance
+	vendorDB:addVendor("Morhan Coppertongue", 0, 0, 38, true, false, false, false, false, -5343.69, -2932.13, 324.36);
+	vendorDB:addVendor("Morhan Coppertongue", 0, 0, 38, false, false, false, false, false, -5343.69, -2932.13, 324.36);
+	vendorDB:addVendor("Innkeeper Hearthstove", 0, 0, 38, false, true, false, false, false, -5377.92, -2973.91, 323.16);
+	vendorDB:addVendor("Innkeeper Hearthstove", 0, 0, 38, false, false, true, false, false, -5377.92, -2973.91, 323.16);
+	vendorDB:addVendor("Yanni Stoutheart", 0, 0, 38, false, false, false, true, false, -5381.88, -2952.48, 322.06);
+	vendorDB:addVendor("Yanni Stoutheart", 0, 0, 38, false, false, false, false, true, -5381.88, -2952.48, 322.06);
+	vendorDB:addVendor("Vrok Blunderblast", 0, 0, 38, false, false, false, false, true, -5286.92, -2981.99, 341.79);
+	vendorDB:addVendor("Vrok Blunderblast", 0, 0, 38, true, false, false, false, false, -5286.92, -2981.99, 341.79);
+	vendorDB:addVendor("Vrok Blunderblast", 0, 0, 38, false, false, false, false, false, -5286.92, -2981.99, 341.79);
+	vendorDB:addVendor("Aldren Cordon", 0, 0, 38, false, false, false, false, false, -5702.53, -3781.8, 322.81);
+	vendorDB:addVendor("Aldren Cordon", 0, 0, 38, true, false, false, false, false, -5702.53, -3781.8, 322.81);
 end

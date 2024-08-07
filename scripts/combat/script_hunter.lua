@@ -218,9 +218,9 @@ function script_hunter:run(targetGUID)
 	end
 
 	-- walk away from target if pet target guid is the same guid as target targeting me
-	if (GetPet() ~= 0) and (self.hasPet) and (targetObj:GetDistance() <= 15) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
+	if (GetPet() ~= 0) and (self.hasPet) and (not targetObj:IsSpellInRange("Arcane Shot")) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
 		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
-			if (script_hunter:runBackwards(targetObj, 25)) then
+			if (script_hunter:runBackwards(targetObj, 15)) then
 				script_grind.tickRate = 100;
 				script_rotation.tickRate = 135;
 				self.waitTimer = GetTimeEX() + 2000;
@@ -553,10 +553,10 @@ function script_hunter:run(targetGUID)
 
 			-- follower 
 			if (GetNumPartyMembers() > 0) then
-				if (targetObj:GetDistance() <= 16) and (targetObj:IsInLineOfSight())
+				if (not targetObj:IsSpellInRange("Arcane Shot")) and (targetObj:IsInLineOfSight())
 				and (targetObj:GetUnitsTarget() ~= 0)
 				and (targetObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
-						if (script_hunter:runBackwards(targetObj, 25)) then
+						if (script_hunter:runBackwards(targetObj, 15)) then
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
 						self.waitTimer = GetTimeEX() + 2000;
@@ -568,10 +568,10 @@ function script_hunter:run(targetGUID)
 				end
 			end
 			-- walk away from target if pet target guid is the same guid as target targeting me
-			if (GetPet() ~= 0) and (self.hasPet) and (targetObj:GetDistance() <= 15) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
+			if (GetPet() ~= 0) and (self.hasPet) and (not targetObj:IsSpellInRange("Arcane Shot")) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
 				if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
 
-					if (script_hunter:runBackwards(targetObj, 25)) then
+					if (script_hunter:runBackwards(targetObj, 15)) then
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
 						self.waitTimer = GetTimeEX() + 2000;
@@ -666,20 +666,20 @@ function script_hunter:run(targetGUID)
 			-- melee attacks otherwise
 
 			-- Auto Attack
-			if (targetObj:GetDistance() < 14) then
+			if (targetObj:GetDistance() < 11) then
 
 			if (self.hasPet) and (not GetPet() ~= 0) then
 				CallPet();
 			end
 
 			-- walk away from target if pet target guid is the same guid as target targeting me
-			if (GetPet() ~= 0) and (self.hasPet) and (targetObj:GetDistance() <= 16)
+			if (GetPet() ~= 0) and (self.hasPet) and (not targetObj:IsSpellInRange("Arcane Shot"))
 				and (not script_grind:isTargetingMe(targetObj))
 				and (targetObj:GetUnitsTarget() ~= 0)
 				and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
 				if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
 
-					if (script_hunter:runBackwards(targetObj, 25)) then
+					if (script_hunter:runBackwards(targetObj, 15)) then
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
 						self.waitTimer = GetTimeEX() + 2000;
