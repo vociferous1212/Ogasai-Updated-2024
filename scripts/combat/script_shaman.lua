@@ -291,8 +291,8 @@ if (IsCasting()) or (IsChanneling()) then
 	if (not IsCasting()) and (not IsChanneling()) and (localMana >= self.healMana) and (not IsMoving()) then
 		if (localHealth < self.healHealth) and (not IsSpellOnCD(self.healingSpell)) then
 			CastSpellByName(self.healingSpell, localObj);
-				self.waitTimer = GetTimeEX() + 5000;
-				script_grind:setWaitTimer(3000);
+			self.waitTimer = GetTimeEX() + 5000;
+			script_grind:setWaitTimer(5000);
 		return 4;
 		end
 	return false;		
@@ -304,7 +304,7 @@ if (IsCasting()) or (IsChanneling()) then
 			if (CastSpellByName("Cure Poison", localObj)) then
 				self.waitTimer = GetTimeEX() + 1650;
 				script_grind:setWaitTimer(1650);
-				return 0;
+				return true;
 			end
 		end
 	end
@@ -315,7 +315,7 @@ if (IsCasting()) or (IsChanneling()) then
 			if (CastSpellByName("Cure Disease", localObj)) then
 				self.waitTimer = GetTimeEX() + 1650;
 				script_grind:setWaitTimer(1650);
-				return 0;
+				return true;
 			end
 		end
 	end
@@ -325,7 +325,7 @@ if (IsCasting()) or (IsChanneling()) then
 		if (localMana >= 20) then
 			if (CastSpellByName("Purge", targetObj)) then
 				self.waitTimer = GetTimeEX() + 1500;
-				return 0;
+				return true;
 			end
 		end
 	end
@@ -336,13 +336,12 @@ if (IsCasting()) or (IsChanneling()) then
 		if (not CastSpellByName("Lightning Shield", localObj)) then
 			self.waitTimer = GetTimeEX() + 1500;
 			script_grind:setWaitTimer(1500);
-			return 0;
+			return true;
 		end
 	end
 
 	if (IsStanding()) then
 		if (script_shaman:checkEnhancement()) then
-			self.waitTimer = GetTimeEX() + 1750;
 			return true;
 		end
 	end	
@@ -539,7 +538,7 @@ function script_shaman:run(targetGUID)
 					and (targetObj:GetDistance() <= 20) then
 					if (not CastSpellByName("Flame Shock", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1500;
-						return 0;
+						return true;
 					end
 				end
 			end
@@ -636,6 +635,18 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
+-- earthbind totem if target is running away
+			if (targetObj:GetHealthPercentage() <= 20) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanEX3:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
+				CastSpellByName("Earthbind Totem");
+				return 3;
+			end
+
+			-- stoneclaw totem if we have more than 1 target
+			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanEX3:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) then
+				CastSpellByName("Stoneclaw Totem");
+				return 0;
+			end
+
 			-- Run backwards if we are too close to the target
 			if (targetObj:GetDistance() < .3) then 
 				if (script_shaman:runBackwards(targetObj,1)) then 
@@ -674,7 +685,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				and (not targetObj:HasDebuff("Frost Shock")) then
 				if (CastSpellByName("Frost Shock")) then
 					self.waitTimer = GetTimeEX() + 1650;
-					return 0;
+					return true;
 				end
 			end
 
@@ -682,7 +693,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (targetObj:IsCasting()) and (HasSpell("Earth Shock")) then
 				if (not IsSpellOnCD("Earth Shock")) and (localMana >= 7) then
 					CastSpellByName("Earth Shock(Rank 1)");
-					return 0;
+					return true;
 				end
 			end
 			-- Earth Shock
@@ -700,7 +711,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 								self.waitTimer = GetTimeEX() + 1750;
 								targetObj:FaceTarget();
 								JumpOrAscendStart();
-								return 0;
+								return true;
 							end
 						end
 					end	
@@ -722,7 +733,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 						self.waitTimer = GetTimeEX() + 1750;
 						targetObj:FaceTarget();
 						JumpOrAscendStart();
-						return 0;
+						return true;
 					end
 				end
 			end
@@ -738,7 +749,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 							self.waitTimer = GetTimeEX() + 1750;
 							targetObj:FaceTarget();
 							JumpOrAscendStart();
-							return 0;
+							return true;
 						end
 					end
 				end
@@ -752,22 +763,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 						and (not targetObj:HasDebuff("Frost Shock")) then
 						if (CastSpellByName("Frost Shock")) then
 							self.waitTimer = GetTimeEX() + 1750;
-							return 0;
+							return true;
 						end
 					end
 				end
-			end
-
-			-- earthbind totem if target is running away
-			if (targetObj:GetHealthPercentage() <= 20) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanEX3:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
-				CastSpellByName("Earthbind Totem");
-				return 3;
-			end
-
-			-- stoneclaw totem if we have more than 1 target
-			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanEX3:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) then
-				CastSpellByName("Stoneclaw Totem");
-				return 0;
 			end
 
 			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
@@ -834,7 +833,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				-- Stormstrike
 				if (HasSpell("Stormstrike") and not IsSpellOnCD("Stormstrike")) then
 					if (CastSpellByName("Stormstrike", targetObj)) then
-						return 0;
+						return true;
 					end
 				end
 			end

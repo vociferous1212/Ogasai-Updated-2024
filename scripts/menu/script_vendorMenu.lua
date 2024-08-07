@@ -66,6 +66,9 @@ function script_vendorMenu:menu()
 
 	if (CollapsingHeader("Vendor NPC And Buy Options")) then
 		wasClicked, script_grind.autoSelectVendors = Checkbox("Auto Load Closest Vendors", script_grind.autoSelectVendors);
+			SameLine();
+			local x, y, z = GetLocalPlayer():GetPosition();
+			Text(" - Reload Dist (yd) "..math.floor(GetDistance3D(x, y, z, script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ.. "")) - 500);
 			Separator();
 
 			Text("Repair Vendor:");
