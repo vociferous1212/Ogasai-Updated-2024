@@ -1618,14 +1618,6 @@ function script_grind:enemyIsValid(i)
 	-- we have a valid enemy in object manager
 	if (i ~= 0) then
 
-	-- if target is out of hotspot distance then don't target... stop walking back and forth and keep us within hotspot range
-	if (self.hotspotReached) then
-		local tX, tY, tZ = i:GetDistance();
-		if (GetDistance3D(tX, tY, tZ, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ) < self.distToHotSpot) then
-			return true;
-		end
-	end
-
 	-- if target distance is close enough and in line of sight and is targeting group then return target
 		if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) then
 			if (script_grind:isTargetingGroup(i)) then
