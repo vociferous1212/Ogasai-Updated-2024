@@ -92,37 +92,7 @@ function script_nav:getDistanceToHotspot()
 	end
 end
 
-function script_nav:moveToHotspot(localObj)
-	if (self.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
-		if (not script_grind.adjustTickRate) then
-			script_grind.tickRate = 135;
-		end
-		-- move to coords
-		
-		self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
 
-			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) then
-				CastStealth();
-				CastGhostWolf();
-				CastSprint();
-			end
-			if (not IsInCombat()) and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) then
-				if (IsMoving()) then
-					StopMoving();
-					return;
-				end
-			return;
-			end
-			local hsDist = 0;
-			if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
-				hsDist = math.floor(script_nav:getDistanceToHotspot());
-			end
-			
-		return "Moving to hotspot " .. self.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
-	else
-		return "No hotspot has been loaded...";
-	end
-end
 
 function script_nav:saveTargetLocation(target, mobLevel)
 	local _tx, _ty, _tz = target:GetPosition();
@@ -151,7 +121,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	
 	-- Let's get at least 2 path nodes around the hot spot before we navigate through them
 	if (self.numSavedLocation < 3) then
-		return script_nav:moveToHotspot(localObj);
+		return script_moveToHotspot:moveToHotspot(localObj);
 	end
 
 	-- Check: If we reached the last location index

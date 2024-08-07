@@ -21,6 +21,7 @@ script_grind = {
 	getSpellsLoaded = include("scripts\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
+	hotspotMoveLoaded = include("scripts\\script_moveToHotspot.lua"),
 
 	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
 	warlockMenu = include("scripts\\combat\\script_warlockEX.lua"),
@@ -846,7 +847,7 @@ function script_grind:run()
 			end
 
 		-- move to hotspot location
-		self.message = script_nav:moveToHotspot(localObj);
+		self.message = script_moveToHotspot:moveToHotspot(localObj);
 		script_grind:setWaitTimer(self.nextToNodeDist * 2);
 		return true;
 		end
@@ -1617,6 +1618,14 @@ function script_grind:enemyIsValid(i)
 	-- we have a valid enemy in object manager
 	if (i ~= 0) then
 
+	-- if target is out of hotspot distance then don't target... stop walking back and forth and keep us within hotspot range
+	if (self.hotspotReached) then
+		local tX, tY, tZ = i:GetDistance();
+		if (GetDistance3D(tX, tY, tZ, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ) < self.distToHotSpot) then
+			return true;
+		end
+	end
+
 	-- if target distance is close enough and in line of sight and is targeting group then return target
 		if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) then
 			if (script_grind:isTargetingGroup(i)) then
@@ -1875,7 +1884,7 @@ function script_grind:doLoot(localObj)
 	local localObj = GetLocalPlayer();
 
 		if (not self.adjustTickRate) then
-			script_grind.tickRate = 105;
+			script_grind.tickRate = 50;
 		end
 
 
@@ -1946,13 +1955,14 @@ function script_grind:doLoot(localObj)
 			return;
 		else
 
-if (self.autoSelectVendors) and (IsLooting()) then
+		if (self.autoSelectVendors) and (IsLooting()) then
 			local bX, bY, bZ = GetLocalPlayer():GetPosition();
 		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
-			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
 			if (not self.vendorMessageSent) then
 			DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
 				self.vendorMessageSent = true;
+					self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
+
 				script_grind:setWaitTimer(2500);
 				if (self.vendorMessageSent) then
 					vendorDB:loadDBVendors();
@@ -2073,6 +2083,9 @@ function script_grind:lootAndSkin()
 	-- Loot if there is anything lootable and we are not in combat and if our bags aren't full
 	if (not self.skipLooting and not AreBagsFull() and not self.bagsFull) then 
 		self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+		if (not IsInCombat()) and (self.lootObj ~= nil) and (self.lootObj ~= 0) then
+			script_grind.enemyObj = nil;
+		end
 	else
 		self.lootObj = nil;
 	end
@@ -2100,7 +2113,7 @@ function script_grind:lootAndSkin()
 		self.lootObj = nil;
 			-- get skin target
 		self.lootObj = script_grind:getSkinTarget(self.findLootDistance);
-		if (not AreBagsFull() and not self.bagsFull and self.lootObj ~= nil) and (not IsMoving()) then
+		if (not AreBagsFull() and not self.bagsFull and self.lootObj ~= nil) then
 			-- do loot
 			if (script_grind:doLoot(localObj)) then
 				return;
