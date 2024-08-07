@@ -2105,10 +2105,10 @@ function script_grind:lootAndSkin()
 		self.lootObj = nil;
 			-- get skin target
 		self.lootObj = script_grind:getSkinTarget(self.findLootDistance);
-		if (not AreBagsFull() and not self.bagsFull and self.lootObj ~= nil) then
+		if (not AreBagsFull() and not self.bagsFull and self.lootObj ~= nil) and (script_vendor:getStatus() == 0) then
 			-- do loot
 			if (script_grind:doLoot(localObj)) then
-				return;
+				return true;
 			end
 		end
 	end
