@@ -3,53 +3,6 @@ script_shamanEX2 = {
 
 }
 
-function script_shamanEX2:useTotem()
-
-	local localMana = GetLocalPlayer():GetManaPercentage();
-	local hasTarget = GetLocalPlayer():GetUnitsTarget();
-
-	-- remove ghost wolf before combat
-	if (localObj:HasBuff("Ghost Wolf")) then
-		CastSpellByName("Ghost Wolf");
-	end
-
-	if (hasTarget ~= 0) then
-		if (not IsAutoCasting("Attack")) then
-			targetObj:AutoAttack();
-			if (not IsMoving()) then
-				targetObj:FaceTarget();
-			end
-		end
-	end
-
-
-	-- Totem 1
-	if (script_shaman.useEarthTotem) and (PlayerHasTarget()) and (not script_shamanEX3:isEarthTotemAlive()) and (localMana >= 20) and (HasSpell(script_shaman.totem)) and (not IsSpellOnCD(self.totem)) then
-		if (CastSpellByName(script_shaman.totem)) then
-			return true;
-		end
-		return true;
-	end
-
-	-- totem 2
-
-	if (script_shaman.useFireTotem) and (PlayerHasTarget()) and (not script_shamanEX3.isFireTotemAlive()) and (HasSpell(script_shaman.totem2)) and (not IsSpellOnCD(self.totem2)) then
-		if (CastSpellByName(script_shaman.totem2)) then
-			return true;
-		end
-		return true;
-	end
-
-	-- totem 3
-	if (script_shaman.useWaterTotem) and (not script_shamanEX3:isWaterTotemAlive()) and (PlayerHasTarget()) and (HasSpell(script_shaman.totem3)) and (not IsSpellOnCD(self.totem3)) then
-		if (CastSpellByName(script_shaman.totem3)) then
-			return true;
-		end
-	end
-
-return false;
-end
-
 function script_shamanEX2:ghostWolf()
 	-- Shaman Ghost Wolf 
 	if (not IsMounted()) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) then

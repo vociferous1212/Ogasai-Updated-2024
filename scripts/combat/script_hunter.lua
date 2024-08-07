@@ -871,7 +871,7 @@ function script_hunter:rest()
 	-- Check hunter bags if they are full
 	local inventoryFull = true;
 	-- Check bags 1-4, except the quiver bag (quiverBagNr)
-	for i=1,5 do 
+		for i=1,5 do 
 		if (i ~= self.quiverBagNr) then 
 			for y=1,GetContainerNumSlots(i-1) do 
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);

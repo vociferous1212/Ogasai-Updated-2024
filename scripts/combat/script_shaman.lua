@@ -1,6 +1,5 @@
 script_shaman = {
 	message = "Shaman Combat Script",
-	shamanMenu = include("scripts\\combat\\script_shamanEX.lua"),
 	eatHealth = 50,
 	drinkMana = 35,
 	healHealth = 55,
@@ -79,36 +78,42 @@ function script_shaman:setup()
 	if (HasItem("Fire Totem")) then
 		self.useFireTotem = true;
 	end
-	--if (HasItem("Water Totem")) then
-	--	self.useWaterTotem = true;
-	--end
+	if (HasItem("Water Totem")) then
+		self.useWaterTotem = true;
+	end
+	if (HasItem("Air Totem")) then
+		self.useAirTotem = true;
+	end
 
 	-- stoneskin totem when we do not have strength of earth totem
 	if (HasSpell("Stoneskin Totem")) and (not HasSpell("Strength of Earth Totem")) and (HasItem("Earth Totem")) then
 		self.totem = "Stoneskin Totem";
-		script_shamanEX3.stoneskinTotem = true;
+		script_shamanTotems.stoneskinTotem = true;
 	end
 
 	-- strength of earth totem
 	if (HasSpell("Strength of Earth Totem") and HasItem("Earth Totem")) then
 		self.totem = "Strength of Earth Totem";
-		script_shamanEX3.strengthOfEarthTotem = true;
-	elseif (HasSpell("Grace of Air Totem") and HasItem("Air Totem")) then
-		self.totem = "Grace of Air Totem";
+		script_shamanTotems.strengthOfEarthTotem = true;
 	end
 
 	-- fire totems
 	if (HasSpell("Searing Totem")) and (HasItem("Fire Totem")) then
 		self.totem2 = "Searing Totem";
-		script_shamanEX3.searingTotem = true;
+		script_shamanTotems.searingTotem = true;
 	end
 
 	-- water totems
 	if (HasSpell("Healing Stream Totem")) and (HasItem("Water Totem")) then
 		self.totem3 = "Healing Stream Totem";
-		self.totem3Buff = "Healing Stream";
+		script_shamanTotems.healingStreamTotem = true;
 	end
 
+	-- air totems
+	if (HasSpell("Windfury Totem")) and (HasItem("Air Totem")) then
+		self.totem4 = "Windfury Totem";
+		script_shamanTotems.windfuryTotem = true;
+	end
 	if (localLevel < 6) then
 		self.drinkMana = 25;
 	end
@@ -521,7 +526,7 @@ function script_shaman:run(targetGUID)
 
 			-- DO NOT TOUCH CASTING FIRE TOTEMS
 			if (self.useFireTotem) and (targetObj:GetDistance() <= 18 or ( self.pullLightningBolt and targetObj:GetDistance() <= 12) ) then
-				if (not script_shamanEX3:isFireTotemAlive()) then
+				if (not script_shamanTotems:isFireTotemAlive()) then
 					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) and (targetHealth >= 10) then
 						CastSpellByName(self.totem2);
 						targetObj:FaceTarget();
@@ -548,7 +553,7 @@ function script_shaman:run(targetGUID)
 			end
 			
 			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
-				if (script_shamanEX2:useTotem()) then
+				if (script_shamanTotems:useTotem()) then
 					return;
 				end
 			end
@@ -607,7 +612,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
-				if (script_shamanEX2:useTotem()) then
+				if (script_shamanTotems:useTotem()) then
 					return;
 				end
 			end
@@ -627,7 +632,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- DO NOT TOUCH CASTING FIRE TOTEMS
 			if (self.useFireTotem) and (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) and (targetHealth >= 10) then
-				if (not script_shamanEX3:isFireTotemAlive()) then
+				if (not script_shamanTotems:isFireTotemAlive()) then
 					CastSpellByName(self.totem2);
 					targetObj:FaceTarget();
 					script_grind.tickRate = 150;
@@ -636,13 +641,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 -- earthbind totem if target is running away
-			if (targetObj:GetHealthPercentage() <= 20) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanEX3:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
+			if (targetObj:GetHealthPercentage() <= 20) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanTotems:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
 				CastSpellByName("Earthbind Totem");
 				return 3;
 			end
 
 			-- stoneclaw totem if we have more than 1 target
-			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanEX3:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) then
+			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanTotems:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) then
 				CastSpellByName("Stoneclaw Totem");
 				return 0;
 			end
@@ -770,7 +775,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
-				if (script_shamanEX2:useTotem()) then
+				if (script_shamanTotems:useTotem()) then
 					return;
 				end
 			end
@@ -825,7 +830,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 				
 				if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
-					if (script_shamanEX2:useTotem()) then
+					if (script_shamanTotems:useTotem()) then
 						return;
 					end
 				end
