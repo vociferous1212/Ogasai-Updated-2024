@@ -41,10 +41,10 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < script_nav.nextNavNodeDistance + 5) then
+	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < script_nav.nextNavNodeDistance) then
 		script_nav.lastnavIndex = script_nav.lastnavIndex +1;		
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
-			script_nav.lastnavIndex = GetPathSize(5);
+			script_nav.lastnavIndex = GetPathSize(5) - 1;
 		end
 	end
 

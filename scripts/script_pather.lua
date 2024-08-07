@@ -1,7 +1,7 @@
 script_pather = {
 	timer = 0,
 	message = "Left Click to test path generation...",
-	nodeDist = 5,
+	nodeDist = 1,
 	path = {},
 	pathSize = 0,
 	maxZSlope = 0.5,

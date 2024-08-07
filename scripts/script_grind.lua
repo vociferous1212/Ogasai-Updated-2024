@@ -90,7 +90,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 6.1, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 3.7, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -165,8 +165,6 @@ script_grind = {
 	usedParanoiaCounter = false,
 	omTimer = GetTimeEX(),
 	hotspotReachedDistance = 50,
-	nodeTimer = GetTimeEX(),
-	useRandomNode = true,
 	drawChests = true,
 	deleteItems = true,
 	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
@@ -456,7 +454,7 @@ function script_grind:run()
 		script_nav:setNextToNodeDist(10); NavmeshSmooth(26);
 	else
 		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist);
+		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*5);
 	end
 
 	-- night elf whisp
@@ -467,24 +465,24 @@ function script_grind:run()
 	else
 		-- else set to preset variable
 		script_nav:setNextToNodeDist(self.nextToNodeDist);
-		NavmeshSmooth(self.nextToNodeDist);
+		NavmeshSmooth(self.nextToNodeDist*5);
 	end
 	
 	-- player is dead
 	if (localObj:IsDead() or IsGhost()) then
 		script_nav:setNextToNodeDist(8);
-		NavmeshSmooth(8);
+		NavmeshSmooth(20);
 		self.tickRate = 100;
 	else
 		-- else set to preset variable
 		script_nav:setNextToNodeDist(self.nextToNodeDist);
-		NavmeshSmooth(self.nextToNodeDist);
+		NavmeshSmooth(self.nextToNodeDist*5);
 	end
 
 	if (IsIndoors()) then
 		script_nav:setNextToNodeDist(2.5); NavmeshSmooth(8);
 	else
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist);
+		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*2.2);
 	end
 	
 	-- run setup function if not ran yet
@@ -521,16 +519,6 @@ function script_grind:run()
 	if (GetLoadNavmeshProgress() ~= 1) then
 		script_grind.message = "Loading Nav Mesh! Please Wait!";
 		return true;
-	end
-
-	--random node dist
-	if (self.useRandomNode) and (not IsGhost() and not localObj:IsDead() and not HasForm() and not IsMounted() and not IsIndoors()) then
-		local randomNodeDist = math.random(3, 6);
-			self.nextToNodeDist = randomNodeDist;
-			script_nav.nextNavNodeDistance = randomNodeDist;
-			script_nav.nextPathNodeDistance = randomNodeDist;
-			NavmeshSmooth(20)
-		
 	end
 
 	-- pause bot
@@ -1957,19 +1945,8 @@ function script_grind:doLoot(localObj)
 			self.waitTimer = GetTimeEX() + 350;
 			return;
 		else
-			-- we looted so reset variables
-			--self.vendorMessageSent = false;
-			self.waitTimer = GetTimeEX() + 350;
-			self.lootCheckTime = 0;
-			self.lootObj = nil;
-			return;
-		end
 
-		-- If we reached the loot object, reset the nav path
-		script_nav:resetNavigate();
-		--self.waitTimer = GetTimeEX() + 550;
-
-	if (self.autoSelectVendors) and (IsLooting()) then
+if (self.autoSelectVendors) and (IsLooting()) then
 			local bX, bY, bZ = GetLocalPlayer():GetPosition();
 		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
 			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
@@ -1984,6 +1961,19 @@ function script_grind:doLoot(localObj)
 			end
 		end
 	end
+			-- we looted so reset variables
+			--self.vendorMessageSent = false;
+			self.waitTimer = GetTimeEX() + 350;
+			self.lootCheckTime = 0;
+			self.lootObj = nil;
+			return;
+		end
+
+		-- If we reached the loot object, reset the nav path
+		script_nav:resetNavigate();
+		--self.waitTimer = GetTimeEX() + 550;
+
+	
 		
 	end
 
@@ -2021,13 +2011,18 @@ function script_grind:doLoot(localObj)
 	if (IsPathLoaded(5)) then
 		if (script_navEX:moveToTarget(localObj, _x, _y, _z)) then
 			self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+			return;
 		end
 	else
 		MoveToTarget(_x, _y, _z);
+		return;
 	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
+		if (IsMoving()) then
+			StopMoving();
+		end
 		self.waitTimer = GetTimeEX() + 250;
 		script_nav:resetNavigate();
 	end
