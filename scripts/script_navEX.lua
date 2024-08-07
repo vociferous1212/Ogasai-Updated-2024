@@ -42,7 +42,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 
 	-- If we are close to the next path node, increase our nav node index
 	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < script_nav.nextNavNodeDistance) then
-		script_nav.lastnavIndex = 1 + script_nav.lastnavIndex;		
+		script_nav.lastnavIndex = script_nav.lastnavIndex +1;		
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
 		end
@@ -59,7 +59,6 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) then
 		script_grind.message = "Moving To Target NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
-		return;
 	else
 		return "Moving to target... Nav EX";
 	end
@@ -71,16 +70,4 @@ function script_navEX:resetPath()
 	script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z'] = 0, 0, 0;
 	local x, y, z = GetLocalPlayer():GetPosition();
 	GeneratePath(x, y, z, x+1, y+1, z);
-end
-
-function script_navEX:moveToHotspotCoords()
-
-	if (IsPathLoaded(5)) then
-			script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
-		else
-			MoveToTarget(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-		end
-		if (not IsMoving()) or (not IsPathLoaded(5)) then
-			Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-		end
 end

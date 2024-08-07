@@ -9,6 +9,7 @@ script_grindEX = {
 }
 
 function script_grindEX:doChecks() 
+
 		-- Load vendors if we move into a new map zone
 		if (GetMapID() ~= self.currMapID) then
 			self.currMapID = GetMapID();
@@ -108,8 +109,8 @@ function script_grindEX:doChecks()
 				if (script_helper:useMount()) then
 				end
 			end
-			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) then
-				if (not HasSpell("Travel Form")) then
+			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) and (HasSpell("Bear Form")) then
+				if (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) then
 					script_druidEX2:catForm();
 				elseif (HasSpell("Travel Form")) then
 					script_druidEX:travelForm();

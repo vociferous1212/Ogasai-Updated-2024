@@ -6,7 +6,7 @@ script_nav = {
 	lastPathIndex = 0,
 	navPosition = {},
 	navPathPosition = {},
-	lastnavIndex = 1,
+	lastnavIndex = 0,
 	lastpathnavIndex = 0,
 	navPath = nil,
 	savedLocations = {},
@@ -98,7 +98,8 @@ function script_nav:moveToHotspot(localObj)
 			script_grind.tickRate = 135;
 		end
 		-- move to coords
-		script_navEX:moveToHotspotCoords();
+		
+		self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
 
 			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) then
 				CastStealth();
@@ -168,7 +169,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		return "Changing go to location...";
 	end
 	script_grind.tickRate = 135;
-	script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+	self.message = script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
 	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
 
@@ -257,7 +258,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < self.nextNavNodeDistance) then
 			self.lastpathnavIndex = self.lastpathnavIndex + 1;	
 			if (GetPathSize(5) <= self.lastpathnavIndex) then
-				self.lastpathnavIndex = GetPathSize(5) - 1;
+				self.lastpathnavIndex = GetPathSize(5);
 			end
 		end
 	end
@@ -328,12 +329,12 @@ function script_nav:navigate(localObj)
 
 		-- Check: If we are close to the next node in the walking path, hop to the next one		
 		if(GetDistance3D(_x, _y, _z, _lx, _ly, _lz) < self.nextPathNodeDistance) then
-			self.lastPathIndex = self.lastPathIndex + 1;
+			self.lastPathIndex = self.lastPathIndex + 2;
 		end
 			
 		-- Check: If we reached the end node, start over at node 1
 		if(self.lastPathIndex >= pathSize) then
-			self.lastPathIndex = 0;
+			self.lastPathIndex = 1;
 		end
 			
 		script_nav:moveToNav(localObj, _x, _y, _z);

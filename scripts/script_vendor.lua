@@ -326,8 +326,8 @@ function script_vendor:sell()
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 	
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.status = 2; -- moving to sell at a vendor
+			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;

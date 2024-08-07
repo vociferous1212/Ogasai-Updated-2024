@@ -90,7 +90,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 4.1, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 6.1, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -402,6 +402,10 @@ function script_grind:run()
 
 	if (self.getSpells) then if (script_getSpells.getSpellsStatus ~= 3) then if (script_getSpells:run()) then end end end
 
+	if (script_grindMenu.showGarbageBox) then
+		collectgarbage(Fcollect);
+	end
+
 	-- display radar
 	if (script_radar.showRadar) then
 		script_radar:draw()
@@ -521,14 +525,12 @@ function script_grind:run()
 
 	--random node dist
 	if (self.useRandomNode) and (not IsGhost() and not localObj:IsDead() and not HasForm() and not IsMounted() and not IsIndoors()) then
-		local randomNodeDist = math.random(4, 9);
-		if (IsMoving()) and (GetTimeEX() > self.nodeTimer) then
+		local randomNodeDist = math.random(3, 6);
 			self.nextToNodeDist = randomNodeDist;
 			script_nav.nextNavNodeDistance = randomNodeDist;
 			script_nav.nextPathNodeDistance = randomNodeDist;
-			NavmeshSmooth(randomNodeDist*2.4)
-			self.nodeTimer = GetTimeEX() + 600;
-		end
+			NavmeshSmooth(20)
+		
 	end
 
 	-- pause bot
@@ -1236,7 +1238,7 @@ function script_grind:run()
 
 		-- Pre checks before navigating
 		if (IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat()) then
-			script_grind:setWaitTimer(1500);
+			script_grind:setWaitTimer(750);
 			return;
 		end
 
@@ -1966,6 +1968,22 @@ function script_grind:doLoot(localObj)
 		-- If we reached the loot object, reset the nav path
 		script_nav:resetNavigate();
 		--self.waitTimer = GetTimeEX() + 550;
+
+	if (self.autoSelectVendors) and (IsLooting()) then
+			local bX, bY, bZ = GetLocalPlayer():GetPosition();
+		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
+			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
+			if (not self.vendorMessageSent) then
+			DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
+				self.vendorMessageSent = true;
+				script_grind:setWaitTimer(2500);
+				if (self.vendorMessageSent) then
+					vendorDB:loadDBVendors();
+					self.vendorMessageSent = false;
+				end
+			end
+		end
+	end
 		
 	end
 
@@ -2001,9 +2019,10 @@ function script_grind:doLoot(localObj)
 	local _x, _y, _z = self.lootObj:GetPosition();
 	
 	if (IsPathLoaded(5)) then
-		script_navEX:moveToTarget(localObj, _x, _y, _z);
-		self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-	elseif (not IsPathLoaded(5)) and (self.loobObj:GetDistance() > self.lootDistance) then
+		if (script_navEX:moveToTarget(localObj, _x, _y, _z)) then
+			self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+		end
+	else
 		MoveToTarget(_x, _y, _z);
 	end
 
@@ -2011,22 +2030,6 @@ function script_grind:doLoot(localObj)
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
 		self.waitTimer = GetTimeEX() + 250;
 		script_nav:resetNavigate();
-	end
-
-	if (self.autoSelectVendors) and (not IsMoving()) then
-			local bX, bY, bZ = GetLocalPlayer():GetPosition();
-		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
-			self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
-			if (not self.vendorMessageSent) then
-			DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
-				self.vendorMessageSent = true;
-				script_grind:setWaitTimer(2500);
-				if (self.vendorMessageSent) then
-					vendorDB:loadDBVendors();
-					self.vendorMessageSent = false;
-				end
-			end
-		end
 	end
 end
 
@@ -2053,6 +2056,25 @@ function script_grind:getSkinTarget(lootRadius)
 end
 
 function script_grind:lootAndSkin()
+
+	-- Check hunter bags if they are full
+	local inventoryFull = true;
+	for i = 1, 5 do 
+		if (i ~= 0) then 
+			for y=1,GetContainerNumSlots(i-1) do 
+				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
+				if (itemCount == 0 or itemCount == nil) then 
+					inventoryFull = false; 
+				end 
+			end
+		end 
+	end 
+
+	-- Tell the grinder we cant loot
+	if (inventoryFull) then
+		script_grind.bagsFull = true;
+	end
+
 	-- Loot if there is anything lootable and we are not in combat and if our bags aren't full
 	if (not self.skipLooting and not AreBagsFull() and not self.bagsFull) then 
 		self.lootObj = script_nav:getLootTarget(self.findLootDistance);
@@ -2123,7 +2145,7 @@ function script_grind:runRest()
 
 		-- set tick rate for resting
 		if (not script_grind.adjustTickRate) then
-			local randomRestTick = math.random(600, 1200);
+			local randomRestTick = math.random(300, 500);
 			script_grind.tickRate = randomRestTick;
 		end
 
