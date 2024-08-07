@@ -39,11 +39,15 @@ function script_grindMenu:menu()
 	local a = gcinfo();
 	if (self.showGarbageBox) then
 		Text("Garbage Data Lost " ..a);
+		if (self.showGarbageBox) then
+			SameLine();
+			Text(" - Can Cause Lag!");
+		end
 	end
-	wasClicked, self.showGarbageBox = Checkbox("Force Garbage Collection", self.showGarbageBox);
+	wasClicked, self.showGarbageBox = Checkbox("Force Garbage Collect", self.showGarbageBox);
 	if (self.showGarbageBox) then
 		SameLine();
-		Text(" - Can Cause Lag!");
+		Text(" - Includes AddOns!");
 	end
 		--show help menu checkbox
 		--SameLine();
