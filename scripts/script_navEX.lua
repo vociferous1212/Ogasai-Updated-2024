@@ -41,7 +41,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < script_nav.nextNavNodeDistance) then
+	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < script_nav.nextNavNodeDistance + 5) then
 		script_nav.lastnavIndex = script_nav.lastnavIndex +1;		
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
@@ -57,7 +57,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
-	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) then
+	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
 		script_grind.message = "Moving To Target NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
 	else
 		return "Moving to target... Nav EX";

@@ -1,8 +1,8 @@
 script_nav = {
 	includeNavEX= include("scripts\\script_navEX.lua"),
 	useNavMesh = true,
-	nextNavNodeDistance = 4.9, -- for mobs and loot
-	nextPathNodeDistance = 10.1, -- for walking paths
+	nextNavNodeDistance = 3.9, -- for mobs and loot
+	nextPathNodeDistance = 4.1, -- for walking paths
 	lastPathIndex = 0,
 	navPosition = {},
 	navPathPosition = {},
@@ -168,7 +168,6 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		self.currentGoToLocation = self.currentGoToLocation + 1;
 		return "Changing go to location...";
 	end
-	script_grind.tickRate = 135;
 	self.message = script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
 	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
@@ -255,7 +254,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		end
 	else
 		-- If we are close to the next path node, increase our nav node index
-		if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < self.nextNavNodeDistance) then
+		if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < self.nextNavNodeDistance + 5) then
 			self.lastpathnavIndex = self.lastpathnavIndex + 1;	
 			if (GetPathSize(5) <= self.lastpathnavIndex) then
 				self.lastpathnavIndex = GetPathSize(5);
