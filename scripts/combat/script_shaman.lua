@@ -33,7 +33,6 @@ script_shaman = {
 	useLightningBolt = false,
 	healMana = 20,
 	enhanceWeaponTimer = 0,
-	randomEnhanceTimer = 0,
 
 }
 
@@ -125,7 +124,6 @@ function script_shaman:setup()
 
 	self.waitTimer = GetTimeEX();
 	self.enhanceWeaponTimer = GetTimeEX();
-	self.randomEnhanceTimer = math.random(10000, 60000);
 
 	self.isSetup = true;
 
@@ -135,7 +133,7 @@ end
 function script_shaman:checkEnhancement()
 	if (not IsInCombat() and not IsEating() and not IsDrinking()) then
 		hasMainHandEnchant, _, _, _, _, _ = GetWeaponEnchantInfo();
-		if (hasMainHandEnchant == nil) or (GetTimeEX() > self.enhanceWeaponTimer - self.randomEnhanceTimer) then 
+		if (hasMainHandEnchant == nil) or (GetTimeEX() > self.enhanceWeaponTimer - 45000) then 
 			-- Apply enhancement
 			if (HasSpell(self.enhanceWeapon)) then
 
@@ -349,10 +347,9 @@ if (IsCasting()) or (IsChanneling()) then
 		end
 	end
 
-	if (IsStanding()) and (GetTimeEX() > self.enhanceWeaponTimer - self.randomEnhanceTimer) then
-			self.randomEnhanceTimer = math.random(10000, 60000);
+	if (IsStanding()) and (GetTimeEX() > self.enhanceWeaponTimer - 45000) then
 		if (script_shaman:checkEnhancement()) then
-				self.enhanceWeaponTimer = GetTimeEX() + self.randomEnhanceTimer;
+			self.enhanceWeaponTimer = GetTimeEX() + 300000;
 			return true;
 		end
 	end	
@@ -709,7 +706,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 			-- Earth Shock
-			if (HasSpell("Earth Shock")) and (self.useEarthShock) then
+			if (HasSpell("Earth Shock")) and (self.useEarthShock or targetHealth <= 15) then
 				if (targetObj:IsCasting())
 				or (not HasSpell("Flame Shock") and targetHealth >= 30)
 				or (targetObj:IsFleeing() and not HasSpell("Frost Shock"))
