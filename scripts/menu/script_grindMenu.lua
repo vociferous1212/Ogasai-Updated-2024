@@ -7,8 +7,26 @@ script_grindMenu = {
 	selectedWalkPath = false,
 	helpMenu = false,
 	showGarbageBox = true,
+	isSetup = false,
 
 }
+
+function script_grindMenu:setup()
+
+	if (not self.isSetup) then
+		script_shaman:setup();
+		script_druid:setup();
+		script_mage:setup();
+		script_warlock:setup();
+		script_priest:setup();
+		script_paladin:setup();
+		script_warrior:setup();
+		script_hunter:setup();
+		script_rogue:setup();
+	end
+
+	self.isSetup = true;
+end
 
 function script_grindMenu:printHotspot()
 	if (script_grind.autoSelectVendors) then
@@ -92,6 +110,7 @@ function script_grindMenu:menu()
 	SameLine();
 	if (Button("Reload Scripts")) then
 		coremenu:reload();
+		self.isSetup = false;
 	end
 
 	SameLine();
@@ -111,6 +130,8 @@ function script_grindMenu:menu()
 	
 	local wasClicked = false;
 	-- Load combat menu by class
+
+	script_grindMenu:setup()
 
 	local class = UnitClass("player");
 	if (class == 'Mage') then

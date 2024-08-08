@@ -13,6 +13,7 @@ script_shaman = {
 	useRock = false,
 	useFlame = false,
 	useWind = false,
+	useFrost = false,
 	totem = "no totem yet",	-- used for totem1
 	totem2 = "no totem yet",	-- used for totem2
 	totem3 = "no totem yet",
@@ -50,7 +51,7 @@ function script_shaman:setup()
 		self.useFlame = true;
 	elseif (HasSpell("Rockbiter Weapon")) then
 		self.enhanceWeapon = "Rockbiter Weapon";
-		self.useWind = true;
+		self.useRock = true;
 	end
 
 	if (localLevel >= 20) then
@@ -124,6 +125,7 @@ function script_shaman:setup()
 
 	self.waitTimer = GetTimeEX();
 	self.enhanceWeaponTimer = GetTimeEX();
+	script_shamanTotems.waitTimer = GetTimeEX();
 
 	self.isSetup = true;
 
@@ -374,6 +376,7 @@ function script_shaman:run(targetGUID)
 	if(not self.isSetup) then
 		script_shaman:setup();
 	end
+
 	
 	local localObj = GetLocalPlayer();
 	local localMana = localObj:GetManaPercentage();

@@ -27,12 +27,13 @@ function script_shamanFollowerHeals:HealsAndBuffs()
 		local localHealth = GetLocalPlayer():GetHealthPercentage();
 
 	for i = 1, GetNumPartyMembers() do
-				
-				local temp = GetPartyMember(i);
-				if (temp:GetGUID() ~= localObj:GetGUID()) then
-					local partyMember = GetPartyMember(i);
+
+				local partyMembers = GetPartyMember(i);
+				for ii = 1, partyMembers do
+					if (partyMembers:GetGUID() ~= localObj:GetGUID()) then
+						local partyMember = GetPartyMember(i);
+					end
 				end
-		
 		if (GetNumPartyMembers() > 0) then
 				local partyMemberHP = partyMember:GetHealthPercentage();
 				local partyMemberDistance = partyMember:GetDistance();

@@ -1,194 +1,98 @@
 script_shamanEX3 = {
 
-	stoneskinTotem = false,
-	strengthOfEarthTotem = false,
-	stoneclawTotem = false,
-	earthbindTotem = false,
-	searingTotem = false,
-	fireNovaTotem = false,
-	  
-
 }
 
--- run object manager to find if we have STONECLAW totem placed...
-function script_shamanEX3:isStoneclawTotemAlive()
-	local i, t = GetFirstObject(); 
-
-	while i ~= 0 do
-		if t == 3 then
-			if (i:GetDistance() <= 18) then
-				if (i:GetUnitName() == "Stoneclaw Totem") then
-				return true;
-				end
-			end
-		end
-	i, t = GetNextObject(i); 
-	end
-return false;
-end
-
--- run object manager to find if we have EARTHBIND totem placed...
-function script_shamanEX3:isEarthbindTotemAlive()
-	local i, t = GetFirstObject(); 
-
-	while i ~= 0 do
-		if t == 3 then
-			if (i:GetDistance() <= 18) then
-				if (i:GetUnitName() == "Earthbind Totem") then
-				return true;
-				end
-			end
-		end
-	i, t = GetNextObject(i); 
-	end
-return false;
-end
-
--- run object manager to find if we have a totem placed...
-function script_shamanEX3:isFireTotemAlive()
-	local i, t = GetFirstObject(); 
-
-	while i ~= 0 do
-		if t == 3 then
-			if (i:GetDistance() <= 18) then
-				if (i:GetUnitName() == "Searing Totem") or (i:GetUnitName() == "Fire Nova Totem")
-				--or (i:GetUnitName() == "Searing Totem")
-				--or (i:GetUnitName() == "Searing Totem")
-				then
-
-				return true;
-				end
-			end
-		end
-	i, t = GetNextObject(i); 
-	end
-return false;
-end
-
--- run object manager to find if we have a totem placed...
-function script_shamanEX3:isEarthTotemAlive()
-	local i, t = GetFirstObject(); 
-
-	while i ~= 0 do
-		if t == 3 then
-			if (i:GetDistance() <= 20) then
-				if (i:GetUnitName() == "Stoneskin Totem") or (i:GetUnitName() == "Strength of Earth Totem") or (i:GetUnitName() == "Earthbind Totem") or (i:GetUnitName() == "Stoneclaw Totem") then
-					return true;
-				end
-			end
-		end
-	i, t = GetNextObject(i); 
-	end
-return false;
-end
-
--- run object manager to find if we have a totem placed...
-function script_shamanEX3:isWaterTotemAlive()
-	local i, t = GetFirstObject(); 
-
-	while i ~= 0 do
-		if t == 3 then
-			if (i:GetDistance() <= 20) then
-				if (i:GetUnitName() == "Healing Stream Totem") or (i:GetUnitName() == "Mana Spring Totem") 
-				--or (i:GetUnitName() == "Earthbind Totem")
-				--or (i:GetUnitName() == "Stoneclaw Totem")
-				then
-					return true;
-				end
-			end
-		end
-	i, t = GetNextObject(i); 
-	end
-return false;
-end
-				
--- XD XD :)
 function script_shamanEX3:alternateEnhanceMenu()
-	local a = script_shaman.useRock; local b = script_shaman.useFlame; local c = script_shaman.useWind;
-	local d = HasSpell("Rockbiter Weapon"); local e = HasSpell("Flametongue Weapon"); local f = HasSpell("Windfury Weapon");
-	
-	-- set rockbiter
-	if (a) and (d) then
-		script_shaman.enhanceWeapon = "Rockbiter Weapon";
+	local a = script_shaman.useRock; local b = script_shaman.useFlame; local c = script_shaman.useFrost; local d = script_shaman.useWind;
+	local e = HasSpell("Rockbiter Weapon"); local f = HasSpell("Flametongue Weapon"); local g = HasSpell("Frostbrand Weapon"); local h = HasSpell("Windfury Weapon");
+
+	Separator();
+	-- show checkboxes
+	if not (b) and not (c) and not (d) and (e) then
+		wasClicked, script_shaman.useRock = Checkbox("Rockbiter", script_shaman.useRock);
+		script_shaman.enhanceWeapon = "Rocbiter Weapon";
 	end
-	-- set flametongue
-	if (b) and (e) then
+	if not (a) and not (c) and not (d) and (f) then
+			SameLine();
+		wasClicked, script_shaman.useFlame = Checkbox("Flametongue", script_shaman.useFlame);
 		script_shaman.enhanceWeapon = "Flametongue Weapon";
 	end
-	-- set windfury
-	if (c) and (f) then
-		script_shaman.enhanceWeapon = "Windfury Weapon";
+	if not (a) and not (b) and not (d) and (g) then
+		wasClicked, script_shaman.useFrost = Checkbox("Frostbrand", script_shaman.useFrost);
+		script_shaman.enhanceWeapon = "Frostbrand Weapon";
 	end
-	
-	-- show checkboxes
-	if not (b) and not (c) and (d) then
-		wasClicked, script_shaman.useRock = Checkbox("Rockbiter", script_shaman.useRock);
-			SameLine();
-	end
-	if not (a) and not (c) and (e) then
-		wasClicked, script_shaman.useFlame = Checkbox("Flametongue", script_shaman.useFlame);
-			SameLine();
-
-	end
-	if not (a) and not (b) and (f) then
+	if not (a) and not (b) and not (c) and (h) then
+		SameLine();
 		wasClicked, script_shaman.useWind = Checkbox("Windfury", script_shaman.useWind);
+		script_shaman.enhanceWeapon = "Windfury Weapon";
 	end
 end
 
+-- show EARTH totem menu
 function script_shamanEX3:alternateTotemMenuEarth()
-	local z = HasItem("Earth Totem"); local aa = HasSpell("Stoneskin Totem"); local bb = HasSpell("Strength of Earth Totem");
+	local z = HasItem("Earth Totem");
+	local aa = HasSpell("Stoneskin Totem"); local bb = HasSpell("Strength of Earth Totem");
 	local cc = HasSpell("Stoneclaw Totem"); local dd = HasSpell("Earthbind Totem");
-	local a = self.stoneskinTotem; local b = self.strengthOfEarthTotem; c = self.stoneclawTotem; d = self.earthbindTotem;
+	local ee = HasSpell("Tremor Totem");
+	local a = script_shamanTotems.stoneskinTotem; local b = script_shamanTotems.strengthOfEarthTotem;
+	local c = script_shamanTotems.stoneclawTotem; local d = script_shamanTotems.earthbindTotem; local e = script_shamanTotems.tremorTotem;
 	
 	-- set totems
 	if (z) then
 		if (a) and (aa) then
 			script_shaman.totem = "Stoneskin Totem";
-			script_shaman.totemBuff = "Stoneskin";
 		end
 		if (b) and (bb) then
-			script_shaman.totemBuff = "Strength of Earth";
+			script_shaman.totem = "Strength of Earth";
 		end
 		if (c) and (cc) then
 			script_shaman.totem = "Stoneclaw Totem";
-			script_shaman.totemBuff = "";
 		end
 		if (d) and (dd) then
 			script_shaman.totem = "Earthbind Totem";
-			script_shaman.totemBuff = "";
+		end
+		if (e) and (ee) then
+			script_shaman.totem = "Tremor Totem";
 		end
 	end
-
+	
 	-- show checkboxes
 	if (z) then
 		-- if a
-		if not (b) and not (c) and not (d) and (aa) then
-			wasClicked, self.stoneskinTotem = Checkbox("Stoneskin", self.stoneskinTotem);
+		if not (b) and not (c) and not (d) and not (e) and (aa) then
+			wasClicked, script_shamanTotems.stoneskinTotem = Checkbox("Stoneskin", script_shamanTotems.stoneskinTotem);
 			SameLine();
 		end
 		-- if b
-		if not (a) and not (c) and not (d) and (bb) then
-			wasClicked, self.strengthOfEarthTotem = Checkbox("Strength of Earth", self.strengthOfEarthTotem);
+		if not (a) and not (c) and not (d) and not (e) and (bb) then
+			wasClicked, script_shamanTotems.strengthOfEarthTotem = Checkbox("Strength of Earth", script_shamanTotems.strengthOfEarthTotem);
 		end
 		-- if c
-		if not (a) and not (b) and not (d) and (cc) then
-			script_shaman.totem = "Strength of Earth Totem";
-			wasClicked, self.stoneclawTotem = Checkbox("Stoneclaw", self.stoneclawTotem);
+		if not (a) and not (b) and not (d) and not (e) and (cc) then
+			wasClicked, script_shamanTotems.stoneclawTotem = Checkbox("Stoneclaw", script_shamanTotems.stoneclawTotem);
 		SameLine();
 		end
 		-- if d
-		if not (a) and not (b) and not (c) and (dd) then
-			wasClicked, self.earthbindTotem = Checkbox("Earthbind", self.earthbindTotem);
+		if not (a) and not (b) and not (c) and not (e) and (dd) then
+			wasClicked, script_shamanTotems.earthbindTotem = Checkbox("Earthbind", script_shamanTotems.earthbindTotem);
+		end
+		-- if e
+		if not (a) and not (b) and not (c) and not (d) and (ee) then
+			SameLine();
+			wasClicked, script_shamanTotems.tremorTotem = Checkbox("Tremor", script_shamanTotems.tremorTotem);
 		end
 	end
 end
 
+
+-- show FIRE totem menu
 function script_shamanEX3:alternateTotemMenuFire()
-local z = HasItem("Fire Totem"); local aa = HasSpell("Searing Totem"); local bb = HasSpell("Fire Nova Totem");
-	--local cc = HasSpell("Stoneclaw Totem"); local dd = HasSpell("Earthbind Totem");
-	local a = self.searingTotem; local b = self.fireNovaTotem;
-	--c = self.stoneclawTotem; d = self.earthbindTotem;
-	
+	local z = HasItem("Fire Totem");
+	local aa = HasSpell("Searing Totem"); local bb = HasSpell("Fire Nova Totem");
+	local cc = HasSpell("Magma Totem"); local dd = HasSpell("Flametongue Totem");
+	local a = script_shamanTotems.searingTotem; local b = script_shamanTotems.fireNovaTotem;
+	local c = script_shamanTotems.magmaTotem; local d = script_shamanTotems.flametongueTotem;
+
 	-- set totems
 	if (z) then
 		if (a) and (aa) then
@@ -197,40 +101,107 @@ local z = HasItem("Fire Totem"); local aa = HasSpell("Searing Totem"); local bb 
 		if (b) and (bb) then
 			script_shaman.totem2 = "Fire Nova Totem";
 		end
-		--if (c) and (cc) then
-		--	script_shaman.totem2 = "";
-		--	script_shaman.totemBuff2 = "";
-		--end
-		--if (d) and (dd) then
-		--	script_shaman.totem2 = "";
-		--	script_shaman.totemBuff2 = "";
-		--end
+		if (c) and (cc) then
+			script_shaman.totem2 = "Magma Totem";
+		end
+		if (d) and (dd) then
+			script_shaman.totem2 = "Flametongue Totem";
+		end
 	end
 
+	
 	-- show checkboxes
 	if (z) then
 		-- if a
 		if not (b) and not (c) and not (d) and (aa) then
-			wasClicked, self.searingTotem = Checkbox("Searing", self.searingTotem);
+			wasClicked, script_shamanTotems.searingTotem = Checkbox("Searing", script_shamanTotems.searingTotem);
 		end
 		-- if b
 		if not (a) and not (c) and not (d) and (bb) then
 			SameLine();
-			wasClicked, self.fireNovaTotem = Checkbox("Fire Nova", self.fireNovaTotem);
+			wasClicked, script_shamanTotems.fireNovaTotem = Checkbox("Fire Nova", script_shamanTotems.fireNovaTotem);
 		end
 		-- if c
-		--if not (a) and not (b) and not (d) and (cc) then
-		--	wasClicked, self. = Checkbox("", self.);
-		--SameLine();
-		--end
+		if not (a) and not (b) and not (d) and (cc) then
+			wasClicked, script_shamanTotems.magmaTotem = Checkbox("Magma", script_shamanTotems.magmaTotem);
+		end
 		-- if d
-		--if not (a) and not (b) and not (c) and (dd) then
-		--	wasClicked, self. = Checkbox("", self.);
-		--end
+		if not (a) and not (b) and not (c) and (dd) then
+			SameLine();
+			wasClicked, script_shamanTotems.flametongueTotem = Checkbox("Flametongue", script_shamanTotems.flametongueTotem);
+		end
 	end
 end
 
+-- show WATER totem menu
 function script_shamanEX3:alternateTotemMenuWater()
+local z = HasItem("Water Totem");
+	local aa = HasSpell("Healing Stream Totem"); local bb = HasSpell("Mana Spring Totem");
+	local cc = HasSpell("Mana Tide Totem");
+	local a = script_shamanTotems.healingStreamTotem; local b = script_shamanTotems.manaSpringTotem; local c = script_shamanTotems.manaTideTotem;
+
+	-- set totems
+	if (z) then
+		if (a) and (aa) then
+			script_shaman.totem3 = "Healing Stream Totem";
+		end
+		if (b) and (bb) then
+			script_shaman.totem3 = "Mana Spring Totem";
+		end
+		if (c) and (cc) then
+			script_shaman.totem3 = "Mana Tide Totem";
+		end
+	end
+
+	
+	-- show checkboxes
+	if (z) then
+		-- if a
+		if not (b) and not (c) and (aa) then
+			wasClicked, script_shamanTotems.healingStreamTotem = Checkbox("Healing Stream", script_shamanTotems.healingStreamTotem);
+		end
+		-- if b
+		if not (a) and not (c) and (bb) then
+			SameLine();
+			wasClicked, script_shamanTotems.manaSpringTotem = Checkbox("Mana Spring", script_shamanTotems.manaSpringTotem);
+		end
+		-- if c
+		if not (a) and not (b) and (cc) then
+			wasClicked, script_shamanTotems.manaTideTotem = Checkbox("Mana Tide", script_shamanTotems.manaTideTotem);
+		SameLine();
+		end
+	end
+
 end
+
+-- show AIR totem menu
 function script_shamanEX3:alternateTotemMenuWind()
+local z = HasItem("Air Totem");
+	local aa = HasSpell("Grace of Air Totem"); local bb = HasSpell("Windfury Totem");
+	local a = script_shamanTotems.graceOfAirTotem; local b = script_shamanTotems.windfuryTotem;
+
+-- set totems
+	if (z) then
+		if (a) and (aa) then
+			script_shaman.totem4 = "Grace of Air Totem";
+		end
+		if (b) and (bb) then
+			script_shaman.totem4 = "Windfury Totem";
+		end
+	end
+
+	
+	-- show checkboxes
+	if (z) then
+		-- if a
+		if not (b) and (aa) then
+			wasClicked, script_shamanTotems.graceOfAirTotem = Checkbox("Grace of Air", script_shamanTotems.graceOfAirTotem);
+		end
+		-- if b
+		if not (a) and (bb) then
+			SameLine();
+			wasClicked, script_shamanTotems.windfuryTotem = Checkbox("Windfury", script_shamanTotems.windfuryTotem);
+		end
+	end
+
 end

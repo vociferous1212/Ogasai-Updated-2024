@@ -1,8 +1,8 @@
 script_shamanEX = {
 
 		healsMenuLoaded = include("scripts\\combat\\script_shamanEX2.lua"),
+		extra2MenuLoaded = include("scripts\\combat\\script_shamanEX3.lua"),
 		extraMenuLoaded = include("scripts\\combat\\script_shamanTotems.lua"),
-
 }
 
 function script_shamanEX:menu()
@@ -84,7 +84,7 @@ function script_shamanEX:menu()
 		if (HasSpell("Rockbiter Weapon")) then
 			if (CollapsingHeader("|+| Weapon Enhancement Options")) then
 				Text("Weapon Enhancement");
-				script_shamanTotems:alternateEnhanceMenu();
+				script_shamanEX3:alternateEnhanceMenu();
 				Separator();
 			end
 		end
@@ -96,20 +96,20 @@ function script_shamanEX:menu()
 				if (script_shaman.useEarthTotem) then
 					Text("Earth Totem");
 
-				script_shamanTotems:alternateTotemMenuEarth();
+				script_shamanEX3:alternateTotemMenuEarth();
 				end
 
 				if (script_shaman.useFireTotem) then
 					Separator();
 					Text("Fire Totem");
-					script_shamanTotems:alternateTotemMenuFire();
+					script_shamanEX3:alternateTotemMenuFire();
 					Separator();
 					
 				end
 				if (script_shaman.useWaterTotem) then
 					Separator();
 					Text("Water Totem");
-					script_shamanTotems:alternateTotemMenuWater();
+					script_shamanEX3:alternateTotemMenuWater();
 				end
 			end
 		end

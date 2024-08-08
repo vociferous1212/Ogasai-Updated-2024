@@ -70,6 +70,7 @@ function hotspotDB_10_20:setup()
 	hotspotDB:addHotspot("The Barrens 16 - 19", "Horde", 16, 19, 805.92, -2945.67, 91.66);
 	hotspotDB:addHotspot("The Barrens 19 - 21", "Horde", 19, 21, -1476.2, -1976.99, 90.51);
 	hotspotDB:addHotspot("The Barrens 17 - 19", "Horde", 17, 19, -1159.64, -3259.29, 91.68);
+	hotspotDB:addHotspot("Southern Barrens 18 - 21", "Tauren", 19, 21, -2328.36, -2218.45, 91.66);
 	hotspotDB:addHotspot("Southern Barrens 17 - 19", "Horde", 17, 19, -1747.7, -2894.05, 93.87);
 	hotspotDB:addHotspot("Southern Barrens 19 - 21", "Horde", 19, 21, -2149.74, -2242.58, 94.75);
 	hotspotDB:addHotspot("Bramblescar 19 - 21", "Horde", 19, 21, -2088.87, -2442.84, 94.16);

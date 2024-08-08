@@ -40,7 +40,7 @@ function script_miscMenu:menu()
 
 	end
 
-	if (CollapsingHeader("Vendor Options")) then
+if (CollapsingHeader("Vendor Options")) then
 		wasClicked, script_grind.useVendor = Checkbox("Use Vendoring", script_grind.useVendor);
 		if (script_hunter.useVendor) then
 			script_grind.useVendor = true;
@@ -51,9 +51,10 @@ function script_miscMenu:menu()
 			Separator(); Text("If Inventory Is Full - ");
 			wasClicked, script_grind.hsWhenFull = Checkbox("Use Hearthstone", script_grind.hsWhenFull); SameLine();
 			wasClicked, script_grind.stopWhenFull = Checkbox("Stop The Bot", script_grind.stopWhenFull); SameLine();
-			wasClicked, script_grindEX.logoutOnHearthstone = Checkbox("Exit On Hearth", script_grindEX.logoutOnHearthstone); Separator();
+			wasClicked, script_grindEX.logoutOnHearth = Checkbox("Exit On Hearth", script_grindEX.logoutOnHearth); Separator();
 		end
 	end
 
 	script_pathMenu:menu();
+
 end
