@@ -42,6 +42,7 @@ function coremenu:draw()
 		LoadScript("Shaman", "scripts\\combat\\script_shaman.lua");
 		AddScriptToCombat("Shaman", "script_shaman");
 
+
 		LoadScript("Druid", "scripts\\combat\\script_druid.lua");
 		AddScriptToCombat("Druid", "script_druid");
 
