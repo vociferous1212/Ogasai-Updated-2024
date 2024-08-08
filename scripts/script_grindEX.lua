@@ -99,6 +99,10 @@ function script_grindEX:doChecks()
 
 		if (vendorStatus >= 1 and not IsInCombat()) then
 			if (script_grind:runRest()) then
+				if (IsMoving()) then
+					StopMoving();
+					return;
+				end
 				return true;
 			end
 
