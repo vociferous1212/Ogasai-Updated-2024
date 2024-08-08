@@ -27,10 +27,10 @@ script_grind = {
 	warlockMenu = include("scripts\\combat\\script_warlockEX.lua"),
 	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
 	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
-	rogueMenu = include("scripts\\combat\\script_rogueEX.lua"),
+	rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
 	paladinMenu = include("scripts\\combat\\script_paladinEX.lua"),
-	shamanMenu = include("scripts\\combat\\script_shamanEX.lua"),
-	druidMenu = include("scripts\\combat\\script_druidEX.lua"),
+	shamanMenu = include("scripts\\combat\\shaman\\script_shamanEX.lua"),
+	druidMenu = include("scripts\\combat\\druid\\script_druidEX.lua"),
 
 	paranoiaMenuLoaded = include("scripts\\menu\\script_paranoiaMenu.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -2027,7 +2027,7 @@ function script_grind:doLoot(localObj)
 
 
 	local _x, _y, _z = self.lootObj:GetPosition();
-	if (self.lootObj:GetDistance() > self.lootDistance) then
+	if (self.lootObj:GetDistance() > (self.lootDistance/2)) then
 		if (IsPathLoaded(5)) then
 			if (script_navEX:moveToTarget(localObj, _x, _y, _z)) then
 			self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
