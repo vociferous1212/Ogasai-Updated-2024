@@ -342,12 +342,11 @@ if (IsCasting()) or (IsChanneling()) then
 	and (not localObj:HasBuff("Lightning Shield")) and (IsStanding()) then
 		if (not Cast("Lightning Shield", localObj)) then
 			self.waitTimer = GetTimeEX() + 1500;
-			script_grind:setWaitTimer(1500);
 			return true;
 		end
 	end
 
-	if (IsStanding()) and (GetTimeEX() > self.enhanceWeaponTimer - 45000) then
+	if (IsStanding()) then
 		if (script_shaman:checkEnhancement()) then
 			self.enhanceWeaponTimer = GetTimeEX() + 300000;
 			return true;
@@ -441,6 +440,7 @@ function script_shaman:run(targetGUID)
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
+				self.waitTimer = GetTimeEX() + 3500;
 				script_om:FORCEOM();
 				return true;
 			end
@@ -555,7 +555,7 @@ function script_shaman:run(targetGUID)
 				targetObj:AutoAttack();
 			end
 			
-			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.skipHardPull or script_grind.skipHardPull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
@@ -596,6 +596,7 @@ function script_shaman:run(targetGUID)
 
 if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0)  and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
+				self.waitTimer = GetTimeEX() + 3500;
 				script_om:FORCEOM();
 				return true;
 			end
@@ -614,7 +615,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.skipHardPull or script_grind.skipHardPull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
@@ -647,7 +648,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 -- earthbind totem if target is running away
 			if (targetObj:GetHealthPercentage() <= 30 or targetObj:IsFleeing()) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanTotems:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
 				CastSpellByName("Earthbind Totem");
-				return 3;
+				return true;
 			end
 
 			-- stoneclaw totem if we have more than 1 target
@@ -778,7 +779,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.skipHardPull or script_grind.skipHardPull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
@@ -834,7 +835,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 				
-				if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
+				if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.skipHardPull or script_grind.skipHardPull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
