@@ -39,11 +39,10 @@ function coremenu:draw()
 			----------------------------
 		]]--
 
-		LoadScript("Shaman", "scripts\\combat\\script_shaman.lua");
+		LoadScript("Shaman", "scripts\\combat\\shaman\\script_shaman.lua");
 		AddScriptToCombat("Shaman", "script_shaman");
 
-
-		LoadScript("Druid", "scripts\\combat\\script_druid.lua");
+		LoadScript("Druid", "scripts\\combat\\druid\\script_druid.lua");
 		AddScriptToCombat("Druid", "script_druid");
 
 		LoadScript("Warlock", "scripts\\combat\\script_warlock.lua");
@@ -52,7 +51,7 @@ function coremenu:draw()
 		LoadScript("Mage", "scripts\\combat\\script_mage.lua");
 		AddScriptToCombat("Mage", "script_mage");
 
-		LoadScript("Rogue", "scripts\\combat\\script_rogue.lua");
+		LoadScript("Rogue", "scripts\\combat\\rogue\\script_rogue.lua");
 		AddScriptToCombat("Rogue", "script_rogue");
 
 		LoadScript("Hunter", "scripts\\combat\\script_hunter.lua");
@@ -87,8 +86,8 @@ function coremenu:draw()
 		AddScriptToMode("Fishing", "script_fish");
 
 		-- Nav Mesh Runner by Rot, Improved by Logitech
-		LoadScript("Runner", "scripts\\script_runner.lua");
-		AddScriptToMode("Runner", "script_runner");
+		--LoadScript("Runner", "scripts\\script_runner.lua");
+		--AddScriptToMode("Runner", "script_runner");
 
 		--LoadScript("Pick Pocket Rogue", "scripts\\script_pickPocket.lua");
 		--AddScriptToMode("Pick Pocket Rogue", "script_pickPocket");
