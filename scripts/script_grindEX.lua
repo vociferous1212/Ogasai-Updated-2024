@@ -3,7 +3,7 @@ script_grindEX = {
 	avoidBlacklisted = false,
 	unstuckTime = GetTimeEX(),
 	deathCounter = 0,
-	logoutOnHearth = true,
+	logoutOnHearth = false,
 	allowSwim = true,
 	useThisVar = true,
 }
@@ -202,8 +202,10 @@ function script_grindEX:doChecks()
 				if (IsMounted()) then DisMount(); script_grind.waitTimer = GetTimeEX()+3000;
 					return true;
 				end
-				UseItem("Hearthstone");
+				if (UseItem("Hearthstone")) then
 					self.waitTimer = GetTimeEX() + 15000;
+					return true;
+				end
 				if (self.logoutOnHearth) then
 					Exit();
 				end

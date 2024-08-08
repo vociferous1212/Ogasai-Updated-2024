@@ -66,7 +66,7 @@ script_grind = {
 	avoidElite = true,	-- avoid elites ( currently not working )
 	avoidRange = 40,	-- aboid elites range
 	findLootDistance = 75,
-	lootDistance = 2.25,
+	lootDistance = 2.15,
 	skipLooting = false,
 	lootCheck = {},
 	minLevel = GetLocalPlayer():GetLevel()-5,
@@ -291,7 +291,7 @@ function script_grind:setup()
 	local randomLogout = math.random(30, 65);
 	self.setParanoidTimer = randomLogout;
 
-	local randomHotspot = math.random(250, 350);
+	local randomHotspot = math.random(450, 950);
 	self.distToHotSpot = randomHotspot;
 
 	local randomSetTimer = math.random(3, 10);
@@ -305,6 +305,8 @@ function script_grind:setup()
 	self.blacklistLootTime = GetTimeEX();
 	self.blacklistLootTimeCheck = GetTimeEX();
 	self.deleteCheckTimer = GetTimeEX();
+	script_shamanTotems.waitTimer = GetTimeEX();
+
 
 	local level = GetLocalPlayer():GetLevel();
 
@@ -2025,15 +2027,16 @@ function script_grind:doLoot(localObj)
 
 
 	local _x, _y, _z = self.lootObj:GetPosition();
-	
-	if (IsPathLoaded(5)) then
-		if (script_navEX:moveToTarget(localObj, _x, _y, _z)) then
+	if (self.lootObj:GetDistance() > self.lootDistance) then
+		if (IsPathLoaded(5)) then
+			if (script_navEX:moveToTarget(localObj, _x, _y, _z)) then
 			self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-			return true;
+			return;
+			end
+		else
+			MoveToTarget(_x, _y, _z);
+			return;
 		end
-	else
-		MoveToTarget(_x, _y, _z);
-		return true;
 	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc

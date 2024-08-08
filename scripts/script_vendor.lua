@@ -306,6 +306,7 @@ function script_vendor:sell()
 	local x, y, z = localObj:GetPosition();
 	local factionID = 1; -- horde
 	local factionNr = GetFaction();
+
 	if (factionNr == 1 or factionNr == 3 or factionNr == 4 or factionNr == 115) then
 		factionID = 0; -- alliance
 	end
