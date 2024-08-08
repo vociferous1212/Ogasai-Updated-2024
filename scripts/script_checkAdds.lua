@@ -12,13 +12,13 @@ script_checkAdds = {
 function script_checkAdds:checkAdds()
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
-	if(script_grind:enemiesWithinRange() <= 4) then
+	if (script_grind:enemiesWithinRange() <= 4) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
 			-- use unstuck script
 			if (not script_unstuck:pathClearAuto(2)) then
 				script_unstuck:unstuck();
-				return true;
+				return false;
 			end
 
 			-- if we have a pet then pet follow
@@ -28,7 +28,7 @@ function script_checkAdds:checkAdds()
 
 			self.message = "Moving away from adds...";
 	
-		return true;
+		return;
 		end
 	end
 return false;
@@ -289,7 +289,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/4, 9);
+				script_checkAdds:avoid(centerX, centerY, zP, self.addsRange, 9);
 				PetFollow();
 				return;
 			else

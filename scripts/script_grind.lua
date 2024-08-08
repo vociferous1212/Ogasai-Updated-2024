@@ -66,7 +66,7 @@ script_grind = {
 	avoidElite = true,	-- avoid elites ( currently not working )
 	avoidRange = 40,	-- aboid elites range
 	findLootDistance = 75,
-	lootDistance = 2.65,
+	lootDistance = 2.25,
 	skipLooting = false,
 	lootCheck = {},
 	minLevel = GetLocalPlayer():GetLevel()-5,
@@ -953,6 +953,7 @@ function script_grind:run()
 
 			-- check and do move away from adds during combat
 			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
+				script_grind:setWaitTimer(4500);
 				script_om:FORCEOM();
 				return;
 			end
@@ -1152,12 +1153,13 @@ function script_grind:run()
 				if (_x ~= 0 and x ~= 0) then
 
 
+					script_nav.lastNavIndex = 1;
 					-- move to target
 					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
 						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 
-					elseif (not IsMoving()) or (IsInCombat() and self.enemyObj:GetDistance() > 8) or (not IsPathLoaded(5)) then
+					elseif (not IsPathLoaded(5)) and (not IsMoving() or IsInCombat() and self.enemyObj:GetDistance() > 8) or (not IsPathLoaded(5)) then
 						self.message = "Moving To Target Nav -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						MoveToTarget(_x, _y, _z);
 					end
@@ -1218,6 +1220,7 @@ function script_grind:run()
 				end
 				-- check and avoid adds
 				if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
+					script_grind:setWaitTimer(4500);
 					script_om:FORCEOM();
 					return;
 				end
