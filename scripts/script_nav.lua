@@ -120,7 +120,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- Let's get at least 2 path nodes around the hot spot before we navigate through them
-	if (self.numSavedLocation < 3) then
+	if (self.numSavedLocation < 3) and (script_grind.lootObj == nil or script_grind.lootObj == 0)then
 		return script_moveToHotspot:moveToHotspot(localObj);
 	end
 

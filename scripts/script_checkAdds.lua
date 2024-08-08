@@ -148,7 +148,7 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script_grind.enemyObj:IsCasting()) then
 			if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget()) then
-					script_grind.tickRate = 350;
+					script_grind.tickRate = 150;
 				end	
 				script_grind.message = "Moving Away From Adds";
 				self.closestEnemy = 0;

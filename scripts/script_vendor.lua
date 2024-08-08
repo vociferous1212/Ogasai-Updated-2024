@@ -276,6 +276,10 @@ function script_vendor:sell()
 		script_vendor:setup();
 	end
 
+	if (script_grind.autoSelectVendors) then
+		vendorDB:loadDBVendors();
+	end
+
 	-- Update sell quality rule
 	script_vendor:setSellQuality(self.sellPoor, self.sellCommon, self.sellUncommon, self.sellRare, self.sellEpic);
 

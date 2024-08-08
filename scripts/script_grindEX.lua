@@ -77,6 +77,7 @@ function script_grindEX:doChecks()
 				end
 				RetrieveCorpse();
 				self.useThisVar = true;
+				return true;
 			end
 			return true;
 		end
@@ -115,6 +116,14 @@ function script_grindEX:doChecks()
 				elseif (HasSpell("Travel Form")) then
 					script_druidEX:travelForm();
 				end
+			end
+			if (script_druid.useStealth) and (IsCatForm()) and (HasSpell("Prowl")) and (not IsSpellOnCD("Prowl")) and (not GetLocalPlayer():HasBuff("Prowl")) then
+				CastSpellByName("Prowl");
+				script_grind:setWaitTimer(1500);
+			end
+			if (script_rogue.useStealth) and (not GetLocalPlayer():HasBuff("Stealth")) and (not IsSpellOnCD("Stealth")) and (HasSpell("Stealth")) then
+				CastSpellByName("Stealth");
+				script_grind:setWaitTimer(1500);
 			end
 		end
 
