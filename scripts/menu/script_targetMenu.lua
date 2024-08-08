@@ -30,46 +30,33 @@ function script_targetMenu:menu()
 		Text("           || Blacklisting Resets On Reload ||");
 
 		Separator();
-		if (UnitClass("Player") == "Shaman") and (script_shamanEX2.usingTotems()) then
-			Text("Disable Totems To Use Avoid Adds In Combat");
+		
+		if (not script_grind.skipHardPull) then
+			script_grind.extraSafe = false;
+			script_grindEX.avoidBlacklisted = false;
 		end
-		if (UnitClass('player') ~= "Shaman") or (UnitClass('player') == "Shaman" and not script_shamanEX2.usingTotems()) then
-			if (not script_grind.skipHardPull) then
-				script_grind.extraSafe = false;
-				script_grindEX.avoidBlacklisted = false;
-			end
 	
-			wasClicked, script_grind.skipHardPull = Checkbox("Blacklist And Avoid Enemies / Aggro Ranges", script_grind.skipHardPull);
+		wasClicked, script_grind.skipHardPull = Checkbox("Blacklist And Avoid Enemies / Aggro Ranges", script_grind.skipHardPull);
+
+		wasClicked, script_grindEX.avoidBlacklisted = Checkbox("(Has Bugs) Avoid Blacklisted Targets", script_grindEX.avoidBlacklisted);
 	
-			wasClicked, script_grindEX.avoidBlacklisted = Checkbox("(Has Bugs) Avoid Blacklisted Targets", script_grindEX.avoidBlacklisted);
+		if (script_grind.skipHardPull) then
 	
-			if (script_grind.skipHardPull) then
+			local a = script_checkAdds.addsRange - 5;
+			wasClicked, script_grind.extraSafe = Checkbox("Recheck Avoid Targets " ..a.." (yds)", script_grind.extraSafe);
+			Separator();
 	
-				local a = script_checkAdds.addsRange - 5;
-				wasClicked, script_grind.extraSafe = Checkbox("Recheck Avoid Targets " ..a.." (yds)", script_grind.extraSafe);
-				Separator();
 	
-				if (UnitClass('player') ~= "Shaman") then
-					
-					Text("Avoid/Move Away From Adds In Combat Range");
-					script_checkAdds.addsRange = SliderInt("Distance", 7, 40, script_checkAdds.addsRange);
+			Text("Move Away From Adds In Combat Range");
+			script_checkAdds.addsRange = SliderInt("Add Range", 7, 40, script_checkAdds.addsRange);
+			
+			Separator();
 	
-				elseif (UnitClass('player') == "Shaman") and (not script_shamanEX2.usingTotems()) then
+			Text("Blacklist Target-to-Target Distance (~ 10yds per tick)");
 	
-					Text("Move Away From Adds In Combat Range");
-					script_checkAdds.addsRange = SliderInt("Add Range", 7, 40, script_checkAdds.addsRange);
-				end
-				if (UnitClass('player') == "Shaman") and (script_shamanEX2.usingTotems()) then
-					Text("Disable Totems To Use Avoid Adds In Combat");
-				end
-	
-				Separator();
-	
-				Text("Blacklist Target-to-Target Distance (~ 10yds per tick)");
-	
-				script_aggro.adjustAggro = SliderFloat("Aggro Distance", 1, 5, script_aggro.adjustAggro);
-			end
+			script_aggro.adjustAggro = SliderFloat("Aggro Distance", 1, 5, script_aggro.adjustAggro);
 		end
+	
 
 		Separator();
 		

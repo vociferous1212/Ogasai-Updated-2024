@@ -6,7 +6,7 @@ script_shaman = {
 	potionHealth = 10,
 	potionMana = 20,
 	isSetup = false,
-	meleeDistance = 4.50,
+	meleeDistance = 3.70,
 	waitTimer = 0,
 	stopIfMHBroken = true,
 	enhanceWeapon = "no weapon enhancement yet",
@@ -23,8 +23,8 @@ script_shaman = {
 	useFireTotem = false,
 	useWaterTotem = false,
 	useAirTotem = false,
-	earthShockMana = 60,
-	flameShockMana = 70,
+	earthShockMana = 35,
+	flameShockMana = 60,
 	lightningBoltMana = 25,
 	pullLightningBolt = false,
 	useFrostShock = false,
@@ -32,6 +32,8 @@ script_shaman = {
 	useFlameShock = false,
 	useLightningBolt = false,
 	healMana = 20,
+	enhanceWeaponTimer = 0,
+	randomEnhanceTimer = 0,
 
 }
 
@@ -122,6 +124,8 @@ function script_shaman:setup()
 	end
 
 	self.waitTimer = GetTimeEX();
+	self.enhanceWeaponTimer = GetTimeEX();
+	self.randomEnhanceTimer = math.random(10000, 60000);
 
 	self.isSetup = true;
 
@@ -131,7 +135,7 @@ end
 function script_shaman:checkEnhancement()
 	if (not IsInCombat() and not IsEating() and not IsDrinking()) then
 		hasMainHandEnchant, _, _, _, _, _ = GetWeaponEnchantInfo();
-		if (hasMainHandEnchant == nil) then 
+		if (hasMainHandEnchant == nil) or (GetTimeEX() > self.enhanceWeaponTimer - self.randomEnhanceTimer) then 
 			-- Apply enhancement
 			if (HasSpell(self.enhanceWeapon)) then
 
@@ -149,7 +153,7 @@ function script_shaman:checkEnhancement()
 			else
 				return false;
 			end
-			return true;
+		return true;
 		end
 	end 
 	return false;
@@ -338,15 +342,17 @@ if (IsCasting()) or (IsChanneling()) then
 	-- Check: Lightning Shield
 	if (IsStanding()) and (HasSpell("Lightning Shield")) and (localMana >= 35)
 	and (not localObj:HasBuff("Lightning Shield")) and (IsStanding()) then
-		if (not CastSpellByName("Lightning Shield", localObj)) then
+		if (not Cast("Lightning Shield", localObj)) then
 			self.waitTimer = GetTimeEX() + 1500;
 			script_grind:setWaitTimer(1500);
 			return true;
 		end
 	end
 
-	if (IsStanding()) then
+	if (IsStanding()) and (GetTimeEX() > self.enhanceWeaponTimer - self.randomEnhanceTimer) then
+			self.randomEnhanceTimer = math.random(10000, 60000);
 		if (script_shaman:checkEnhancement()) then
+				self.enhanceWeaponTimer = GetTimeEX() + self.randomEnhanceTimer;
 			return true;
 		end
 	end	
@@ -436,7 +442,7 @@ function script_shaman:run(targetGUID)
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				return true;
@@ -518,7 +524,7 @@ function script_shaman:run(targetGUID)
 			-- run backwards can't see target but close enough to attack
 			if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance) and (not targetObj:IsInLineOfSight()) then
 				if (targetObj:GetDistance() <= .3) then 
-					if (script_shaman:runBackwards(targetObj,1)) then 
+					if (script_shaman:runBackwards(targetObj,2)) then 
 						return 4; 
 					end 
 				end
@@ -552,7 +558,7 @@ function script_shaman:run(targetGUID)
 				targetObj:AutoAttack();
 			end
 			
-			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
@@ -591,7 +597,7 @@ function script_shaman:run(targetGUID)
 					end
 				end
 
-if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not script_shamanEX2.usingTotems()) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
+if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0)  and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				return true;
@@ -611,11 +617,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
 			end
+
 
 			-- Dismount
 			if (IsMounted()) then DisMount(); end
@@ -641,7 +648,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 -- earthbind totem if target is running away
-			if (targetObj:GetHealthPercentage() <= 20) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanTotems:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
+			if (targetObj:GetHealthPercentage() <= 30 or targetObj:IsFleeing()) and (localMana >= 20) and (targetObj:GetCreatureType() == "Humanoid") and (HasSpell("Earthbind Totem")) and (not script_shamanTotems:isEarthbindTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Earthbind Totem")) then
 				CastSpellByName("Earthbind Totem");
 				return 3;
 			end
@@ -654,7 +661,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- Run backwards if we are too close to the target
 			if (targetObj:GetDistance() < .3) then 
-				if (script_shaman:runBackwards(targetObj,1)) then 
+				if (script_shaman:runBackwards(targetObj,2)) then 
 					return 4; 
 				end 
 			end
@@ -774,11 +781,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			end
 
-			if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
+			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
 				if (script_shamanTotems:useTotem()) then
 					return;
 				end
 			end
+
 
 			-- cast lightning bolt in combat
 			if (self.useLightningBolt) then
@@ -829,11 +837,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 				
-				if (localMana >= 20) and (targetObj:GetDistance() <= 20) then
-					if (script_shamanTotems:useTotem()) then
-						return;
-					end
+				if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.safePull or script_grind.safePull and not script_checkAdds:checkAdds()) then
+				if (script_shamanTotems:useTotem()) then
+					return;
 				end
+			end
+
 
 				-- Stormstrike
 				if (HasSpell("Stormstrike") and not IsSpellOnCD("Stormstrike")) then
@@ -899,6 +908,21 @@ function script_shaman:rest()
 			if (localHealth < 70) and (not isGhostWolf) then
 				if (localMana >= self.healMana) then 
 					if (CastSpellByName("Lesser Healing Wave", localObj)) then
+						self.waitTimer = GetTimeEX() + 2200;
+						script_grind:setWaitTimer(2200);
+						return 4;
+					end
+				end
+			end
+		end
+	end
+
+	-- check healing wave...
+	if (not IsInCombat()) and (IsStanding()) then
+		if (not IsCasting()) and (not IsChanneling()) and (HasSpell("Healing Wave")) then
+			if (localHealth < 55) and (not isGhostWolf) then
+				if (localMana >= self.healMana) then 
+					if (CastSpellByName("Healing Wave", localObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						script_grind:setWaitTimer(2200);
 						return 4;
