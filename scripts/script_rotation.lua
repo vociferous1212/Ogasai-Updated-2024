@@ -1,7 +1,7 @@
 script_rotation = {
 	useMount = false,
 	disMountRange = 25,
-	timer = GetTimeEX(),
+	waitTimer = GetTimeEX(),
 	tickRate = 500,
 	combatError = 0,
 	message = 'Rotation',
@@ -28,23 +28,13 @@ script_rotation = {
 }
 
 function script_rotation:setup()
-	script_helper:setup();
-	script_gather:setup();
-	self.isSetup = true;
+	script_helper:setup();script_gather:setup();self.isSetup = true;
 end
 
 function script_rotation:window() -- stuff here runs continous
-	EndWindow();
-	if(NewWindow("Rotation", 320, 300)) then 
-		script_rotationMenu:menu(); 
-	end
+	EndWindow(); if(NewWindow("Rotation", 320, 300)) then script_rotationMenu:menu(); end
 	-- draw chests
-	if (self.drawChests) then
-		script_gather:drawChestNodes();
-	end
-	if (self.useExpChecker) then
-		script_expChecker:menu();
-	end
+	if (self.drawChests) then script_gather:drawChestNodes(); end if (self.useExpChecker) then script_expChecker:menu(); end
 end
 
 function script_rotation:run()
@@ -67,10 +57,10 @@ function script_rotation:run()
 	if (IsCasting() or IsChanneling()) then 
 		return; 
 	end
-	if(self.timer > GetTimeEX()) then
+	if (self.waitTimer > GetTimeEX()) then
 		return;
 	end
-	self.timer = GetTimeEX() + self.tickRate;
+	self.waitTimer = GetTimeEX() + self.tickRate;
 	if (not self.adjustTickRate) then
 			local tickRotationRandom = random(400, 1200);
 		if (not GetLocalPlayer():GetUnitsTarget() == 0) or (IsMoving()) then
@@ -252,7 +242,7 @@ function script_rotation:draw()
 		--DrawRect(x - 10, y - 5, x + width, y + 120, 255, 255, 0,  1, 1, 1);
 		--DrawRectFilled(x - 10, y - 5, x + width, y + 80, 0, 0, 0, 60, 0, 0);
 		--DrawText('Rotation', x-5, y-4, r, g, b) y = y + 15;
-		DrawText('Script Idle: ' .. math.max(0, math.floor(self.timer-GetTimeEX())) .. ' ms.', x+255, y, 255, 255, 255); y = y + 20;
+		DrawText('Script Idle: ' .. math.max(0, math.floor(self.waitTimer-GetTimeEX())) .. ' ms.', x+255, y, 255, 255, 255); y = y + 20;
 		--DrawText('Rotation status: ', x+255, y, r, g, b); y = y + 20;
 		DrawText(self.message or "error", x+255, y, 100, 255, 255);
 		DrawText('Status: ', x+255, y+30, r, g, b);
@@ -269,8 +259,8 @@ function script_rotation:runRest()
 		end
 
 		-- Add 2500 ms timer to the rest script rotations (timer could be set already)
-		if ((self.timer - GetTimeEX()) < 2500) then 
-			self.timer = GetTimeEX() + 2500;
+		if ((self.waitTimer - GetTimeEX()) < 2500) then 
+			self.waitTimer = GetTimeEX() + 2500;
 		end
 	return true;	
 	end

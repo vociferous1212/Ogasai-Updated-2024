@@ -866,8 +866,8 @@ function script_grind:run()
 
 		-- move to hotspot location
 		-- was return true and self.message script_movetohotspot
-		script_moveToHotspot:moveToHotspot(localObj);
-		script_grind:setWaitTimer(self.nextToNodeDist * 2);
+		self.message = script_moveToHotspot:moveToHotspot(localObj);
+		return;
 		end
 
 		-- check party members
@@ -888,7 +888,7 @@ function script_grind:run()
 		end
 
 		self.enemyObj = script_grind:assignTarget();
-		
+
 		if (IsInCombat()) or (not PlayerHasTarget()) then
 			self.stealthRanOnce = false;
 		end
@@ -972,11 +972,11 @@ function script_grind:run()
 		
 		-- wait after combat phase - stuck in combat
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
-			self.message = "waiting after combat - stuck in combat";
+			self.message = "Waiting... Server says we are InCombat()";
 			return;
 		end
 		if (GetLocalPlayer():HasBuff("Bloodrage") and not PlayerHasTarget() and script_grind.enemiesAttackingUs() == 0) or ((IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20)) then
-			self.message = "Waiting after combat - stuck in combat";
+			self.message = "Waiting... Server says we are InCombat()";
 		return;
 		end
 
@@ -1045,7 +1045,7 @@ function script_grind:run()
 						and GetPet():GetHealthPercentage() > 1
 						and not PetHasTarget())
 					and (not PlayerHasTarget())
-					and (script_warlock.hasPet or script_hunter.hasPet)
+					and (HasPet())
 				then
 
 					-- if pet has a target then assist and do combat

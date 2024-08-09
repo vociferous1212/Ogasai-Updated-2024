@@ -16,7 +16,7 @@ function script_drawStatusEX:drawSetup()
 	if (script_grind.drawGather) then
 		script_gather:drawGatherNodes();
 	end
-	if (script_grind.drawPath) or (script_vendor:getStatus() > 0) or (not script_grind.hotspotReached) then
+	if (script_grind.drawPath) then
 		if (IsMoving()) then
 			script_drawData:drawPath();
 		end
