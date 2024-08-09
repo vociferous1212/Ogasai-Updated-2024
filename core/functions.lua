@@ -97,8 +97,8 @@ end
 
 function PetHasTarget()
 	
-	if (GetPet() ~= 0) then
-		if (GetPet():GetUnitsTarget() ~= 0) then
+	if (GetPet() ~= 0) and (GetPet() ~= nil) then
+		if (GetPet():GetUnitsTarget() ~= 0) and (GetPet():GetUnitsTarget():GetGUID() ~= nil) then
 			return true;
 		end
 	end
@@ -107,15 +107,17 @@ end
 
 function PlayerHasTarget()
 	
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-		return true;
+	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetUnitsTarget() ~= nil) then
+		if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= nil) then
+			return true;
+		end
 	end
 return false;
 end
 
 function HasPet()
-	if (GetPet() ~= 0) then
-		if (GetPet():GetHealthPercentage() > 0) then
+	if (GetPet() ~= 0) and (GetPet() ~= nil) then
+		if (GetPet():GetHealthPercentage() > 1) then
 			return true;
 		end
 	end
@@ -124,7 +126,7 @@ end
 
 function CallPet()
 
-	if (GetPet() == 0) then
+	if (GetPet() == 0) and (GetPet() ~= nil) then
 		script_hunter.message = "GetPet() is missing, calling GetPet()...";
 		CastSpellByName("Call Pet");
 		return true;
