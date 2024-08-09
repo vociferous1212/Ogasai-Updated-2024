@@ -696,6 +696,10 @@ function script_grind:run()
 			return;
 		end
 
+		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (not IsCasting()) and (not IsChanneling()) then
+			JumpOrAscendStart();
+		end
+
 		if (IsInCombat()) and (GetTimeEX() > self.omTimer) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
 			if (self.enemyObj:GetHealthPercentage() >= 20) then
 				script_om:FORCEOM();
@@ -1822,15 +1826,15 @@ function script_grind:enemiesAttackingUs() -- returns number of enemies attackin
 	local unitsAttackingUs = 0; 
 	local currentObj, typeObj = GetFirstObject(); 
 	while currentObj ~= 0 do 
-    	if typeObj == 3 then
-		if (currentObj:CanAttack() and not currentObj:IsDead()) then
-                	if (script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) then 
-                		unitsAttackingUs = unitsAttackingUs + 1; 
-                	end 
-            	end 
-       	end
+    		if typeObj == 3 then
+			if (currentObj:CanAttack() and not currentObj:IsDead()) then
+        	        	if (script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) then 
+        	        		unitsAttackingUs = unitsAttackingUs + 1; 
+        	        	end 
+        	    	end 
+       		end
         currentObj, typeObj = GetNextObject(currentObj); 
-    end
+    	end
     return unitsAttackingUs;
 end
 

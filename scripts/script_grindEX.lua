@@ -8,6 +8,15 @@ script_grindEX = {
 	useThisVar = true,
 }
 
+function script_grindEX:areWeSwimming()
+	if (GetLocalPlayer():GetHealthPercentage() >= 1) and (not GetLocalPlayer():IsDead()) then
+		if (IsSwimming()) then
+			return true;
+		end
+	end
+return false;
+end
+
 function script_grindEX:doChecks() 
 
 		-- Load vendors if we move into a new map zone

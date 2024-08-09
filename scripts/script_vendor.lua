@@ -217,7 +217,6 @@ function script_vendor:repair()
 		end
 	return;
 	end
-
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
