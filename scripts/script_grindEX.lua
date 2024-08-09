@@ -181,7 +181,7 @@ function script_grindEX:doChecks()
 
 		if (not IsInCombat()) and (not localObj:HasBuff('Feign Death')) then
 			-- Move out of water before resting/mounting
-			if (IsSwimming()) and (not script_grindEX.allowSwim) then 
+			if (script_grindEX:areWeSwimming()) and (not script_grindEX.allowSwim) then 
 				script_grind.message = "Moving out of the water..."; 
 				if (script_grind.autoPath) then
 					self.message = script_nav:moveToSavedLocation(localObj, script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);

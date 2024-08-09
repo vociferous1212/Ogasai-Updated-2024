@@ -24,7 +24,7 @@ script_grind = {
 	hotspotMoveLoaded = include("scripts\\script_moveToHotspot.lua"),
 
 	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
-	warlockMenu = include("scripts\\combat\\script_warlockEX.lua"),
+	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
 	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
 	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
 	rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
@@ -179,6 +179,7 @@ script_grind = {
 	myLastZ = 0,		-- set coords
 	vendorMessageSent = false,	-- send message to chat frame - vendors loaded from DB...
 	safePullAvoidTargets = false,	-- TODO try to safe pull avoided targets with adds nearby...
+	swimJumpTimer = 0,
 }
 
 function script_grind:setup()
@@ -306,6 +307,7 @@ function script_grind:setup()
 	self.blacklistLootTimeCheck = GetTimeEX();
 	self.deleteCheckTimer = GetTimeEX();
 	script_shamanTotems.waitTimer = GetTimeEX();
+	self.swimJumpTimer = GetTimeEX();
 
 
 	local level = GetLocalPlayer():GetLevel();
@@ -544,7 +546,7 @@ function script_grind:run()
 
 	-- run backwards target has frost nova
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Frostbite") or GetLocalPlayer():GetUnitsTarget():HasDebuff("Frost Nova")) and (not GetLocalPlayer():HasBuff('Evocation')) and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
+		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Frostbite") or GetLocalPlayer():GetUnitsTarget():HasDebuff("Frost Nova")) and (not GetLocalPlayer():HasBuff('Evocation')) and (not script_checkDebuffs:hasDisabledMovement()) and (not script_grindEX:areWeSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
 		if (script_mage:runBackwards(targetObj, 8)) then -- Moves if the target is closer than 7 yards
 			script_grind.tickRate = 0;
 			script_grind.waitTimer = GetTimeEX();
@@ -558,7 +560,7 @@ function script_grind:run()
 	end
 	-- run backwards target has entangling roots
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetManaPercentage() >= 25) then
-		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Entangling Roots")) and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
+		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Entangling Roots")) and (not script_checkDebuffs:hasDisabledMovement()) and (not script_grindEX:areWeSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
 		if (script_druid:runBackwards(targetObj, 10)) then -- Moves if the target is closer than 7 yards
 			script_grind.tickRate = 0;
 			script_grind.waitTimer = GetTimeEX();
@@ -697,7 +699,10 @@ function script_grind:run()
 		end
 
 		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (not IsCasting()) and (not IsChanneling()) then
-			JumpOrAscendStart();
+			if (GetTimeEX() > self.swimJumpTimer) then
+				JumpOrAscendStart();
+				self.swimJumpTimer = GetTimeEX() + 3000;
+			end
 		end
 
 		if (IsInCombat()) and (GetTimeEX() > self.omTimer) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
