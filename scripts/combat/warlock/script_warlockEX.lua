@@ -86,6 +86,7 @@ function script_warlockEX:menu()
 
 	-- show combat menu
 	if (CollapsingHeader("Warlock Combat Options")) then
+		
 
 		--wasClicked, script_warlock.waitAfterCombat = Checkbox("Wait After Combat", script_warlock.waitAfterCombat);
 		--SameLine();
@@ -176,11 +177,6 @@ function script_warlockEX:menu()
 				
 				script_warlock.useVoid = false;
 			end
-		end
-		
-		if (HasSpell("Drain Soul")) then
-			
-			wasClicked, script_warlock.enableGatherShards = Checkbox("Gather Soul Shards", script_warlock.enableGatherShards);
 		end
 
 		Separator();

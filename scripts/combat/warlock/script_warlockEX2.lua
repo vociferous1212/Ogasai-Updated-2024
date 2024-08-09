@@ -1,6 +1,7 @@
 script_warlockEX2 = {
 
 	impUsed = false,
+	shardCount = 0,
 
 }
 
@@ -16,6 +17,7 @@ function script_warlockEX2:summonPet()
 
 	if (not script_grind.adjustTickRate) then
 	script_grind.tickRate = 1500;
+	script_rotation.tickRate = 1500;
 	end
 
 	local localMana = GetLocalPlayer():GetManaPercentage();
@@ -49,6 +51,7 @@ function script_warlockEX2:summonPet()
 		CastSpellByName("Summon Imp");
 		script_grind:setWaitTimer(15000);
 		script_warlock.waitTimer = GetTimeEX() + 15000;
+		script_rotation.waitTimer = GetTimeEX() + 15000;
 		script_warlock.hasPet = true;
 		script_warlock.impUsed = true;
 	end
@@ -166,6 +169,7 @@ function script_warlockEX2:summonPet()
 					if (CastSpellByName("Summon Succubus")) then
 					script_grind:setWaitTimer(15000);
 					script_warlock.waitTimer = GetTimeEX() + 15000;
+					script_rotation.waitTimer = GetTimeEX() + 15000;
 					script_warlock.message = "Summoning Succubus";
 					script_warlock.hasPet = true;
 					return 4;
@@ -186,6 +190,7 @@ function script_warlockEX2:summonPet()
 					if (CastSpellByName("Summon Voidwalker")) then
 					script_grind:setWaitTimer(15000);
 					script_warlock.waitTimer = GetTimeEX() + 15000;
+					script_rotation.waitTimer = GetTimeEX() + 15000;
 					script_warlock.message = "Summoning Void Walker";
 					script_warlock.hasPet = true;
 					return 4;
@@ -213,20 +218,6 @@ function script_warlockEX2:summonPet()
 				return 4;
 				end
 			end
-		elseif (notHasPet or (hasPet and pet:GetHealthPercentage() <= 1)) and (HasSpell("Summon Imp")) and (script_warlock.useImp) and (not IsChanneling()) and (not script_warlock.hasPet) and (not script_warlockEX2:isPetActive()) then
-			-- summon Imp
-			if (localMana > 35) and (notHasPet or (hasPet and pet:GetHealthPercentage() <= 1)) and (not script_warlock.hasPet) then
-				if (notHasPet or (hasPet and pet:GetHealthPercentage() <= 1)) and (not script_warlock.hasPet) then
-					if (CastSpellByName("Summon Imp")) then
-					script_grind:setWaitTimer(15000);
-					script_warlock.waitTimer = GetTimeEX() + 15000;
-					script_warlock.message = "Summoning Imp";
-					script_warlock.hasPet = true;
-					return 4;
-					end
-				return 4;
-				end
-			end
 		end
 	end
 
@@ -244,7 +235,6 @@ function script_warlockEX2:hasSoulShard()
 				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
 				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
    				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
-
 				if (itemName == "Soul Shard") then
 					return true;
 				end
@@ -253,4 +243,24 @@ function script_warlockEX2:hasSoulShard()
 	end
 return false;
 end
-		
+function script_warlockEX2:numberSoulShard()
+	local shardCount = 0;
+	self.shardCount = 0;
+	for i = 0,4 do 
+		for y=0,GetContainerNumSlots(i) do 
+			if (GetContainerItemLink(i,y) ~= nil) then
+				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+				for t = 0, GetContainerNumSlots(i,y) do
+					if (itemName == "Soul Shard") then
+						shardCount = shardCount + 1;
+						self.shardCount = self.shardCount + 1;
+						return shardCount;
+					end
+				end
+			end
+		end 
+	end
+return shardCount;
+end
