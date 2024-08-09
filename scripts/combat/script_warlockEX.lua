@@ -334,14 +334,6 @@ function script_warlockEX:menu()
 
 		if (CollapsingHeader("|+| DoT Options")) then
 				
-			if (HasSpell("Corruption")) and (script_warlock.enableCorruption) then
-				
-				Text("Corruption cast time - 14 is 1.4 seconds");	
-				
-				script_warlock.corruptionCastTime = SliderInt("CCT (ms)", 0, 20, script_warlock.corruptionCastTime);
-				
-				Separator();
-			end
 			
 			if (HasSpell("Siphon Life")) then
 

@@ -17,7 +17,6 @@ script_warlock = {
 	waitTimer = 0,
 	useWand = true,
 	isChecked = true,
-	corruptionCastTime = 0, -- 0-2000 ms = 2000 with no improved corruption talent
 	lifeTapHealth = 75,
 	lifeTapMana = 80,
 	soulShard = 0;
@@ -59,6 +58,37 @@ script_warlock = {
 	howLucky = 3,
 }
 
+function script_warlock:castImmolate(target)
+	if (target ~= 0 and target ~= nil) then
+		if (not script_warlock:targetHasImmolate(target)) then
+			if (not targetObj:HasDebuff("Immolate")) then
+				if (not IsCasting()) and (not IsChanneling()) then
+					CastSpellByName("Immolate");
+					return true;
+				else
+					return 4;
+				end
+			end
+		end
+	end
+return false;
+end
+function script_warlock:castCorruption(target)
+	if (target ~= 0 and target ~= nil) then
+		if (not script_warlock:targetHasCorruption(target)) then
+			if (not targetObj:HasDebuff("Corruption")) then
+				if (not IsCasting()) and (not IsChanneling()) then
+					CastSpellByName("Corruption");
+					return true;
+				else
+					return 4;
+				end
+			end
+		end
+	end
+return false;
+end
+
 --if a target is targeting me and not my pet then send pet to attack
 --only if 2 targets or only check 2 targets
 
@@ -79,7 +109,7 @@ end
 -- need to make a sperate function to check
 function script_warlock:targetHasImmolate(target)
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
-		script_warlock.waitTimer = GetTimeEX() + 300;
+		script_warlock.waitTimer = GetTimeEX() + 500;
 		if (target:HasDebuff("Immolate")) then
 			return true;
 		end
@@ -90,7 +120,7 @@ end
 -- might as well do it for the rest because it works
 function script_warlock:targetHasCorruption(target)
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
-		script_warlock.waitTimer = GetTimeEX() + 300;
+		script_warlock.waitTimer = GetTimeEX() + 500;
 		if (target:HasDebuff("Corruption")) then
 			return true;
 		end
@@ -101,7 +131,7 @@ end
 -- checking for debuffs in a way that actually works
 function script_warlock:targetHasCurseOfAgony(target)
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
-		script_warlock.waitTimer = GetTimeEX() + 300;
+		script_warlock.waitTimer = GetTimeEX() + 500;
 		if (target:HasDebuff("Curse of Agony")) then
 			return true;
 		end
@@ -175,7 +205,7 @@ function script_warlock:fearAdd(targetObjGUID)
 	local localObj = GetLocalPlayer();
 	while currentObj ~= 0 do 
 		if typeObj == 3 then
-			if (currentObj:CanAttack() and not currentObj:IsDead()) then
+			if (currentObj:CanAttack() and not currentObj:IsDead()) and (not currentObj:GetCreatureType() == "Undead") then
 				if (currentObj:GetGUID() ~= targetObjGUID) and (script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) then
 					if (not currentObj:HasDebuff("Fear") and currentObj:GetCreatureType() ~= 'Elemental' and not currentObj:IsCritter()) then
 						if (currentObj:IsInLineOfSight()) then
@@ -274,22 +304,6 @@ function script_warlock:setup()
 		--	self.useFelhunter = true;
 		end
 	end
-
-	-- set corruption based on talent points assuming affliction spec
-	if (GetLocalPlayer():GetLevel() < 10) then
-		self.corruptionCastTime = 20;
-	elseif (GetLocalPlayer():GetLevel() == 10) then
-		self.corruptionCastTime = 16;
-	elseif (GetLocalPlayer():GetLevel() == 11) then
-			self.corruptionCastTime = 12;
-	elseif (GetLocalPlayer():GetLevel() == 12) then
-		self.corruptionCastTime = 8;
-	elseif (GetLocalPlayer():GetLevel() == 13) then
-			self.corruptionCastTime = 4;
-	elseif (GetLocalPlayer():GetLevel() == 14) then
-		self.corruptionCastTime = 0;
-	end
-
 		
 	if (not localObj:HasRangedWeapon()) then
 		self.useShadowBolt = true;
@@ -435,12 +449,12 @@ function script_warlock:run(targetGUID)
 		return 4;
 	end
 
-if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and (HasSpell("Summon Imp")) and ( (localMana >= 45) or (localObj:HasBuff("Fel Domination") and localMana >= 30) ) then
+if (self.useVoid or self.useImp or self.useSuccubus or self.useFelhunter) and ((GetPet() == 0) or ((GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and (HasSpell("Summon Imp")) and ( (localMana >= 45)) or (localObj:HasBuff("Fel Domination") and localMana >= 30) )) then
 		if (IsMoving()) then
 			StopMoving();
 			return true;
 		end
-		if (not script_warlockEX2:isPetActive()) and (not IsCasting()) and (not IsChanneling()) and (not localObj:HasBuff("Blood Pact")) then
+		if (self.useImp or self.useVoid or self.useSuccubus or self.useFelhunter) and (not script_warlockEX2:isPetActive()) and (not IsCasting()) and (not IsChanneling()) and (not localObj:HasBuff("Blood Pact")) then
 			if (script_warlockEX2:summonPet()) then
 				self.waitTimer = GetTimeEX() + 15000;
 				script_grind:setWaitTimer(15000);
@@ -589,7 +603,7 @@ if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and
 			self.useShadowBolt = true;
 			self.varUsed = true;
 		end
-		if (self.varUsed and not IsInCombat()) or (localMana < 15 and self.varUsed) then
+		if (self.varUsed and not IsInCombat() or script_grind:enemiesAttackingUs() < 2) or (localMana < 15 and self.varUsed) then
 			self.useWand = true;
 			self.useShadowBolt = true;
 			self.varUsed = false;
@@ -729,6 +743,10 @@ if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and
 				script_warlock:petAttack();
 				self.message = "Pulling Target";
 				targetObj:FaceTarget();
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
 				if (CastSpellByName("Shadow Bolt", targetObj)) then
 					self.waitTimer = GetTimeEX() + 2550;
 					script_grind:setWaitTimer(2550);
@@ -753,6 +771,14 @@ if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and
 		local petHasTarget = GetPet():GetUnitsTarget();
 	end
 		local playerHasTarget = GetLocalPlayer():GetUnitsTarget();
+
+-- Check: Do nothing if we are channeling, casting
+	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX()) then
+		if (IsChanneling()) or (IsCasting()) then
+		self.waitTimer = GetTimeEX() + 500
+		end
+		return 4;
+	end
 
 -- Check: Do we have the right target (in UI) ??
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
@@ -810,7 +836,7 @@ if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and
 
 			if (HasSpell("Will of the Forsaken")) and (script_checkDebuffs:undeadForsaken()) then
 				if (not IsSpellOnCD("Will of the Forsaken")) then
-					CastSpellByName("Cure Disease", localObj);
+					CastSpellByName("Will of the Forsaken", localObj);
 					self.waitTimer = GetTimeEX() + 1750;
 					return 0;
 				end
@@ -954,7 +980,7 @@ if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and
 				end
 			end
 
-			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) then
+			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (not targetObj:GetCreatureType() == "Undead") then
 				CastSpellByName("Fear", targetObj);
 				self.waitTimer = GetTimeEX() + 1500;
 				return 0;
@@ -1144,25 +1170,49 @@ if (GetPet() == 0) or (GetPet() ~= 0 and GetPet():GetHealthPercentage() < 1) and
 
 
 			-- Check: Keep the Corruption DoT up (15 s duration)
-			if (not IsMoving()) and (self.enableCorruption) and (not script_warlock:targetHasCorruption(targetObj) and not targetObj:HasDebuff("Corruption")) and (targetHealth >= 20) and (targetObj:IsInLineOfSight()) then
-				if (not CastSpellByName("Corruption", targetObj)) then
-					targetObj:FaceTarget();
-					self.waitTimer = GetTimeEX() + 2250 + (self.corruptionCastTime * 100);
-					script_grind:setWaitTimer(2250 + (self.corruptionCastTime * 100));
+			if (not IsMoving()) and (self.enableCorruption) and (not script_warlock:targetHasCorruption(targetObj)) and (targetHealth >= 20) and (targetObj:IsInLineOfSight()) and (not IsCasting()) and (not IsChanneling()) then
+					if (IsMoving()) then
+						StopMoving();
+						return true;
+					end
+					self.waitTimer = GetTimeEX() + 750;
+					script_grind:setWaitTimer(750);
+					self.tickRate = 1750;
+				if (not IsMoving()) and (not script_warlock:targetHasCorruption(targetObj)) then
+					if not (IsCasting()) and (not IsChanneling()) then
+						if (script_warlock:castCorruption(targetObj)) then
+							targetObj:FaceTarget();
+							self.waitTimer = GetTimeEX() + 3500;
+							script_grind:setWaitTimer(3500);
+							return 4;
+						else
+							return 4;
+						end
 					return 4;
+					end
 				end				
 			end
 	
 			-- Check: Keep the Immolate DoT up (15 s duration)
-			if (not IsMoving()) and (self.enableImmolate) and (not script_warlock:targetHasImmolate(targetObj)) and (localMana > 25) and (targetHealth > 20) and (targetObj:IsInLineOfSight()) and (not IsMoving()) then
-				if (not script_warlock:targetHasImmolate(targetObj) and not targetObj:HasDebuff("Immolate")) and (not IsMoving()) then
-					if (not CastSpellByName("Immolate", targetObj)) then
+			if (not IsMoving()) and (self.enableImmolate) and (not script_warlock:targetHasImmolate(targetObj)) and (localMana > 25) and (targetHealth > 20) and (targetObj:IsInLineOfSight()) and (not IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
+				if not (IsCasting()) and (not IsChanneling()) and (not script_warlock:targetHasImmolate(targetObj)) and (not IsMoving()) then
+					if (IsMoving()) then
+						StopMoving();
+						return true;
+					end
+					self.waitTimer = GetTimeEX() + 750;
+					script_grind:setWaitTimer(750);
+					if (IsCasting()) or (IsChanneling()) then
+						return;
+					end
+					if (script_warlock:castImmolate(targetObj)) then
 						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 2500;
-						script_grind:setWaitTimer(2500);
+						self.waitTimer = GetTimeEX() + 3500;
+						script_grind:setWaitTimer(3500);
+						return 4;
+					else
 						return 4;
 					end
-				return 4;
 				end
 			end
 
@@ -1373,7 +1423,7 @@ if (GetPet() ~= 0) then
 		self.hasPet = true;
 	end
 	
-	if (HasSpell("Summon Imp")) and (GetPet == 0 or GetPet == nil) and (not script_warlockEX2:isPetActive()) then	
+	if (HasSpell("Summon Imp")) and (GetPet == 0 or GetPet == nil) and (not script_warlockEX2:isPetActive()) and (self.useImp or self.useVoid or self.useSuccubus or self.useFelhunter) then	
 		if (IsMoving()) then
 			StopMoving();
 		end
