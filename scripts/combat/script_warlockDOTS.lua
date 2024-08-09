@@ -15,9 +15,9 @@ if (IsInCombat()) then
                			if (script_grind:isTargetingMe(currentObj))
 					or (script_grind:isTargetingPet(currentObj))
 					then
-					if (HasSpell("Corruption") and not currentObj:HasDebuff('Corruption'))
-					or (HasSpell("Immolate") and not currentObj:HasDebuff("Immolate"))
-					or (HasSpell("Curse of Agony") and not currentObj:HasDebuff("Curse of Agony"))
+					if (HasSpell("Corruption") and not currentObj:HasDebuff('Corruption') and not script_warlock:targetHasCorruption(currentObj))
+					or (HasSpell("Immolate") and not currentObj:HasDebuff("Immolate") and not script_warlock:targetHasImmolate(targetObj))
+					or (HasSpell("Curse of Agony") and not currentObj:HasDebuff("Curse of Agony") and not script_warlock:targetHasCurseOfAgony(targetObj))
 					then
            				return currentObj;
               	 			end 
@@ -42,9 +42,9 @@ function script_warlockDOTS:getTargetDOT()
                			if (script_grind:isTargetingMe(currentObj))
 					or (script_grind:isTargetingPet(currentObj))
 					then
-					if (currentObj:HasDebuff('Corruption'))
-					or (currentObj:HasDebuff("Immolate"))
-					or (currentObj:HasDebuff("Curse of Agony"))
+					if (currentObj:HasDebuff('Corruption') or script_warlock:targetHasCorruption())
+					or (currentObj:HasDebuff("Immolate") or script_warlock.targetHasImmolate())
+					or (currentObj:HasDebuff("Curse of Agony") or currentObj:HasDebuff("Curse of Agony"))
 					then
            				return currentObj;
               	 			end 
@@ -70,7 +70,7 @@ function script_warlockDOTS:corruption(targetObj)
 							script_grind.tickRate = 250;
 							script_rotation.tickRate = 250;
 						end
-						if (script_warlock:cast('Corruption', currentObj)) then 
+						if (not script_warlock:cast('Corruption', currentObj)) then 
 							script_grind:setWaitTimer(2500);
 							script_warlock.waitTimer = GetTimeEX() + 2500;
 							return true; 
@@ -99,7 +99,7 @@ function script_warlockDOTS:immolate(targetObj)
 							script_grind.tickRate = 250;
 							script_rotation.tickRate = 250;
 						end
-						if (script_warlock:cast('Immolate', currentObj)) then 
+						if (not script_warlock:cast('Immolate', currentObj)) then 
 							script_grind:setWaitTimer(2500);
 							script_warlock.waitTimer = GetTimeEX() + 2500;
 							return true; 
@@ -128,7 +128,7 @@ function script_warlockDOTS:curseOfAgony(targetObj)
 							script_grind.tickRate = 250;
 							script_rotation.tickRate = 250;
 						end
-						if (script_warlock:cast('Curse of Agony', currentObj)) then 
+						if (not script_warlock:cast('Curse of Agony', currentObj)) then 
 							script_grind:setWaitTimer(2500);
 							script_warlock.waitTimer = GetTimeEX() + 2500;
 							return true; 

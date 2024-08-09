@@ -101,7 +101,7 @@ function script_vendorMenu:menu()
 			if (script_vendor.foodVendor ~= 0) then
 				SameLine();
 				Text('' .. script_vendor.foodVendor['name'] .. ' loaded.');
-				if (not script_grind.autoSelectVendors) then
+				
 					if Button("Buy Food Now") then 
 						script_vendor.status = 4;
 						script_vendor.itemName = script_vendor.foodName;
@@ -109,7 +109,6 @@ function script_vendorMenu:menu()
 						script_vendor.itemIsFood = true;
 						script_vendor.itemIsDrink = false;
 						script_vendor.itemIsAmmo = false;
-					end
 					SameLine();
 					if Button("Cancel Buy Food") then
 						script_vendor.message = "Idle...";
@@ -135,7 +134,6 @@ function script_vendorMenu:menu()
 				if (script_vendor.drinkVendor ~= 0) then
 				SameLine();
 				Text('' .. script_vendor.drinkVendor['name'] .. ' loaded.');
-				if (not script_grind.autoSelectVendors) then
 					if Button("Buy Drink Now") then 
 						script_vendor.status = 4;
 						script_vendor.itemName = script_vendor.drinkName;
@@ -143,7 +141,6 @@ function script_vendorMenu:menu()
 						script_vendor.itemIsFood = false;
 						script_vendor.itemIsDrink = true;
 						script_vendor.itemIsAmmo = false;
-					end
 					SameLine();
 					if Button("Cancel Buy Drinks") then
 						script_vendor.message = "Idle...";
