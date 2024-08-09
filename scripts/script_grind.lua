@@ -867,7 +867,7 @@ function script_grind:run()
 		-- move to hotspot location
 		-- was return true and self.message script_movetohotspot
 		self.message = script_moveToHotspot:moveToHotspot(localObj);
-		return;
+		return true;
 		end
 
 		-- check party members
@@ -971,7 +971,7 @@ function script_grind:run()
 		end	
 		
 		-- wait after combat phase - stuck in combat
-		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
+		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (not self.enemyObj:HasDebuff("Fear")) then
 			self.message = "Waiting... Server says we are InCombat()";
 			return;
 		end
