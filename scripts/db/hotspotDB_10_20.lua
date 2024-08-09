@@ -51,13 +51,16 @@ function hotspotDB_10_20:setup()
 	hotspotDB:addHotspot("Grizzlepaw Ridge 14 - 16", "Alliance", 14, 16, -5659.24, -3217.88, 320.02);
 
 -- Silverpine Forest
-
 	hotspotDB:addHotspot("Silverpine Forest 16 - 18", "Horde", 16, 18, -522, 1323.19, 45.47);
 	hotspotDB:addHotspot("Silverpine Forest 10 - 12", "Horde", 10, 12, 456.39, 1326.19, 83.7);
 	hotspotDB:addHotspot("Silverpine Forest 10 - 12", "Horde", 10, 12, 740.58, 1458.97, 64.31);
 	hotspotDB:addHotspot("Silverpine Forest 13 - 15", "Horde", 13, 15, 1049.6, 1364.06, 38.17);
 	hotspotDB:addHotspot("North Tide's Hollow 14 - 16", "Horde", 14, 16, 806.7, 1827.12, 6.54);
-	hotspotDB:addHotspot("Silverpine Forest 10 - 12", "Horde", 10, 12, 1533.23, 652.43, 44.5);
+	hotspotDB:addHotspot("Silverpine Forest 10 - 11", "Horde", 10, 11, 1533.23, 652.43, 44.5);
+	hotspotDB:addHotspot("Malden's Orchard 11 - 13", "Horde", 11, 13, 1426.39, 1019.32, 52.38);
+	--hotspotDB:addHotspot("Silverpine Forest 11 - 13", "Horde", 11, 13, 1131.34, 1265.5, 39.98);
+	hotspotDB:addHotspot("The Dead Field 11 - 13", "Horde", 11, 13, 1125.71, 1489.95, 34.19);
+
 
 -- Barrens
 	hotspotDB:addHotspot("The Barrens 10 - 12", "Horde", 10, 12, -611.31, -2775.74, 92.92);
@@ -70,7 +73,7 @@ function hotspotDB_10_20:setup()
 	hotspotDB:addHotspot("The Barrens 16 - 19", "Horde", 16, 19, 805.92, -2945.67, 91.66);
 	hotspotDB:addHotspot("The Barrens 19 - 21", "Horde", 19, 21, -1476.2, -1976.99, 90.51);
 	hotspotDB:addHotspot("The Barrens 17 - 19", "Horde", 17, 19, -1159.64, -3259.29, 91.68);
-	hotspotDB:addHotspot("Southern Barrens 18 - 21", "Tauren", 19, 21, -2328.36, -2218.45, 91.66);
+	hotspotDB:addHotspot("Southern Barrens 18 - 21", "Horde", 19, 21, -2328.36, -2218.45, 91.66);
 	hotspotDB:addHotspot("Southern Barrens 17 - 19", "Horde", 17, 19, -1747.7, -2894.05, 93.87);
 	hotspotDB:addHotspot("Southern Barrens 19 - 21", "Horde", 19, 21, -2149.74, -2242.58, 94.75);
 	hotspotDB:addHotspot("Bramblescar 19 - 21", "Horde", 19, 21, -2088.87, -2442.84, 94.16);

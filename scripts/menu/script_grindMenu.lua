@@ -21,7 +21,6 @@ function script_grindMenu:setup()
 		script_priest:setup();
 		script_paladin:setup();
 		script_warrior:setup();
-		--script_hunter:setup();
 		script_rogue:setup();
 	end
 
