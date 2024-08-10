@@ -1,6 +1,7 @@
 script_priest = {
 	message = 'Priest Combat Script',
 	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
+	priestExtra = include("scripts\\combat\\script_priestEX2.lua"),
 	isSetup = false,	-- setup stuff
 	isChecked = true,	-- setup stuff
 	drinkMana = 45,	-- drink at health %
@@ -573,6 +574,12 @@ function script_priest:run(targetGUID)
 					self.waitTimer = GetTimeEX() + 1550;
 					self.message = "Keeping DoT up!";
 					return; -- keep trying until cast
+				end
+			end
+			if (script_grind:enemiesAttackingUs() > 1) then
+				if (script_priestEX2:castDOTOnAdd()) then
+					ClearTarget();
+					return true;
 				end
 			end
 
