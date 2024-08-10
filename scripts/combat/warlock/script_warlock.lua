@@ -2,7 +2,7 @@ script_warlock = {
 	message = 'Warlock Combat Script',
 	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
 	warlockExtra2 = include("scripts\\combat\\warlock\\script_warlockEX2.lua"),
-	warlockDOTS = include("scripts\\combat\\warlock\\script_warlockDOTS.lua"),
+	warlockDOTSLoaded = include("scripts\\combat\\warlock\\script_warlockDOTS.lua"),
 	warlockFunctions = include("scripts\\combat\\warlock\\script_warlockFunctions.lua"),
 	drinkMana = 40,
 	eatHealth = 55,
@@ -12,7 +12,6 @@ script_warlock = {
 	numStone = 0,
 	stoneHealth = 30,
 	isSetup = false,
-	fearTimer = 0,
 	cooldownTimer = 0,
 	addFeared = false,
 	fearAdds = true,
@@ -56,12 +55,13 @@ script_warlock = {
 	varUsed = false,	-- turn on and off shadowbolt and wand during combat
 	waitAfterCombat = false,
 	corruptionCastTime = 0,
+	warlockDOTS = false,
+	warlockDOTSCount = 2,
 }
 
 function script_warlock:setup()
 
 	self.waitTimer = GetTimeEX();
-	self.fearTimer = GetTimeEX();
 	self.cooldownTimer = GetTimeEX();
 
 	local localObj = GetLocalPlayer();
@@ -73,10 +73,6 @@ function script_warlock:setup()
 		self.corruptionCastTime = 800;
 	elseif (localLevel == 12) then
 		self.corruptioncastTime = 1200;
-	elseif (localLevel == 13) then
-		self.corruptionCastTime = 1600;
-	elseif (localLevel == 14) then
-		self.corruptionCastTime = 2000;
 	end
 
 	if (not localObj:HasRangedWeapon()) then
@@ -129,7 +125,7 @@ function script_warlock:setup()
 		self.useWandHealth = 100;
 		self.useShadowbolt = false;
 	end
-
+	
 	self.isSetup = true;
 end
 
@@ -372,7 +368,10 @@ function script_warlock:run(targetGUID)
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
-				return true;
+				if (HasPet()) then
+					PetFollow();
+				end
+			return true;
 			end
 		end
 
@@ -397,10 +396,6 @@ function script_warlock:run(targetGUID)
 		-- stand if sitting
 		if (not IsStanding()) then
 			JumpOrAscendStart();
-		end
-
-		if (IsCasting()) then
-			targetObj:FaceTarget();
 		end
 
 -- Opener check range of ALL SPELLS
@@ -437,6 +432,25 @@ function script_warlock:run(targetGUID)
 			end
 		end
 
+		if (self.warlockDOTS) and (script_grindEX:howManyEnemiesInRange(29) >= self.warlockDOTSCount) and (script_grind.enemiesAttackingUs() < self.warlockDOTSCount) and (localMana >= 50) and (localHealth >= 65) then
+		if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) then
+			return 3;
+		end
+
+			if (script_warlockDOTS:corruption()) then
+				self.waitTimer = GetTimeEX() + 1500;
+				return true;
+			end
+			if (script_warlockDOTS:curseOfAgony()) then
+				self.waitTimer = GetTimeEX() + 1500;
+				return true;
+			end
+			if (script_warlockDOTS:immolate()) then
+				self.waitTimer = GetTimeEX() + 2500;
+				return true;
+			end
+			ClearTarget();
+		end
 
 
 -- START OF COMBAT PHASE
@@ -530,8 +544,8 @@ function script_warlock:run(targetGUID)
 						if (script_warlockFunctions:castCorruption(targetObj)) then
 							script_warlockFunctions:petAttack();
 							targetObj:FaceTarget();
-							self.waitTimer = GetTimeEX() + 1500 - self.corruptionCastTime;
-							script_grind:setWaitTimer(1500 - self.corruptionCastTime);
+							self.waitTimer = GetTimeEX() + 2750 - self.corruptionCastTime;
+							script_grind:setWaitTimer(2750 - self.corruptionCastTime);
 							return 4;
 						else
 							return 4;
@@ -579,6 +593,8 @@ function script_warlock:run(targetGUID)
 			return 4;
 			end
 
+
+
 			-- Check: Do we have the right target (in UI) ??
 			if (PlayerHasTarget()) then
 				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
@@ -616,6 +632,7 @@ function script_warlock:run(targetGUID)
 					if (not script_grind.adjustTickRate) then
 						script_grind.tickRate = 135;
 					end
+					targetObj:FaceTarget();
 					CastSpellByName('Drain Soul', targetObj);
 					self.message = "Gathering Soulshards";
 					return;
@@ -733,35 +750,36 @@ function script_warlock:run(targetGUID)
 				end
 			end
 
-			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (not targetObj:GetCreatureType() == "Undead") then
-				CastSpellByName("Fear", targetObj);
+			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetCreatureType() ~= "Undead") then
+				script_warlockFunctions:cast("Fear", targetObj);
 				self.waitTimer = GetTimeEX() + 1500;
 				return;
 			end
 
 			-- Fear single Target
 			if (self.alwaysFear) and (HasSpell("Fear")) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetHealthPercentage() > 40) and (targetObj:GetCreatureType() ~= "Undead") then
-				if (targetObj:GetCreatureType() ~= "Undead") and (not targetObj:HasDebuff("Fear")) then
-					CastSpellByName("Fear", targetObj);
-					if (not script_grind.adjustTickRate) and (IsInCombat()) then
+				if (not script_grind.adjustTickRate) and (IsInCombat()) then
 					script_grind.tickRate = 135;
-					end
-					self.waitTimer = GetTimeEX() + 1900;
-					return;
 				end
+				self.waitTimer = GetTimeEX() + 1900;
+
+				script_warlockFunctions:cast("Fear", targetObj);
+			return;
 			end
 
 			-- Check if add already feared
-			if (not script_warlockFunctions:isAddFeared() and not (self.fearTimer < GetTimeEX())) then
+			if (not script_warlockFunctions:isAddFeared()) then
 				self.addFeared = false;
 			end
 
 			-- Check: Fear add
-			if (targetObj ~= nil) and (self.fearAdds) and (script_grind:enemiesAttackingUs() > 1) and (HasSpell('Fear')) and (not self.addFeared) and (self.fearTimer < GetTimeEX()) then
+			if (targetObj ~= nil) and (self.fearAdds) and (script_grind:enemiesAttackingUs() > 1) and (HasSpell("Fear")) and (not self.addFeared) then
 				self.message = "Fearing add...";
-				script_warlockFunctions:fearAdd(targetObj:GetGUID());
-				if (not script_grind.adjustTickRate) and (IsInCombat()) then
-					script_grind.tickRate = 250;
+				if (script_warlockFunctions:fearAdd(targetObj:GetGUID())) then
+					if (not script_grind.adjustTickRate) and (IsInCombat()) then
+						script_grind.tickRate = 250;
+					end
+				return;
 				end
 			end
 
@@ -804,7 +822,9 @@ function script_warlock:run(targetGUID)
 						self.waitTimer = GetTimeEX() + 600;
 						return 0;
 					else
+						if (IsMoving()) then
 						StopMoving();
+						end
 					end
 					CastSpellByName("Health Funnel"); 
 					return 0;
@@ -876,7 +896,9 @@ function script_warlock:run(targetGUID)
 						script_navEX:moveToTarget(localObj, GetPet():GetPosition()); 
 						self.waitTimer = GetTimeEX() + 600;
 					else
-						StopMoving();
+						if (IsMoving()) then
+							StopMoving();
+						end
 					end
 					CastSpellByName("Health Funnel"); 
 					return 0;
@@ -911,6 +933,29 @@ function script_warlock:run(targetGUID)
 				end
 			end
 
+-- Check: Keep the Immolate DoT up (15 s duration)
+			if (not IsMoving()) and (self.enableImmolate) and (not script_warlockFunctions:targetHasImmolate(targetObj)) and (localMana > 25) and (targetHealth > 20) and (targetObj:IsInLineOfSight()) and (not IsMoving()) and (not IsCasting()) and (not IsChanneling()) and (HasSpell("Immolate")) then
+				if not (IsCasting()) and (not IsChanneling()) and (not script_warlockFunctions:targetHasImmolate(targetObj)) and (not IsMoving()) then
+					if (IsMoving()) then
+						StopMoving();
+						return true;
+					end
+					self.waitTimer = GetTimeEX() + 750;
+					script_grind:setWaitTimer(750);
+					if (IsCasting()) or (IsChanneling()) then
+						return;
+					end
+					if (script_warlockFunctions:castImmolate(targetObj)) then
+						targetObj:FaceTarget();
+						self.waitTimer = GetTimeEX() + 3250;
+						script_grind:setWaitTimer(3250);
+						return 4;
+					else
+						return 4;
+					end
+				end
+			end
+
 
 			-- Check: Keep the Corruption DoT up (15 s duration)
 			if (not IsMoving()) and (self.enableCorruption) and (not script_warlockFunctions:targetHasCorruption(targetObj)) and (targetHealth >= 25) and (targetObj:IsInLineOfSight()) and (not IsCasting()) and (not IsChanneling()) and (HasSpell("Corruption")) then
@@ -937,38 +982,16 @@ function script_warlock:run(targetGUID)
 					end
 				end				
 			end
-	
-			-- Check: Keep the Immolate DoT up (15 s duration)
-			if (not IsMoving()) and (self.enableImmolate) and (not script_warlockFunctions:targetHasImmolate(targetObj)) and (localMana > 25) and (targetHealth > 20) and (targetObj:IsInLineOfSight()) and (not IsMoving()) and (not IsCasting()) and (not IsChanneling()) and (HasSpell("Immolate")) then
-				if not (IsCasting()) and (not IsChanneling()) and (not script_warlockFunctions:targetHasImmolate(targetObj)) and (not IsMoving()) then
-					if (IsMoving()) then
-						StopMoving();
-						return true;
-					end
-					self.waitTimer = GetTimeEX() + 750;
-					script_grind:setWaitTimer(750);
-					if (IsCasting()) or (IsChanneling()) then
-						return;
-					end
-					if (script_warlockFunctions:castImmolate(targetObj)) then
-						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 2250;
-						script_grind:setWaitTimer(2250);
-						return 4;
-					else
-						return 4;
-					end
-				end
-			end
 
 			-- Fear single Target
 			if (self.alwaysFear) and (HasSpell("Fear")) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetHealthPercentage() > 40) and (targetObj:GetCreatureType() ~= "Undead") then
-				CastSpellByName("Fear", targetObj);
+				if (script_warlockFunctions:cast("Fear", targetObj)) then
 					self.waitTimer = GetTimeEX() + 1900;
 					if (not script_grind.adjustTickRate) and (IsInCombat()) then
-					script_grind.tickRate = 135;
+						script_grind.tickRate = 135;
 					end
-					return;
+				return;
+				end
 			end
 
 			-- Drain Life on low health

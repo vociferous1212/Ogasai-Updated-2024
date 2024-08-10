@@ -15,17 +15,17 @@ if (IsInCombat()) then
                			if (script_grind:isTargetingMe(currentObj))
 					or (script_grind:isTargetingPet(currentObj))
 					then
-					if (HasSpell("Corruption") and not currentObj:HasDebuff('Corruption') and not script_warlock:targetHasCorruption(currentObj))
-					or (HasSpell("Immolate") and not currentObj:HasDebuff("Immolate") and not script_warlock:targetHasImmolate(targetObj))
-					or (HasSpell("Curse of Agony") and not currentObj:HasDebuff("Curse of Agony") and not script_warlock:targetHasCurseOfAgony(targetObj))
+					if (HasSpell("Corruption") and not currentObj:HasDebuff('Corruption') and not script_warlockFunctions:targetHasCorruption(currentObj))
+					or (HasSpell("Immolate") and not currentObj:HasDebuff("Immolate") and not script_warlockFunctions:targetHasImmolate(currentObj))
+					or (HasSpell("Curse of Agony") and not currentObj:HasDebuff("Curse of Agony") and not script_warlockFunctions:targetHasCurseOfAgony(currentObj))
 					then
            				return currentObj;
               	 			end 
 				end
 			end
            	end 
-       	end
         currentObj, typeObj = GetNextObject(currentObj)
+       	end
 end
  
 return nil;
@@ -42,103 +42,106 @@ function script_warlockDOTS:getTargetDOT()
                			if (script_grind:isTargetingMe(currentObj))
 					or (script_grind:isTargetingPet(currentObj))
 					then
-					if (currentObj:HasDebuff('Corruption') or script_warlock:targetHasCorruption())
-					or (currentObj:HasDebuff("Immolate") or script_warlock.targetHasImmolate())
-					or (currentObj:HasDebuff("Curse of Agony") or currentObj:HasDebuff("Curse of Agony"))
+					if (currentObj:HasDebuff('Corruption') or script_warlockFunctions:targetHasCorruption(currentObj))
+					or (currentObj:HasDebuff("Immolate") or script_warlockFunctions.targetHasImmolate(currentObj))
+					or (currentObj:HasDebuff("Curse of Agony") or script_warlockFunctions.targetHasCurseOfAgony(currentObj))
 					then
            				return currentObj;
               	 			end 
 				end
 			end
            	end 
-       	end
         currentObj, typeObj = GetNextObject(currentObj); 
+       	end
 return nil;
 end
 
-function script_warlockDOTS:corruption(targetObj) 
+function script_warlockDOTS:corruption() 
 	local currentObj, typeObj = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	local mana = localObj:GetManaPercentage();
 	if (IsInCombat()) and (mana >= 15) and (HasSpell("Corruption")) then
-	while currentObj ~= 0 do 
-		if typeObj == 3 then
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
-				if (currentObj:GetDistance() <= 40) then
-					if (not currentObj:HasDebuff("Corruption")) and (currentObj:IsInLineOfSight()) then
-						if (not script_grind.adjustTickRate) then
-							script_grind.tickRate = 250;
-							script_rotation.tickRate = 250;
-						end
-						if (not script_warlock:cast('Corruption', currentObj)) then 
+		while currentObj ~= 0 do 
+			if typeObj == 3 then
+				if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
+					if (currentObj:GetDistance() <= 28) then
+						if (not currentObj:HasDebuff("Corruption") and not script_warlockFunctions:targetHasCorruption(currentObj)) and (currentObj:IsInLineOfSight()) then
+							if (not script_grind.adjustTickRate) then
+								script_grind.tickRate = 250;
+								script_rotation.tickRate = 250;
+							end
+							currentObj:FaceTarget();
+							script_warlockFunctions:cast('Corruption', currentObj);
+							ClearTarget();
 							script_grind:setWaitTimer(2500);
 							script_warlock.waitTimer = GetTimeEX() + 2500;
 							return true; 
-						end
+						end 
 					end 
 				end 
-			end 
+			end
+        	currentObj, typeObj = GetNextObject(currentObj); 
 		end
-        currentObj, typeObj = GetNextObject(currentObj); 
-	end
 	end
 return false;
 end
 
-function script_warlockDOTS:immolate(targetObj) 
+function script_warlockDOTS:immolate() 
 	local currentObj, typeObj = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	local mana = localObj:GetManaPercentage();
 	if (IsInCombat()) and (mana >= 40) and (HasSpell("Immolate")) then
-	while currentObj ~= 0 do 
-		if typeObj == 3 then
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
-				if (currentObj:GetDistance() <= 40) then
-					if (not currentObj:HasDebuff("Immolate")) and (currentObj:IsInLineOfSight()) then
-						if (not script_grind.adjustTickRate) then
-							script_grind.tickRate = 250;
-							script_rotation.tickRate = 250;
-						end
-						if (not script_warlock:cast('Immolate', currentObj)) then 
-							script_grind:setWaitTimer(2500);
-							script_warlock.waitTimer = GetTimeEX() + 2500;
-							return true; 
-						end
+		while currentObj ~= 0 do 
+			if typeObj == 3 then
+				if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
+					if (currentObj:GetDistance() <= 28) then
+						if (not currentObj:HasDebuff("Immolate") and not script_warlockFunctions:targetHasImmolate(currentObj)) and (currentObj:IsInLineOfSight()) then
+							if (not script_grind.adjustTickRate) then
+								script_grind.tickRate = 250;
+								script_rotation.tickRate = 250;
+							end
+							currentObj:FaceTarget();
+							if (not script_warlockFunctions:cast('Immolate', currentObj)) then 
+								script_grind:setWaitTimer(2500);
+								script_warlock.waitTimer = GetTimeEX() + 2500;
+								return true; 
+							end
+						end 
 					end 
 				end 
-			end 
+			end
+        	currentObj, typeObj = GetNextObject(currentObj); 
 		end
-        currentObj, typeObj = GetNextObject(currentObj); 
-	end
 	end
 return false;
 end
 
-function script_warlockDOTS:curseOfAgony(targetObj) 
+function script_warlockDOTS:curseOfAgony() 
 	local currentObj, typeObj = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	local mana = localObj:GetManaPercentage();
 	if (IsInCombat()) and (mana >= 15) and (HasSpell("Curse of Agony")) then
-	while currentObj ~= 0 do 
-		if typeObj == 3 then
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
-				if (currentObj:GetDistance() <= 40) then
-					if (not currentObj:HasDebuff("Curse of Agony")) and (currentObj:IsInLineOfSight()) then
-						if (not script_grind.adjustTickRate) then
-							script_grind.tickRate = 250;
-							script_rotation.tickRate = 250;
-						end
-						if (not script_warlock:cast('Curse of Agony', currentObj)) then 
-							script_grind:setWaitTimer(2500);
-							script_warlock.waitTimer = GetTimeEX() + 2500;
-							return true; 
-						end
+		while currentObj ~= 0 do 
+			if typeObj == 3 then
+				if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
+					if (currentObj:GetDistance() <= 28) then
+						if (not currentObj:HasDebuff("Curse of Agony") and not script_warlockFunctions:targetHasCurseOfAgony(currentObj)) and (currentObj:IsInLineOfSight()) then
+							if (not script_grind.adjustTickRate) then
+								script_grind.tickRate = 250;
+								script_rotation.tickRate = 250;
+							end
+							currentObj:FaceTarget();
+							if (not script_warlockFunctions:cast('Curse of Agony', currentObj)) then 
+								script_grind:setWaitTimer(2500);
+								script_warlock.waitTimer = GetTimeEX() + 2500;
+								return true; 
+							end
+						end 
 					end 
 				end 
-			end 
+			end
+        	currentObj, typeObj = GetNextObject(currentObj); 
 		end
-        currentObj, typeObj = GetNextObject(currentObj); 
-	end
 	end
 return false;
 end

@@ -87,7 +87,13 @@ function script_warlockEX:menu()
 	-- show combat menu
 	if (CollapsingHeader("Warlock Combat Options")) then
 		
-
+		if (HasSpell("Corruption")) then
+			wasClicked, script_warlock.warlockDOTS = Checkbox("Feeling Lucky?", script_warlock.warlockDOTS);
+			if (script_warlock.warlockDOTS) then
+				Text("Your luck");
+				script_warlock.warlockDOTSCount = SliderInt("NPC Count", 0, 5, script_warlock.warlockDOTSCount);
+			end
+		end
 		--wasClicked, script_warlock.waitAfterCombat = Checkbox("Wait After Combat", script_warlock.waitAfterCombat);
 		--SameLine();
 		--if (HasSpell("Corruption")) then

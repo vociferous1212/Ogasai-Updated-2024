@@ -134,9 +134,7 @@ function script_warlockFunctions:getTargetNotFeared()
    	while currentObj ~= 0 do 
    		if typeObj == 3 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
-               			if ((script_grind:isTargetingMe(currentObj)
-				or script_grind:isTargetingPet(currentObj))
-				and not currentObj:HasDebuff('Fear')) then 
+               			if ((script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) and not currentObj:HasDebuff('Fear')) then 
            		return currentObj;
               	 	end 
            	end 
@@ -152,10 +150,10 @@ function script_warlockFunctions:isAddFeared()
 	while currentObj ~= 0 do 
 		if typeObj == 3 then
 			if (currentObj:HasDebuff("Fear")) then
-				self.addFeared = true; 
+				script_warlock.addFeared = true; 
 				return true;
 			else 
-				self.addFeared = false;
+				script_warlock.addFeared = false;
 			end
 		end
 		currentObj, typeObj = GetNextObject(currentObj); 
@@ -168,7 +166,7 @@ function script_warlockFunctions:fearAdd(targetObjGUID)
 	local localObj = GetLocalPlayer();
 	while currentObj ~= 0 do 
 		if typeObj == 3 then
-			if (currentObj:CanAttack() and not currentObj:IsDead()) and (not currentObj:GetCreatureType() == "Undead") then
+			if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:GetCreatureType() ~= "Undead") then
 				if (currentObj:GetGUID() ~= targetObjGUID) and (script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) then
 					if (not currentObj:HasDebuff("Fear") and currentObj:GetCreatureType() ~= 'Elemental' and not currentObj:IsCritter()) then
 						if (currentObj:IsInLineOfSight()) then
@@ -176,9 +174,10 @@ function script_warlockFunctions:fearAdd(targetObjGUID)
 								script_grind.tickRate = 100;
 								script_rotation.tickRate = 100;
 							end
-							if (CastSpellByName('Fear', currentObj)) then 
-								self.addFeared = true; 
-								fearTimer = GetTimeEX() + 8000;
+							if (script_warlockFunctions:cast("Fear", currentObj)) then
+								script_warlock.waitTimer = GetTimeEX() + 2500;
+								script_grind:setWaitTimer(2500);
+								script_warlock.addFeared = true; 
 								return true; 
 							end
 						end
@@ -205,11 +204,26 @@ function script_warlockFunctions:runBackwards(targetObj, range)
  		if (distance < range and targetObj:IsInLineOfSight()) then
  			script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
 			if (IsMoving()) then
-				self.waitTimer = GetTimeEX() + 1500;
+				script_warlock.waitTimer = GetTimeEX() + 1500;
 				JumpOrAscendStart();
 			end
  			return true;
  		end
 	end
 	return false;
+end
+
+function script_warlockFunctions:petAttackTargetAtackingMe()
+	if (not PlayerHasTarget()) or (not PetHasTarget()) then
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				if (script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
+					script_grind.enemyObj = i;
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
+return false;
 end

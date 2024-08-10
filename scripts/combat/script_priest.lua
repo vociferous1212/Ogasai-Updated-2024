@@ -28,7 +28,6 @@ script_priest = {
 	swpMana = 15, -- Use shadow word: pain above this mana %
 	followTargetDistance = 100,
 	rangeDistance = 28,
-	openerRange = 25,
 }
 
 function script_priest:heal(spellName, target)
@@ -121,10 +120,6 @@ function script_priest:setup()
 	if (not HasSpell("Mind Blast")) then
 		self.useSmite = true;
 		self.useWandHealth = 65;
-	end
-
-	if (HasSpell("Vampiric Embrace")) then
-		self.openerRange = 30;
 	end
 
 end
@@ -339,14 +334,9 @@ function script_priest:run(targetGUID)
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 			
 			-- Opener check range of ALL SPELLS
-			if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+			if (targetObj:GetDistance() > 30) or (not targetObj:IsInLineOfSight()) then
 				self.message = "Walking to spell range!";
 				return 3;
-			end
-
-			-- forces bot to walk closer to enemy and adds some randomness
-			if (targetObj:GetDistance() <= self.openerRange + 3) then
-				self.openerRange = 31;
 			end
 
 			-- casts mind blast quicker
@@ -360,9 +350,16 @@ function script_priest:run(targetGUID)
 			end
 			
 			-- smite low level wouldn't cast for some reason kept defaulting to auto attack
-			if (GetLocalPlayer():GetLevel() <= 3) and (targetObj:GetDistance() < 28) and (localMana > 10) then
-				CastSpellByName("Smite", targetObj);
+			if (not HasSpell("Mind Blast")) and (targetObj:GetDistance() <= 28) and (localMana > 10) and (not IsMoving()) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
 				targetObj:FaceTarget();
+				if (CastSpellByName("Smite", targetObj)) then
+					self.waitTimer = GetTimeEX() + 1650;
+					targetObj:FaceTarget();
+				end
 			end
 
 			-- No Mind Blast but wand ? fixed!
@@ -417,33 +414,44 @@ function script_priest:run(targetGUID)
 
 			-- Use Smite and wand
 			elseif (self.useSmite) and (localMana >= self.useWandMana) and (targetHealth >= self.useWandHealth) then
-				if (not IsMoving()) then
-					Cast("Smite", targetObj);
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				targetObj:FaceTarget();
+				if (CastSpellByName("Smite", targetObj)) then
 					targetObj:FaceTarget();
-					self.waitTimer = GetTimeEX() + 750;
+					self.waitTimer = GetTimeEX() + 1550;
 					self.message = "Smite is checked!";
 					return 0; -- keep trying until cast
 				end
 				if (HasSpell("Holy Fire")) and (not targetObj:HasDebuff("Holy Fire")) and (localMana >= 25) then
 					targetObj:FaceTarget();
 					CastSpellByName("Holy Fire");
-					self.waitTimer = GetTimeEX() + 750;
+					self.waitTimer = GetTimeEX() + 1650;
 					return 0;
 				end
 
 			-- Use Smite if we have it
 			elseif (self.useSmite) and (localMana >= 7) then
-				if (Cast("Smite", targetObj)) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				targetObj:FaceTarget();
+				if (CastSpellByName("Smite", targetObj)) then
 					targetObj:FaceTarget();
-					self.waitTimer = GetTimeEX() + 750;
+					self.waitTimer = GetTimeEX() + 1650;
 					self.message = "Smite is checked!";
 					return 0; -- keep trying until cast
 				end
 				if (HasSpell("Holy Fire")) and (not targetObj:HasDebuff("Holy Fire")) and (localMana >= 25) then
 					targetObj:FaceTarget();
-					CastSpellByName("Holy Fire");
-					self.waitTimer = GetTimeEX() + 750;
-					return 0;
+					if (CastSpellByName("Holy Fire", targetObj)) then
+						targetObj:FaceTarget();
+						self.waitTimer = GetTimeEX() + 1650;
+						return 0;
+					end
 				end
 			end
 
@@ -453,14 +461,15 @@ function script_priest:run(targetGUID)
 			end
 
 
-
-
 		-- IN COMBAT
 
 		-- Combat
 
 		else	
 
+			if (IsCasting()) or (IsChanneling()) then
+				return;
+			end
 			if (IsInCombat()) and (not localObj:HasRangedWeapon()) and (IsAutoCasting("Attack")) then
 				if (targetObj:GetDistance() > 6) then
 					return 3;
@@ -599,14 +608,23 @@ function script_priest:run(targetGUID)
 			end
 
 			-- Cast: Smite (last choice e.g. at level 1)
-			if (self.useSmite) and (self.useWand) and (targetHealth >= self.useWandHealth) and (localMana >= 7) then
-				if (Cast("Smite", targetObj)) then 
-					self.waitTimer = GetTimeEX() + 750;
+			if (self.useSmite) and (self.useWand) and (localMana >= 7) and
+			( (targetHealth >= self.useWandHealth and HasSpell("Mind Blast")) or (not HasSpell("Mind Blast") and targetHealth >= 25) ) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				if (CastSpellByName("Smite", targetObj)) then 
+					self.waitTimer = GetTimeEX() + 1650;
 					return 0; -- keep trying until cast
 				end
-			elseif (self.useSmite) and (not localObj:HasRangedWeapon()) and (localMana >=7) then
-				if (Cast("Smite", targetObj)) then 
-					self.waitTimer = GetTimeEX() + 750;
+			elseif (self.useSmite) and (not localObj:HasRangedWeapon()) and (localMana >=7) and ( (targetHealth >= self.useWandHealth and HasSpell("Mind Blast")) or (not HasSpell("Mind Blast") and targetHealth >= 25) ) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				if (not CastSpellByName("Smite", targetObj)) then 
+					self.waitTimer = GetTimeEX() + 2050;
 					return 0; -- keep trying until cast
 				end
 			end
