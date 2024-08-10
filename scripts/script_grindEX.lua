@@ -252,3 +252,17 @@ function script_grindEX:doChecks()
 
 	return false;
 end
+
+function script_grindEX:howManyEnemiesInRange(range)
+	local i, t = GetFirstObject();
+	local numberNearby = 0;
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() <= range) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
+				numberNearby = numberNearby + 1;
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return numberNearby;
+end

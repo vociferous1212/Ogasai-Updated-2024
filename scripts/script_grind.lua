@@ -666,7 +666,20 @@ function script_grind:run()
 		return true;
 	end
 
-	if (IsInCombat()) and (not IsMoving()) then
+	-- we are being attacked by something so attack it - we have a pet
+	if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) then		
+		if (not PlayerHasTarget()) or (HasPet() and not PetHasTarget()) then
+			script_warlockFunctions:petAttackTargetAtackingMe();
+		end
+	end
+	-- we are being attacked by something so attack it - we have NO pet
+	if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) then
+		if (not PlayerHasTarget()) and (not HasPet()) then
+			script_grind:attackTargetAttackingMe();
+		end
+	end
+
+	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (self.enemyObj:GetDistance() <= 30) then
 				self.enemyObj:FaceTarget();
@@ -881,7 +894,7 @@ function script_grind:run()
 		if (self.useExpChecker) then
 			script_expChecker:targetLevels();
 		end
-		
+
 		-- Assign the next valid target to be killed within the pull range
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			self.lastTarget = self.enemyObj:GetGUID();
@@ -2251,5 +2264,20 @@ function script_grind:isAnyTargetTargetingMe()
 		i, targetType = GetNextObject(i);
 	end
 
+return false;
+end
+
+function script_grind:attackTargetAtackingMe()
+	if (not PlayerHasTarget()) then
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				if (script_grind:isTargetingMe(i)) then
+					script_grind.enemyObj = i;
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
 return false;
 end
