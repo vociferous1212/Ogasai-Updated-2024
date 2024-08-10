@@ -1,8 +1,8 @@
 script_nav = {
 	includeNavEX= include("scripts\\script_navEX.lua"),
 	useNavMesh = true,
-	nextNavNodeDistance = 3.9, -- for mobs and loot
-	nextPathNodeDistance = 4.1, -- for walking paths
+	nextNavNodeDistance = 2.9, -- for mobs and loot
+	nextPathNodeDistance = 2.9, -- for walking paths
 	lastPathIndex = 0,
 	navPosition = {},
 	navPathPosition = {},

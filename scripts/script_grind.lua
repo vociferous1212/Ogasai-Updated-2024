@@ -91,7 +91,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 3.7, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 3.15, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -447,47 +447,47 @@ function script_grind:run()
 
 	 -- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
-		script_nav:setNextToNodeDist(14); NavmeshSmooth(14);
+		script_nav:setNextToNodeDist(11); NavmeshSmooth(self.nextToNodeDist*1.8);
 	else
 		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist);
+		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
 	end
 
 		localObj = GetLocalPlayer();
 	-- sprint or dash or aspect or cheetah or cat form
 	if (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
-		script_nav:setNextToNodeDist(10); NavmeshSmooth(26);
+		script_nav:setNextToNodeDist(8); NavmeshSmooth(self.nextToNodeDist*1.8);
 	else
 		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*5);
+		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
 	end
 
 	-- night elf whisp
 		local race = UnitRace('player');
 	if (race == 'Night Elf') and (localObj:IsDead()) then
 		script_nav:setNextToNodeDist(8);
-		NavmeshSmooth(18);
+		NavmeshSmooth(self.nextToNodeDist*1.6);
 	else
 		-- else set to preset variable
 		script_nav:setNextToNodeDist(self.nextToNodeDist);
-		NavmeshSmooth(self.nextToNodeDist*5);
+		NavmeshSmooth(self.nextToNodeDist*1.6);
 	end
 	
 	-- player is dead
 	if (localObj:IsDead() or IsGhost()) then
-		script_nav:setNextToNodeDist(8);
-		NavmeshSmooth(20);
+		script_nav:setNextToNodeDist(5);
+		NavmeshSmooth(self.nextToNodeDist*1.6);
 		self.tickRate = 100;
 	else
 		-- else set to preset variable
 		script_nav:setNextToNodeDist(self.nextToNodeDist);
-		NavmeshSmooth(self.nextToNodeDist*5);
+		NavmeshSmooth(self.nextToNodeDist*1.6);
 	end
 
 	if (IsIndoors()) then
-		script_nav:setNextToNodeDist(2.5); NavmeshSmooth(8);
+		script_nav:setNextToNodeDist(2.5); NavmeshSmooth(self.nextToNodeDist*1.8);
 	else
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*2.2);
+		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
 	end
 	
 	-- run setup function if not ran yet
