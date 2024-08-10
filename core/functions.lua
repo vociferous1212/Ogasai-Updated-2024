@@ -107,7 +107,7 @@ end
 
 function PlayerHasTarget()
 	
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetUnitsTarget() ~= nil) then
+	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetUnitsTarget() ~= nil) and (GetTarget() ~= 0) and (GetTarget() ~= nil) then
 		if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= nil) then
 			return true;
 		end
