@@ -8,21 +8,18 @@ function coremenu:reload()
 	coremenu:draw();
 end
 
-localObj = GetLocalPlayer();
-
 function coremenu:draw()
 
+	-- should tell the bot to keep variables if disconnected or switching areas (loading screens)
+	PersistLoadingScreen(true);
+
 	if (self.isSetup == false) then
-	
 		self.isSetup = true;
-		
-		
 		--[[
 			----------------------------
 			Core Files
 			----------------------------
 		]]--
-		
 		include("core\\core.lua");
 		include("core\\functions.lua");
 		include("core\\racialSpells.lua");
@@ -30,15 +27,11 @@ function coremenu:draw()
 		-- Load DBs
 		include("scripts\\db\\vendorDB.lua");
 		include("scripts\\db\\hotspotDB.lua");
-
-
-
 		--[[
 			----------------------------
 			Class Rotations
 			----------------------------
 		]]--
-
 		LoadScript("Shaman", "scripts\\combat\\shaman\\script_shaman.lua");
 		AddScriptToCombat("Shaman", "script_shaman");
 
@@ -65,14 +58,11 @@ function coremenu:draw()
 
 		LoadScript("Warrior", "scripts\\combat\\script_warrior.lua");
 		AddScriptToCombat("Warrior", "script_warrior");
-
-
 		--[[
 			----------------------------
 			Bot Types
 			----------------------------
 		]]--
-	
 		LoadScript("Grinder", "scripts\\script_grind.lua");
 		AddScriptToMode("Grinder", "script_grind");
 
@@ -89,25 +79,18 @@ function coremenu:draw()
 		--LoadScript("Runner", "scripts\\script_runner.lua");
 		--AddScriptToMode("Runner", "script_runner");
 
-		--LoadScript("Pick Pocket Rogue", "scripts\\script_pickPocket.lua");
-		--AddScriptToMode("Pick Pocket Rogue", "script_pickPocket");
-
 		--LoadScript("Unstuck Test", "scripts\\script_unstuck.lua");
 		--AddScriptToMode("Unstuck Test", "script_unstuck");
 
 		--LoadScript("Pather", "scripts\\script_pather.lua");
 		--AddScriptToMode("Pather Debug", "script_pather");
-		
 		--[[
 			----------------------------
 			Override Settings
 			----------------------------
 		]]--
-	
-	DrawPath(true);
-		
+		--DrawPath(true);
 		--NewTheme(false);
-		
 	end
 
 	--[[
@@ -115,23 +98,18 @@ function coremenu:draw()
 		Append To Menu
 		----------------------------
 	]]--
-
 	-- Grind 
 	--Separator();
 	--if (CollapsingHeader("Grind options")) then
 	--	script_grindMenu:menu();
 	--end
-
 	--if (CollapsingHeader("Follower options")) then
 	--	script_followEX:menu();
 	--end
-
 	--if (CollapsingHeader("Fishing options")) then
 	--	script_fish:menu();
 	--end
-	
 	--Separator();
-
 	---- Add Combat scripts menus
 	--if (CollapsingHeader("Combat options")) then
 	--	script_mageEX:menu();
@@ -144,5 +122,4 @@ function coremenu:draw()
 	--	script_rogueEX:menu();
 	--	script_shamanEX:menu();
 	--end
-	
 end

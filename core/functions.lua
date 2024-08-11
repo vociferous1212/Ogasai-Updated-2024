@@ -1,64 +1,47 @@
-script_functions = {
+script_functions = {}
 
-}
-
-
--- druid or shaman check forms
 function HasForm()
+	local player = GetLocalPlayer();
 
-	if (GetLocalPlayer():HasBuff("Bear Form"))
-		or (GetLocalPlayer():HasBuff("Dire Bear Form"))
-		or (GetLocalPlayer():HasBuff("Cat Form"))
-		or (GetLocalPlayer():HasBuff("Aquatic Form"))
-		or (GetLocalPlayer():HasBuff("Travel Form"))
-		or (GetLocalPlayer():HasBuff("Moonkin Form"))
-		or (GetLocalPlayer():HasBuff("Ghost Wolf"))
-	then
+	if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) or (player:HasBuff("Cat Form")) or (player:HasBuff("Aquatic Form")) or (player:HasBuff("Travel Form")) or (player:HasBuff("Moonkin Form")) or (player:HasBuff("Ghost Wolf")) then
 		return true;
 	end
 return false;
 end
 
 function IsMoonkinForm()
+	local player = GetLocalPlayer();
 
-	if (GetLocalPlayer():HasBuff("Moonkin Form"))
-
-	then
+	if (player:HasBuff("Moonkin Form")) then
 		return true;
 	end
+return false;
 end
 
--- druid has cat form
 function IsCatForm()
+	local player = GetLocalPlayer();
 
-	if (GetLocalPlayer():HasBuff("Cat Form"))
-	
-	then
+	if (player:HasBuff("Cat Form")) then
 		return true;
 	end
-
 return false;
 end
 
 -- druid has bear form
 function IsBearForm()
-	
-	if (GetLocalPlayer():HasBuff("Bear Form"))
-		or (GetLocalPlayer():HasBuff("Dire Bear Form"))
-	
-	then
-		return true;
+	local player = GetLocalPlayer();
 
+	if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) then
+		return true;
 	end
 return false;
 end
 
 -- druid has travel form
 function IsTravelForm()
-	
-	if (GetLocalPlayer():HasBuff("Travel Form"))
+	local player = GetLocalPlayer();
 
-	then
+	if (player:HasBuff("Travel Form")) then
 		return true;
 	end
 return false;
@@ -66,19 +49,19 @@ end
 
 -- druid has aquatic form
 function IsAquaticForm()
-	
-	if (GetLocalPlayer():HasBuff("Aquatic Form"))
+	local player = GetLocalPlayer();
 
-	then
+	if (player:HasBuff("Aquatic Form")) then
 		return true;
 	end
 return false;
 end
 
 function CastGhostWolf()
+	local player = GetLocalPlayer();
 
-	if (HasSpell("Ghost Wolf")) and (not GetLocalPlayer():HasBuff("Ghost Wolf")) and (not IsSpellOnCD("Ghost Wolf")) then
-		CastSpellByName("Ghost Wolf", GetLocalPlayer());
+	if (HasSpell("Ghost Wolf")) and (not player:HasBuff("Ghost Wolf")) and (not IsSpellOnCD("Ghost Wolf")) then
+		CastSpellByName("Ghost Wolf", player);
 		return true;
 	end
 return false;
@@ -86,19 +69,19 @@ end
 
 -- shaman has ghost wolf form
 function IsGhostWolf()
-	
-	if (GetLocalPlayer():HasBuff("Ghost Wolf"))
+	local player = GetLocalPlayer();
 
-	then
+	if (player:HasBuff("Ghost Wolf")) then
 		return true;
 	end
 return false;
 end
 
 function PetHasTarget()
-	
-	if (GetPet() ~= 0) and (GetPet() ~= nil) then
-		if (GetPet():GetUnitsTarget() ~= 0) and (GetPet():GetUnitsTarget():GetGUID() ~= nil) then
+	local pet = GetPet();
+
+	if (pet ~= 0) and (pet ~= nil) then
+		if (pet:GetUnitsTarget() ~= 0) and (pet:GetUnitsTarget():GetGUID() ~= nil) then
 			return true;
 		end
 	end
@@ -106,9 +89,10 @@ return false;
 end
 
 function PlayerHasTarget()
-	
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetUnitsTarget() ~= nil) and (GetTarget() ~= 0) and (GetTarget() ~= nil) then
-		if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= nil) then
+	local player = GetLocalPlayer();
+
+	if (player:GetUnitsTarget() ~= 0) and (player:GetUnitsTarget() ~= nil) and (GetTarget() ~= 0) and (GetTarget() ~= nil) then
+		if (player:GetUnitsTarget():GetGUID() ~= nil) then
 			return true;
 		end
 	end
@@ -116,8 +100,10 @@ return false;
 end
 
 function HasPet()
-	if (GetPet() ~= 0) and (GetPet() ~= nil) then
-		if (GetPet():GetHealthPercentage() > 1) then
+	local pet = GetPet();
+
+	if (pet ~= 0) and (pet ~= nil) then
+		if (pet:GetHealthPercentage() > 1) then
 			return true;
 		end
 	end
@@ -125,9 +111,10 @@ return false;
 end
 
 function CallPet()
+	local pet = GetPet();
 
-	if (GetPet() == 0) and (GetPet() ~= nil) then
-		script_hunter.message = "GetPet() is missing, calling GetPet()...";
+	if (pet == 0) and (pet ~= nil) then
+		script_hunter.message = "pet is missing, calling pet...";
 		CastSpellByName("Call Pet");
 		return true;
 	end
@@ -135,11 +122,12 @@ return false;
 end
 
 function CastStealth()
+	local player = GetLocalPlayer();
 
 	if (HasSpell("Stealth")) or (HasSpell("Prowl")) and (not script_checkDebuffs:hasMagic()) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasCurse()) and (not IsStealth()) then
 		if (HasSpell("Stealth")) and (script_rogue.useStealth) then
 			if (not IsSpellOnCD("Stealth")) then
-				CastSpellByName("Stealth", GetLocalPlayer());
+				CastSpellByName("Stealth", player);
 				script_grind:setWaitTimer(1500);
 				return true;
 			end
@@ -150,7 +138,7 @@ function CastStealth()
 					return true;
 				end
 			elseif (not IsSpellOnCD("Prowl")) and (IsCatForm()) then
-				CastSpellByName("Prowl", GetLocalPlayer());
+				CastSpellByName("Prowl", player);
 				script_grind:setWaitTimer(1500);
 				return true;
 			end
@@ -160,8 +148,9 @@ return false;
 end
 
 function IsStealth()
+	local player = GetLocalPlayer();
 
-	if (GetLocalPlayer():HasBuff("Stealth")) or (GetLocalPlayer():HasBuff("Prowl")) then
+	if (player:HasBuff("Stealth")) or (player:HasBuff("Prowl")) then
 		return true;
 	end
 return false;
