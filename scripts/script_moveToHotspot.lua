@@ -3,6 +3,10 @@ script_moveToHotspot = {}
 
 -- script character limit... need to continue splitting files...
 function script_moveToHotspot:moveToHotspot(localObj)
+
+	if (script_getSpells.getSpellsStatus == 1) then
+		return false;
+	end
 	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
@@ -12,7 +16,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
 
 			-- mount/stealth/cat form/ travel form/ ghost wolf
-			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) then
+			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
 				CastStealth();
 				CastGhostWolf();
 				CastSprint();

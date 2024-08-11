@@ -25,6 +25,7 @@ function script_deleteItems:setup()
 	script_deleteItems:addDeleteItem("Snickerfang Jowl");
 	script_deleteItems:addDeleteItem("Imperfect Draenethyst Fragment");
 	script_deleteItems:addDeleteItem("Wooden Key");
+	script_deleteItems:addDeleteItem("Kolkar Booty Key");
 	--script_deleteItems:addDeleteItem("");
 
 

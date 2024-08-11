@@ -18,7 +18,7 @@ script_grind = {
 	gatherLoaded = include("scripts\\script_gather.lua"),
 	grindExtra = include("scripts\\script_grindEX.lua"),
 	extraFunctionsLoaded = include("scripts\\script_extraFunctions.lua"),
-	getSpellsLoaded = include("scripts\\script_getSpells.lua"),
+	getSpellsLoaded = include("scripts\\getTrainerSpells\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	hotspotMoveLoaded = include("scripts\\script_moveToHotspot.lua"),
@@ -119,7 +119,7 @@ script_grind = {
 	showClassOptions = true,	-- setup function to show menu
 	pause = true,		-- pause script
 	bagsFull = false,	-- are bags full
-	vendorRefill = false,	-- refill at vendor
+	vendorRefill = true,	-- refill at vendor
 	useMana = true,		-- does player use mana
 	drawGather = false,	-- draw gather nodes
 	hotspotReached = false,	-- is hotspot reached
@@ -237,6 +237,9 @@ function script_grind:setup()
 		self.blacklistTime = 20;
 		script_gather.collectChests = true;
 	end
+	if (GetLocalPlayer():GetLevel() <= 10) then
+		self.getSpells = true;
+	end
 
 	-- enable drawing unit info on screen
 	self.drawEnabled = true;
@@ -261,6 +264,8 @@ function script_grind:setup()
 
 	-- auto load sell vendors
 	vendorDB:loadDBVendors();
+
+	script_getSpells:setup();
 
 	-- navigation script loaded
 	script_nav:setup();
@@ -309,6 +314,7 @@ function script_grind:setup()
 	self.lootCheck['target'] = 0;
 	self.lootCheck['timer'] = GetTimeEX();
 	self.buffTimer = GetTimeEX();
+	script_getSpells.waitTimer = GetTimeEX();
 
 
 	local level = GetLocalPlayer():GetLevel();
@@ -408,8 +414,6 @@ function script_grind:run()
 	-- show grinder window
 	script_grind:window();
 
-	if (self.getSpells) then if (script_getSpells.getSpellsStatus ~= 3) then if (script_getSpells:run()) then end end end
-
 	if (script_grindMenu.showGarbageBox) then
 		collectgarbage(Fcollect);
 	end
@@ -431,7 +435,7 @@ function script_grind:run()
 	-- draw fishing pools
 	if (script_gatherEX.drawFishingPools) then
 		script_gatherEX:drawFishNodes();
-	end
+	end	
 
 	-- logout timer
 	if (self.useLogoutTimer) then
@@ -549,9 +553,12 @@ function script_grind:run()
 		end
 	end
 
-	if (not IsInCombat()) and (GetTimeEX() > self.buffTimer) then
+	if (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
 		self.buffTimer = GetTimeEX() + 3000;
 		if (script_buffOtherPlayers:doBuffs()) then
+			if (not IsStanding()) then
+				JumpOrAscendStart();
+			end
 			return true;
 		end
 	end
@@ -723,6 +730,22 @@ function script_grind:run()
 			return;
 		end
 
+		-- reset to allow bot to continue if we don't have the checkbox clicked...
+		if (not self.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
+			script_getSpells.getSpellsStatus = 0;
+		end
+		-- go to trainer and get spells
+		if (self.getSpells) and (not self.pause) and (not IsInCombat()) then
+			script_grind.message = "Moving to class trainer for spells";
+			if (script_getSpells:checkForSpellsNeeded()) then
+				return;
+			end
+		end
+		-- force bot to keep path to trainer
+		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
+			return;
+		end
+	
 		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
 			local x, y, z = GetLocalPlayer():GetPosition();
 			if (GetTimeEX() > self.swimJumpTimer) then
@@ -879,7 +902,7 @@ function script_grind:run()
 			end
 
 			-- Shaman Ghost Wolf 
-			if (not IsMounted()) and (not self.useMount) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) then
+			if (not IsMounted()) and (not self.useMount) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) and (not IsIndoors()) then
 					CastSpellByName('Ghost Wolf');
 					self.waitTimer = GetTimeEX() + 1500;
 					script_grind:setWaitTimer(1500);
