@@ -8,8 +8,8 @@ function script_displayOptionsMenu:menu()
 
 		if (script_grind.drawEnabled) then
 			if (CollapsingHeader("|+| Move Status Window")) then
-				script_grind.adjustX = SliderInt("adjust X scale", -300, 300, script_grind.adjustX);
-				script_grind.adjustY = SliderInt("adjust Y scale", -300, 300, script_grind.adjustY);
+				script_drawStatus.adjustX = SliderInt("adjust X scale", -300, 300, script_drawStatus.adjustX);
+				script_drawStatus.adjustY = SliderInt("adjust Y scale", -300, 300, script_drawStatus.adjustY);
 			end
 		end
 		if (CollapsingHeader("|+| Draw Radar")) then

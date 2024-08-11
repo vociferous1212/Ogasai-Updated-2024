@@ -174,7 +174,8 @@ function script_warrior:draw()	-- draw warrior window and status text
 			tY = tY + script_grind.adjustY;
 		end
 
-	DrawText(self.message, tX+230, tY+9, 255, 250, 205);
+	DrawText(self.message, tX+30, tY+100, 255, 250, 205);
+
 	else
 		if (script_grind.adjustText) and (script_grind.drawEnabled) then
 			tX = tX + script_grind.adjustX;

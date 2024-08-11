@@ -98,10 +98,12 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	
 			-- Cast Shield Power Word: Shield
 		if (localMana >= 10) and (localHealth <= script_priest.shieldHP) and (not localObj:HasDebuff("Weakened Soul")) and (IsInCombat()) and (HasSpell("Power Word: Shield")) then
-			if (Buff("Power Word: Shield", localObj)) then 
-				script_grind:setWaitTimer(1600);
-				script_priest.waitTimer = GetTimeEX() + 1600;
-				return 0;  -- if buffed 
+			if ( (not PlayerHasTarget()) or (PlayerHasTarget() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetHealthPercentage() >= 20) )  then
+				if (Buff("Power Word: Shield", localObj)) then 
+					script_grind:setWaitTimer(1600);
+					script_priest.waitTimer = GetTimeEX() + 1600;
+					return 0;  -- if buffed 
+				end
 			end
 		end
 
@@ -203,6 +205,31 @@ function script_priestEX:menu()
 		-- priest combat options all COMBAT spells under here. skills spells talents
 		if (CollapsingHeader("Priest Combat Options")) then
 
+	-- hide wand menu if no ranged weapon equipped
+			if (localObj:HasRangedWeapon()) then
+
+				-- wand options menu
+				if (CollapsingHeader("|+| Wand Options")) then
+
+					Text('Wand options:');
+						if (not script_priest.useWand) then
+							SameLine();
+							Text("    Priest script was built with using wand");	
+						end
+					wasClicked, script_priest.useWand = Checkbox("Use Wand", script_priest.useWand);
+						if (not script_priest.useWand) then
+							SameLine();
+							Text("     Disabling will greatly hinder survivability");
+						end
+					Text('Wand below Self mana percent');
+					script_priest.useWandMana = SliderInt("WM%", 10, 100, script_priest.useWandMana);
+
+					Text('Wand below target HP percent');
+					script_priest.useWandHealth = SliderInt("WH%", 10, 100, script_priest.useWandHealth);
+				end
+				Separator();
+			end
+
 			-- MIND BLAST
 			-- hide spell if not obtained yet
 			if (HasSpell("Mind Blast")) then
@@ -215,7 +242,9 @@ function script_priestEX:menu()
 			-- SHADOW WORD PAIN
 			-- hide spell if not obtained yet
 			if (HasSpell("Shadow Word: Pain")) then
-				Text("Shadow Word: Pain above Self mana percent");
+				Text("Shadow Word: Pain above mana percent");
+				SameLine();
+				wasClicked, script_priest.useDOTOnAdds = Checkbox("DOT Adds", script_priest.useDOTOnAdds);
 				script_priest.swpMana = SliderInt("SPM", 10, 100, script_priest.swpMana)
 			end
 
@@ -254,7 +283,7 @@ function script_priestEX:menu()
 				
 				SameLine();
 
-				wasClicked,	script_priest.useMindFlay = Checkbox("Mind Flay instead of Wand", script_priest.useMindFlay);
+				wasClicked,script_priest.useMindFlay = Checkbox("Mind Flay instead of Wand", script_priest.useMindFlay);
 				
 				-- if mind flay is clicked then set useWand to false/unclicked
 				if script_priest.useMindFlay then
@@ -264,30 +293,11 @@ function script_priestEX:menu()
 				end
 
 			end
-			
-			-- if mind flay is being used then hide wand menu
-			if (not script_priest.useMindFlay) then
-				localObj = GetLocalPlayer();
 
-
-				-- hide wand menu if no ranged weapon equipped
-				if (localObj:HasRangedWeapon()) then
-
-					-- wand options menu
-					if (CollapsingHeader("|+| Wand Options")) then
-
-						Text('Wand options:');
-						wasClicked, script_priest.useWand = Checkbox("Use Wand", script_priest.useWand);
-						
-						Text('Wand below Self mana percent');
-						script_priest.useWandMana = SliderInt("WM%", 10, 100, script_priest.useWandMana);
-
-						Text('Wand below target HP percent');
-						script_priest.useWandHealth = SliderInt("WH%", 10, 100, script_priest.useWandHealth);
-
-					end
-				end
+			if (HasSpell("Hex of Weakness")) then
+				wasClicked, script_priest.useHexOfWeakness = Checkbox("Hex of Weakness", script_priest.useHexOfWeakness);
 			end
+						
 		end
 
 		if (CollapsingHeader("Priest Heal Options - Self")) then

@@ -198,7 +198,7 @@ function script_druid:draw()
 			tY = tY + script_grind.adjustY;
 		end
 
-	DrawText(self.message, tX+230, tY+9, 255, 250, 205);
+		DrawText(self.message, tX+30, tY+100, 255, 250, 205);
 	else
 		if (script_grind.adjustText) and (script_grind.drawEnabled) then
 			tX = tX + script_grind.adjustX;
@@ -661,16 +661,6 @@ function script_druid:run(targetGUID)
 	if(targetObj == 0 or targetObj == nil) then
 		return 2;
 	end
-
--- Check: Do we have the right target (in UI) ??
-		if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
-			if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= targetObj:GetGUID()) then
-				ClearTarget();
-				self.waitTimer = GetTimeEX() + 1500;
-				script_grind:setWaitTimer(1500);
-				targetObj = 0;
-			end
-		end
 
 	-- Check: if we target player pets/totems
 	if (GetTarget() ~= 0) then
