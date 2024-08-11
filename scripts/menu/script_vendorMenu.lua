@@ -324,14 +324,12 @@ function script_vendorMenu:checkVendor(useMana)
 	end
 
 	if (not hasDrink and script_vendor.drinkVendor ~= 0 and useMana) then
-		DEFAULT_CHAT_FRAME:AddMessage('Out of drinks, going to vendor...');
 		script_vendor:buy(script_vendor.drinkName, script_vendor.drinkNr, false, true, false, false);
 		return true;
 		
 	end
 
 	if (not hasFood and script_vendor.foodVendor ~= 0) then
-		DEFAULT_CHAT_FRAME:AddMessage('Out of food, going to vendor...');
 		script_vendor:buy(script_vendor.foodName, script_vendor.foodNr, true, false, false, false);
 		return true;
 	end
