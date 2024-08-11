@@ -38,12 +38,15 @@ function vendorDB_10_20:setup()
 	vendorDB:addVendor("Sanuye Runetotem", 1, 1, 17, false, false, false, false, false, -2374.27, -1948.8, 96.08);
 	vendorDB:addVendor("Innkeeper Byula", 1, 1, 17, false, true, false, false, false, -2376.28, -1995.74, 96.7);
 	vendorDB:addVendor("Innkeeper Byula", 1, 1, 17, false, false, true, false, false, -2376.28, -1995.74, 96.7);
+	vendorDB:addVendor("Innkeeper Boorand Plainswind", 1, 1, 17, false, true, true, false, false, -407.13, -2645.22, 96.22);
+	vendorDB:addVendor("Innkeeper Boorand Plainswind", 1, 1, 17, false, false, false, false, false, -407.13, -2645.22, 96.22);
 	vendorDB:addVendor("Ironzar", 1, 1, 17, true, false, false, false, false, -919.62, -3683.77, 8.15);
 	vendorDB:addVendor("Ironzar", 1, 1, 17, false, false, false, false, false, -919.62, -3683.77, 8.15);
 	vendorDB:addVendor("Jazzik", 1, 1, 17, false, false, false, true, false, -1008.67, -3651.95, 20.06);
 	vendorDB:addVendor("Jazzik", 1, 1, 17, false, false, false, false, true, -1008.67, -3651.95, 20.06);
 	vendorDB:addVendor("Innkeeper Wiley", 1, 1, 17, false, false, true, false, false, -1050.05, -3664.81, 23.88);
 	vendorDB:addVendor("Innkeeper Wiley", 1, 1, 17, false, true, false, false, false, -1050.05, -3664.81, 23.88);
+
 
 -- Barrens - Alliance
 	vendorDB:addVendor("Ironzar", 0, 1, 17, true, false, false, false, false, -919.62, -3683.77, 8.15);

@@ -9,11 +9,6 @@ vendorDB = {
 	includeVendorDB_50_60 = include("scripts\\db\\vendorDB_50_60.lua"),
 }
 
---[[
-	todo:
-		- Add class trainers
---]]
-
 function vendorDB:addVendor(name, faction, continentID, mapID, canRepair, hasFood, hasWater, hasArrow, hasBullet, posX, posY, posZ, race)
 
 	--[[

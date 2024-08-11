@@ -179,6 +179,15 @@ function script_grindMenu:menu()
 	wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
 
 
+	if (script_grind.getSpells) then
+		Separator();
+	end
+	wasClicked, script_grind.getSpells = Checkbox("Get Class Spells", script_grind.getSpells);
+	if (script_grind.getSpells) then
+		Text("More or less a proof of concept...");
+		Text("Why let bot run all the way to a trainer?");
+		Separator();
+	end
 	
 end
 end

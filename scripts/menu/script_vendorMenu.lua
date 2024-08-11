@@ -117,7 +117,7 @@ function script_vendorMenu:menu()
 				end
 			end
 					
-			Text("Input Food Name And Number Of Stacks:");
+			Text("Input Food Name And Number Of Stacks: 1 stack = 5 drinks");
 			script_vendor.foodName = InputText("Food", script_vendor.foodName); 
 			SameLine();
 			script_vendor.foodNr = InputText("FX", script_vendor.foodNr);
@@ -149,7 +149,7 @@ function script_vendorMenu:menu()
 				end
 			end
 		
-			Text("Input Drink Name And Number Of Stacks:");
+			Text("Input Drink Name And Number Of Stacks: 1 stack = 5 drinks");
 			
 			script_vendor.drinkName = InputText("Drink", script_vendor.drinkName); 
 			

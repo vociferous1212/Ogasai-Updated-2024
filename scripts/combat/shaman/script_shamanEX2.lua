@@ -5,7 +5,7 @@ script_shamanEX2 = {
 
 function script_shamanEX2:ghostWolf()
 	-- Shaman Ghost Wolf 
-	if (not IsMounted()) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) then
+	if (not IsMounted()) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) and (not IsIndoors()) then
 		if (IsMoving()) then
 			StopMoving();
 			return false;

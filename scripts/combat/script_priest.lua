@@ -316,7 +316,7 @@ function script_priest:run(targetGUID)
 		end
 
 		-- use mind blast on CD
-		if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) then
+		if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() < 29) then
 				if (IsMoving()) then
 					StopMoving();
@@ -370,7 +370,7 @@ function script_priest:run(targetGUID)
 
 			-- casts mind blast quicker
 			if (HasSpell("Mind Blast")) and (targetObj:IsInLineOfSight()) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) then
-				if (not HasSpell("Vampiric Embrace")) or (not HasSpell("Devouring Plague")) then
+				if (not HasSpell("Vampiric Embrace")) or (not HasSpell("Devouring Plague")) and (targetObj:GetDistance() < 29) then
 					if (IsMoving()) then
 						StopMoving();
 					end
@@ -683,9 +683,12 @@ function script_priest:run(targetGUID)
 			end
 
 			-- use wand
-			if (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling())
+			if (GetLocalPlayer():GetUnitsTarget():GetGUID() == targetObj:GetGUID()) and (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling())
 				and ( (not self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) or (self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) ) then
 				if (localObj:HasRangedWeapon()) then
+					if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+						return 3;
+					end
 					if (not IsAutoCasting("Shoot")) and (self.useWand) then
 						self.message = "Using wand...";
 						targetObj:FaceTarget();

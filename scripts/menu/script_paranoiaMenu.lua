@@ -21,6 +21,7 @@ function script_paranoiaMenu:menu()
 		
 	-- paranoid on/off button
 	wasClicked, script_paranoia.paranoidOn = Checkbox("Enable Paranoia", script_paranoia.paranoidOn);
+	SameLine();	wasClicked, script_buffOtherPlayers.enableBuffs = Checkbox("Enable Buff Other Players", script_buffOtherPlayers.enableBuffs);
 		
 	SameLine();
 		

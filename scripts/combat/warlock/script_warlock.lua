@@ -210,8 +210,10 @@ function script_warlock:run(targetGUID)
 	-- stuck in combat
 	if (self.waitAfterCombat) and (HasPet()) then
 		if (IsInCombat()) and (not PlayerHasTarget()) and (not PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
-			AssistUnit("pet");
 			self.message = "No Target - stuck in combat! WAITING!";
+			return 4;
+		elseif (IsInCombat()) and (not PlayerHasTarget()) and (PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
+			AssistUnit("Pet");
 			return 4;
 		end
 	end
@@ -223,7 +225,7 @@ function script_warlock:run(targetGUID)
 			PetFollow();
 		end
 	elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
-		AssistUnit("pet");
+		--AssistUnit("pet");
 		self.message = "Stuck in combat! WAITING!";
 		return 4;
 	end
@@ -317,7 +319,7 @@ function script_warlock:run(targetGUID)
 			PetFollow();
 		end
 	elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
-		AssistUnit("pet");
+		--AssistUnit("pet");
 		self.message = "Stuck in combat! WAITING!";
 		return 4;
 	end
@@ -615,7 +617,7 @@ function script_warlock:run(targetGUID)
 						PetFollow();
 					end
 				elseif (HasPet()) and (not PetHasTarget()) then
-					AssistUnit("pet");
+					--AssistUnit("pet");
 					self.message = "Stuck in combat! WAITING!";
 					return 4;
 				end
@@ -1083,8 +1085,8 @@ function script_warlock:rest()
 				AssistUnit("pet");
 				PetFollow();
 			end
-		elseif (not PetHasTarget()) and (IsInCombat()) then
-			AssistUnit("pet");
+		elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
+			--AssistUnit("pet");
 			self.message = "Stuck in combat! WAITING!";
 			return 4;
 		end
