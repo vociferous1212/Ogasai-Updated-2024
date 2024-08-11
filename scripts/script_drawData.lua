@@ -47,6 +47,11 @@ function script_drawData:drawUnitsDataOnScreen()
 			-- draw NPC data
 			script_drawData:drawMonsterDataOnScreen(i);
 		end
+		-- show my selected target whatever it is
+		if (targetType == 3 and PlayerHasTarget() and i:GetGUID() == GetLocalPlayer():GetUnitsTarget():GetGUID()) then
+			-- draw NPC data
+			script_drawData:drawMonsterDataOnScreen(i);
+		end
 
 		-- player targets
 		if (targetType == 4 and not i:IsCritter() and not i:IsDead()) then
@@ -126,6 +131,12 @@ function script_drawData:drawPlayerDataOnScreen(target)
 			end
 			DrawText('HP: ' .. math.floor(target:GetHealthPercentage()) .. '%', tX, tY, 255, 0, 0);
 			DrawText('' .. math.floor(distance) .. ' yd.', tX, tY+10, 255, 255, 255);
+			-- draw my target TARGETED
+			if (GetTarget() == target) or (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == target:GetGUID()) then 
+
+			-- draw text targeted
+			DrawText('(TARGETED)', tX, tY-40, 255, 0, 0); 
+			end
 			if (target:GetUnitsTarget() ~= 0) then
 				if (target:GetUnitsTarget():GetGUID() == player:GetGUID()) then 
 					DrawText('TARGETING US!', tX, tY+20, 255, 0, 0); 

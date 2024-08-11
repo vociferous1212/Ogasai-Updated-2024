@@ -37,4 +37,5 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	else
 		return "No hotspot has been loaded...";
 	end
+return false;
 end

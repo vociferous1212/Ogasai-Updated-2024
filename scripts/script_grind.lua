@@ -22,6 +22,7 @@ script_grind = {
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	hotspotMoveLoaded = include("scripts\\script_moveToHotspot.lua"),
+	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
 	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
 	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
@@ -48,7 +49,7 @@ script_grind = {
 
 	getSpells = false,
 	jump = true,	-- enable jumping out of combat
-	jumpRandomFloat = 98,	-- jump > than 
+	jumpRandomFloat = 99,	-- jump > than 
 	jumpCheck = false,
 	useVendor = true,	-- use vendor
 	repairWhenYellow = true,	-- repair when yellow
@@ -66,7 +67,7 @@ script_grind = {
 	avoidElite = true,	-- avoid elites ( currently not working )
 	avoidRange = 40,	-- aboid elites range
 	findLootDistance = 75,
-	lootDistance = 2.15,
+	lootDistance = 2.55,
 	skipLooting = false,
 	lootCheck = {},
 	minLevel = GetLocalPlayer():GetLevel()-5,
@@ -141,9 +142,6 @@ script_grind = {
 	lootCheckTime = 0,	-- loot check time
 	afkActionSlot = "24",	-- /afk slot for paranoia
 	playerParanoidDistance = 0,	-- paranoid player check their distance
-	adjustText = true,	-- adjust info box
-	adjustY = 0,	-- adjust info box
-	adjustX = 0,	-- adjust info box
 	paranoidTarget = "",	-- name of paranoid players
 	currentTime2 = GetTimeEX() / 1000,	-- paranoia logout timer
 	setParanoidTimer = 213,		-- time added to paranoid logout timer
@@ -180,14 +178,16 @@ script_grind = {
 	vendorMessageSent = false,	-- send message to chat frame - vendors loaded from DB...
 	safePullAvoidTargets = false,	-- TODO try to safe pull avoided targets with adds nearby...
 	swimJumpTimer = 0,
+	buffTimer = 0;
 }
 
 function script_grind:setup()
 
-	myLastX, myLastY, myLastZ = GetLocalPlayer():GetPosition();
+	-- should tell the bot to keep variables if disconnected or switching areas (loading screens)
+	PersistLoadingScreen(true);
 
-	self.lootCheck['target'] = 0;
-	self.lootCheck['timer'] = GetTimeEX();
+	-- used to auto select vendors based on position of last known position
+	myLastX, myLastY, myLastZ = GetLocalPlayer():GetPosition();
 
 	-- Classes that don't use mana
 	local class, classFileName = UnitClass("player");
@@ -289,18 +289,16 @@ function script_grind:setup()
 	end
 
 	-- change some values to random
-	local randomLogout = math.random(30, 65);
+	local randomLogout = math.random(45, 80);
 	self.setParanoidTimer = randomLogout;
-
 	local randomHotspot = math.random(450, 950);
 	self.distToHotSpot = randomHotspot;
-
 	local randomSetTimer = math.random(3, 10);
 	self.paranoidSetTimer = randomSetTimer;
-
-	local randomRange = math.random(50, 90);
+	local randomRange = math.random(45, 100);
 	self.paranoidRange = randomRange;
 
+	-- set timers for script to run based on grind script timer
 	self.nodeTimer = GetTimeEX();
 	self.attackTimer = GetTimeEX();
 	self.blacklistLootTime = GetTimeEX();
@@ -308,6 +306,9 @@ function script_grind:setup()
 	self.deleteCheckTimer = GetTimeEX();
 	script_shamanTotems.waitTimer = GetTimeEX();
 	self.swimJumpTimer = GetTimeEX();
+	self.lootCheck['target'] = 0;
+	self.lootCheck['timer'] = GetTimeEX();
+	self.buffTimer = GetTimeEX();
 
 
 	local level = GetLocalPlayer():GetLevel();
@@ -400,6 +401,10 @@ end
 
 -- run grinder
 function script_grind:run()
+
+-- should tell the bot to keep variables if disconnected or switching areas (loading screens)
+	PersistLoadingScreen(true);
+
 	-- show grinder window
 	script_grind:window();
 
@@ -541,6 +546,13 @@ function script_grind:run()
 		if (script_talent:learnTalents()) then
 			self.message = "Checking/learning talent: " .. script_talent:getNextTalentName();
 			return;
+		end
+	end
+
+	if (not IsInCombat()) and (GetTimeEX() > self.buffTimer) then
+		self.buffTimer = GetTimeEX() + 3000;
+		if (script_buffOtherPlayers:doBuffs()) then
+			return true;
 		end
 	end
 
@@ -711,10 +723,16 @@ function script_grind:run()
 			return;
 		end
 
-		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (not IsCasting()) and (not IsChanneling()) then
+		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
+			local x, y, z = GetLocalPlayer():GetPosition();
 			if (GetTimeEX() > self.swimJumpTimer) then
-				JumpOrAscendStart();
-				self.swimJumpTimer = GetTimeEX() + 3000;
+				local x2, y2, z2 = GetLocalPlayer():GetPosition();
+				if (GetDistance3D(x, y, z, x2, y2, z2) > 5) then
+					JumpOrAscendStart();
+					self.swimJumpTimer = GetTimeEX() + 1500;
+					Move(x, y, z+10)
+				end
+				
 			end
 		end
 
@@ -878,7 +896,6 @@ function script_grind:run()
 			end
 
 		-- move to hotspot location
-		-- was return true and self.message script_movetohotspot
 		self.message = script_moveToHotspot:moveToHotspot(localObj);
 		return true;
 		end
@@ -1165,6 +1182,7 @@ function script_grind:run()
 				-- check positions
 				local _x, _y, _z = self.enemyObj:GetPosition();
 				local localObj = GetLocalPlayer();
+				local mX, mY, mZ = localObj:GetPosition();
 
 				-- adjust tick rate to make targeting and movement quicker
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget() and (script_grind:isTargetingMe(self.enemyObj) or targetObj:GetHealthPercentage() < 20)) then

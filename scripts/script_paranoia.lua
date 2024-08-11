@@ -177,3 +177,4 @@ function script_paranoia:checkParanoia()
 		end
 	end
 end
+

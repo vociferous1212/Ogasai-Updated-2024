@@ -513,7 +513,7 @@ function script_aggro:drawAggroCircles(maxRange)
  		if typeObj == 3 and currentObj:GetDistance() < maxRange and not currentObj:IsDead() and currentObj:CanAttack() and not currentObj:IsCritter() then
 
 			-- set conditions
-			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
+			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 19.5;
 			local cx, cy, cz = currentObj:GetPosition();
 			local px, py, pz = localObj:GetPosition();
 		

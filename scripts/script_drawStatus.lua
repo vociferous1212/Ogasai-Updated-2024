@@ -1,5 +1,9 @@
 script_drawStatus = {
 
+	adjustText = true,	-- adjust info box
+	adjustY = 90,	-- adjust info box
+	adjustX = -200,	-- adjust info box
+
 }
 -- draw status text and display boxes on screen
 	-- self.message follow.message grind.message etc
@@ -14,9 +18,9 @@ function script_drawStatus:draw()
 	end
 	-- info
 	if (not script_grind.pause) then
-	if (script_grind.adjustText) and (script_grind.drawEnabled) then
-		x = x + script_grind.adjustX;
-		y = y + script_grind.adjustY;
+	if (self.adjustText) and (script_grind.drawEnabled) then
+		x = x + self.adjustX;
+		y = y + self.adjustY;
 	end
 	if (script_grind.drawEnabled) then
 		--DrawRect(x - 10, y - 7, x + width, y + 140, 255, 255, 0, 10, 77, 0);
