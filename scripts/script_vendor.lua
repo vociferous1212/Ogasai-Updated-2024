@@ -410,9 +410,9 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	local vendorID = vendorDB:GetVendor(factionID, GetContinentID(), GetMapID(), false, false, false, itemIsArrow, not itemIsArrow, x, y, z);
 	local vendor = nil;
 
-	if (itemIsArrow and self.arrowVendor ~= 0) and (not script_grind.autoSelectVendors) then
+	if (itemIsArrow and self.arrowVendor ~= 0) then
 		vendor = self.arrowVendor;
-	elseif (not itemIsArrow and self.bulletVendor ~= 0) and (not script_grind.autoSelectVendors) then
+	elseif (not itemIsArrow and self.bulletVendor ~= 0) then
 		vendor = self.bulletVendor;
 	else
 		if (vendorID ~= -1) then
@@ -537,9 +537,9 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 	
 	local vendor = nil;
 
-	if (isFood and self.foodVendor ~= 0) and (not script_grind.autoSelectVendors) then
+	if (isFood and self.foodVendor ~= 0) then
 		vendor = self.foodVendor;
-	elseif (isDrink and self.drinkVendor ~= 0) and (not script_grind.autoSelectVendors) then
+	elseif (isDrink and self.drinkVendor ~= 0) then
 		vendor = self.drinkVendor;
 	else
 		-- Fetch a food/drink vendor
