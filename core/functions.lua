@@ -60,7 +60,7 @@ end
 function CastGhostWolf()
 	local player = GetLocalPlayer();
 
-	if (HasSpell("Ghost Wolf")) and (not player:HasBuff("Ghost Wolf")) and (not IsSpellOnCD("Ghost Wolf")) then
+	if (HasSpell("Ghost Wolf")) and (not player:HasBuff("Ghost Wolf")) and (not IsSpellOnCD("Ghost Wolf")) and (not IsIndoors()) then
 		CastSpellByName("Ghost Wolf", player);
 		return true;
 	end
@@ -161,5 +161,14 @@ function CastSprint()
 		CastSpellByName("Sprint");
 		return true;
 	end
+return false;
+end
+
+function RemoveForm()
+	script_druidEX:removeTravelForm();
+	script_druidEX:removeBearForm();
+	script_druidEX:removeCatForm();
+	script_druidEX:removeMoonkinForm();
+	script_shamanEX2:removeGhostWolf();
 return false;
 end
