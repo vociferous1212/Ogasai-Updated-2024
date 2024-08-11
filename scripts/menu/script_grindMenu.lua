@@ -182,7 +182,7 @@ function script_grindMenu:menu()
 	if (script_grind.getSpells) then
 		Separator();
 	end
-	wasClicked, script_grind.getSpells = Checkbox("Get Class Spells", script_grind.getSpells);
+	wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
 	if (script_grind.getSpells) then
 		Text("More or less a proof of concept...");
 		Text("Why let bot run all the way to a trainer?");
