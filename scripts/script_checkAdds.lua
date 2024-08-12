@@ -15,10 +15,12 @@ function script_checkAdds:checkAdds()
 	if (script_grind:enemiesWithinRange() <= 4) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
-			-- use unstuck script
-			if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-				return false;
+			-- use unstuck feature
+			if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
+				if (not script_unstuck:pathClearAuto(2)) then
+					script_unstuck:unstuck();
+					return true;
+				end
 			end
 
 			-- if we have a pet then pet follow

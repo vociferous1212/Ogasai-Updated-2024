@@ -400,3 +400,29 @@ function script_helper:mountUp()
 
 return false;
 end
+
+function script_helper:weAreStandingInFire()
+	i, t = GetFirstObject();
+	local id = i:GetObjectDisplayID();
+	local localObj = GetLocalPlayer();
+
+	while i ~= 0 do
+		if t == 5 then
+			if i:GetObjectDisplayID() == 192 and i:GetDistance() <= 10 and (not script_checkDebuffs:hasDisabledMovement()) then
+ 				local xT, yT, zT = i:GetPosition();
+ 				local xP, yP, zP = localObj:GetPosition();
+ 				local distance = i:GetDistance();
+ 				local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
+ 				local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
+ 				local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
+ 				local moveX, moveY, moveZ = xT + xUV*4, yT + yUV*4, zT + zUV;		
+ 				if (distance <= 4) then 
+					MoveToTarget(moveX, moveY, moveZ);
+				return;
+				end
+			end
+ 		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end

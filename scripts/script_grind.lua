@@ -119,7 +119,7 @@ script_grind = {
 	showClassOptions = true,	-- setup function to show menu
 	pause = true,		-- pause script
 	bagsFull = false,	-- are bags full
-	vendorRefill = true,	-- refill at vendor
+	vendorRefill = false,	-- refill at vendor FOOD AND DRINK REFIL
 	useMana = true,		-- does player use mana
 	drawGather = false,	-- draw gather nodes
 	hotspotReached = false,	-- is hotspot reached
@@ -494,7 +494,7 @@ function script_grind:run()
 	end
 
 	if (IsIndoors()) then
-		script_nav:setNextToNodeDist(2.5); NavmeshSmooth(self.nextToNodeDist*1.8);
+		script_nav:setNextToNodeDist(2.2); NavmeshSmooth(self.nextToNodeDist*1.2);
 	else
 		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
 	end
@@ -535,6 +535,26 @@ function script_grind:run()
 		return true;
 	end
 
+	-- buff other players
+	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
+		self.buffTimer = GetTimeEX() + 3000;
+		if (not HasSpell("Blessing of Might")) then
+			if (script_buffOtherPlayers:doBuffs()) then
+				if (not IsStanding()) then
+					JumpOrAscendStart();
+				end
+				return true;
+			end
+		elseif (HasSpell("Blessing of Might")) then
+			if (script_buffOtherPlayers:doBuffsPaladin()) then
+				if (IsStanding()) then
+					JumpOrAscendStart();
+				end
+				return true;
+			end
+		end
+	end
+
 	-- pause bot
 	if (self.pause) then self.message = "Paused by user...";
 		-- set paranoid used to off to reset paranoia
@@ -550,16 +570,6 @@ function script_grind:run()
 		if (script_talent:learnTalents()) then
 			self.message = "Checking/learning talent: " .. script_talent:getNextTalentName();
 			return;
-		end
-	end
-
-	if (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
-		self.buffTimer = GetTimeEX() + 3000;
-		if (script_buffOtherPlayers:doBuffs()) then
-			if (not IsStanding()) then
-				JumpOrAscendStart();
-			end
-			return true;
 		end
 	end
 
@@ -730,21 +740,9 @@ function script_grind:run()
 			return;
 		end
 
-		-- reset to allow bot to continue if we don't have the checkbox clicked...
-		if (not self.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
-			script_getSpells.getSpellsStatus = 0;
-		end
-		-- go to trainer and get spells
-		if (self.getSpells) and (not self.pause) and (not IsInCombat()) then
-			script_grind.message = "Moving to class trainer for spells";
-			if (script_getSpells:checkForSpellsNeeded()) then
-				return;
-			end
-		end
-		-- force bot to keep path to trainer
-		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
-			return;
-		end
+	--if (script_helper:weAreStandingInFire()) then
+	--	return true;
+	--end
 	
 		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
 			local x, y, z = GetLocalPlayer():GetPosition();
@@ -752,7 +750,7 @@ function script_grind:run()
 				local x2, y2, z2 = GetLocalPlayer():GetPosition();
 				if (GetDistance3D(x, y, z, x2, y2, z2) > 5) then
 					JumpOrAscendStart();
-					self.swimJumpTimer = GetTimeEX() + 1500;
+					self.swimJumpTimer = GetTimeEX() + 1200;
 					Move(x, y, z+10)
 				end
 				
@@ -862,14 +860,36 @@ function script_grind:run()
 			script_gather.gathering = false;
 		end
 
+		-- reset to allow bot to continue if we don't have the checkbox clicked...
+		if (not self.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
+			script_getSpells.getSpellsStatus = 0;
+		end
+		-- go to trainer and get spells
+		if (self.getSpells) and (not self.pause) and (not IsInCombat()) then
+			script_grind.message = "Moving to class trainer for spells";
+			if (script_getSpells:checkForSpellsNeeded()) then
+				if (self.useUnstuck) and (IsMoving()) and (not self.pause) then
+					if (not script_unstuck:pathClearAuto(2)) then
+						script_unstuck:unstuck();
+							return true;
+					end
+				end
+			return;
+			end
+		end
+		-- force bot to keep path to trainer
+		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
+			return;
+		end
+
 		-- hotspot reached distance
-		if (script_nav:getDistanceToHotspot() <= self.hotspotReachedDistance) or (script_nav:getDistanceToHotspot() <= 0) or (script_nav:getDistanceToHotspot() == nil) then
-			self.hotspotReached = true;
+		if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
+			self.hotspotReached = false;
 		end
 
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
 		if ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_vendor:getStatus() == 0) and
-			(script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX())) and (not IsLooting()) then
+			(script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
 				self.hotSpotTimer = GetTimeEX() + 20000;
 			end
@@ -920,7 +940,7 @@ function script_grind:run()
 
 		-- move to hotspot location
 		self.message = script_moveToHotspot:moveToHotspot(localObj);
-		return true;
+		--return true;
 		end
 
 		-- check party members
@@ -1212,10 +1232,16 @@ function script_grind:run()
 					script_grind.tickRate = 50;
 				end
 
-				script_nav:resetNavigate();
-
 				-- if we have a valid position coordinates
 				if (_x ~= 0 and x ~= 0) then
+
+					-- use unstuck feature
+					if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
+						if (not script_unstuck:pathClearAuto(2)) then
+							script_unstuck:unstuck();
+							return true;
+						end
+					end
 
 
 					script_nav.lastNavIndex = 1;
@@ -1295,6 +1321,10 @@ function script_grind:run()
 					script_unstuck:unstuck();
 					return true;
 				end
+				if (not IsInCombat()) and (not script_grind:isAnyTargetTargetingMe()) and (self.enemyObj:IsDead()) or (self.enemyObj:GetHealthPercentage() < 1) then
+					self.waitTimer = GetTimeEX() + 2500;
+					self.enemyObj = nil;
+				end
 			end
 		end
 
@@ -1361,7 +1391,7 @@ function script_grind:run()
 			-- continue to hotspot until we find a valid enemy...
 				-- move to a diff location if no valid enemies around?
 					-- run autopath nodes?
-			if (script_nav:getDistanceToHotspot() < 20 and self.hotspotReached) then
+			if (script_nav:getDistanceToHotspot() < self.hotspotReachedDistance and self.hotspotReached) then
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
@@ -1515,7 +1545,7 @@ function script_grind:assignTarget()
 			if (script_grind:enemyIsValid(i)) then
 
 				-- save the closest mob or mobs attacking us
-				if (mobDistance > i:GetDistance()) then
+				if (mobDistance > i:GetDistance()) and (i:GetDistance() < self.distToHotSpot) then
 
 					-- get taret position
 					local _x, _y, _z = i:GetPosition();
@@ -1699,18 +1729,18 @@ function script_grind:enemyIsValid(i)
 		end
 
 	-- add target to blacklist not a safe pull from aggro script
-		if (self.hotspotReached) and (self.skipHardPull) and (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) and (i:GetDistance() <= 65) then	
+		if (self.hotspotReached) and (self.skipHardPull) and (i:GetDistance() <= 65)and  (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) then	
 			script_grind:addTargetToBlacklist(i:GetGUID());
 		end
 		
 	-- add elite to blacklist
-		if (self.skipElites) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetDistance() <= 65) then
+		if (self.skipElites) and (i:GetDistance() <= 65) and (i:GetClassification() == 1 or i:GetClassification() == 2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) then
 			DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Elite " .. i:GetUnitName() .. "");	
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
 		end
 
 	-- add above maxLevel to blacklist
-		if (self.skipHardPull) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > self.maxLevel) and (i:GetDistance() <= 65) then
+		if (self.skipHardPull) and (i:GetDistance() <= 65) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > self.maxLevel) then
 			script_grind:addTargetToHardBlacklist(i:GetGUID());
 			DEFAULT_CHAT_FRAME:AddMessage('Blacklisting ' .. i:GetUnitName() .. ', too high level...');
 

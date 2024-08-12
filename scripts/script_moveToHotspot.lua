@@ -7,6 +7,15 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	if (script_getSpells.getSpellsStatus == 1) then
 		return false;
 	end
+
+	-- use unstuck feature
+	if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
+		if (not script_unstuck:pathClearAuto(2)) then
+			script_unstuck:unstuck();
+			return true;
+		end
+	end
+
 	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;

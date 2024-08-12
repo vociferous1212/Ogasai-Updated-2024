@@ -274,7 +274,7 @@ local targetObj, targetType = GetFirstObject();
 				DrawText(chestName, _tX-25, _tY, 0, 255, 0);
 				DrawText(fishName, _tX-25, _tY, 0, 255, 0);
 				if (script_grindMenu.showIDD) then
-					if (id ~= 192) and (id ~= 0) and (id ~= 386) then
+					if (id ~= nil) and (id ~= 0) then
 						local idd = "ID - "..id.."";
 						DrawText(idd, _tX-10, _tY-12, 255, 255, 0);
 					end
