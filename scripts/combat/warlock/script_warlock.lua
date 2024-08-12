@@ -57,6 +57,7 @@ script_warlock = {
 	corruptionCastTime = 0,
 	warlockDOTS = false,
 	warlockDOTSCount = 2,
+	hasSoulStone = false,
 }
 
 function script_warlock:setup()

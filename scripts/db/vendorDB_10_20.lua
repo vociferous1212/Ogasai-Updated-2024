@@ -29,6 +29,7 @@ function vendorDB_10_20:setup()
 	vendorDB:addVendor("Edwin Harly", 1, 0, 130, false, false, true, false, false, 549.58, 1602.98, 128.48);
 	vendorDB:addVendor("Edwin Harly", 1, 0, 130, false, false, false, false, true, 549.58, 1602.98, 128.48);
 	vendorDB:addVendor("Nadia Vernon", 1, 0, 130, false, false, false, true, false, 566.3, 1559.59, 132.51);
+	vendorDB:addVendor("Killian Sanatha", 1, 0, 130, false, false, false, false, false, 1166.95, 2063.98, 5.4);
 
 -- Barrens - Horde
 	vendorDB:addVendor("Zlagk", 1, 1, 14, true, false, false, false, false, -560.13, -4217.21, 41.59);

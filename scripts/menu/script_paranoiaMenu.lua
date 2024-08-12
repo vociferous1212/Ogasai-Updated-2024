@@ -7,8 +7,8 @@ function script_paranoiaMenu:menu()
 	Separator();
 
 	-- set move node dist
-	Text("Distance to create a new path node");
-	script_grind.nextToNodeDist = SliderFloat("Node Dist", 2, 10, script_grind.nextToNodeDist);
+	Text("Distance to new path node / Click-To-Move Dist");
+	script_grind.nextToNodeDist = SliderFloat("Node Dist", 2, 8, script_grind.nextToNodeDist);
 	Separator();
 	wasClicked, script_grind.jump = Checkbox("Random Jump", script_grind.jump);
 	

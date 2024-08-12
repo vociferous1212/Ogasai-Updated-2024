@@ -76,7 +76,7 @@ function script_getSpells:run()
 		self.getSpellsStatus = 1;
 
 		local x, y, r, g, b = 0, 0, 0, 0, 0;
-		DrawText("Moving To Trainers if player is level 22 or lower... proof of concept.. may break bot... ",  x+800, y+500, r+255, g+255, b+0);
+		DrawText("Moving To Trainers if player is level 22 or lower... proof of concept.. may break bot... ",  x+800, y+300, r+255, g+255, b+0);
 
 		local x, y, z = GetLocalPlayer():GetPosition();
 		local vX, vY, vZ = 0, 0, 0;
@@ -110,6 +110,11 @@ function script_getSpells:run()
 			vX, vY, vZ = script_getSpellsHunter:getTrainerTargetHunter();
 		end
 
+		if (GetDistance3D(x, y, z, vX, vY, vZ) < 20) then
+			if (HasForm()) then
+				RemoveForm();
+			end
+		end
 		-- if position not close to trainer then move to trainer
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3) then
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
@@ -123,6 +128,7 @@ function script_getSpells:run()
 
 		-- if distance is close to trainer then
 		if (GetDistance3D(x, y, z, vX, vY, vZ) <= 4) then
+			
 			if (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetUnitName() ~= self.trainerTarget) then
 				ClearTarget();
 			end

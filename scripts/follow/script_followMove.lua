@@ -1,7 +1,7 @@
 script_followMove = {
 	
-	navFunctionsLoaded = include("scripts\\script_nav.lua"),
-	navFunctions2Loaded = include("scripts\\script_navEX.lua"),
+	navFunctionsLoaded = include("scripts\\nav\\script_nav.lua"),
+	navFunctions2Loaded = include("scripts\\nav\\script_navEX.lua"),
 }
 
 function script_followMove:followLeader()

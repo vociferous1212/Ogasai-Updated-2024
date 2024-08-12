@@ -39,8 +39,8 @@ script_follow = {
 	grindFunctions = include("scripts\\script_grind.lua"),
 	vendorsLoaded = include("scripts\\script_vendor.lua"),
 	vendormenu = include("scripts\\menu\\script_vendorMenu.lua"),
-	nav1 = include("scripts\\script_nav.lua"),
-	mav2 = include("scripts\\script_navEX.lua"),
+	nav1 = include("scripts\\nav\\script_nav.lua"),
+	mav2 = include("scripts\\nav\\script_navEX.lua"),
 
 	-- follow folder
 	healsLoaded = include("scripts\\follow\\script_followHealsAndBuffs.lua"),
