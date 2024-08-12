@@ -9,7 +9,11 @@ script_grind = {
 	drawStatusScript = include("scripts\\script_drawStatus.lua"),
 	drawStatusEXScript = include("scripts\\script_drawStatusEX.lua"),
 	omLoaded = include("scripts\\script_om.lua"),
-	navFunctionsLoaded = include("scripts\\script_nav.lua"),
+	navFunctionsLoaded 	= include("scripts\\nav\\script_nav.lua"),
+	includeNavEX 		= include("scripts\\nav\\script_navEX.lua"),
+	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
+	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
+
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
 	talentLoaded = include("scripts\\script_talent.lua"),
@@ -21,7 +25,6 @@ script_grind = {
 	getSpellsLoaded = include("scripts\\getTrainerSpells\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
-	hotspotMoveLoaded = include("scripts\\script_moveToHotspot.lua"),
 	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
 	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
@@ -92,7 +95,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 3.15, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 3.55, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -315,6 +318,7 @@ function script_grind:setup()
 	self.lootCheck['timer'] = GetTimeEX();
 	self.buffTimer = GetTimeEX();
 	script_getSpells.waitTimer = GetTimeEX();
+	script_navEX.waitTimer = GetTimeEX();
 
 
 	local level = GetLocalPlayer():GetLevel();
@@ -453,47 +457,20 @@ function script_grind:run()
 	if (AreBagsFull()) then
 		self.bagsFull = true;
 	end
+		localObj = GetLocalPlayer();
 
 	 -- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
 		script_nav:setNextToNodeDist(11); NavmeshSmooth(self.nextToNodeDist*1.8);
-	else
-		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
-	end
-
-		localObj = GetLocalPlayer();
-	-- sprint or dash or aspect or cheetah or cat form
-	if (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
-		script_nav:setNextToNodeDist(8); NavmeshSmooth(self.nextToNodeDist*1.8);
-	else
-		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
-	end
-
-	-- night elf whisp
-		local race = UnitRace('player');
-	if (race == 'Night Elf') and (localObj:IsDead()) then
+	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
+		script_nav:setNextToNodeDist(5); NavmeshSmooth(self.nextToNodeDist*1.8);
+	elseif (race == 'Night Elf') and (localObj:IsDead()) then
 		script_nav:setNextToNodeDist(8);
 		NavmeshSmooth(self.nextToNodeDist*1.6);
-	else
-		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist);
-		NavmeshSmooth(self.nextToNodeDist*1.6);
-	end
-	
-	-- player is dead
-	if (localObj:IsDead() or IsGhost()) then
+	elseif (localObj:IsDead() or IsGhost()) then
 		script_nav:setNextToNodeDist(5);
 		NavmeshSmooth(self.nextToNodeDist*1.6);
-		self.tickRate = 100;
-	else
-		-- else set to preset variable
-		script_nav:setNextToNodeDist(self.nextToNodeDist);
-		NavmeshSmooth(self.nextToNodeDist*1.6);
-	end
-
-	if (IsIndoors()) then
+	elseif (IsIndoors()) then
 		script_nav:setNextToNodeDist(2.2); NavmeshSmooth(self.nextToNodeDist*1.2);
 	else
 		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
@@ -557,24 +534,25 @@ function script_grind:run()
 
 	-- buff other players
 	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
-		self.buffTimer = GetTimeEX() + 3000;
-		if (not HasSpell("Blessing of Might")) then
-			if (script_buffOtherPlayers:doBuffs()) then
-				if (not IsStanding()) then
-					JumpOrAscendStart();
+		if (HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Forititude") or HasSpell("Blessing of Might")) then
+			self.buffTimer = GetTimeEX() + 3000;
+			if (not HasSpell("Blessing of Might")) then
+				if (script_buffOtherPlayers:doBuffs()) then
+					if (not IsStanding()) then
+						JumpOrAscendStart();
+					end
+					return true;
 				end
-				return true;
-			end
-		elseif (HasSpell("Blessing of Might")) then
-			if (script_buffOtherPlayers:doBuffsPaladin()) then
-				if (IsStanding()) then
-					JumpOrAscendStart();
+			elseif (HasSpell("Blessing of Might")) then
+				if (script_buffOtherPlayers:doBuffsPaladin()) then
+					if (IsStanding()) then
+						JumpOrAscendStart();
+					end
+					return true;
 				end
-				return true;
 			end
-		end
+		end	
 	end
-
 	-- pause bot
 	if (self.pause) then self.message = "Paused by user...";
 		-- set paranoid used to off to reset paranoia
@@ -1059,7 +1037,7 @@ function script_grind:run()
 		end	
 		
 		-- wait after combat phase - stuck in combat
-		if (IsInCombat()) and ((GetLocalPlayer():HasBuff("Bloodrage")) or (HasPet() and not PetHasTarget() and not PlayerHasTarget()) or (not HasPet() and not PlayerHasTarget()) ) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (not self.enemyObj:HasDebuff("Fear")) then
+		if (IsInCombat()) and ((GetLocalPlayer():HasBuff("Bloodrage")) or (HasPet() and not PetHasTarget() and not PlayerHasTarget()) or (not HasPet() and not PlayerHasTarget()) ) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				ex, ey, ez = self.lootObj:GetPosition();
@@ -1237,6 +1215,7 @@ function script_grind:run()
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 
+
 				-- check positions
 				local _x, _y, _z = self.enemyObj:GetPosition();
 				local localObj = GetLocalPlayer();
@@ -1250,11 +1229,10 @@ function script_grind:run()
 				-- if we have a valid position coordinates
 				if (_x ~= 0 and x ~= 0) then
 
-					script_nav.lastNavIndex = 1;
 					-- move to target
 					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
-						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
-						self.message = "Moving To Target NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
+						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 
 					elseif (not IsPathLoaded(5)) and (not IsMoving() or IsInCombat() and self.enemyObj:GetDistance() > 8) or (not IsPathLoaded(5)) then
 						self.message = "Moving To Target Nav -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
@@ -2131,7 +2109,7 @@ function script_grind:doLoot(localObj)
 	local _x, _y, _z = self.lootObj:GetPosition();
 	if (self.lootObj:GetDistance() > (self.lootDistance/2)) then
 		if (IsPathLoaded(5)) then
-			if (script_navEX:moveToTarget(localObj, _x, _y, _z)) then
+			if (script_navEX:moveToLoot(localObj, _x, _y, _z)) then
 			self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
 			return;
 			end
