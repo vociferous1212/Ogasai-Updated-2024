@@ -535,6 +535,26 @@ function script_grind:run()
 		return true;
 	end
 
+	-- very quick pickpocketing WORKS WHEN GRINDER IS NOT PAUSED
+	--if (not self.pause) and (not IsInCombat()) and (GetLocalPlayer():HasBuff("Stealth")) and (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
+		if (GetLocalPlayer():HasBuff("Stealth")) and (PlayerHasTarget()) and (not IsInCombat()) then
+			if (GetLocalPlayer():GetUnitsTarget():GetDistance() < 3) then
+				if (IsLooting()) then
+					if (not LootTarget()) then
+						return;
+					end
+				end
+				--if (self.waitTimer > GetTimeEX()) then
+				--	return;
+				--end
+				--if (not CastHeal("Pick Pocket", GetLocalPlayer():GetUnitsTarget())) then
+				--	self.waitTimer = GetTimeEX() + 1550;
+				--end
+				
+			end
+		end
+	--end
+
 	-- buff other players
 	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
 		self.buffTimer = GetTimeEX() + 3000;
@@ -864,6 +884,7 @@ function script_grind:run()
 		if (not self.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
 			script_getSpells.getSpellsStatus = 0;
 		end
+		
 		-- go to trainer and get spells
 		if (self.getSpells) and (not self.pause) and (not IsInCombat()) then
 			script_grind.message = "Moving to class trainer for spells";
@@ -882,14 +903,8 @@ function script_grind:run()
 			return;
 		end
 
-		-- hotspot reached distance
-		if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
-			self.hotspotReached = false;
-		end
-
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
-		if ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_vendor:getStatus() == 0) and
-			(script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
+		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
 				self.hotSpotTimer = GetTimeEX() + 20000;
 			end
@@ -1044,13 +1059,13 @@ function script_grind:run()
 		end	
 		
 		-- wait after combat phase - stuck in combat
-		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (not self.enemyObj:HasDebuff("Fear")) then
+		if (IsInCombat()) and ((GetLocalPlayer():HasBuff("Bloodrage")) or (HasPet() and not PetHasTarget() and not PlayerHasTarget()) or (not HasPet() and not PlayerHasTarget()) ) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (not self.enemyObj:HasDebuff("Fear")) then
 			self.message = "Waiting... Server says we are InCombat()";
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+				ex, ey, ez = self.lootObj:GetPosition();
+				Move(ex, ey, ez);
+			end
 			return;
-		end
-		if (GetLocalPlayer():HasBuff("Bloodrage") and not PlayerHasTarget() and script_grind.enemiesAttackingUs() == 0) or ((IsInCombat()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20)) then
-			self.message = "Waiting... Server says we are InCombat()";
-		return;
 		end
 
 		-- Finish loot before we engage new targets or navigate - return
@@ -1235,15 +1250,6 @@ function script_grind:run()
 				-- if we have a valid position coordinates
 				if (_x ~= 0 and x ~= 0) then
 
-					-- use unstuck feature
-					if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
-						if (not script_unstuck:pathClearAuto(2)) then
-							script_unstuck:unstuck();
-							return true;
-						end
-					end
-
-
 					script_nav.lastNavIndex = 1;
 					-- move to target
 					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
@@ -1321,10 +1327,6 @@ function script_grind:run()
 					script_unstuck:unstuck();
 					return true;
 				end
-				if (not IsInCombat()) and (not script_grind:isAnyTargetTargetingMe()) and (self.enemyObj:IsDead()) or (self.enemyObj:GetHealthPercentage() < 1) then
-					self.waitTimer = GetTimeEX() + 2500;
-					self.enemyObj = nil;
-				end
 			end
 		end
 
@@ -1383,6 +1385,11 @@ function script_grind:run()
 					end
 				end
 			end
+		end
+
+-- hotspot reached distance
+		if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
+			self.hotspotReached = false;
 		end
 
 		-- Use auto pathing or walk paths
