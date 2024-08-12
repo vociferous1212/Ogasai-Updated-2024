@@ -375,7 +375,7 @@ function script_druid:healsAndBuffs()
 	end
 
 	-- moving buffs hierarchy up
-	if (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (script_grind.lootObj == nil) and (not IsMounted()) and (not script_checkDebuffs:hasSilence()) then
+	if (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (not IsMounted()) and (not script_checkDebuffs:hasSilence()) then
 
 		-- Innervate
 		if (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana) then
@@ -1770,7 +1770,7 @@ function script_druid:rest()
 	end
 
 	-- check heals and buffs
-	if (not IsLooting()) and (script_grind.lootObj == nil or script_grind.lootObj == 0) and (not IsDrinking()) and (not IsEating()) and (not localObj:HasBuff("Frenzied Regeneration")) and (not IsInCombat()) and (not script_checkDebuffs:hasSilence()) then
+	if (not IsLooting()) and (not IsDrinking()) and (not IsEating()) and (not localObj:HasBuff("Frenzied Regeneration")) and (not IsInCombat()) and (not script_checkDebuffs:hasSilence()) then
 		if (script_druid:healsAndBuffs()) then
 			if (IsMoving()) then
 				StopMoving();
@@ -1862,7 +1862,7 @@ function script_druid:rest()
 		end
 
 	-- rest in form
-	if (IsBearForm() or IsCatForm()) and (self.useBear or self.useCat) and (self.useRest) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
+	if (IsBearForm() or IsCatForm()) and (self.useBear or self.useCat) and (self.useRest) then
 		if (localObj:GetUnitsTarget() == 0) then
 			if (localMana <= 70 or localHealth <= 70) and (not IsInCombat()) then
 				if (IsCatForm()) and (HasSpell("Prowl")) and (not IsSpellOnCD("Prowl")) and (not IsStealth()) and (not script_checkDebuffs:hasPoison()) then

@@ -38,6 +38,7 @@ script_shaman = {
 	useLightningBolt = false,
 	healMana = 20,
 	enhanceWeaponTimer = 0,
+	healingSpellTimer = 0,
 
 }
 
@@ -130,6 +131,7 @@ function script_shaman:setup()
 	self.waitTimer = GetTimeEX();
 	self.enhanceWeaponTimer = GetTimeEX();
 	script_shamanTotems.waitTimer = GetTimeEX();
+	self.healingSpellTimer = GetTimeEX();
 
 	self.isSetup = true;
 
@@ -303,12 +305,14 @@ if (IsCasting()) or (IsChanneling()) then
 	-- Check: Healing
 	if (not IsCasting()) and (not IsChanneling()) and (localMana >= self.healMana) and (not IsMoving()) then
 		if (localHealth < self.healHealth) and (not IsSpellOnCD(self.healingSpell)) then
-			CastSpellByName(self.healingSpell, localObj);
-			self.waitTimer = GetTimeEX() + 5000;
-			script_grind:setWaitTimer(5000);
+			if (IsMoving()) then
+				StopMoving();
+			end
+			script_shaman:castHealingSpell();
+			self.waitTimer = GetTimeEX() + 3000;
+			script_grind:setWaitTimer(3000);
 		return 4;
 		end
-	return false;		
 	end
 
 	-- check cure poison
@@ -901,6 +905,7 @@ function script_shaman:rest()
 
 	-- Stop moving before we can rest
 	if(localHealth < self.eatHealth or localMana < self.drinkMana) then
+		script_grind.needRest = true;
 		if (IsMoving()) then
 			StopMoving();
 			return true;
@@ -915,7 +920,7 @@ function script_shaman:rest()
 					if (CastSpellByName("Lesser Healing Wave", localObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						script_grind:setWaitTimer(2200);
-						return 4;
+						return true;
 					end
 				end
 			end
@@ -930,7 +935,7 @@ function script_shaman:rest()
 					if (CastSpellByName("Healing Wave", localObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						script_grind:setWaitTimer(2200);
-						return 4;
+						return true;
 					end
 				end
 			end
@@ -939,7 +944,7 @@ function script_shaman:rest()
 	
 
 	-- Drink something
-	if (not IsDrinking() and localMana < self.drinkMana) and (not IsMoving()) and (not IsInCombat()) and (script_grind.lootObj == nil) then
+	if (not IsDrinking() and localMana < self.drinkMana) and (not IsMoving()) and (not IsInCombat()) then
 		self.waitTimer = GetTimeEX() + 2000;
 		script_grind:setWaitTimer(2000);
 		self.message = "Need to drink...";
@@ -962,7 +967,7 @@ function script_shaman:rest()
 	end
 
 	-- Eat something
-	if (not IsEating() and localHealth < self.eatHealth) and (not IsMoving()) and (not IsInCombat()) and (script_grind.lootObj == nil) then
+	if (not IsEating() and localHealth < self.eatHealth) and (not IsMoving()) and (not IsInCombat()) then
 		self.waitTimer = GetTimeEX() + 2000;
 		script_grind:setWaitTimer(2000);
 		self.message = "Need to eat...";
@@ -1033,4 +1038,24 @@ function script_shaman:window()
 			script_shamanEX:menu();
 		end
 	end
+end
+
+function script_shaman:castHealingSpell(localObj)
+	if (self.healingSpellTimer > GetTimeEX()) then
+		return false;
+	end
+	if (HasSpell(script_shaman.healingSpell)) then
+		if (not IsSpellOnCD(script_shaman.healingSpell)) then
+			if (not IsMoving()) and (IsStanding()) then
+				if (not IsCasting()) and (not IsChanneling()) then
+					self.healingSpellTimer = GetTimeEX() + 5500;
+					self.waitTimer = GetTimeEX() + 3500;
+					if (CastSpellByName(self.healingSpell, localObj)) then
+						return 4;
+					end
+				end
+			end
+		end
+	end
+return false;
 end

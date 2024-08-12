@@ -748,7 +748,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- Don't attack if we should rest first
 			if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
-				and targetHealth > 99 and not targetObj:IsStunned() and script_grind.lootobj == nil) then
+				and targetHealth > 99 and not targetObj:IsStunned()) then
 				self.message = "Need rest...";
 				return 4;
 			end
@@ -792,7 +792,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 
 				-- Stealth in range if enabled
-				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) and (script_grind.lootObj == nil) then
+				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) then
 					if (not IsStealth()) then
 						CastStealth();
 					end

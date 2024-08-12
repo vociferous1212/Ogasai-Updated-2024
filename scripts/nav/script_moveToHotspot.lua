@@ -21,16 +21,20 @@ function script_moveToHotspot:moveToHotspot(localObj)
 			script_grind.tickRate = 135;
 		end
 		
-	-- move to hotspot coords
+-- move to hotspot coords
 		if (not script_grind.hotspotReached) then
-			script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ); 
+			if (not IsMoving()) then
+				Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+				script_nav.message = "Stuck out of bounds or stuck not moving...";
+			end
+		script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		end
 			-- mount/stealth/cat form/ travel form/ ghost wolf
-			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
-				CastStealth();
-				CastGhostWolf();
-				CastSprint();
-			end
+			--if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
+			--	CastStealth();
+			--	CastGhostWolf();
+			--	CastSprint();
+			--end
 		
 	-- stop moving so we can mount
 			if (not IsInCombat()) and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) then

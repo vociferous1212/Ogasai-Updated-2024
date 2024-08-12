@@ -321,7 +321,7 @@ function script_hunter:run(targetGUID)
 
 		-- Don't attack if we should rest first
 		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
-			and targetHealth > 99 and not targetObj:IsStunned() and script_grind.lootobj ~= nil) then
+			and targetHealth > 99 and not targetObj:IsStunned()) then
 			self.message = "Need rest...";
 			return 4;
 		end

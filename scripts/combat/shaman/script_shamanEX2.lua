@@ -42,6 +42,7 @@ function script_shamanEX2:menu()
 		Text('Rest options:');
 		script_shaman.eatHealth = SliderInt("Eat below HP%", 1, 100, script_shaman.eatHealth);
 		script_shaman.drinkMana = SliderInt("Drink below Mana%", 1, 100, script_shaman.drinkMana);
+		script_grind.drinkMana = script_shaman.drinkMana; script_grind.eatHealth = script_shaman.eatHealth;
 		Text('You can add more food/drinks in script_helper.lua');
 
 		Separator();

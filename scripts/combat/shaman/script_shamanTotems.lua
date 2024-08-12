@@ -211,3 +211,35 @@ function script_shamanTotems:isAirTotemAlive()
 	end
 return false;
 end
+
+
+function script_shamanTotems:isAnythingAttackingMyTotems()
+	local i, t = GetFirstObject()
+	--local fireTable = {Searing Totem, Fire Nova Totem, Magma Totem, Flametongue Totem};
+	local totem1 = 0;
+	local totem2 = 0;
+	local totem3 = 0;
+
+	-- get totem
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() < 45) then
+				if i:GetUnitName() == "a" then
+				end
+			end
+		end
+	end
+return firetotem1
+end
+					
+
+
+
+
+
+
+
+
+
+
+

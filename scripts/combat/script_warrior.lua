@@ -285,7 +285,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 		-- Don't attack if we should rest first
 		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
-			and targetHealth > 99 and not targetObj:IsStunned() and script_grind.lootobj == nil) then
+			and targetHealth > 99 and not targetObj:IsStunned()) then
 			self.message = "Need rest...";
 			return 4;
 		end
@@ -919,7 +919,7 @@ function script_warrior:rest()
 	end
 
 	-- eat if not bandages
-	if (not IsEating() and localHealth <= self.eatHealth) and (not IsInCombat()) and (not IsMoving()) and (script_grind.lootObj == nil) then
+	if (not IsEating() and localHealth <= self.eatHealth) and (not IsInCombat()) and (not IsMoving()) then
 		self.message = "Need to eat...";	
 		if (IsMoving()) then
 			StopMoving();

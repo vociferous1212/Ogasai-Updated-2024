@@ -65,8 +65,10 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 		end	-- Move to the next destination in the path
 	end
 		
-	if (Move(_ix, _iy, _iz)) then
-		
+	Move(_ix, _iy, _iz);
+
+	if (IsMoving()) then
+		script_unstuck:unstuck();
 	end
 
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then

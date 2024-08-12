@@ -57,8 +57,14 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
+	if (IsMoving()) then
+		script_unstuck:unstuck();
+	elseif (not IsMoving()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+		Move(script_grind.enemyObj:GetPosition());
+	end
+
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
-		script_grind.message = "Moving To Target NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
+		script_grind.message = "Moving To Target Combat NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
 	else
 		return "Moving to target... Nav EX";
 	end
