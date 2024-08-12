@@ -177,8 +177,8 @@ script_grind = {
 	myLastZ = 0,		-- set coords
 	vendorMessageSent = false,	-- send message to chat frame - vendors loaded from DB...
 	safePullAvoidTargets = false,	-- TODO try to safe pull avoided targets with adds nearby...
-	swimJumpTimer = 0,
-	buffTimer = 0;
+	swimJumpTimer = 0,	-- jump when swimming
+	buffTimer = 0,		-- timer to buff other players in range
 }
 
 function script_grind:setup()
