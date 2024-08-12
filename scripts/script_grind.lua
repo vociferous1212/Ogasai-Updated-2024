@@ -708,16 +708,6 @@ function script_grind:run()
 		end
 	end
 
-	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
-		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (self.enemyObj:GetDistance() <= 30) then
-				self.enemyObj:FaceTarget();
-				self.blacklistLootTime = GetTimeEX();
-				self.blacklistLootTimeCheck = GetTimeEX();
-			end
-		end
-	end
-
 	if (not IsInCombat()) and (not IsLooting()) then
 		self.blacklistLootTime = GetTimeEX();
 	end
@@ -737,6 +727,16 @@ function script_grind:run()
 	-- set tick rate for scripts
 	if (self.waitTimer > GetTimeEX() + self.tickRate) then
 		return;
+	end
+
+if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
+		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+			if (self.enemyObj:GetDistance() <= 30) then
+				self.enemyObj:FaceTarget();
+				self.blacklistLootTime = GetTimeEX();
+				self.blacklistLootTimeCheck = GetTimeEX();
+			end
+		end
 	end
 		-- Do all checks
 		if (script_grindEX:doChecks()) then
@@ -898,7 +898,7 @@ function script_grind:run()
 
 		-- move to hotspot location
 		self.message = script_moveToHotspot:moveToHotspot(localObj);
-		--return true;
+		return true;
 		end
 
 		-- check party members
