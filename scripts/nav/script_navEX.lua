@@ -48,7 +48,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 
 	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.2) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.3) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		return "Generating a new path...";
 	end
@@ -61,7 +61,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 
 	if (IsMoving()) then
 		if (script_grind.nextToNodeDist < 6) then
-			--self.waitTimer = GetTimeEX() + ((script_grind.nextToNodeDist*2) + (GetDistance3D(mX, mY, mZ ,_lx, _ly, _lz))*1000);
+			self.waitTimer = GetTimeEX() + ((script_grind.nextToNodeDist*2) + (GetDistance3D(mX, mY, mZ ,_lx, _ly, _lz))*1000);
 		end	-- Move to the next destination in the path
 	end
 		
