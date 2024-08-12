@@ -898,7 +898,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 
 		-- move to hotspot location
 		self.message = script_moveToHotspot:moveToHotspot(localObj);
-		return true;
+		--return true;
 		end
 
 		-- check party members
