@@ -400,7 +400,7 @@ function script_gather:gather()
 			if (_x ~= 0) then
 				local nDist = math.floor(self.nodeObj:GetDistance());
 				if (IsPathLoaded(5)) then
-					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
+					script_navEXCombat:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
 				else
 					MoveToTarget(_x, _y, _z);
