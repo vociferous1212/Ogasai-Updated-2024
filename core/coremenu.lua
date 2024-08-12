@@ -1,4 +1,5 @@
 coremenu = {
+
 	--Setup
 	isSetup = false,
 }
