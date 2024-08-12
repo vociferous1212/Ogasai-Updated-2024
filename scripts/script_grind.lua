@@ -1965,6 +1965,8 @@ function script_grind:getDistanceDif()
 end
 
 function script_grind:drawStatus()
+-- should tell the bot to keep variables if disconnected or switching areas (loading screens)
+	PersistLoadingScreen(true);
 	script_drawStatusEX:drawSetup();
 	script_drawStatus:draw();
 end
@@ -2338,7 +2340,7 @@ function script_grind:isAnyTargetTargetingMe()
 return false;
 end
 
-function script_grind:attackTargetAtackingMe()
+function script_grind:attackTargetAttackingMe()
 	if (not PlayerHasTarget()) then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
