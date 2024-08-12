@@ -15,6 +15,9 @@ script_talent = {
 }
 
 function script_talent:setup()
+
+
+			-- "talent page number ( 1 2 3 );TalentName",
 	if (not self.isSetup) then
 
 		-- Paladin ret talent points in order 1-31, (3; = ret tab, 1; would be holy tab etc)
@@ -60,18 +63,30 @@ function script_talent:setup()
 			"2;Adrenaline Rush"
 		}
 
+
 		-- Druid feral talent points in order 1-31
 		self.druidTalents = {
+
+			-- level 10 - 14
 			"2;Ferocity", "2;Ferocity", "2;Ferocity", "2;Ferocity", "2;Ferocity",
-			"2;Feral Instinct", "2;Feral Instinct", "2;Feral Instinct", "2;Feral Instinct", "2;Feral Instinct", 
-			"2;Feline Swiftness", "2;Feline Swiftness", "2;Feral Charge",
-			"2;Sharpened Claws", "2;Sharpened Claws", "2;Sharpened Claws",
-			"2;Blood Frenzy", "2;Blood Frenzy",
-			"2;Predatory Strikes", "2;Predatory Strikes", "2;Predatory Strikes",
-		"2;Faerie Fire (Feral)",
-			"2;Savage Fury", "2;Savage Fury",
+			-- level 14 - 19
+			"2;Feral Instinct", "2;Feral Instinct", "2;Thick Hide", "2;Thick Hide", "2;Thick Hide", 
+			-- level 20 - 24
+			"2;Feline Swiftness", "2;Feline Swiftness", "2;Feral Charge", "2;Sharpened Claws", "2;Sharpened Claws",
+			-- level 25 - 29
+			"2;Predatory Strikes", "2;Predatory Strikes", "2;Predatory Strikes", "2;Sharpened Claws", "2;Blood Frenzy",
+			-- level 30 - 34
+			"2;Faerie Fire (Feral)", "2;Blood Frenzy", "2;Savage Fury", "2;Savage Fury", "2;Thick Hide",
+			-- level 35 - 39
 			"2;Heart of the Wild", "2;Heart of the Wild", "2;Heart of the Wild", "2;Heart of the Wild", "2;Heart of the Wild",
-			"2;Leader of the Pack"
+			-- level 40 - 44
+			"2;Leader of the Pack", "3;Furor", "3;Furor", "3;Furor", "3;Furor",
+			-- level 45 - 49
+			"3;Furor", "1;Nature's Grasp", "1;Improved Nature's Grasp", "1;Improved Nature's Grasp", "1;Improved Nature's Grasp",
+			-- level 50 - 54
+			"1;Improved Nature's Grasp", "1;Natural Weapons", "1;Natural Weapons", "1;Natural Weapons", "1;Natural Weapons",
+			-- level 55 - 60
+			"1;Natural Weapons", "1;Omen of Clarity", "1;Natural Shapeshifter", "1;Natural Shapeshifter", "1;Natural Shapeshifter"
 		}
 		
 		-- Priest talent points in order 1-31

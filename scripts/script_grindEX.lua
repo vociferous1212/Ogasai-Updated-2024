@@ -140,6 +140,48 @@ function script_grindEX:doChecks()
 			end
 		end
 
+		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
+			local x, y, z = GetLocalPlayer():GetPosition();
+			if (GetTimeEX() > script_grind.swimJumpTimer) then
+				local x2, y2, z2 = GetLocalPlayer():GetPosition();
+				if (GetDistance3D(x, y, z, x2, y2, z2) > 5) then
+					JumpOrAscendStart();
+					script_grind.swimJumpTimer = GetTimeEX() + 1200;
+					Move(x, y, z+10)
+					return true;
+				end
+				
+			end
+		end
+
+		if (IsInCombat()) and (GetTimeEX() > script_grind.omTimer) and (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
+			if (script_grind.enemyObj:GetHealthPercentage() >= 20) then
+				script_om:FORCEOM();
+				script_grind.omTimer = GetTimeEX() + 5000;
+				return true;
+			end
+		end
+
+		-- delete items 
+		if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then
+			script_deleteItems:checkDeleteItems();
+		end
+
+		-- check party members
+		if (GetNumPartyMembers() >= 1) then
+			if (script_grindParty:partyOptions()) then
+				return true;
+			end
+		end
+
+		-- Jump
+		if (script_grind.jump) then
+			local jumpRandom = random(1, 100);
+			if (jumpRandom > script_grind.jumpRandomFloat and IsMoving() and not IsInCombat()) then
+				JumpOrAscendStart();
+			end
+		end
+
 		if (not IsInCombat() or IsMounted()) then
 			if (vendorStatus == 1) then
 				script_grind.message = "Repairing at vendor...";
@@ -184,7 +226,7 @@ function script_grindEX:doChecks()
 			if (script_grindEX:areWeSwimming()) and (not script_grindEX.allowSwim) then 
 				script_grind.message = "Moving out of the water..."; 
 				if (script_grind.autoPath) then
-					self.message = script_nav:moveToSavedLocation(localObj, script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
+					script_grind.message = script_nav:moveToSavedLocation(localObj, script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
 				else
 					script_nav:navigate(GetLocalPlayer());
 					return true;

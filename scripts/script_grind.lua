@@ -182,6 +182,8 @@ script_grind = {
 	safePullAvoidTargets = false,	-- TODO try to safe pull avoided targets with adds nearby...
 	swimJumpTimer = 0,	-- jump when swimming
 	buffTimer = 0,		-- timer to buff other players in range
+	restMana = 1,
+	restHealth = 1,
 }
 
 function script_grind:setup()
@@ -463,7 +465,7 @@ function script_grind:run()
 	if (IsMounted()) then
 		script_nav:setNextToNodeDist(11); NavmeshSmooth(self.nextToNodeDist*1.8);
 	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
-		script_nav:setNextToNodeDist(5); NavmeshSmooth(self.nextToNodeDist*1.8);
+		script_nav:setNextToNodeDist(6.5); NavmeshSmooth(self.nextToNodeDist*1.8);
 	elseif (race == 'Night Elf') and (localObj:IsDead()) then
 		script_nav:setNextToNodeDist(8);
 		NavmeshSmooth(self.nextToNodeDist*1.6);
@@ -729,6 +731,9 @@ function script_grind:run()
 		script_vendor.message = "idle...";
 	end
 
+
+ -- ready to run rest of script - navigation / combat / gathering / vendoring / etc
+
 	-- set tick rate for scripts
 	if (self.waitTimer > GetTimeEX() + self.tickRate) then
 		return;
@@ -741,26 +746,6 @@ function script_grind:run()
 	--if (script_helper:weAreStandingInFire()) then
 	--	return true;
 	--end
-	
-		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
-			local x, y, z = GetLocalPlayer():GetPosition();
-			if (GetTimeEX() > self.swimJumpTimer) then
-				local x2, y2, z2 = GetLocalPlayer():GetPosition();
-				if (GetDistance3D(x, y, z, x2, y2, z2) > 5) then
-					JumpOrAscendStart();
-					self.swimJumpTimer = GetTimeEX() + 1200;
-					Move(x, y, z+10)
-				end
-				
-			end
-		end
-
-		if (IsInCombat()) and (GetTimeEX() > self.omTimer) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-			if (self.enemyObj:GetHealthPercentage() >= 20) then
-				script_om:FORCEOM();
-				self.omTimer = GetTimeEX() + 5000;
-			end
-		end
 
 		-- Check: If our gear is yellow
 		for i = 1, 16 do
@@ -773,27 +758,7 @@ function script_grind:run()
 				end
 			end
 		end
-
-		-- check party members
-		if (GetNumPartyMembers() >= 1) then
-			if (script_grindParty:partyOptions()) then
-				return true;
-			end
-		end
-
-		-- Jump
-		if (self.jump) then
-			local jumpRandom = random(1, 100);
-			if (jumpRandom > self.jumpRandomFloat and IsMoving() and not IsInCombat()) then
-				JumpOrAscendStart();
-			end
-		end
-
-		-- delete items 
-		if (not IsInCombat()) and (not IsMoving()) and (self.deleteItems) then
-			script_deleteItems:checkDeleteItems();
-		end
-		
+				
 		--Mount up
 		if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
@@ -915,13 +880,13 @@ function script_grind:run()
 			end
 
 			-- Shaman Ghost Wolf 
-			if (not IsMounted()) and (not self.useMount) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) and (not IsIndoors()) then
-					CastSpellByName('Ghost Wolf');
-					self.waitTimer = GetTimeEX() + 1500;
-					script_grind:setWaitTimer(1500);
-					return;
-				
-			end
+			--if (not IsMounted()) and (not self.useMount) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) and (not IsIndoors()) then
+			--		CastSpellByName('Ghost Wolf');
+			--		self.waitTimer = GetTimeEX() + 1500;
+			--		script_grind:setWaitTimer(1500);
+			--		return;
+			--	
+			--end
 			if (IsLooting()) or (IsCasting()) or (IsChanneling()) or (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				return;
 			end
@@ -1036,15 +1001,18 @@ function script_grind:run()
 			end
 		end	
 		
-		-- wait after combat phase - stuck in combat
-		if (IsInCombat()) and ((GetLocalPlayer():HasBuff("Bloodrage")) or (HasPet() and not PetHasTarget() and not PlayerHasTarget()) or (not HasPet() and not PlayerHasTarget()) ) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
+		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
+			self.message = "waiting after combat - stuck in combat";
+			return;
+		end
+		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				ex, ey, ez = self.lootObj:GetPosition();
 				Move(ex, ey, ez);
 			end
-			return;
-		end
+		return;
+		end	
 
 		-- Finish loot before we engage new targets or navigate - return
 		if (self.lootObj ~= nil and (not IsInCombat() or script_grind:enemiesAttackingUs() ==0)) then
@@ -1233,16 +1201,12 @@ function script_grind:run()
 					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
 						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-
-					elseif (not IsPathLoaded(5)) and (not IsMoving() or IsInCombat() and self.enemyObj:GetDistance() > 8) or (not IsPathLoaded(5)) then
-						self.message = "Moving To Target Nav -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-						MoveToTarget(_x, _y, _z);
 					end
-					--if (not IsMoving()) andand (script_grind.enemyObj:GetDistance() > 8) then
-					--	Move(_x, _y, _z);
-					--	self.message = "Forcing movement return 3";
-					--end
-
+					if (not IsMoving()) then
+						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						Move(_x, _y, _z);
+						return;
+					end
 					-- set wait timer to move clicks
 					--if (IsMoving()) then
 					--	script_grind:setWaitTimer(100);
@@ -1341,29 +1305,29 @@ function script_grind:run()
 		end
 
 		-- travel forms
-		if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
-		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (not self.useMount) then
-			if (HasSpell("Ghost Wolf")) or (HasSpell("Travel Form")) then
-				if (IsMoving()) then
-					StopMoving();
-					return true;
-				end
-
-				-- use travel form function
-				if (HasSpell("Travel Form")) then
-					if (script_druidEX:travelForm()) then
-						script_grind:setWaitTimer(2500);
-					end
-				end
-
-				-- use ghost wolf function
-				if (HasSpell("Ghost Wolf")) then
-					if (script_shamanEX2:ghostWolf()) then
-						script_grind:setWaitTimer(4000);
-					end
-				end
-			end
-		end
+		--if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
+		--and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (not self.useMount) then
+		--	if (HasSpell("Ghost Wolf")) or (HasSpell("Travel Form")) then
+		--		if (IsMoving()) then
+		--			StopMoving();
+		--			return true;
+		--		end
+		--
+		--		-- use travel form function
+		--		if (HasSpell("Travel Form")) then
+		--			if (script_druidEX:travelForm()) then
+		--				script_grind:setWaitTimer(2500);
+		--			end
+		--		end
+		--
+		--		-- use ghost wolf function
+		--		if (HasSpell("Ghost Wolf")) then
+		--			if (script_shamanEX2:ghostWolf()) then
+		--				script_grind:setWaitTimer(4000);
+		--			end
+		--		end
+		--	end
+		--end
 
 -- hotspot reached distance
 		if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
@@ -2190,7 +2154,7 @@ function script_grind:lootAndSkin()
 	end
 	-- do loot if there is anything lootable
 	local isLoot = not IsInCombat() and not (self.lootObj == nil);
-	if (isLoot and not AreBagsFull() and not self.bagsFull) and (not IsEating() or not IsDrinking()) then
+	if (isLoot and not AreBagsFull() and not self.bagsFull) and (not IsEating() or not IsDrinking()) and (not self.needRest) then
 		script_grind:doLoot(localObj);
 		
 		return true;
@@ -2200,7 +2164,7 @@ function script_grind:lootAndSkin()
 		return false;
 	end
 	-- Skin if there is anything skinnable within the loot radius
-	if (HasSpell('Skinning') and self.skinning and HasItem('Skinning Knife')) and (not IsDrinking()) and (not IsEating()) and (IsStanding()) then
+	if (HasSpell('Skinning') and self.skinning and HasItem('Skinning Knife')) and (not IsDrinking()) and (not IsEating()) and (IsStanding()) and (not self.needRest) then
 		self.lootObj = nil;
 			-- get skin target
 		self.lootObj = script_grind:getSkinTarget(self.findLootDistance);
