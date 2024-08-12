@@ -48,6 +48,8 @@ function script_paladin:setup()
 		self.useBubbleHearth = false;
 	end
 	self.waitTimer = GetTimeEX();
+	script_paladinEX.waitTimer = GetTimeEX();
+	script_paladinEX.holyLightTimer = GetTimeEX();
 	self.isSetup = true;
 end
 
@@ -115,13 +117,6 @@ function script_paladin:run(targetGUID)
 		return 6;
 	end
 
-	-- stop bot from moving target to target when stuck in combat and we need to rest
-	if (IsInCombat()) and (PlayerHasTarget()) and (not script_grind:isAnyTargetTargetingMe()) and (script_grind.enemiesAttackingUs() == 0) and (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() >= 99) then
-		self.message = "Waiting! Stuck in combat phase!";
-		return 4;
-	end
-
-
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
 
@@ -129,8 +124,15 @@ function script_paladin:run(targetGUID)
 		return 2;
 	end	
 
+	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (script_checkAdds:checkAdds()) then
+			script_om:FORCEOM();
+			return true;
+		end
+	end
+
 	if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
-		return true;
+		return 4;
 	end
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling()) or (IsCasting()) or (self.waitTimer > GetTimeEX()) then
@@ -144,7 +146,7 @@ function script_paladin:run(targetGUID)
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
-		local tickRandom = random(450, 800);
+		local tickRandom = random(650, 900);
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
 		elseif (not IsInCombat()) and (not IsMoving()) then
@@ -160,13 +162,6 @@ function script_paladin:run(targetGUID)
 	end
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
-
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return true;
-			end
-		end
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
@@ -210,7 +205,7 @@ function script_paladin:run(targetGUID)
 			 end
 
 			if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
-				return true;
+				return 4;
 			end
 
 			-- Check move into melee range
@@ -274,7 +269,7 @@ function script_paladin:run(targetGUID)
 
 			if (not targetObj:IsFleeing()) and (localMana > 8) then
 				if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
-					return true;
+					return 4;
 				end
 			end
 
@@ -301,7 +296,7 @@ function script_paladin:run(targetGUID)
 			end
 
 			if (script_paladinEX:healsAndBuffs()) then
-				return true;
+				return 4;
 			end
 
 			-- dwarf stone form racial
@@ -346,7 +341,7 @@ function script_paladin:run(targetGUID)
 				
 				if (not targetObj:IsFleeing()) and (localMana > 8) then
 					if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
-						return true;
+						return 4;
 					end
 				end
 
@@ -491,7 +486,7 @@ function script_paladin:rest()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(450, 800);
+		local tickRandom = random(1250, 1900);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -505,11 +500,16 @@ function script_paladin:rest()
 	local localLevel = localObj:GetLevel();
 	local localHealth = localObj:GetHealthPercentage();
 	local localMana = localObj:GetManaPercentage();
+
 	-- heal before eating
 	if (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsMoving()) and (not IsInCombat()) and (localMana > 8) then
 		if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
 			return true;
 		end
+	end
+
+	if (IsEating() and localHealth >= 90) or (IsDrinking() and localMana >= 90) then
+		JumpOrAscendStart();
 	end
 
 	-- Stop moving before we can rest
@@ -573,7 +573,7 @@ function script_paladin:rest()
 		end
 	end
 	if (IsEating()) and (not IsDrinking()) and (localMana <= 65) then
-		if (script_helper:drink()) then 
+		if (script_helper:drinkWater()) then 
 			self.message = "Drinking..."; 
 			self.waitTimer = GetTimeEX() + 2000;
 			return true; 

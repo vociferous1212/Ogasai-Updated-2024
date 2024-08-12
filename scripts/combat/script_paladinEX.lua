@@ -1,9 +1,16 @@
 script_paladinEX = {
 
+	waitTimer = 0,
+	holyLightTimer = 0,
+
 
 }
 
 function script_paladinEX:healsAndBuffs(localObj, localMana)
+	
+	if ((self.waitTimer + script_grind.tickRate) > GetTimeEX()) or (IsCasting()) or (IsChanneling()) then
+		return;
+	end
 
 	local localMana = GetLocalPlayer():GetManaPercentage();
 	local localHealth = GetLocalPlayer():GetHealthPercentage();
@@ -21,6 +28,7 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 		if (not localObj:HasBuff(script_paladin.aura) and HasSpell(script_paladin.aura)) then
 			CastSpellByName(script_paladin.aura);
 			script_grind:setWaitTimer(1750);
+			self.waitTimer = GetTimeEX() + 1750;
 		end
 	end
 
@@ -29,21 +37,24 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 		if (localMana > 10) and (not localObj:HasBuff(script_paladin.blessing)) then
 			Buff(script_paladin.blessing, localObj);
 			script_grind:setWaitTimer(1750);
-			return 0;
+			self.waitTimer = GetTimeEX() + 1750;
+			return true;
 		end
 	end
 
 	if (IsInCombat()) and (localObj:HasBuff("Judgement")) and (not IsSpellOnCD("Judgement")) and (localObj:HasBuff("Seal of Righteousness")) then
 		CastSpellByName("Judgement", targetObj);
 		script_grind:setWaitTimer(1650);
-		return 0;
+		self.waitTimer = GetTimeEX() + 1750;
+		return true;
 	end
 
 	-- Check: Use Lay of Hands
 	if (localHealth < script_paladin.lohHealth) and (HasSpell("Lay on Hands")) and (not IsSpellOnCD("Lay on Hands")) then 
 		if (Cast("Lay on Hands", localObj)) then 
+			self.waitTimer = GetTimeEX() + 1750;
 			script_paladin.message = "Cast Lay on Hands...";
-			return 0;
+			return true;
 		end
 	end
 
@@ -63,6 +74,7 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 	if (script_paladin.useBubbleHearth) and (localObj:HasBuff("Divine Shiel")) then
 		UseItem("Hearthstone");
 		script_grind:setWaitTimer(12000);
+		self.waitTimer = GetTimeEX() + 12050;
 		StopBot();
 		return;
 	end
@@ -72,15 +84,18 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 		if (HasSpell("Divine Shield")) and (not IsSpellOnCD("Divine Shield")) then
 			CastSpellByName("Divine Shield");
 			script_paladin.message = "Cast Divine Shield...";
-			return 0;
+			self.waitTimer = GetTimeEX() + 1750;
+			return true;
 		elseif (HasSpell("Divine Protection")) and (not IsSpellOnCD("Divine Protection")) then
 			CastSpellByName("Divine Protection");
 			script_paladin.message = "Cast Divine Protection...";
-			return 0;
+			self.waitTimer = GetTimeEX() + 1750;
+			return true;
 		elseif (HasSpell("Blessing of Protection")) and (not IsSpellOnCD("Blessing of Protection")) then
 			CastSpellByName("Blessing of Protection");
 			script_paladin.message = "Cast Blessing of Protection...";
-			return 0;
+			self.waitTimer = GetTimeEX() + 1750;
+			return true;
 		end
 	end
 
@@ -92,7 +107,9 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 			end
 			CastSpellByName("Holy Light", localObj);
 			script_grind:setWaitTimer(2550);
-			return 0;
+			self.waitTimer = GetTimeEX() + 3050;
+			script_paladin.waitTimer = GetTimeEX() + 3050
+			return 4;
 		else
 			if (localMana > 8) and (HasSpell("Flash of Light")) then
 				if (IsMoving()) then
@@ -100,6 +117,7 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 				end
 				CastSpellByName("Flash of Light", localObj);
 				script_grind:setWaitTimer(1550);
+				self.waitTimer = GetTimeEX() + 1750;
 				return 0;
 			end
 		end
@@ -111,7 +129,8 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 			if (Buff("Cleanse", localObj)) then 
 				script_paladin.message = "Cleansing..."; 
 					script_grind:setWaitTimer(1750); 
-					return 0; 
+					self.waitTimer = GetTimeEX() + 1750;
+					return true; 
 			end
 		end
 	end
@@ -122,7 +141,8 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 			if (Buff("Purify", localObj)) then 
 				script_paladin.message = "Cleansing..."; 
 				script_grind:setWaitTimer(1750); 
-				return 0; 
+				self.waitTimer = GetTimeEX() + 1750;
+				return true; 
 			end
 		end
 	end
@@ -130,7 +150,8 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 	-- Check: Remove movement disables with Freedom
 	if (localObj:IsMovementDisabed() or script_checkDebuffs:hasDisabledMovement()) and (HasSpell("Blessing of Freedom")) then
 		Buff("Blessing of Freedom", localObj);
-		return 0;
+		self.waitTimer = GetTimeEX() + 1750;
+		return true;
 	end
 
 	-- flash of light not in combat
@@ -143,39 +164,46 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 			CastHeal("Flash of Light", localObj);
 			ClearTarget();
 			script_grind:setWaitTimer(1500);
+			self.waitTimer = GetTimeEX() + 2050;
+			return true;
+
 		end
 		return;
 	end
 
-	local checkHealth = GetLocalPlayer():GetHealthPercentage();
-
 	-- holy light
-	if (localMana > 18) and (checkHealth < script_paladin.holyLightHealth) and (not IsMoving()) then
-		if (IsMoving()) then
-			StopMoving();
-		end
-		CastHeal("Holy Light", localObj);
-		script_grind:setWaitTimer(3250);
-		return 4;
-	end
-
-	-- Flash of Light in combat
-	if (script_paladin.useFlashOfLightCombat) then
-		if (IsInCombat()) and (HasSpell("Flash of Light")) and (localHealth <= script_paladin.flashOfLightHP) and (localMana >= 10) then
-			script_grind.tickRate = 100;
+	if (localMana > 18) and (script_paladinEX:doubleCheckHealthPercentage() < script_paladin.holyLightHealth) and (not IsMoving()) then
+		if (not IsCasting()) and (not IsChanneling()) and (GetLocalPlayer():GetHealthPercentage() < script_paladin.holyLightHealth) then
+			script_grind.tickRate = 2500;
 			if (IsMoving()) then
 				StopMoving();
 			end
-			CastHeal("Flash of Light", localObj);
-			script_grind:setWaitTimer(1500);
-			script_paladin.message = "Flash of Light enabled - Healing!";
-			if (localMana > 8) then
-				CastSpellByName("Flash of Light", localObj);
-			return 4;
-			end			
+			script_paladinEX:castHolyLight(localObj);
+			script_grind:setWaitTimer(2250);
+			self.waitTimer = GetTimeEX() + 2250;
+		return 4;
 		end
-	return;	
+		
 	end
+	-- Flash of Light in combat
+	if (script_paladin.useFlashOfLightCombat) then
+		if (IsInCombat()) and (HasSpell("Flash of Light")) and (script_paladinEX:doubleCheckHealthPercentage() <= script_paladin.flashOfLightHP) and (localMana >= 10) then
+			if (not IsCasting()) and (not IsChanneling()) and (GetLocalPlayer():GetHealthPercentage() <= script_paladin.flashOfLightHP) then
+				script_grind.tickRate = 2500;
+				if (IsMoving()) then
+					StopMoving();
+				end
+				if (not CastSpellByName("Flash of Light", localObj)) then
+					script_grind:setWaitTimer(2750);
+					self.waitTimer = GetTimeEX() + 2750;
+					script_paladin.waitTimer = GetTimeEX() + 2750
+					script_paladin.message = "Flash of Light enabled - Healing!";
+				return 4;
+				end
+			return 4;			
+			end
+		end
+	end	
 
 	--flash of light in combat very low health and mana
 	if (HasSpell("Flash of Light")) and (IsInCombat()) and (localMana < 15) and (localMana > 5) and (localHealth < script_paladin.holyLightHealth) then
@@ -184,10 +212,12 @@ function script_paladinEX:healsAndBuffs(localObj, localMana)
 			StopMoving();
 		end
 
-		CastHeal("Flash of Light", localObj);
-		script_grind:setWaitTimer(1500);
-		script_paladin.message = "We are dying - trying to save!";
-		return;
+		if (not CastHeal("Flash of Light", localObj)) then
+			script_grind:setWaitTimer(1500);
+			self.waitTimer = GetTimeEX() + 1750;
+			script_paladin.message = "We are dying - trying to save!";
+			return 4;
+		end
 	end
 
 	-- set tick rate for script to run
@@ -290,4 +320,36 @@ function script_paladinEX:menu()
 			end
 		end
 	end
+end
+
+function script_paladinEX:doubleCheckHealthPercentage()
+	local localObj = GetLocalPlayer();
+	local localHealth = localObj:GetHealthPercentage();
+	
+	for i=0, 5 do
+		if (localHealth > 0) then
+			return localHealth;
+		end
+	end
+return 0;
+end
+
+function script_paladinEX:castHolyLight(localObj)
+	if (self.holyLightTimer > GetTimeEX()) then
+		return false;
+	end
+	if (HasSpell("Holy Light")) then
+		if (not IsSpellOnCD("Holy Light")) then
+			if (not IsMoving()) and (IsStanding()) then
+				if (not IsCasting()) and (not IsChanneling()) then
+					self.holyLightTimer = GetTimeEX() + 5500;
+					self.waitTimer = GetTimeEX() + 3500;
+					if (CastSpellByName("Holy Light", localObj)) then
+						return 4;
+					end
+				end
+			end
+		end
+	end
+return false;
 end
