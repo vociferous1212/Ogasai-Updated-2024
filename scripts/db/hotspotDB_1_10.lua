@@ -21,7 +21,7 @@ function hotspotDB_1_10:setup()
 	hotspotDB:addHotspot("Northshire Valley 4 - 5", "Alliance", 4, 5, -8863.01, -416.01, 66.07);
 	hotspotDB:addHotspot("Elwynn Forest 6 - 6", "Human", 6, 6, -9544.41, 218.33, 54.59);
 	hotspotDB:addHotspot("The Stonefield Farm 7 - 7", "Alliance", 7, 7, -9994.89, 309.12, 34.82);
-	hotspotDB:addHotspot('Elwynn Forest 8 - 8', "Alliance", 8, 8, -9202.76, 62.19, 77.55);
+	hotspotDB:addHotspot("Elwynn Forest 8 - 8", "Human", 8, 8, -9639.18, -23.02, 44.45);
 	hotspotDB:addHotspot("Elwynn Forest 9 - 9", "Alliance", 9, 9, -9342.09, -832.4, 64.71);
 	hotspotDB:addHotspot("Elwynn Forest 10 - 10", "Alliance", 10, 10, -9459.37, -1122.34, 52.69);
 	hotspotDB:addHotspot("Ridgepoint Tower 11 - 11", "Alliance", 11, 11, -9866.62, -1350.71, 37.85);

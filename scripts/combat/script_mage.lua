@@ -873,8 +873,8 @@ function script_mage:run(targetGUID)
 				-- cast fireball
 				if (CastSpellByName("Fireball", targetObj)) then
 					FaceTarget();
-					script_grind:setWaitTimer(1500);
-					self.waitTimer = GetTimeEX() + 1500;
+					script_grind:setWaitTimer(2500);
+					self.waitTimer = GetTimeEX() + 2500;
 					return 0;
 				end
 			end
@@ -1153,7 +1153,7 @@ if (not IsMounted()) then
 	end	
 
 -- Eat and Drink
-	if (not IsDrinking() and localMana < self.drinkMana) then
+	if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		self.message = "Need to drink...";
 		-- Dismount
 		if(IsMounted()) then 
@@ -1173,7 +1173,7 @@ if (not IsMounted()) then
 			return true; 
 		end
 	end
-	if (not IsEating() and localHealth < self.eatHealth) then
+	if (not IsEating() and localHealth < self.eatHealth) and (not IsSwimming()) then
 		-- Dismount
 		if(IsMounted()) then DisMount(); end
 		self.message = "Need to eat...";	

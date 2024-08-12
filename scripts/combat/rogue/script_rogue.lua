@@ -20,7 +20,7 @@ script_rogue = {
 	throwOpener = false,
 	isSetup = false,
 	useStealth = false,
-	usePoison = true,
+	usePoison = false,
 	useSliceAndDice = true,
 	stopIfMHBroken = true,
 	adrenRushCombo = true,
@@ -36,7 +36,7 @@ script_rogue = {
 	hasBandages = false,
 	riposteActionBarSlot = 8,
 	exposeArmorStacks = 1,
-	useExposeArmor = true,
+	useExposeArmor = false,
 	useRupture = false,
 	ruptureStacks = 2,
 	pickpocketUsed = false,
@@ -95,6 +95,9 @@ function script_rogue:setup()
 	if (GetLocalPlayer():GetLevel() < 6) then
 		self.eatHealth = 55;
 	end
+	if (GetLocalPlayer():GetLevel() >= 20) and (HasSpell("Poisons")) then
+		self.usePoison = true;
+	end
 
 	self.isSetup = true;
 end
@@ -125,7 +128,7 @@ function script_rogue:equipThrow()
 end
 
 function script_rogue:checkPoisons()
-	if (not IsInCombat() and not IsEating()) then
+	if (not IsInCombat() and not IsEating()) and (self.usePoison) then
 		hasMainHandEnchant, _, _, hasOffHandEnchant, _, _ = GetWeaponEnchantInfo();
 		if (hasMainHandEnchant == nil and HasItem(self.mainhandPoison)) then 
 			-- Check: Stop moving, sitting

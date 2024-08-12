@@ -125,6 +125,8 @@ function script_warlock:setup()
 		self.useWandHealth = 100;
 		self.useShadowbolt = false;
 	end
+
+	script_warlockDOTS.waitTimer = GetTimeEX();
 	
 	self.isSetup = true;
 end
@@ -435,24 +437,20 @@ function script_warlock:run(targetGUID)
 			end
 		end
 
-		if (self.warlockDOTS) and (script_grindEX:howManyEnemiesInRange(29) >= self.warlockDOTSCount) and (script_grind.enemiesAttackingUs() < self.warlockDOTSCount) and (localMana >= 50) and (localHealth >= 65) then
-		if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) then
-			return 3;
+		if (self.warlockDOTS) and (script_grindEX:howManyEnemiesInRange(29) >= self.warlockDOTSCount) and (script_grind.enemiesAttackingUs() <= self.warlockDOTSCount) and (localMana >= 35) and (localHealth >= 45) then
+		
+				script_warlockDOTS:corruption();
+				script_warlockDOTS:curseOfAgony();
+				script_warlockDOTS:immolate();
+				self.waitTimer = GetTimeEX() + 1000;
+				
 		end
 
-			if (script_warlockDOTS:corruption()) then
-				self.waitTimer = GetTimeEX() + 1500;
-				return true;
+		if (IsInCombat()) then
+			if (script_warlockDOTS:DOTAdds()) then
+				self.waitTimer = GetTimeEX()  + 1000;
+				return;
 			end
-			if (script_warlockDOTS:curseOfAgony()) then
-				self.waitTimer = GetTimeEX() + 1500;
-				return true;
-			end
-			if (script_warlockDOTS:immolate()) then
-				self.waitTimer = GetTimeEX() + 2500;
-				return true;
-			end
-			ClearTarget();
 		end
 
 
@@ -755,7 +753,7 @@ function script_warlock:run(targetGUID)
 
 			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetCreatureType() ~= "Undead") then
 				script_warlockFunctions:cast("Fear", targetObj);
-				self.waitTimer = GetTimeEX() + 1500;
+				self.waitTimer = GetTimeEX() + 3500;
 				return;
 			end
 

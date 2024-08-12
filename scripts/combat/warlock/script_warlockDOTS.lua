@@ -1,5 +1,6 @@
 script_warlockDOTS = {
 
+	waitTimer = 0,
 
 }
 
@@ -72,10 +73,10 @@ function script_warlockDOTS:corruption()
 							end
 							currentObj:FaceTarget();
 							script_warlockFunctions:cast('Corruption', currentObj);
-							ClearTarget();
 							script_grind:setWaitTimer(2500);
 							script_warlock.waitTimer = GetTimeEX() + 2500;
-							return true; 
+							ClearTarget();
+							return; 
 						end 
 					end 
 				end 
@@ -102,9 +103,9 @@ function script_warlockDOTS:immolate()
 							end
 							currentObj:FaceTarget();
 							if (not script_warlockFunctions:cast('Immolate', currentObj)) then 
-								script_grind:setWaitTimer(2500);
-								script_warlock.waitTimer = GetTimeEX() + 2500;
-								return true; 
+								script_grind:setWaitTimer(3000);
+								script_warlock.waitTimer = GetTimeEX() + 3000;
+								return; 
 							end
 						end 
 					end 
@@ -134,13 +135,56 @@ function script_warlockDOTS:curseOfAgony()
 							if (not script_warlockFunctions:cast('Curse of Agony', currentObj)) then 
 								script_grind:setWaitTimer(2500);
 								script_warlock.waitTimer = GetTimeEX() + 2500;
-								return true; 
+								ClearTarget();
+								return; 
 							end
 						end 
 					end 
 				end 
 			end
         	currentObj, typeObj = GetNextObject(currentObj); 
+		end
+	end
+return false;
+end
+
+-- more than 1 target is attacking me or pet then cast DOTS
+function script_warlockDOTS:DOTAdds()
+	if (script_grind:enemiesAttackingUs() > 1) and (not script_warlock.warlockDOTS) then
+
+		if (self.waitTimer > GetTimeEX()) then
+			return;
+		end
+
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				if script_grind:isTargetingMe(i) then
+					if (not script_warlockFunctions:targetHasImmolate(i)) or (not script_warlockFunctions:targetHasCurseOfAgony(i)) or (not script_warlockFunctions:targetHasCorruption(i)) then
+						if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) then
+							return 3;
+						end
+
+						if (script_warlockDOTS:corruption()) then
+							self.waitTimer = GetTimeEX() + 1000;
+							script_warlock.waitTimer = GetTimeEX() + 1500;
+							return true;
+						end
+						if (script_warlockDOTS:curseOfAgony()) then
+							self.waitTimer = GetTimeEX() + 1000;
+							script_warlock.waitTimer = GetTimeEX() + 1500;
+							return true;
+						end
+						if (script_warlockDOTS:immolate()) then
+							self.waitTimer = GetTimeEX() + 1000;
+							script_warlock.waitTimer = GetTimeEX() + 1500;
+							return true;
+						end
+						ClearTarget();
+					end
+				end
+			end
+		i, t = GetNextObject(i);
 		end
 	end
 return false;
