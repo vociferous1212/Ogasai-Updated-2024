@@ -11,7 +11,7 @@ script_talent = {
 	lockTalents = {},
 	shamTalents = {},
 	currentTalentTable = {},
-	isSetup = false
+	isSetup = falsem
 }
 
 function script_talent:setup()
@@ -146,37 +146,29 @@ function script_talent:setup()
 		-- Warlock talent points 1-21 Affliction, 22-51 Demonology
 		self.lockTalents = {
 			"1;Improved Corruption", "1;Improved Corruption", "1;Improved Corruption", "1;Improved Corruption", "1;Improved Corruption",
-			"1;Suppression", "1;Suppression", "1;Suppression", "1;Suppression", "1;Suppression",
-			"1;Improved Curse of Agony", "1;Improved Curse of Agony", "1;Improved Curse of Agony",
-			"1;Fel Concentration", "1;Fel Concentration",  
-			"1;Nightfall", "1;Nightfall",
-			"1;Improved Life Tap",
-			"1;Fel Concentration", "1;Fel Concentration", "1;Fel Concentration", 
-			"1;Siphon Life",
-			"2;Demonic Embrace", "2;Demonic Embrace", "2;Demonic Embrace", "2;Demonic Embrace", "2;Demonic Embrace",
-			"2;Improved Voidwalker", "2;Improved Voidwalker", "2;Improved Voidwalker", 
-			"2;Improved Healthstone", "2;Improved Healthstone",
-			"2;Fel Stamina", "2;Fel Stamina", "2;Fel Stamina", 
-			"2;Improved Health Funnel", "2;Improved Health Funnel",
-			"2;Unholy Power", "2;Unholy Power", "2;Unholy Power", "2;Unholy Power", "2;Unholy Power", 
-			"2;Demonic Sacrifice",
-			"2;Fel Intellect", "2;Fel Intellect", "2;Fel Intellect", 
-			"2;Fel Domination",
-			"2;Master Demonologist", "2;Master Demonologist", "2;Master Demonologist", "2;Master Demonologist", "2;Master Demonologist"		
-		}
+			"1;Improved Life tap", "1;Improved Life Tap", "1;Suppression", "1;Suppression", "1;Suppression", 
+			"1;Amplify Curse", "1;Improved Curse of Agony", "1;Improved Curse of Agony", "1;Improved Curse of Agony", "1;Suppression",  
+			"1;Nightfall", "1;Nightfall", "1;Grim Reach", "1;Grim Reach", "1;Suppression",
+			"1;Siphon Life", "1;Curse of Exhaustion", "1;Improved Drain Soul", "1;Improved Drain Soul", "1;Improved Drain Life",
+			"1;Shadow Mastery", "1;Shadow Mastery", "1;Shadow Mastery", "1;Shadow Mastery", "1;Shadow Mastery",
+			"1;Dark Pact", 
+				}
 
 		-- Shaman Enhancement talent points in order 1-31
 		self.shamTalents = {
+			--level 10 - 14
 			"2;Ancestral Knowledge", "2;Ancestral Knowledge", "2;Ancestral Knowledge", "2;Ancestral Knowledge", "2;Ancestral Knowledge", 
+			--level 15 - 19
 			"2;Thundering Strikes", "2;Thundering Strikes", "2;Thundering Strikes", "2;Thundering Strikes", "2;Thundering Strikes", 
-			"2;Two-Handed Axes and Maces",
-			"2;Improved Ghost Wolf", "2;Improved Ghost Wolf", 
-			"2;Improved Lightning Shield", "2;Improved Lightning Shield",
+			--level 20 - 24
+			"2;Two-Handed Axes and Maces", "2;Improved Ghost Wolf", "2;Improved Ghost Wolf", "2;Improved Lightning Shield", "2;Improved Lightning Shield",
+			--level 25 - 29
 			"2;Flurry", "2;Flurry", "2;Flurry", "2;Flurry", "2;Flurry", 
-			"2;Elemental Weapons", "2;Elemental Weapons", "2;Elemental Weapons", 
-			"2;Parry", 
-			"2;Improved Lightning Shield",
+			--level 30 - 34
+			"2;Elemental Weapons", "2;Elemental Weapons", "2;Elemental Weapons", "2;Parry", "2;Improved Lightning Shield",
+			--level 35 - 39
 			"2;Weapon Mastery", "2;Weapon Mastery", "2;Weapon Mastery", "2;Weapon Mastery", "2;Weapon Mastery", 
+			--level 40 - 44
 			"2;Stormstrike"
 		}
 

@@ -14,17 +14,15 @@ script_rotation = {
 	radarLoaded = include("scripts\\script_radar.lua"),
 	menuLoaded = include("scripts\\menu\\script_rotationMenu.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
-	drawEnabled = false,
-	drawAggro = false,
-	drawGather = false,
-	drawUnits = false,
+	rotationEXLoaded = include("scripts\\script_rotationEX.lua"),
+	testDOTSLoaded = include("scripts\\combat\\warlock\\script_warlockRotationDots.lua"),
+
 	isSetup = false,
 	pullDistance = 150,
 	showClassOptions = true,
 	meleeDistance = 4,
 	aggroRangeTank = 50,
 	adjustTickRate = false,
-	drawChests = true,
 }
 
 function script_rotation:setup()
@@ -41,9 +39,15 @@ function script_rotation:run()
 	if (not self.isSetup) then 
 		script_rotation:setup(); 
 	end
+	script_rotationEX:draw();
 	if (script_rotationMenu.pause) then 
 		self.message = "Paused by user..."; 
 		return; 
+	end
+	if (self.warlockDots) and (script_warlockRotationDots:assignTarget() ~= nil) then
+		if (script_warlockRotationDots:forFun()) then
+			return;
+		end
 	end
 	local partyMana = GetLocalPlayer():GetManaPercentage();
 	local partyHealth = GetLocalPlayer():GetHealthPercentage();
@@ -203,51 +207,7 @@ function script_rotation:assignTarget()
 	return closestTarget;
 end
 
-function script_rotation:draw()
 
-	script_rotation:window();
-
-	if (script_radar.showRadar) then
-		script_radar:draw()
-	end
-
-	if (self.drawAggro) then 
-		script_aggro:drawAggroCircles(self.aggroRangeTank); 
-	end
-
-	if (self.drawGather) then 
-		script_gather:drawGatherNodes(); 
-	end
-
-	if (self.drawUnits) then 
-		script_drawData:drawUnitsDataOnScreen(); 
-	end
-
-	if (not self.drawEnabled) then 
-		return; 
-	end
-
-	-- color
-	local r, g, b = 255, 55, 55;
-
-	-- position
-	local y, x, width = 120, 25, 370;
-	local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
-	if (onScreen) then
-		y, x = tY-25, tX+75;
-	end
-
-	-- info
-	if (not script_rotation.pause) then
-		--DrawRect(x - 10, y - 5, x + width, y + 120, 255, 255, 0,  1, 1, 1);
-		--DrawRectFilled(x - 10, y - 5, x + width, y + 80, 0, 0, 0, 60, 0, 0);
-		--DrawText('Rotation', x-5, y-4, r, g, b) y = y + 15;
-		DrawText('Script Idle: ' .. math.max(0, math.floor(self.waitTimer-GetTimeEX())) .. ' ms.', x+255, y, 255, 255, 255); y = y + 20;
-		--DrawText('Rotation status: ', x+255, y, r, g, b); y = y + 20;
-		DrawText(self.message or "error", x+255, y, 100, 255, 255);
-		DrawText('Status: ', x+255, y+30, r, g, b);
-	end
-end
 
 function script_rotation:runRest()
 	if(RunRestScript()) then

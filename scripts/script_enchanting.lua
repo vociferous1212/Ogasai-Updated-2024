@@ -25,7 +25,7 @@ function script_enchanting:closeMenu()
 end
 
 function script_enchanting:doEnchant()
-    local name;
+    local name = "";
 
     -- Enchant Bracer - Minor Health
     if (HasItem("Strange Dust")) then
@@ -36,9 +36,11 @@ function script_enchanting:doEnchant()
 
                 -- use this way it works!
                 
-                if (name == "Lesser Magic Wand") then
+                if (name == "Enchant Bracer - Minor Health") then
                		DoTradeSkill(i, 1);
+			ReplaceEnchant();
                 	self.waitTimer = GetTimeEX() + 5500;
+			return true
                 end
             end
     end

@@ -13,6 +13,7 @@ script_grind = {
 	includeNavEX 		= include("scripts\\nav\\script_navEX.lua"),
 	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
+	enchantingLoaded 	= include("scripts\\script_enchanting.lua"),
 
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
@@ -414,15 +415,27 @@ end
 -- run grinder
 function script_grind:run()
 
--- should tell the bot to keep variables if disconnected or switching areas (loading screens)
-	PersistLoadingScreen(true);
-
 	-- show grinder window
 	script_grind:window();
 
 	if (script_grindMenu.showGarbageBox) then
 		collectgarbage(Fcollect);
 	end
+
+	-- loot quick disenchanting
+	--if (self.waitTimer > GetTimeEX()) then
+	--	return;
+	--end
+	--if (IsLooting()) then
+	--	if (LootTarget()) then
+	--	self.waitTimer = GetTimeEX() + 500;
+	--	return;
+	--	end
+	--end
+	--if (script_enchanting:doEnchant()) then
+	--	--self.waitTimer = GetTimeEX() + 5000;
+	--end
+	--ReplaceEnchant();
 
 	-- display radar
 	if (script_radar.showRadar) then
@@ -728,6 +741,7 @@ function script_grind:run()
 	if (self.waitTimer > GetTimeEX() + self.tickRate) then
 		return;
 	end
+
 
 if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -1915,8 +1929,6 @@ function script_grind:getDistanceDif()
 end
 
 function script_grind:drawStatus()
--- should tell the bot to keep variables if disconnected or switching areas (loading screens)
-	PersistLoadingScreen(true);
 	script_drawStatusEX:drawSetup();
 	script_drawStatus:draw();
 end
