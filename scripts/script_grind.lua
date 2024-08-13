@@ -615,6 +615,11 @@ function script_grind:run()
 	end
 	end
 
+	-- check party members
+	if (GetNumPartyMembers() >= 1) then
+		script_grindParty:partyOptions();
+	end
+
 
 	if (IsInCombat()) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (self.skipHardPull) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
 		if (self.enemyObj:GetHealthPercentage() >= 20) then
@@ -646,7 +651,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
+	if (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -915,13 +920,6 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		
 		end
 
-		-- check party members
-		if (GetNumPartyMembers() >= 1) then
-			if (script_grindParty:partyOptions()) then
-				return true;
-			end
-		end
-
 		-- use kills to level tracker
 		if (self.useExpChecker) then
 			script_expChecker:targetLevels();
@@ -1016,7 +1014,12 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		end	
 		
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
-			self.message = "waiting after combat - stuck in combat";
+			self.message = "Waiting... Server says we are InCombat()";
+			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+				ex, ey, ez = self.lootObj:GetPosition();
+				Move(ex, ey, ez);
+			end
 			return;
 		end
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
