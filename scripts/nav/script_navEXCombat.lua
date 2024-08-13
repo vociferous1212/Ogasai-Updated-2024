@@ -49,7 +49,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 15) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		return "Generating a new path...";
 	end

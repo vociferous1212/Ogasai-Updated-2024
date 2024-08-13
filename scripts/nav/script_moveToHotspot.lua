@@ -12,7 +12,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
 		if (not script_unstuck:pathClearAuto(2)) then
 			script_unstuck:unstuck();
-			return true;
+			return;
 		end
 	end
 

@@ -155,7 +155,7 @@ function script_nav:getLootTarget(lootRadius)
 			if(targetObj:IsDead()) then
 				if (targetObj:IsLootable()) then
 					local dist = targetObj:GetDistance();
-					if(dist < lootRadius and bestDist > dist) then
+					if (dist < lootRadius and bestDist > dist) then
 					local _x, _y, _z = targetObj:GetPosition();
 						if(not IsNodeBlacklisted(_x, _y, _z, self.nextNavNodeDistance)) then
 							bestDist = dist;

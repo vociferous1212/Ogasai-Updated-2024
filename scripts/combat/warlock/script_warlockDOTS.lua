@@ -13,8 +13,8 @@ if (IsInCombat()) then
    	while currentObj ~= 0 do 
    		if typeObj == 3 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and (not currentObj:IsCritter()) then
-               			if (script_grind:isTargetingMe(currentObj))
-					or (script_grind:isTargetingPet(currentObj))
+               			if (script_grind:isTargetingMe(currentObj)) or (script_grind:isTargetingPet(currentObj))
+					or (currentObj:HasDebuff("Fear") and HasPet())
 					then
 					if (HasSpell("Corruption") and not currentObj:HasDebuff('Corruption') and not script_warlockFunctions:targetHasCorruption(currentObj))
 					or (HasSpell("Immolate") and not currentObj:HasDebuff("Immolate") and not script_warlockFunctions:targetHasImmolate(currentObj))
@@ -102,10 +102,10 @@ function script_warlockDOTS:immolate()
 								script_rotation.tickRate = 250;
 							end
 							currentObj:FaceTarget();
-							if (not script_warlockFunctions:cast('Immolate', currentObj)) then 
+							if (script_warlockFunctions:cast('Immolate', currentObj)) then 
 								script_grind:setWaitTimer(3000);
 								script_warlock.waitTimer = GetTimeEX() + 3000;
-								return; 
+								return true; 
 							end
 						end 
 					end 
@@ -137,7 +137,7 @@ function script_warlockDOTS:curseOfAgony()
 								script_grind:setWaitTimer(2500);
 								script_warlock.waitTimer = GetTimeEX() + 2500;
 								ClearTarget();
-								return; 
+								return true; 
 							end
 						end 
 					end 

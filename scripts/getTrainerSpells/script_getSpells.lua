@@ -117,10 +117,15 @@ function script_getSpells:run()
 		end
 		-- if position not close to trainer then move to trainer
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3) then
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			script_grind.message = script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.getSpellsStatus = 1;
+			if (not IsMoving()) then
+				Move(vX, vY, vZ);
+				script_grind.message = "We are stuck!";
+			end
 		return;
 		end
+		script_grind.hotspotReached = false;
 
 		if (not IsInCombat()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 15) then
 			ClearTarget();

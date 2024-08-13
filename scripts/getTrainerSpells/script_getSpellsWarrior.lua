@@ -3,13 +3,20 @@ script_getSpellsWarrior = {}
 function script_getSpellsWarrior:getTrainerTargetWarrior()
 
 	local vX, vY, vZ = 0, 0, 0;
+	local a = script_getSpells:deadZones();
+	local b = script_getSpells:orcZones();
+	local c = script_getSpells:gnomeZones();
+	local d = script_getSpells:humanZones();
+	local e = script_getSpells:elfZones();
+	local f = script_getSpells:cowZones();
+
 
 	-- get trainer position
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Gnome/dwarf starter area
-		if (GetFaction() == 115) or (GetFaction() == 3) or (script_getSpells:gnomeZones()) then
+		if ( (GetFaction() == 115 or GetFaction() == 3) and (not a and not b and not d and not e and not f)) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6084.7700195313, 382.14099121094, 395.54364013672;
 				script_getSpells.trainerTarget = "Thran Khorman";
@@ -25,7 +32,7 @@ function script_getSpellsWarrior:getTrainerTargetWarrior()
 			end
 		end
 		-- Human starter area
-		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
+		if (GetFaction() == 1 and not a and not b and not c and not e and not f) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8918.3603515625, -208.4109954834, 82.125961303711;
 				script_getSpells.trainerTarget = "Llane Beshere";
@@ -41,7 +48,7 @@ function script_getSpellsWarrior:getTrainerTargetWarrior()
 			end
 		end
 		-- Night Elf starter area
-		if (GetFaction() == 4) or (script_getSpells:elfZones()) then
+		if (GetFaction() == 4 and not a and not b and not c and not d and not f) or (script_getSpells:elfZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 10526.599609375, 778.08599853516, 1329.5993652344;
 				script_getSpells.trainerTarget = "Alyissia";
@@ -57,7 +64,7 @@ function script_getSpellsWarrior:getTrainerTargetWarrior()
 			end
 		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
+		if ( (GetFaction() == 2 or GetFaction() == 116) and not a and not c and not d and not e and not f) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -639.34399414063, -4230.1899414063, 38.134117126465;
 				script_getSpells.trainerTarget = "Frang";
@@ -73,7 +80,7 @@ function script_getSpellsWarrior:getTrainerTargetWarrior()
 			end
 		end
 		-- Undead starter area
-		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
+		if (GetFaction() == 5 and not b and not c and not d and not e and not f) or (script_getSpells:deadZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 1862.4599609375, 1556.3299560547, 94.778495788574;
 				script_getSpells.trainerTarget = "Dannal Stern";
@@ -89,7 +96,7 @@ function script_getSpellsWarrior:getTrainerTargetWarrior()
 			end
 		end
 		-- Tauren starter area
-		if (GetFaction() == 6) or (script_getSpells:cowZones()) then
+		if (GetFaction() == 6 and not a and not b and not c and not d and not e) or (script_getSpells:cowZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -2880.4299316406, -213.02000427246, 54.821006774902;
 				script_getSpells.trainerTarget = "Harutt Thunderhorn";

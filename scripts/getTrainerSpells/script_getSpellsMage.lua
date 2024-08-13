@@ -3,6 +3,13 @@ script_getSpellsMage = {}
 function script_getSpellsMage:getTrainerTargetMage()
 
 		local vX, vY, vZ = 0, 0, 0;
+		local a = script_getSpells:deadZones();
+		local b = script_getSpells:orcZones();
+		local c = script_getSpells:gnomeZones();
+		local d = script_getSpells:humanZones();
+		local e = script_getSpells:elfZones();
+		local f = script_getSpells:cowZones();
+
 
 		-- get trainer position
 
@@ -12,7 +19,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 
 
 		-- Gnomes starter area
-		if (GetFaction() == 115) or (script_getSpells:gnomeZones()) then
+		if ( (GetFaction() == 115 or GetFaction() == 3) and (not a and not b and not d and not e and not f)) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6056.08984375, 388.17498779297, 392.76116943359;
 				script_getSpells.trainerTarget = "Marryk Nurribit";
@@ -28,7 +35,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 			end
 		end
 		-- Human starter area
-		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
+		if (GetFaction() == 1 and not a and not b and not c and not e and not f) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8851.5703125, -188.23399353027, 89.314559936523;
 				script_getSpells.trainerTarget = "Khelden Bremen";
@@ -44,7 +51,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 			end
 		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
+		if ( (GetFaction() == 2 or GetFaction() == 116) and not a and not c and not d and not e and not f) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -625.29602050781, -4210.169921875, 38.134181976318;
 				script_getSpells.trainerTarget = "Mai'ah";
@@ -60,7 +67,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 			end
 		end
 		-- Undead starter area
-		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
+		if (GetFaction() == 5 and not b and not c and not d and not e and not f) or (script_getSpells:deadZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 1847.3900146484, 1635.5200195313, 96.933547973633;
 				script_getSpells.trainerTarget = "Isabella";

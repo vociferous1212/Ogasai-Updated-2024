@@ -3,13 +3,20 @@ script_getSpellsHunter = {}
 function script_getSpellsHunter:getTrainerTargetHunter()
 
 	local vX, vY, vZ = 0, 0, 0;
+	local a = script_getSpells:deadZones();
+	local b = script_getSpells:orcZones();
+	local c = script_getSpells:gnomeZones();
+	local d = script_getSpells:humanZones();
+	local e = script_getSpells:elfZones();
+	local f = script_getSpells:cowZones();
+
 
 	-- get trainer position
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Gnome/dwarf starter area
-		if (GetFaction() == 115) or (GetFaction() == 3) or (script_getSpells:gnomeZones()) then
+		if ( (GetFaction() == 115 or GetFaction() == 3) and (not a and not b and not d and not e and not f)) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then				
 				vX, vY, vZ = -6091.7900390625, 365.14099121094, 395.5400390625;
 				script_getSpells.trainerTarget = "Thorgas Grimson";
@@ -25,7 +32,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 			end
 		end
 		-- Night Elf starter area
-		if (GetFaction() == 4) or (script_getSpells:elfZones()) then
+		if (GetFaction() == 4 and not a and not b and not c and not d and not f) or (script_getSpells:elfZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 10458.5, 827.86798095703, 1380.939453125;
 				script_getSpells.trainerTarget = "Ayanna Everstride";
@@ -41,7 +48,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 			end
 		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
+		if ( (GetFaction() == 2 or GetFaction() == 116) and not a and not c and not d and not e and not f) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -635.46197509766, -4227.5200195313, 38.133941650391;
 				script_getSpells.trainerTarget = "Jen'shan";
@@ -57,7 +64,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 			end
 		end
 		-- Tauren starter area
-		if (GetFaction() == 6) or (script_getSpells:cowZones()) then
+		if (GetFaction() == 6 and not a and not b and not c and not d and not e) or (script_getSpells:cowZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -2865.3999023438, -225.73100280762, 54.820751190186;
 				script_getSpells.trainerTarget = "Lanka Farshot";

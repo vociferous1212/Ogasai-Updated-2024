@@ -2,12 +2,20 @@ script_getSpellsPriest = {}
 
 function script_getSpellsPriest:getTrainerTargetPriest()
 	local vX, vY, vZ = 0, 0, 0;
+
+	local a = script_getSpells:deadZones();
+	local b = script_getSpells:orcZones();
+	local c = script_getSpells:gnomeZones();
+	local d = script_getSpells:humanZones();
+	local e = script_getSpells:elfZones();
+	local f = script_getSpells:cowZones();
+
 	-- get trainer position
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Gnome/dwarf starter area
-		if (GetFaction() == 115) or (GetFaction() == 3) or (script_getSpells:gnomeZones()) then
+		if ( (GetFaction() == 115 or GetFaction() == 3) and (not a and not b and not d and not e and not f)) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6056.740234375, 393.54800415039, 392.75955200195;
 				script_getSpells.trainerTarget = "Branstock Khalder";
@@ -23,7 +31,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 			end
 		end
 		-- Human starter area
-		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
+		if (GetFaction() == 1 and not a and not b and not c and not e and not f) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8853.58984375, -193.33599853516, 81.932304382324;
 				script_getSpells.trainerTarget = "Priestess Anetta";
@@ -39,7 +47,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 			end
 		end
 		-- Night Elf starter area
-		if (GetFaction() == 4) or (script_getSpells:elfZones()) then
+		if (GetFaction() == 4 and not a and not b and not c and not d and not f) or (script_getSpells:elfZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 10458.799804688, 801.62298583984, 1346.7547607422;
 				script_getSpells.trainerTarget = "Shanda";
@@ -55,7 +63,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 			end
 		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
+		if ( (GetFaction() == 2 or GetFaction() == 116) and not a and not c and not d and not e and not f) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -617.39501953125, -4202.3999023438, 38.134056091309;
 				script_getSpells.trainerTarget = "Ken'jai";
@@ -71,7 +79,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 			end
 		end
 		-- Undead starter area
-		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
+		if (GetFaction() == 5 and not b and not c and not d and not e and not f) or (script_getSpells:deadZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 1848.3199462891, 1627.6300048828, 96.933753967285;
 				script_getSpells.trainerTarget = "Dark Cleric Duesten";

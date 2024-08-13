@@ -168,7 +168,10 @@ function script_warlock:run(targetGUID)
 	if (self.enableGatherShards) then
 		self.alwaysFear = false;
 	end
-
+	if (script_grindEX:areWeSwimming()) then
+		self.useUnendingBreath = true;
+	end
+	
 	local localObj = GetLocalPlayer();
 	local localMana = localObj:GetManaPercentage();
 	local localHealth = localObj:GetHealthPercentage();
@@ -345,6 +348,16 @@ function script_warlock:run(targetGUID)
 		end
 	end
 
+	-- move away from adds / check adds
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM();
+				if (HasPet()) then
+					PetFollow();
+				end
+			return true;
+			end
+		end
 	-- check for silence and use wand
 	if (PlayerHasTarget()) and (not localObj:IsStunned()) and (script_checkDebuffs:hasSilence()) and (localObj:HasRangedWeapon()) and (IsInCombat()) then
 		if (not IsAutoCasting("Shoot")) then
@@ -373,17 +386,6 @@ function script_warlock:run(targetGUID)
 
 	--Valid Enemy
 	if (targetObj ~= 0 and targetObj ~= nil) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasSilence()) then
-
-		-- move away from adds / check adds
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				if (HasPet()) then
-					PetFollow();
-				end
-			return true;
-			end
-		end
 
 		-- in group with a mage? run backwards on frost nova!
 		if (GetNumPartyMembers() >= 1) then
@@ -453,7 +455,6 @@ function script_warlock:run(targetGUID)
 				if (script_warlockDOTS:immolate()) then
 					return true;
 				end
-		return true;
 		end
 
 		if (IsInCombat()) then

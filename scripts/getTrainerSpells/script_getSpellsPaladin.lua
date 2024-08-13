@@ -3,13 +3,19 @@ script_getSpellsPaladin = {}
 function script_getSpellsPaladin:getTrainerTargetPaladin()
 
 	local vX, vY, vZ = 0, 0, 0;
+	local a = script_getSpells:deadZones();
+	local b = script_getSpells:orcZones();
+	local c = script_getSpells:gnomeZones();
+	local d = script_getSpells:humanZones();
+	local e = script_getSpells:elfZones();
+	local f = script_getSpells:cowZones();
 
 	-- get trainer position
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Gnome/dwarf starter area
-		if (GetFaction() == 115) or (GetFaction() == 3) or (script_getSpells:gnomeZones()) then
+		if ( (GetFaction() == 115 or GetFaction() == 3) and (not a and not b and not d and not e and not f)) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6120.6801757813, 382.08898925781, 395.54284667969;
 				script_getSpells.trainerTarget = "Bromos Grummner";
@@ -25,7 +31,7 @@ function script_getSpellsPaladin:getTrainerTargetPaladin()
 			end
 		end
 		-- Human starter area
-		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
+		if (GetFaction() == 1 and not a and not b and not c and not e and not f) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8914.5703125, -215.01600646973, 82.116622924805;
 				script_getSpells.trainerTarget = "Brother Sammuel";
@@ -40,7 +46,7 @@ function script_getSpellsPaladin:getTrainerTargetPaladin()
 				script_getSpells.trainerTarget = "Lord Grayson Shadowbreaker";
 			end
 		end
-			return vX, vY, vZ;
+	return vX, vY, vZ;
 end
 
 function script_getSpellsPaladin:checkForSpellsNeededPaladin()

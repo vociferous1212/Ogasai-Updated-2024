@@ -3,19 +3,26 @@ script_getSpellsDruid = {}
 function script_getSpellsDruid:getTrainerTargetDruid()
 
 	local vX, vY, vZ = 0, 0, 0;
+	local a = script_getSpells:deadZones();
+	local b = script_getSpells:orcZones();
+	local c = script_getSpells:gnomeZones();
+	local d = script_getSpells:humanZones();
+	local e = script_getSpells:elfZones();
+	local f = script_getSpells:cowZones();
+
 
 	-- get trainer position
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		--stormwind has a druid trainer...
-		if (script_getSpells:humanZones()) then
+		if (GetFaction() == 1 and not a and not b and not c and not e and not f) or (script_getSpells:humanZones()) then
 			vX, vY, vZ = 0, 0, 0;
 			script_getSpells.trainerTarget = "Theridran";
 		end
 		-- Night Elf starter area
 				-- faction elf and in elf zones so we can use stormwind trainer, too
-		if (GetFaction() == 4 and script_getSpells:elfZones()) then
+		if (GetFaction() == 4 and not a and not b and not c and not d and not f) or (script_getSpells:elfZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then	
 				vX, vY, vZ = 10464, 829.53802490234, 1380.9401855469;
 				script_getSpells.trainerTarget = "Mardant Strongoak";
@@ -31,7 +38,7 @@ function script_getSpellsDruid:getTrainerTargetDruid()
 			end
 		end
 		-- Tauren starter area
-		if (GetFaction() == 6) or (script_getSpells:cowZones()) then
+		if (GetFaction() == 6 and not a and not b and not c and not d and not e) or (script_getSpells:cowZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -2873.5700683594, -268.59100341797, 53.916931152344;
 				script_getSpells.trainerTarget = "Gart Mistrunner";

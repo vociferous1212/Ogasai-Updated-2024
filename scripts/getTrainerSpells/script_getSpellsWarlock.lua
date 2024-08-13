@@ -3,13 +3,36 @@ script_getSpellsWarlock = {}
 function script_getSpellsWarlock:getTrainerTargetWarlock()
 
 	local vX, vY, vZ = 0, 0, 0;
+	local a = script_getSpells:deadZones();
+	local b = script_getSpells:orcZones();
+	local c = script_getSpells:gnomeZones();
+	local d = script_getSpells:humanZones();
 
 	-- get trainer position
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
+			
+
+		-- Undead starter area
+		if (GetFaction() == 5 and not b and not c and not d) or (script_getSpells:deadZones()) then
+			if (GetLocalPlayer():GetLevel() <= 6) then
+				vX, vY, vZ = 1839.0300292969, 1636.5400390625, 96.933532714844;
+				script_getSpells.trainerTarget = "Maximillion";
+			end
+			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+				vX, vY, vZ = 2259.0500488281, 250.31700134277, 41.114887237549;
+				script_getSpells.trainerTarget = "Rupert Boch";
+			end
+			-- Undercity trainer
+			if (GetLocalPlayer():GetLevel() >= 10) then
+				vX, vY, vZ = 1776.4000244141, 20.254299163818, -47.388172149658;
+				script_getSpells.trainerTarget = "Richard Kerwin";
+			end
+		end
+
 		-- Gnomes starter area
-		if (GetFaction() == 115) or (GetFaction() == 3) or (script_getSpells:gnomeZones()) then
+		if ( (GetFaction() == 115 or GetFaction() == 3) and (not a and not b and not d)) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6048.7900390625, 391.07900292969, 398.9580078125;
 				script_getSpells.trainerTarget = "Alamar Grimm";
@@ -25,7 +48,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 			end
 		end			
 		-- Human starter area
-		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
+		if (GetFaction() == 1 and not a and not b and not c) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8926.740234375, -195.5890045166, 80.588554382324;
 				script_getSpells.trainerTarget = "Drusilla La Salle";
@@ -41,7 +64,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 			end
 		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
+		if ( (GetFaction() == 2 or GetFaction() == 116) and not a and not c and not d) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -639.34399414063, -4230.1899414063, 38.134117126465;
 				script_getSpells.trainerTarget = "Frang";
@@ -54,22 +77,6 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 			if (GetLocalPlayer():GetLevel() >= 10) then
 				vX, vY, vZ = 1848.9599609375, -4360.4301757813, -14.943470954895;
 				script_getSpells.trainerTarget = "Zevrost";
-			end
-		end
-		-- Undead starter area
-		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = 1839.0300292969, 1636.5400390625, 96.933532714844;
-				script_getSpells.trainerTarget = "Maximillion";
-			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
-				vX, vY, vZ = 2259.0500488281, 250.31700134277, 41.114887237549;
-				script_getSpells.trainerTarget = "Rupert Boch";
-			end
-			-- Undercity trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
-				vX, vY, vZ = 1776.4000244141, 20.254299163818, -47.388172149658;
-				script_getSpells.trainerTarget = "Richard Kerwin";
 			end
 		end
 	return vX, vY, vZ;
@@ -114,7 +121,7 @@ function script_getSpellsWarlock:checkForSpellsNeededWarlock()
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 18) and (myMoney >= 4500) and (not HasSpell("Curse of Agony")) then
+		elseif (myLevel >= 18) and (myMoney >= 4500) and (not HasSpell("Searing Pain")) then
 			if (script_getSpells:run()) then
 				return true;
 			end
