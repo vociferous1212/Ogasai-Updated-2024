@@ -24,7 +24,7 @@ script_rotation = {
 	aggroRangeTank = 50,
 	adjustTickRate = false,
 }
-
+function script_rotation:draw() script_rotationEX:draw(); end
 function script_rotation:setup()
 	script_helper:setup();script_gather:setup();self.isSetup = true;
 end
@@ -39,7 +39,6 @@ function script_rotation:run()
 	if (not self.isSetup) then 
 		script_rotation:setup(); 
 	end
-	script_rotationEX:draw();
 	if (script_rotationMenu.pause) then 
 		self.message = "Paused by user..."; 
 		return; 

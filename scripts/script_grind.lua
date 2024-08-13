@@ -1219,7 +1219,11 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
 						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-					return true;
+					end
+					if (not IsMoving()) then
+						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						Move(_x, _y, _z);
+						return;
 					end
 					
 					-- set wait timer to move clicks

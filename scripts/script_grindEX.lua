@@ -24,6 +24,10 @@ function script_grindEX:doChecks()
 			self.currMapID = GetMapID();
 			vendorDB:loadDBVendors();
 		end
+		
+		-- load hotspot stuff
+		--hotspotDB_setInfo_1_10_checkMobs();
+
 	
 		if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then
 			return true;
