@@ -125,7 +125,6 @@ function script_getSpells:run()
 			end
 		return;
 		end
-		script_grind.hotspotReached = false;
 
 		if (not IsInCombat()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 15) then
 			ClearTarget();
