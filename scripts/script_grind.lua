@@ -14,6 +14,7 @@ script_grind = {
 	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
 	enchantingLoaded 	= include("scripts\\script_enchanting.lua"),
+	hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
 
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
@@ -620,7 +621,6 @@ function script_grind:run()
 		script_grindParty:partyOptions();
 	end
 
-
 	if (IsInCombat()) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (self.skipHardPull) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
 		if (self.enemyObj:GetHealthPercentage() >= 20) then
 			script_om:FORCEOM();
@@ -1120,14 +1120,14 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					end
 				end
 			end
-			if (HasSpell("Lightning Bolt")) and (IsInCombat()) and (script_grind:enemiesAttackingUs() == 0) and (not PlayerHasTarget()) then
-				self.message = "Stuck in combat! WAITING!";
-				if (IsMoving()) then
-					StopMoving();
-					return;
-				end
-				return 4;
-			end
+			--if (HasSpell("Lightning Bolt")) and (IsInCombat()) and (script_grind:enemiesAttackingUs() == 0) and (not PlayerHasTarget()) then
+			--	self.message = "Stuck in combat! WAITING!";
+			--	if (IsMoving()) then
+			--		StopMoving();
+			--		return;
+			--	end
+			--	return 4;
+			--end
 
 			-- reset object manager and check adds enemies
 			script_checkAdds.closestEnemy = 0;
@@ -1219,12 +1219,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
 						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+					return true;
 					end
-					if (not IsMoving()) then
-						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-						Move(_x, _y, _z);
-						return;
-					end
+					
 					-- set wait timer to move clicks
 					--if (IsMoving()) then
 					--	script_grind:setWaitTimer(100);
@@ -2011,6 +2008,10 @@ function script_grind:doLoot(localObj)
 			DisMount();
 			self.waitTimer = GetTimeEX() + 350;
 			return;
+		end
+
+		if (IsLooting()) then
+			self.waitTimer = GetTimeEX() + 650;
 		end
 
 		-- interact with object if we are not looting

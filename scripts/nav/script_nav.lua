@@ -1,11 +1,11 @@
 script_nav = {
 	useNavMesh = true,
-	nextNavNodeDistance = 3.9, -- for mobs and loot
-	nextPathNodeDistance = 3.9, -- for walking paths
+	nextNavNodeDistance = 4.9, -- for mobs and loot
+	nextPathNodeDistance = 10.1, -- for walking paths
 	lastPathIndex = 0,
 	navPosition = {},
 	navPathPosition = {},
-	lastnavIndex = 0,
+	lastnavIndex = 1,
 	lastpathnavIndex = 0,
 	navPath = nil,
 	savedLocations = {},
@@ -223,10 +223,10 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		end
 	else
 		-- If we are close to the next path node, increase our nav node index
-		if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < self.nextNavNodeDistance -1) then
+		if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < self.nextNavNodeDistance) then
 			self.lastpathnavIndex = self.lastpathnavIndex + 1;	
 			if (GetPathSize(5) <= self.lastpathnavIndex) then
-				self.lastpathnavIndex = GetPathSize(5) - 3;
+				self.lastpathnavIndex = GetPathSize(5) - 1;
 			end
 		end
 	end

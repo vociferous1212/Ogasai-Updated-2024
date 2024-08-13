@@ -23,7 +23,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		
 -- move to hotspot coords
 		if (not script_grind.hotspotReached) then
-			if (not IsMoving()) then
+			if (not IsMoving() and not IsPathLoaded(5)) then
 				Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 				script_nav.message = "Stuck out of bounds or stuck not moving...";
 			end
