@@ -1,7 +1,7 @@
 script_nav = {
 	useNavMesh = true,
-	nextNavNodeDistance = 4.9, -- for mobs and loot
-	nextPathNodeDistance = 10.1, -- for walking paths
+	nextNavNodeDistance = 3.9, -- for mobs and loot
+	nextPathNodeDistance = 3.9, -- for walking paths
 	lastPathIndex = 0,
 	navPosition = {},
 	navPathPosition = {},
@@ -302,7 +302,7 @@ function script_nav:navigate(localObj)
 			
 		-- Check: If we reached the end node, start over at node 1
 		if(self.lastPathIndex >= pathSize) then
-			self.lastPathIndex = 1;
+			self.lastPathIndex = -1;
 		end
 			
 		script_nav:moveToNav(localObj, _x, _y, _z);

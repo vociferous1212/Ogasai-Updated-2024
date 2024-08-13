@@ -2,38 +2,38 @@ hotspotDB_1_10 = {}
 
 function hotspotDB_1_10:setup()
 -- Teldrassil
-	hotspotDB:addHotspot("Shadowglen 1 - 2", "Alliance", 1, 2, 10463.98, 979.26, 1321.49);
-	hotspotDB:addHotspot("Shadowglen 2 - 3", "Alliance", 2, 3, 10540.92, 627.82, 1328.61);
-	hotspotDB:addHotspot("Shadowglen 3 - 6", "Alliance", 3, 6, 10729.28, 922.62, 1331.32);
-	hotspotDB:addHotspot("Teldrassil 6 - 8", "Alliance", 6, 8, 9873.64, 721.59, 1305.96);
-	hotspotDB:addHotspot("Teldrassil 6 - 8", "Alliance", 6, 8, 9672.04, 1014.01, 1287.04); 
-	hotspotDB:addHotspot("Teldrassil 7 - 8", "Alliance", 7, 8, 9681.1, 1195.13, 1268.12);
-	hotspotDB:addHotspot("Teldrassil 7 - 9", "Alliance", 7, 9, 9268.52, 1507.39, 1288.18);
-	hotspotDB:addHotspot("Teldrassil 7 - 10", "Alliance", 7, 10, 9877.98, 1856.31, 1317.36);
-	hotspotDB:addHotspot("Teldrassil 9 - 11", "Alliance", 9, 11, 10709.71, 1425.11, 1325.13);
-	hotspotDB:addHotspot("Teldrassil 9 - 11", "Alliance", 9, 11, 9411.51, 1121.82, 1249.81); 
-	hotspotDB:addHotspot("The Oracle Glade 10 - 12", "Alliance", 10, 12, 10888.36, 1739.92, 1318.92);
-	hotspotDB:addHotspot("Teldrassil 10 - 12", "Alliance", 10, 12, 9428.69, 1693.50, 1304.38);
+	hotspotDB:addHotspot("Shadowglen 1 - 2", "Alliance", 1, 2, 10463.98, 979.26, 1321.49, 1);
+	hotspotDB:addHotspot("Shadowglen 2 - 3", "Alliance", 2, 3, 10540.92, 627.82, 1328.61, 2);
+	hotspotDB:addHotspot("Shadowglen 3 - 6", "Alliance", 3, 6, 10729.28, 922.62, 1331.32, 3);
+	hotspotDB:addHotspot("Teldrassil 6 - 8", "Alliance", 6, 8, 9873.64, 721.59, 1305.96, 4);
+	hotspotDB:addHotspot("Teldrassil 6 - 8", "Alliance", 6, 8, 9672.04, 1014.01, 1287.04, 5); 
+	hotspotDB:addHotspot("Teldrassil 7 - 8", "Alliance", 7, 8, 9681.1, 1195.13, 1268.12, 6);
+	hotspotDB:addHotspot("Teldrassil 7 - 9", "Alliance", 7, 9, 9268.52, 1507.39, 1288.18, 7);
+	hotspotDB:addHotspot("Teldrassil 7 - 10", "Alliance", 7, 10, 9877.98, 1856.31, 1317.36, 8);
+	hotspotDB:addHotspot("Teldrassil 9 - 11", "Alliance", 9, 11, 10709.71, 1425.11, 1325.13, 9);
+	hotspotDB:addHotspot("Teldrassil 9 - 11", "Alliance", 9, 11, 9411.51, 1121.82, 1249.81, 10); 
+	hotspotDB:addHotspot("The Oracle Glade 10 - 12", "Alliance", 10, 12, 10888.36, 1739.92, 1318.92, 11);
+	hotspotDB:addHotspot("Teldrassil 10 - 12", "Alliance", 10, 12, 9428.69, 1693.50, 1304.38, 12);
 -- elwynn forest
-	hotspotDB:addHotspot('North Shire 1 - 1', "Alliance", 1, 1, -8903.322, -69.84078, 86.58018);
-	hotspotDB:addHotspot('North Shire 2 - 2', "Alliance", 2, 2, -8724.425, -137.0334, 86.89613);
-	hotspotDB:addHotspot("Echo Ridge Mine 3 - 3", "Alliance", 3, 3, -8721.64, -106.24, 86.92);
-	hotspotDB:addHotspot("Northshire Valley 4 - 5", "Alliance", 4, 5, -8863.01, -416.01, 66.07);
-	hotspotDB:addHotspot("Elwynn Forest 6 - 6", "Human", 6, 6, -9544.41, 218.33, 54.59);
-	hotspotDB:addHotspot("The Stonefield Farm 7 - 7", "Alliance", 7, 7, -9994.89, 309.12, 34.82);
-	hotspotDB:addHotspot("Elwynn Forest 8 - 8", "Human", 8, 8, -9639.18, -23.02, 44.45);
-	hotspotDB:addHotspot("Elwynn Forest 9 - 9", "Alliance", 9, 9, -9342.09, -832.4, 64.71);
-	hotspotDB:addHotspot("Elwynn Forest 10 - 10", "Alliance", 10, 10, -9459.37, -1122.34, 52.69);
-	hotspotDB:addHotspot("Ridgepoint Tower 11 - 11", "Alliance", 11, 11, -9866.62, -1350.71, 37.85);
+	hotspotDB:addHotspot('North Shire 1 - 1', "Alliance", 1, 1, -8903.322, -69.84078, 86.58018, 13);
+	hotspotDB:addHotspot('North Shire 2 - 2', "Alliance", 2, 2, -8724.425, -137.0334, 86.89613, 14);
+	hotspotDB:addHotspot("Echo Ridge Mine 3 - 3", "Alliance", 3, 3, -8721.64, -106.24, 86.92, 15);
+	hotspotDB:addHotspot("Northshire Valley 4 - 5", "Alliance", 4, 5, -8863.01, -416.01, 66.07, 16);
+	hotspotDB:addHotspot("Elwynn Forest 6 - 6", "Human", 6, 6, -9544.41, 218.33, 54.59, 17);
+	hotspotDB:addHotspot("The Stonefield Farm 7 - 7", "Alliance", 7, 7, -9994.89, 309.12, 34.82, 18);
+	hotspotDB:addHotspot("Elwynn Forest 8 - 8", "Human", 8, 8, -9639.18, -23.02, 44.45, 19);
+	hotspotDB:addHotspot("Elwynn Forest 9 - 9", "Alliance", 9, 9, -9342.09, -832.4, 64.71, 20);
+	hotspotDB:addHotspot("Elwynn Forest 10 - 10", "Alliance", 10, 10, -9459.37, -1122.34, 52.69, 21);
+	hotspotDB:addHotspot("Ridgepoint Tower 11 - 11", "Alliance", 11, 11, -9866.62, -1350.71, 37.85, 22);
 -- Dun Morogh
-	hotspotDB:addHotspot("Coldridge Valley 1 - 2", "Alliance", 1, 2, -6240.32, 331.03, 382.75);
-	hotspotDB:addHotspot("Coldridge Valley 2 - 3", "Alliance", 2, 3, -6209.81, 722.07, 387.1);
-	hotspotDB:addHotspot("Coldridge Valley 3 - 4", "Alliance", 3, 4, -6426.68, 490.5, 384.05);
-	hotspotDB:addHotspot("Coldridge Valley 4 - 6", "Alliance", 4, 6, -6537.13, 468.76, 386.5);
-	hotspotDB:addHotspot("Dun Morogh 6 - 8", "Alliance", 6, 8, -5874.11, -213.25, 360.58);
-	hotspotDB:addHotspot("Dun Morogh 8 - 10", "Alliance", 8, 10, -5630.72, 385.68, 383.5);
-	hotspotDB:addHotspot("Chill Breeze Valley 7 - 9", "Alliance", 7, 9, -5422.33, -145.01, 400.3);
-	hotspotDB:addHotspot("The Tundrid Hills 8 - 10", "Alliance", 8, 10, -5749.6, -1135.85, 381.56);
+	hotspotDB:addHotspot("Coldridge Valley 1 - 2", "Alliance", 1, 2, -6240.32, 331.03, 382.75, 23);
+	hotspotDB:addHotspot("Coldridge Valley 2 - 3", "Alliance", 2, 3, -6209.81, 722.07, 387.1, 24);
+	hotspotDB:addHotspot("Coldridge Valley 3 - 4", "Alliance", 3, 4, -6426.68, 490.5, 384.05, 25);
+	hotspotDB:addHotspot("Coldridge Valley 4 - 6", "Alliance", 4, 6, -6537.13, 468.76, 386.5, 26);
+	hotspotDB:addHotspot("Dun Morogh 6 - 8", "Alliance", 6, 8, -5874.11, -213.25, 360.58, 27);
+	hotspotDB:addHotspot("Dun Morogh 8 - 10", "Alliance", 8, 10, -5630.72, 385.68, 383.5, 28);
+	hotspotDB:addHotspot("Chill Breeze Valley 7 - 9", "Alliance", 7, 9, -5422.33, -145.01, 400.3, 29);
+	hotspotDB:addHotspot("The Tundrid Hills 8 - 10", "Alliance", 8, 10, -5749.6, -1135.85, 381.56, 30);
 	hotspotDB:addHotspot("Dun Morogh 10 - 12", "Alliance", 10, 12, -5593.85, -1674.8, 398.33);
 -- Mulgore
 	hotspotDB:addHotspot("Red Cloud Mesa 1 - 2", "Horde", 1, 2, -2889.91, -418.89, 48.47);

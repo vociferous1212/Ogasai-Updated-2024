@@ -121,9 +121,8 @@ function script_getSpells:run()
 			self.getSpellsStatus = 1;
 			if (not IsMoving()) then
 				Move(vX, vY, vZ);
-				script_grind.message = "We are stuck!";
 			end
-		return;
+		return true;
 		end
 
 		if (not IsInCombat()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 15) then

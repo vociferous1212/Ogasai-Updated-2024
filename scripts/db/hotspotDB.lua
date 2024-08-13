@@ -11,7 +11,7 @@ hotspotDB = {
 	includeHotspotDB_50_60 = include("scripts\\db\\hotspotDB_50_60.lua"),
 }
 
-function hotspotDB:addHotspot(name, race, minLevel, maxLevel, posX, posY, posZ)
+function hotspotDB:addHotspot(name, race, minLevel, maxLevel, posX, posY, posZ, idd)
 	self.hotspotList[self.numHotspots] = {};
 	self.hotspotList[self.numHotspots]['name'] = name;
 	self.hotspotList[self.numHotspots]['race'] = race;
@@ -22,6 +22,7 @@ function hotspotDB:addHotspot(name, race, minLevel, maxLevel, posX, posY, posZ)
 	self.hotspotList[self.numHotspots]['pos']['x'] = posX;
 	self.hotspotList[self.numHotspots]['pos']['y'] = posY;
 	self.hotspotList[self.numHotspots]['pos']['z'] = posZ;
+	self.hotspotList[self.numHotspots]['idd'] = idd;
 
 	self.selectionList[self.numHotspots] = name;
 
