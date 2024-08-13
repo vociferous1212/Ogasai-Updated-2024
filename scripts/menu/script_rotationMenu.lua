@@ -31,6 +31,11 @@ function script_rotationMenu:menu()
 		StopBot(); 
 	end
 
+	if (HasSpell("Corruption")) then
+		SameLine();
+		wasClicked, script_rotation.warlockDots = Checkbox("DoT's", script_rotation.warlockDots);
+	end
+
 	Separator();
 
 	-- Load combat menu by class
@@ -64,15 +69,15 @@ function script_rotationMenu:menu()
 
 		local wasClicked = false;
 
-		wasClicked, script_rotation.drawEnabled = Checkbox('Show status window', script_rotation.drawEnabled);
+		wasClicked, script_rotationEX.drawEnabled = Checkbox('Show status window', script_rotationEX.drawEnabled);
 
-		wasClicked, script_rotation.drawGather = Checkbox('Show gather nodes', script_rotation.drawGather);
+		wasClicked, script_rotationEX.drawGather = Checkbox('Show gather nodes', script_rotationEX.drawGather);
 		SameLine();
 		wasClicked, script_grindMenu.showIDD = Checkbox("Show Item ID's", script_grindMenu.showIDD);
 
-		wasClicked, script_rotation.drawUnits = Checkbox("Show unit info on screen", script_rotation.drawUnits);
+		wasClicked, script_rotationEX.drawUnits = Checkbox("Show unit info on screen", script_rotationEX.drawUnits);
 
-		wasClicked, script_rotation.drawAggro = Checkbox('Show aggro range circles', script_rotation.drawAggro);
+		wasClicked, script_rotationEX.drawAggro = Checkbox('Show aggro range circles', script_rotationEX.drawAggro);
 		
 		Separator();
 
@@ -84,11 +89,11 @@ function script_rotationMenu:menu()
 			script_rotation.tickRate = SliderInt("TR", 50, 2000, script_rotation.tickRate);
 		end
 	end
-	if (script_rotation.drawAggro) then
+	if (script_rotationEX.drawAggro) then
 		Text("Aggro Circle Range");
-		script_rotation.aggroRangeTank = SliderInt("AR", 36, 300, script_rotation.aggroRangeTank);
+		script_rotationEX.aggroRangeTank = SliderInt("AR", 36, 300, script_rotationEX.aggroRangeTank);
 	end
 
-	wasClicked, script_rotation.drawChests = Checkbox("Draw Chests", script_rotation.drawChests);
+	wasClicked, script_rotationEX.drawChests = Checkbox("Draw Chests", script_rotationEX.drawChests);
 		
 end

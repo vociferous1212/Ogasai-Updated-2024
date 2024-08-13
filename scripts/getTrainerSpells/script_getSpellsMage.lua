@@ -12,7 +12,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 
 
 		-- Gnomes starter area
-		if (GetFaction() == 115) then
+		if (GetFaction() == 115) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6056.08984375, 388.17498779297, 392.76116943359;
 				script_getSpells.trainerTarget = "Marryk Nurribit";
@@ -28,7 +28,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 			end
 		end
 		-- Human starter area
-		if (GetFaction() == 1) then
+		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8851.5703125, -188.23399353027, 89.314559936523;
 				script_getSpells.trainerTarget = "Khelden Bremen";
@@ -43,24 +43,8 @@ function script_getSpellsMage:getTrainerTargetMage()
 				script_getSpells.trainerTarget = "Elsharin";
 			end
 		end
-		-- Night Elf starter area
-		if (GetFaction() == 4) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = 10526.599609375, 778.08599853516, 1329.5993652344;
-				script_getSpells.trainerTarget = "Alyissia";
-			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
-				vX, vY, vZ = 9822.23046875, 952.00701904297, 1308.7742919922;
-				script_getSpells.trainerTarget = "Kyra Windblade";
-			end
-			-- Darnassus trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
-				vX, vY, vZ = 9992.009765625, 2316.9699707031, 1330.7905273438;
-				script_getSpells.trainerTarget = "Arias'ta Bladesinger";
-			end
-		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) then
+		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -625.29602050781, -4210.169921875, 38.134181976318;
 				script_getSpells.trainerTarget = "Mai'ah";
@@ -76,7 +60,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 			end
 		end
 		-- Undead starter area
-		if (GetFaction() == 5) then
+		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 1847.3900146484, 1635.5200195313, 96.933547973633;
 				script_getSpells.trainerTarget = "Isabella";
@@ -89,22 +73,6 @@ function script_getSpellsMage:getTrainerTargetMage()
 			if (GetLocalPlayer():GetLevel() >= 10) then
 				vX, vY, vZ = 1813.7399902344, 56.413799285889, -47.387073516846;
 				script_getSpells.trainerTarget = "Anastasia Hartwell";
-			end
-		end
-		-- Tauren starter area
-		if (GetFaction() == 6) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = -2880.4299316406, -213.02000427246, 54.821006774902;
-				script_getSpells.trainerTarget = "Harutt Thunderhorn";
-			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
-				vX, vY, vZ = -2347.9799804688, -495.92001342773, -9.0472869873047;
-				script_getSpells.trainerTarget = "Krang Stonehoof";
-			end
-			-- TB trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
-				vX, vY, vZ = -1472.8699951172, -78.183898925781, 161.10205078125;
-				script_getSpells.trainerTarget = "Sark Ragetotem";
 			end
 		end
 	return vX, vY, vZ;

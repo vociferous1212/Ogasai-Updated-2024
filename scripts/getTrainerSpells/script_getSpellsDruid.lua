@@ -8,8 +8,14 @@ function script_getSpellsDruid:getTrainerTargetDruid()
 		
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
+		--stormwind has a druid trainer...
+		if (script_getSpells:humanZones()) then
+			vX, vY, vZ = 0, 0, 0;
+			script_getSpells.trainerTarget = "Theridran";
+		end
 		-- Night Elf starter area
-		if (GetFaction() == 4) then
+				-- faction elf and in elf zones so we can use stormwind trainer, too
+		if (GetFaction() == 4 and script_getSpells:elfZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then	
 				vX, vY, vZ = 10464, 829.53802490234, 1380.9401855469;
 				script_getSpells.trainerTarget = "Mardant Strongoak";
@@ -25,7 +31,7 @@ function script_getSpellsDruid:getTrainerTargetDruid()
 			end
 		end
 		-- Tauren starter area
-		if (GetFaction() == 6) then
+		if (GetFaction() == 6) or (script_getSpells:cowZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -2873.5700683594, -268.59100341797, 53.916931152344;
 				script_getSpells.trainerTarget = "Gart Mistrunner";

@@ -39,6 +39,7 @@ script_shaman = {
 	healMana = 20,
 	enhanceWeaponTimer = 0,
 	healingSpellTimer = 0,
+	healingSpellTimer2 = 0,
 
 }
 
@@ -132,6 +133,7 @@ function script_shaman:setup()
 	self.enhanceWeaponTimer = GetTimeEX();
 	script_shamanTotems.waitTimer = GetTimeEX();
 	self.healingSpellTimer = GetTimeEX();
+	self.healingSpellTimer2 = GetTimeEX();
 
 	self.isSetup = true;
 
@@ -911,37 +913,32 @@ function script_shaman:rest()
 			return true;
 		end
 	end
-
-	-- Check: Healing - lesser healing wave
-	if (not IsInCombat()) and (IsStanding()) then
-		if (not IsCasting()) and (not IsChanneling()) and (HasSpell("Lesser Healing Wave")) then
-			if (localHealth < 70) and (not isGhostWolf) then
-				if (localMana >= self.healMana) then 
-					if (CastSpellByName("Lesser Healing Wave", localObj)) then
-						self.waitTimer = GetTimeEX() + 2200;
-						script_grind:setWaitTimer(2200);
-						return true;
-					end
-				end
-			end
-		end
-	end
-
 	-- check healing wave...
 	if (not IsInCombat()) and (IsStanding()) then
 		if (not IsCasting()) and (not IsChanneling()) and (HasSpell("Healing Wave")) then
-			if (localHealth < 55) and (not isGhostWolf) then
+			if (localHealth < 45) and (not isGhostWolf) then
 				if (localMana >= self.healMana) then 
-					if (CastSpellByName("Healing Wave", localObj)) then
+					script_shaman:castHealingSpell(GetLocalPlayer());
 						self.waitTimer = GetTimeEX() + 2200;
 						script_grind:setWaitTimer(2200);
 						return true;
-					end
+					
 				end
 			end
 		end
 	end
-	
+	-- Check: Healing - lesser healing wave
+	if (not IsInCombat()) and (IsStanding()) then
+		if (not IsCasting()) and (not IsChanneling()) and (HasSpell("Lesser Healing Wave")) then
+			if (localHealth < self.eatHealth) and (not isGhostWolf) then
+				if (localMana >= self.healMana) then 
+					script_shaman:castLesserHealingWave(localObj);
+					self.waitTimer = GetTimeEX() + 2200;
+					script_grind:setWaitTimer(2200);
+				end
+			end
+		end
+	end
 
 	-- Drink something
 	if (not IsDrinking() and localMana < self.drinkMana) and (not IsMoving()) and (not IsInCombat()) then
@@ -1022,11 +1019,7 @@ function script_shaman:rest()
 	-- Don't need to rest
 	return false;
 end
-
-function script_shaman:mount()
-	return false;
-end
-
+function script_shaman:mount()	return false; end
 function script_shaman:window()
 
 	if (self.isChecked) then
@@ -1051,6 +1044,25 @@ function script_shaman:castHealingSpell(localObj)
 					self.healingSpellTimer = GetTimeEX() + 5500;
 					self.waitTimer = GetTimeEX() + 3500;
 					if (CastSpellByName(self.healingSpell, localObj)) then
+						return 4;
+					end
+				end
+			end
+		end
+	end
+return false;
+end
+function script_shaman:castLesserHealingWave(localObj)
+	if (self.healingSpellTimer2 > GetTimeEX()) then
+		return false;
+	end
+	if (HasSpell("Lesser Healing Wave")) then
+		if (not IsSpellOnCD("Lesser Healing Wave")) then
+			if (not IsMoving()) and (IsStanding()) then
+				if (not IsCasting()) and (not IsChanneling()) then
+					self.healingSpellTimer2 = GetTimeEX() + 2500;
+					self.waitTimer = GetTimeEX() + 2500;
+					if (CastSpellByName("Lesser Healing Wave", localObj)) then
 						return 4;
 					end
 				end

@@ -1,5 +1,7 @@
 script_getSpellsRogue = {}
 
+
+
 function script_getSpellsRogue:getTrainerTargetRogue()
 
 	local vX, vY, vZ = 0, 0, 0;
@@ -11,7 +13,7 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Gnomes starter area
-		if (GetFaction() == 115) then
+		if (GetFaction() == 115 or GetFaction() == 3) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6093.75, 404.91799926758, 395.53692626953;
 				script_getSpells.trainerTarget = "Solm Hargrin";
@@ -28,7 +30,7 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 		end
 		-- Human starter area
 		if (GetFaction() == 1) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
+			if (GetLocalPlayer():GetLevel() <= 6) or (script_getSpells:humanZones()) then
 				vX, vY, vZ = -8863.4697265625, -210.9049987793, 80.572006225586;
 				script_getSpells.trainerTarget = "Jorik Kerridan";
 			end
@@ -44,7 +46,7 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 		end
 		-- Night Elf starter area
 		if (GetFaction() == 4) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
+			if (GetLocalPlayer():GetLevel() <= 6) or (script_getSpells:elfZones()) then
 				vX, vY, vZ = 10519.099609375, 778.01397705078, 1329.5992431641;
 				script_getSpells.trainerTarget = "Frahun Shadewhisper";
 			end
@@ -59,7 +61,7 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 			end
 		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) then
+		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then				
 				vX, vY, vZ = -588.70300292969, -4144.9399414063, 41.02010345459;
 				script_getSpells.trainerTarget = "Rwag";
@@ -75,7 +77,7 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 			end
 		end
 		-- Undead starter area
-		if (GetFaction() == 5) then
+		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 1859.6500244141, 1563.3000488281, 94.306686401367;
 				script_getSpells.trainerTarget = "David Trias";
@@ -88,22 +90,6 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 			if (GetLocalPlayer():GetLevel() >= 10) then				
 				vX, vY, vZ = 1419.8000488281, 55.702098846436, -62.278587341309;
 				script_getSpells.trainerTarget = "Miles Dexter";
-			end
-		end
-		-- Tauren starter area
-		if (GetFaction() == 6) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = -2880.4299316406, -213.02000427246, 54.821006774902;
-				script_getSpells.trainerTarget = "Harutt Thunderhorn";
-			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
-				vX, vY, vZ = -2347.9799804688, -495.92001342773, -9.0472869873047;
-				script_getSpells.trainerTarget = "Krang Stonehoof";
-			end
-			-- TB trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
-				vX, vY, vZ = -1472.8699951172, -78.183898925781, 161.10205078125;
-				script_getSpells.trainerTarget = "Sark Ragetotem";
 			end
 		end
 	return vX, vY, vZ;

@@ -9,7 +9,7 @@ function script_getSpellsShaman:getTrainerTargetShaman()
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) then
+		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -623.93902587891, -4203.8798828125, 38.13410949707;
 				script_getSpells.trainerTarget = "Shikrik";
@@ -25,7 +25,7 @@ function script_getSpellsShaman:getTrainerTargetShaman()
 			end
 		end
 		-- Tauren starter area
-		if (GetFaction() == 6) then
+		if (GetFaction() == 6) or (script_getSpells:cowZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -2873.8798828125, -264.70901489258, 53.916400909424;
 				script_getSpells.trainerTarget = "Meela Dawnstrider";

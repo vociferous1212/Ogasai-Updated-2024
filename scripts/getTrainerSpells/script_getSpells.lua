@@ -158,3 +158,58 @@ function script_getSpells:run()
 	end
 return false;
 end
+function script_getSpells:gnomeZones()
+	local map = GetMapID();
+		if map == 1 or map == 1537 or map == 38 or map == 11 then
+			return true;
+		end
+
+return false;
+end
+function script_getSpells:humanZones()
+	local map = GetMapID();
+		if map == 12 or map == 10 or map == 44 or map == 40 or map == 1519 then
+			return true;
+		end
+
+return false;
+end
+function script_getSpells:elfZones()
+	local map = GetMapID();
+		if map == 331 or map == 148 or map == 1657 or map == 141 then
+			return true;
+		end
+
+return false;
+end
+function script_getSpells:orcZones()
+	local map = GetMapID();
+		if map == 14 or map == 1637 or map == 17 or ( (map == 406 or map == 400) and not script_getSpells:areWeAlliance()) then
+			return true;
+		end
+
+return false;
+end
+function script_getSpells:cowZones()
+	local map = GetMapID();
+		if map == 215 or map == 1638 or map == 17 or ( (map == 406 or map == 400) and not script_getSpells:areWeAlliance()) then
+			return true;
+		end
+
+return false;
+end
+function script_getSpells:deadZones()
+	local map = GetMapID();
+		if map == 130 or map == 85 or map == 1497 or map == 267 or (map == 267 and not script_getSpells:areWeAlliance()) then
+			return true;
+		end
+
+return false;
+end
+function script_getSpells:areWeAlliance()
+	local a = GetFaction();
+		if a == 4 or a == 115 or a == 3 or a == 1 then
+			return true;
+		end
+return false;
+end

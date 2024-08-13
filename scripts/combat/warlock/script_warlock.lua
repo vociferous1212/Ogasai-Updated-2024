@@ -213,8 +213,12 @@ function script_warlock:run(targetGUID)
 	-- stuck in combat
 	if (self.waitAfterCombat) and (HasPet()) then
 		if (IsInCombat()) and (not PlayerHasTarget()) and (not PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
-			self.message = "No Target - stuck in combat! WAITING!";
-			return 4;
+			self.message = "Waiting... Server says we are InCombat()";
+			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+				ex, ey, ez = self.lootObj:GetPosition();
+				Move(ex, ey, ez);
+			end
 		elseif (IsInCombat()) and (not PlayerHasTarget()) and (PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
 			AssistUnit("Pet");
 			return 4;
@@ -229,7 +233,7 @@ function script_warlock:run(targetGUID)
 		end
 	elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
 		--AssistUnit("pet");
-		self.message = "Stuck in combat! WAITING!";
+		self.message = "Stuck in combat! WAITING! 1";
 		return 4;
 	end
 
@@ -323,7 +327,7 @@ function script_warlock:run(targetGUID)
 		end
 	elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
 		--AssistUnit("pet");
-		self.message = "Stuck in combat! WAITING!";
+		self.message = "Stuck in combat! WAITING! 2";
 		return 4;
 	end
 
@@ -440,11 +444,16 @@ function script_warlock:run(targetGUID)
 
 		if (self.warlockDOTS) and (script_grindEX:howManyEnemiesInRange(29) >= self.warlockDOTSCount) and (script_grind.enemiesAttackingUs() <= self.warlockDOTSCount) and (localMana >= 35) and (localHealth >= 45) then
 		
-				script_warlockDOTS:corruption();
-				script_warlockDOTS:curseOfAgony();
-				script_warlockDOTS:immolate();
-				self.waitTimer = GetTimeEX() + 1000;
-				
+				if (script_warlockDOTS:corruption()) then
+					return true;
+				end
+				if (script_warlockDOTS:curseOfAgony()) then
+					return true;
+				end
+				if (script_warlockDOTS:immolate()) then
+					return true;
+				end
+		return true;
 		end
 
 		if (IsInCombat()) then
@@ -546,8 +555,8 @@ function script_warlock:run(targetGUID)
 						if (script_warlockFunctions:castCorruption(targetObj)) then
 							script_warlockFunctions:petAttack();
 							targetObj:FaceTarget();
-							self.waitTimer = GetTimeEX() + 2750 - self.corruptionCastTime;
-							script_grind:setWaitTimer(2750 - self.corruptionCastTime);
+							self.waitTimer = GetTimeEX() + 2050 - self.corruptionCastTime;
+							script_grind:setWaitTimer(2050 - self.corruptionCastTime);
 							return 4;
 						else
 							return 4;
@@ -582,7 +591,7 @@ function script_warlock:run(targetGUID)
 			-- IN COMBAT
 
 			-- Combat
-		else	
+		elseif (IsInCombat()) or (PlayerHasTarget()) then	
 
 			self.message = "Killing " .. targetObj:GetUnitName() .. "...";
 
@@ -617,7 +626,7 @@ function script_warlock:run(targetGUID)
 					end
 				elseif (HasPet()) and (not PetHasTarget()) then
 					--AssistUnit("pet");
-					self.message = "Stuck in combat! WAITING!";
+					self.message = "Stuck in combat! WAITING! 3";
 					return 4;
 				end
 			end
@@ -680,9 +689,9 @@ function script_warlock:run(targetGUID)
 			end
 
 			-- pet assist me if i am being targeted by more than 1 npc
-		--	if (HasPet()) then
-		--		script_warlockFunctions:petAssistMe();
-		--	end
+			--if (HasPet()) then
+			--	script_warlockFunctions:petAssistMe();
+			--end
 
 			-- Dismount
 			if(IsMounted()) then 
@@ -864,7 +873,7 @@ function script_warlock:run(targetGUID)
 				if (CastSpellByName("Life Tap")) then
 					self.waitTimer = GetTimeEX() + 1600;
 					self.message = "Using Life Tap!";
-					return;
+					return true;
 				end
 			end
 
@@ -1086,7 +1095,7 @@ function script_warlock:rest()
 			end
 		elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
 			--AssistUnit("pet");
-			self.message = "Stuck in combat! WAITING!";
+			self.message = "Stuck in combat! WAITING! 4";
 			return 4;
 		end
 	end

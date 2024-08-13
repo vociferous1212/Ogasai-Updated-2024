@@ -52,11 +52,11 @@ end
 
 function script_warlockFunctions:petAssistMe()
 	local i, t = GetFirstObject();
-	if (HasPet()) and (script_warlockEX2:isPetActive()) and (script_grind.enemiesAttackingUs() <= 3) then
+	if (HasPet() and not GetPet():IsDead()) and (script_grind.enemiesAttackingUs() <= 3) then
 		while i ~= 0 do
 			if t == 3 then
 				if (script_grind:isTargetingMe(i)) and (not script_grind:isTargetingPet(i))
-				and (not GetPet():GetUnitsTarget():GetGUID() ==  i:GetGUID()) then
+				and (GetPet():GetUnitsTarget():GetGUID() ~=  i:GetGUID()) then
 					PetAttack(i);
 				end
 			end

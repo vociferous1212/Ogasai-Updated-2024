@@ -9,7 +9,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 	-- !!!! 	these need to all be put in a table to check from like hotspot distances 	!!!!!
 
 		-- Gnomes starter area
-		if (GetFaction() == 115) or (GetFaction() == 3) then
+		if (GetFaction() == 115) or (GetFaction() == 3) or (script_getSpells:gnomeZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -6048.7900390625, 391.07900292969, 398.9580078125;
 				script_getSpells.trainerTarget = "Alamar Grimm";
@@ -25,7 +25,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 			end
 		end			
 		-- Human starter area
-		if (GetFaction() == 1) then
+		if (GetFaction() == 1) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -8926.740234375, -195.5890045166, 80.588554382324;
 				script_getSpells.trainerTarget = "Drusilla La Salle";
@@ -40,24 +40,8 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 				script_getSpells.trainerTarget = "Ursula Deline";
 			end
 		end
-		-- Night Elf starter area
-		if (GetFaction() == 4) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = 10526.599609375, 778.08599853516, 1329.5993652344;
-				script_getSpells.trainerTarget = "Alyissia";
-			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
-				vX, vY, vZ = 9822.23046875, 952.00701904297, 1308.7742919922;
-				script_getSpells.trainerTarget = "Kyra Windblade";
-			end
-			-- Darnassus trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
-				vX, vY, vZ = 9992.009765625, 2316.9699707031, 1330.7905273438;
-				script_getSpells.trainerTarget = "Arias'ta Bladesinger";
-			end
-		end
 		-- Orc/troll starter area
-		if (GetFaction() == 2) or (GetFaction() == 116) then
+		if (GetFaction() == 2) or (GetFaction() == 116) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = -639.34399414063, -4230.1899414063, 38.134117126465;
 				script_getSpells.trainerTarget = "Frang";
@@ -73,7 +57,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 			end
 		end
 		-- Undead starter area
-		if (GetFaction() == 5) then
+		if (GetFaction() == 5) or (script_getSpells:deadZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
 				vX, vY, vZ = 1839.0300292969, 1636.5400390625, 96.933532714844;
 				script_getSpells.trainerTarget = "Maximillion";
@@ -86,22 +70,6 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 			if (GetLocalPlayer():GetLevel() >= 10) then
 				vX, vY, vZ = 1776.4000244141, 20.254299163818, -47.388172149658;
 				script_getSpells.trainerTarget = "Richard Kerwin";
-			end
-		end
-		-- Tauren starter area
-		if (GetFaction() == 6) then
-			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = -2880.4299316406, -213.02000427246, 54.821006774902;
-				script_getSpells.trainerTarget = "Harutt Thunderhorn";
-			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
-				vX, vY, vZ = -2347.9799804688, -495.92001342773, -9.0472869873047;
-				script_getSpells.trainerTarget = "Krang Stonehoof";
-			end
-			-- TB trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
-				vX, vY, vZ = -1472.8699951172, -78.183898925781, 161.10205078125;
-				script_getSpells.trainerTarget = "Sark Ragetotem";
 			end
 		end
 	return vX, vY, vZ;
