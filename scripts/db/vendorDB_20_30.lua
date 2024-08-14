@@ -18,6 +18,9 @@ function vendorDB_20_30:setup()
 	vendorDB:addVendor("Haljan Oakheart", 0, 1, 331, false, false, false, true, false, 2717.69, -309.67, 110.72);
 	vendorDB:addVendor("Maliynn", 0, 1, 331, false, true, false, false, false, 2751.84, -412.04, 111.45);
 	vendorDB:addVendor("Maliynn", 0, 1, 331, false, false, true, false, false, 2751.84, -412.04, 111.45);
+	vendorDB:addVendor("Bhaldaran Ravenshade", 0, 1, 331, true, false, false, false, false, 2087.08, -1199.18, 101.7);
+	vendorDB:addVendor("Bhaldaran Ravenshade", 0, 1, 331, false, false, false, false, false, 2087.08, -1199.18, 101.7);
+	vendorDB:addVendor("Bhaldaran Ravenshade", 0, 1, 331, false, false, false, true, false, 2087.08, -1199.18, 101.7);
 
 -- Hillsbrad Foothills - Horde
 	vendorDB:addVendor("Ott", 1, 0, 267, false, false, false, false, false, -158.53, -867.18, 56.89);
