@@ -1020,6 +1020,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				ex, ey, ez = self.lootObj:GetPosition();
 				Move(ex, ey, ez);
 			end
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+				script_grind:doLoot(localObj);
+			end
 			return;
 		end
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
@@ -1028,6 +1031,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				ex, ey, ez = self.lootObj:GetPosition();
 				Move(ex, ey, ez);
+			end
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+				script_grind:doLoot(localObj);
 			end
 		return;
 		end	
