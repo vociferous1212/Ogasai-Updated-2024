@@ -328,7 +328,9 @@ function script_grind:setup()
 
 
 	local level = GetLocalPlayer():GetLevel();
-
+	if (level < 6) then
+		script_gather.safeGather = false;
+	end
 	if (level < 10) then
 		script_checkAdds.addsRange = 15;
 		self.paranoidRange = 25;

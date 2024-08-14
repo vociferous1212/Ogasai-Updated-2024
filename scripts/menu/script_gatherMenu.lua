@@ -61,7 +61,7 @@ function script_gatherMenu:menu()
 				end
 			end
 
-			Text('Gather Search Distance'); SameLine(); wasClicked, script_grind.killStuffAroundGatherNodes = Checkbox("Kill Stuff Around Nodes", script_grind.killStuffAroundGatherNodes);
+			Text('Gather Search Distance');
 			script_gather.gatherDistance = SliderFloat("GSD", 1, 250, script_gather.gatherDistance);
 			if (Button("Add Node To Blacklist By GUID")) then
 				if (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) then
@@ -72,6 +72,14 @@ function script_gatherMenu:menu()
 				elseif (script_gather.nodeObj == nil or script_gather.nodeObj == 0) then
 					DEFAULT_CHAT_FRAME:AddMessage("No target to blacklist gather node!");
 				end
+			end
+			wasClicked, script_gather.safeGather = Checkbox("Safe Gathering", script_gather.safeGather);
+			SameLine(); 
+			wasClicked, script_grind.killStuffAroundGatherNodes = Checkbox("Kill Stuff Around Nodes", script_grind.killStuffAroundGatherNodes);
+
+			if (script_gather.safeGather) then
+				Text("Blacklisting gather nodes with 3 or more enemies in range");
+				Text("");
 			end
 			
 			Separator();
