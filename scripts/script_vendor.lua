@@ -220,7 +220,9 @@ function script_vendor:repair()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		
+		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
+			Move(vX, vY, vZ);
+		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 1; -- moving to a repair vendor
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
@@ -328,7 +330,9 @@ function script_vendor:sell()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-	
+		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
+			Move(vX, vY, vZ);
+		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
@@ -425,7 +429,9 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		
+		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
+			Move(vX, vY, vZ);
+		end
 		-- Move to vendor
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
@@ -556,7 +562,9 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		
+		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
+			Move(vX, vY, vZ);
+		end
 		-- Move to vendor
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
@@ -565,6 +573,8 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 			self.currentSlot = 0;
 			return true;
 		end
+		
+
 
 		if(HasForm()) then
 			if (script_vendor:removeShapeShift()) then

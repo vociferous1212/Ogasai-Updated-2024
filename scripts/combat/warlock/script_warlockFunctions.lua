@@ -175,8 +175,8 @@ function script_warlockFunctions:fearAdd(targetObjGUID)
 								script_rotation.tickRate = 100;
 							end
 							if (script_warlockFunctions:cast("Fear", currentObj)) then
-								script_warlock.waitTimer = GetTimeEX() + 2500;
-								script_grind:setWaitTimer(2500);
+								script_warlock.waitTimer = GetTimeEX() + 1650;
+								script_grind:setWaitTimer(1650);
 								script_warlock.addFeared = true; 
 								return true; 
 							end

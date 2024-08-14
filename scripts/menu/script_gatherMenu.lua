@@ -61,7 +61,7 @@ function script_gatherMenu:menu()
 				end
 			end
 
-			Text('Gather Search Distance');
+			Text('Gather Search Distance'); SameLine(); wasClicked, script_grind.killStuffAroundGatherNodes = Checkbox("Kill Stuff Around Nodes", script_grind.killStuffAroundGatherNodes);
 			script_gather.gatherDistance = SliderFloat("GSD", 1, 250, script_gather.gatherDistance);
 			if (Button("Add Node To Blacklist By GUID")) then
 				if (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) then

@@ -23,6 +23,10 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		
 -- move to hotspot coords
 		if (not script_grind.hotspotReached) then
+
+			if (not IsInCombat()) and (not script_gather.gathering) then
+				script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime*1000;
+			end
 			if (not IsMoving() and not IsPathLoaded(5)) then
 				Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 				script_nav.message = "Stuck out of bounds or stuck not moving...";
@@ -30,11 +34,15 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		end
 			-- mount/stealth/cat form/ travel form/ ghost wolf
-			--if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
-			--	CastStealth();
+			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
+				if (script_rogue.useStealth or script_druid.useStealth) and (not IsSpellOnCD("Stealth")) and (not IsSpellOnCD("Prowl")) then
+					CastStealth();
+				end
 			--	CastGhostWolf();
-			--	CastSprint();
-			--end
+				if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) then
+					CastSprint();
+				end
+			end
 		
 	-- stop moving so we can mount
 			if (not IsInCombat()) and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) then

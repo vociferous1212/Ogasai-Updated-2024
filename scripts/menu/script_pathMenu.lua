@@ -21,7 +21,7 @@ function script_pathMenu:menu()
 		if (script_grindMenu.useHotSpotArea) then
 			if (Button("Save Current Location As Hotspot")) then
 				script_nav:newHotspot(GetMinimapZoneText() .. ' ' .. GetLocalPlayer():GetLevel() .. ' - ' .. GetLocalPlayer():GetLevel()+2);
-				if (IsMoving()) then
+				if (script_grind.pause) and (IsMoving()) then
 					StopMoving();
 				end
 				if (script_grind.autoSelectVendors) then

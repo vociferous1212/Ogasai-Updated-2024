@@ -26,6 +26,8 @@ script_grind = {
 	extraFunctionsLoaded = include("scripts\\script_extraFunctions.lua"),
 	getSpellsLoaded = include("scripts\\getTrainerSpells\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
+	gatherEX2Loaded = include("scripts\\script_gatherEX2.lua"),
+	gatherRunLoaded = include("scripts\\script_gatherRun.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
@@ -97,7 +99,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 3.55, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 4.55, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -186,6 +188,7 @@ script_grind = {
 	buffTimer = 0,		-- timer to buff other players in range
 	restMana = 1,
 	restHealth = 1,
+	killStuffAroundGatherNodes = true,
 }
 
 function script_grind:setup()
@@ -242,7 +245,6 @@ function script_grind:setup()
 	if (GetLocalPlayer():GetLevel() <= 5) then
 		self.skipHardPull = false;
 		self.blacklistTime = 20;
-		script_gather.collectChests = true;
 	end
 	if (GetLocalPlayer():GetLevel() <= 10) then
 		self.getSpells = true;
@@ -576,6 +578,7 @@ function script_grind:run()
 		--reset new target time for blacklisting
 		script_grind.newTargetTime = GetTimeEX();
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 		return;
 	end
 
@@ -808,10 +811,21 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		end
 		
 		-- Gather
-		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
+		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
+
 				script_gather.gathering = true;
-			if (script_gather:gather()) then
-					script_nav.lastPathIndex = -1;
+
+			if (not IsInCombat()) and (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
+				self.message = "Killing stuff around gather node";
+				self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+				if (self.combatError == 3) then
+					local x, y, z = self.enemyObj:GetPosition();
+					MoveToTarget(x, y, z);
+					return;
+				end
+				return;
+			else
+			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
 					if (self.jump) then
@@ -824,6 +838,8 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 						CastStealth();
 					end
 
+				
+
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 135;
 				end
@@ -833,6 +849,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					script_grind:setWaitTimer(1500);
 				end
 			return true;
+			end
 			end
 		end
 		-- turn jump back on once gathering is done
@@ -864,7 +881,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
 			return;
 		end
-
+		
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
 		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
@@ -963,11 +980,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
 			end
-			-- we are stuck trying to target a mob. let's force move until we can find another target
-			if (not IsMoving()) and (not IsInCombat()) and (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime) then
-			local mx, my, mz = GetLocalPlayer():GetPosition();
-			Move(mx+5, my+5, mz);
-			end
+			
 		end
 
 		-- distance to hotspot
@@ -1013,6 +1026,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			end
 		end	
 		
+-- stuck in combat phase
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
@@ -1021,10 +1035,14 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				Move(ex, ey, ez);
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				script_grind:doLoot(localObj);
+				if (script_grind:doLoot(localObj)) then
+				self.waitTimer = GetTimeEX() + 1000;
+
+				end
 			end
 			return;
 		end
+-- stuck in combat phase
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
@@ -1033,7 +1051,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				Move(ex, ey, ez);
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				script_grind:doLoot(localObj);
+				if (script_grind:doLoot(localObj)) then
+				self.waitTimer = GetTimeEX() + 1000;
+				end
 			end
 		return;
 		end	
@@ -1203,7 +1223,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			-- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
 				and (not script_checkDebuffs:hasDisabledMovement()) then
-				self.message = "Moving to target...";
+				self.message = "Moving to target return 3...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 
@@ -1228,8 +1248,10 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					end
 					if (not IsMoving()) then
 						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						local px, py, pz = GetLocalPlayer():GetPosition();
+						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+						DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 						Move(_x, _y, _z);
-						return;
 					end
 					
 					-- set wait timer to move clicks
@@ -2105,7 +2127,9 @@ function script_grind:doLoot(localObj)
 			return;
 			end
 		else
+			
 			MoveToTarget(_x, _y, _z);
+			
 			return;
 		end
 	end
@@ -2241,6 +2265,7 @@ function script_grind:runRest()
 	if(RunRestScript()) then
 		-- reset blacklist looting time
 		script_grind.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 
 		-- set tick rate for resting
 		if (not script_grind.adjustTickRate) then
