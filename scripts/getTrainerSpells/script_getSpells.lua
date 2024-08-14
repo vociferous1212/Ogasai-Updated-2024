@@ -120,6 +120,9 @@ function script_getSpells:run()
 			script_grind.message = script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.getSpellsStatus = 1;
 			if (not IsMoving()) then
+				local px, py, pz = GetLocalPlayer():GetPosition();
+				local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+				DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 				Move(vX, vY, vZ);
 			end
 		return true;
