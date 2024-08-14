@@ -119,7 +119,7 @@ function script_getSpellsWarrior:checkForSpellsNeededWarrior()
 	local myLevel = localObj:GetLevel();
 	local myMoney = GetMoney();	-- copper...
 
-	if (HasSpell("Heroic Strike")) then
+	if (HasSpell("Battle Stance")) then
 		if (myLevel >= 1) and (myMoney >= 10) and (not HasSpell("Battle Shout")) then
 			if (script_getSpells:run()) then
 				return true;
