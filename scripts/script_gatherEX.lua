@@ -114,35 +114,3 @@ function script_gatherEX:drawFishNodes()
 	targetObj, targetType = GetNextObject(targetObj);
 	end
 end
-
--- if there is a mob within gathering distance based on aggro range then
-function script_gatherEX:checkForTargetsOnGatherRoute()
-
-	if (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(script_gather.nodeGUID)) then
-
-		i, t = GetFirstObject();
-		while i ~= 0 do
-			if t == 3 then
-				if (i:GetDistance() <= 40) and (not i:IsDead()) and (not i:IsCritter()) then
-					local iX, iY, iZ = i:GetPosition();	
-					local lX, lY, lZ = GetLocalPlayer():GetPosition();
-					local nX, nY, nZ = script_gather.nodeObj:GetPosition();
-					local tX = GetDistance3D(iX, iY, iZ, nX, nY, nZ);
-					local bX = GetDistance3D(lX, lY, lZ, iX, iY, iZ);
-					local mX = GetDistance3D(lX, lY, lZ, nX, nY, nZ);
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20;
-					local bestDist = aggro;
-					local bestTarget = nil;	
-					if (tX <= aggro or tX <= 22) or (bX <= aggro or i:GetDistance() <= 22) then
-						
-						script_grind.enemyObj = i;
-						return true;
-					end
-				
-				end
-			end
-		i, t = GetNextObject(i);
-		end
-	end
-return false;
-end

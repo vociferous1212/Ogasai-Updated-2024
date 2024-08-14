@@ -26,6 +26,7 @@ script_grind = {
 	extraFunctionsLoaded = include("scripts\\script_extraFunctions.lua"),
 	getSpellsLoaded = include("scripts\\getTrainerSpells\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
+	gatherEX2Loaded = include("scripts\\script_gatherEX2.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
@@ -243,7 +244,6 @@ function script_grind:setup()
 	if (GetLocalPlayer():GetLevel() <= 5) then
 		self.skipHardPull = false;
 		self.blacklistTime = 20;
-		script_gather.collectChests = true;
 	end
 	if (GetLocalPlayer():GetLevel() <= 10) then
 		self.getSpells = true;
@@ -813,12 +813,12 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 
 				script_gather.gathering = true;
 
-			if (self.killStuffAroundGatherNodes) and (script_gatherEX:checkForTargetsOnGatherRoute()) then
+			if (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
 				self.message = "Killing stuff around gather node";
 				self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
 				if (self.combatError == 3) then
 					local x, y, z = self.enemyObj:GetPosition();
-					Move(x, y, z);
+					MoveToTarget(x, y, z);
 				end
 			else
 			if (script_gather:gather()) then
@@ -878,9 +878,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
 			return;
 		end
-		if (script_gather.gathering) then
-			return;
-		end
+		
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
 		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
