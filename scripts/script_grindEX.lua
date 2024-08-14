@@ -42,6 +42,14 @@ function script_grindEX:doChecks()
 		--	end 
 		--end
 
+		if (localObj:IsDead()) and (localObj:HasBuff("Soulstone Resurrection")) then
+			-- wow in-game api
+			if (HasSoulstone()) then
+				UseSoulstone();
+				return;
+			end
+		end
+
 		if (localObj:IsDead()) and (script_paranoia:checkParanoia(40)) then
 			return;
 		end

@@ -186,6 +186,7 @@ script_grind = {
 	buffTimer = 0,		-- timer to buff other players in range
 	restMana = 1,
 	restHealth = 1,
+	killStuffAroundGatherNodes = true,
 }
 
 function script_grind:setup()
@@ -808,8 +809,18 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		end
 		
 		-- Gather
-		if (self.gather and not IsInCombat() and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
+		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
+
 				script_gather.gathering = true;
+
+			if (self.killStuffAroundGatherNodes) and (script_gatherEX:checkForTargetsOnGatherRoute()) then
+				self.message = "Killing stuff around gather node";
+				self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+				if (self.combatError == 3) then
+					local x, y, z = self.enemyObj:GetPosition();
+					Move(x, y, z);
+				end
+			else
 			if (script_gather:gather()) then
 					script_nav.lastPathIndex = -1;
 
@@ -824,6 +835,8 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 						CastStealth();
 					end
 
+				
+
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 135;
 				end
@@ -833,6 +846,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					script_grind:setWaitTimer(1500);
 				end
 			return true;
+			end
 			end
 		end
 		-- turn jump back on once gathering is done
@@ -864,7 +878,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
 			return;
 		end
-
+		if (script_gather.gathering) then
+			return;
+		end
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
 		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
@@ -1013,6 +1029,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			end
 		end	
 		
+-- stuck in combat phase
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
@@ -1021,10 +1038,14 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				Move(ex, ey, ez);
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				script_grind:doLoot(localObj);
+				if (script_grind:doLoot(localObj)) then
+				self.waitTimer = GetTimeEX() + 1000;
+
+				end
 			end
 			return;
 		end
+-- stuck in combat phase
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
@@ -1033,7 +1054,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				Move(ex, ey, ez);
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				script_grind:doLoot(localObj);
+				if (script_grind:doLoot(localObj)) then
+				self.waitTimer = GetTimeEX() + 1000;
+				end
 			end
 		return;
 		end	

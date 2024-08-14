@@ -398,6 +398,7 @@ function script_gather:gather()
 			self.waitTimer = GetTimeEX() + 450;
 		else
 			if (_x ~= 0) then
+
 				local nDist = math.floor(self.nodeObj:GetDistance());
 				if (IsPathLoaded(5)) then
 					script_navEXCombat:moveToTarget(GetLocalPlayer(), _x, _y, _z);
