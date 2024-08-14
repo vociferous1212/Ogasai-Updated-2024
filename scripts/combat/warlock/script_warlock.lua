@@ -59,6 +59,7 @@ script_warlock = {
 	warlockDOTSCount = 2,
 	hasSoulStone = false,
 	consumeShadowsTimer = 0,
+	soulstoneTimer = 0,
 }
 
 function script_warlock:setup()
@@ -69,6 +70,7 @@ function script_warlock:setup()
 	script_warlockDOTS.immolateTimer = GetTimeEX();
 	script_warlockDOTS.curseOfAgonyTimer = GetTimeEX();
 	self.consumeShadowsTimer = GetTimeEX();
+	self.soulstoneTimer = GetTimeEX();
 
 
 	local localObj = GetLocalPlayer();
@@ -357,7 +359,7 @@ function script_warlock:run(targetGUID)
 	end
 
 	-- move away from adds / check adds
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (not IsCasting()) and (not IsChanneling()) and (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				if (HasPet()) then
@@ -474,7 +476,7 @@ function script_warlock:run(targetGUID)
 		if (IsInCombat()) then
 			if (script_warlockDOTS:DOTAdds()) then
 				self.waitTimer = GetTimeEX()  + 1000;
-				return;
+				return true;
 			end
 		end
 
@@ -1102,6 +1104,32 @@ function script_warlock:rest()
 		end
 	end
 
+	-- create soulstone
+	if (script_warlockEX:checkSoulstonesSpells()) then
+		if (HasPet()) and (HasItem("Soul Shard")) and (not IsInCombat()) and (not localObj:HasBuff("Soulstone Resurrection")) then
+			if (script_warlockEX:checkSoulstones()) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				self.waitTimer = GetTimeEX() + 1750;
+				script_grind:setWaitTimer(1750);
+			end
+		end
+	-- use soulstone
+		if (GetTimeEX() >= self.soulstoneTimer) then
+			if (not localObj:HasBuff("Soulstone Resurrection")) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				script_warlockEX:useSoulstones();
+				-- 1,800,000 ---   1000miliseconds per second * 60 seconds per minute * 30 minutes per cooldown
+				self.soulstoneTimer = GetTimeEX() + 1800000;
+			end
+		end
+	end
+
 	-- force bot to attack pets target
 	if (GetNumPartyMembers() == 0) and (self.waitAfterCombat) and (IsInCombat()) and (HasPet()) and (not PlayerHasTarget()) then
 		if (not PetHasTarget()) then
@@ -1139,7 +1167,7 @@ function script_warlock:rest()
 	if (localMana < localHealth) and (HasSpell("Life Tap")) and (localHealth > self.lifeTapHealth) and (localMana < self.lifeTapMana) then
 		if (not IsInCombat()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (IsStanding()) then
 			if (not IsSpellOnCD("Life Tap")) then
-				if (CastSpellByName("Life Tap", localObj)) then
+				if (not CastSpellByName("Life Tap", localObj)) then
 					self.waitTimer = GetTimeEX() + 1650;
 				end
 			end
@@ -1209,7 +1237,7 @@ function script_warlock:rest()
 		return true;
 	end
 	
-	if (HasSpell("Summon Imp")) and (not HasPet()) then	
+	if (HasSpell("Summon Imp")) and (not HasPet()) and (self.useImp or self.useVoid or self.useSuccubus or self.usefelHunter) then	
 		if (IsMoving()) then
 			StopMoving();
 		end

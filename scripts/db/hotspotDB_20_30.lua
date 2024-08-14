@@ -73,13 +73,12 @@ function hotspotDB_20_30:setup()
 	hotspotDB:addHotspot("The Shimmering Flats 33 - 35", "All", 33, 35, -5941.85, -3609.42, -58.76);
 
 -- Hillsbrad Foothills
-
+	hotspotDB:addHotspot("Tarren Mill 20 - 22", "Horde", 20, 22, 59.02, -917.01, 64.06);
 	hotspotDB:addHotspot("Hillsbrad Foothills 23 - 25", "All", 23, 25, -256.12, -658.98, 55.77);
 	hotspotDB:addHotspot("Nethander Stead 25 - 27", "All", 25, 27, -769.46, -1016, 41.12);
 	hotspotDB:addHotspot("Nethander Stead 27 - 29", "All", 27, 29, -1025.12, -871.5, 35.51);
 	hotspotDB:addHotspot("Hillsbrad Foothills 26 - 28", "All", 26, 28, -811.02, -1442.8, 60.7);
 	hotspotDB:addHotspot("Hillsbrad Foothills 26 - 28", "All", 26, 28, -887.8, -5.65, 25.84);
 	hotspotDB:addHotspot("Hillsbrad Fields 21 - 23", "All", 21, 23, -459.45, 309.12, 91.67);
-
 
 end
