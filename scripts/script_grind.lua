@@ -27,6 +27,7 @@ script_grind = {
 	getSpellsLoaded = include("scripts\\getTrainerSpells\\script_getSpells.lua"),
 	gatherEXLoaded = include("scripts\\script_gatherEX.lua"),
 	gatherEX2Loaded = include("scripts\\script_gatherEX2.lua"),
+	gatherRunLoaded = include("scripts\\script_gatherRun.lua"),
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
@@ -810,11 +811,11 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		end
 		
 		-- Gather
-		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) then
+		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
 
 				script_gather.gathering = true;
 
-			if (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
+			if (not IsInCombat()) and (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
 				self.message = "Killing stuff around gather node";
 				self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
 				if (self.combatError == 3) then
@@ -822,8 +823,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					MoveToTarget(x, y, z);
 					return;
 				end
+				return;
 			else
-			if (script_gather:gather()) then
+			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
 					if (self.jump) then
@@ -978,14 +980,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
 			end
-			-- we are stuck trying to target a mob. let's force move until we can find another target
-			if (not IsMoving()) and (not IsInCombat()) and (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime) then
-			local mx, my, mz = GetLocalPlayer():GetPosition();
-			local _tX, _tY, onScreen = WorldToScreen(mx, my, mz);
-			DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
-
-			Move(mx+5, my+5, mz);
-			end
+			
 		end
 
 		-- distance to hotspot
@@ -1255,9 +1250,8 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						local px, py, pz = GetLocalPlayer():GetPosition();
 						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-						DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
+						DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 						Move(_x, _y, _z);
-						return;
 					end
 					
 					-- set wait timer to move clicks

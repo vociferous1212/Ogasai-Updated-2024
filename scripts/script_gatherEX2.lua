@@ -1,9 +1,12 @@
-script_gatherEX2 = {}
+script_gatherEX2 = {waitTimer = 0,}
 
 
 -- if there is a mob within gathering distance based on aggro range then
 function script_gatherEX2:checkForTargetsOnGatherRoute()
 
+	if (self.waitTimer > GetTimeEX()) then
+		return false;
+	end
 	if (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(script_gather.nodeGUID)) then
 
 		i, t = GetFirstObject();
@@ -26,6 +29,8 @@ function script_gatherEX2:checkForTargetsOnGatherRoute()
 					or (meToTarget <= aggro) and (not GetLocalPlayer():HasBuff("Stealth")) and (not GetLocalPlayer():HasBuff("Prowl")) then
 						
 						script_grind.enemyObj = i;
+						i:AutoAttack();
+						self.waitTimer = GetTimeEX() + 4000;
 						return true;
 					end
 				

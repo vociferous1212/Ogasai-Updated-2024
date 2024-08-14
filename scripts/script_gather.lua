@@ -1,91 +1,29 @@
-script_gather = {
-	isSetup = false,
-	useVendor = false,
-	useMount = true,
-	nodeObj = nil,
-	gatherDistance = 85,
-	message = 'Gather...',
-	collectMinerals = true,
-	collectHerbs = true,
-	herbs = {},
-	numHerbs = 0,
-	minerals = {},
-	numMinerals = 0,
-	lootDistance = 3,
-	timer = 0,
-	nodeID = 0,
-	gatherAllPossible = true,
-	timerSet = false,
-	nodeGUID = 0,
-	chests = {},
-	numChests = 0,
-	lock = {},
-	numLock = 0,
-	fish = {},
-	numFish = 0,
-	collectChests = true,
-	dist = 0,
-	messageToGrinder = "",
-	gathering = false,
-	blacklistedNodes = {},
-	blacklistedNodesNum = 0,
-	blacklistedNodesNameNum = 0,
-	blacklistTime = 0,
-	blacklistSetTime = 60,
-	isChest = false,
+script_gather = { isSetup = false, useVendor = false, useMount = true, nodeObj = nil, gatherDistance = 85, message = 'Gather...', collectMinerals = true, collectHerbs = true, herbs = {}, numHerbs = 0, minerals = {}, numMinerals = 0, lootDistance = 3, timer = 0, nodeID = 0, gatherAllPossible = true, timerSet = false, nodeGUID = 0, chests = {}, numChests = 0, lock = {}, numLock = 0, fish = {}, numFish = 0, collectChests = true, dist = 0, messageToGrinder = "", gathering = false, blacklistedNodes = {}, blacklistedNodesNum = 0, blacklistedNodesNameNum = 0, blacklistTime = 0, blacklistSetTime = 60, isChest = false, lastNode = 0, messageSent = false,
 }
 
 -- add node to blacklist table by GUID
-function script_gather:addNodeToBlacklist(nodeGUID)
-	if (nodeGUID ~= nil and nodeGUID ~= 0 and nodeGUID ~= '') then	
-		self.blacklistedNodes[self.blacklistedNodesNum] = nodeGUID;
-		self.blacklistedNodesNum = self.blacklistedNodesNum + 1;
-	end
-end
+function script_gather:addNodeToBlacklist(nodeGUID) 
+if (nodeGUID ~= nil and nodeGUID ~= 0 and nodeGUID ~= '') then	 self.blacklistedNodes[self.blacklistedNodesNum] = nodeGUID; self.blacklistedNodesNum = self.blacklistedNodesNum + 1; end end
 
 -- check if node is blacklisted by table GUID
 function script_gather:isNodeBlacklisted(nodeGUID) 
-	for i=0,self.blacklistedNodesNum do
-		if (nodeGUID == self.blacklistedNodes[i]) then
-			return true;
-		end
-	end
-	return false;
-end
+for i=0,self.blacklistedNodesNum do if (nodeGUID == self.blacklistedNodes[i]) then return true; end end return false; end
+
 function script_gather:addChest(name, id)
-	self.chests[self.numChests] = {};
-	self.chests[self.numChests][0] = name;
-	self.chests[self.numChests][1] = id;
-	self.numChests = self.numChests + 1;
-end
+self.chests[self.numChests] = {}; self.chests[self.numChests][0] = name; self.chests[self.numChests][1] = id; self.numChests = self.numChests + 1; end
+
 function script_gather:addLock(name, id)
-	self.lock[self.numLock] = {};
-	self.lock[self.numLock][0] = name;
-	self.lock[self.numLock][1] = id;
-	self.numLock = self.numLock + 1;
-end
+self.lock[self.numLock] = {}; self.lock[self.numLock][0] = name; self.lock[self.numLock][1] = id; self.numLock = self.numLock + 1; end
+
 function script_gather:addFish(name, id)
-	self.fish[self.numFish] = {};
-	self.fish[self.numFish][0] = name;
-	self.fish[self.numFish][1] = id;
-	self.numFish = self.numFish + 1;
-end
+self.fish[self.numFish] = {}; self.fish[self.numFish][0] = name; self.fish[self.numFish][1] = id; self.numFish = self.numFish + 1; end
+
 function script_gather:addHerb(name, id, use, req)
-	self.herbs[self.numHerbs] = {}
-	self.herbs[self.numHerbs][0] = name;
-	self.herbs[self.numHerbs][1] = id;
-	self.herbs[self.numHerbs][2] = use;
-	self.herbs[self.numHerbs][3] = req;
-	self.numHerbs = self.numHerbs + 1;
-end
+self.herbs[self.numHerbs] = {}self.herbs[self.numHerbs][0] = name;self.herbs[self.numHerbs][1] = id;self.herbs[self.numHerbs][2] = use;self.herbs[self.numHerbs][3] = req; self.numHerbs = self.numHerbs + 1; end
+
 function script_gather:addMineral(name, id, use, req)
-	self.minerals[self.numMinerals] = {}
-	self.minerals[self.numMinerals][0] = name;
-	self.minerals[self.numMinerals][1] = id;
-	self.minerals[self.numMinerals][2] = use;
-	self.minerals[self.numMinerals][3] = req;
-	self.numMinerals = self.numMinerals + 1;
-end
+self.minerals[self.numMinerals] = {} self.minerals[self.numMinerals][0] = name; self.minerals[self.numMinerals][1] = id; self.minerals[self.numMinerals][2] = use; self.minerals[self.numMinerals][3] = req; self.numMinerals = self.numMinerals + 1; end
+
 function script_gather:setup()
 	
 	self.collectMinerals = HasSpell('Find Minerals');
@@ -95,6 +33,7 @@ function script_gather:setup()
 
 	self.blacklistTime = GetTimeEX();
 	self.timer = GetTimeEX();
+	script_gatherEX2.waitTimer = GetTimeEX();
 	self.isSetup = true;
 end
 function script_gather:getHerbSkill()
@@ -298,91 +237,4 @@ function script_gather:currentGatherName()
 		end
 	end
 	return name;
-end
-
-function script_gather:gather()
-	
-	if(not self.isSetup) then
-		script_gather:setup();
-	end
-
-	if (self.timer > GetTimeEX()) then
-		return true;
-	end
-
-	if (not self.timerSet) then
-		self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
-		self.timerSet = true;
-	end
-	
-	local tempNode = script_gather:GetNode();
-	local newNode = (self.nodeObj == tempNode);
-	self.nodeObj = script_gather:GetNode();
-	if (self.nodeObj ~= 0 and self.nodeObj ~= nil) then
-		self.nodeGUID = self.nodeObj:GetGUID();
-	end
-	
-	if (self.nodeObj ~= 0 and self.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(self.nodeGUID)) then
-	self.gathering = true;
-		local _x, _y, _z = self.nodeObj:GetPosition();
-		local dist = self.nodeObj:GetDistance();	
-		self.nodeID = self.nodeObj:GetObjectDisplayID();
-		--self.dist to use node dist in other scripts...
-		self.dist = self.nodeObj:GetDistance();
-		-- start to blacklist by nodeID?
-		self.nodeGUID = self.nodeObj:GetGUID();
-		if (GetTimeEX() > self.blacklistTime) then
-			script_gather:addNodeToBlacklist(script_gather.nodeGUID);
-			self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
-			self.timerSet = false;
-		end
-		if (dist < self.lootDistance) then
-			if (self.isChest) and (HasForm()) and (self.collectChests) then if (IsCatForm()) then script_druidEX:removeCatForm(); end if (IsBearForm()) then script_druidEX:removeBearForm(); end if (IsTravelForm) then script_druidEX:removeTravelForm();end end		
-			if (IsMoving()) then
-				StopMoving();
-				self.timer = GetTimeEX() + 950;
-				return true;
-			end
-			if (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
-				self.nodeObj:GameObjectInteract();
-				self.timer = GetTimeEX() + 1650;
-				return true;
-			end
-			if (not LootTarget()) and (self.nodeObj:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
-				self.timer = GetTimeEX() + 4550;
-				script_grind:setWaitTimer(5000);
-			end
-			if (IsLooting()) then
-				self.waitTimer = GetTimeEX() + 2500;
-				if (LootTarget()) or (IsLooting()) then
-					if (self.collectHerbs) then
-						self.waitTimer = GetTimeEX() + 2500;
-						script_grind:setWaitTimer(5000);
-					end
-				end
-				if (self.timerSet) then
-					self.timerSet = false;
-					self.blacklistTime = GetTimeEX() + self.blacklistSetTime*1000;
-				end
-			end
-			self.waitTimer = GetTimeEX() + 450;
-		else
-			if (_x ~= 0) then
-				local nDist = math.floor(self.nodeObj:GetDistance());
-				if (IsPathLoaded(5)) then
-					script_navEX:moveToLoot(GetLocalPlayer(), _x, _y, _z);
-					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
-				elseif (not IsMoving()) then
-					local px, py, pz = GetLocalPlayer():GetPosition();
-					local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-					DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
-					MoveToTarget(_x, _y, _z);
-					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Force Move - no nav path!";
-				end
-			end
-		end
-		return true;
-	end
-	self.gathering = false;
-	return false;
 end
