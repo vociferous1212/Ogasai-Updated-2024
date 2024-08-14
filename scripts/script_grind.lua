@@ -98,7 +98,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 3.55, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 4.55, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -981,6 +981,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			-- we are stuck trying to target a mob. let's force move until we can find another target
 			if (not IsMoving()) and (not IsInCombat()) and (((GetTimeEX()-self.newTargetTime)/1000) > self.blacklistTime) then
 			local mx, my, mz = GetLocalPlayer():GetPosition();
+			local _tX, _tY, onScreen = WorldToScreen(mx, my, mz);
+			DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
+
 			Move(mx+5, my+5, mz);
 			end
 		end
@@ -1225,7 +1228,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 			-- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
 				and (not script_checkDebuffs:hasDisabledMovement()) then
-				self.message = "Moving to target...";
+				self.message = "Moving to target return 3...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 
@@ -1250,6 +1253,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 					end
 					if (not IsMoving()) then
 						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
+						local px, py, pz = GetLocalPlayer():GetPosition();
+						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+						DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 						Move(_x, _y, _z);
 						return;
 					end
@@ -2127,7 +2133,9 @@ function script_grind:doLoot(localObj)
 			return;
 			end
 		else
+			
 			MoveToTarget(_x, _y, _z);
+			
 			return;
 		end
 	end
@@ -2263,6 +2271,7 @@ function script_grind:runRest()
 	if(RunRestScript()) then
 		-- reset blacklist looting time
 		script_grind.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 
 		-- set tick rate for resting
 		if (not script_grind.adjustTickRate) then

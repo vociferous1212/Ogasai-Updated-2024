@@ -23,7 +23,7 @@ function script_gatherEX2:checkForTargetsOnGatherRoute()
 					-- if we can see the node and it is within 40 yards then attack enemies within 25 yards
 					if (targetToNode <= aggro and meToNode <= 40 and node:IsInLineOfSight())
 					-- or attack targets near me on my way to gather node
-					or (meToTarget <= aggro) then
+					or (meToTarget <= aggro) and (not GetLocalPlayer():HasBuff("Stealth")) and (not GetLocalPlayer():HasBuff("Prowl")) then
 						
 						script_grind.enemyObj = i;
 						return true;

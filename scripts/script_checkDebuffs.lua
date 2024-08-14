@@ -2,56 +2,27 @@ script_checkDebuffs = {
 
 }
 
-
 -- use script_checkDebuffs:functionName(); as a boolean true or false.
 -- returns true if player has debuff
 -- returns false if player does not has debuff
 
 -- make check for not specific debuffs like rend
-
 function script_checkDebuffs:hasCurse()
 
 	local player = GetLocalPlayer();
 
-	if (player:HasDebuff("Curse of Mending"))
-		or (player:HasDebuff("Curse of the Shadowhorn"))
-		or (player:HasDebuff("Curse of Recklessness"))
-		or (player:HasDebuff("Curse of Thule"))
-
-
-	then
-
+	if (player:HasDebuff("Curse of Mending")) or (player:HasDebuff("Curse of the Shadowhorn")) or (player:HasDebuff("Curse of Recklessness")) or (player:HasDebuff("Curse of Thule")) then
 		return true;
-
-	else
-
-		return false;
 	end
-
+return false;
 end
 
 function script_checkDebuffs:hasPoison()
-
 	local player = GetLocalPlayer();
-
-	if (player:HasDebuff("Weak Poison"))
-		or (player:HasDebuff("Corrosive Poison"))
-		or (player:HasDebuff("Poison"))
-		or (player:HasDebuff("Slowing Poison"))
-		or (player:HasDebuff("Poisoned Shot"))
-		or (player:HasDebuff("Venom Spit"))
-		or (player:HasDebuff("Bottle of Poison"))
-		or (player:HasDebuff("Venom Sting"))
-		or (player:HasDebuff("Touch of Zanzil"))
-		or (player:HasDebuff("Webwood Lurker's Poison"))
-
-		then
-
+	if (player:HasDebuff("Weak Poison")) or (player:HasDebuff("Corrosive Poison")) or (player:HasDebuff("Poison")) or (player:HasDebuff("Slowing Poison")) or (player:HasDebuff("Poisoned Shot")) or (player:HasDebuff("Venom Spit")) or (player:HasDebuff("Bottle of Poison")) or (player:HasDebuff("Venom Sting")) or (player:HasDebuff("Touch of Zanzil")) or (player:HasDebuff("Webwood Lurker's Poison")) or (player:HasDebuff("Deadly Poison")) then
 		return true;
-	else
-
-		return false;
 	end
+return false;
 end
 
 function script_checkDebuffs:hasDisease()
@@ -72,10 +43,8 @@ function script_checkDebuffs:hasDisease()
 		then
 
 		return true;
-	else
-
-		return false;
 	end
+return false;
 end
 
 function script_checkDebuffs:hasMagic()
@@ -97,10 +66,8 @@ function script_checkDebuffs:hasMagic()
 
 		return true;
 
-	else
-
-		return false;
 	end
+return false;
 
 end
 
@@ -119,10 +86,8 @@ function script_checkDebuffs:hasDisabledMovement()
 	
 		return true;
 
-	else 
-	
-		return false;
 	end
+return false;
 end
 
 -- pet debuff checks
@@ -139,12 +104,9 @@ function script_checkDebuffs:petDebuff()
 		then
 	
 			return true;
-		
-		else
-	
-			return false;
 		end
 	end
+return false;
 end
 
 -- undead will of the forsaken
@@ -160,11 +122,8 @@ function script_checkDebuffs:undeadForsaken()
 
 		return true;
 
-	else
-
-		return false;
-
 	end
+return false;
 
 end
 
@@ -180,10 +139,8 @@ function script_checkDebuffs:hasSilence()
 	
 		return true;
 	
-	else
-
-		return false;
 	end
+return false;
 end
 
 function script_checkDebuffs:enemyBuff()
@@ -209,9 +166,8 @@ function script_checkDebuffs:enemyBuff()
 			
 			return true;
 	
-			else
-		return false;
 			end
 		end
 	end
+return false;
 end
