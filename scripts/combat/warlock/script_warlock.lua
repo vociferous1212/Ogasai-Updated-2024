@@ -60,6 +60,7 @@ script_warlock = {
 	hasSoulStone = false,
 	consumeShadowsTimer = 0,
 	soulstoneTimer = 0,
+	useSoulstone = true,
 }
 
 function script_warlock:setup()
@@ -1105,27 +1106,33 @@ function script_warlock:rest()
 	end
 
 	-- create soulstone
-	if (script_warlockEX:checkSoulstonesSpells()) then
-		if (HasPet()) and (HasItem("Soul Shard")) and (not IsInCombat()) and (not localObj:HasBuff("Soulstone Resurrection")) then
-			if (script_warlockEX:checkSoulstones()) then
-				if (IsMoving()) then
-					StopMoving();
-					return true;
+	if (self.useSoulstone) then
+		if (script_warlockEX:checkSoulstonesSpells()) then
+			if (HasPet()) and (HasItem("Soul Shard")) and (not IsInCombat()) and (not localObj:HasBuff("Soulstone Resurrection")) then
+				if (script_warlockEX:checkSoulstones()) then
+					if (IsMoving()) then
+						StopMoving();
+						return true;
+					end
+					self.waitTimer = GetTimeEX() + 2000;
+					script_grind:setWaitTimer(2000);
 				end
-				self.waitTimer = GetTimeEX() + 1750;
-				script_grind:setWaitTimer(1750);
 			end
-		end
-	-- use soulstone
-		if (GetTimeEX() >= self.soulstoneTimer) then
-			if (not localObj:HasBuff("Soulstone Resurrection")) then
+		-- use soulstone
+			if (GetTimeEX() >= self.soulstoneTimer) and (not localObj:HasBuff("Soulstone Resurrection")) then
+				local px, py, pz = GetLocalPlayer():GetPosition();
+				local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+				DrawText("Trying to use Soulstone in inventory!", _tX- 200, _tY-100, 255, 255, 255);
 				if (IsMoving()) then
 					StopMoving();
 					return true;
 				end
-				script_warlockEX:useSoulstones();
-				-- 1,800,000 ---   1000miliseconds per second * 60 seconds per minute * 30 minutes per cooldown
-				self.soulstoneTimer = GetTimeEX() + 1800000;
+				if (not localObj:HasBuff("Soulstone Resurrection")) then
+					
+					script_warlockEX:useSoulstones();
+					-- 1,800,000 ---   1000miliseconds per second * 60 seconds per minute * 30 minutes per cooldown
+					self.soulstoneTimer = GetTimeEX() + 1800000;
+				end
 			end
 		end
 	end

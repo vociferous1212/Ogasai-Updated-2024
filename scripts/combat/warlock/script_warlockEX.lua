@@ -192,6 +192,15 @@ function script_warlockEX:menu()
 
 	-- show combat menu
 	if (CollapsingHeader("Warlock Combat Options")) then
+		if (script_warlockEX:checkSoulstonesSpells()) then
+			wasClicked, script_warlock.useSoulstone = Checkbox("Use Soul Stones", script_warlock.useSoulstone);
+			if (script_warlock.useSoulstone) then
+				SameLine();
+				Text("	Make sure item is not on CD!");
+				Text("Can bug out if you accept a res and stone is on CD");
+				Separator();
+				end
+		end
 		
 		if (HasSpell("Corruption")) then
 			wasClicked, script_warlock.warlockDOTS = Checkbox("Feeling Lucky?", script_warlock.warlockDOTS);
