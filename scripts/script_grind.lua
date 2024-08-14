@@ -577,6 +577,7 @@ function script_grind:run()
 		--reset new target time for blacklisting
 		script_grind.newTargetTime = GetTimeEX();
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 		return;
 	end
 
@@ -819,10 +820,10 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				if (self.combatError == 3) then
 					local x, y, z = self.enemyObj:GetPosition();
 					MoveToTarget(x, y, z);
+					return;
 				end
 			else
 			if (script_gather:gather()) then
-					script_nav.lastPathIndex = -1;
 
 					-- turn off jump for gathering...
 					if (self.jump) then

@@ -403,9 +403,6 @@ function script_gather:gather()
 				if (IsPathLoaded(5)) then
 					script_navEXCombat:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
-				else
-					MoveToTarget(_x, _y, _z);
-					self.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Force Move - no nav path!";
 				end
 			end
 		end
