@@ -27,6 +27,10 @@ function script_warlockEX:checkHealthstones()
 
 	if (HasSpell("Create Healthstone (Major)")) then
 		if (not HasItem("Major Healthstone")) and (HasItem("Soul Shard")) then
+			if (IsMoving()) then
+				StopMoving();
+				return;
+			end
 			if (CastSpellByName("Create Healthstone (Major)()")) then
 				script_warlock.hasHealthstone = true;
 				script_grind:setWaitTimer(1750);
@@ -36,6 +40,10 @@ function script_warlockEX:checkHealthstones()
 		end
 	elseif (HasSpell("Create Healthstone (Greater)")) then
 		if (not HasItem("Greater Healthstone")) and (HasItem("Soul Shard")) then
+			if (IsMoving()) then
+				StopMoving();
+				return;
+			end
 			if (CastSpellByName("Create Healthstone (Greater)()")) then
 				script_warlock.hasHealthstone = true;
 				script_grind:setWaitTimer(1750);
@@ -45,6 +53,10 @@ function script_warlockEX:checkHealthstones()
 		end
 	elseif (HasSpell("Create Healthstone")) then
 		if (not HasItem("Healstone")) and (HasItem("Soul Shard")) then
+			if (IsMoving()) then
+				StopMoving();
+				return;
+			end
 			if (CastSpellByName("Create Healthstone ()")) then
 				script_warlock.hasHealthstone = true;
 				script_grind:setWaitTimer(1750);
@@ -55,6 +67,10 @@ function script_warlockEX:checkHealthstones()
 
 	elseif (HasSpell("Create Healthstone (Lesser)")) then
 		if (not HasItem("Lesser Healthstone")) and (HasItem("Soul Shard")) then
+			if (IsMoving()) then
+				StopMoving();
+				return;
+			end
 			if (CastSpellByName("Create Healthstone (Lesser)()")) then
 				script_warlock.hasHealthstone = true;
 				script_grind:setWaitTimer(1750);
@@ -64,6 +80,10 @@ function script_warlockEX:checkHealthstones()
 		end
 	elseif (HasSpell("Create Healthstone (Minor)")) then
 		if (not HasItem("Minor Healthstone")) and (HasItem("Soul Shard")) then
+			if (IsMoving()) then
+				StopMoving();
+				return;
+			end
 			if (CastSpellByName("Create Healthstone (Minor)()")) then
 				script_warlock.hasHealthstone = true;
 				script_grind:setWaitTimer(1750);

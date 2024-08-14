@@ -33,7 +33,7 @@ function script_warlockEX2:summonPet()
 	end
 
 	-- no soul shards but have summon voidwalker - summon imp until shards obtained
-	if (not HasItem("Soul Shard")) and (not HasPet()) and (localMana >= 35) and (HasSpell("Voidwalker")) and (script_warlock.useVoid) then
+	if (not HasItem("Soul Shard")) and (not HasPet()) and (localMana >= 35) and (HasSpell("Summon Voidwalker")) and (script_warlock.useVoid) then
 		CastSpellByName("Summon Imp");
 		script_grind:setWaitTimer(15000);
 		script_warlock.waitTimer = GetTimeEX() + 15000;

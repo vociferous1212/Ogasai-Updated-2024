@@ -1,6 +1,9 @@
 script_warlockDOTS = {
 
 	waitTimer = 0,
+	corruptionTimer = 0,
+	immolateTimer = 0,
+	curseOfAgonyTimer = 0,
 
 }
 
@@ -73,8 +76,8 @@ function script_warlockDOTS:corruption()
 							end
 							currentObj:FaceTarget();
 							script_warlockFunctions:cast('Corruption', currentObj);
-							script_grind:setWaitTimer(2500);
-							script_warlock.waitTimer = GetTimeEX() + 2500;
+							self.corruptionTimer = GetTimeEX() + 2500;
+							script_warlock.waitTimer = GetTimeEX() + 1500;
 							ClearTarget();
 							return; 
 						end 
@@ -103,8 +106,8 @@ function script_warlockDOTS:immolate()
 							end
 							currentObj:FaceTarget();
 							if (script_warlockFunctions:cast('Immolate', currentObj)) then 
-								script_grind:setWaitTimer(3000);
-								script_warlock.waitTimer = GetTimeEX() + 3000;
+								self.imolateTimer = GetTimeEX() + 4000;
+								script_warlock.waitTimer = GetTimeEX() + 2000;
 								return true; 
 							end
 						end 
@@ -134,8 +137,8 @@ function script_warlockDOTS:curseOfAgony()
 							currentObj:FaceTarget();
 							if (not script_warlockFunctions:cast('Curse of Agony', currentObj)) then 
 								currentObj:FaceTarget();
-								script_grind:setWaitTimer(2500);
-								script_warlock.waitTimer = GetTimeEX() + 2500;
+								self.curseOfAgonyTimer = GetTimeEX() + 2000;
+								script_warlock.waitTimer = GetTimeEX() + 1500;
 								ClearTarget();
 								return true; 
 							end
@@ -166,22 +169,22 @@ function script_warlockDOTS:DOTAdds()
 							return 3;
 						end
 
-						if (script_warlockDOTS:corruption()) then
-							self.waitTimer = GetTimeEX() + 1000;
-							script_warlock.waitTimer = GetTimeEX() + 1500;
-							return true;
+						if (GetTimeEX() > script_warlockDOTS.corruptionTimer) then
+							if (script_warlockDOTS:corruption()) then
+								return true;
+							end
 						end
-						if (script_warlockDOTS:curseOfAgony()) then
-							self.waitTimer = GetTimeEX() + 1000;
-							script_warlock.waitTimer = GetTimeEX() + 1500;
-							return true;
+						if (GetTimeEX() > script_warlockDOTS.curseOfAgonyTimer) then
+							if (script_warlockDOTS:curseOfAgony()) then
+								return true;
+							end
 						end
-						if (script_warlockDOTS:immolate()) then
-							self.waitTimer = GetTimeEX() + 1000;
-							script_warlock.waitTimer = GetTimeEX() + 1500;
-							return true;
+						if (GetTimeEX() > script_warlockDOTS.immolateTimer) then
+							if (script_warlockDOTS:immolate()) then
+								return true;
+							end
 						end
-						ClearTarget();
+
 					end
 				end
 			end

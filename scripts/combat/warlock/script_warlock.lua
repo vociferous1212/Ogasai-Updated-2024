@@ -58,12 +58,18 @@ script_warlock = {
 	warlockDOTS = false,
 	warlockDOTSCount = 2,
 	hasSoulStone = false,
+	consumeShadowsTimer = 0,
 }
 
 function script_warlock:setup()
 
 	self.waitTimer = GetTimeEX();
 	self.cooldownTimer = GetTimeEX();
+	script_warlockDOTS.corruptionTimer = GetTimeEX();
+	script_warlockDOTS.immolateTimer = GetTimeEX();
+	script_warlockDOTS.curseOfAgonyTimer = GetTimeEX();
+	self.consumeShadowsTimer = GetTimeEX();
+
 
 	local localObj = GetLocalPlayer();
 	local localLevel = localObj:GetLevel();
@@ -178,27 +184,29 @@ function script_warlock:run(targetGUID)
 	local localLevel = localObj:GetLevel();
 	local playerHasTarget = GetLocalPlayer():GetUnitsTarget();
 
-	-- Check: If the pet is void and has spell Consume Shadows
-	if (HasPet()) and (self.useVoid) then
-		name, __, __, __, __, __, __ = GetPetActionInfo(6);
-		if (name == "Consume Shadows") then 
-			self.hasConsumeShadowsSpell = true;
+	for i=0, 10 do
+		-- Check: If the pet is void and has spell Consume Shadows
+		if (HasPet()) and (self.useVoid) then
+			name, __, __, __, __, __, __ = GetPetActionInfo(i);
+			if (name == "Consume Shadows") then 
+				self.hasConsumeShadowsSpell = true;
+			end
 		end
-	end
+		
+		-- Check: If the pet is void and has spell suffering
+		if (HasPet()) and (self.useVoid) then
+			name, __, __, __, __, __, __ = GetPetActionInfo(i);
+			if (name == "Suffering") then 
+				self.hasSufferingSpell = true;
+			end
+		end
 	
-	-- Check: If the pet is void and has spell suffering
-	if (HasPet()) and (self.useVoid) then
-		name, __, __, __, __, __, __ = GetPetActionInfo(7);
-		if (name == "Suffering") then 
-			self.hasSufferingSpell = true;
-		end
-	end
-
-	-- Check: If the pet is void and has spell sacrifice
-	if (HasPet()) and (self.useVoid) then
-		name, __, __, __, __, __, __ = GetPetActionInfo(5);
-		if (name == "Sacrifice") then 
-			self.hasSacrificeSpell = true;
+		-- Check: If the pet is void and has spell sacrifice
+		if (HasPet()) and (self.useVoid) then
+			name, __, __, __, __, __, __ = GetPetActionInfo(i);
+			if (name == "Sacrifice") then 
+				self.hasSacrificeSpell = true;
+			end
 		end
 	end
 
@@ -241,7 +249,7 @@ function script_warlock:run(targetGUID)
 	end
 
 	-- dismiss imp if we have it for some reason and we don't want it
-	if (not IsInCombat()) and (HasPet()) and (self.useVoid or self.useSuccubus or self.useFelhunter) and (not self.useImp) then
+	if (not IsInCombat()) and (HasPet()) and (self.useVoid or self.useSuccubus or self.useFelhunter) and (not self.useImp) and (HasItem("Soul Shard")) then
 		if (localObj:HasBuff("Blood Pact")) then
 			PetDismiss();
 		end
@@ -446,14 +454,20 @@ function script_warlock:run(targetGUID)
 
 		if (self.warlockDOTS) and (script_grindEX:howManyEnemiesInRange(29) >= self.warlockDOTSCount) and (script_grind.enemiesAttackingUs() <= self.warlockDOTSCount) and (localMana >= 35) and (localHealth >= 45) then
 		
-				if (script_warlockDOTS:corruption()) then
-					return true;
+				if (GetTimeEX() > script_warlockDOTS.corruptionTimer) then
+					if (script_warlockDOTS:corruption()) then
+						return true;
+					end
 				end
-				if (script_warlockDOTS:curseOfAgony()) then
-					return true;
+				if (GetTimeEX() > script_warlockDOTS.curseOfAgonyTimer) then
+					if (script_warlockDOTS:curseOfAgony()) then
+						return true;
+					end
 				end
-				if (script_warlockDOTS:immolate()) then
-					return true;
+				if (GetTimeEX() > script_warlockDOTS.immolateTimer) then
+					if (script_warlockDOTS:immolate()) then
+						return true;
+					end
 				end
 		end
 
@@ -1080,6 +1094,7 @@ function script_warlock:rest()
 		end
 	end
 
+	-- create healthstone
 	if (HasPet()) and (HasItem("Soul Shard")) and (not IsInCombat()) then
 		if (script_warlockEX:checkHealthstones()) then
 			self.waitTimer = GetTimeEX() + 1750;
@@ -1174,9 +1189,22 @@ function script_warlock:rest()
 		return true;
 	end
 
-	if (HasPet()) and (self.useVoid) and (GetPet():GetHealthPercentage() < 70 and GetPet():GetHealthPercentage() > 1) and (self.hasConsumeShadowsSpell) and (GetPet():GetManaPercentage() >= 45) and (not IsSpellOnCD("Consume Shadows")) then
+	-- force bot to stop when using consume shadows
+	if (self.consumeShadowsTimer > GetTimeEX()) then
+		if (IsMoving()) then
+			StopMoving();
+			return true;
+		end
+	return true;
+	end
+
+	-- consume shadows
+	if (HasPet()) and (self.useVoid) and (GetPet():GetHealthPercentage() < 55) and (not GetPet():IsDead()) and (self.hasConsumeShadowsSpell) and (not IsSpellOnCD("Consume Shadows")) and (not GetPet():HasBuff("Consume Shadow")) and (GetPet():GetManaPercentage() >= 40) and (GetTimeEX() > self.consumeShadowsTimer) then
 		CastSpellByName("Consume Shadows");
 		self.waitTimer = GetTimeEX() + 2500;
+		self.consumeShadowsTimer = GetTimeEX() + 10000;
+		script_grind:setWaitTimer(7000);
+		StopMoving();
 		self.message = "Using Voidwalker spell Consume Shadows";
 		return true;
 	end
