@@ -1134,6 +1134,15 @@ function script_rogue:rest()
 	--	Dismount();
 	--end
 
+	-- if we are undead then use cannibalize on humanoids or other undeads
+	if (HasSpell("Cannibalize")) and (not IsSpellOnCD("Cannibalize")) then
+		if (Cannibalize()) then
+			self.waitTimer = GetTimeEX() + 10000;
+			script_grind:setWaitTimer(2500);
+			return true;
+		end
+	end
+
 	-- if has bandage then use bandages
 	if (self.eatHealth >= 35) and (self.hasBandages) and (self.useBandage) and (not IsMoving()) and (localHealth < self.eatHealth) then
 		if (not script_checkDebuffs:hasPoison()) and (not IsEating()) and (not localObj:HasDebuff("Recently Bandaged")) then

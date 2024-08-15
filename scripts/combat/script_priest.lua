@@ -738,6 +738,15 @@ function script_priest:rest()
 		DisMount();
 	end
 
+	-- if we are undead then use cannibalize on humanoids or other undeads
+	if (HasSpell("Cannibalize")) and (not IsSpellOnCD("Cannibalize")) then
+		if (Cannibalize()) then
+			self.waitTimer = GetTimeEX() + 10000;
+			script_grind:setWaitTimer(2500);
+			return true;
+		end
+	end
+
 	-- Stop moving before we can rest
 	if (localHealth <= self.eatHealth) or (localMana <= self.drinkMana) then
 		if (IsMoving()) then

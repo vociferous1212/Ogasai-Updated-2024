@@ -1097,6 +1097,15 @@ function script_warlock:rest()
 		end
 	end
 
+	-- if we are undead then use cannibalize on humanoids or other undeads
+	if (HasSpell("Cannibalize")) and (not IsSpellOnCD("Cannibalize")) then
+		if (Cannibalize()) then
+			self.waitTimer = GetTimeEX() + 10000;
+			script_grind:setWaitTimer(2500);
+			return true;
+		end
+	end
+
 	-- create healthstone
 	if (HasPet()) and (HasItem("Soul Shard")) and (not IsInCombat()) then
 		if (script_warlockEX:checkHealthstones()) then

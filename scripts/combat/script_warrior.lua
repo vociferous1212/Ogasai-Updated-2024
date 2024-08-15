@@ -918,6 +918,15 @@ function script_warrior:rest()
 		end
 	end
 
+	-- if we are undead then use cannibalize on humanoids or other undeads
+	if (HasSpell("Cannibalize")) and (not IsSpellOnCD("Cannibalize")) then
+		if (Cannibalize()) then
+			self.waitTimer = GetTimeEX() + 10000;
+			script_grind:setWaitTimer(1000);
+			return true;
+		end
+	end
+
 	-- eat if not bandages
 	if (not IsEating() and localHealth <= self.eatHealth) and (not IsInCombat()) and (not IsMoving()) then
 		self.message = "Need to eat...";	

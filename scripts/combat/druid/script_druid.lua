@@ -543,6 +543,9 @@ function script_druid:healsAndBuffs()
 		-- remove curse
 		if (HasSpell("Remove Curse")) and (script_checkDebuffs:hasCurse()) and (not IsMoving()) and (IsStanding()) and (not IsSpellOnCD("Remove Curse")) then
 			if (localMana >= 30) then
+				if (PlayerHasTarget()) and (localObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
+					ClearTarget();
+				end
 				if (CastSpellByName("Remove Curse", localObj)) then
 					self.waitTimer = GetTimeEX() + 1750;
 					return true;

@@ -938,6 +938,15 @@ if (not IsMounted()) then
 		return;
 	end
 
+	-- if we are undead then use cannibalize on humanoids or other undeads
+	if (HasSpell("Cannibalize")) and (not IsSpellOnCD("Cannibalize")) then
+		if (Cannibalize()) then
+			self.waitTimer = GetTimeEX() + 10000;
+			script_grind:setWaitTimer(2500);
+			return true;
+		end
+	end
+
 	--Create Water
 	local waterIndex = -1;
 	for i=0,self.numWater do
