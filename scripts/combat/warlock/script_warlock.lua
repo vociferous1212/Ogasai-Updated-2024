@@ -1123,15 +1123,14 @@ function script_warlock:rest()
 				local px, py, pz = GetLocalPlayer():GetPosition();
 				local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
 				DrawText("Trying to use Soulstone in inventory!", _tX- 200, _tY-100, 255, 255, 255);
-				if (IsMoving()) then
+				if (not localObj:HasBuff("Soulstone Resurrection")) and (not IsMoving()) then
 					StopMoving();
-					return true;
-				end
-				if (not localObj:HasBuff("Soulstone Resurrection")) then
-					
-					script_warlockEX:useSoulstones();
+					if (script_warlockEX:useSoulstones()) then
 					-- 1,800,000 ---   1000miliseconds per second * 60 seconds per minute * 30 minutes per cooldown
 					self.soulstoneTimer = GetTimeEX() + 1800000;
+					return true;
+					end
+				return;
 				end
 			end
 		end

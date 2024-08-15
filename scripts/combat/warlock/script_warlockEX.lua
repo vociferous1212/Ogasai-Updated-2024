@@ -97,7 +97,7 @@ return false;
 end
 
 function script_warlockEX:useSoulstones()
-	if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
+	if PlayerHasTarget() and (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
 		ClearTarget();
 	end
 
