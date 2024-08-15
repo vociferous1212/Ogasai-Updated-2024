@@ -6,7 +6,7 @@ script_grindMenu = {
 	useHotSpotArea = true,
 	selectedWalkPath = false,
 	helpMenu = false,
-	showGarbageBox = true,
+	showGarbageBox = false,
 	isSetup = false,
 
 }

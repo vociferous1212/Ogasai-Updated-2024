@@ -75,6 +75,11 @@ function script_getSpells:run()
 		end
 		self.getSpellsStatus = 1;
 
+		--if (GetLocalPlayer():GetLevel() >= 10) and (GetMapID() ~= 0) then
+		--	script_goToFP();
+		--return;
+		--end
+
 		local x, y, r, g, b = 0, 0, 0, 0, 0;
 		DrawText("Moving To Trainers if player is level 22 or lower... proof of concept.. may break bot... ",  x+800, y+300, r+255, g+255, b+0);
 
@@ -128,7 +133,7 @@ function script_getSpells:run()
 		return true;
 		end
 
-		if (not IsInCombat()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 15) then
+		if (not IsInCombat()) and (PlayerHasTarget()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 15) then
 			ClearTarget();
 		end
 
