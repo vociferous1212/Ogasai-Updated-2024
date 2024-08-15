@@ -229,7 +229,13 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 			self.currentRessAngle = self.currentRessAngle + 0.05;
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
 			rTime = GetTimeEX();
-			Move(rX, rY, rZ);			
+			Move(rX, rY, rZ);
+	
+			-- try unstuck script
+			if (not script_unstuck:pathClearAuto(2)) then
+				script_unstuck:unstuck();
+				return true;
+			end		
 
 			return;
 	end

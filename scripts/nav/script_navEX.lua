@@ -48,7 +48,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 
 	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.3) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.6) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		return "Generating a new path...";
 	end
@@ -66,10 +66,6 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 		
 	Move(_ix, _iy, _iz);
-
-	if (IsMoving()) then
-		script_unstuck:unstuck();
-	end
 
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
 		script_grind.message = "Moving To Target NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";

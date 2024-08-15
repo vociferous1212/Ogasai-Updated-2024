@@ -194,7 +194,6 @@ script_grind = {
 	timeToSit = GetTimeEX(),
 	sitTimerSet = false,
 	afkUsed = false,
-	uTime = 0,
 }
 
 function script_grind:setup()
@@ -332,19 +331,19 @@ function script_grind:setup()
 	script_getSpells.waitTimer = GetTimeEX();
 	script_navEX.waitTimer = GetTimeEX();
 	self.timeToSit = GetTimeEX();
-	self.uTime = GetTimeEX();
+	script_grindEX.waitTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
 		script_gather.safeGather = false;
 	end
 	if (level < 10) then
-		script_checkAdds.addsRange = 15;
+		script_checkAdds.addsRange = 18;
 		self.paranoidRange = 25;
 		self.paranoidSetTimer = 3;
 	end
 	if (level >= 10) and (level < 40) then
-		script_checkAdds.addsRange = 20;
+		script_checkAdds.addsRange = 23;
 	end
 	if (level > 40) then
 		script_checkAdds.addsRange = 25;
@@ -863,7 +862,6 @@ function script_grind:run()
 					MoveToTarget(x, y, z);
 					return true;
 				end
-				return true;
 			else
 			if (script_gatherRun:gather()) then
 
@@ -966,6 +964,21 @@ function script_grind:run()
 			if (IsLooting()) or (IsCasting()) or (IsChanneling()) or (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				return;
 			end
+
+
+			if (not script_grind.hotspotReached) then
+				if (script_grindEX:checkForTargetsOnHotspotRoute()) then
+					self.message = "Killing stuff in our path.";
+					self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+					if (self.combatError == 3) then
+						local x, y, z = self.enemyObj:GetPosition();
+						MoveToTarget(x, y, z);
+						return true;
+					end
+					return true;
+				end
+			end
+
 			if (self.lootObj ~= nil and self.lootObj ~= 0) then
 				if (script_grind:doLoot(localObj)) then
 					return true;
@@ -1263,7 +1276,7 @@ function script_grind:run()
 			-- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
 				and (not script_checkDebuffs:hasDisabledMovement()) then
-				self.message = "Moving to target return 3...";
+				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 
@@ -1276,6 +1289,10 @@ function script_grind:run()
 				-- adjust tick rate to make targeting and movement quicker
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget() and (script_grind:isTargetingMe(self.enemyObj) or targetObj:GetHealthPercentage() < 20)) then
 					script_grind.tickRate = 50;
+				end
+	
+				if (not self.enemyObj:IsInLineOfSight()) and (self.enemyObj:GetDistance() <= 3) then
+					return false;
 				end
 
 				-- if we have a valid position coordinates

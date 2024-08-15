@@ -6,7 +6,48 @@ script_grindEX = {
 	logoutOnHearth = false,
 	allowSwim = true,
 	useThisVar = true,
+	waitTimer = 0,
 }
+
+function script_grindEX:checkForTargetsOnHotspotRoute()
+
+	-- wait out timer to stop targeting diffrent mobs over and over again
+	if (self.waitTimer > GetTimeEX()) then
+		return false;
+	end
+
+		i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				-- check targets within 40 yards
+				if (i:GetDistance() <= 40) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 3) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) then
+					local iX, iY, iZ = i:GetPosition();	
+					local lX, lY, lZ = GetLocalPlayer():GetPosition();
+		
+					-- my distance to target
+					local meToTarget = GetDistance3D(lX, lY, lZ, iX, iY, iZ);
+
+					-- aggro range of mobs around me and node
+					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
+					local bestDist = aggro;
+					local bestTarget = nil;
+
+					-- if we can see the node and it is within 40 yards then attack enemies within 25 yards
+					if (meToTarget <= aggro) and (not GetLocalPlayer():HasBuff("Stealth")) and (not GetLocalPlayer():HasBuff("Prowl")) then
+						
+						script_grind.enemyObj = i;
+						i:AutoAttack();
+						self.waitTimer = GetTimeEX() + 4000;
+						return true;
+					end
+				
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+return false;
+end
+
 
 function script_grindEX:areWeSwimming()
 	if (GetLocalPlayer():GetHealthPercentage() >= 1) and (not GetLocalPlayer():IsDead()) then
