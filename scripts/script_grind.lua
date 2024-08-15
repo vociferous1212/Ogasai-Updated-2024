@@ -15,6 +15,8 @@ script_grind = {
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
 	enchantingLoaded 	= include("scripts\\script_enchanting.lua"),
 	hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
+	--fpBDLoaded 		= include("scripts\\db\\fpDB.lua"),
+	--goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
 
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
