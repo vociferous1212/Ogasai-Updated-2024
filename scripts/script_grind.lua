@@ -189,6 +189,9 @@ script_grind = {
 	restMana = 1,
 	restHealth = 1,
 	killStuffAroundGatherNodes = true,
+	timeToSit = GetTimeEX(),
+	sitTimerSet = false,
+	afkUsed = false,
 }
 
 function script_grind:setup()
@@ -325,7 +328,7 @@ function script_grind:setup()
 	self.buffTimer = GetTimeEX();
 	script_getSpells.waitTimer = GetTimeEX();
 	script_navEX.waitTimer = GetTimeEX();
-
+	self.timeToSit = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -572,6 +575,37 @@ function script_grind:run()
 				end
 			end
 		end	
+	end
+
+-- sit timer
+	-- set sit timer
+	if (not IsMoving()) and (IsStanding()) and (not self.sitTimerSet) and (not IsInCombat()) and (not IsCasting()) and (not IsChanneling()) then
+		self.sitTimerSet = true;
+		self.timeToSit = GetTimeEX() + 300000;
+	end
+	if (not IsMoving()) and (IsStanding()) and (not IsInCombat()) and (not IsCasting()) and (not IsChanneling()) then
+		local px, py, pz = GetLocalPlayer():GetPosition();
+		local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+		local timer = math.floor(((self.timeToSit - GetTimeEX())/1000));
+		DrawText("Time to sit - "..timer.." Seconds", _tX+ 50, _tY-50, 0, 255, 0);
+		DrawText("Add /afk macro to action bar '2' slot '='", _tX+50, _tY-66, 0, 255, 0);
+	end
+	-- reset sit timer when moving or sitting
+	if (IsMoving()) or (not IsStanding()) or (IsInCombat()) then
+		self.sitTimerSet = false;
+		self.timeToSit = 0;
+		if (self.afkUsed) then
+			--undo afk
+			self.afkUsed = false;
+			UseAction(script_grind.afkActionSlot, 0, 0);
+		end
+	end
+	-- sit when we aren't doing anything - the bot doesn't do /afk automatically...
+	if (GetTimeEX() > self.timeToSit) and (IsStanding()) and (self.sitTimerSet) and (not IsInCombat()) then
+		SitOrStand();
+		UseAction(script_grind.afkActionSlot, 0, 0);
+		self.timeToSit = 0;
+		self.afkSet = true;
 	end
 	-- pause bot
 	if (self.pause) then self.message = "Paused by user...";
@@ -1852,10 +1886,12 @@ function script_grind:enemyIsValid(i)
 	-- RECHECK TARGETS
 	-- target blacklisted moved away from other targets
 	-- bot can target blacklisted targets under these conditions
-		if (self.skipHardPull)
-			and (self.extraSafe)
-			and (script_grind:isTargetBlacklisted(i:GetGUID())
-			and script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
+		local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20;
+		if (self.skipHardPull) and (self.extraSafe)
+			and (i:GetDistance() <= 65)
+			and (script_grind:isTargetBlacklisted(i:GetGUID()))
+			and (script_aggro:safePullRecheck(i) or i:GetDistance() <= aggro) then
+
 			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
 				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
 				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))

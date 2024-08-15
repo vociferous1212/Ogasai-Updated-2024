@@ -1,5 +1,17 @@
 script_gatherEX2 = {waitTimer = 0,}
 
+-- is there a node anywhere on the map we can see
+function script_gatherEX2:isThereAnyValidNode()
+	local i, t = GetFirstObject();
+	while i ~= 0 do
+		if t == 5 then
+			return true;
+		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end
+
 -- if there is a mob within gathering distance based on aggro range then
 function script_gatherEX2:checkForTargetsOnGatherRoute()
 
