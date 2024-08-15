@@ -103,23 +103,25 @@ end
 
 function Cannibalize()
 	i, t = GetFirstObject();
-	while i ~= 0 do
-		if t == 3 then
-			if (i:GetDistance() <= 10) and (i:IsDead()) and (i:GetCreatureType() == "Humanoid" or i:GetCreatureType() == "Undead") and (i:IsInLineOfSight()) then
-				if (i:GetDistance() <= 10 and i:GetDistance() > 4) then
-					x, y, z = i:GetPosition();
-					Move(x, y, z);
-					return true;
-				end
-				if (not IsSpellOnCD("Cannibalize")) and (not GetLocalPlayer():HasBuff("Cannibalize")) then
-					if (i:GetDistance() <= 4) then
-						CastSpellByName("Cannibalize");
+	if (GetLocalPlayer():GetHealthPercentage() <= 70) then
+		while i ~= 0 do
+			if t == 3 then
+				if (i:GetDistance() <= 10) and (i:IsDead()) and (i:GetCreatureType() == "Humanoid" or i:GetCreatureType() == "Undead") and (i:IsInLineOfSight()) then
+					if (i:GetDistance() <= 10 and i:GetDistance() > 4) then
+						x, y, z = i:GetPosition();
+						Move(x, y, z);
 						return true;
+					end
+					if (not IsSpellOnCD("Cannibalize")) and (not GetLocalPlayer():HasBuff("Cannibalize")) then
+						if (i:GetDistance() <= 4) then
+							CastSpellByName("Cannibalize");
+							return true;
+						end
 					end
 				end
 			end
+		i, t = GetNextObject(i);
 		end
-	i, t = GetNextObject(i);
 	end
 return false;
 end
