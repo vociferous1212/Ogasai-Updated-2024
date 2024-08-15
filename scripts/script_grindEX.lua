@@ -13,14 +13,18 @@ function script_grindEX:checkForTargetsOnHotspotRoute()
 
 	-- wait out timer to stop targeting diffrent mobs over and over again
 	if (self.waitTimer > GetTimeEX()) then
-		return false;
+		return;
 	end
+
+if (GetLocalPlayer():HasBuff("Stealth")) or (GetLocalPlayer():HasBuff("Prowl")) then
+		return false;
+end
 
 		i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then
 				-- check targets within 40 yards
-				if (i:GetDistance() <= 40) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 3) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) then
+				if (i:GetDistance() < 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 5) then
 					local iX, iY, iZ = i:GetPosition();	
 					local lX, lY, lZ = GetLocalPlayer():GetPosition();
 		
@@ -28,19 +32,28 @@ function script_grindEX:checkForTargetsOnHotspotRoute()
 					local meToTarget = GetDistance3D(lX, lY, lZ, iX, iY, iZ);
 
 					-- aggro range of mobs around me and node
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
-					local bestDist = aggro;
-					local bestTarget = nil;
+					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 19;
 
-					-- if we can see the node and it is within 40 yards then attack enemies within 25 yards
-					if (meToTarget <= aggro) and (not GetLocalPlayer():HasBuff("Stealth")) and (not GetLocalPlayer():HasBuff("Prowl")) then
-						
-						script_grind.enemyObj = i;
+					if (meToTarget <= aggro) then
+						-- target it...
 						i:AutoAttack();
-						self.waitTimer = GetTimeEX() + 4000;
-						return true;
+						if (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
+							if (UnitIsEnemy("target","player")) then
+								script_grind.enemyObj = i;
+								script_grind.message = "Killing stuff in our path.";
+
+								if (i:GetDistance() > script_grind.combatScriptRange) then
+									MoveToTarget(iX, iY, iZ);									
+								return;
+								end
+							else
+								script_grind.enemyObj = nil;
+								ClearTarget();
+							return false;
+							end
+						end
+					return true;
 					end
-				
 				end
 			end
 		i, t = GetNextObject(i);
@@ -237,14 +250,35 @@ function script_grindEX:doChecks()
 
 		if (not IsInCombat() or IsMounted()) then
 			if (vendorStatus == 1) then
-				script_grind.message = "Repairing at vendor...";
-				if (script_vendor:repair()) then script_grind:setWaitTimer(100);
-					return true;
+
+				script_grindEX:checkForTargetsOnHotspotRoute();
+
+				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
+					self.message = "Killing stuff in our path.";
+					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
+				else
+
+					script_grind.message = "Repairing at vendor...";
+
+					if (script_vendor:repair()) then script_grind:setWaitTimer(100);
+						return true;
+					end
+
 				end
 			elseif (vendorStatus == 2) then
-				script_grind.message = "Selling to vendor...";
-				if (script_vendor:sell()) then script_grind:setWaitTimer(100);
-					return true;
+			
+				script_grindEX:checkForTargetsOnHotspotRoute();
+
+				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
+					self.message = "Killing stuff in our path.";
+					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
+				else
+
+					script_grind.message = "Selling to vendor...";
+
+					if (script_vendor:sell()) then script_grind:setWaitTimer(100);
+						return true;
+					end
 				end
 			elseif (vendorStatus == 3) then
 				script_grind.message = "Buying ammo at vendor...";

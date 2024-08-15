@@ -26,7 +26,7 @@ function script_gatherEX2:checkForTargetsOnGatherRoute()
 		while i ~= 0 do
 			if t == 3 then
 				-- check targets within 40 yards
-				if (i:GetDistance() <= 40) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) then
+				if (i:GetDistance() <= 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 3) then
 					local node = script_gather.nodeObj;
 					local iX, iY, iZ = i:GetPosition();	
 					local lX, lY, lZ = GetLocalPlayer():GetPosition();
@@ -42,7 +42,7 @@ function script_gatherEX2:checkForTargetsOnGatherRoute()
 					local meToNode = GetDistance3D(lX, lY, lZ, nX, nY, nZ);
 
 					-- aggro range of mobs around me and node
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
+					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
 					local bestDist = aggro;
 					local bestTarget = nil;
 
@@ -50,11 +50,17 @@ function script_gatherEX2:checkForTargetsOnGatherRoute()
 					if (targetToNode <= aggro and meToNode <= 40 and node:IsInLineOfSight())
 					-- or attack targets near me on my way to gather node
 					or (meToTarget <= aggro) and (not GetLocalPlayer():HasBuff("Stealth")) and (not GetLocalPlayer():HasBuff("Prowl")) then
-						
-						script_grind.enemyObj = i;
+
+						-- target it...
 						i:AutoAttack();
-						self.waitTimer = GetTimeEX() + 4000;
-						return true;
+						if (UnitIsEnemy("target","player")) then
+							script_grind.enemyObj = i;
+							Move(iX, iY, iZ);
+							return true;
+						else
+							ClearTarget();
+						return false;
+						end
 					end
 				
 				end

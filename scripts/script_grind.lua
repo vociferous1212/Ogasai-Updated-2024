@@ -194,6 +194,8 @@ script_grind = {
 	timeToSit = GetTimeEX(),
 	sitTimerSet = false,
 	afkUsed = false,
+	combatScriptRange = 30,
+	attackTargetsOnRoutes = true,
 }
 
 function script_grind:setup()
@@ -657,7 +659,7 @@ function script_grind:run()
 		end
 	end
 	end
-
+		
 	-- check party members
 	if (GetNumPartyMembers() >= 1) then
 		script_grindParty:partyOptions();
@@ -854,14 +856,11 @@ function script_grind:run()
 
 				script_gather.gathering = true;
 
-			if (not IsInCombat()) and (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
+			if (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
 				self.message = "Killing stuff around gather node";
 				self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-				if (self.combatError == 3) then
-					local x, y, z = self.enemyObj:GetPosition();
-					MoveToTarget(x, y, z);
-					return true;
-				end
+				return true;
+		
 			else
 			if (script_gatherRun:gather()) then
 
@@ -904,8 +903,8 @@ function script_grind:run()
 		
 		-- go to trainer and get spells
 		if (self.getSpells) and (not self.pause) and (not IsInCombat()) then
-			script_grind.message = "Moving to class trainer for spells";
 			if (script_getSpells:checkForSpellsNeeded()) then
+			script_grind.message = "Moving to class trainer for spells";
 				if (self.useUnstuck) and (IsMoving()) and (not self.pause) then
 					if (not script_unstuck:pathClearAuto(2)) then
 						script_unstuck:unstuck();
@@ -919,7 +918,7 @@ function script_grind:run()
 		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
 			return;
 		end
-		
+
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
 		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
@@ -965,31 +964,39 @@ function script_grind:run()
 				return;
 			end
 
-
-			if (not script_grind.hotspotReached) then
-				if (script_grindEX:checkForTargetsOnHotspotRoute()) then
-					self.message = "Killing stuff in our path.";
-					self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-					if (self.combatError == 3) then
-						local x, y, z = self.enemyObj:GetPosition();
-						MoveToTarget(x, y, z);
-						return true;
-					end
-					return true;
-				end
-			end
-
 			if (self.lootObj ~= nil and self.lootObj ~= 0) then
 				if (script_grind:doLoot(localObj)) then
 					return true;
 				end
 			end
 
-		-- move to hotspot location
-		self.message = script_moveToHotspot:moveToHotspot(localObj);
-		
+			if (self.attackTargetsOnRoutes) then
+					script_grindEX:checkForTargetsOnHotspotRoute()
+				if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+					self.message = "Killing stuff in our path.";
+					
+					if (self.enemyObj:GetDistance() <= self.combatScriptRange) then
+						if (IsMoving()) then
+							StopMoving();
+						end
+					end
+					if (not IsMoving()) then
+						self.enemyObj:FaceTarget();
+					end
+				script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
+				end
+				if (self.enemyObj == nil or self.enemyObj == 0) and (not PlayerHasTarget()) then
+					-- move to hotspot location
+					self.message = script_moveToHotspot:moveToHotspot(localObj);	
+					if (PlayerHasTarget()) then
+						ClearTarget();
+					end
+				end
+			else
+				self.message = script_moveToHotspot:moveToHotspot(localObj);
+			end
 		end
-
+		
 		-- use kills to level tracker
 		if (self.useExpChecker) then
 			script_expChecker:targetLevels();
@@ -1035,6 +1042,7 @@ function script_grind:run()
 			end
 			
 		end
+
 
 		-- distance to hotspot
 		if (script_nav:getDistanceToHotspot() <= 45) then
