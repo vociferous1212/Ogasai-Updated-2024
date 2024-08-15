@@ -450,6 +450,7 @@ function script_shaman:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	
+	script_grind.combatScriptRange = self.meleeDistance;
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then

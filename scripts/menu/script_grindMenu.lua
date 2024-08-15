@@ -109,6 +109,8 @@ function script_grindMenu:menu()
 	SameLine();
 	if (Button("Reload Scripts")) then
 		coremenu:reload();
+		coremenu:reload();
+
 		self.isSetup = false;
 	end
 

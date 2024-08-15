@@ -265,6 +265,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) and (not localObj:HasDebuff("Disarm")) then
 		
+		script_grind.combatScriptRange = self.meleeDistance;
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then

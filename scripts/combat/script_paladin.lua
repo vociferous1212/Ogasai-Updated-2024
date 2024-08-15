@@ -163,6 +163,8 @@ function script_paladin:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+	script_grind.combatScriptRange = self.meleeDistance;
+
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
 			self.waitTimer = GetTimeEX() + 1200;

@@ -286,6 +286,8 @@ function script_rogue:run(targetGUID)
 		--Valid Enemy
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+			script_grind.combatScriptRange = self.meleeDistance;
+
 			if (IsLooting()) then
 				if (not LootTarget()) then
 					LootTarget();

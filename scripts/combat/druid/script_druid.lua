@@ -737,6 +737,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+	script_grind.combatScriptRange = self.meleeDistance;
+
+
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
