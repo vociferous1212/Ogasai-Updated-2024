@@ -229,9 +229,9 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 			self.currentRessAngle = self.currentRessAngle + 0.05;
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
 			rTime = GetTimeEX();
-			Move (rX, rY, rZ);			
+			Move(rX, rY, rZ);			
 
-			return true;
+			return;
 	end
 
 	return false;

@@ -194,6 +194,7 @@ script_grind = {
 	timeToSit = GetTimeEX(),
 	sitTimerSet = false,
 	afkUsed = false,
+	uTime = 0,
 }
 
 function script_grind:setup()
@@ -331,6 +332,7 @@ function script_grind:setup()
 	script_getSpells.waitTimer = GetTimeEX();
 	script_navEX.waitTimer = GetTimeEX();
 	self.timeToSit = GetTimeEX();
+	self.uTime = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -789,7 +791,7 @@ function script_grind:run()
 	end
 
 
-if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
+	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (self.enemyObj:GetDistance() <= 30) then
 				self.enemyObj:FaceTarget();
@@ -859,9 +861,9 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				if (self.combatError == 3) then
 					local x, y, z = self.enemyObj:GetPosition();
 					MoveToTarget(x, y, z);
-					return;
+					return true;
 				end
-				return;
+				return true;
 			else
 			if (script_gatherRun:gather()) then
 
@@ -1068,7 +1070,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (script_grind.enemyObj:IsDead()) then
 				ex, ey, ez = self.lootObj:GetPosition();
 				Move(ex, ey, ez);
 			end
@@ -1084,7 +1086,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (script_grind.enemyObj:IsDead()) then
 				ex, ey, ez = self.lootObj:GetPosition();
 				Move(ex, ey, ez);
 			end
@@ -1280,7 +1282,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 				if (_x ~= 0 and x ~= 0) then
 
 					-- move to target
-					if (IsPathLoaded(5)) or (IsInCombat() and self.enemyObj:GetDistance() <= 8) then
+					if (IsPathLoaded(5)) then
 						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					end
@@ -1290,6 +1292,7 @@ if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
 						DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 						Move(_x, _y, _z);
+						return true;
 					end
 					
 					-- set wait timer to move clicks
