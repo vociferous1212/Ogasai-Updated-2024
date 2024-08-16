@@ -4,45 +4,72 @@ script_firstAid = {
 	showFirstAid = false,
 }
 
-function script_firstAid:openMenu()
-
-	if (not self.bookOpen) then
- 		if (HasItem("Linen Cloth")) then
-			if (CastSpellByName("First Aid")) then
-				self.bookOpen = true;
-				return true;
+function script_firstAid:howMuchLinenDoWeHave()
+	for i = 0,5 do 
+		for y=0,GetContainerNumSlots(i) do 
+			if (GetContainerItemLink(i,y) ~= nil) then
+				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+				-- check skill level here
+				if (itemName == "Linen Cloth") then
+					texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
+					number = itemCount;
+				end	
 			end
 		end
-	end
-
-return false;
+	end	
+return number;	
 end
+function script_firstAid:howMuchWoolDoWeHave()
+	for i = 0,5 do 
+		for y=0,GetContainerNumSlots(i) do 
+			if (GetContainerItemLink(i,y) ~= nil) then
+				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+				-- check skill level here
+				if (itemName == "Wool Cloth") then
+					texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
+					number = itemCount;
+				end	
+			end
+		end
+	end	
+return number;	
+end
+function script_firstAid:openMenu()
+	local name = "First Aid";
 
-function script_firstAid:closeMenu()
-
-	if (not HasItem("Linen Cloth")) and (self.bookOpen) then  
-		CloseTradeSkill();
-		self.bookOpen = false;
+	if (CastSpellByName(name)) then
+		self.bookOpen = true;
 		return true;
 	end
 
 return false;
 end
-
+function script_firstAid:closeMenu()
+	if (self.bookOpen) then  
+		self.bookOpen = false;
+		CloseTradeSkill();
+		return true;
+	end
+return false;
+end
 function script_firstAid:craftBandages()
 
-	-- linen bandage
-	if (HasItem("Linen Cloth")) then
-		for i = 1, GetNumTradeSkills() do
+	-- wool bandage
+	if (HasItem("Wool Cloth")) then
+		for i = 0, GetNumTradeSkills(i) do
 			local name, _, _, _, _ = GetTradeSkillInfo(i);
-			if (name == "Heavy Linen Bandage") then
-				if (HasItem("Linen Cloth")) then
+			if (name == "Heavy Wool Bandage") then
+				if script_firstAid:howMuchWoolDoWeHave() >= 2 then
 					script_firstAid:openMenu();
 					DoTradeSkill(i, 20);
 					return true;
 				end
 			end                   
-			if (name == "Linen Bandage") then
+			if (name == "Wool Bandage") then
 				script_firstAid:openMenu();
 				DoTradeSkill(i, 20);
 				return true;
@@ -50,6 +77,27 @@ function script_firstAid:craftBandages()
 		end
 	end
 
+	
+	-- linen bandage
+	if (HasItem("Linen Cloth")) then
+		for i = 0, GetNumTradeSkills(i) do
+			local name, _, _, _, _ = GetTradeSkillInfo(i);
+			if (name == "Heavy Linen Bandage") then
+				if script_firstAid:howMuchLinenDoWeHave() >= 2 then
+					script_firstAid:openMenu();
+					DoTradeSkill(i, 20);
+					return true;
+				end
+			elseif (name == "Linen Bandage") then
+				script_firstAid:openMenu();
+				DoTradeSkill(i, 20);
+				return true;
+			end
+		end
+	end
+if (self.bookOpen) then
+CloseTradeSkill();
+end
 return false;
 end
 

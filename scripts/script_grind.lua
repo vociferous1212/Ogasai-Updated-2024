@@ -15,6 +15,7 @@ script_grind = {
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
 	enchantingLoaded 	= include("scripts\\script_enchanting.lua"),
 	tailoringLoaded 	= include("scripts\\script_tailoring.lua"),
+	firstAidLoaded 		= include("scripts\\script_firstAid.lua"),
 	--hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
 	--fpBDLoaded 		= include("scripts\\db\\fpDB.lua"),
 	--goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
@@ -198,6 +199,7 @@ script_grind = {
 	attackTargetsOnRoutes = true,
 	drawAggroAtStart = true,
 	showOM = false,
+	useFirstAid = true,
 }
 
 function GetObjectsAroundMe()
@@ -600,8 +602,10 @@ function script_grind:run()
 
 
 
-
-
+	-- craft bandages
+	if (self.useFirstAid) and (HasSpell("First Aid")) then
+		script_firstAid:craftBandages();
+	end
 
 	-- very quick pickpocketing WORKS WHEN GRINDER IS NOT PAUSED
 	--if (not self.pause) and (not IsInCombat()) and (GetLocalPlayer():HasBuff("Stealth")) and (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
@@ -1164,7 +1168,7 @@ function script_grind:run()
 
 				end
 			end
-			return;
+		return 4;
 		end
 -- stuck in combat phase
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
@@ -1179,7 +1183,7 @@ function script_grind:run()
 				self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
-		return;
+		return 4;
 		end	
 
 		-- Finish loot before we engage new targets or navigate - return

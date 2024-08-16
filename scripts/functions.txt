@@ -11,6 +11,16 @@ if HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") an
 	return 0;				
 end
 
+for y=0,GetContainerNumSlots(i) do 
+	if (GetContainerItemLink(i,y) ~= nil) then
+		_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+		itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   		itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+		if (itemName == "Soul Shard") then
+			texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
+			if (itemCount < 3) then
+
+
 
 GetLastError() [number] spellId, [number] errorCode
 

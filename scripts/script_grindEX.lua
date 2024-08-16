@@ -36,14 +36,16 @@ end
 
 					if (meToTarget <= aggro) then
 						-- target it...
-						i:AutoAttack();
+						name = i:GetUnitName();
+						TargetByName(name);
 						if (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 							if (UnitIsEnemy("target","player")) then
 								script_grind.enemyObj = i;
 								script_grind.message = "Killing stuff in our path.";
 
 								if (i:GetDistance() > script_grind.combatScriptRange) then
-									MoveToTarget(iX, iY, iZ);									
+									MoveToTarget(iX, iY, iZ);
+									self.waitTimer = GetTimeEX() + 500;									
 								return;
 								end
 							else
