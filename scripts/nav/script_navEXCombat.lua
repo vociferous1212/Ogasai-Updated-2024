@@ -24,7 +24,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		script_nav.navPosition['y'] = _y;
 		script_nav.navPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		script_nav.lastnavIndex = 1; -- start at index 1, index 0 is our position
+		script_nav.lastnavIndex = 0; -- start at index 1, index 0 is our position
 		--script_grind:setWaitTimer(135);
 	end
 

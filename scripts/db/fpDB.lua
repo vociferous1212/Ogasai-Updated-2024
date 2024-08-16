@@ -4,6 +4,13 @@ fpDB = {isSetup = false, fpList = {}, numfps = 0,}
 --1685.1613769531, -4460.06640625, 18.851095199585
 
 
+-- local name = GetLocalPlayer():GetUnitsTarget():GetUnitName();
+-- local fx, fy, fz = GetLocalPlayer():GetUnitsTarget():GetPosition();
+-- local id = GetMapID();
+-- ToFile('"'..name..'";');
+-- ToFile('"'..fx..', '..fy..', '..fz..'";');
+-- ToFile("id = "..id";");
+
 function fpDB:addFP(name, faction, mapID, posX, posY, posZ)
 	self.fpList[self.numfps] = {};
 	self.fpList[self.numfps]['name'] = name;

@@ -179,7 +179,11 @@ function script_grindMenu:menu()
 	wasClicked, script_grind.showOM = Checkbox("Show Object Manager", script_grind.showOM);
 	
 	wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
-
+	SameLine();
+	wasClicked, script_grind.useFirstAid = Checkbox("Auto FirstAid", script_grind.useFirstAid);
+	if (not HasSpell("First Aid")) then
+		script_grind.useFirstAid = false;
+	end
 
 	if (script_grind.getSpells) then
 		Separator();

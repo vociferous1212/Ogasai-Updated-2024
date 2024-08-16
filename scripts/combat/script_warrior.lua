@@ -463,25 +463,23 @@ function script_warrior:run(targetGUID)	-- main content of script
 				return 0;
 			end
 
-			if (IsChanneling() or IsCasting()) then
-				targetObj:FaceTarget();
+			if (not IsAutoCasting("Attack")) then
+				targetObj:AutoAttack();
 			end
+
 			-- melee Skill: Heroic Strike if we got 15 rage battle stance
 			if (self.battleStance) and (not IsMoving()) then
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
 					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
+						if (not IsAutoCasting("Attack")) then
+							targetObj:AutoAttack();
+						end
 						CastSpellByName('Heroic Strike', targetObj);
 						targetObj:FaceTarget();
 					end
-				targetObj:FaceTarget();
-				end 
-				targetObj:FaceTarget();
+				end	
 			end
-			if (IsChanneling() or IsCasting()) then
-				targetObj:FaceTarget();
-			end
-
 
 			-- shield block
 			-- main rage user use only if target has at least 1 sunder for threat gain

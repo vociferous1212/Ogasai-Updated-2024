@@ -656,15 +656,28 @@ function script_warlock:run(targetGUID)
 			end
 			
 			-- gather soul shards
-			if (not script_warlockEX2:hasSoulShard() and not HasItem("Soul Shard")) then
-				if (targetHealth <= 25) and (HasSpell("Drain Soul")) and (targetObj:GetDistance() <= 26) and (IsInCombat()) then
-					if (not script_grind.adjustTickRate) then
-						script_grind.tickRate = 135;
+			if (targetHealth <= 25) and (HasSpell("Drain Soul")) and (targetObj:GetDistance() <= 26) and (IsInCombat()) then
+				for i = 0,5 do 
+					for y=0,GetContainerNumSlots(i) do 
+						if (GetContainerItemLink(i,y) ~= nil) then
+							_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+							itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   							itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+							if (itemName == "Soul Shard") then
+								texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
+								if (itemCount < 3) then
+								
+									if (not script_grind.adjustTickRate) then
+										script_grind.tickRate = 135;
+									end
+									targetObj:FaceTarget();
+									CastSpellByName('Drain Soul', targetObj);
+									self.message = "Gathering Soulshards";
+								return;
+								end
+							end
+						end
 					end
-					targetObj:FaceTarget();
-					CastSpellByName('Drain Soul', targetObj);
-					self.message = "Gathering Soulshards";
-					return;
 				end
 			end
 
