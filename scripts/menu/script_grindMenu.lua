@@ -108,8 +108,9 @@ function script_grindMenu:menu()
 
 	SameLine();
 	if (Button("Reload Scripts")) then
-		coremenu:reload();
-		coremenu:reload();
+		if (coremenu:reload()) then
+			coremenu:reload();
+		end
 
 		self.isSetup = false;
 	end
@@ -174,10 +175,9 @@ function script_grindMenu:menu()
 	script_counterMenu:menu();
 
 	wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
-	if (script_grindMenu.helpMenu) then
-		Text("HELP *Show chests and lootable boxes on screen");
-	end
-
+	SameLine();
+	wasClicked, script_grind.showOM = Checkbox("Show Object Manager", script_grind.showOM);
+	
 	wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
 
 

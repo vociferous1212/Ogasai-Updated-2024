@@ -15,6 +15,13 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		end
 	end
 
+	if (GetLocalPlayer():IsStunned()) then
+		return false;
+	end
+	if (IsMoving()) then
+		return false;
+	end
+
 	-- get target health percentage
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat()) then
 		local targetHealth = targetObj:GetHealthPercentage();
@@ -178,7 +185,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	
 		-- use mind blast on CD
 				-- !! must be placed here to stop wand casting !!
-		if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat()) then
+		if (not IsMoving()) and  (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat()) then
 			if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (IsInCombat()) then
 				if (targetHealth >= 20) and (localMana >= script_priest.mindBlastMana) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
 					targetObj:FaceTarget();

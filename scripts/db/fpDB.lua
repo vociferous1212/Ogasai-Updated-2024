@@ -1,5 +1,9 @@
 fpDB = {isSetup = false, fpList = {}, numfps = 0,}
 
+--org AH
+--1685.1613769531, -4460.06640625, 18.851095199585
+
+
 function fpDB:addFP(name, faction, mapID, posX, posY, posZ)
 	self.fpList[self.numfps] = {};
 	self.fpList[self.numfps]['name'] = name;
@@ -100,3 +104,15 @@ function fpDB:getFPTest()
 
 return fx, fy, fz;
 end
+
+function fpDB:crossroads();
+id = GetMapID();
+
+	if (id == 331) and (script_getSpells:areWeAlliance()) then
+		script_goToFP.fpTarget = "Devrak";
+		fx, fy, fz = -437.1369934082, -2596, 95.787719726563;
+
+	end
+return fx, fy, fz;
+end
+

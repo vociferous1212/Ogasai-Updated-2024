@@ -454,7 +454,6 @@ function script_shaman:run(targetGUID)
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
-				self.waitTimer = GetTimeEX() + 3500;
 				script_om:FORCEOM();
 				return true;
 			end
@@ -610,7 +609,6 @@ function script_shaman:run(targetGUID)
 
 if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0)  and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
-				self.waitTimer = GetTimeEX() + 3500;
 				script_om:FORCEOM();
 				return true;
 			end

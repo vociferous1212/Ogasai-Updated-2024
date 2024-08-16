@@ -283,7 +283,7 @@ function script_priest:run(targetGUID)
 	if (targetObj ~= 0) and (targetObj ~= nil) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasSilence()) then
 
 
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (not IsCasting()) and (not IsChanneling()) and (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				return true;
@@ -316,7 +316,7 @@ function script_priest:run(targetGUID)
 		end
 
 		-- use mind blast on CD
-		if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
+		if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() < 29) then
 				if (IsMoving()) then
 					StopMoving();
@@ -369,10 +369,11 @@ function script_priest:run(targetGUID)
 			end
 
 			-- casts mind blast quicker
-			if (HasSpell("Mind Blast")) and (targetObj:IsInLineOfSight()) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) then
+			if (not IsMoving()) and (HasSpell("Mind Blast")) and (targetObj:IsInLineOfSight()) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) then
 				if (not HasSpell("Vampiric Embrace")) or (not HasSpell("Devouring Plague")) and (targetObj:GetDistance() < 29) then
 					if (IsMoving()) then
 						StopMoving();
+						return true;
 					end
 					CastSpellByName("Mind Blast");
 					targetObj:FaceTarget();
@@ -393,8 +394,6 @@ function script_priest:run(targetGUID)
 				targetObj:FaceTarget();
 			end
 
-			
-
 			-- Devouring Plague to pull
 			if (HasSpell("Devouring Plague")) and (localMana >= 25) and (not IsSpellOnCD("Devouring Plague")) and (not IsMoving()) then
 				if (Cast("Devouring Plague", targetObj)) then
@@ -406,8 +405,12 @@ function script_priest:run(targetGUID)
 			end
 
 			-- Mind Blast to pull
-			if (HasSpell("Mind Blast")) and (localMana >= self.mindBlastMana) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) and (targetObj:IsInLineOfSight()) then
-				if (Cast("Mind Blast", targetObj)) then	
+			if (not IsMoving()) and (HasSpell("Mind Blast")) and (localMana >= self.mindBlastMana) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) and (targetObj:IsInLineOfSight()) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+				if (not Cast("Mind Blast", targetObj)) then	
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1850;
 					self.message = "Casting Mind Blast!";
@@ -563,7 +566,7 @@ function script_priest:run(targetGUID)
 			end
 
 			-- use mind blast on CD
-			if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) then
+			if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) then
 				if (targetHealth >= 20) and (localMana >= self.mindBlastMana) then
 					CastSpellByName("Mind Blast", targetObj);
 					targetObj:FaceTarget();
@@ -660,7 +663,7 @@ function script_priest:run(targetGUID)
 			end
 
 			-- use mind blast on CD
-			if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) then
+			if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) then
 				if (targetHealth >= 20) and (localMana >= self.mindBlastMana) then
 					CastSpellByName("Mind Blast", targetObj);
 					targetObj:FaceTarget();
@@ -683,7 +686,7 @@ function script_priest:run(targetGUID)
 			end
 
 			-- use wand
-			if (GetLocalPlayer():GetUnitsTarget():GetGUID() == targetObj:GetGUID()) and (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling())
+			if (not IsMoving()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetGUID() == targetObj:GetGUID()) and (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling()) and (not script_checkAdds:checkAdds())
 				and ( (not self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) or (self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) ) then
 				if (localObj:HasRangedWeapon()) then
 					if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
@@ -757,8 +760,10 @@ function script_priest:rest()
 	end
 
 	-- check heals and buffs
-	if (script_priestEX:healsAndBuffs(localObj, localMana)) then 
-		return;
+	if (IsStanding()) then
+		if (script_priestEX:healsAndBuffs(localObj, localMana)) then 
+			return;
+		end
 	end
 
 	-- Eat and Drink
