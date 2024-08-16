@@ -215,6 +215,9 @@ return false;
 end
 function script_getSpells:cowZones()
 	local map = GetMapID();
+		if (GetFaction() == 6) then
+			return false;
+		end
 		if map == 215 or map == 1638 or map == 17 or ( (map == 406 or map == 400) and not script_getSpells:areWeAlliance()) then
 			return true;
 		end

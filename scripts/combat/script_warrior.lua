@@ -478,6 +478,15 @@ function script_warrior:run(targetGUID)	-- main content of script
 				targetObj:AutoAttack();
 			end
 
+			-- Humanoid use to flee, keep Hamstring up on them
+				if (self.battleStance) or (self.berserkerStance) then
+					if (targetObj:GetCreatureType() == 'Humanoid' and localRage >= 10 and not targetObj:HasDebuff('Hamstring')) and (targetHealth <= 45) then 
+						if (Cast('Hamstring', targetObj)) then
+							return 0; 
+						end 
+					end 
+				end
+
 			-- melee Skill: Heroic Strike if we got 15 rage battle stance
 			if (self.battleStance) and (not IsMoving()) then
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
@@ -805,15 +814,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 					end 
 				end  
 
-				-- Humanoid use to flee, keep Hamstring up on them
-				if (self.battleStance) or (self.berserkerStance) then
-					if (targetObj:GetCreatureType() == 'Humanoid' and localRage >= 10 and not targetObj:HasDebuff('Hamstring')) and (targetHealth <= 45) then 
-						if (Cast('Hamstring', targetObj)) then
-							return 0; 
-						end 
-					end 
-				end
-
 				if (targetObj:GetDistance() <= 8) and (not IsMoving()) then
 					targetObj:FaceTarget();
 				end
@@ -910,6 +910,10 @@ function script_warrior:rest()
 	if (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) then
 		if (HasItem("Linen Cloth")) or (HasItem("Wool Cloth")) then
 			if (script_firstAid:craftBandages()) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
 				return true;
 			end
 		end
