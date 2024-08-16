@@ -12,7 +12,7 @@ script_checkAdds = {
 function script_checkAdds:checkAdds()
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
-	if (script_grind:enemiesWithinRange() <= 4) and (not script_checkDebuffs:hasDisabledMovement()) then
+	if (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 3) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
 			-- use unstuck feature

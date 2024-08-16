@@ -118,7 +118,7 @@ function script_aggro:enemiesNearMe()
 					and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (currentObj:IsInLineOfSight()) and (not currentObj:IsCasting()) then
 
 					-- acceptable target aggro based on level
-					aggro = currentObj:GetLevel() - localObj:GetLevel() + (script_aggro.adjustAggro + 17.5);		
+					aggro = currentObj:GetLevel() - localObj:GetLevel() + (19.5);		
 					-- acceptable target aggro based on distance
 					cx, cy, cz = currentObj:GetPosition();
 
@@ -164,18 +164,25 @@ function script_aggro:safePullRecheck(target)
 			-- acceptable targets
 			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
 
-				-- aggro range is aggro addsRange slider
-				aggro = script_checkAdds.addsRange - 5;
-
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
 
-				-- acceptable range
-				if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) or (currentObj:GetDistance() <= aggro)  then
+				local mx, my, mz = GetLocalPlayer():GetPosition();
+
+				-- zero out my distance then add in aggro range to other target from that distance
+				local zeroMyRange = GetDistance3D(mx, my, mz, tx, ty, tz) - GetDistance3D(mx, my, mz, tx, ty, tz);
+				local aggroDistToMe = ((currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 20.5) / 1.85);
+				
+				-- if current object distance to other target is closer than aggro range
+				local currentObjRangeToOtherTarget = GetDistance3D(tx, ty, tz, cx, cy, cz);
+				
+
+				-- if me moving to target would be less than aggro range of 2nd target then +1
+				-- if target distance is closer than aggro to other target
+				if (currentObjRangeToOtherTarget <= aggro) then
 
 					-- acceptable targets in range
 					countUnitsInRange = countUnitsInRange + 1;
-					script_grind.enemyObj = currentObj;
 				end
  			end
  		end

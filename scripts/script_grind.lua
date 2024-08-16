@@ -14,7 +14,8 @@ script_grind = {
 	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
 	enchantingLoaded 	= include("scripts\\script_enchanting.lua"),
-	hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
+	tailoringLoaded 	= include("scripts\\script_tailoring.lua"),
+	--hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
 	--fpBDLoaded 		= include("scripts\\db\\fpDB.lua"),
 	--goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
 
@@ -172,7 +173,6 @@ script_grind = {
 	paranoiaCounter = 0,
 	usedParanoiaCounter = false,
 	omTimer = GetTimeEX(),
-	hotspotReachedDistance = 50,
 	drawChests = true,
 	deleteItems = true,
 	stealthRanOnce = false,	-- used for checking if we have stealth and need to turn auto attack on then off
@@ -196,7 +196,50 @@ script_grind = {
 	afkUsed = false,
 	combatScriptRange = 30,
 	attackTargetsOnRoutes = true,
+	drawAggroAtStart = true,
+	showOM = false,
 }
+
+function GetObjectsAroundMe()
+
+	local i, t = GetFirstObject();
+	if NewWindow("Object Manager", 320, 320) then
+		if (CollapsingHeader("All Players In Range")) then
+			while i ~= 0 do
+				if t == 4 then
+					local table = {}
+					for o = 0, 1 -1 do
+						Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl");
+					end
+				end
+			i, t = GetNextObject(i);
+			end
+		end
+		if (CollapsingHeader("All NPC In Range")) then
+			while i ~= 0 do
+				if t == 3 then
+					for oo = 0, 1 -1 do
+						Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetCreatureType());
+					end
+				end
+			i, t = GetNextObject(i);
+			end
+		end
+		if (CollapsingHeader("All Items In Range")) then
+			while i ~= 0 do
+				if t == 5 then
+					if (i:GetDistance() <= 300) then
+						for ooo = 0, 1 -1 do
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetObjectDisplayID().." ID");
+						end
+					end
+				end
+			i, t = GetNextObject(i);
+			end
+		end
+	end
+end
+					
 
 function script_grind:setup()
 
@@ -428,6 +471,12 @@ end
 -- run grinder
 function script_grind:run()
 
+	-- draw object manager and end debug window
+	if (self.showOM) then
+		EndWindow();
+
+		GetObjectsAroundMe();
+	end
 	-- show grinder window
 	script_grind:window();
 
@@ -539,6 +588,20 @@ function script_grind:run()
 		script_grind.message = "Loading Nav Mesh! Please Wait!";
 		return true;
 	end
+	-- hotspot reached distance
+	if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
+		self.hotspotReached = false;
+	end	
+		
+
+
+
+
+
+
+
+
+
 
 	-- very quick pickpocketing WORKS WHEN GRINDER IS NOT PAUSED
 	--if (not self.pause) and (not IsInCombat()) and (GetLocalPlayer():HasBuff("Stealth")) and (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
@@ -562,7 +625,7 @@ function script_grind:run()
 
 	-- buff other players
 	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
-		if (HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Forititude") or HasSpell("Blessing of Might")) then
+		if (HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Fortitude") or HasSpell("Blessing of Might")) then
 			self.buffTimer = GetTimeEX() + 3000;
 			if (not HasSpell("Blessing of Might")) then
 				if (script_buffOtherPlayers:doBuffs()) then
@@ -1442,18 +1505,13 @@ function script_grind:run()
 		--	end
 		--end
 
--- hotspot reached distance
-		if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
-			self.hotspotReached = false;
-		end
-
 		-- Use auto pathing or walk paths
 		if (self.autoPath) then
 
 			-- continue to hotspot until we find a valid enemy...
 				-- move to a diff location if no valid enemies around?
 					-- run autopath nodes?
-			if (script_nav:getDistanceToHotspot() < self.hotspotReachedDistance and self.hotspotReached) then
+			if (script_nav:getDistanceToHotspot() < 50 and self.hotspotReached) then
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
@@ -1916,11 +1974,10 @@ function script_grind:enemyIsValid(i)
 	-- RECHECK TARGETS
 	-- target blacklisted moved away from other targets
 	-- bot can target blacklisted targets under these conditions
-		local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20;
 		if (self.skipHardPull) and (self.extraSafe)
 			and (i:GetDistance() <= 65)
 			and (script_grind:isTargetBlacklisted(i:GetGUID()))
-			and (script_aggro:safePullRecheck(i) or i:GetDistance() <= aggro) then
+			and (script_aggro:safePullRecheck(i)) then
 
 			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
 				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()

@@ -173,11 +173,11 @@ function script_runner:avoidToAggro(safeMargin)
 			local safeRange = safeMargin+1;
 			local intersectMob = script_runner:aggroIntersect(closestEnemy);
 			if (intersectMob ~= nil) then
-				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21 + aggro; 
+				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21 + safeRange; 
 				local x, y, z = closestEnemy:GetPosition();
 				local xx, yy, zz = intersectMob:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
-				script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange);
+				script_runner:avoid(centerX, centerY, zP, aggroRange/2, safeRange);
 			else
 				script_runner:avoid(xT, yT, zP, aggro, safeRange);
 			end

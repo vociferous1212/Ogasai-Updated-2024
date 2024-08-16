@@ -33,32 +33,34 @@ function script_buffOtherPlayers:doBuffs()
 	end
 
 	while i ~= 0 do
-		if t == 4 then
-			-- target doesn't have buff already and is within distance and is in line of sight
-			if (HasSpell(buff2)) and (i:GetDistance() < 28) and (not i:HasBuff(buff2)) and (not i:CanAttack()) and (i:IsInLineOfSight()) and (not i:IsDead()) then
+		if (i:GetDistance() <= 30) then
+			if t == 4 then
+				-- target doesn't have buff already and is within distance and is in line of sight
+				if (HasSpell(buff2)) and (i:GetDistance() < 28) and (not i:HasBuff(buff2)) and (not i:CanAttack()) and (i:IsInLineOfSight()) and (not i:IsDead()) then
 
-				-- run the table to find the proper spell rank to use
-				for r=6, 1, -1 do 
-
-					-- level is within spell range to use
-					if i:GetLevel() >= Sp[r] then
-
-						-- needed to actually target the player... can be called from a different function though
-						i:AutoAttack();
-
-						local myTarget = i;
-
-						-- finish the missing syntax from above
-						local b = "), myTarget";
-
-						if (CastSpellByName(buff..r..b)) then
-						--CastSpellByName("Power Word: Fortitude(Rank ", myTarget);
-
-						return true;
+					-- run the table to find the proper spell rank to use
+					for r=6, 1, -1 do 
+	
+						-- level is within spell range to use
+						if i:GetLevel() >= Sp[r] then
+	
+							-- needed to actually target the player... can be called from a different function though
+							i:AutoAttack();
+	
+							local myTarget = i;
+	
+							-- finish the missing syntax from above
+							local b = "), myTarget";
+	
+							if (CastSpellByName(buff..r..b)) then
+							--CastSpellByName("Power Word: Fortitude(Rank ", myTarget);
+	
+							return true;
+							end
 						end
 					end
-				end
-			end		
+				end		
+			end
 		end
 	i, t = GetNextObject(i);
 	end
