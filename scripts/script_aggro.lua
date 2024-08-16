@@ -173,7 +173,7 @@ function script_aggro:safePullRecheck(target)
 				local zeroMyRange = GetDistance3D(mx, my, mz, tx, ty, tz) - GetDistance3D(mx, my, mz, tx, ty, tz);
 				
 				-- if we are a ranged class we can pull at half the distance!
-				if (not HasSpell("Heroic Strike")) or (not HasSpell("Sinister Strike")) or (not HasSpell("Seal of Righteousness")) then
+				if (not HasSpell("Heroic Strike")) and (not HasSpell("Sinister Strike")) and (not HasSpell("Seal of Righteousness")) then
 					aggroDistToMe = ((currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 20.5) / 1.85);
 				end
 

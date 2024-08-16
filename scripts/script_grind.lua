@@ -114,7 +114,7 @@ script_grind = {
 	drawUnits = true,	-- draw unit data on screen
 	Name = "", -- set to e.g. "paths\1-5 Durator.xml" for auto load at startup
 	pathLoaded = "",	-- path that is loaded
-	drawPath = false,	-- draw path
+	drawPath = true,	-- draw path
 	autoPath = true,	-- use nav 
 	drawAutoPath = true,	-- draw walk path
 	distToHotSpot = 500,	-- distance to target enemies from hotspot
@@ -602,10 +602,7 @@ function script_grind:run()
 
 
 
-	-- craft bandages
-	if (self.useFirstAid) and (HasSpell("First Aid")) then
-		script_firstAid:craftBandages();
-	end
+
 
 	-- very quick pickpocketing WORKS WHEN GRINDER IS NOT PAUSED
 	--if (not self.pause) and (not IsInCombat()) and (GetLocalPlayer():HasBuff("Stealth")) and (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
@@ -697,6 +694,17 @@ function script_grind:run()
 			return;
 		end
 	end
+
+-- heroic strike stuck on and target moved away or we stopped casting auto attack
+
+	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
+
+		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_warrior.meleeDistance or IsMoving()) then
+			if hstable[GetLocalPlayer():GetCasting()] then
+				SpellStopCasting();
+			
+			end
+		end
 
 	-- run backwards target has frost nova
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
@@ -858,6 +866,23 @@ function script_grind:run()
 		return;
 	end
 
+	-- close trade skills...
+	if (script_firstAid.bookOpen) and (not IsChanneling()) and (not IsCasting()) then
+		script_firstAid.bookOpen = false;
+		CloseTradeSkill();
+	end
+
+
+
+
+
+
+
+
+
+
+
+
 
 	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -868,6 +893,8 @@ function script_grind:run()
 			end
 		end
 	end
+
+
 		-- Do all checks
 		if (script_grindEX:doChecks()) then
 			return;
@@ -1147,8 +1174,8 @@ function script_grind:run()
 			end
 
 			-- check and do move away from adds during combat
-			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
-				script_grind:setWaitTimer(4500);
+			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) and (self.enemyObj:GetManaPercentage() <= 5) then
+				script_grind:setWaitTimer(3500);
 				script_om:FORCEOM();
 				return;
 			end
@@ -1366,7 +1393,8 @@ function script_grind:run()
 					script_grind.tickRate = 50;
 				end
 	
-				if (not self.enemyObj:IsInLineOfSight()) and (self.enemyObj:GetDistance() <= 3) then
+				-- if we are already close to the target and they are stuck behind a wall then return false
+				if (not self.enemyObj:IsInLineOfSight() and self.enemyObj:GetDistance() <= 3) then
 					return false;
 				end
 
@@ -1422,7 +1450,7 @@ function script_grind:run()
 			end
 
 			-- attempt to run away from adds in combat
-			if (IsInCombat()) and (self.safePull)
+			if (IsInCombat()) and (not script_checkDebuffs:hasDisabledMovement()) and (self.safePull)
 				and (GetLocalPlayer():GetHealthPercentage() >= 1)
 				and (script_grind.skipHardPull)
 				and (script_grind:isTargetingMe2(self.enemyObj))
@@ -1439,7 +1467,7 @@ function script_grind:run()
 				end
 				-- check and avoid adds
 				if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
-					script_grind:setWaitTimer(4500);
+					script_grind:setWaitTimer(500);
 					script_om:FORCEOM();
 					return;
 				end
