@@ -129,7 +129,9 @@ function script_navEX:moveToLoot(localObj, _x, _y, _z) -- use when moving to mov
 	end
 
 	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
+		-- cannot find a path node so it will try to walk as far as needed to find one
+		-- this can be tested from orgrimmar trying to walk to the west of barrens
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 45) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		return "Generating a new path...";
 	end
