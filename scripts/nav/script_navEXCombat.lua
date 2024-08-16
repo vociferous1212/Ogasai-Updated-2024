@@ -18,13 +18,13 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);	
 
 	-- If the target moves more than 2 yard then make a new path
-	if(GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 2
+	if(GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 1
 		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
 		script_nav.navPosition['x'] = _x;
 		script_nav.navPosition['y'] = _y;
 		script_nav.navPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		script_nav.lastnavIndex = 0; -- start at index 1, index 0 is our position
+		script_nav.lastnavIndex = 2; -- start at index 1, index 0 is our position
 		--script_grind:setWaitTimer(135);
 	end
 

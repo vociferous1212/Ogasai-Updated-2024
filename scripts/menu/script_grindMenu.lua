@@ -174,6 +174,8 @@ function script_grindMenu:menu()
 
 	script_counterMenu:menu();
 
+	Separator();
+	Text("These checkboxes have no home yet");
 	wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
 	SameLine();
 	wasClicked, script_grind.showOM = Checkbox("Show Object Manager", script_grind.showOM);
