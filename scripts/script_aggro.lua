@@ -168,13 +168,13 @@ function script_aggro:safePullRecheck(target)
 				cx, cy, cz = currentObj:GetPosition();
 
 				local mx, my, mz = GetLocalPlayer():GetPosition();
-				local aggroDistToMe = 20.5;
+				local aggroDistToMe = 21.5;
 				-- zero out my distance then add in aggro range to other target from that distance
 				local zeroMyRange = GetDistance3D(mx, my, mz, tx, ty, tz) - GetDistance3D(mx, my, mz, tx, ty, tz);
 				
 				-- if we are a ranged class we can pull at half the distance!
 				if (not HasSpell("Heroic Strike")) and (not HasSpell("Sinister Strike")) and (not HasSpell("Seal of Righteousness")) then
-					aggroDistToMe = ((currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 20.5) / 1.85);
+					aggroDistToMe = (aggroDistToMe / 1.85);
 				end
 
 				-- if current object distance to other target is closer than aggro range
@@ -241,14 +241,8 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
 			rTime = GetTimeEX();
 			Move(rX, rY, rZ);
-	
-			-- try unstuck script
-			if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-				return true;
-			end		
-
-			return;
+			return true;
+		
 	end
 
 	return false;

@@ -1,7 +1,7 @@
 script_checkAdds = {
 
 	addsRange = 35,	-- range circles from from adds
-	checkAddsRange = 3,	-- safe margin move from adds
+	checkAddsRange = 6,	-- safe margin move from adds
 
 		-- these are global so we can rerun object manager from om script
 	closestEnemy = 0,	-- set closest enemy
@@ -12,7 +12,7 @@ script_checkAdds = {
 function script_checkAdds:checkAdds()
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
-	if (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 3) and (not script_checkDebuffs:hasDisabledMovement()) then
+	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind:isTargetingMe2(script_grind.enemyObj) and script_grind.enemyObj:GetDistance() <= script_grind.combatScriptRange) and (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 3) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
 			-- use unstuck feature

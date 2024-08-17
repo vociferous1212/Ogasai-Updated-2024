@@ -154,7 +154,6 @@ function script_grindEX:doChecks()
 				end
 				RetrieveCorpse();
 				self.useThisVar = true;
-				return true;
 			end
 			return true;
 		end

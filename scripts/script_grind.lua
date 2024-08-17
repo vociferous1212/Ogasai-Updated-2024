@@ -217,6 +217,7 @@ function GetObjectsAroundMe()
 			i, t = GetNextObject(i);
 			end
 		end
+		Separator();
 		if (CollapsingHeader("All NPC In Range")) then
 			while i ~= 0 do
 				if t == 3 then
@@ -227,11 +228,12 @@ function GetObjectsAroundMe()
 			i, t = GetNextObject(i);
 			end
 		end
+		Separator();
 		if (CollapsingHeader("All Items In Range")) then
 			while i ~= 0 do
-				if t == 5 then
+				if t ~= 3 and t ~= 4 then
 					if (i:GetDistance() <= 300) then
-						for ooo = 0, 1 -1 do
+						for ooo = 0, 1 do
 							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetObjectDisplayID().." ID");
 						end
 					end
@@ -1072,6 +1074,7 @@ function script_grind:run()
 					if (self.enemyObj:GetDistance() <= self.combatScriptRange) then
 						if (IsMoving()) then
 							StopMoving();
+							return true;
 						end
 					end
 					if (not IsMoving()) then
@@ -1551,7 +1554,6 @@ function script_grind:run()
 
 				-- move to saved locations
 				self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
-				script_grind:setWaitTimer(self.nextToNodeDist * 2);
 
 
 				-- check stealth rogue

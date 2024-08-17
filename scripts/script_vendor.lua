@@ -221,9 +221,17 @@ function script_vendor:repair()
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
+			local px, py, pz = GetLocalPlayer():GetPosition();
+			local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+			DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 			Move(vX, vY, vZ);
 		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
+			if (not script_unstuck:pathClearAuto(2)) then
+				script_unstuck:unstuck();
+				return true;
+			end
+
 			self.status = 1; -- moving to a repair vendor
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
@@ -331,6 +339,9 @@ function script_vendor:sell()
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
+			local px, py, pz = GetLocalPlayer():GetPosition();
+			local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
+			DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
 			Move(vX, vY, vZ);
 		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
