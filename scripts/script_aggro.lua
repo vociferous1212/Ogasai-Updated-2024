@@ -6,6 +6,7 @@ script_aggro = {
 	rTime = 0,		-- res time
 	adjustAggro = 2.5,	-- adjust blacklist distance range
 	tarDist = 0,		-- target distance checked with run away from adds range
+	waitTimer = 0,
 }
 
 
@@ -239,8 +240,11 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 
 	-- avoid the closest mob
 	if (closestEnemy ~= 0) then
+			if (self.waitTimer > GetTimeEX()) then
+				return;
+			end
 
-			self.currentRessAngle = self.currentRessAngle + 0.01;
+			self.currentRessAngle = self.currentRessAngle - .01;
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
 			rTime = GetTimeEX();
 
@@ -248,6 +252,9 @@ if (not script_unstuck:pathClearAuto(2)) then
 		script_unstuck:unstuck();
 	end
 			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);
+			if (IsMoving()) then
+			self.waitTimer = GetTimeEX() + 150;
+			end
 			return true;
 		
 	end
