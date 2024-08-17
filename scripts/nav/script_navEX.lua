@@ -48,9 +48,11 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 
 	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.6) then
-		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
-		return "Generating a new path...";
+	if (script_vendor.status == 0) then
+		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.6) then
+			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+			return "Generating a new path...";
+		end
 	end
 
 	if (self.waitTimer > GetTimeEX()) then
@@ -58,6 +60,10 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 
 	local mX, mY, mZ = GetLocalPlayer():GetPosition();
+
+	if (not script_unstuck:pathClearAuto(2)) then
+		script_unstuck:unstuck();
+	end
 
 	if (IsMoving()) then
 		if (script_grind.nextToNodeDist < 6) then

@@ -53,7 +53,9 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		return "Generating a new path...";
 	end
-
+	if (not script_unstuck:pathClearAuto(2)) then
+		script_unstuck:unstuck();
+	end
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 

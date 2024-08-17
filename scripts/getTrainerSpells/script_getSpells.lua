@@ -134,6 +134,11 @@ function script_getSpells:run()
 		end
 		-- if position not close to trainer then move to trainer
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3) then
+if (not script_unstuck:pathClearAuto(2)) then
+			script_unstuck:unstuck();
+			return true;
+		end
+
 			script_grind.message = script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.getSpellsStatus = 1;
 			if (not IsMoving()) then

@@ -29,7 +29,7 @@ script_priest = {
 	swpMana = 15, -- Use shadow word: pain above this mana %
 	followTargetDistance = 100,
 	rangeDistance = 28,
-	openerRange = 28,	-- range to return 3 / walk to target to attack
+	openerRange = 26,	-- range to return 3 / walk to target to attack
 	useDOTOnAdds = true,
 	useHexOfWeakness = false,
 }

@@ -367,7 +367,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- Check: Charge if possible in battle stance
 			if (self.enableCharge and self.battleStance) then
 				if (HasSpell("Charge")) and (not IsSpellOnCD("Charge")) and (targetObj:IsSpellInRange("Charge")) 
-					and (targetObj:GetDistance() >= 12) and (targetObj:IsInLineOfSight()) then
+					and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
 					script_nav:resetNavPos();
 					targetObj:FaceTarget();
 					targetObj:AutoAttack();
@@ -937,9 +937,14 @@ function script_warrior:rest()
 			self.tickRate = 1500;
 		if (IsMoving()) then
 			StopMoving();
+			return true;
 		end
 			self.waitTimer = GetTimeEX() + 1200;
 		if (IsStanding()) and (not IsInCombat()) and (not IsMoving()) and (not localObj:HasDebuff("Recently Bandaged")) then
+			if (IsMoving()) then
+				StopMoving();
+				return true;
+			end
 			script_helper:useBandage();		
 			self.waitTimer = GetTimeEX() + 6000;
 			script_grind:setWaitTimer(6000);

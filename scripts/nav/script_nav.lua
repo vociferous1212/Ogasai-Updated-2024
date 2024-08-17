@@ -91,8 +91,6 @@ function script_nav:getDistanceToHotspot()
 	end
 end
 
-
-
 function script_nav:saveTargetLocation(target, mobLevel)
 	local _tx, _ty, _tz = target:GetPosition();
 	-- Check: Don't save if we are outside the hotspot distance
@@ -119,7 +117,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- Let's get at least 2 path nodes around the hot spot before we navigate through them
-	if (self.numSavedLocation < 3) and (script_grind.lootObj == nil or script_grind.lootObj == 0)then
+	if (self.numSavedLocation < 3) then
 		return script_moveToHotspot:moveToHotspot(localObj);
 	end
 
@@ -137,8 +135,16 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		self.currentGoToLocation = self.currentGoToLocation + 1;
 		return "Changing go to location...";
 	end
-	self.message = script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
+	
+	if (script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z'])) then
+		self.message = "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
+		if (not IsMoving()) or not (IsPathLoaded(5)) then
+			Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+		end
+	return true;
+	end
+return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
+
 end
 
 function script_nav:setNextToNodeDist(distance)
@@ -192,7 +198,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		self.navPathPosition['y'] = _y;
 		self.navPathPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		self.lastpathnavIndex = 1; 
+		self.lastpathnavIndex = 0; 
 		end
 		
 	elseif (script_grind.gather) and (not localObj:IsDead()) and (self.navPathPosition['x'] ~= _x) or (self.navPathPosition['y'] ~= _y) or (self.navPathPosition['z'] ~= _z)
@@ -232,7 +238,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 	end
 
 	-- Check: If the move to coords are too far away, something wrong don't use those
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 45) then
 		return "Moving to target... Nav";
 	end
 

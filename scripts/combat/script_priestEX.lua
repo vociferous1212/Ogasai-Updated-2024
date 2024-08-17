@@ -182,6 +182,16 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 				return 0;
 			end
 		end
+
+
+		-- Check: Do we have the right target (in UI) ??
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+			if (GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
+				ClearTarget();
+				self.waitTimer = GetTimeEX() + 1500;
+			end
+		end
+
 	
 		-- use mind blast on CD
 				-- !! must be placed here to stop wand casting !!
