@@ -412,6 +412,7 @@ function script_grindEX:howManyEnemiesInRangeOfTarget(target)
 	local numberNearby = 0;
 	local targetToCheck = 0;
 	local range = 0;
+	local distToOtherTarget = 0;
 
 	while i ~= 0 do
 		if t == 3 then
@@ -421,7 +422,7 @@ function script_grindEX:howManyEnemiesInRangeOfTarget(target)
 				local _x, _y, _z = i:GetPosition()
 
 				-- distance of target to other target
-				local distToOtherTarget = GetDistance3D(x, y, z, _x, _y, _z);
+				distToOtherTarget = GetDistance3D(x, y, z, _x, _y, _z);
 	
 				-- if they are within my aggro range
 				range = i:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
@@ -436,7 +437,7 @@ function script_grindEX:howManyEnemiesInRangeOfTarget(target)
 
 	while i ~= 0 do
 		if t == 3 then
-			if (i:GetGUID() ~= targetToCheck:GetGUID()) and (i:GetDistance() <= 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
+			if (i:GetGUID() ~= targetToCheck:GetGUID()) and (distToOtherTarget <= 30) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
 				if (targetToCheck ~= 0) then
 					local cx, cy, cz = targetToCheck:GetPosition();
 					local vx, vy, vz = i:GetPosition();

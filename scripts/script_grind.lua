@@ -200,6 +200,8 @@ script_grind = {
 	drawAggroAtStart = true,
 	showOM = false,
 	useFirstAid = true,
+	blacklistTargetName = "";
+	blacklistTargetName2 = "";
 }
 
 function GetObjectsAroundMe()
@@ -1919,6 +1921,12 @@ function script_grind:enemyIsValid(i)
 
 		end
 
+	-- add selected target name to blacklist
+		if (i:GetUnitName() == self.blacklistTargetName or i:GetUnitName() == self.blacklistTargetName2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) then
+			script_grind:addTargetToHardBlacklist(i:GetGUID());
+		end
+
+
 	-- try to skip units below us or above us (in water or structure)
 		-- has bugs
 		--if (self.skipHardPull) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) then
@@ -2030,7 +2038,7 @@ function script_grind:enemyIsValid(i)
 		if (self.skipHardPull) and (self.extraSafe)
 			and (i:GetDistance() <= 65)
 			and (script_grind:isTargetBlacklisted(i:GetGUID()))
-			and (script_aggro:safePullRecheck(i)) then
+			and (script_aggro:safePullRecheck(i) and (script_grindEX:howManyEnemiesInRangeOfTarget(i) < 3)) then
 
 			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
 				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()

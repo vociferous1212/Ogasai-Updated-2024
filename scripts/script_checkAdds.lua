@@ -188,8 +188,8 @@ function script_checkAdds:avoidToAggro(safeMargin)
 	while currentObj ~= 0 do
 				local range = script_checkAdds.addsRange;
 				local aggro = script_checkAdds.addsRange;
-				--local myAggro = currentObj:GetLevel() - localObj:GetLevel() + 23;
-				local myAggro = script_checkAdds.addsRange;
+				local myAggro = currentObj:GetLevel() - localObj:GetLevel() + 24;
+				--local myAggro = script_checkAdds.addsRange;
 				
  		if (typeObj == 3)
 			and (currentObj:GetDistance() <= self.addsRange)

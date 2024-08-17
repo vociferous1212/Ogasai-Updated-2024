@@ -47,18 +47,14 @@ function script_targetMenu:menu()
 			Separator();
 	
 	
-			Text("Move Away From Adds In Combat Range");
-			script_checkAdds.addsRange = SliderInt("Add Range", 7, 40, script_checkAdds.addsRange);
-			
-			Separator();
+			--Text("Move Away From Adds In Combat Range");
+			--script_checkAdds.addsRange = SliderInt("Add Range", 7, 40, script_checkAdds.addsRange);
 	
-			Text("Blacklist Target-to-Target Distance (~ 10yds per tick)");
+			Text("Adds Target-to-Target Distance (~ 10yds per tick)");
 	
-			script_aggro.adjustAggro = SliderFloat("Aggro Distance", 1, 5, script_aggro.adjustAggro);
+			script_aggro.adjustAggro = SliderInt("Aggro Distance", 1, 5, script_aggro.adjustAggro);
 		end
-	
 
-		Separator();
 		
 		Text('Blacklist Time'); 
 		script_grind.blacklistTime = SliderInt("BT (s)", 1, 120, script_grind.blacklistTime);
@@ -91,7 +87,9 @@ function script_targetMenu:menu()
 		script_grind.maxLevel = SliderInt("Max lvl", 1, 60, script_grind.maxLevel); 
 
 		Separator();
-	
+		Text("Blacklist Targets By Name");
+		script_grind.blacklistTargetName = InputText("Unit Name", script_grind.blacklistTargetName);
+		script_grind.blacklistTargetName2 = InputText("Unit Name 2", script_grind.blacklistTargetName2);
 		--wasClicked, script_nav.avoidElite = Checkbox("Avoid Elites (current not working)", script_nav.avoidElite);
 		
 		--if (script_grind.avoidElite) then
