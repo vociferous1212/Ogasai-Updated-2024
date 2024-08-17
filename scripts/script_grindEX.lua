@@ -42,7 +42,14 @@ end
 							if (UnitIsEnemy("target","player")) then
 								script_grind.enemyObj = i;
 								script_grind.message = "Killing stuff in our path.";
+							else
+								script_grind.enemyObj = nil;
+								ClearTarget();
+								return false;
+							end
 
+						else
+							if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
 								if (i:GetDistance() > script_grind.combatScriptRange) then
 									MoveToTarget(iX, iY, iZ);
 									self.waitTimer = GetTimeEX() + 500;									
@@ -51,7 +58,7 @@ end
 							else
 								script_grind.enemyObj = nil;
 								ClearTarget();
-							return false;
+								return false;
 							end
 						end
 					return true;

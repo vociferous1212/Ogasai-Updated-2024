@@ -220,11 +220,14 @@ function script_vendor:repair()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
+		if (not script_unstuck:pathClearAuto(2)) then
+			script_unstuck:unstuck();
+			return true;
+		end
+		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
+			MoveToTarget(vX, vY, vZ);
+		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-				return true;
-			end
 			self.status = 1; -- moving to a repair vendor
 			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
@@ -331,11 +334,13 @@ function script_vendor:sell()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-				return true;
-			end
-		
+		if (not script_unstuck:pathClearAuto(2)) then
+			script_unstuck:unstuck();
+			return true;
+		end
+		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
+			MoveToTarget(vX, vY, vZ);
+		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
 			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
@@ -432,7 +437,13 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		-- Move to vendor
+		if (not script_unstuck:pathClearAuto(2)) then
+			script_unstuck:unstuck();
+			return true;
+		end
+		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
+			MoveToTarget(vX, vY, vZ);
+		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.status = 3; -- moving to buy ammo at a vendor
@@ -563,6 +574,13 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		-- Move to vendor
+		if (not script_unstuck:pathClearAuto(2)) then
+			script_unstuck:unstuck();
+			return true;
+		end
+		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
+			MoveToTarget(vX, vY, vZ);
+		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.status = 4; 

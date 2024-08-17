@@ -211,7 +211,22 @@ function GetObjectsAroundMe()
 				if t == 4 then
 					local table = {}
 					for o = 0, 1 -1 do
-						Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl");
+						-- show we can attack horde if we are alliance
+						if (i:CanAttack()) and (script_getSpells:areWeAlliance()) then
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Horde");
+						end
+						-- show we can attack alliance if we are horde
+						if (i:CanAttack()) and (not script_getSpells:areWeAlliance()) then
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Alliance");
+						end
+						-- show we can't attack alliance if we are alliance
+						if (not i:CanAttack()) and (script_getSpells:areWeAlliance()) then
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Alliance");
+						end
+						-- show we can't attack horde if we are horde
+						if (not i:CanAttack()) and (not script_getSpells:areWeAlliance()) then
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Horde");
+						end
 					end
 				end
 			i, t = GetNextObject(i);
@@ -1082,7 +1097,7 @@ function script_grind:run()
 					end
 
 					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
-				else
+				elseif (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 
 					self.message = script_moveToHotspot:moveToHotspot(localObj);	
 
