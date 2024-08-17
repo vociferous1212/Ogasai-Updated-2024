@@ -23,8 +23,8 @@ end
 		i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then
-				-- check targets within 40 yards
-				if (i:GetDistance() < 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 5) then
+				-- check targets within 32 yards
+				if (i:GetDistance() < 32) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 5) then
 					local iX, iY, iZ = i:GetPosition();	
 					local lX, lY, lZ = GetLocalPlayer():GetPosition();
 		

@@ -220,20 +220,13 @@ function script_vendor:repair()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
-			local px, py, pz = GetLocalPlayer():GetPosition();
-			local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-			DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
-			Move(vX, vY, vZ);
-		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			if (not script_unstuck:pathClearAuto(2)) then
 				script_unstuck:unstuck();
 				return true;
 			end
-
 			self.status = 1; -- moving to a repair vendor
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			return true;
 		end
@@ -338,15 +331,14 @@ function script_vendor:sell()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
-			local px, py, pz = GetLocalPlayer():GetPosition();
-			local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-			DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
-			Move(vX, vY, vZ);
-		end
+if (not script_unstuck:pathClearAuto(2)) then
+				script_unstuck:unstuck();
+				return true;
+			end
+		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;
@@ -440,12 +432,9 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
-			Move(vX, vY, vZ);
-		end
 		-- Move to vendor
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.status = 3; -- moving to buy ammo at a vendor
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
@@ -573,12 +562,9 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) and (not IsPathLoaded(5) or not IsMoving()) then
-			Move(vX, vY, vZ);
-		end
 		-- Move to vendor
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
 			self.status = 4; 
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;

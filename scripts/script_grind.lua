@@ -627,9 +627,9 @@ function script_grind:run()
 	--end
 
 	-- buff other players
-	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) and (script_vendor.status == 0) then
+	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) and (script_vendor.status == 0) and (IsStanding()) and (not self.afkUsed) then
 		if (HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Fortitude") or HasSpell("Blessing of Might")) then
-			self.buffTimer = GetTimeEX() + 7000;
+			self.buffTimer = GetTimeEX() + 5500;
 			if (not HasSpell("Blessing of Might")) then
 				if (script_buffOtherPlayers:doBuffs()) then
 					if (not IsStanding()) then
@@ -1080,9 +1080,12 @@ function script_grind:run()
 					if (not IsMoving()) then
 						self.enemyObj:FaceTarget();
 					end
-				script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
+
+					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
 				else
+
 					self.message = script_moveToHotspot:moveToHotspot(localObj);	
+
 					if (PlayerHasTarget()) then
 						ClearTarget();
 					end
