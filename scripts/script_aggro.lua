@@ -166,7 +166,7 @@ function script_aggro:safePullRecheck(target)
 
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (testRange < 30) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (testRange < 30) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) then	
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();

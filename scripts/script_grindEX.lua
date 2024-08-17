@@ -403,3 +403,54 @@ function script_grindEX:howManyEnemiesInRange(range)
 	end
 return numberNearby;
 end
+
+-- used for safe pulling - check for how many targets are around it before pulling it... especially humanoids
+function script_grindEX:howManyEnemiesInRangeOfTarget(target)
+
+	local i, t = GetFirstObject();
+	local x, y, z = target:GetPosition();
+	local numberNearby = 0;
+	local targetToCheck = 0;
+	local range = 0;
+
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetDistance() <= 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
+
+				-- get other targets pos
+				local _x, _y, _z = i:GetPosition()
+
+				-- distance of target to other target
+				local distToOtherTarget = GetDistance3D(x, y, z, _x, _y, _z);
+	
+				-- if they are within my aggro range
+				range = i:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
+	
+				if (distToOtherTarget <= range) then
+					targetToCheck = i;
+				end
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+
+	while i ~= 0 do
+		if t == 3 then
+			if (i:GetGUID() ~= targetToCheck:GetGUID()) and (i:GetDistance() <= 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
+				if (targetToCheck ~= 0) then
+					local cx, cy, cz = targetToCheck:GetPosition();
+					local vx, vy, vz = i:GetPosition();
+
+					checkThisTarDistance = GetDistance3D(cx, cy, cz, vx, vy, vz);
+			
+					-- if that target is in range if I pull it or move to it...
+					if (checkThisTarDistance >= range) then
+						numberNearby = numberNearby + 1;
+					end
+				end
+			end
+		end
+	i, t = GetNextObject(i);
+	end		
+return numberNearby;
+end

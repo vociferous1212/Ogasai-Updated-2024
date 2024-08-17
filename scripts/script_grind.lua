@@ -396,6 +396,7 @@ function script_grind:setup()
 	script_navEX.waitTimer = GetTimeEX();
 	self.timeToSit = GetTimeEX();
 	script_grindEX.waitTimer = GetTimeEX();
+	script_aggro.waitTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -1414,7 +1415,9 @@ function script_grind:run()
 	
 				-- if we are already close to the target and they are stuck behind a wall then return false
 				if (not self.enemyObj:IsInLineOfSight() and self.enemyObj:GetDistance() <= 3) then
-					return false;
+					if (script_mage:runBackwards(targetObj, 8)) then
+						return true;
+					end
 				end
 
 				-- if we have a valid position coordinates
@@ -1431,7 +1434,7 @@ function script_grind:run()
 						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
 						DrawText("Cannot find a path!", _tX+ 50, _tY-150, 0, 255, 0);
 						Move(_x, _y, _z);
-						return true;
+						return;
 					end
 					
 					-- set wait timer to move clicks
