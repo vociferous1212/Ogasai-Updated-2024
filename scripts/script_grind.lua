@@ -2056,7 +2056,7 @@ function script_grind:enemyIsValid(i)
 		if (self.skipHardPull)
 			and (self.extraSafe)
 			and (script_grind:isTargetBlacklisted(i:GetGUID()))
-			and (self.safePullAvoidTargets) and (not script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 65) then
+			and (self.safePullAvoidTargets) and (script_aggro:safePullRecheck(i)) and (i:GetDistance() <= 35) then
 			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
 				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
 				and ((i:GetLevel() <= self.maxLevel and i:GetLevel() >= self.minLevel))

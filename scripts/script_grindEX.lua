@@ -34,7 +34,7 @@ end
 					-- aggro range of mobs around me and node
 					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20.5;
 
-					if (meToTarget <= aggro) then
+					if (meToTarget <= aggro) and (i:IsInLineOfSight()) then
 						-- target it...
 						name = i:GetUnitName();
 						TargetByName(name);

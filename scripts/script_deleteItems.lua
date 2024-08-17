@@ -27,6 +27,7 @@ function script_deleteItems:setup()
 	script_deleteItems:addDeleteItem("Wooden Key");
 	script_deleteItems:addDeleteItem("Kolkar Booty Key");
 	script_deleteItems:addDeleteItem("Sunscale Feather");
+	script_deleteItems:addDeleteItem("A Letter to Yvette");
 	--script_deleteItems:addDeleteItem("");
 
 

@@ -160,9 +160,12 @@ function script_aggro:safePullRecheck(target)
 
 		-- NPC type 3
  		if (typeObj == 3) then
+			
+			local testRange = GetDistance3D(tx, ty, tz, cx, cy, cz);
+
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetDistance() < 65) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
+			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (testRange < 30) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) then	
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
@@ -174,7 +177,7 @@ function script_aggro:safePullRecheck(target)
 				
 				-- if we are a ranged class we can pull at half the distance!
 				if (not HasSpell("Heroic Strike")) and (not HasSpell("Sinister Strike")) and (not HasSpell("Seal of Righteousness")) then
-					aggroDistToMe = (aggroDistToMe / 1.85);
+					aggroDistToMe = (aggroDistToMe / 1.5);
 				end
 
 				-- if current object distance to other target is closer than aggro range
