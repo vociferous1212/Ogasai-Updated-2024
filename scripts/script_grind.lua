@@ -627,9 +627,9 @@ function script_grind:run()
 	--end
 
 	-- buff other players
-	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) then
+	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) and (script_vendor.status == 0) then
 		if (HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Fortitude") or HasSpell("Blessing of Might")) then
-			self.buffTimer = GetTimeEX() + 3000;
+			self.buffTimer = GetTimeEX() + 7000;
 			if (not HasSpell("Blessing of Might")) then
 				if (script_buffOtherPlayers:doBuffs()) then
 					if (not IsStanding()) then
@@ -1081,9 +1081,7 @@ function script_grind:run()
 						self.enemyObj:FaceTarget();
 					end
 				script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
-				end
-				if (self.enemyObj == nil or self.enemyObj == 0) and (not PlayerHasTarget()) then
-					-- move to hotspot location
+				else
 					self.message = script_moveToHotspot:moveToHotspot(localObj);	
 					if (PlayerHasTarget()) then
 						ClearTarget();
@@ -1413,7 +1411,7 @@ function script_grind:run()
 						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						local px, py, pz = GetLocalPlayer():GetPosition();
 						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-						DrawText("Cannot find a path!", _tX+ 50, _tY-50, 0, 255, 0);
+						DrawText("Cannot find a path!", _tX+ 50, _tY-150, 0, 255, 0);
 						Move(_x, _y, _z);
 						return true;
 					end
