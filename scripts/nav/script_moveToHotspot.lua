@@ -52,6 +52,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		
 		self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 
+
 		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 	else
 		return "No hotspot has been loaded...";

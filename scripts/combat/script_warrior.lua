@@ -820,7 +820,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 				-- melee Skill: Rend if we got more than 10 rage battle or bersker stance
 				if (self.battleStance) and (self.enableRend) then
-					if (targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental' and HasSpell('Rend') and not targetObj:HasDebuff("Rend") 
+					if (targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental' and HasSpell('Rend') and not targetObj:HasDebuff("Rend") and (not targetObj:GetCreatureType() == "Undead")
 						and targetHealth >= 30 and localRage >= 10) then 
 						if (Cast('Rend', targetObj)) then 
 							return 0; 

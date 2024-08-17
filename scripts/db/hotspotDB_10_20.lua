@@ -57,7 +57,6 @@ function hotspotDB_10_20:setup()
 	hotspotDB:addHotspot("Silverpine Forest 13 - 15", "Horde", 13, 15, 1049.6, 1364.06, 38.17);
 	hotspotDB:addHotspot("North Tide's Hollow 14 - 16", "Horde", 14, 16, 806.7, 1827.12, 6.54);
 	hotspotDB:addHotspot("Silverpine Forest 10 - 11", "Horde", 10, 11, 1533.23, 652.43, 44.5);
-	hotspotDB:addHotspot("Malden's Orchard 11 - 13", "Horde", 11, 13, 1426.39, 1019.32, 52.38);
 	--hotspotDB:addHotspot("Silverpine Forest 11 - 13", "Horde", 11, 13, 1131.34, 1265.5, 39.98);
 	hotspotDB:addHotspot("The Dead Field 11 - 13", "Horde", 11, 13, 1125.71, 1489.95, 34.19);
 
