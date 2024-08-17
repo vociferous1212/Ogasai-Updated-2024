@@ -210,7 +210,7 @@ function script_shaman:runBackwards(targetObj, range)
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
  		local moveX, moveY, moveZ = xT + xUV*5, yT + yUV*5, zT + zUV;		
  		if (distance < range) then 
- 			script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
+ 			Move(moveX, moveY, moveZ);
 			if (IsMoving()) then
 				JumpOrAscendStart();
 			end

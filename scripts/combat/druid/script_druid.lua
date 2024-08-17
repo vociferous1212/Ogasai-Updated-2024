@@ -180,7 +180,7 @@ function script_druid:runBackwards(targetObj, range)
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
  		local moveX, moveY, moveZ = xT + xUV*16, yT + yUV*16, zT + zUV;		
  		if (distance < range and targetObj:IsInLineOfSight()) then 
-			script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
+			Move(moveX, moveY, moveZ);
 			if (script_grind.jump) and (IsMoving()) then
 				JumpOrAscendStart();
 			end

@@ -18,7 +18,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);	
 
 	-- If the target moves more than 2 yard then make a new path
-	if(GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 1
+	if(GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 1.5
 		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
 		script_nav.navPosition['x'] = _x;
 		script_nav.navPosition['y'] = _y;
@@ -49,7 +49,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 15) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 45) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		return "Generating a new path...";
 	end

@@ -166,7 +166,7 @@ function script_mage:runBackwards(targetObj, range)
 			and (targetObj:IsInLineOfSight())
 			and (not script_checkDebuffs:hasDisabledMovement())
 		then 		
- 			if (script_navEX:moveToTarget(localObj, moveX, moveY, moveZ)) then
+ 			if (Move(moveX, moveY, moveZ)) then
  				return true;
 			end
 		return;

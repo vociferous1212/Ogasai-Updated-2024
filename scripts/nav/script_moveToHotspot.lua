@@ -8,15 +8,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		return false;
 	end
 
-	-- use unstuck feature
-	if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
-	end
-
-	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
+	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
@@ -27,11 +19,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 			if (not IsInCombat()) and (not script_gather.gathering) then
 				script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime*1000;
 			end
-			if (not IsMoving() and not IsPathLoaded(5)) then
-				Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-				script_nav.message = "Stuck out of bounds or stuck not moving...";
-			end
-		script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+			
 		end
 			-- mount/stealth/cat form/ travel form/ ghost wolf
 			if (not IsMounted() and not script_grind.useMount) and (HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
@@ -58,7 +46,10 @@ function script_moveToHotspot:moveToHotspot(localObj)
 			if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
 				hsDist = math.floor(script_nav:getDistanceToHotspot());
 			end
-			
+	
+		
+		self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+
 		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 	else
 		return "No hotspot has been loaded...";

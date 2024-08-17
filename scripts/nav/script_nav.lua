@@ -121,7 +121,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		return script_moveToHotspot:moveToHotspot(localObj);
 	end
 
-	-- Check: If we reached the last location index
+		-- Check: If we reached the last location index
 	if (self.currentGoToLocation > (self.numSavedLocation - 1)) then
 		self.currentGoToLocation = 0;
 	end
@@ -135,16 +135,13 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		self.currentGoToLocation = self.currentGoToLocation + 1;
 		return "Changing go to location...";
 	end
+
 	
 	if (script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z'])) then
-		self.message = "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
-		if (not IsMoving()) or not (IsPathLoaded(5)) then
-			Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-		end
-	return true;
+		return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
+		
 	end
-return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
-
+	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
 
 function script_nav:setNextToNodeDist(distance)
@@ -198,7 +195,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		self.navPathPosition['y'] = _y;
 		self.navPathPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		self.lastpathnavIndex = 0; 
+		self.lastpathnavIndex = 1; 
 		end
 		
 	elseif (script_grind.gather) and (not localObj:IsDead()) and (self.navPathPosition['x'] ~= _x) or (self.navPathPosition['y'] ~= _y) or (self.navPathPosition['z'] ~= _z)
