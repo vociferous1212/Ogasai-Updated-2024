@@ -289,23 +289,6 @@ function script_warlock:run(targetGUID)
 		return 4;
 	end
 
-	-- resummon pet
-	if (self.useVoid or self.useImp or self.useSuccubus or self.useFelhunter) and (not HasPet()) and (HasSpell("Summon Imp")) 
-		and ( (localMana >= 45) or (localObj:HasBuff("Fel Domination") and localMana >= 30) ) then
-		if (IsMoving()) then
-			StopMoving();
-			return true;
-		end
-		if (not HasPet()) and (not IsCasting()) and (not IsChanneling()) then
-			if (script_warlockEX2:summonPet()) then
-				self.waitTimer = GetTimeEX() + 15000;
-				script_grind:setWaitTimer(15000);
-				return 4;
-			end
-			return 4;
-		end
-	end
-
 	-- sacrifice voidwalker low health
 	if (HasPet()) and (self.useVoid) and (self.hasSacrificeSpell) and (self.sacrificeVoid) and (localHealth <= self.sacrificeVoidHealth or GetPet():GetHealthPercentage() <= self.sacrificeVoidHealth) then
 		if (not script_grind.adjustTickRate) then
@@ -325,6 +308,23 @@ function script_warlock:run(targetGUID)
 			self.waitTimer = GetTimeEX() + 12000;
 			script_grind:setWaitTimer(1200);
 			return true;
+		end
+	end
+
+-- resummon pet
+	if (self.useVoid or self.useImp or self.useSuccubus or self.useFelhunter) and (not HasPet()) and (HasSpell("Summon Imp")) 
+		and ( (localMana >= 45) or (localObj:HasBuff("Fel Domination") and localMana >= 30) ) then
+		if (IsMoving()) then
+			StopMoving();
+			return true;
+		end
+		if (not HasPet()) and (not IsCasting()) and (not IsChanneling()) then
+			if (script_warlockEX2:summonPet()) then
+				self.waitTimer = GetTimeEX() + 15000;
+				script_grind:setWaitTimer(15000);
+				return 4;
+			end
+			return 4;
 		end
 	end
 
@@ -1230,11 +1230,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 
 	-- force bot to stop when using consume shadows
 	if (self.consumeShadowsTimer > GetTimeEX()) then
-		if (IsMoving()) then
-			StopMoving();
-			return true;
-		end
-	return true;
+		return true;
 	end
 
 	-- consume shadows
