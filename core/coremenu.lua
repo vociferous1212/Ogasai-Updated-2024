@@ -11,9 +11,6 @@ end
 
 function coremenu:draw()
 
-	-- should tell the bot to keep variables if disconnected or switching areas (loading screens)
-	PersistLoadingScreen(true);
-
 	if (self.isSetup == false) then
 		self.isSetup = true;
 		--[[
