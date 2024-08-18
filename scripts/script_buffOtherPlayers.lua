@@ -45,7 +45,11 @@ function script_buffOtherPlayers:doBuffs()
 						if i:GetLevel() >= Sp[r] then
 	
 							-- needed to actually target the player... can be called from a different function though
-							i:AutoAttack();
+							name = i:GetUnitName();
+							TargetByName(name);
+							if (PlayerHasTarget()) and (UnitOnTaxi("target"))  then
+								ClearTarget();
+							end
 	
 							local myTarget = i;
 	

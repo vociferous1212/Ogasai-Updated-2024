@@ -1,5 +1,4 @@
 script_runner = {
-	unstuckLoaded = include("scripts\\script_unstuck.lua"),
         nRcombo = 0, -- selected destination number (combo box)
         runit = false, 
         distDestination = 0,
@@ -29,11 +28,9 @@ script_runner = {
 	generating = false,
 	avoidTimer = 0,
 	destinationReached = false,
-	avoidAggro = false,
+	avoidAggro = true,
 	safeDistance = 5,
-	genTime = GetTimeEX(),
-	useUnstuck = true,
-	pause = false,
+	genTime = GetTimeEX()
 }
 
 function script_runner:window()
@@ -41,62 +38,10 @@ function script_runner:window()
 	--Close existing Window
 	EndWindow();
 
-	if(NewWindow("Runner", 200, 200)) then
+	if(NewWindow("[Runner", 200, 200)) then
 		script_runner:menu();
 	end
 
-end
-
-function script_runner:setup()
-
-	-- Add Destinations
-
-	script_runner:addDestination("Tanaris Avoid Demo Start", -7288.0126953125, -3773.5656738281, 9.1952447891235, 1, 440);
-	script_runner:addDestination("Tanaris Avoid Demo Stop", -7427.31, -3759.38, 11.87, 10.79, 1, 440);
-	script_runner:addDestination("Razor Hill - Durator", 323.82, -4736.34, 9.80, 1, 14);
-	script_runner:addDestination("Orgrimmar - Durator", 1620.57, -4433.01, 11.07, 1, 1637);
-	script_runner:addDestination("The Crossroads - The Barrens", -433.57, -2651.16, 95.96, 1, 17);
-	script_runner:addDestination("Camp Taurajo - The Barrens", -2356.23, -1964.11, 96.06, 1, 17);
-	script_runner:addDestination("Brackenwall Village - Dustwallow Marsh", -3154.01, -2900.93, 33.83, 0, 0);
-	script_runner:addDestination("Splintertree Post - Ashenvale", 2324.94, -2546.02, 101.05, 1, 331);
-	script_runner:addDestination("Bloodvenom Post - Felwood", 5105.07, -353.01, 357.25, 1, 361);
-	script_runner:addDestination("Valormok - Aszhara", 3609.11, -4410.26, 114.02, 0, 0);
-	script_runner:addDestination("Bloodhoof Village - Mulgore", -2335.72, -361.89, -8.56, 1, 215);
-	script_runner:addDestination("Sun Rock Retreat - Stonetalon Mountains", 924.82, 906.05, 104.97, 0, 0);
-	script_runner:addDestination("Freewind Post - Thousand Needles", -5455.99, -2451.29, 89.41, 0, 0);
-	script_runner:addDestination("Gadgetzan - Tanaris", -7157.03, -3824.21, 8.55, 0, 0);
-	script_runner:addDestination("Marshal's Refuge - Un'Goro Crater", -6149.63, -1082.23, -199.68, 0, 0);
-	script_runner:addDestination("Cenarion Hold - Silithus", -6836.59, 745.39, 42.60, 0, 0);
-	script_runner:addDestination("Light's Hope Chapel", 2282.57, -5317.24, 88.55, 0, 0);
-	script_runner:addDestination("Brill - Tirisfal Glades", 2234.78, 251.79, 33.56, 0, 0);
-	script_runner:addDestination("The Bulwark - Tirisfal Glades", 1709.83, -737.01, 54.28, 0, 0);
-	script_runner:addDestination("The Sepulcher - Tirisfal Glades", 508.36, 1622.63, 125.54, 0, 130);
-	script_runner:addDestination("Tarren Mill - Hillsbrad Foothills", -25.29, -930.49, 54.84, 0, 267);
-	script_runner:addDestination("Southshore - Hillsbrad Foothills", -853.22, -533.52, 9.96, 0, 267);
-	script_runner:addDestination("Hammerfall - Arathi Highlands", -934.21, -3522.75, 70.93, 0, 45);
-	script_runner:addDestination("Refuge Pointe - Arathi Highlands", -1246.61, -2529.32, 20.61, 0, 45);	
-	script_runner:addDestination("Kargath - Badlands", -6673.03, -2181.01, 243.78, 0, 3);
-	script_runner:addDestination("Thorium Point - Searing Gorge", -6505.15, -1167.08, 308.81, 0, 51);
-	script_runner:addDestination("Flame Crest - Burning Steppes", -7504.19, -2182.93, 165.81, 0, 46);
-	script_runner:addDestination("Morgan's Vigil - Burning Steppes", -8361.44, -2753.10, 185.55, 0, 46);
-	script_runner:addDestination("Stonard - Swamp of Sorrows", -10459.82, -3261.91, 20.18, 0, 8);
-	script_runner:addDestination("Grom'gol - Stranglethorn Vale", -12388.52, 151.96, 2.63, 0, 33);
-	script_runner:addDestination("Booty Bay - Stranglethorn Vale", -14448.18, 473.49, 15.21, 0, 33);
-	script_runner:addDestination("Shadowprey Village - Desolace", -1616.38, 3115.15, 43.25, 1, 405);
-	script_runner:addDestination("Camp Mojache - Feralas", -4431.41, 257.74, 37.48, 1, 357);
-	script_runner:addDestination("The Forgotten Coast - Feralas", -4346.82, 2329.58, 8.33, 1, 357);
-	script_runner:addDestination("Everlook - Winterspring", 6707.71, -4670.25, 721.39, 1, 618);
-	script_runner:addDestination("Nighthaven - Moonglade", 7945.57, -2577.50, 489.92, 1, 493);
-	script_runner:addDestination("Ratchet - The Barrens", -1028.38, -3669.89, 22.95, 1, 17);
-	script_runner:addDestination("Scarlet Monastery Meeting Stone",  2663.21, -682.73, 113.44, 0, 85);
-
-
-	-- end of destinations
-
-	self.timer = GetTimeEX();
-	self.genTimer = GetTimeEX();
-	self.avoidTimer = GetTimeEX();
-	self.isSetup = true;
 end
 
 function script_runner:DrawCircles(pointX,pointY,pointZ,radius)
@@ -173,74 +118,15 @@ function script_runner:avoidToAggro(safeMargin)
 			local safeRange = safeMargin+1;
 			local intersectMob = script_runner:aggroIntersect(closestEnemy);
 			if (intersectMob ~= nil) then
-				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21 + safeRange; 
+				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21 + aggro; 
 				local x, y, z = closestEnemy:GetPosition();
 				local xx, yy, zz = intersectMob:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
-				script_runner:avoid(centerX, centerY, zP, aggroRange/2, safeRange);
+				script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange);
 			else
 				script_runner:avoid(xT, yT, zP, aggro, safeRange);
 			end
 
-			return true;
-	end
-
-	return false;
-end
-
-function script_runner:avoidToBlacklist(safeMargin) 
-	local countUnitsInRange = 0;
-	local currentObj, typeObj = GetFirstObject();
-	local localObj = GetLocalPlayer();
-	local closestEnemy = 0;
-	local closestDist = 999;
-	local aggro = 0;
-
-	if (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-		enemy = localObj;
-	else
-		enemy = script_grind.enemyObj;
-	end
-
-	while currentObj ~= 0 do
- 		if typeObj == 3 then
-			aggro = currentObj:GetLevel() - localObj:GetLevel() + 21;
-			local range = aggro + safeMargin+5;
-			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range and script_grind:isTargetBlacklisted(currentObj:GetGUID()) and (not script_grind:isTargetingMe(currentObj)) then
-				if (closestEnemy == 0) and (not GetLocalPlayer():GetUnitsTarget() ~= 0 and enemy:GetGUID() ~= currentObj:GetGUID()) then
-					closestEnemy = currentObj;
-				else
-					local dist = currentObj:GetDistance();
-					if (dist < closestDist) then
-						closestDist = dist;
-						closestEnemy = currentObj;
-					end
-				end
- 			end
- 		end
- 		currentObj, typeObj = GetNextObject(currentObj);
- 	end
-
-	-- avoid the closest mob
-	if (closestEnemy ~= 0) then
-
-			local xT, yT, zT = closestEnemy:GetPosition();
-
- 			local xP, yP, zP = localObj:GetPosition();
-
-			local safeRange = safeMargin;
-			local intersectMob = script_runner:aggroIntersect(closestEnemy);
-			if (intersectMob ~= nil) then
-				local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21; 
-				local x, y, z = closestEnemy:GetPosition();
-				local xx, yy, zz = intersectMob:GetPosition();
-				local centerX, centerY = (x+xx)/2, (y+yy)/2;
-				script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange+2);
-			else
-				script_runner:avoid(xT, yT, zP, aggro, safeRange+2);
-			end
-
-			script_nav:navigate(localObj)
 			return true;
 	end
 
@@ -319,54 +205,23 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 		end
 	end
 
-	script_grind.tickRate = 0;
+	-- TODO use closestPoint and closestTargetPoint to calculate direction to travel
 
 	-- Move just outside the aggro range
 	local moveToPoint = closestPoint;
-	local setPoint = 25;
-
-	if (closestPointToDest ~= nil) then	
-		local diffPoint = closestPointToDest - moveToPoint;
-		if (diffPoint <= 0) then
-			moveToPoint = closestPoint - setPoint;
-		else
-			moveToPoint = closestPoint + setPoint;
-		end
-	else
-		-- need to assign blacklisted target only closest target
-		--script_grind:assignTarget();
-		moveToPoint = closestPoint + setPoint;
-	end
 	
-	-- out of bound
-	if (moveToPoint > point or moveToPoint == 0) then
-		moveToPoint = - setPoint;
-		-- need to assign blacklisted target only closest target
-		script_grind:assignTarget();
+	moveToPoint = closestPoint + 4;
+	
+	if (moveToPoint > point) then
+		moveToPoint = 1;
 	end
 
-	if (moveToPoint ~= 0)
-		and (moveToPoint ~= nil)
-		and (points[point].x ~= nil)
-		and (points[point].y ~= nil)
-		and (pointsTwo[moveToPoint] ~= nil)
-		and (pointZ ~= nil)
-		and (point ~= nil)
-		and (points[point] ~= nil)
-
-		then
-
-		if (self.useUnstuck and IsMoving()) then
-			if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-				return true;
-			end
-		end
-
-		if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
-			script_grind:setWaitTimer(300);
-		end
+	if (moveToPoint == 0) then
+		moveToPoint = 1;
 	end
+
+	script_grind.moveTimer = GetTimeEX() + 7000;
+	Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ);
 end
 
 function script_runner:drawAggroCircles()
@@ -394,17 +249,50 @@ function script_runner:drawAggroCircles()
  	end
 end
 
+function script_runner:setup()
+	self.timer = GetTimeEX();
+	self.genTimer = GetTimeEX();
+	self.avoidTimer = GetTimeEX();
+	-- Add Destinations
+	script_runner:addDestination("Tanaris Avoid Demo Start", -7288.0126953125, -3773.5656738281, 9.1952447891235, 1, 440);
+	script_runner:addDestination("Tanaris Avoid Demo Stop", -7427.31, -3759.38, 11.87, 10.79, 1, 440);
+	script_runner:addDestination("Razor Hill - Durator", 323.82, -4736.34, 9.80, 1, 14);
+	script_runner:addDestination("Orgrimmar - Durator", 1620.57, -4433.01, 11.07, 1, 1637);
+	script_runner:addDestination("The Crossroads - The Barrens", -433.57, -2651.16, 95.96, 1, 17);
+	script_runner:addDestination("Camp Taurajo - The Barrens", -2356.23, -1964.11, 96.06, 1, 17);
+	script_runner:addDestination("Brackenwall Village - Dustwallow Marsh", -3154.01, -2900.93, 33.83, 0, 0);
+	script_runner:addDestination("Splintertree Post - Ashenvale", 2324.94, -2546.02, 101.05, 1, 331);
+	script_runner:addDestination("Bloodvenom Post - Felwood", 5105.07, -353.01, 357.25, 1, 361);
+	script_runner:addDestination("Valormok - Aszhara", 3609.11, -4410.26, 114.02, 0, 0);
+	script_runner:addDestination("Bloodhoof Village - Mulgore", -2335.72, -361.89, -8.56, 1, 215);
+	script_runner:addDestination("Sun Rock Retreat - Stonetalon Mountains", 924.82, 906.05, 104.97, 0, 0);
+	script_runner:addDestination("Freewind Post - Thousand Needles", -5455.99, -2451.29, 89.41, 0, 0);
+	script_runner:addDestination("Gadgetzan - Tanaris", -7157.03, -3824.21, 8.55, 0, 0);
+	script_runner:addDestination("Marshal's Refuge - Un'Goro Crater", -6149.63, -1082.23, -199.68, 0, 0);
+	script_runner:addDestination("Cenarion Hold - Silithus", -6836.59, 745.39, 42.60, 0, 0);
+	script_runner:addDestination("Light's Hope Chapel", 2282.57, -5317.24, 88.55, 0, 0);
+	script_runner:addDestination("Brill - Tirisfal Glades", 2234.78, 251.79, 33.56, 0, 0);
+	script_runner:addDestination("The Bulwark - Tirisfal Glades", 1709.83, -737.01, 54.28, 0, 0);
+	script_runner:addDestination("The Sepulcher - Tirisfal Glades", 508.36, 1622.63, 125.54, 0, 130);
+	script_runner:addDestination("Tarren Mill - Hillsbrad Foothills", -25.29, -930.49, 54.84, 0, 267);
+	script_runner:addDestination("Southshore - Hillsbrad Foothills", -853.22, -533.52, 9.96, 0, 267);
+	script_runner:addDestination("Hammerfall - Arathi Highlands", -934.21, -3522.75, 70.93, 0, 45);
+	script_runner:addDestination("Refuge Pointe - Arathi Highlands", -1246.61, -2529.32, 20.61, 0, 45);	
+	script_runner:addDestination("Kargath - Badlands", -6673.03, -2181.01, 243.78, 0, 3);
+	script_runner:addDestination("Thorium Point - Searing Gorge", -6505.15, -1167.08, 308.81, 0, 51);
+	script_runner:addDestination("Flame Crest - Burning Steppes", -7504.19, -2182.93, 165.81, 0, 46);
+	script_runner:addDestination("Morgan's Vigil - Burning Steppes", -8361.44, -2753.10, 185.55, 0, 46);
+	script_runner:addDestination("Stonard - Swamp of Sorrows", -10459.82, -3261.91, 20.18, 0, 8);
+	script_runner:addDestination("Grom'gol - Stranglethorn Vale", -12388.52, 151.96, 2.63, 0, 33);
+	script_runner:addDestination("Booty Bay - Stranglethorn Vale", -14448.18, 473.49, 15.21, 0, 33);
+	script_runner:addDestination("Shadowprey Village - Desolace", -1616.38, 3115.15, 43.25, 1, 405);
+	script_runner:addDestination("Camp Mojache - Feralas", -4431.41, 257.74, 37.48, 1, 357);
+	script_runner:addDestination("The Forgotten Coast - Feralas", -4346.82, 2329.58, 8.33, 1, 357);
+	script_runner:addDestination("Everlook - Winterspring", 6707.71, -4670.25, 721.39, 1, 618);
+	script_runner:addDestination("Nighthaven - Moonglade", 7945.57, -2577.50, 489.92, 1, 493);
+	script_runner:addDestination("Ratchet - The Barrens", -1028.38, -3669.89, 22.95, 1, 17);
 
-function script_runner:printNewPath()
-	DEFAULT_CHAT_FRAME:AddMessage('script_runner: Add this Path to your database by adding the following line in the setup-function in script_runner.lua:');
-	DEFAULT_CHAT_FRAME:AddMessage('You can copy the line from logs//.txt');
-	local x, y, z = GetLocalPlayer():GetPosition();
-	local hx, hy, hz = math.floor(x*100)/100, math.floor(y*100)/100, math.floor(z*100)/100;
-	local cont = GetContinentID();
-	local map = GetMapID();
-	local addString = 'script_runner:addDestination("' .. GetMinimapZoneText() .. '", ' .. hx .. ', ' .. hy .. ', ' .. hz .. ', '.. cont ..', '.. map..');'	
-	DEFAULT_CHAT_FRAME:AddMessage(addString);
-	ToFile(addString);
+	self.isSetup = true;
 end
 
 function script_runner:addDestination(name, x, y, z, continentID, mapID) 
@@ -471,17 +359,6 @@ function script_runner:run()
 	if (not self.isSetup) then
 		script_runner:setup();
 		return;
-	end
-
-	if (self.pause) then self.message = "Paused by user...";
-		return;
-	end
-	
-	if (self.useUnstuck and IsMoving()) and (not self.pause) then
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
 	end
 
 	if (GetTimeEX() < self.timer) then
@@ -582,25 +459,6 @@ end
 function script_runner:menu()
 	--if (CollapsingHeader("[Runner")) then
 
-	if (not self.pause) then
-		if (Button("Pause Bot")) then
-			self.pause = true;
-			StopMoving();
-		end
-	else
-		if (Button("Resume Bot")) then
-			self.pause = false;
-		end
-	end
-	SameLine();
-	if (Button("Reload Scripts"))
-		then coremenu:reload();
-	end
-	SameLine();
-	if (Button("Exit Bot")) then
-		StopBot();
-	end
-
 		-- Setup destinations
 		if (not self.isSetup) then
 			script_runner:setup();
@@ -646,9 +504,6 @@ function script_runner:menu()
 		Text("Distance to destination: " .. string.format("%.0f", self.distDestination) .. ' yards.')
 
 		Separator()
-
-		if (Button("Save current location as the new Runner Path")) then script_runner:printNewPath(); end
-
 
 		local wasClicked = false;
 		wasClicked, self.avoidAggro = Checkbox("Avoid Aggro", self.avoidAggro);

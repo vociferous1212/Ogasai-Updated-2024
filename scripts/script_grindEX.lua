@@ -32,7 +32,7 @@ end
 					local meToTarget = GetDistance3D(lX, lY, lZ, iX, iY, iZ);
 
 					-- aggro range of mobs around me and node
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20.5;
+					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
 
 					if (meToTarget <= aggro) and (i:IsInLineOfSight()) then
 						-- target it...

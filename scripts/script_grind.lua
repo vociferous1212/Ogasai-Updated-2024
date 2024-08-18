@@ -10,6 +10,7 @@ script_grind = {
 	drawStatusEXScript = include("scripts\\script_drawStatusEX.lua"),
 	omLoaded = include("scripts\\script_om.lua"),
 	navFunctionsLoaded 	= include("scripts\\nav\\script_nav.lua"),
+	runnerLoaded 	= include("scripts\\script_runner.lua"),
 	includeNavEX 		= include("scripts\\nav\\script_navEX.lua"),
 	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
@@ -37,7 +38,7 @@ script_grind = {
 
 	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
 	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
-	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
+	priestMenu = include("scripts\\combat\\script_priestMenu.lua"),
 	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
 	rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
 	paladinMenu = include("scripts\\combat\\script_paladinEX.lua"),
@@ -78,7 +79,7 @@ script_grind = {
 	avoidElite = true,	-- avoid elites ( currently not working )
 	avoidRange = 40,	-- aboid elites range
 	findLootDistance = 75,
-	lootDistance = 2.55,
+	lootDistance = 3.05,
 	skipLooting = false,
 	lootCheck = {},
 	minLevel = GetLocalPlayer():GetLevel()-5,
@@ -200,8 +201,10 @@ script_grind = {
 	drawAggroAtStart = true,
 	showOM = false,
 	useFirstAid = true,
-	blacklistTargetName = "";
-	blacklistTargetName2 = "";
+	blacklistTargetName = "",
+	blacklistTargetName2 = "",
+	moveTimer = 0,
+	lastTargetKilled = 0;
 }
 
 function GetObjectsAroundMe()
@@ -250,7 +253,7 @@ function GetObjectsAroundMe()
 			while i ~= 0 do
 				if t ~= 3 and t ~= 4 then
 					if (i:GetDistance() <= 300) then
-						for ooo = 0, 1 do
+						for ooo = 0, 1 -1 do
 							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetObjectDisplayID().." ID");
 						end
 					end
@@ -399,6 +402,7 @@ function script_grind:setup()
 	self.timeToSit = GetTimeEX();
 	script_grindEX.waitTimer = GetTimeEX();
 	script_aggro.waitTimer = GetTimeEX();
+	self.moveTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -1108,9 +1112,17 @@ function script_grind:run()
 						ClearTarget();
 					end
 				end
-			else
+			elseif (not self.attackTargetsOnRoutes) and (script_runner:avoidToAggro(5)) then
+				local x, y, z = GetLocalPlayer():GetPosition();
+				if (GetTimeEX() > self.moveTimer) then
+				self.moveTimer = GetTimeEX() + 10000;
+				GeneratePath(x, y, z, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+				end
+				return true;
+			elseif (GetTimeEX() > self.moveTimer) then
 				self.message = script_moveToHotspot:moveToHotspot(localObj);
 			end
+			
 		end
 		
 		-- use kills to level tracker
@@ -1207,8 +1219,8 @@ function script_grind:run()
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (script_grind.enemyObj:IsDead()) then
-				ex, ey, ez = self.lootObj:GetPosition();
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) then
+				ex, ey, ez = self.lastTargetKilled:GetPosition();
 				Move(ex, ey, ez);
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
@@ -1223,8 +1235,8 @@ function script_grind:run()
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (script_grind.enemyObj:IsDead()) then
-				ex, ey, ez = self.lootObj:GetPosition();
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) then
+				ex, ey, ez = self.lastTargetKilled:GetPosition();
 				Move(ex, ey, ez);
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
@@ -1361,6 +1373,7 @@ function script_grind:run()
 			-- monster kill variable on and off
 			if (self.enemyObj ~= nil and self.enemyObj ~= 0) and (not self.useAnotherVar) then
 				if (self.enemyObj:GetHealthPercentage() <= 20 or self.enemyObj:IsDead()) then
+					self.lastTargetKilled = self.enemyObj;
 					self.monsterKillCount = self.monsterKillCount + 1;
 					self.useAnotherVar = true;
 				end

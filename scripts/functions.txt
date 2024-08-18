@@ -11,6 +11,7 @@ if HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") an
 	return 0;				
 end
 
+for i=0,5 do
 for y=0,GetContainerNumSlots(i) do 
 	if (GetContainerItemLink(i,y) ~= nil) then
 		_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
