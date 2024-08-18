@@ -1120,12 +1120,6 @@ function script_warlock:rest()
 		if (script_warlockEX:checkSoulstonesSpells()) then
 			if (HasPet()) and (HasItem("Soul Shard")) and (not IsInCombat()) and (not localObj:HasBuff("Soulstone Resurrection")) then
 				if (script_warlockEX:checkSoulstones()) then
-					if (IsMoving()) then
-						StopMoving();
-						return true;
-					end
-					self.waitTimer = GetTimeEX() + 2000;
-					script_grind:setWaitTimer(2000);
 				end
 			end
 		-- use soulstone
