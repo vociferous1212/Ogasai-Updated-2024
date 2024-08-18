@@ -147,7 +147,7 @@ function script_grindMenu:menu()
 	elseif (class == 'Warlock') then
 		script_warlockEX:menu();
 	elseif (class == 'Priest') then
-		script_priestEX:menu();
+		script_priestMenu:menu();
 	elseif (class == 'Warrior') then
 		script_warriorEX:menu();
 	elseif (class == 'Paladin') then

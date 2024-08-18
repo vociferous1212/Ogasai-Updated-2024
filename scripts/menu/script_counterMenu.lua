@@ -37,6 +37,7 @@ function script_counterMenu:menu()
 		local test = (moneyObtainedCount - moneyObtainedCountSilver * 100);
 
 		-- copper from gold when we have gold??
+		local test2 = (moneyObtainedCount - moneyObtainedCountSilver) / 100;
 		
 	
 		-- less than 100 copper
@@ -55,7 +56,7 @@ function script_counterMenu:menu()
 		elseif (moneyObtainedCount >= 1000) then
 
 			-- show gold and silver
-			Text("Money Obtained : " ..moneyObtainedCountGold.. " Gold " ..test.. " Silver");
+			Text("Money Obtained : " ..moneyObtainedCountGold.. " Gold " ..test2.. " Silver");
 		end
 
 		-- counter is grind script counter

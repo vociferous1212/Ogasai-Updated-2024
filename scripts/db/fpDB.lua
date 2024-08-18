@@ -8,7 +8,7 @@ fpDB = {isSetup = false, fpList = {}, numfps = 0,}
 -- local fx, fy, fz = GetLocalPlayer():GetUnitsTarget():GetPosition();
 -- local id = GetMapID();
 -- ToFile('"'..name..'";');
--- ToFile('"'..fx..', '..fy..', '..fz..'";');
+-- ToFile(fx..', '..fy..', '..fz..';');
 -- ToFile("id = "..id";");
 
 function fpDB:addFP(name, faction, mapID, posX, posY, posZ)
@@ -115,7 +115,7 @@ end
 function fpDB:crossroads();
 id = GetMapID();
 
-	if (id == 331) and (script_getSpells:areWeAlliance()) then
+	if (id == 331) and (not script_getSpells:areWeAlliance()) then
 		script_goToFP.fpTarget = "Devrak";
 		fx, fy, fz = -437.1369934082, -2596, 95.787719726563;
 
@@ -123,3 +123,11 @@ id = GetMapID();
 return fx, fy, fz;
 end
 
+function fbDB:ratchet()
+id = GetMapID();
+
+	if (id == 331) and (not script_getSpells:areWeAlliance()) then
+		script_goToFP.fpTarget = "Bragok";
+		fx, fy, fz = -898.24597167969, -3769.6499023438, 11.710169792175;
+return fx, fy, fz;
+end

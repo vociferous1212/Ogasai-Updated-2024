@@ -1,7 +1,8 @@
 script_priest = {
 	message = 'Priest Combat Script',
-	priestMenu = include("scripts\\combat\\script_priestEX.lua"),
+	priestExtra2 = include("scripts\\combat\\script_priestEX.lua"),
 	priestExtra = include("scripts\\combat\\script_priestEX2.lua"),
+	priestMenuLoaded = include("scripts\\combat\\script_priestMenu.lua"),
 	isSetup = false,	-- setup stuff
 	isChecked = true,	-- setup stuff
 	drinkMana = 45,	-- drink at health %
@@ -192,6 +193,7 @@ function script_priest:run(targetGUID)
 	
 	-- Assign the target 
 	targetObj =  GetGUIDObject(targetGUID); -- get guid of target and save it
+	
 
 	-- clear target
 	if(targetObj == 0) or (targetObj == nil) or (targetObj:IsDead()) then
@@ -302,10 +304,10 @@ function script_priest:run(targetGUID)
 		end
 
 		-- Don't attack if we should rest first
-		if (GetNumPartyMembers() < 1) and ((localHealth < self.eatHealth or localMana < self.drinkMana) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) then
-				self.message = "Need rest...";
-				return 4;
-		end
+		--if (GetNumPartyMembers() < 1) and ((localHealth < self.eatHealth or localMana < self.drinkMana) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) then
+		--		self.message = "Need rest...";
+		--		return 4;
+		--end
 
 		-- set target health
 		targetHealth = targetObj:GetHealthPercentage();
@@ -363,7 +365,7 @@ function script_priest:run(targetGUID)
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 			
 			-- Opener check range of ALL SPELLS
-			if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+			if ( (targetObj:GetDistance() > self.openerRange and not IsCasting() and not IsChanneling()) or (not targetObj:IsInLineOfSight()) ) then
 				self.message = "Walking to spell range!";
 				return 3;
 			end
@@ -710,12 +712,12 @@ end
 
 
 function script_priest:rest()
-
 	-- check setup
 	if (not self.isSetup) then
 		script_priest:setup();
 	end
 
+	local localObj = GetLocalPlayer();
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
@@ -750,8 +752,16 @@ function script_priest:rest()
 		end
 	end
 
+	if (localObj:HasBuff("Spirit Tap")) and (not IsEating()) and (not IsDrinking()) and (not script_grind:isAnyTargetTargetingMe()) and (localMana >= self.drinkMana/2) and (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
+		if (script_grind.lastTargetKilled ~= 0 and script_grind.lastTargetKilled ~= nil) then
+			local x, y, z = script_grind.lastTargetKilled:GetPosition();
+			Move(x, y, z);
+		return;
+		end
+	end
+
 	-- Stop moving before we can rest
-	if (localHealth <= self.eatHealth) or (localMana <= self.drinkMana) then
+	if (localHealth <= self.eatHealth) or (localMana <= self.drinkMana and not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/2) then
 		if (IsMoving()) then
 			self.waitTimer = GetTimeEX() + 1000;
 			StopMoving();

@@ -924,7 +924,7 @@ function script_mage:rest()
 	local localHealth = localObj:GetHealthPercentage();
 
 	if (self.moveAwayRest) and (localMana < self.drinkMana or localHealth < self.eatHealth) and (not IsInCombat()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-		if (script_checkAdds:avoidToAggro2(script_checkAdds.checkAddsRange+10)) then
+		if (script_checkAdds:avoidToAggro(script_checkAdds.checkAddsRange+10)) then
 			script_grind:setWaitTimer(1700);
 			self.waitTimer = GetTimeEX() + 5500;
 			self.message = "Moving away from adds to drink/eat.";
@@ -1227,7 +1227,7 @@ end
 function script_mage.frostMagePull(targetObj)
 
 	-- recheck line of sight on target
-	if (not IsMounted()) and (not targetObj:IsInLineOfSight()) or (targetObj:GetDistance() > 31) and (PlayerHasTarget()) then
+	if (not IsMounted()) and ( (not targetObj:IsInLineOfSight()) or  (targetObj:GetDistance() > 30 and not IsCasting() and not IsChanneling()) or (targetObj:GetDistance() > 30) ) and (PlayerHasTarget()) then
 		return 3;
 	else
 		if (IsMoving()) then

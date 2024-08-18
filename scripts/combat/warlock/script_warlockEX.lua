@@ -101,6 +101,24 @@ function script_warlockEX:useSoulstones()
 		ClearTarget();
 	end
 
+	local coolDown = 30;
+	for i=0, 6 do
+		for y=0,GetContainerNumSlots(i) do 
+			if (GetContainerItemLink(i,y) ~= nil) then
+				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+				if (itemName == "Minor Soulstone") or (itemName == "Lesser Soulstone") or (itemName == "Soulstone") or (itemName == "Greater Soulstone") or (itemName == "Major Soulstone") then
+					local cooldown = GetContainerItemCooldown(i, y);
+					coolDown = cooldown;
+				end	
+			end
+		end
+	end
+	if (coolDown > 0) then
+		return false;
+	end
+
 	if (HasItem("Major Soulstone")) then
 		UseItem("Major Soulstone");
 		return true;
@@ -194,12 +212,6 @@ function script_warlockEX:menu()
 	if (CollapsingHeader("Warlock Combat Options")) then
 		if (script_warlockEX:checkSoulstonesSpells()) then
 			wasClicked, script_warlock.useSoulstone = Checkbox("Use Soul Stones", script_warlock.useSoulstone);
-			if (script_warlock.useSoulstone) then
-				SameLine();
-				Text("	Make sure item is not on CD!");
-				Text("Can bug out if you accept a res and stone is on CD");
-				Separator();
-				end
 		end
 		
 		if (HasSpell("Corruption")) then

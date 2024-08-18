@@ -58,7 +58,7 @@ script_follow = {
 
 -- i'm sorry :( file size limitations....
 function script_follow:window() if (self.isChecked) then EndWindow(); if(NewWindow("Follower Options", 320, 360)) then script_followMenu:menu(); end end end
-function script_follow:setup() self.lootCheck['timer'] = 0; self.lootCheck['target'] = 0; script_helper:setup(); script_followEX2:setup(); self.isSetup = true; ClearTarget(); end
+function script_follow:setup() self.lootCheck['timer'] = 0; self.lootCheck['target'] = 0; script_helper:setup(); script_followEX2:setup(); script_priestFollowerHeals.timer = GetTimeEX(); self.isSetup = true; ClearTarget(); end
 function script_follow:draw() script_followEX:drawStatus(); end
 function script_follow:setWaitTimer(ms) self.waitTimer = GetTimeEX() + (ms); end
 function GetPartyLeaderObject() if GetNumPartyMembers() > 0 then leaderObj = GetPartyMember(GetPartyLeaderIndex()); if (leaderObj ~= nil) then return leaderObj; end end return 0; end
@@ -235,7 +235,7 @@ function script_follow:run() script_follow:window();
 			-- Healer check: heal/buff the party
 			for i = 1, GetNumPartyMembers() do
 				local member = GetPartyMember(i);
-				if (not member:IsDead()) and (not localObj:IsDead()) and (not IsMoving()) then
+				if (not member:IsDead()) and (not localObj:IsDead()) and (not IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
 					if (script_followHealsAndBuffs:healAndBuff()) then
 						--self.waitTimer = GetTimeEX() + 1550;
 						self.message = "Healing/buffing the party...";
