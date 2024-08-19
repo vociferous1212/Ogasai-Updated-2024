@@ -34,6 +34,9 @@ function script_rotationEX:draw()
 		return; 
 	end
 
+	if (script_rotation.drawChests) then script_gather:drawChestNodes();
+	end
+
 	-- color
 	local r, g, b = 255, 55, 55;
 

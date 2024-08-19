@@ -32,7 +32,7 @@ end
 function script_rotation:window() -- stuff here runs continous
 	EndWindow(); if(NewWindow("Rotation", 320, 300)) then script_rotationMenu:menu(); end
 	-- draw chests
-	if (self.drawChests) then script_gather:drawChestNodes(); end if (self.useExpChecker) then script_expChecker:menu(); end
+	if (self.useExpChecker) then script_expChecker:menu(); end
 end
 
 function script_rotation:run()
@@ -65,7 +65,7 @@ function script_rotation:run()
 	end
 	self.waitTimer = GetTimeEX() + self.tickRate;
 	if (not self.adjustTickRate) then
-			local tickRotationRandom = random(400, 1200);
+			local tickRotationRandom = random(200, 400);
 		if (not GetLocalPlayer():GetUnitsTarget() == 0) or (IsMoving()) then
 			script_rotation.tickRate = 135;
 
@@ -74,20 +74,22 @@ function script_rotation:run()
 		end
 	end
 
-	if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (not IsLooting()) then
 		local target = GetTarget();
 		if (target:CanAttack()) then
 			self.enemyObj = target;
-		else
+		elseif (not IsLooting()) then
 			self.enemyObj = nil;
 		end
 	end
 	
 	if (not localObj:IsDead()) then
 		
-		self.enemyObj = GetTarget();		
+		self.enemyObj = GetTarget();
 
-		if(self.enemyObj ~= 0) then
+	
+
+		if(self.enemyObj ~= 0) and (self.enemyObj:CanAttack()) then
 
 			-- Auto dismount if in range
 			if (IsMounted()) then 
@@ -107,6 +109,12 @@ function script_rotation:run()
 			return;
 			end
 		else
+			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+				if (not self.enemyObj:CanAttack()) then
+					ClearTarget();
+				end	
+			end
+
 			-- Rest
 			if (script_rotation:runRest()) then
 				return;

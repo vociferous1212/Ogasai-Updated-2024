@@ -417,7 +417,8 @@ function script_grind:setup()
 	script_aggro.waitTimer = GetTimeEX();
 	self.moveTimer = GetTimeEX();
 	script_goToFP.goToFPTimer = GetTimeEX();
-
+	script_nav.timer = GetTimeEX();
+	script_navEXCombat.timer = GetTimeEX();
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
 		script_gather.safeGather = false;
@@ -632,10 +633,22 @@ function script_grind:run()
 	if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
 		self.hotspotReached = false;
 	end	
-		
 
-
-
+	-- go to FP buttons
+	if (fpDB.goTo) and (not GetLocalPlayer():IsDead()) and (not IsEating()) and (not IsDrinking()) then	
+		if (IsInCombat() and self.pause) then
+			if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
+				if (RunCombatScript(GetLocalPlayer():GetUnitsTarget():GetGUID())) then
+					self.pause = false;
+					return true;
+				end
+			end
+		elseif (not IsInCombat()) then
+			self.pause = true;
+			fpDB:goToAshenvale();
+			return true;
+		end
+	end
 
 
 
@@ -1395,16 +1408,19 @@ function script_grind:run()
 				script_grind:assignTarget();
 			end
 
+			if (not IsMoving()) then
 			-- combat script message
 			self.message = "Running the combat script...";
-
+			end
 			-- death counter turning variable on and off for 2 or more enemies attacking us
 			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 				if (IsInCombat()) and (self.enemyObj:GetHealthPercentage() > 20) then
 					self.useAnotherVar = false;
 				end
+				if (self.enemyObj:GetHealthPercentage() <= 40 or self.enemyObj:IsDead()) then
+					self.lastTargetKilled = self.enemyObj;
+				end
 			end
-
 			-- monster kill variable on and off
 			if (self.enemyObj ~= nil and self.enemyObj ~= 0) and (not self.useAnotherVar) then
 				if (self.enemyObj:GetHealthPercentage() <= 20 or self.enemyObj:IsDead()) then
@@ -1921,8 +1937,10 @@ end
 function script_grind:isTargetingMe(i) 
 	local localPlayer = GetLocalPlayer();
 	if (localPlayer ~= nil and localPlayer ~= 0 and not localPlayer:IsDead()) then
+		if (i) ~= nil then
 		if (i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0) then
 			return i:GetUnitsTarget():GetGUID() == localPlayer:GetGUID();
+		end
 		end
 	end
 	return false;
@@ -2481,12 +2499,6 @@ function script_grind:lootAndSkin()
 end
 
 function script_grind:runRest()
-
-		if (script_checkAdds:checkAdds()) then
-				script_grind:setWaitTimer(3500);
-				script_om:FORCEOM();
-				return;
-			end
 
 
 		local localObj = GetLocalPlayer();
