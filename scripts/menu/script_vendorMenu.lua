@@ -38,7 +38,7 @@ function script_vendorMenu:menu()
 
 	wasClicked, script_grind.repairWhenYellow = Checkbox("Repair When Gear Is Yellow", script_grind.repairWhenYellow);
 
-	if (CollapsingHeader("Selling Options:")) then
+	if (CollapsingHeader(">>> |+| Selling Options:")) then
 		local wasClicked = false;
 		local keepBox = false;
 		wasClicked, script_vendor.sellPoor = Checkbox("Sell Poor Items (Grey)", script_vendor.sellPoor);
@@ -64,7 +64,7 @@ function script_vendorMenu:menu()
 		Text("keep item list when reloading scripts...");
 	end
 
-	if (CollapsingHeader("Vendor NPC And Buy Options")) then
+	if (CollapsingHeader(">>> |+| Vendor NPC And Buy Options")) then
 		wasClicked, script_grind.autoSelectVendors = Checkbox("Auto Load Closest Vendors", script_grind.autoSelectVendors);
 			SameLine();
 			local x, y, z = GetLocalPlayer():GetPosition();

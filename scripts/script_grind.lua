@@ -522,7 +522,11 @@ function script_grind:run()
 	script_grind:window();
 
 	if (script_grindMenu.showGarbageBox) then
-		collectgarbage(Fcollect);
+		collectgarbage(collect);
+	end
+
+	if (not HasSpell("First Aid")) then
+		script_grind.useFirstAid = false;
 	end
 
 	-- loot quick disenchanting

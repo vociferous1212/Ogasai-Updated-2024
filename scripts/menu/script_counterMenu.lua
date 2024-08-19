@@ -7,7 +7,7 @@ function script_counterMenu:menu()
 	Separator();
 
 	-- show text since last reload
-	Text("Counters Since Last Reload - ");
+	Text("Counters Since Last Reload - "); SameLine(); Text(" | "); SameLine(); wasClicked, script_grind.useFirstAid = Checkbox("Auto FirstAid", script_grind.useFirstAid);
 
 		-- counter is grindEX script counter
 		local lastReloadDeathCounter = script_grindEX.deathCounter;

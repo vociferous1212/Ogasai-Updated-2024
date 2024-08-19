@@ -168,51 +168,33 @@ function script_grindMenu:menu()
 
 	script_grindPartyMenu:menu();
 
+	if (CollapsingHeader("Trainers and Flight Path Options")) then
+		wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
+		wasClicked, script_grind.useFPS = Checkbox("Use Flight Paths (level 20 areas and under)", script_grind.useFPS);
+		
+		if (CollapsingHeader(">>> |+| Testing Stuff")) then
+			Text("Testing... Go To FP and kill on the way...");
+
+			if (fpDB.goTo) then
+				if (Button("STOP")) then
+					fpDB.goTo = false;
+				end
+			end
+			if (fpDB.goTo) then
+				SameLine();
+			end
+			if (Button("Ashenvale")) then
+				fpDB.goTo = true;
+				
+			end
+		end
+	end
+
 	if (script_grindMenu.debugMenu) then
 		script_debugMenu:menu();
 	end
 
 	script_counterMenu:menu();
 
-	Separator();
-	if (CollapsingHeader("Other Stuff")) then
-		Text("These checkboxes have no home yet");
-		wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
-		SameLine();
-		wasClicked, script_grind.showOM = Checkbox("Show Object Manager", script_grind.showOM);
-		
-		wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
-		SameLine();
-		wasClicked, script_grind.useFirstAid = Checkbox("Auto FirstAid", script_grind.useFirstAid);
-		if (not HasSpell("First Aid")) then
-			script_grind.useFirstAid = false;
-		end
-	
-		if (script_grind.getSpells) then
-			Separator();
-		end
-		wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
-		wasClicked, script_grind.useFPS = Checkbox("Use Flight Paths (level 20 areas and under)", script_grind.useFPS);
-		if (script_grind.useFPS) then
-			Text("Works gathering spells and simply leaving a city");
-		end
-
-		if (CollapsingHeader("Testing Stuff")) then
-		Text("Testing... Go To FP and kill on the way...");
-
-		if (fpDB.goTo) then
-			if (Button("STOP")) then
-				fpDB.goTo = false;
-			end
-		end
-		if (fpDB.goTo) then
-			SameLine();
-		end
-		if (Button("Ashenvale")) then
-			fpDB.goTo = true;
-			
-		end
-		end
-	end
 	end
 end

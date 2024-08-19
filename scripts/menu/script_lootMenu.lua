@@ -6,7 +6,7 @@ function script_lootMenu:menu()
 		local wasClicked = false;
 
 		if (script_grind.deleteItems) then
-			if (CollapsingHeader("|+| Items To Delete")) then
+			if (CollapsingHeader(">>> |+| Items To Delete")) then
 				--for i=0, script_deleteItems.deleteNum -1 do
 				--	Text(script_deleteItems.deleteItems[i]);
 				--end
