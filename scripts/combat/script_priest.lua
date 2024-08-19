@@ -30,7 +30,7 @@ script_priest = {
 	swpMana = 15, -- Use shadow word: pain above this mana %
 	followTargetDistance = 100,
 	rangeDistance = 28,
-	openerRange = 26,	-- range to return 3 / walk to target to attack
+	openerRange = 28,	-- range to return 3 / walk to target to attack
 	useDOTOnAdds = true,
 	useHexOfWeakness = false,
 	useShadowGuard = false,
@@ -325,14 +325,11 @@ function script_priest:run(targetGUID)
 		-- use mind blast on CD
 		if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() < 29) then
-				if (IsMoving()) then
-					StopMoving();
-					return true;
-				end
+				
 				CastSpellByName("Mind Blast", targetObj);
 				targetObj:FaceTarget();
 				self.waitTimer = GetTimeEX() + 1550;
-				return;
+				return true;
 			end
 		end
 
@@ -372,6 +369,7 @@ function script_priest:run(targetGUID)
 			-- Opener check range of ALL SPELLS
 			if ( (targetObj:GetDistance() > self.openerRange and not IsCasting() and not IsChanneling()) or (not targetObj:IsInLineOfSight()) ) then
 				self.message = "Walking to spell range!";
+				self.waitTimer = GetTimeEX() + 150;
 				return 3;
 			end
 
@@ -413,11 +411,12 @@ function script_priest:run(targetGUID)
 
 			-- Mind Blast to pull
 			if (not IsMoving()) and (HasSpell("Mind Blast")) and (localMana >= self.mindBlastMana) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) and (targetObj:IsInLineOfSight()) then
-				if (IsMoving()) then
+				
+				if (not Cast("Mind Blast", targetObj)) then	
+if (IsMoving()) then
 					StopMoving();
 					return true;
 				end
-				if (not Cast("Mind Blast", targetObj)) then	
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1850;
 					self.message = "Casting Mind Blast!";
@@ -505,6 +504,7 @@ function script_priest:run(targetGUID)
 			end
 
 			if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+				self.waitTimer = GetTimeEX() + 150;
 				return 3;
 			end
 
@@ -578,7 +578,7 @@ function script_priest:run(targetGUID)
 					CastSpellByName("Mind Blast", targetObj);
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1550;
-					return;
+					return true;
 				end
 			
 			end
@@ -760,8 +760,9 @@ function script_priest:rest()
 	if (localObj:HasBuff("Spirit Tap")) and (not IsEating()) and (not IsDrinking()) and (not script_grind:isAnyTargetTargetingMe()) and (localMana >= self.drinkMana/2) and (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
 		if (script_grind.lastTargetKilled ~= 0 and script_grind.lastTargetKilled ~= nil) and (script_grind.lastTargetKilled:GetDistance() > 5) then
 			local x, y, z = script_grind.lastTargetKilled:GetPosition();
-			Move(x, y, z);
-		return true;
+			if (Move(x, y, z)) then
+				return;
+			end
 		end
 	end
 
@@ -777,7 +778,7 @@ function script_priest:rest()
 	-- check heals and buffs
 	if (IsStanding()) then
 		if (script_priestEX:healsAndBuffs(localObj, localMana)) then 
-			return;
+			return true;
 		end
 	end
 

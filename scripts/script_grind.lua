@@ -2482,6 +2482,13 @@ end
 
 function script_grind:runRest()
 
+		if (script_checkAdds:checkAdds()) then
+				script_grind:setWaitTimer(3500);
+				script_om:FORCEOM();
+				return;
+			end
+
+
 		local localObj = GetLocalPlayer();
 		local localHealth = localObj:GetHealthPercentage();
 		local localMana = localObj:GetManaPercentage();
@@ -2513,11 +2520,6 @@ function script_grind:runRest()
 		if (not script_grind.adjustTickRate) then
 			local randomRestTick = math.random(300, 500);
 			script_grind.tickRate = randomRestTick;
-		end
-
-		if (GetLocalPlayer():HasBuff("Spirit Tap")) and (GetLocalPlayer():GetManaPercentage() >= script_priest.drinkMana) then
-			self.needRest = false;
-			return false;
 		end
 
 		self.message = "Resting...";
