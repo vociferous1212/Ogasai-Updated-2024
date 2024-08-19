@@ -93,13 +93,44 @@ function fpDB:removeFP()
 	end
 end
 
+function fpDB:goToAshenvale()
+	local faction = GetFaction();
+	local myfaction = 1;
+	if faction == 1 or faction == 3 or faction == 4 or faction == 115 then
+		myfaction = 0;
+	end
+
+	local x, y, z = GetLocalPlayer():GetPosition();
+	if (myfaction == 1) then
+		if (GetDistance3D(x, y, z, 2305.6398925781, -2520.1499023438, 103.80885314941) > 5) then
+			if (script_navEX:moveToTarget(GetLocalPlayer(), 2305.6398925781, -2520.1499023438, 103.80885314941)) then
+					return true;
+				end
+		else
+			fpDB.goTo = false;
+		end
+	end
+	if (myfaction == 0) then
+		if (GetDistance3D(x, y, z, 2828.3798828125, -284.25, 106.67706298828) > 5) then
+			if (script_navEX:moveToTarget(GetLocalPlayer(), 2828.3798828125, -284.25, 106.67706298828)) then
+				return true;
+			end
+		else
+			fpDB.goTo = false;
+		end
+	end
+return false;
+end
+
 
 
 function fpDB:setup()
 
-	--ashenvale
+	--ashenvale alliance
 	fpDB:addFP("Daelyshia", 0, 331, 2828.3798828125, -284.25, 106.67706298828);
+	--ashenvale horde
 	fpDB:addFP("Vhulgra", 1, 331, 2305.6398925781, -2520.1499023438, 103.80885314941);
+	fpDB:addFP("Andruk", 1, 331, 3373.6899414063, 994.35101318359, 5.2784662246704);
 
 	--westfall
 	fpDB:addFP("Thor", 0, 40, -10628.299804688, 1037.2700195313, 34.110454559326);

@@ -233,6 +233,7 @@ function script_follow:run() script_follow:window();
 		-- do combat
 		if (not localObj:IsDead()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
 
+			if (script_priestFollowerHeals.enableHeals) then
 			-- Healer check: heal/buff the party
 			for i = 1, GetNumPartyMembers() do
 				local member = GetPartyMember(i);
@@ -245,6 +246,7 @@ function script_follow:run() script_follow:window();
 					end
 				end
 			end
+			end
 	
 			if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then
 				self.combatError = script_followDoCombat:run();
@@ -254,6 +256,7 @@ function script_follow:run() script_follow:window();
 			self.enemyObj = nil;
 
 			-- Healer check: heal/buff the party
+			if (script_priestFollowerHeals.enableHeals) then
 			for i = 1, GetNumPartyMembers() do
 				local member = GetPartyMember(i);
 				if (not member:IsDead()) and (not localObj:IsDead()) and (not IsMoving()) then
@@ -263,6 +266,7 @@ function script_follow:run() script_follow:window();
 						return true;
 					end
 				end
+			end
 			end
 
 			local leader = GetPartyLeaderObject();

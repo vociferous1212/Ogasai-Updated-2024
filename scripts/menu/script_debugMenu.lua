@@ -86,6 +86,12 @@ function script_debugMenu:menu()
 			Text("Grinder enemyObj - No Target!");
 		end
 
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+			local za = GetTarget():GetCasting();
+			Text("GetCasting() - "..za);
+		else
+			Text("GetCasting() - No Target!");
+		end
 			-- show vendor status
 			local f = script_vendor.status;
 			Text("Vendor status - " ..f);

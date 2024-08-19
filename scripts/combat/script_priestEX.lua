@@ -1,5 +1,5 @@
 script_priestEX = {
-			waitTimer = 0,
+			waitTimer = 0, flashHealTimer = 0,
 
 }
 
@@ -67,7 +67,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 
 		-- priest shadowguard
 		if (script_priest.useShadowGuard) and (HasSpell("Shadowguard")) and (not localObj:HasBuff("Shadowguard")) and (not IsSpellOnCD("Shadowguard")) and (localMana >= 15) then
-			if (CastSpellByName("Shadowguard")) then
+			if (not CastSpellByName("Shadowguard")) then
 				self.waitTimer = GetTimeEX() + 1500;
 				return true;
 			end
@@ -152,10 +152,9 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		-- Cast Flash Heal
 		if (not script_priest.shadowForm) then	-- if not in shadowform
 			if (localMana >= 8) and (localHealth <= script_priest.flashHealHP) then
-				if (CastHeal("Flash Heal", localObj)) then
+					script_priestEX:castFlashHeal();
 					script_grind:setWaitTimer(1700);
-					return 0;	-- if cast 
-				end
+					return true;
 			end
 		end
 	
@@ -185,7 +184,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 			if (localMana > 20) and (HasSpell("Cure Disease")) then
 				CastSpellByName("Cure Disease", localObj);
 				script_grind:setWaitTimer(1750);
-				return 0;
+				return true;
 			end
 		end
 	
@@ -198,9 +197,10 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 					TargetByName(name);
 					CastSpellByName("Dispel Magic", localObj);
 					script_grind:setWaitTimer(1750);
-					return 0;
+					return 4;
 				end
 			end
+		return;
 		end
 
 
@@ -224,6 +224,16 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 					return 0;
 				end
 			end
+		end
+	end
+return false;
+end
+function script_priestEX:castFlashHeal()
+	if (HasSpell("Flash Heal")) and (not IsSpellOnCD("Flash Heal")) and (GetTimeEX() > self.flashHealTimer) then
+		if (CastSpellByName("Flash Heal")) then
+			self.waitTimer = GetTimeEX() + 1500;
+			self.flashHealTimer = GetTimeEX() + 2500;
+			return 4;
 		end
 	end
 return false;

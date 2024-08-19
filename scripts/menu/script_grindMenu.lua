@@ -196,6 +196,23 @@ function script_grindMenu:menu()
 		if (script_grind.useFPS) then
 			Text("Works gathering spells and simply leaving a city");
 		end
+
+		if (CollapsingHeader("Testing Stuff")) then
+		Text("Testing... Go To FP and kill on the way...");
+
+		if (fpDB.goTo) then
+			if (Button("STOP")) then
+				fpDB.goTo = false;
+			end
+		end
+		if (fpDB.goTo) then
+			SameLine();
+		end
+		if (Button("Ashenvale")) then
+			fpDB.goTo = true;
+			
+		end
+		end
 	end
 	end
 end

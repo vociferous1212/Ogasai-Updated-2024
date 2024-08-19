@@ -51,7 +51,7 @@ function script_rotationMenu:menu()
 	elseif (class == 'Druid') then
 		script_druidEX:menu();
 	elseif (class == 'Priest') then
-		script_priestEX:menu();
+		script_priestMenu:menu();
 	elseif (class == 'Warrior') then
 		script_warriorEX:menu();
 	elseif (class == 'Rogue') then

@@ -113,6 +113,7 @@ end
 function script_priest:setup()
 	self.waitTimer = GetTimeEX(); -- set timer
 	script_priestEX.waitTiemr = GetTimeEX();
+	script_priestEX.flashHealTimer = GetTimeEX();
 	self.isSetup = true; -- setup variable run once
 	if (HasSpell("Mind Flay")) then -- if has mind flay
 		self.drinkMana = 35; -- set drinkMana variable
@@ -275,6 +276,7 @@ function script_priest:run(targetGUID)
 			self.message = "Using wand...";
 			targetObj:FaceTarget();
 			targetObj:CastSpell("Shoot");
+			self.waitTimer = GetTimeEX() + 100;
 			return true; -- return true - if not AutoCasting then false
 		end
 		if (script_priestEX:healsAndBuffs(localObj, localMana)) then
@@ -311,10 +313,10 @@ script_priestEX.waitTimer = self.waitTimer;
 		end
 
 		-- Don't attack if we should rest first
-		--if (GetNumPartyMembers() < 1) and ((localHealth < self.eatHealth or localMana < self.drinkMana) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) then
-		--		self.message = "Need rest...";
-		--		return 4;
-		--end
+		if ((localHealth < self.eatHealth or (localMana < self.drinkMana or localObj:HasBuff("Spirit Tap") and localMana < self.drinkMana/1.5)) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) then
+				self.message = "Need rest...";
+				return 4;
+		end
 
 		-- set target health
 		targetHealth = targetObj:GetHealthPercentage();
@@ -687,6 +689,7 @@ script_priestEX.waitTimer = self.waitTimer;
 			-- No Mind Blast but wand ? fixed!
 			if (not HasSpell("Mind Blast")) and (localObj:HasRangedWeapon()) and (self.useWand) then
 					if (not IsAutoCasting("Shoot")) and (self.useWand) then
+						self.waitTimer = GetTimeEX() + 100;
 						targetObj:FaceTarget();
 						self.message = "Using wand...";
 						targetObj:CastSpell("Shoot");
@@ -706,10 +709,10 @@ script_priestEX.waitTimer = self.waitTimer;
 						return 3;
 					end
 					if (not IsAutoCasting("Shoot")) and (self.useWand) then
+						self.waitTimer = GetTimeEX() + 100;
 						self.message = "Using wand...";
 						targetObj:FaceTarget();
 						targetObj:CastSpell("Shoot");
-						self.waitTimer = GetTimeEX() + 500;
 						return true; -- return if not AutoCasting then false
 					end
 					if (script_priestEX:healsAndBuffs(localObj, localMana)) then
@@ -764,7 +767,7 @@ function script_priest:rest()
 		end
 	end
 
-	if (localObj:HasBuff("Spirit Tap")) and (not IsEating()) and (not IsDrinking()) and (not script_grind:isAnyTargetTargetingMe()) and (localMana >= self.drinkMana/2) and (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
+	if (localObj:HasBuff("Spirit Tap")) and (not IsEating()) and (not IsDrinking()) and (not script_grind:isAnyTargetTargetingMe()) and (localMana >= self.drinkMana/1.5) and (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
 		if (script_grind.lastTargetKilled ~= 0 and script_grind.lastTargetKilled ~= nil) and (script_grind.lastTargetKilled:GetDistance() > 5) then
 			local x, y, z = script_grind.lastTargetKilled:GetPosition();
 			if (Move(x, y, z)) then
@@ -774,7 +777,7 @@ function script_priest:rest()
 	end
 
 	-- Stop moving before we can rest
-	if (localHealth <= self.eatHealth) or (localMana <= self.drinkMana and not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/2) then
+	if (localHealth <= self.eatHealth) or (localMana <= self.drinkMana and not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/1.5) or (IsDrinking() or IsEating()) then
 		if (IsMoving()) then
 			self.waitTimer = GetTimeEX() + 1000;
 			StopMoving();
@@ -783,7 +786,7 @@ function script_priest:rest()
 	end
 
 	-- check heals and buffs
-	if (IsStanding()) then
+	if (IsStanding()) and (not IsDrinking() and not IsEating()) then
 		if (script_priestEX:healsAndBuffs(localObj, localMana)) then 
 script_priestEX.waitTimer = self.waitTimer;
 			return true;
@@ -791,7 +794,7 @@ script_priestEX.waitTimer = self.waitTimer;
 	end
 
 	-- Eat and Drink
-	if (not IsDrinking() and localMana < self.drinkMana) and (not localObj:HasBuff("Spirit Tap")) then
+	if (not IsDrinking() and localMana < self.drinkMana) and (not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/1.5) and not (IsEating() or IsDrinking()) then
 
 		ClearTarget();
 
@@ -819,7 +822,7 @@ script_priestEX.waitTimer = self.waitTimer;
 	end
 
 	-- drink with spirit tap
-	if (not IsDrinking() and localMana <= (self.drinkMana/2)) and (localObj:HasBuff("Spirit Tap")) then
+	if (not IsDrinking() and localMana <= (self.drinkMana/1.5)) and (localObj:HasBuff("Spirit Tap")) then
 
 		ClearTarget();
 
@@ -868,7 +871,7 @@ script_priestEX.waitTimer = self.waitTimer;
 		end	
 	end
 	
-	if(localMana < self.drinkMana or localHealth < self.eatHealth) and (not localObj:HasBuff("Spirit Tap")) then
+	if ((localMana < self.drinkMana or localHealth < self.eatHealth) and (not localObj:HasBuff("Spirit Tap"))) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/1.5) or (IsDrinking() or IsEating()) then
 		if (IsMoving()) then
 			StopMoving();
 			self.waitTimer = GetTimeEX() + 500;
