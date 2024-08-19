@@ -1,4 +1,5 @@
 script_priestEX = {
+			waitTimer = 0,
 
 }
 
@@ -21,6 +22,12 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	if (IsMoving()) then
 		return false;
 	end
+
+	if (self.waitTimer > GetTimeEX()) then
+		return false;
+	end
+
+	script_priest.waitTimer = self.waitTimer;
 
 	-- get target health percentage
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat()) then
@@ -55,6 +62,14 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 			if (Cast("Flash Heal", localObj)) then
 				script_grind:setWaitTimer(1550);
 				return; -- keep trying until cast
+			end
+		end
+
+		-- priest shadowguard
+		if (script_priest.useShadowGuard) and (HasSpell("Shadowguard")) and (not localObj:HasBuff("Shadowguard")) and (not IsSpellOnCD("Shadowguard")) and (localMana >= 15) then
+			if (CastSpellByName("Shadowguard")) then
+				self.waitTimer = GetTimeEX() + 1500;
+				return true;
 			end
 		end
 	

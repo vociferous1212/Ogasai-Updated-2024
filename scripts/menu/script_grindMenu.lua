@@ -175,27 +175,27 @@ function script_grindMenu:menu()
 	script_counterMenu:menu();
 
 	Separator();
-	Text("These checkboxes have no home yet");
-	wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
-	SameLine();
-	wasClicked, script_grind.showOM = Checkbox("Show Object Manager", script_grind.showOM);
+	if (CollapsingHeader("Other Stuff")) then
+		Text("These checkboxes have no home yet");
+		wasClicked, script_grind.drawChests = Checkbox("Draw Chests", script_grind.drawChests);
+		SameLine();
+		wasClicked, script_grind.showOM = Checkbox("Show Object Manager", script_grind.showOM);
+		
+		wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
+		SameLine();
+		wasClicked, script_grind.useFirstAid = Checkbox("Auto FirstAid", script_grind.useFirstAid);
+		if (not HasSpell("First Aid")) then
+			script_grind.useFirstAid = false;
+		end
 	
-	wasClicked, script_gatherEX.drawFishingPools = Checkbox("Draw Fishing Pools", script_gatherEX.drawFishingPools);
-	SameLine();
-	wasClicked, script_grind.useFirstAid = Checkbox("Auto FirstAid", script_grind.useFirstAid);
-	if (not HasSpell("First Aid")) then
-		script_grind.useFirstAid = false;
+		if (script_grind.getSpells) then
+			Separator();
+		end
+		wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
+		wasClicked, script_grind.useFPS = Checkbox("Use Flight Paths (level 20 areas and under)", script_grind.useFPS);
+		if (script_grind.useFPS) then
+			Text("Works gathering spells and simply leaving a city");
+		end
 	end
-
-	if (script_grind.getSpells) then
-		Separator();
 	end
-	wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
-	if (script_grind.getSpells) then
-		Text("More or less a proof of concept...");
-		Text("Why let bot run all the way to a trainer?");
-		Separator();
-	end
-	
-end
 end

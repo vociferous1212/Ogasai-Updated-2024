@@ -75,13 +75,17 @@ function script_getSpells:run()
 		end
 		self.getSpellsStatus = 1;
 
-		--if (GetLocalPlayer():GetLevel() >= 10) and (GetMapID() ~= 0) then
-		--	script_goToFP();
-		--return;
-		--end
+		if (GetLocalPlayer():GetLevel() >= 10) and (not fpDB:areWeInStarterZones()) and (not script_getSpells:cityZones()) then
+			script_goToFP:run();
+		return true;
+		end
+
+		if (script_goToFP.getFPStatus ~= 0) then
+			return;
+		end
 
 		local x, y, r, g, b = 0, 0, 0, 0, 0;
-		DrawText("Moving To Trainers if player is level 22 or lower... proof of concept.. may break bot... ",  x+800, y+300, r+255, g+255, b+0);
+		DrawText("Moving To Trainers if player is level 22 or lower... ",  x+800, y+300, r+255, g+255, b+0);
 
 		local x, y, z = GetLocalPlayer():GetPosition();
 		local vX, vY, vZ = 0, 0, 0;
@@ -156,6 +160,8 @@ if (not script_unstuck:pathClearAuto(2)) then
 
 		-- if distance is close to trainer then
 		if (GetDistance3D(x, y, z, vX, vY, vZ) <= 4) then
+
+			script_goToFP.goToFPTimer = GetTimeEX();
 			
 			if (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetUnitName() ~= self.trainerTarget) then
 				ClearTarget();
@@ -184,6 +190,13 @@ if (not script_unstuck:pathClearAuto(2)) then
 	if (script_getSpells:checkForSpellsNeeded()) then
 		return true;
 	end
+return false;
+end
+function script_getSpells:cityZones()
+	local map = GetMapID();
+		if map == 1537 or map == 1519 or map == 1657 or map == 1637 or map == 1638 or map == 1497 then
+			return true;
+		end
 return false;
 end
 function script_getSpells:gnomeZones()

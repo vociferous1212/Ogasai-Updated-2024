@@ -1178,7 +1178,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 	if (localMana < localHealth) and (HasSpell("Life Tap")) and (localHealth > self.lifeTapHealth) and (localMana < self.lifeTapMana) then
 		if (not IsInCombat()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (IsStanding()) then
 			if (not IsSpellOnCD("Life Tap")) then
-				if (not CastSpellByName("Life Tap", localObj)) then
+				if (CastSpellByName("Life Tap", localObj)) then
 					self.waitTimer = GetTimeEX() + 1650;
 				end
 			end

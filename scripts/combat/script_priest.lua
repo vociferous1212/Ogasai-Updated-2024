@@ -33,6 +33,7 @@ script_priest = {
 	openerRange = 26,	-- range to return 3 / walk to target to attack
 	useDOTOnAdds = true,
 	useHexOfWeakness = false,
+	useShadowGuard = false,
 }
 
 function script_priest:heal(spellName, target)
@@ -111,6 +112,7 @@ end
 
 function script_priest:setup()
 	self.waitTimer = GetTimeEX(); -- set timer
+	script_priestEX.waitTiemr = GetTimeEX();
 	self.isSetup = true; -- setup variable run once
 	if (HasSpell("Mind Flay")) then -- if has mind flay
 		self.drinkMana = 35; -- set drinkMana variable
@@ -129,6 +131,9 @@ function script_priest:setup()
 
 	if (HasSpell("Hex of Weakness")) then
 		self.useHexOfWeakness = true;
+	end
+	if (HasSpell("Shadowguard")) then
+		self.useShadowGuard = true;
 	end
 end
 
@@ -753,10 +758,10 @@ function script_priest:rest()
 	end
 
 	if (localObj:HasBuff("Spirit Tap")) and (not IsEating()) and (not IsDrinking()) and (not script_grind:isAnyTargetTargetingMe()) and (localMana >= self.drinkMana/2) and (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
-		if (script_grind.lastTargetKilled ~= 0 and script_grind.lastTargetKilled ~= nil) then
+		if (script_grind.lastTargetKilled ~= 0 and script_grind.lastTargetKilled ~= nil) and (script_grind.lastTargetKilled:GetDistance() > 5) then
 			local x, y, z = script_grind.lastTargetKilled:GetPosition();
 			Move(x, y, z);
-		return;
+		return true;
 		end
 	end
 
@@ -854,7 +859,7 @@ function script_priest:rest()
 		end	
 	end
 	
-	if(localMana < self.drinkMana or localHealth < self.eatHealth) then
+	if(localMana < self.drinkMana or localHealth < self.eatHealth) and (not localObj:HasBuff("Spirit Tap")) then
 		if (IsMoving()) then
 			StopMoving();
 			self.waitTimer = GetTimeEX() + 500;

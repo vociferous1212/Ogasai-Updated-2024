@@ -107,6 +107,10 @@ function script_priestMenu:menu()
 			if (HasSpell("Hex of Weakness")) then
 				wasClicked, script_priest.useHexOfWeakness = Checkbox("Hex of Weakness", script_priest.useHexOfWeakness);
 			end
+			if (HasSpell("Shadowguard")) then
+				SameLine();
+				wasClicked, script_priest.useShadowGuard = Checkbox("Use Shadowguard", script_priest.useShadowGuard);
+			end
 						
 		end
 
