@@ -11,6 +11,10 @@ script_checkAdds = {
 -- requires target from grind script 'enemyObj'
 function script_checkAdds:checkAdds()
 
+	if (TargetHasRangedWeapon()) then
+		return false;
+	end
+
 	-- check if there are adds and avoid those adds. call this to run avoid adds
 	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind:isTargetingMe2(script_grind.enemyObj) and script_grind.enemyObj:GetDistance() <= script_grind.combatScriptRange) and (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 3) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then

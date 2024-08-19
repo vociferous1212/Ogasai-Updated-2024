@@ -18,8 +18,8 @@ script_grind = {
 	tailoringLoaded 	= include("scripts\\script_tailoring.lua"),
 	firstAidLoaded 		= include("scripts\\script_firstAid.lua"),
 	--hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
-	--fpBDLoaded 		= include("scripts\\db\\fpDB.lua"),
-	--goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
+	fpDBLoaded 		= include("scripts\\db\\fpDB.lua"),
+	goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
 
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
@@ -203,9 +203,21 @@ script_grind = {
 	useFirstAid = true,
 	blacklistTargetName = "",
 	blacklistTargetName2 = "",
-	moveTimer = 0,
-	lastTargetKilled = 0;
+	moveTimer = 0,		-- timer for movement when stuck
+	lastTargetKilled = 0,	-- last target killed by grinder
+	fpPause = false,	-- was script paused by fp script
+	useFPS = false,		-- use flight paths
 }
+
+
+function TargetHasRangedWeapon(target)
+	if target ~= nil and target ~= 0 then
+		if target:GetCasting() == 6660 then
+			return true;
+		end
+	end
+return false;
+end
 
 function GetObjectsAroundMe()
 
@@ -320,8 +332,9 @@ function script_grind:setup()
 		self.skipHardPull = false;
 		self.blacklistTime = 20;
 	end
-	if (GetLocalPlayer():GetLevel() <= 10) then
+	if (GetLocalPlayer():GetLevel() <= 22) then
 		self.getSpells = true;
+		self.useFPS = true;
 	end
 
 	-- enable drawing unit info on screen
@@ -403,6 +416,7 @@ function script_grind:setup()
 	script_grindEX.waitTimer = GetTimeEX();
 	script_aggro.waitTimer = GetTimeEX();
 	self.moveTimer = GetTimeEX();
+	script_goToFP.goToFPTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -700,6 +714,18 @@ function script_grind:run()
 		self.timeToSit = 0;
 		self.afkSet = true;
 	end
+
+	if (self.useFPS) then
+		if (UnitOnTaxi('player')) and (self.getSpells) then
+			self.fpPause = true;
+			self.pause = true;
+		end
+		if (not UnitOnTaxi('player')) and (self.pause) and (self.fpPause) then
+			self.fpPause = false;
+			self.pause = false;
+		end
+	end
+
 	-- pause bot
 	if (self.pause) then self.message = "Paused by user...";
 		-- set paranoid used to off to reset paranoia
@@ -1032,6 +1058,12 @@ function script_grind:run()
 			return;
 			end
 		end
+
+		if (self.useFPS) and (script_getSpells:cityZones()) and (script_getSpells.getSpellsStatus == 0) and (script_goToFP.getFPStatus ~= 3) then
+			script_goToFP:run();
+			return;
+		end
+
 		-- force bot to keep path to trainer
 		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
 			return;
@@ -1084,11 +1116,12 @@ function script_grind:run()
 
 			if (self.lootObj ~= nil and self.lootObj ~= 0) then
 				if (script_grind:doLoot(localObj)) then
+					self.waitTimer = GetTimeEX() + 1000;
 					return true;
 				end
 			end
 
-			if (self.attackTargetsOnRoutes) then
+			if (self.attackTargetsOnRoutes) and (not IsStealth()) then
 					script_grindEX:checkForTargetsOnHotspotRoute()
 				if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
 					self.message = "Killing stuff in our path.";
@@ -1112,14 +1145,14 @@ function script_grind:run()
 						ClearTarget();
 					end
 				end
-			elseif (not self.attackTargetsOnRoutes) and (script_runner:avoidToAggro(5)) then
+			elseif (not self.attackTargetsOnRoutes) and (script_runner:avoidToAggro(5)) and (not IsStealth()) then
 				local x, y, z = GetLocalPlayer():GetPosition();
 				if (GetTimeEX() > self.moveTimer) then
 				self.moveTimer = GetTimeEX() + 10000;
 				GeneratePath(x, y, z, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 				end
 				return true;
-			elseif (GetTimeEX() > self.moveTimer) then
+			elseif (GetTimeEX() > self.moveTimer) or (IsStealth()) then
 				self.message = script_moveToHotspot:moveToHotspot(localObj);
 			end
 			
@@ -1219,9 +1252,10 @@ function script_grind:run()
 		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) then
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) and (self.lastTargetKilled:GetPosition() > 3) then
 				ex, ey, ez = self.lastTargetKilled:GetPosition();
 				Move(ex, ey, ez);
+				return;
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				if (script_grind:doLoot(localObj)) then
@@ -1235,9 +1269,10 @@ function script_grind:run()
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) then
+			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) and (self.lastTargetKilled:GetPosition() > 3) then
 				ex, ey, ez = self.lastTargetKilled:GetPosition();
 				Move(ex, ey, ez);
+				return;
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
 				if (script_grind:doLoot(localObj)) then
@@ -1716,6 +1751,14 @@ function script_grind:assignTarget()
 			-- return target
 			return self.enemyObj;
 		end
+	end
+
+	while i ~= 0 do
+		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+			return i;
+		end
+	-- get next target
+	i, targetType = GetNextObject(i);	
 	end
 
 	-- Find the closest valid target if we have no target or we are not in combat
@@ -2470,6 +2513,11 @@ function script_grind:runRest()
 		if (not script_grind.adjustTickRate) then
 			local randomRestTick = math.random(300, 500);
 			script_grind.tickRate = randomRestTick;
+		end
+
+		if (GetLocalPlayer():HasBuff("Spirit Tap")) and (GetLocalPlayer():GetManaPercentage() >= script_priest.drinkMana) then
+			self.needRest = false;
+			return false;
 		end
 
 		self.message = "Resting...";

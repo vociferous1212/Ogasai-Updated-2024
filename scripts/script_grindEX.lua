@@ -106,6 +106,9 @@ function script_grindEX:doChecks()
 		--end
 
 		if (localObj:IsDead()) and (localObj:HasBuff("Soulstone Resurrection")) then
+			if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+			script_grind:addTargetToHardBlacklist(script_grind.enemyObj:GetGUID());
+			end
 			-- wow in-game api
 			if (HasSoulstone()) then
 				UseSoulstone();
