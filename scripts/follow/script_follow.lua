@@ -74,6 +74,7 @@ function script_follow:run() script_follow:window();
 	if (not IsUsingNavmesh()) then UseNavmesh(true); return; end
 	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files..."; return; end
 	if (GetLoadNavmeshProgress() ~= 1) then self.message = "Loading the nav mesh... "; return; end
+	if (GetLoadNavmeshProgress() ~= 1) then return; end
 
 	-- auto unstuck feature
 	local thisTime = script_followMoveToTarget.moveTimer - 4000;

@@ -40,6 +40,12 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
+	if (GetTimeEX() > self.waitTimer) and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.6) then
+			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+			self.waitTimer = GetTimeEX() + 1050;
+		end
+
+
 	-- If we are close to the next path node, increase our nav node index
 	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= 5) then
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;		

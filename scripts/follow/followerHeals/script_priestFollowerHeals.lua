@@ -66,17 +66,28 @@ function script_priestFollowerHeals:HealsAndBuffs()
 		local partyMember = 0;
 		for i = 1, GetNumPartyMembers() do
 
-				partyMember = GetPartyMember(i);
-
-				if (GetNumPartyMembers() > 0) then
+			partyMember = GetPartyMember(i);
+	
+			if (GetNumPartyMembers() > 0) and (partyMember:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 
 				local partyMembersHP = partyMember:GetHealthPercentage();
 				local partyMemberDistance = partyMember:GetDistance();
 				local leaderObj = GetPartyLeaderObject();
 				local px, py, pz = GetPartyMember(i):GetPosition();
 				local localObj = GetLocalPlayer();
-				end
-	
+			
+				if (not leaderObj:IsInLineOfSight()) or (leaderObj:IsInLineOfSight() and not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance) or (leaderObj:GetDistance() > 40 and self.enableHeals) then
+					script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
+					if (script_follow.followLeaderDistance >= 10 and leaderObj:GetDistance() < 10 and leaderObj:IsInLineOfSight()) then
+						if (IsMoving()) then
+							StopMoving();
+							return true;
+						end
+					end
+					return true;
+
+                       		end
+
 				-- Dispel Magic
 				if (HasSpell("Dispel Magic")) and (localMana > 20) then 
 					if (partyMember:HasDebuff("Sleep"))
@@ -115,9 +126,6 @@ function script_priestFollowerHeals:HealsAndBuffs()
                 		-- Power word Fortitude
                 		if (HasSpell("Power Word: Fortitude")) and (localMana > 40)
 					and (not partyMember:HasBuff("Power Word: Fortitude")) then
-					if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then 											script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       			end
 					if (Cast("Power Word: Fortitude", partyMember)) then
 						self.timer = GetTimeEX() + 1500;
 						return true;
@@ -125,11 +133,7 @@ function script_priestFollowerHeals:HealsAndBuffs()
 				end	
 	
 				-- Divine Spirit
-				if (HasSpell("Divine Spirit")) and (localMana > 30)
-					and (not partyMember:HasBuff("Divine Spirit")) then
-					if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
+				if (HasSpell("Divine Spirit")) and (localMana > 30) and (not partyMember:HasBuff("Divine Spirit")) then
 					if (Cast("Divine Spirit", partyMember)) then
 						self.timer = GetTimeEX() + 1500;
 						return true;
@@ -146,7 +150,7 @@ function script_priestFollowerHeals:HealsAndBuffs()
 				end
 	
 				-- priest fear
-				if (script_followEX2:enemiesAttackingUs(5) > 3) and (HasSpell("Psychic Scream")) then
+				if (script_followEX2:enemiesAttackingUs() > 3) and (HasSpell("Psychic Scream")) then
 					if (CastSpellByName("Psychic Scream")) then
 						return true;
 					end
@@ -177,108 +181,87 @@ function script_priestFollowerHeals:HealsAndBuffs()
 					end
 				end
 
-			if (self.enableHeals) and (GetNumPartyMembers() > 0) then
-			local localMana = GetLocalPlayer():GetManaPercentage();
-	                	-- flash heal 
-	                	if (self.clickFlashHeal) then
-                			if (localMana > self.flashHealMana)
-						and (partyMembersHP < self.partyFlashHealHealth) then
-               	        			if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
-                	        		if (CastHeal("Flash Heal", partyMember)) then
-                	            			self.timer = GetTimeEX() + 2000;
-							return true;
-                        			end
-               	    			end
-               			end
-	
-	                	-- Greater Heal
-	               		if (self.clickGreaterHeal) then
-	               	    		if (localMana > self.greaterHealMana)
-						and (partyMembersHP < self.partyGreaterHealHealth)
-						and (HasSpell("Greater Heal")) then
-         		               		if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
-         	        	       		if (CastHeal("Greater Heal", partyMember)) then
-         	        	       			self.timer = GetTimeEX() + 2000;
-         	                   			return true;
-         	               			end
-					end
-				end
-	
-                		-- Heal
-                		if (self.clickHeal) then
-                    			if (localMana > self.healMana) and (partyMembersHP < self.partyHealHealth)
-						and (HasSpell("Heal")) then
-                        			if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
-                        			if (CastHeal("Heal", partyMember)) then
-                        	    			self.timer = GetTimeEX() + 3200;
-                        	    			return true;
-       	 	        	        	end
-       	 	        	    	end
-	                	end
-	
-	                	-- Lesser Heal
-	                	-- level 20+ at very low mana
-	                	if (localObj:GetLevel() >= 20) then
-	                    		if (localMana <= 8) and (partyMembersHP <= 20) then
-	                        		if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end	
-	                        		if (CastHeal("Lesser Heal", partyMember)) then
-	                        			self.timer = GetTimeEX() + 3500;
-	                        		end
-	                    		end
-	                    	-- below level 20 cast lesser heal
-	                	elseif (localObj:GetLevel() <= 20) then
-	                    		if (localMana > self.lesserHealMana)
-					and (partyMembersHP < self.partyLesserHealHealth)
-						and (HasSpell("Lesser Heal")) then
-	                        		if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
-	                        		if (Cast("Lesser Heal", partyMember)) then
-	                            			self.timer = GetTimeEX() + 3500;
-	                            			return true;
-	                        		end
-	                    		end
-	                	end
-	
-                		-- Renew
-                		if (self.clickRenew) then
-                    			if (localMana > self.renewMana) and (partyMembersHP < self.partyRenewHealth)
-						and (not partyMember:HasBuff("Renew")) and (HasSpell("Renew")) then
-                        			if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
-                        			if (CastHeal("Renew", partyMember)) then
-                        	    			self.timer = GetTimeEX() + 1650;
-                        	    			return true;
-                        			end
-                    			end
-                		end
-
-                		-- Shield
-                		if (self.clickShield) then
-                    			if (localMana > self.shieldMana) and (partyMembersHP < self.partyShieldHealth)
-						and (not partyMember:HasDebuff("Weakened Soul"))
-						and (HasSpell("Power Word: Shield")) then
-                        			if (not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance and leaderObj:IsInLineOfSight()) then script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
-							return true;
-                       				end
-                        			if (CastHeal("Power Word: Shield", partyMember)) then 
-                        	    			self.timer = GetTimeEX() + 1550;
-                        	    			return true; 
-                        			end
-                    			end
-	   			end
-    			end
+				if (self.enableHeals) and (GetNumPartyMembers() > 0) then
+				local localMana = GetLocalPlayer():GetManaPercentage();
+	                		-- flash heal 
+	                		if (self.clickFlashHeal) then
+                				if (localMana > self.flashHealMana) and (partyMembersHP < self.partyFlashHealHealth) then
+							if (CastHeal("Flash Heal", partyMember)) then
+                		            			self.timer = GetTimeEX() + 2000;
+								return true;
+                        				end
+               	    				end
+               				end
 		
+		                	-- Greater Heal
+		               		if (self.clickGreaterHeal) then
+		               	    		if (localMana > self.greaterHealMana)
+							and (partyMembersHP < self.partyGreaterHealHealth)
+							and (HasSpell("Greater Heal")) then
+							if (CastHeal("Greater Heal", partyMember)) then
+        	 	        	       			self.timer = GetTimeEX() + 2000;
+        	 	                   			return true;
+        	 	               			end
+						end
+					end
+		
+        	        		-- Heal
+        	        		if (self.clickHeal) then
+        	            			if (localMana > self.healMana) and (partyMembersHP < self.partyHealHealth)
+							and (HasSpell("Heal")) then
+        	                			if (CastHeal("Heal", partyMember)) then
+        	                	    			self.timer = GetTimeEX() + 3200;
+        	                	    			return true;
+       		 	        	        	end
+       		 	        	    	end
+		                	end
+		
+		                	-- Lesser Heal
+		                	-- level 20+ at very low mana
+		                	if (localObj:GetLevel() >= 20) then
+		                    		if (localMana <= 8) and (partyMembersHP <= 20) then
+		                        		if (CastHeal("Lesser Heal", partyMember)) then
+		                        			self.timer = GetTimeEX() + 3500;
+		                        		end
+		                    		end
+		                    	-- below level 20 cast lesser heal
+		                	elseif (localObj:GetLevel() <= 20) then
+		                    		if (localMana > self.lesserHealMana)
+						and (partyMembersHP < self.partyLesserHealHealth)
+							and (HasSpell("Lesser Heal")) then
+		                        		if (Cast("Lesser Heal", partyMember)) then
+		                            			self.timer = GetTimeEX() + 3500;
+		                            			return true;
+		                        		end
+		                    		end
+		                	end
+		
+        	        		-- Renew
+        	        		if (self.clickRenew) then
+        	            			if (localMana > self.renewMana) and (partyMembersHP < self.partyRenewHealth)
+							and (not partyMember:HasBuff("Renew")) and (HasSpell("Renew")) then
+        	                			if (CastHeal("Renew", partyMember)) then
+        	                	    			self.timer = GetTimeEX() + 1650;
+        	                	    			return true;
+        	                			end
+        	            			end
+        	        		end
+	
+	                		-- Shield
+	                		if (self.clickShield) then
+	                    			if (localMana > self.shieldMana) and (partyMembersHP < self.partyShieldHealth)
+							and (not partyMember:HasDebuff("Weakened Soul"))
+							and (HasSpell("Power Word: Shield")) then
+	                        			if (CastHeal("Power Word: Shield", partyMember)) then 
+	                        	    			self.timer = GetTimeEX() + 1550;
+	                        	    			return true; 
+	                        			end
+	                    			end
+		   			end
+	    			end
+			
+			end
 		end
+	return false;
 	end
-return false;
 end
