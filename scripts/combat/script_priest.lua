@@ -193,6 +193,7 @@ function script_priest:run(targetGUID)
 	end
 
 	if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+		script_priestEX.waitTimer = self.waitTimer;
 		return;
 	end
 	
@@ -277,6 +278,7 @@ function script_priest:run(targetGUID)
 			return true; -- return true - if not AutoCasting then false
 		end
 		if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+script_priestEX.waitTimer = self.waitTimer;
 			return;
 		end
 	end
@@ -527,6 +529,7 @@ if (IsMoving()) then
 
 			-- check heals and buffs
 			if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+script_priestEX.waitTimer = self.waitTimer;
 				return;
 			end
 
@@ -644,6 +647,7 @@ if (IsMoving()) then
 
 			-- check heal and buffs
 			if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+script_priestEX.waitTimer = self.waitTimer;
 				return; -- keep trying until cast
 			end
 
@@ -666,6 +670,7 @@ if (IsMoving()) then
 			end
 
 			if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+script_priestEX.waitTimer = self.waitTimer;
 				return;
 			end
 
@@ -688,6 +693,7 @@ if (IsMoving()) then
 						return true; -- return true - if not AutoCasting then false
 					end
 				if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+script_priestEX.waitTimer = self.waitTimer;
 					return;
 				end
 			end
@@ -707,6 +713,7 @@ if (IsMoving()) then
 						return true; -- return if not AutoCasting then false
 					end
 					if (script_priestEX:healsAndBuffs(localObj, localMana)) then
+script_priestEX.waitTimer = self.waitTimer;
 						return;
 					end
 				end
@@ -778,6 +785,7 @@ function script_priest:rest()
 	-- check heals and buffs
 	if (IsStanding()) then
 		if (script_priestEX:healsAndBuffs(localObj, localMana)) then 
+script_priestEX.waitTimer = self.waitTimer;
 			return true;
 		end
 	end
