@@ -8,6 +8,7 @@ script_goToFP = {
 		closestCityZone = "",
 		goToFPTimer = 0,
 		timerSet = false,
+		closestGrindZone = "",
 }
 
 function script_goToFP:run()
@@ -93,7 +94,7 @@ function script_goToFP:run()
 			TargetByName(self.fpTarget);
 			if (not self.timerSet) then
 				self.timerSet = true;
-				self.goToFPTimer = GetTimeEX() + 15000;
+				self.goToFPTimer = GetTimeEX() + 8000;
 			end
 
 			-- get target
@@ -130,39 +131,19 @@ function script_goToFP:run()
 				-- we have no flight path saved so go to location based on current level
 				-- maybe we reloaded the bot?
 				if (temp == "name" or temp2 == "name") then
-
-					--if we are in HUMAN zones then based on level fly to westfall or duskwood
-					if (script_getSpells:humanZones()) then
-						sString = fpDB:getAHumanZone();
-					end
-					if (script_getSpells:elfZones()) then
-						sString = fpDB:getAElfZone();
-					end
-					if (script_getSpells:gnomeZones()) then
-						sString = fpDB:getADwarfZone();
-					end
-					if (script_getSpells:orcZones()) or (script_getSpells:cowZones()) then
-						sString = fpDB:getAOrcZone();
-					end
-					if (script_getSpells:deadZones()) then
-						sString = fpDB:getAUndeadZone();
-					end
+					sString = fpDB:getClosestGrindZone();
+					self.closestGrindZone = sString;
 				end
 
-				-- check to see if we have the FP or not and if not then return false and status == 0
-				--for i=0, NumTaxiNodes() do
-				--	if (TaxiNodeName(2) == "INVALID" and GetLocalPlayer():GetLevel() <= 10) or (TaxiNodeName(3) == "INVALID" and GetLocalPlayer():GetLevel() >= 20) and (script_getSpells:cityZones()) then
-				--		DEFAULT_CHAT_FRAME:AddMessage("No FP connection found - walking to hotspot");
-				--		self.getFPStatus = 3;
-				--	return false;			
-				--	end
-				--end
-					if (GetTimeEX() > self.goToFPTimer) then
-						self.goToFPTimer = GetTimeEX() + 10000;
+				if (GetTimeEX() > self.goToFPTimer) and (self.closestGrindZone ~= 0) then
+					if (not script_getSpells:cityZones()) then
 						fpDB:removeCity();
-						fpDB:removeFP();
-						DEFAULT_CHAT_FRAME:AddMessage("Took too long at flight master. No path found!");
 					end
+					if (script_getSpells:cityZones()) then
+						fpDB:removeFP();
+					end
+					self.goToFPTimer = GetTimeEX() + 100;
+				end
 					
 			
 			-- we are not in a city so take this flight path

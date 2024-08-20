@@ -75,6 +75,8 @@ function script_getSpells:run()
 		end
 		self.getSpellsStatus = 1;
 
+		script_grind.currentTime2 = GetTimeEX();
+
 		if (GetLocalPlayer():GetLevel() >= 10) and (not fpDB:areWeInStarterZones()) and (not script_getSpells:cityZones()) then
 			script_goToFP:run();
 		return true;

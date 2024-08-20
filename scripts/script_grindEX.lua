@@ -184,6 +184,7 @@ function script_grindEX:doChecks()
 		local vendorStatus = script_vendor:getStatus();
 
 		if (vendorStatus >= 1 and not IsInCombat()) then
+			script_grind.currentTime2 = GetTimeEX();
 			if (script_grind:runRest()) then
 				if (IsMoving()) then
 					StopMoving();

@@ -649,7 +649,12 @@ function script_grind:run()
 			end
 		elseif (not IsInCombat()) then
 			self.pause = true;
-			fpDB:goToAshenvale();
+			if (fpDB.goToAshenvaleBool) then
+				fpDB:goToAshenvale();
+			end
+			if (fpDB.goToNearestFPBool) then
+				fpDB:goToNearestFP();
+			end
 			return true;
 		end
 	end
@@ -680,7 +685,7 @@ function script_grind:run()
 	--end
 
 	-- buff other players
-	if (not self.pause) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) and (script_vendor.status == 0) and (IsStanding()) and (not self.afkUsed) then
+	if (not self.pause) and (not script_getSpells:cityZones()) and (not IsInCombat()) and (GetTimeEX() > self.buffTimer) and (script_buffOtherPlayers.enableBuffs) and (GetLocalPlayer():GetManaPercentage() >= 40) and (script_vendor.status == 0) and (IsStanding()) and (not self.afkUsed) then
 		if (HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Fortitude") or HasSpell("Blessing of Might")) then
 			self.buffTimer = GetTimeEX() + 5500;
 			if (not HasSpell("Blessing of Might")) then
@@ -737,7 +742,7 @@ function script_grind:run()
 			self.fpPause = true;
 			self.pause = true;
 		end
-		if (not UnitOnTaxi('player')) and (self.pause) and (self.fpPause) then
+		if (self.getSpells) and (not UnitOnTaxi('player')) and (self.pause) and (self.fpPause) then
 			self.fpPause = false;
 			self.pause = false;
 		end
@@ -837,7 +842,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
+	if (not script_getSpells:cityZones()) and (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -863,7 +868,7 @@ function script_grind:run()
 			-- logout timer reached then logout
 			if (script_paranoia.currentTime >= script_grind.currentTime2 + script_grind.setParanoidTimer) then
 					-- reset paranoia timer
-				script_paranoia.currentTime = GetTimeEX() + (45*1000);
+				script_grind.currentTime2 = GetTimeEX() + (45*1000);
 				StopBot();
 				Logout();
 				return 4;
@@ -1153,7 +1158,8 @@ function script_grind:run()
 						self.enemyObj:FaceTarget();
 					end
 
-					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
+					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+					return;	
 				elseif (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 
 					self.message = script_moveToHotspot:moveToHotspot(localObj);	

@@ -1,47 +1,13 @@
-fpDB = {isSetup = false, fpList = {}, numfps = 0, cityList = {}, numCity = 0,}
+fpDB = {isSetup = false, fpList = {}, numfps = 0, cityList = {}, numCity = 0, goToNearestFPBool = false, goToAshenvaleBool = false,
 
---org AH
---1685.1613769531, -4460.06640625, 18.851095199585
+}
 
-
--- local name = GetLocalPlayer():GetUnitsTarget():GetUnitName();
--- local fx, fy, fz = GetLocalPlayer():GetUnitsTarget():GetPosition();
--- local id = GetMapID();
--- ToFile('"'..name..'";');
--- ToFile(fx..', '..fy..', '..fz..';');
--- ToFile("map ID"..id);
-
-
---intent... add all known FP's to a list. call this list as a setup and run script_gotofp:run().
--- run gotofp script
--- script_gotofp:run() should collect current mapID, current zone and
--- current minimap zone text. it should save these as a 'recall' point when done with collecting spells from a trainer.
--- the bot should then walk to the closest fp from db and once at or near flight master it should call the
--- fbDP:findClosestCity() script to return a minimap zone, zone name for bot to use the taxi service...
--- pause bot! and keep the bot targeting player and checking for unitontaxi
--- unpause when unit not on taxi
--- stop gotofp script
-
--- start get spells script
--- get spells should return back to a fp if level < 10
--- get spells should return fpDB:getCity from db 
--- walk to flight master
--- once at flight master the bot should 'recall' the last area mapid, zone text and area text to use the taxi service
--- pause bot!
--- target player for unitontaxi
--- unpause when unit is not on taxi anymore
--- end get spells script
-
--- restart grinder
-
-
-
-
-function fpDB:addFP(name, faction, mapID, posX, posY, posZ)
+function fpDB:addFP(name, faction, mapID, zone, posX, posY, posZ)
 	self.fpList[self.numfps] = {};
 	self.fpList[self.numfps]['name'] = name;
 	self.fpList[self.numfps]['faction'] = faction;
 	self.fpList[self.numfps]['mapID'] = mapID;
+	self.fpList[self.numfps]['zone'] = zone;
 	self.fpList[self.numfps]['pos'] = {};
 	self.fpList[self.numfps]['pos']['x'] = posX;
 	self.fpList[self.numfps]['pos']['y'] = posY;
@@ -65,24 +31,32 @@ end
 
 -- remove by zone name......... took me too long to realize that... we go to city by zone and flight masters by name.....
 function fpDB:removeCity()
+	local name = "";
 	for i=0, self.numCity -1 do
 		if (self.cityList[i]['zone'] ~= "nnil") then
 			if (script_goToFP.closestCityZone == self.cityList[i]['zone']) then
+				name = self.cityList[i]['zone'];
+				self.cityList[i]['name'] = "nnil";
 				self.cityList[i]['zone'] = "nnil";
 
 			end
 		end
 	end
+	DEFAULT_CHAT_FRAME:AddMessage("Blacklisting FP - "..name);
 end
 function fpDB:removeFP()
+	local name = "";
 	for i=0, self.numfps -1 do
-		if (self.fpList[i]['name'] ~= "nnil") then
-			if (script_goToFP.fpTarget == self.fpList[i]['name']) then
+		if (self.fpList[i]['zone'] ~= "nnil") then
+			if (script_goToFP.closestGrindZone == self.fpList[i]['zone']) then
+				name = self.fpList[i]['zone'];
 				self.fpList[i]['name'] = "nnil";
+				self.fpList[i]['zone'] = "nnil";
 			end
 		
 		end
 	end
+	DEFAULT_CHAT_FRAME:AddMessage("Blacklisting FP - "..name);
 end
 
 function fpDB:goToAshenvale()
@@ -100,6 +74,7 @@ function fpDB:goToAshenvale()
 				end
 		else
 			fpDB.goTo = false;
+			fpDB.goToAshenvaleBool = false;
 		end
 	end
 	if (myfaction == 0) then
@@ -109,55 +84,79 @@ function fpDB:goToAshenvale()
 			end
 		else
 			fpDB.goTo = false;
+			fpDB.goToAshenvaleBool = false;
 		end
 	end
 return false;
 end
+
+function fpDB:goToNearestFP()
+	local faction = GetFaction();
+	local myfaction = 1;
+	if faction == 1 or faction == 3 or faction == 4 or faction == 115 then
+		myfaction = 0;
+	end
+
+	local x, y, z = GetLocalPlayer():GetPosition();
+
+	local xx, yy, zz = fpDB:getFP();
+
+		if (GetDistance3D(x, y, z, xx, yy, zz) > 5) then
+			if (script_navEX:moveToTarget(GetLocalPlayer(), xx, yy, zz)) then
+				return true;
+			end
+		else
+			fpDB.goTo = false;
+			fpDB.goToNearestFPBool = false;
+		end
+return false;
+end
+
 
 
 
 function fpDB:setup()
 
 	--ashenvale alliance
-	fpDB:addFP("Daelyshia", 0, 331, 2828.3798828125, -284.25, 106.67706298828);
+	fpDB:addFP("Daelyshia", 0, 331, "Astranaar, Ashenvale", 2828.3798828125, -284.25, 106.67706298828);
 	--ashenvale horde
-	fpDB:addFP("Vhulgra", 1, 331, 2305.6398925781, -2520.1499023438, 103.80885314941);
-	fpDB:addFP("Andruk", 1, 331, 3373.6899414063, 994.35101318359, 5.2784662246704);
+	fpDB:addFP("Vhulgra", 1, 331, "Splinter Tree Post, Ashenvale", 2305.6398925781, -2520.1499023438, 103.80885314941);
+	fpDB:addFP("Andruk", 1, 331, "Zoram'gar Outpost, Ashenvale", 3373.6899414063, 994.35101318359, 5.2784662246704);
 
 	--westfall
-	fpDB:addFP("Thor", 0, 40, -10628.299804688, 1037.2700195313, 34.110454559326);
+	fpDB:addFP("Thor", 0, 40, "Sentinel Hill, Westfall", -10628.299804688, 1037.2700195313, 34.110454559326);
 
 	-- loch modan
-	fpDB:addFP("Thorgrum Borrelson", 0, 38, -5424.8500976563, -2929.8701171875, 347.56225585938);
+	fpDB:addFP("Thorgrum Borrelson", 0, 38, "Thelsamar, Loch Modan", -5424.8500976563, -2929.8701171875, 347.56225585938);
 
 	-- wetlands
-	fpDB:addFP("Shellei Brondir", 0, 11, -3793.1999511719, -782.05200195313, 9.0148887634277);
+	fpDB:addFP("Shellei Brondir", 0, 11, "Theramore, Wetlands", -3793.1999511719, -782.05200195313, 9.0148887634277);
 
 	-- crossroads
-	fpDB:addFP("Devrak", 1, 17, -437.1369934082, -2596, 95.787719726563);
+	fpDB:addFP("Devrak", 1, 17, "Crossroads, The Barrens", -437.1369934082, -2596, 95.787719726563);
 
 	-- camp tarujo
-	fpDB:addFP("Omusa Thunderhorn", 1, 17, -2384.080078125, -1880.9399414063, 95.850372314453);
+	fpDB:addFP("Omusa Thunderhorn", 1, 17, "Camp Taurajo, The Barrens",-2384.080078125, -1880.9399414063, 95.850372314453);
 
 	-- ratchet
-	fpDB:addFP("Bragok", 0, 17, -898.24597167969, -3769.6499023438, 11.710169792175);
-	fpDB:addFP("Bragok", 1, 17, -898.24597167969, -3769.6499023438, 11.710169792175);
+	fpDB:addFP("Bragok", 0, 17, "Ratchet, The Barrens", -898.24597167969, -3769.6499023438, 11.710169792175);
+	fpDB:addFP("Bragok", 1, 17, "Ratchet, The Barrens", -898.24597167969, -3769.6499023438, 11.710169792175);
 
 	-- darkshire
-	fpDB:addFP("Felicia Maline", 0, 10, -10513.799804688, -1258.7900390625, 41.431617736816);
+	fpDB:addFP("Felicia Maline", 0, 10, "Darkshire, Duskwood", -10513.799804688, -1258.7900390625, 41.431617736816);
 
 	-- lakeshire
-	fpDB:addFP("Ariena Stormfeather", 0, 44, -9435.2099609375, -2234.8798828125, 69.10888671875);
+	fpDB:addFP("Ariena Stormfeather", 0, 44, "Lakeshire, Redridge Mountains", -9435.2099609375, -2234.8798828125, 69.10888671875);
 
 	-- darkshore
-	fpDB:addFP("Caylais Moonfeather", 0, 148, 6343.2001953125, 561.65100097656, 15.798759460449);
+	fpDB:addFP("Caylais Moonfeather", 0, 148, "Auberdine, Darkshore", 6343.2001953125, 561.65100097656, 15.798759460449);
 
 	-- silverpine
-	fpDB:addFP("Karos Razok", 1, 130, 473.93899536133, 1533.9499511719, 131.8770904541);
+	fpDB:addFP("Karos Razok", 1, 130, "The Seplucher, Silverpine Forest", 473.93899536133, 1533.9499511719, 131.8770904541);
 
 	-- hillsbrad
-	fpDB:addFP("Zarise", 1, 267, 2.6755700111389, -857.91900634766, 58.774402618408);
-	fpDB:addFP("Darla Harris", 0, 267, -715.14599609375, -512.13397216797, 26.544595718384);
+	fpDB:addFP("Zarise", 1, 267, "Tarren Mill, Hillsbrad Foothills", 2.6755700111389, -857.91900634766, 58.774402618408);
+	fpDB:addFP("Darla Harris", 0, 267, "Southshore, Hillsbrad Foothills", -715.14599609375, -512.13397216797, 26.544595718384);
 
 
 
@@ -181,6 +180,7 @@ function fpDB:setup()
 
 end
 
+-- going to flight master
 function fpDB:getFP()
 	local fx, fy, fz = 0, 0 ,0;
 	local bestDist = 10000;
@@ -233,7 +233,6 @@ function fpDB:getClosestCity()
 		faction = 0;
 	end
 
-	-- we don't need to do any check but to make sure our mapID == mapID of flight master in the city
 	for i=0, self.numCity - 1 do
 
 		if self.cityList[i]['faction'] ~= nil and faction == self.cityList[i]['faction'] then
@@ -276,15 +275,47 @@ function fpDB:getClosestCityZone()
 				if (dist < bestDist) then
 					bestDist = dist;
 				end
-				if (bestDist < dist) then
-					fpName = self.cityList[i]['zone'];
-				end
+					zoneName = self.cityList[i]['zone'];
 			end
 		end
 
 	end
 
-return fpName;
+return zoneName;
+end
+function fpDB:getClosestGrindZone()
+
+	local x, y, z = GetLocalPlayer():GetPosition();
+	local bestDist = 10000;
+
+
+	-- faction check - 0 for alliance and 1 for horde
+	local faction = 1;
+
+	if (GetFaction() == 115 or GetFaction() == 3 or GetFaction() == 4 or GetFaction() == 1) then
+		faction = 0;
+	end
+
+	for i=0, self.numfps -1 do
+
+		-- check for removed table entries
+		if (self.fpList[i]['zone'] ~= "nnil") then
+
+			if (self.fpList[i]['faction'] ~= nil) and (self.fpList[i]['faction'] == faction) then
+		
+				local dist = GetDistance3D(x, y, z, self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z']);
+		
+				if (dist < bestDist) then
+					bestDist = dist;
+					sString = self.fpList[i]['zone'];
+				end
+					
+			end
+		end
+
+	end
+
+return sString;
 end
 
 -- we dont want to use a FP in these areas...
@@ -302,64 +333,3 @@ function fpDB:areWeInStarterZones()
 return false;
 end
 
-function fpDB:getAHumanZone()
-	local sString = "";
-	-- go to westfall level 10 - 20
-		if (GetLocalPlayer():GetLevel() >= 10 and GetLocalPlayer():GetLevel() < 20) then
-			sString = "Sentinel Hill, Westfall";
-
-	-- go to duskwood 10 - 30
-		elseif (GetLocalPlayer():GetLevel() >= 20) then
-			sString = "Darkshire, Duskwood";
-		end
-return sString;
-end
-
-function fpDB:getAOrcZone()
-	local sString = "";
-	-- go to barrens
-	if (GetLocalPlayer():GetLevel() >= 10 and GetLocalPlayer():GetLevel() < 20) then
-			sString = "Crossroads, The Barrens";
-	-- go to ashenvale
-	elseif (GetLocalPlayer():GetLevel() >= 20) then
-		sString = "Camp Taurajo, The Barrens";
-	end
-	
-return sString;
-end
-function fpDB:getAUndeadZone()
-	local sString = "";
-	-- go to silverpine
-	if (GetLocalPlayer():GetLevel() >= 10 and GetLocalPlayer():GetLevel() < 20) then
-			sString = "The Sepulcher, Silverpine Forest";
-	-- go to hillsbrad
-	elseif (GetLocalPlayer():GetLevel() >= 20) then
-		sString = "Tarren Mill, Hillsbrad";
-	end
-	
-return sString;
-end
-function fpDB:getAElfZone()
-	local sString = "";
-	-- go to barrens
-	if (GetLocalPlayer():GetLevel() >= 10 and GetLocalPlayer():GetLevel() < 20) then
-			sString = "Auberdine, Darkshore";
-	-- go to hillsbrad
-	elseif (GetLocalPlayer():GetLevel() >= 20) then
-		sString = "Astranaar, Ashenvale";
-	end
-	
-return sString;
-end
-function fpDB:getADwarfZone()
-	local sString = "";
-	-- go to barrens
-	if (GetLocalPlayer():GetLevel() >= 10 and GetLocalPlayer():GetLevel() < 20) then
-			sString = "Thelsamar, Loch Modan";
-	-- go to hillsbrad
-	elseif (GetLocalPlayer():GetLevel() >= 20) then
-		sString = "Menethil Habor, Wetlands";
-	end
-	
-return sString;
-end
