@@ -648,15 +648,17 @@ function script_grind:run()
 				end
 			end
 		elseif (not IsInCombat()) then
+
+		local x, y, r, g, b = 0, 0, 0, 0, 0;
+		
+
 			self.pause = true;
 			if (fpDB.goToAshenvaleBool) then
 				fpDB:goToAshenvale();
 			end
 			if (fpDB.goToNearestFPBool) then
 				fpDB:goToNearestFP();
-			end
-			if (fpDB.goToNearestCityBool) then
-				fpDB:goToNearestCity();
+				DrawText("Moving To Closest Flight Path... ",  x+800, y+300, r+255, g+255, b+0);
 			end
 			return true;
 		end

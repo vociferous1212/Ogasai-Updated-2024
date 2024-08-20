@@ -34,7 +34,8 @@ function script_rotationEX:draw()
 		return; 
 	end
 
-	if (script_rotation.drawChests) then script_gather:drawChestNodes();
+	if (script_rotationEX.drawChests) then
+		script_gather:drawChestNodes();
 	end
 
 	-- color

@@ -172,7 +172,7 @@ function script_aggro:safePullRecheck(target)
 				cx, cy, cz = currentObj:GetPosition();
 
 				local mx, my, mz = GetLocalPlayer():GetPosition();
-				local aggroDistToMe = 21.5;
+				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 21.5;
 				-- zero out my distance then add in aggro range to other target from that distance
 				local zeroMyRange = GetDistance3D(mx, my, mz, tx, ty, tz) - GetDistance3D(mx, my, mz, tx, ty, tz);
 				

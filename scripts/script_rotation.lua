@@ -31,7 +31,6 @@ end
 
 function script_rotation:window() -- stuff here runs continous
 	EndWindow(); if(NewWindow("Rotation", 320, 300)) then script_rotationMenu:menu(); end
-	-- draw chests
 	if (self.useExpChecker) then script_expChecker:menu(); end
 end
 
