@@ -190,22 +190,26 @@ end
 
 function script_followEX2:isTargetAttackingMember() 
    	local currentObj, typeObj = GetFirstObject(); 
-	local member = GetPartyMember(i);
+	local member = 0;
 
-	for i = 1, GetNumPartyMembers() do
-		member = GetPartyMember(i);
-	end
+	if (GetNumPartyMembers() > 0) then
+		for i = 0, GetNumPartyMembers() do
+			member = GetPartyMember(i);
+		end
 
-   	while currentObj ~= 0 do 
-    	if typeObj == 3 then
-			if (currentObj:CanAttack() and not currentObj:IsDead()) then
-				if (currentObj:GetUnitsTarget() == member) then 
-					script_follow.objectAttackingUs = currentObj;
-                			return true; 
-				end 
+   		while currentObj ~= 0 do 
+    			if typeObj == 3 then
+				if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:GetDistance() <= 50) then
+					if (currentObj:GetUnitsTarget():GetGUID() == member:GetGUID()) then 
+						if (script_follow.assistInCombat) then
+							script_follow.objectAttackingUs = currentObj;	
+						end
+                				return true; 
+					end 
+				end
 			end
-	end
-        currentObj, typeObj = GetNextObject(currentObj); 
+      		  currentObj, typeObj = GetNextObject(currentObj); 
+		end
     end
     return false;
 end
