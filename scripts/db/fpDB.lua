@@ -91,34 +91,32 @@ return false;
 end
 
 function fpDB:goToNearestFP()
-	local faction = GetFaction();
-	local myfaction = 1;
-	if faction == 1 or faction == 3 or faction == 4 or faction == 115 then
-		myfaction = 0;
-	end
-
+	local fx, fy, fz = 0, 0, 0;
 	local x, y, z = GetLocalPlayer():GetPosition();
 
-	local xx, yy, zz = fpDB:getFP();
-
-		if (GetDistance3D(x, y, z, xx, yy, zz) > 5) then
-			if (script_navEX:moveToTarget(GetLocalPlayer(), xx, yy, zz)) then
-				return true;
+	local fx, fy, fz = fpDB:getFP();
+		if (not fpDB.isSetup) then
+			fpDB:setup();
+		end
+		if (fx ~= 0) then
+			if (GetDistance3D(x, y, z, fx, fy, fz) > 5) then
+				if (script_navEX:moveToTarget(GetLocalPlayer(), fx, fy, fz)) then
+					return true;
+				end
+			else
+				fpDB.goTo = false;
+				fpDB.goToNearestFPBool = false;
 			end
-		else
-			fpDB.goTo = false;
-			fpDB.goToNearestFPBool = false;
 		end
 return false;
 end
 
-
-
-
 function fpDB:setup()
 
 	--ashenvale alliance
+
 	fpDB:addFP("Daelyshia", 0, 331, "Astranaar, Ashenvale", 2828.3798828125, -284.25, 106.67706298828);
+
 	--ashenvale horde
 	fpDB:addFP("Vhulgra", 1, 331, "Splinter Tree Post, Ashenvale", 2305.6398925781, -2520.1499023438, 103.80885314941);
 	fpDB:addFP("Andruk", 1, 331, "Zoram'gar Outpost, Ashenvale", 3373.6899414063, 994.35101318359, 5.2784662246704);
@@ -187,9 +185,10 @@ function fpDB:getFP()
 	local x, y, z = GetLocalPlayer():GetPosition();
 
 	-- faction check - 0 for alliance and 1 for horde
-	local faction = 1;
+	local myfaction = 1;
+
 	if (GetFaction() == 115 or GetFaction() == 3 or GetFaction() == 4 or GetFaction() == 1) then
-		faction = 0;
+		myfaction = 0;
 	end
 
 	for i=0, self.numfps - 1 do
@@ -197,7 +196,7 @@ function fpDB:getFP()
 		-- check for removed entries in the table
 		if (self.fpList[i]['name'] ~= "nnil") then
 			-- check our faction
-			if self.fpList[i]['faction'] ~= nil and faction == self.fpList[i]['faction'] then
+			if myfaction == self.fpList[i]['faction'] then
 	
 				-- check our mapID
 				if self.fpList[i]['mapID'] == GetMapID() then
@@ -205,12 +204,11 @@ function fpDB:getFP()
 					local dist = GetDistance3D(x, y, z, self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z']);
 	
 					
-					if(dist < bestDist) then
+					if (dist < bestDist) then
 
 						bestDist = dist;
 
 						fx, fy, fz = self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z'];
-
 						script_goToFP.fpTarget = self.fpList[i]['name'];
 					end
 				end
