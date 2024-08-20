@@ -200,7 +200,7 @@ Separator();
 		end
 
 		if (script_druid.useBear) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) then
-			if (CollapsingHeader("|+| Bear Form Options")) then
+			if (CollapsingHeader(">>> |+| Bear Form Options")) then
 				Text("Maul Rage Cost");
 				script_druid.maulRage = SliderInt("Rage", 10, 15, script_druid.maulRage);
 				if (HasSpell("Feral Charge")) then
@@ -210,7 +210,7 @@ Separator();
 		end
 
 		if (script_druid.useCat) and (HasSpell("Cat Form")) then
-			if (CollapsingHeader("|+| Cat Form Options")) then
+			if (CollapsingHeader(">>> |+| Cat Form Options")) then
 				wasClicked, script_druid.useStealth = Checkbox("Use Stealth", script_druid.useStealth);
 				if (script_druid.useStealth) then
 					Text("Stealth Opener");
@@ -222,7 +222,7 @@ Separator();
 		end
 
 		if (script_druid.useMoonkin) and (HasSpell("Moonkin Form")) then
-				if (CollapsingHeader("|+| Moonkin Form Options")) then
+				if (CollapsingHeader(">>> |+| Moonkin Form Options")) then
 					Text("Nothing here yet!");
 					Text("To DO!");
 				end

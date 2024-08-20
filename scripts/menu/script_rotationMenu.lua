@@ -94,6 +94,6 @@ function script_rotationMenu:menu()
 		script_rotationEX.aggroRangeTank = SliderInt("AR", 36, 300, script_rotationEX.aggroRangeTank);
 	end
 
-	wasClicked, script_rotationEX.drawChests = Checkbox("Draw Chests", script_rotationEX.drawChests);
+	--wasClicked, script_rotationEX.drawChests = Checkbox("Draw Chests", script_rotationEX.drawChests);
 		
 end

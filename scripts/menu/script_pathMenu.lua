@@ -31,6 +31,7 @@ function script_pathMenu:menu()
 				script_grind.staticHotSpot = false;
 				script_grindMenu:printHotspot(); 
 				script_grind.hotspotReached = true;
+				script_grind:setWaitTimer(1500);
 			end
 			
 			-- distance from hotspot slider
