@@ -655,6 +655,9 @@ function script_grind:run()
 			if (fpDB.goToNearestFPBool) then
 				fpDB:goToNearestFP();
 			end
+			if (fpDB.goToNearestCityBool) then
+				fpDB:goToNearestCity();
+			end
 			return true;
 		end
 	end
