@@ -180,6 +180,7 @@ function script_grindMenu:menu()
 					fpDB.goTo = false;
 					fpDB.goToNearestFPBool = false;
 					fpDB.goToAshenvaleBool = false;
+					fpDB.goToNearestCity = false;
 				end
 			end
 			if (fpDB.goTo) then
@@ -192,6 +193,11 @@ function script_grindMenu:menu()
 			if (Button("Nearest FP")) then
 				fpDB.goTo = true;
 				fpDB.goToNearestFPBool = true;
+			end
+			SameLine();
+			if (Button("Nearest City")) then
+				fpDB.goTo = true;
+				fpDB.goToNearestCityBool = true;
 			end
 		end
 	end

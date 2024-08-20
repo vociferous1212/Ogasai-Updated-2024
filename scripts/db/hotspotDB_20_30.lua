@@ -7,7 +7,7 @@ function hotspotDB_20_30:setup()
 	hotspotDB:addHotspot("Duskwood 20 - 21", "Alliance", 19, 25, -10811, 522.47, 35.07);
 	hotspotDB:addHotspot('Duskwood 21 - 25', "Alliance", 21, 25, -10759.08, 479.45, 35.19);	
 	hotspotDB:addHotspot("Duskwood 22 - 24", "Alliance", 21, 25, -10029.30, -783.62, 33.81);
-	hotspotDB:addHotspot("Duskwood 23 - 24", "Alliance", 23, 26, -10937.13, 1251.42, 49.95);
+	hotspotDB:addHotspot("Duskwood 23 - 24", "Alliance", 23, 24, -10937.13, 1251.42, 49.95);
 	hotspotDB:addHotspot("Duskwood 22 - 24", "Alliance", 22, 24, -11077.7, 370.85, 29.51);
 	hotspotDB:addHotspot("The Darkened Bank 22 - 24", "Alliance", 22, 24, -10078.23, -1067.3, 28.1);
 	hotspotDB:addHotspot("The Darkened Bank 20 - 22", "Alliance", 20, 22, -9962.79, -567.63, 35.56);
@@ -28,7 +28,7 @@ function hotspotDB_20_30:setup()
 
 	hotspotDB:addHotspot("Astranaar 20 - 23", "Alliance", 20, 23, 2819.65, -116.68, 103.22);
 	hotspotDB:addHotspot("Ashenvale 22 - 24", "All", 22, 24, 2647.01, 168.43, 92.14);
-	hotspotDB:addHotspot("Ashenvale 23 - 24", "All", 22, 27, 2873.68, -910.45, 197.96);
+	hotspotDB:addHotspot("Ashenvale 22 - 25", "All", 22, 25, 2873.68, -910.45, 197.96);
 	hotspotDB:addHotspot("Ashenvale 25 - 26", "All", 24, 28, 2046.75, -1739.65, 75.40);
 	hotspotDB:addHotspot("Ashenvale 25 - 30", "All", 25, 30, 3113.14, -1511.09, 195.10);
 	hotspotDB:addHotspot("Ashenvale 20 - 22", "All", 20, 22, 3860.44, 737.77, 7.2);

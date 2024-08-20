@@ -1,4 +1,4 @@
-fpDB = {isSetup = false, fpList = {}, numfps = 0, cityList = {}, numCity = 0, goToNearestFPBool = false, goToAshenvaleBool = false,
+fpDB = {isSetup = false, fpList = {}, numfps = 0, cityList = {}, numCity = 0, goToNearestFPBool = false, goToAshenvaleBool = false, goToNearestCityBool = false,
 
 }
 
@@ -110,6 +110,63 @@ function fpDB:goToNearestFP()
 		end
 return false;
 end
+
+function fpDB:goToNearestCity()
+
+	local fx, fy, fz = 0, 0, 0;
+	local x, y, z = GetLocalPlayer():GetPosition();
+
+	local fx, fy, fz = fpDB:getClosestCityWalkTo()
+		if (not fpDB.isSetup) then
+			fpDB:setup();
+		end
+		if (fx ~= 0) then
+			if (GetDistance3D(x, y, z, fx, fy, fz) > 5) then
+				if (script_navEX:moveToTarget(GetLocalPlayer(), fx, fy, fz)) then
+					return true;
+				end
+			else
+				fpDB.goTo = false;
+				fpDB.goToNearestCityBool = false;
+			end
+		end
+return false;
+end
+
+function fpDB:getClosestCityWalkTo()
+
+	local fx, fy, fz = 0, 0 ,0;
+	local bestDist = 10000;
+
+	-- faction check - 0 for alliance and 1 for horde
+	local faction = 1;
+	if (GetFaction() == 115 or GetFaction() == 3 or GetFaction() == 4 or GetFaction() == 1) then
+		faction = 0;
+	end
+
+	for i=0, self.numCity - 1 do
+
+		if self.cityList[i]['faction'] ~= nil and faction == self.cityList[i]['faction'] then
+
+			local dist = GetDistance3D(x, y, z, self.cityList[i]['pos']['x'], self.cityList[i]['pos']['y'], self.cityList[i]['pos']['z']);
+
+	
+					if (dist < bestDist) then
+
+						bestDist = dist;
+
+
+					fx, fy, fz = self.cityList[i]['pos']['x'], self.cityList[i]['pos']['y'], self.cityList[i]['pos']['z'];
+
+					script_goToFP.fpTarget = self.cityList[i]['name'];
+					end
+		end
+	end
+return fx, fy, fz;
+end
+
+
+
 
 function fpDB:setup()
 

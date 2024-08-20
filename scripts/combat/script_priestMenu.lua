@@ -19,7 +19,7 @@ function script_priestMenu:menu()
 			if (localObj:HasRangedWeapon()) then
 
 				-- wand options menu
-				if (CollapsingHeader("|+| Wand Options")) then
+				if (CollapsingHeader(">>> |+| Wand Options")) then
 
 					Text('Wand options:');
 						if (not script_priest.useWand) then
