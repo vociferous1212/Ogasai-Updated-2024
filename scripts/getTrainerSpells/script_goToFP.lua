@@ -93,7 +93,7 @@ function script_goToFP:run()
 			TargetByName(self.fpTarget);
 			if (not self.timerSet) then
 				self.timerSet = true;
-				self.goToFPTimer = GetTimeEX() + 5000;
+				self.goToFPTimer = GetTimeEX() + 15000;
 			end
 
 			-- get target
@@ -158,6 +158,7 @@ function script_goToFP:run()
 				--	end
 				--end
 					if (GetTimeEX() > self.goToFPTimer) then
+						self.goToFPTimer = GetTimeEX() + 10000;
 						fpDB:removeCity();
 						fpDB:removeFP();
 						DEFAULT_CHAT_FRAME:AddMessage("Took too long at flight master. No path found!");

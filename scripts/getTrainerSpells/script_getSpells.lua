@@ -161,7 +161,7 @@ if (not script_unstuck:pathClearAuto(2)) then
 		-- if distance is close to trainer then
 		if (GetDistance3D(x, y, z, vX, vY, vZ) <= 4) then
 
-			script_goToFP.goToFPTimer = GetTimeEX();
+			script_goToFP.goToFPTimer = GetTimeEX() + 6000000;
 			
 			if (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetUnitName() ~= self.trainerTarget) then
 				ClearTarget();

@@ -62,33 +62,25 @@ function fpDB:addCity(name, faction, mapID, zone, posX, posY, posZ)
 
 	self.numCity = self.numCity + 1;
 end
-function fpDB:removeCity()
-	for i=0, self.numCity do
-		if (script_goToFP.fpTarget == self.cityList[i]['name']) then
-			self.cityList[self.numCity]['name'] = nil;
-			self.cityList[self.numCity]['faction'] = nil;
-			self.cityList[self.numCity]['mapID'] = nil;
-			self.cityList[self.numCity]['zone'] = nil;
-			self.cityList[self.numCity]['pos']['x'] = nil;
-			self.cityList[self.numCity]['pos']['y'] = nil;
-			self.cityList[self.numCity]['pos']['z'] = nil;
 
-			self.numCity = self.numCity - 1;
+-- remove by zone name......... took me too long to realize that... we go to city by zone and flight masters by name.....
+function fpDB:removeCity()
+	for i=0, self.numCity -1 do
+		if (self.cityList[i]['zone'] ~= "nnil") then
+			if (script_goToFP.closestCityZone == self.cityList[i]['zone']) then
+				self.cityList[i]['zone'] = "nnil";
+
+			end
 		end
 	end
 end
 function fpDB:removeFP()
-	for i=0, self.numCity do
-		if (script_goToFP.fpTarget == self.fpList[i]['name']) then
-			self.fpList[self.numfps]['name'] = nil;
-			self.fpList[self.numfps]['faction'] = nil;
-			self.fpList[self.numfps]['mapID'] = nil;
-			self.fpList[self.numfps]['zone'] = nil;
-			self.fpList[self.numfps]['pos']['x'] = nil;
-			self.fpList[self.numfps]['pos']['y'] = nil;
-			self.fpList[self.numfps]['pos']['z'] = nil;
-
-			self.numfps = self.numfps - 1;
+	for i=0, self.numfps -1 do
+		if (self.fpList[i]['name'] ~= "nnil") then
+			if (script_goToFP.fpTarget == self.fpList[i]['name']) then
+				self.fpList[i]['name'] = "nnil";
+			end
+		
 		end
 	end
 end
@@ -202,19 +194,25 @@ function fpDB:getFP()
 
 	for i=0, self.numfps - 1 do
 
-		-- check our faction
-		if self.fpList[i]['faction'] ~= nil and faction == self.fpList[i]['faction'] then
+		-- check for removed entries in the table
+		if (self.fpList[i]['name'] ~= "nnil") then
+			-- check our faction
+			if self.fpList[i]['faction'] ~= nil and faction == self.fpList[i]['faction'] then
+	
+				-- check our mapID
+				if self.fpList[i]['mapID'] == GetMapID() then
+	
+					local dist = GetDistance3D(x, y, z, self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z']);
+	
+					
+					if(dist < bestDist) then
 
-			-- check our mapID
-			if self.fpList[i]['mapID'] == GetMapID() then
+						bestDist = dist;
 
-				local dist = GetDistance3D(x, y, z, self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z']);
+						fx, fy, fz = self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z'];
 
-				
-				if(dist < bestDist) then
-					bestDist = dist;
-					fx, fy, fz = self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z'];
-					script_goToFP.fpTarget = self.fpList[i]['name'];
+						script_goToFP.fpTarget = self.fpList[i]['name'];
+					end
 				end
 
 			end
@@ -237,9 +235,13 @@ function fpDB:getClosestCity()
 
 	-- we don't need to do any check but to make sure our mapID == mapID of flight master in the city
 	for i=0, self.numCity - 1 do
+
 		if self.cityList[i]['faction'] ~= nil and faction == self.cityList[i]['faction'] then
+
 			if (GetMapID() == self.cityList[i]['mapID']) then
+
 				fx, fy, fz = self.cityList[i]['pos']['x'], self.cityList[i]['pos']['y'], self.cityList[i]['pos']['z'];
+
 				script_goToFP.fpTarget = self.cityList[i]['name'];
 			end
 		end
@@ -264,15 +266,19 @@ function fpDB:getClosestCityZone()
 
 	for i=0, self.numCity -1 do
 
-		if (self.cityList[i]['faction'] ~= nil) and (self.cityList[i]['faction'] == faction) then
+		-- check for removed table entries
+		if (self.cityList[i]['zone'] ~= "nnil") then
 
-			local dist = GetDistance3D(x, y, z, self.cityList[i]['pos']['x'], self.cityList[i]['pos']['y'], self.cityList[i]['pos']['z']);
+			if (self.cityList[i]['faction'] ~= nil) and (self.cityList[i]['faction'] == faction) then
 		
-			if (dist < bestDist) then
-				bestDist = dist;
-			end
-			if (bestDist < dist) then
-				fpName = self.cityList[i]['zone'];
+				local dist = GetDistance3D(x, y, z, self.cityList[i]['pos']['x'], self.cityList[i]['pos']['y'], self.cityList[i]['pos']['z']);
+		
+				if (dist < bestDist) then
+					bestDist = dist;
+				end
+				if (bestDist < dist) then
+					fpName = self.cityList[i]['zone'];
+				end
 			end
 		end
 
