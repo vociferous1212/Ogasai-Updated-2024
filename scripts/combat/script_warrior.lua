@@ -104,7 +104,7 @@ end
 
 function script_warrior:canOverpower()	-- use overpower function
 	local isUsable, _ = IsUsableAction(self.overpowerActionBarSlot); 
-	if (isUsable == 1 and not IsSpellOnCD("Overpower")) then 
+	if (isUsable == 1 and not IsSpellOnCD("Overpower")) and (CanOverpower()) then 
 		return true; 
 	end 
 	return false;

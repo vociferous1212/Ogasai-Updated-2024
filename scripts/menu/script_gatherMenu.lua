@@ -74,8 +74,8 @@ function script_gatherMenu:menu()
 				end
 			end
 			wasClicked, script_gather.safeGather = Checkbox("Safe Gathering", script_gather.safeGather);
-			SameLine(); 
-			wasClicked, script_grind.killStuffAroundGatherNodes = Checkbox("Kill Stuff Around Nodes", script_grind.killStuffAroundGatherNodes);
+			--SameLine(); 
+			--wasClicked, script_grind.killStuffAroundGatherNodes = Checkbox("Kill Stuff Around Nodes", script_grind.killStuffAroundGatherNodes);
 
 			if (script_gather.safeGather) then
 				Text("Blacklisting gather nodes with 3 or more enemies in range");

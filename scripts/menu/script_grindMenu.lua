@@ -198,7 +198,7 @@ function script_grindMenu:menu()
 				fpDB.goToNearestFPBool = true;
 				fpDB.goTo = true;
 				fpDB.goToCityBool = true;
-			end
+			end	
 		end
 	end
 

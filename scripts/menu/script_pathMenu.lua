@@ -16,7 +16,7 @@ function script_pathMenu:menu()
 
 			wasClicked, script_grind.staticHotSpot = Checkbox("Auto Load Hotspots From - HotspotDB.lua", script_grind.staticHotSpot);
 		end
-			wasClicked, script_grind.attackTargetsOnRoutes = Checkbox("Attack Unfriendly NPC's Going To Hotspots", script_grind.attackTargetsOnRoutes);
+			--wasClicked, script_grind.attackTargetsOnRoutes = Checkbox("Attack Unfriendly NPC's Going To Hotspots", script_grind.attackTargetsOnRoutes);
 		
 		-- show auto hotspot button
 		if (script_grindMenu.useHotSpotArea) then

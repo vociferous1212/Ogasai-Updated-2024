@@ -1,7 +1,7 @@
 fpDB = {isSetup = false, fpList = {}, numfps = 0, cityList = {}, numCity = 0, goToNearestFPBool = false, goToAshenvaleBool = false, goToCityBool = false, test = "",
 
 }
-
+		
 function fpDB:addFP(name, faction, mapID, zone, posX, posY, posZ)
 	self.fpList[self.numfps] = {};
 	self.fpList[self.numfps]['name'] = name;
@@ -155,7 +155,9 @@ function fpDB:setup()
 	fpDB:addFP("Zarise", 1, 267, "Tarren Mill, Hillsbrad Foothills", 2.6755700111389, -857.91900634766, 58.774402618408);
 	fpDB:addFP("Darla Harris", 0, 267, "Southshore, Hillsbrad Foothills", -715.14599609375, -512.13397216797, 26.544595718384);
 
+	
 
+-- add cities
 
 	-- stormwind
 	fpDB:addCity("Dungar Longdrink", 0, 1519, "Stormwind, Elwynn", -8835.759765625, 490.08401489258, 109.61573028564);
@@ -196,23 +198,19 @@ function fpDB:getFP()
 		if (self.fpList[i]['name'] ~= "nnil") then
 			-- check our faction
 			if myfaction == self.fpList[i]['faction'] then
-	
-				-- check our mapID
-				if self.fpList[i]['mapID'] == GetMapID() then
-	
-					local dist = GetDistance3D(x, y, z, self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z']);
-	
+		
+				local dist = GetDistance3D(x, y, z, self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z']);
 					
-					if (dist < bestDist) then
+				if (dist < bestDist) then
 
-						bestDist = dist;
+					bestDist = dist;
 
-						fx, fy, fz = self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z'];
-						script_goToFP.fpTarget = self.fpList[i]['name'];
-					end
+					fx, fy, fz = self.fpList[i]['pos']['x'], self.fpList[i]['pos']['y'], self.fpList[i]['pos']['z'];
+
+					script_goToFP.fpTarget = self.fpList[i]['name'];
 				end
-
 			end
+
 		end
 	end
 

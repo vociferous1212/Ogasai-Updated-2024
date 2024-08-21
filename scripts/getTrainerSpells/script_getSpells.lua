@@ -121,16 +121,16 @@ function script_getSpells:run()
 			vX, vY, vZ = script_getSpellsHunter:getTrainerTargetHunter();
 		end
 
-		if (script_grindEX:checkForTargetsOnHotspotRoute()) then
-			script_grind.message = "Killing stuff in our path.";
-			script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-			if (self.combatError == 3) then
-				local x, y, z = script_grind.enemyObj:GetPosition();
-				MoveToTarget(x, y, z);
-				return true;
-			end
-			return true;
-		end
+		--if (script_grindEX:checkForTargetsOnHotspotRoute()) then
+		--	script_grind.message = "Killing stuff in our path.";
+		--	script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+		--	if (self.combatError == 3) then
+		--		local x, y, z = script_grind.enemyObj:GetPosition();
+		--		MoveToTarget(x, y, z);
+		--		return true;
+		--	end
+		--	return true;
+		--end
 
 
 		if (GetDistance3D(x, y, z, vX, vY, vZ) < 20) then
