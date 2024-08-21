@@ -23,8 +23,8 @@ end
 		i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then
-				-- check targets within 32 yards
-				if (i:GetDistance() < 32) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 5) then
+				-- check targets within 30 yards
+				if (i:GetDistance() < 30) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 5) then
 					local iX, iY, iZ = i:GetPosition();	
 					local lX, lY, lZ = GetLocalPlayer():GetPosition();
 		
@@ -38,6 +38,11 @@ end
 						-- target it...
 						name = i:GetUnitName();
 						TargetByName(name);
+						if (PlayerHasTarget()) then
+							if (i:GetGUID() ~= GetLocalPlayer():GetUnitsTarget():GetGUID()) then
+								ClearTarget();
+							end
+						end
 						if (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 							if (UnitIsEnemy("target","player")) then
 								script_grind.enemyObj = i;

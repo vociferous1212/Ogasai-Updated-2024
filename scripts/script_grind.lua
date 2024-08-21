@@ -197,7 +197,7 @@ script_grind = {
 	sitTimerSet = false,
 	afkUsed = false,
 	combatScriptRange = 30,
-	attackTargetsOnRoutes = true,
+	--attackTargetsOnRoutes = true,
 	drawAggroAtStart = true,
 	showOM = false,
 	useFirstAid = true,
@@ -387,6 +387,7 @@ function script_grind:setup()
 	-- turn on mining
 	if (HasSpell("Find Minerals")) then
 		self.gather = true;
+		script_gather.blacklistSetTime = 30;
 	end
 
 	-- change some values to random
@@ -1025,14 +1026,15 @@ function script_grind:run()
 		-- Gather
 		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
 
-				script_gather.gathering = true;
 
-			if (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
-				self.message = "Killing stuff around gather node";
-				self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-				return true;
-		
-			else
+			--if (script_gather.gathering) then
+			--	if (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
+			--		self.message = "Killing stuff around gather node";
+			--		self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+			--		return true;
+			--	end
+		--
+		--	end
 			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
@@ -1057,7 +1059,7 @@ function script_grind:run()
 					script_grind:setWaitTimer(1500);
 				end
 			return true;
-			end
+			
 			end
 		end
 		-- turn jump back on once gathering is done
@@ -1148,42 +1150,24 @@ function script_grind:run()
 				end
 			end
 
-			if (self.attackTargetsOnRoutes) and (not IsStealth()) then
-					script_grindEX:checkForTargetsOnHotspotRoute()
-				if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-					self.message = "Killing stuff in our path.";
-					
-					if (self.enemyObj:GetDistance() <= self.combatScriptRange) then
-						if (IsMoving()) then
-							StopMoving();
-							return true;
-						end
-					end
-					if (not IsMoving()) then
-						self.enemyObj:FaceTarget();
-					end
-
-					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-					return;	
-				elseif (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-
-					self.message = script_moveToHotspot:moveToHotspot(localObj);	
-
-					if (PlayerHasTarget()) then
-						ClearTarget();
-					end
-				end
-			elseif (not self.attackTargetsOnRoutes) and (script_runner:avoidToAggro(5)) and (not IsStealth()) then
-				local x, y, z = GetLocalPlayer():GetPosition();
-				if (GetTimeEX() > self.moveTimer) then
-				self.moveTimer = GetTimeEX() + 10000;
-				GeneratePath(x, y, z, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-				end
-				return true;
-			elseif (GetTimeEX() > self.moveTimer) or (IsStealth()) then
-				self.message = script_moveToHotspot:moveToHotspot(localObj);
-			end
-			
+			--if (self.attackTargetsOnRoutes) and (not IsStealth()) and (not self.hotspotReached) then
+			--		--script_grindEX:checkForTargetsOnHotspotRoute()
+			--	if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+			--		self.message = "Killing stuff in our path.";
+			--		script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
+			--		return true;
+			--	elseif (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
+			--
+			--		if (not self.hotspotReached) and (script_vendor.status == 0) then
+			--			self.message = script_moveToHotspot:moveToHotspot(localObj);	
+			--		end
+			--		if (PlayerHasTarget()) then
+			--			ClearTarget();
+			--		end
+			--	end
+			--elseif (not self.attackTargetsOnRoutes) or (not self.hotspotReached) then
+			--	self.message = script_moveToHotspot:moveToHotspot(localObj);
+			--end
 		end
 		
 		-- use kills to level tracker
