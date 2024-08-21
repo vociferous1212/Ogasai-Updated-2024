@@ -156,16 +156,16 @@ function script_drawData:drawPath()
 			firstIndex = script_nav.lastnavIndex;
 		end
 		if (script_nav.lastnavIndex <= GetPathSize(5)) then
-			for index = firstIndex, GetPathSize(5) - 2 do
+			for index = firstIndex, GetPathSize(5) - 4 do
 				local _x, _y, _z = GetPathPositionAtIndex(5, index);
 				local _xx, _yy, _zz = GetPathPositionAtIndex(5, index+1);
 				local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);
 				local _tXX, _tYY, onScreens = WorldToScreen(_xx, _yy, _zz);
 				if(onScreen and onScreens) then
-					DrawLine(_tX, _tY, _tXX, _tYY, 255, 255, 0, 1);
+					DrawLine(_tX, _tY, _tXX, _tYY, 255, 255, 0, 0);
 					if (GetDistance3D(mx, my, mz, _xx, _yy, _zz) < 100) then
-						script_aggro:DrawCircles(_x, _y, _z, 0.2);
-						script_aggro:DrawCircles(_xx, _yy, _zz, 0.2);
+						script_aggro:DrawCircles(_x, _y, _z, 0.1);
+						script_aggro:DrawCircles(_xx, _yy, _zz, .3);
 					end
 				end
 			end

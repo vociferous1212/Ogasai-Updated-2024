@@ -1467,6 +1467,17 @@ function script_grind:run()
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 
+-- heroic strike stuck on and target moved away or we stopped casting auto attack
+
+	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
+
+		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_warrior.meleeDistance or IsMoving()) then
+			if hstable[GetLocalPlayer():GetCasting()] then
+				SpellStopCasting();
+			
+			end
+		end
+
 
 				-- check positions
 				local _x, _y, _z = self.enemyObj:GetPosition();
@@ -2111,7 +2122,7 @@ function script_grind:enemyIsValid(i)
 		if (self.skipHardPull) and (self.extraSafe)
 			and (i:GetDistance() <= 65)
 			and (script_grind:isTargetBlacklisted(i:GetGUID()))
-			and (script_aggro:safePullRecheck(i) and (script_grindEX:howManyEnemiesInRangeOfTarget(i) < 3)) then
+			and (script_aggro:safePullRecheck(i)) then
 
 			if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
 				and (not i:IsDead() and i:CanAttack() and not i:IsCritter()

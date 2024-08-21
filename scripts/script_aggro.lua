@@ -155,31 +155,32 @@ function script_aggro:safePullRecheck(target)
 	local aggro = 0;
 	local cx, cy, cz = 0, 0, 0;
 	local tx, ty, tz = target:GetPosition();
+	local x, y, z = GetLocalPlayer():GetPosition();
 
 	-- run object manager
 	while currentObj ~= 0 do
 
 		-- NPC type 3
  		if (typeObj == 3) then
-			
-			local testRange = GetDistance3D(tx, ty, tz, cx, cy, cz);
+
+			local rx, ry, rz = currentObj:GetPosition()
+
+			-- target distance to current object being checked distance
+			local testRange = GetDistance3D(tx, ty, tz, rx, ry, rz);
 
 
 			-- acceptable targets
-			if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (testRange < 30) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting()) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) then	
+			if (testRange < 30) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) and (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting())  then	
+
+				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 21.5;
+
+				-- if we are a ranged class we can pull at half the distance!
+				if (not HasSpell("Heroic Strike")) or (not HasSpell("Sinister Strike")) or (not HasSpell("Seal of Righteousness")) then
+					aggroDistToMe = (aggroDistToMe / 1.5);
+				end
 
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
-
-				local mx, my, mz = GetLocalPlayer():GetPosition();
-				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 23.5;
-				-- zero out my distance then add in aggro range to other target from that distance
-				local zeroMyRange = GetDistance3D(mx, my, mz, tx, ty, tz) - GetDistance3D(mx, my, mz, tx, ty, tz);
-				
-				-- if we are a ranged class we can pull at half the distance!
-				if (not HasSpell("Heroic Strike")) and (not HasSpell("Sinister Strike")) and (not HasSpell("Seal of Righteousness")) then
-					aggroDistToMe = (aggroDistToMe / 1.5);
-				end
 
 				-- if current object distance to other target is closer than aggro range
 				local currentObjRangeToOtherTarget = GetDistance3D(tx, ty, tz, cx, cy, cz);
@@ -187,7 +188,7 @@ function script_aggro:safePullRecheck(target)
 
 				-- if me moving to target would be less than aggro range of 2nd target then +1
 				-- if target distance is closer than aggro to other target
-				if (currentObjRangeToOtherTarget <= aggro) then
+				if (currentObjRangeToOtherTarget <= aggroDistToMe) then
 
 					-- acceptable targets in range
 					countUnitsInRange = countUnitsInRange + 1;

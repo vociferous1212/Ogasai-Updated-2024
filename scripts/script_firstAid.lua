@@ -58,44 +58,46 @@ return false;
 end
 function script_firstAid:craftBandages()
 
-	-- wool bandage
-	if (HasItem("Wool Cloth")) then
-				script_firstAid:openMenu();
-
-		for i = 0, GetNumTradeSkills(i) do
-			local name, _, _, _, _ = GetTradeSkillInfo(i);
-			if (name == "Heavy Wool Bandage") then
-
-				if script_firstAid:howMuchWoolDoWeHave() >= 2 then
-					DoTradeSkill(i, 20);
-					return true;
-				end
-			elseif (name == "Wool Bandage") then
-				DoTradeSkill(i, 20);
-				return true;
-			end
-		end
-	end
-
+	if (not IsMoving()) then
+		-- wool bandage
+		if (HasItem("Wool Cloth")) then
+			script_firstAid:openMenu();
 	
-	-- linen bandage
-	if (HasItem("Linen Cloth")) then
-				script_firstAid:openMenu();
-
-		for i = 0, GetNumTradeSkills(i) do
-			local name, _, _, _, _ = GetTradeSkillInfo(i);
-			if (name == "Heavy Linen Bandage") then
-
-				if script_firstAid:howMuchLinenDoWeHave() >= 2 then
+			for i = 0, GetNumTradeSkills(i) do
+				local name, _, _, _, _ = GetTradeSkillInfo(i);
+				if (name == "Heavy Wool Bandage") then
+	
+					if script_firstAid:howMuchWoolDoWeHave() >= 2 then
+						DoTradeSkill(i, 20);
+						return true;
+					end
+				elseif (name == "Wool Bandage") then
 					DoTradeSkill(i, 20);
 					return true;
 				end
-			elseif (name == "Linen Bandage") then
-				DoTradeSkill(i, 20);
-				return true;
+			end
+		end
+	
+		-- linen bandage
+		if (HasItem("Linen Cloth")) then
+						script_firstAid:openMenu();
+	
+			for i = 0, GetNumTradeSkills(i) do
+				local name, _, _, _, _ = GetTradeSkillInfo(i);
+				if (name == "Heavy Linen Bandage") then
+	
+					if script_firstAid:howMuchLinenDoWeHave() >= 2 then
+							DoTradeSkill(i, 20);
+						return true;
+					end
+				elseif (name == "Linen Bandage") then
+					DoTradeSkill(i, 20);
+					return true;
+				end
 			end
 		end
 	end
+
 if (self.bookOpen) then
 CloseTradeSkill();
 end
