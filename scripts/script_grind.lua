@@ -965,7 +965,7 @@ function script_grind:run()
 	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (self.enemyObj:GetDistance() <= 30) then
-				self.enemyObj:FaceTarget();
+				--self.enemyObj:FaceTarget();
 				self.blacklistLootTime = GetTimeEX();
 				self.blacklistLootTimeCheck = GetTimeEX();
 			end
@@ -1416,7 +1416,7 @@ function script_grind:run()
 				if (IsInCombat()) and (self.enemyObj:GetHealthPercentage() > 20) then
 					self.useAnotherVar = false;
 				end
-				if (self.enemyObj:GetHealthPercentage() <= 40 or self.enemyObj:IsDead()) then
+				if (self.enemyObj:GetHealthPercentage() <= 90 or self.enemyObj:IsDead()) then
 					self.lastTargetKilled = self.enemyObj;
 				end
 			end

@@ -1,7 +1,7 @@
 script_checkAdds = {
 
 	addsRange = 35,	-- range circles from from adds
-	checkAddsRange = 6,	-- safe margin move from adds
+	checkAddsRange = 10,	-- safe margin move from adds
 
 		-- these are global so we can rerun object manager from om script
 	closestEnemy = 0,	-- set closest enemy
@@ -16,7 +16,7 @@ function script_checkAdds:checkAdds()
 	end
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
-	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind:isTargetingMe2(script_grind.enemyObj) and script_grind.enemyObj:GetDistance() <= script_grind.combatScriptRange) and (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 3) and (not script_checkDebuffs:hasDisabledMovement()) then
+	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind:isTargetingMe2(script_grind.enemyObj)) and (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 4) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
 			-- use unstuck feature
@@ -147,12 +147,12 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 		end
 
 		if (not IsMoving()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			if (script_grind.enemyObj:GetDistance() <= 6.5) then
+			if (script_grind.enemyObj:GetDistance() <= 4) then
 				script_grind.enemyObj:FaceTarget();
 			end
 		end
 if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script_grind.enemyObj:IsCasting()) then
-			if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
+			script_navEX:moveToTarget(GetLocalPlayer(), pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ);
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget()) then
 					script_grind.tickRate = 150;
 				end	
@@ -160,8 +160,8 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script
 				self.closestEnemy = 0;
 				self.intersectEnemy = nil;
 				script_om:FORCEOM();
-			return;
-			end
+			return true;
+			
 		end
 	end
 end
