@@ -34,6 +34,7 @@ script_warrior = {
 	lastStandHealth = 8,
 	useBow = false,
 	heroicStrikeRage = 15,
+	overpowerTimer = 0,
 
 	-- note. the checkbox in the menu controls battle, defensive, berserker stance. all spells have arguments for which
 	-- stance they apply to and can be used in. if the palyer does not click defensive stance in-game then the bot
@@ -54,6 +55,7 @@ function script_warrior:setup()
 	-- no more bugs first time we run the bot
 
 	self.waitTimer = GetTimeEX(); 
+	self.overpowerTimer = GetTimeEX();
 	self.isSetup = true;
 
 	if (HasSpell("Charge")) then
@@ -786,10 +788,11 @@ function script_warrior:run(targetGUID)	-- main content of script
 				end
 
 				-- melee Skill: Overpower if possible battle stance
-				if (self.battleStance) then
+				if (self.battleStance) and (GetTimeEX() > self.overpowerTimer) then
 					if (script_warrior:canOverpower() and localRage >= 5 and not IsSpellOnCD('Overpower')) then 
+						self.overpowerTimer = GetTimeEX() + 1000;
 						if (Cast("Overpower", targetObj)) then
-							return;
+							return true;
 						end
 					end  
 				end
@@ -907,7 +910,7 @@ function script_warrior:rest()
 	end
 
 -- craft bandages
-	if (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) then
+	if (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) and (not IsMoving()) then
 		if (HasItem("Linen Cloth")) or (HasItem("Wool Cloth")) then
 			if (script_firstAid:craftBandages()) then
 				if (IsMoving()) then

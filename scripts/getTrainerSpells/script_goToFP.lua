@@ -142,7 +142,7 @@ function script_goToFP:run()
 					if (script_getSpells:cityZones()) then
 						fpDB:removeFP();
 					end
-					self.goToFPTimer = GetTimeEX() + 100;
+					self.goToFPTimer = GetTimeEX() + 500;
 				end
 					
 			
