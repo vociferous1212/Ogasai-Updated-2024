@@ -722,8 +722,8 @@ function script_grind:run()
 		local px, py, pz = GetLocalPlayer():GetPosition();
 		local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
 		local timer = math.floor(((self.timeToSit - GetTimeEX())/1000));
-		DrawText("Time to sit - "..timer.." Seconds", _tX+ 50, _tY-50, 0, 255, 0);
-		DrawText("Add /afk macro to action bar '2' slot '='", _tX+50, _tY-66, 0, 255, 0);
+		DrawText("Time to sit - "..timer.." Seconds", _tX+ 50, _tY-70, 0, 255, 0);
+		DrawText("Add /afk macro to action bar '2' slot '='", _tX+50, _tY-86, 0, 255, 0);
 	end
 	-- reset sit timer when moving or sitting
 	if (IsMoving()) or (not IsStanding()) or (IsInCombat()) then
@@ -1395,14 +1395,18 @@ function script_grind:run()
 			script_checkAdds.closestEnemy = 0;
 			script_checkAdds.intersectEnemy = nil;
 			end
+			if (IsInCombat() and self.enemyObj == 0 or self.enemyObj == nil) then
+				self.enemyObj = script_grind:getTargetAttackingUs();
+			end
+					
+
 			-- if we have a valid enemy
 			if (self.enemyObj ~= nil) and (not IsInCombat()) then
-				if (script_grind.getTargetAttackingUs()) then
 				
-				else
+			else
 					-- else assign a target
 					script_grind:assignTarget();
-				end
+			
 			end
 
 			if (not IsMoving()) then
@@ -1460,7 +1464,7 @@ function script_grind:run()
 
 			-- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
-				and (not script_checkDebuffs:hasDisabledMovement()) then
+				and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
