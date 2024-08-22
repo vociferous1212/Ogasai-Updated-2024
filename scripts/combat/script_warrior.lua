@@ -236,7 +236,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 		return 2;
 	end
 
-	if (IsInCombat()) and (IsChanneling() or IsCasting()) then
+	if (IsInCombat()) and (IsChanneling() or IsCasting()) and (not IsMoving()) then
 		targetObj:FaceTarget();
 	end
 
@@ -264,6 +264,12 @@ function script_warrior:run(targetGUID)	-- main content of script
 		DisMount();
 	end
 
+	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
+		if (script_checkAdds:checkAdds()) then
+			return true;
+		end
+	end
+
 -- heroic strike stuck on and target moved away or we stopped casting auto attack
 
 	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
@@ -279,13 +285,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) and (not localObj:HasDebuff("Disarm")) then
 		
 		script_grind.combatScriptRange = self.meleeDistance;
-
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return true;
-			end
-		end
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
