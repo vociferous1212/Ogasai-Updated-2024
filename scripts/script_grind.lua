@@ -1499,7 +1499,7 @@ function script_grind:run()
 
 					-- move to target
 					if (IsPathLoaded(5)) then
-						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
+						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					end
 					if (not IsMoving()) then
