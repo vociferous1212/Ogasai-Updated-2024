@@ -868,7 +868,7 @@ function script_grind:run()
 			if (IsInCombat()) and (script_grind.playerParanoidDistance <= 8) then
 				local pX, pY, pZ = script_grind.playerPos;
 				FacePosition(pX, pY, pZ);
-			return;
+			return true;
 			end
 	
 			-- logout timer reached then logout
@@ -1255,7 +1255,7 @@ function script_grind:run()
 			-- check and do move away from adds during combat
 			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) and (self.enemyObj:GetManaPercentage() <= 5) then
 				script_om:FORCEOM();
-				return;
+				return true;
 			end
 		end	
 		
@@ -1274,7 +1274,7 @@ function script_grind:run()
 
 				end
 			end
-		return 4;
+		return;
 		end
 -- stuck in combat phase
 		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
@@ -1290,7 +1290,7 @@ function script_grind:run()
 				self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
-		return 4;
+		return;
 		end	
 
 		-- Finish loot before we engage new targets or navigate - return
@@ -1564,7 +1564,7 @@ function script_grind:run()
 				-- check and avoid adds
 				if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
 					script_om:FORCEOM();
-					return;
+					return true;
 				end
 
 				-- try unstuck script
