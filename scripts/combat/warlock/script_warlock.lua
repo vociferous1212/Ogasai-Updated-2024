@@ -186,6 +186,9 @@ function script_warlock:run(targetGUID)
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();
 	local playerHasTarget = GetLocalPlayer():GetUnitsTarget();
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
+
 
 	for i=0, 10 do
 		-- Check: If the pet is void and has spell Consume Shadows

@@ -627,6 +627,9 @@ function script_druid:run(targetGUID)
 	local localEnergy = localObj:GetEnergyPercentage();
 	local localCP = GetComboPoints("player", "target");
 	local isMoonkin = localObj:HasBuff("Moonkin Form");
+	script_grind.combatScriptRange = self.meleeDistance;
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
@@ -736,8 +739,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
-
-	script_grind.combatScriptRange = self.meleeDistance;
 
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then

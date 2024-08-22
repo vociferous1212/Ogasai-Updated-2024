@@ -184,6 +184,9 @@ function script_hunter:run(targetGUID)
 	local localMana = localObj:GetManaPercentage();
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
+
 
 	if (localObj:IsDead()) then
 		return 0;

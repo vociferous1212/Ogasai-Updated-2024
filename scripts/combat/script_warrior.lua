@@ -285,6 +285,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) and (not localObj:HasDebuff("Disarm")) then
 		
 		script_grind.combatScriptRange = self.meleeDistance;
+		script_grind.eatHealth = self.eatHealth;
+		script_grind.drinkMana = 0;
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
@@ -909,7 +911,7 @@ function script_warrior:rest()
 	end
 
 -- craft bandages
-	if (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) and (not IsMoving()) then
+	if (not script_grind.bagsFull) and (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) and (not IsMoving()) then
 		if (HasItem("Linen Cloth")) or (HasItem("Wool Cloth")) then
 			if (script_firstAid:craftBandages()) then
 				if (IsMoving()) then

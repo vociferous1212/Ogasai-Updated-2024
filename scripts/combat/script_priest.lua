@@ -178,6 +178,10 @@ function script_priest:run(targetGUID)
 	local localHealth = localObj:GetHealthPercentage(); -- get player health percentage wow API
 
 	local localLevel = localObj:GetLevel(); -- get player level wow API
+
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
+
 	
 	-- if no wand equipped then force using smite
 	if (not localObj:HasRangedWeapon()) then

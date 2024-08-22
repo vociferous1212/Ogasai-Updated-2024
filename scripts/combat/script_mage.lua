@@ -326,7 +326,10 @@ function script_mage:run(targetGUID)
 	local localHealth = localObj:GetHealthPercentage();
 
 	local localLevel = localObj:GetLevel();
-	
+
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
+
 	-- check if we are dead
 	if (localObj:IsDead()) then
 		return 0;

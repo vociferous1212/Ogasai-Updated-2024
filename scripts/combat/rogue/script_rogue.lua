@@ -222,6 +222,9 @@ function script_rogue:run(targetGUID)
 	local localEnergy = localObj:GetEnergy();
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = 0;
+	script_grind.combatScriptRange = self.meleeDistance;
 
 	if (localObj:IsDead()) then 
 		return 0; 
@@ -286,7 +289,7 @@ function script_rogue:run(targetGUID)
 		--Valid Enemy
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-			script_grind.combatScriptRange = self.meleeDistance;
+			
 
 			if (IsLooting()) then
 				if (not LootTarget()) then

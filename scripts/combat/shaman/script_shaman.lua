@@ -392,6 +392,9 @@ function script_shaman:run(targetGUID)
 	local localMana = localObj:GetManaPercentage();
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();	
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
+
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then

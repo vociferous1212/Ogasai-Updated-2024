@@ -164,6 +164,8 @@ function script_paladin:run(targetGUID)
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
 	script_grind.combatScriptRange = self.meleeDistance;
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = self.drinkMana;
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
