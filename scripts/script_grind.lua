@@ -207,6 +207,8 @@ script_grind = {
 	lastTargetKilled = 0,	-- last target killed by grinder
 	fpPause = false,	-- was script paused by fp script
 	useFPS = false,		-- use flight paths
+	eatHealth = 50,
+	drinkMana = 50,
 }
 
 
@@ -1260,7 +1262,7 @@ function script_grind:run()
 		end	
 		
 -- stuck in combat phase
-		if (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
+		if (GetLocalPlayer():GetManaPercentage() > self.drinkMana and GetLocalPlayer():GetHealthPercentage() > self.eatHealth) and (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) and (self.lastTargetKilled:GetPosition() > 3) then
@@ -1277,7 +1279,7 @@ function script_grind:run()
 		return 4;
 		end
 -- stuck in combat phase
-		if (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
+		if (GetLocalPlayer():GetManaPercentage() > self.drinkMana and GetLocalPlayer():GetHealthPercentage() > self.eatHealth) and (IsInCombat() or localObj:HasBuff("Bloodrage")) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) and (self.lastTargetKilled:GetPosition() > 3) then

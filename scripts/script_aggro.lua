@@ -173,11 +173,13 @@ function script_aggro:safePullRecheck(target)
 			if (testRange < 30) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) and (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting())  then	
 
 				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 23.5;
-				local aTable = {[HasSpell("Heroic Strike")] = true, [HasSpell("Sinister Strike")] = true, [HasSpell("Seal of Righteousness")] = true};
+
 				-- if we are a ranged class we can pull at half the distance!
-				if (not aTable) then
-					aggroDistToMe = (aggroDistToMe / 1.5);
+
+				if not HasSpell("Heroic Strike") and not HasSpell("Sinister Strike") and not HasSpell("Seal of Righteousness") then
+					aggroDistToMe = (aggroDistToMe / 1.35);
 				end
+		
 				-- currentObj position
 				cx, cy, cz = currentObj:GetPosition();
 
