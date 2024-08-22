@@ -848,7 +848,7 @@ function script_grind:run()
 
 
 	-- do paranoia
-	if (not script_getSpells:cityZones()) and (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
+	if (not localObj:IsDead()) and (not script_getSpells:cityZones()) and (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -1254,7 +1254,6 @@ function script_grind:run()
 
 			-- check and do move away from adds during combat
 			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) and (self.enemyObj:GetManaPercentage() <= 5) then
-				script_grind:setWaitTimer(3500);
 				script_om:FORCEOM();
 				return;
 			end
@@ -1391,20 +1390,19 @@ function script_grind:run()
 			--	return 4;
 			--end
 
+			if (not IsMoving()) then
 			-- reset object manager and check adds enemies
 			script_checkAdds.closestEnemy = 0;
 			script_checkAdds.intersectEnemy = nil;
-
+			end
 			-- if we have a valid enemy
-			if (self.enemyObj ~= nil) then
-
-				-- if enemy distance is melee range then face the target
-				if (self.enemyObj:GetDistance() <= 8) and (not IsMoving()) and (PlayerHasTarget()) then
-					self.enemyObj:FaceTarget();
+			if (self.enemyObj ~= nil) and (not IsInCombat()) then
+				if (script_grind.getTargetAttackingUs()) then
+				
+				else
+					-- else assign a target
+					script_grind:assignTarget();
 				end
-			else
-				-- else assign a target
-				script_grind:assignTarget();
 			end
 
 			if (not IsMoving()) then
@@ -1565,7 +1563,6 @@ function script_grind:run()
 				end
 				-- check and avoid adds
 				if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
-					script_grind:setWaitTimer(500);
 					script_om:FORCEOM();
 					return;
 				end

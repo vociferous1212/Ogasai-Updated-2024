@@ -172,7 +172,7 @@ function script_aggro:safePullRecheck(target)
 			-- acceptable targets
 			if (testRange < 30) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) and (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting())  then	
 
-				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 21.5;
+				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 22.5;
 
 				-- if we are a ranged class we can pull at half the distance!
 				if (not HasSpell("Heroic Strike")) or (not HasSpell("Sinister Strike")) or (not HasSpell("Seal of Righteousness")) then
@@ -256,7 +256,7 @@ if (not script_unstuck:pathClearAuto(2)) then
 			if (IsMoving()) then
 			self.waitTimer = GetTimeEX() + 150;
 			end
-			return true;
+			return;
 		
 	end
 

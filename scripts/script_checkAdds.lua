@@ -1,7 +1,7 @@
 script_checkAdds = {
 
 	addsRange = 35,	-- range circles from from adds
-	checkAddsRange = 10,	-- safe margin move from adds
+	checkAddsRange = 5,	-- safe margin move from adds
 
 		-- these are global so we can rerun object manager from om script
 	closestEnemy = 0,	-- set closest enemy
@@ -11,20 +11,14 @@ script_checkAdds = {
 -- requires target from grind script 'enemyObj'
 function script_checkAdds:checkAdds()
 
-	if (TargetHasRangedWeapon()) then
-		return false;
-	end
-
 	-- check if there are adds and avoid those adds. call this to run avoid adds
-	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind:isTargetingMe2(script_grind.enemyObj)) and (script_grindEX:howManyEnemiesInRange(self.addsRange) <= 4) and (not script_checkDebuffs:hasDisabledMovement()) then
+	if(script_grind:enemiesWithinRange() <= 3) and (script_grind.enemyObj:GetHealthPercentage() >= 25) then
 		if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 
-			-- use unstuck feature
-			if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) then
-				if (not script_unstuck:pathClearAuto(2)) then
-					script_unstuck:unstuck();
-					return true;
-				end
+			-- use unstuck script
+			if (not script_unstuck:pathClearAuto(2)) then
+				script_unstuck:unstuck();
+				return true;
 			end
 
 			-- if we have a pet then pet follow
@@ -72,11 +66,11 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 	-- get points
 	for i = 1, point do
 		local firstPoint = i
-		local secondPoint = i + 1
+		local secondPoint = i + 3
 
 		-- get next point
 		if firstPoint == point then
-			secondPoint = 1
+			secondPoint = 4
 		end
 
 		-- we if have move points then do
@@ -112,7 +106,7 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 
 	-- Move just outside the aggro range
 	local moveToPoint = closestPoint;
-	local setPoint = 3;
+	local setPoint = 5;
 
 	if (closestPointToDest ~= nil) then	
 		local diffPoint = closestPointToDest - moveToPoint;
@@ -146,22 +140,18 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 			return true;
 		end
 
-		if (not IsMoving()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			if (script_grind.enemyObj:GetDistance() <= 4) then
-				script_grind.enemyObj:FaceTarget();
-			end
-		end
+	
 if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script_grind.enemyObj:IsCasting()) then
-			script_navEX:moveToTarget(GetLocalPlayer(), pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ);
+			if (script_navEX:moveToTarget(GetLocalPlayer(), pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget()) then
-					script_grind.tickRate = 150;
+					script_grind.tickRate = 350;
 				end	
 				script_grind.message = "Moving Away From Adds";
 				self.closestEnemy = 0;
 				self.intersectEnemy = nil;
 				script_om:FORCEOM();
 			return true;
-			
+			end
 		end
 	end
 end
@@ -192,15 +182,14 @@ function script_checkAdds:avoidToAggro(safeMargin)
 	while currentObj ~= 0 do
 				local range = script_checkAdds.addsRange;
 				local aggro = script_checkAdds.addsRange;
-				local myAggro = currentObj:GetLevel() - localObj:GetLevel() + 24;
-				--local myAggro = script_checkAdds.addsRange;
+				--local myAggro = currentObj:GetLevel() - localObj:GetLevel() + 23;
+				local myAggro = script_checkAdds.addsRange;
 				
  		if (typeObj == 3)
 			and (currentObj:GetDistance() <= self.addsRange)
-			and (currentObj:IsInLineOfSight())
+			--and (currentObj:IsInLineOfSight())
 		then
-			if (script_grind.enemyObj ~= nil and self.enemyObj ~= 0)
-				and (script_grind.enemyObj:GetHealthPercentage() >= 20)
+			if (script_grind.enemyObj ~= nil)
 				and (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID())
 				and (not script_grind:isTargetingMe(currentObj))
 				and (not script_grind:isTargetingPet(currentObj))
@@ -209,12 +198,6 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:IsCritter())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
-				--and (currentObj:GetHealthPercentage() >= 20)
-				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
-				and (not currentObj:IsCasting())
-				and (not script_grind.enemyObj:IsCasting())
-				and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4)
-				and (currentObj:GetCreatureType() ~= 'Not specified')
 			then
 					local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -222,7 +205,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro)
 				then
 					self.closestEnemy = currentObj;	
-				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) and (not currentObj:IsCritter()) then
+				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) then
 
 					local dist = currentObj:GetDistance();
 
@@ -239,9 +222,9 @@ function script_checkAdds:avoidToAggro(safeMargin)
 		-- recheck closest target
 		if (typeObj == 3)
 			and (currentObj:GetDistance() <= self.addsRange)
+			--and (currentObj:IsInLineOfSight())
 		then
-			if (script_grind.enemyObj ~= nil and self.enemyObj ~= 0)
-				and (script_grind.enemyObj:GetHealthPercentage() >= 20)
+			if (script_grind.enemyObj ~= nil)
 				and (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID())
 				and (not script_grind:isTargetingMe(currentObj))
 				and (not script_grind:isTargetingPet(currentObj))
@@ -250,12 +233,6 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				and (not currentObj:IsCritter())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
-				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
-				and (not script_grind.enemyObj:IsCasting())
-				and (not currentObj:IsCasting())
-				and (currentObj:GetLevel() >= GetLocalPlayer():GetLevel() - 4)
-				and (currentObj:GetCreatureType() ~= 'Not specified')
-
 			then
 						local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
@@ -263,7 +240,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro)
 				then
 					self.closestEnemy = currentObj;	
-				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) and (not currentObj:IsCritter()) then
+				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) then
 
 					local dist = currentObj:GetDistance();
 
@@ -275,7 +252,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 			typeObj = GetNextObject(currentObj);
 			end
 		end
-	--currentObj, typeObj = GetNextObject(currentObj);
+	currentObj, typeObj = GetNextObject(currentObj);
 				
 
 		-- avoid the closest mob
@@ -295,13 +272,11 @@ function script_checkAdds:avoidToAggro(safeMargin)
 				local xx, yy, zz = self.intersectEnemy:GetPosition();
 				local centerX, centerY = (x+xx)/2, (y+yy)/2;
 			
-				script_checkAdds:avoid(centerX, centerY, zP, self.addsRange, safeRange);
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange*2);
 				PetFollow();
-				return;
 			else
-				script_checkAdds:avoid(xT, yT, zP, self.addsRange, safeRange);
+				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2);
 				PetFollow();
-				return;
 			end
 
 		return;
@@ -313,17 +288,18 @@ function script_checkAdds:avoidToAggro(safeMargin)
 	return false;
 end
 
+
+
+
 function script_checkAdds:aggroIntersect(target)
 	local x, y, z = target:GetPosition();
 	self.intersectEnemy = nil;
 	while currentObj ~= 0 do
  		if (typeObj == 3)
-			and (currentObj:GetDistance() <= 45)
-			and (currentObj:IsInLineOfSight())
+			and (currentObj:GetDistance() <= 35)
+			--and (currentObj:IsInLineOfSight())
 		then
-			if (script_grind.enemyObj ~= nil and self.enemyObj ~= 0)
-				and (script_grind.enemyObj:GetHealthPercentage() >= 20)
-				and (currentObj:CanAttack())
+			if (currentObj:CanAttack())
 				and (not currentObj:IsDead())
 				and (not currentObj:IsCritter())
 				and (not script_grind:isTargetingMe(currentObj))
@@ -332,11 +308,6 @@ function script_checkAdds:aggroIntersect(target)
 				and (currentObj:GetGUID() ~= self.closestEnemy:GetGUID())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
-				and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID())
-				and (not currentObj:IsCasting())
-				and (not script_grind.enemyObj:IsCasting())
-				and (currentObj:GetCreatureType() ~= 'Not specified')
-
 			then
 				
 				local xx, yy, zz = currentObj:GetPosition();
@@ -450,11 +421,7 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 			return true;
 		end
 
-		if (not IsMoving()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			if (script_grind.enemyObj:GetDistance() < 8) then
-				script_grind.enemyObj:FaceTarget();
-			end
-		end
+		
 
 		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script_grind.enemyObj:IsCasting()) then
 			if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
@@ -469,4 +436,88 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 			end
 		end
 	end
+end
+
+-- lazy attempt to avoid adds during resting
+function script_checkAdds:avoidToAggro2(safeMargin) 
+
+	local countUnitsInRange = 0;
+	local currentObj, typeObj = GetFirstObject();
+	local localObj = GetLocalPlayer();
+	self.closestEnemy = 0;
+	local closestDist = 999;
+	local aggro = 0;
+	local range = 0;
+	local xT, yT, zT = 0, 0, 0;
+	local xP, yP, zP = 0, 0, 0;
+	local x, y, z = 0, 0, 0;
+	local xx, yy, zz = 0, 0, 0;
+	local centerX, centerY = 0, 0;
+
+	while currentObj ~= 0 do
+				local range = script_checkAdds.addsRange;
+				local aggro = script_checkAdds.addsRange;
+				--local myAggro = currentObj:GetLevel() - localObj:GetLevel() + 25;
+				local myAggro = script_checkAdds.addsRange;
+				
+ 		if (typeObj == 3)
+			and (currentObj:GetDistance() <= self.addsRange +5)
+			--and (currentObj:IsInLineOfSight())
+		then
+			if (not script_grind:isTargetingMe(currentObj))
+				and (not script_grind:isTargetingPet(currentObj))
+				and (currentObj:CanAttack())
+				and (not currentObj:IsDead())
+				and (not currentObj:IsCritter())
+				and (not currentObj:HasDebuff("Polymorph"))
+				and (not currentObj:HasDebuff("Fear"))
+			then
+					local tarX, tarY, tarZ = currentObj:GetPosition();
+					local myX, myY, myZ = localObj:GetPosition();
+				if (currentObj:GetDistance() <= (range+1))
+				--or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= (myAggro))
+				then
+					self.closestEnemy = currentObj;	
+				end
+					
+ 			end
+		end
+	currentObj, typeObj = GetNextObject(currentObj);
+				
+
+		-- avoid the closest mob
+			local range = self.addsRange;
+						
+		if (self.closestEnemy ~= 0) and (not script_checkDebuff:hasDisabledMovement()) and (closestEnemy:GetDistance() < self.addsRange + 5) then
+
+			local xT, yT, zT = self.closestEnemy:GetPosition();
+
+ 			local xP, yP, zP = localObj:GetPosition();
+
+			local safeRange = safeMargin+1;
+			self.intersectEnemy = script_checkAdds:aggroIntersect(self.closestEnemy);
+			if (self.intersectEnemy ~= nil) then
+				local aggroRange = self.addsRange; 
+				local x, y, z = self.closestEnemy:GetPosition();
+				local xx, yy, zz = self.intersectEnemy:GetPosition();
+				local centerX, centerY = (x+xx)/2, (y+yy)/2;
+			
+				script_checkAdds:avoid(centerX, centerY, zP, aggroRange/3, self.checkAddsRange*2);
+				PetFollow();
+
+			else
+
+				script_checkAdds:avoid(xT, yT, zP, aggro/3, self.checkAddsRange/2);
+				PetFollow();
+			end
+
+		typeObj = GetNextObject(currentObj);
+
+		return true;
+		end
+	currentObj, typeObj = GetNextObject(currentObj);
+
+
+	end
+	return false;
 end
