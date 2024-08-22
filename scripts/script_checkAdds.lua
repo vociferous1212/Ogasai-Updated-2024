@@ -202,7 +202,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 					local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
 				if (currentObj:GetDistance() <= (range+10)
-				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro + 7)
+				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro + 10)
 				then
 					self.closestEnemy = currentObj;	
 				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) then
@@ -237,7 +237,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 						local tarX, tarY, tarZ = currentObj:GetPosition();
 					local myX, myY, myZ = localObj:GetPosition();
 				if (currentObj:GetDistance() <= (range+7)
-				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro + 7)
+				or GetDistance3D(myX, myY, myZ, tarX, tarY, tarZ) <= myAggro + 10)
 				then
 					self.closestEnemy = currentObj;	
 				elseif (currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID()) then
