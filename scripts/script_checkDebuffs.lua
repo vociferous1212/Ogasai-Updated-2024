@@ -11,7 +11,7 @@ function script_checkDebuffs:hasCurse()
 
 	local player = GetLocalPlayer();
 
-	if (player:HasDebuff("Curse of Mending")) or (player:HasDebuff("Curse of the Shadowhorn")) or (player:HasDebuff("Curse of Recklessness")) or (player:HasDebuff("Curse of Thule")) then
+	if (player:HasDebuff("Curse of Mending")) or (player:HasDebuff("Curse of the Shadowhorn")) or (player:HasDebuff("Curse of Recklessness")) or (player:HasDebuff("Curse of Thule")) or (player:HasDebuff("Curse of Thorns")) then
 		return true;
 	end
 return false;

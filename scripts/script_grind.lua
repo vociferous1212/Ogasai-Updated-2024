@@ -820,9 +820,11 @@ function script_grind:run()
 		script_grindParty:partyOptions();
 	end
 
-	if (IsInCombat()) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (self.skipHardPull) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-		if (self.enemyObj:GetHealthPercentage() >= 20) then
-			script_om:FORCEOM();
+	if (IsInCombat()) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (self.skipHardPull) then
+		if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+			if (self.enemyObj:GetHealthPercentage() >= 20) then
+				script_om:FORCEOM();
+			end
 		end
 	end
 
@@ -1296,7 +1298,7 @@ function script_grind:run()
 		end	
 
 		-- Finish loot before we engage new targets or navigate - return
-		if (self.lootObj ~= nil and (not IsInCombat() or script_grind:enemiesAttackingUs() ==0)) then
+		if (self.lootObj ~= nil and self.lootObj ~= 0 and (not IsInCombat() or script_grind:enemiesAttackingUs() ==0)) then
 			return; 
 		else
 
@@ -1397,6 +1399,7 @@ function script_grind:run()
 			script_checkAdds.closestEnemy = 0;
 			script_checkAdds.intersectEnemy = nil;
 			end
+
 			if (IsInCombat() and self.enemyObj == 0 or self.enemyObj == nil) then
 				self.enemyObj = script_grind:getTargetAttackingUs();
 			end
@@ -1405,23 +1408,26 @@ function script_grind:run()
 			-- if we have a valid enemy
 			if (self.enemyObj ~= nil) and (not IsInCombat()) then
 				
-			else
-					-- else assign a target
-					script_grind:assignTarget();
+			elseif (self.enemyObj == nil or self.enemyObj == 0) then
+				-- else assign a target
+				script_grind:assignTarget();
 			
 			end
 
 			if (not IsMoving()) then
-			-- combat script message
-			self.message = "Running the combat script...";
+				-- combat script message
+				self.message = "Running the combat script...";
 			end
+
 			-- death counter turning variable on and off for 2 or more enemies attacking us
 			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 				if (IsInCombat()) and (self.enemyObj:GetHealthPercentage() > 20) then
 					self.useAnotherVar = false;
 				end
-				if (self.enemyObj:GetHealthPercentage() <= 90 or self.enemyObj:IsDead()) then
-					self.lastTargetKilled = self.enemyObj;
+				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+					if (self.enemyObj:GetHealthPercentage() <= 90 or self.enemyObj:IsDead()) then
+						self.lastTargetKilled = self.enemyObj;
+					end
 				end
 			end
 			-- monster kill variable on and off
@@ -1648,6 +1654,7 @@ function script_grind:run()
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
+
 			else
 
 				-- move to saved locations
@@ -1717,7 +1724,7 @@ function script_grind:getTargetAttackingUs()
 				end	
 
 				-- acceptable target is targeting our group members (limited by distance)
-				if (currentObj:GetDistance() < 50) and (currentObj:IsInLineOfSight()) and (script_grindParty.forceTarget) then
+				if (GetNumPartyMembers() > 1) and (currentObj:GetDistance() < 50) and (currentObj:IsInLineOfSight()) and (script_grindParty.forceTarget) then
 
 					-- run another object manager script to get a different target 
                 			if (script_grind:isTargetingGroup(currentObj)) then 

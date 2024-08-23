@@ -222,12 +222,12 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 
 	while currentObj ~= 0 do
  		if typeObj == 3 then
-			aggro = currentObj:GetLevel() - localObj:GetLevel() + 21;
+			aggro = currentObj:GetLevel() - localObj:GetLevel() + 22;
 			local range = aggro + 5;
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then	
 				if (closestEnemy == 0) then
 					closestEnemy = currentObj;
-					aggroClosest = currentObj:GetLevel() - localObj:GetLevel() + 21;
+					aggroClosest = currentObj:GetLevel() - localObj:GetLevel() + 22;
 				else
 					local dist = currentObj:GetDistance();
 					if (dist < closestDist) then
@@ -242,6 +242,7 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 
 	-- avoid the closest mob
 	if (closestEnemy ~= 0) then
+
 			if (self.waitTimer > GetTimeEX()) then
 				return;
 			end
@@ -250,15 +251,17 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
 			rTime = GetTimeEX();
 
-if (not script_unstuck:pathClearAuto(2)) then
-		script_unstuck:unstuck();
-	end
-			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);
-			if (IsMoving()) then
-			self.waitTimer = GetTimeEX() + 150;
+			if (not script_unstuck:pathClearAuto(2)) then
+				script_unstuck:unstuck();
 			end
-			return;
-		
+
+			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);
+
+			if (IsMoving()) then
+				self.waitTimer = GetTimeEX() + 150;
+			end
+
+		return true;	
 	end
 
 	return false;

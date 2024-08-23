@@ -14,9 +14,25 @@ function script_drawData:drawSavedTargetLocations()
 	
 		-- if locations are on screen then show text
 		if (onScreen) then
-			DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
-			DrawText('ID: ' .. i+1, tX, tY-10, 0, 255, 255);
-			DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
+				-- draw 15
+			if (script_nav.numSavedLocation < 15) then
+				DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
+				DrawText('ID: ' .. i+1, tX, tY-10, 0, 255, 255);
+				DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
+
+				-- draw between 5 and 10
+			elseif (script_nav.numSavedLocation > 15) then
+				DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
+				DrawText('ID: ' .. i+3, tX, tY-10, 0, 255, 255);
+				DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
+
+				-- draw 10 + to save your eyes from trying to sort the screen
+			elseif (script_nav.numSavedLocation > 30) then
+				DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
+				DrawText('ID: ' .. i+3, tX, tY-10, 0, 255, 255);
+				DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
+			end
+
 		end
 	end
 
@@ -81,12 +97,14 @@ function script_drawData:drawMonsterDataOnScreen(target)
 
 			-- draw text targeted
 			DrawText('(TARGETED)', tX, tY-40, 255, 0, 0); 
-		else
-		-- grinder target TARGETED
-		if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetGUID() == target:GetGUID()) then
-			-- draw text targeted
-			DrawText('(Grinder Target)', tX, tY-40, 255, 0, 0); 
-		end
+
+			-- grinder target TARGETED
+
+		elseif (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+			if (script_grind.enemyObj:GetGUID() == target:GetGUID()) then
+				-- draw text targeted
+				DrawText('(Grinder Target)', tX, tY-40, 255, 0, 0); 
+			end
 		end
 		-- draw avoiding targets
 		if (script_grind:isTargetBlacklisted(target:GetGUID())) and (script_grind.skipHardPull)
@@ -126,7 +144,7 @@ function script_drawData:drawPlayerDataOnScreen(target)
 		if (onScreen) then
 			if (target:CanAttack()) then 
 				DrawText('' .. target:GetUnitName() .. ' - ' .. target:GetLevel(), tX, tY-10, 255, 0, 0);
-			else 
+			elseif (not target:CanAttack()) then 
 				DrawText('' .. target:GetUnitName() .. ' - ' .. target:GetLevel(), tX, tY-10, 0, 255, 0);
 			end
 			DrawText('HP: ' .. math.floor(target:GetHealthPercentage()) .. '%', tX, tY, 255, 0, 0);
@@ -152,7 +170,7 @@ function script_drawData:drawPath()
 	if (IsPathLoaded(5)) then
 		if (script_nav.drawNav) then
 			firstIndex = script_nav.lastpathnavIndex;
-		else
+		elseif (not script_nav.drawNav) then
 			firstIndex = script_nav.lastnavIndex;
 		end
 		if (script_nav.lastnavIndex <= GetPathSize(5)) then

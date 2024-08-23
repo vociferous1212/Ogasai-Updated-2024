@@ -229,7 +229,7 @@ function script_vendor:repair()
 		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 1; -- moving to a repair vendor
-			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
+			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			return true;
 		end
@@ -343,7 +343,7 @@ function script_vendor:sell()
 		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
-			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
+			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;
@@ -445,7 +445,7 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 			MoveToTarget(vX, vY, vZ);
 		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
+			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.status = 3; -- moving to buy ammo at a vendor
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
@@ -582,7 +582,7 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 			MoveToTarget(vX, vY, vZ);
 		end
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEXCombat:moveToVendor(localObj, vX, vY, vZ);
+			script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			self.status = 4; 
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;

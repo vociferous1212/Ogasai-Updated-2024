@@ -317,11 +317,13 @@ function script_grindEX:doChecks()
 			if (script_grind.hotspotReached and script_grind.enemyObj:IsDead() and script_grind.enemyObj:GetLevel() >= script_grind.minLevel and script_grind.enemyObj:GetLevel() <= script_grind.maxLevel) then 
 				script_nav:saveTargetLocation(script_grind.enemyObj, script_grind.enemyObj:GetLevel());
 			end
-			if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
-				or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
-				or script_grind.enemyObj:IsDead()) then
-					script_grind.enemyObj = nil;
-					ClearTarget();
+			if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+				if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
+					or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
+					or script_grind.enemyObj:IsDead()) then
+						script_grind.enemyObj = nil;
+						ClearTarget();
+				end
 			end
 		end
 
@@ -463,4 +465,25 @@ function script_grindEX:howManyEnemiesInRangeOfTarget(target)
 	i, t = GetNextObject(i);
 	end		
 return numberNearby;
+end
+
+-- return the target...
+function script_grindEX:getTargetWithinAggroRange()
+
+	i, t = GetFirstObject();
+	x, y, z = GetLocalPlayer():GetPosition();
+	tx, ty, tz = 0, 0, 0;
+	target = 0;
+
+	while i ~= 0 do
+		if t == 3 then
+			local aggro = ((i:GetLevel() - GetLocalPlayer():GetLevel()) + 22);
+return target;
+		end
+
+			
+
+	i, t = GetNextObject(i);
+	end
+return nil;
 end
