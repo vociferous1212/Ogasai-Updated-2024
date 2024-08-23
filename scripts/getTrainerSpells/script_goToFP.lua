@@ -35,7 +35,7 @@ function script_goToFP:run()
 			return false;
 		end
 		-- we are in a city and are done getting spells and need to fly back
-		if (self.fx == 0 and self.fx ~= nil) and (script_getSpells:cityZones()) and (script_getSpells.getSpellsStatus == 0) then
+		if (GetLocalPlayer():GetLevel() > 10) and (self.fx == 0 and self.fx ~= nil) and (script_getSpells:cityZones()) and (script_getSpells.getSpellsStatus == 0) then
 			-- we need to target a city flight master
 			self.fx, self.fy, self.fz = fpDB:getClosestCity();
 		end
