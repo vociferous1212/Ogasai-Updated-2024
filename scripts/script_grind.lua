@@ -1158,12 +1158,9 @@ function script_grind:run()
 		end
 
 		-- Dont pull mobs before we reached our hotspot
-		if (not self.hotspotReached or IsMoving()) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
-			self.enemyObj = nil;
-			if (PlayerHasTarget()) then
-				ClearTarget();
-			end
-		elseif (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) and (GetLocalPlayer():GetLevel() > 6) then
+		if (not self.hotspotReached) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+			self.enemyObj = nil;	
+		elseif (not self.hotspotReached) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
 			self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 		end
 
@@ -1647,7 +1644,7 @@ function script_grind:run()
 				-- move to a diff location if no valid enemies around?
 					-- run autopath nodes?
 			if (script_nav:getDistanceToHotspot() < 50 and self.hotspotReached) then
-				self.message = "Hotspot reached... (No targets around?)";
+				--self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
 
