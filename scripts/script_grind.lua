@@ -1159,8 +1159,11 @@ function script_grind:run()
 
 		-- Dont pull mobs before we reached our hotspot
 		if (not self.hotspotReached) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
-			self.enemyObj = nil;	
-		elseif (not self.hotspotReached) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
+			self.enemyObj = nil;
+			if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
+				ClearTarget();
+			end	
+		elseif (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
 			self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 		end
 
