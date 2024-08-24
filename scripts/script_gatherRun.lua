@@ -101,6 +101,7 @@ function script_gatherRun:gather()
 				if (IsPathLoaded(5)) then
 					script_navEX:moveToLoot(GetLocalPlayer(), _x, _y, _z);
 					script_gather.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
+					return true;
 				elseif (IsPathLoaded(5) and not IsMoving()) or (not IsPathLoaded(5)) then
 					local px, py, pz = GetLocalPlayer():GetPosition();
 					local _tX, _tY, onScreen = WorldToScreen(px, py, pz);

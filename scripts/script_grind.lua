@@ -1107,11 +1107,11 @@ function script_grind:run()
 		end
 
 		-- Assign the next valid target to be killed within the pull range
-		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not IsInCombat()) then
 			self.lastTarget = self.enemyObj:GetGUID();
 		end
 		
-		-- don't assign targets until we get to hotspot
+		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) then
 			self.enemyObj = script_grind:assignTarget();
 		end
@@ -1152,18 +1152,20 @@ function script_grind:run()
 
 
 		-- distance to hotspot
-		if (script_nav:getDistanceToHotspot() <= 45) then
+		if (script_nav:getDistanceToHotspot() <= 80) then
 			self.hotspotReached = true;
 		end
 
 		-- Dont pull mobs before we reached our hotspot unless we are in aggro range
-		if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
-			self.enemyObj = nil;
-			if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-				ClearTarget();
-			end	
-		elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
-			self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+		if (not IsInCombat()) then
+			if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+				self.enemyObj = nil;
+				if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
+					ClearTarget();
+				end	
+			elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
+				self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+			end
 		end
 
 		-- Dont pull if more than 1 add will be pulled check SafePull aggro
@@ -1335,18 +1337,18 @@ function script_grind:run()
 			script_checkAdds.intersectEnemy = nil;
 			end
 
-			if (IsInCombat() and self.enemyObj == 0 or self.enemyObj == nil) then
-				self.enemyObj = script_grind:getTargetAttackingUs();
+			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) then
+				self.enemyObj = script_grind:assignTarget();
+				self.lastTarget = self.enemyObj:GetGUID();
 			end
 					
 
 			-- if we have a valid enemy
 			if (self.enemyObj ~= nil) and (not IsInCombat()) then
 				
-			elseif (self.enemyObj == nil or self.enemyObj == 0) then
+			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) then
 				-- else assign a target
 				script_grind:assignTarget();
-			
 			end
 
 			if (not IsMoving()) then
@@ -1356,8 +1358,10 @@ function script_grind:run()
 
 			-- death counter turning variable on and off for 2 or more enemies attacking us
 			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-				if (IsInCombat()) and (self.enemyObj:GetHealthPercentage() > 20) then
-					self.useAnotherVar = false;
+				if (IsInCombat()) then
+					if (self.enemyObj:GetHealthPercentage() > 20) then
+						self.useAnotherVar = false;
+					end
 				end
 				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 					if (self.enemyObj:GetHealthPercentage() <= 90 or self.enemyObj:IsDead()) then
@@ -1645,7 +1649,7 @@ function script_grind:run()
 			-- continue to hotspot until we find a valid enemy...
 				-- move to a diff location if no valid enemies around?
 					-- run autopath nodes?
-			if (script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached) then
+			if (script_nav:getDistanceToHotspot() < 50) and (not self.hotspotReached or script_nav.numSavedLocation < 3) then
 				--self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
