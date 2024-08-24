@@ -1645,7 +1645,7 @@ function script_grind:run()
 			-- continue to hotspot until we find a valid enemy...
 				-- move to a diff location if no valid enemies around?
 					-- run autopath nodes?
-			if (script_nav:getDistanceToHotspot() < 50 and self.hotspotReached) then
+			if (script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached) then
 				--self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;

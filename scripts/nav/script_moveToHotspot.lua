@@ -10,7 +10,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	--if (IsInCombat()) or (script_grindEX:checkForTargetsOnHotspotRoute() and script_grind.attackTargetsOnRoutes) then
 	--	return false;
 	--end
-	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3) then
+	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
@@ -50,7 +50,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 			end
 	
 		if (not script_grind.hotspotReached) and (script_getSpells.getSpellsStatus < 1) then
-		self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+			self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		end
 
 		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
