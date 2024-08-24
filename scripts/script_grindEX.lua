@@ -9,72 +9,28 @@ script_grindEX = {
 	waitTimer = 0,
 }
 
-function script_grindEX:checkForTargetsOnHotspotRoute()
+function script_grindEX:returnTargetNearMyAggroRange()
+	local i, t = GetFirstObject();
+	local mx, my, mz = GetLocalPlayer():GetPosition();
+	local tx, ty, tz = 0, 0, 0;
 
-	-- wait out timer to stop targeting diffrent mobs over and over again
-	if (self.waitTimer > GetTimeEX()) then
-		return;
-	end
-
-if (GetLocalPlayer():HasBuff("Stealth")) or (GetLocalPlayer():HasBuff("Prowl")) then
-		return false;
-end
-
-		i, t = GetFirstObject();
-		while i ~= 0 do
-			if t == 3 then
-				-- check targets within 30 yards
-				if (i:GetDistance() < 30) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (i:IsInLineOfSight()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - 5) then
-					local iX, iY, iZ = i:GetPosition();	
-					local lX, lY, lZ = GetLocalPlayer():GetPosition();
-		
-					-- my distance to target
-					local meToTarget = GetDistance3D(lX, lY, lZ, iX, iY, iZ);
-
-					-- aggro range of mobs around me and node
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
-
-					if (meToTarget <= aggro) and (i:IsInLineOfSight()) then
-						-- target it...
-						name = i:GetUnitName();
-						TargetByName(name);
-						if (PlayerHasTarget()) then
-							if (i:GetGUID() ~= GetLocalPlayer():GetUnitsTarget():GetGUID()) then
-								ClearTarget();
-							end
-						end
-						if (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-							if (UnitIsEnemy("target","player")) then
-								script_grind.enemyObj = i;
-								script_grind.message = "Killing stuff in our path.";
-							else
-								script_grind.enemyObj = nil;
-								ClearTarget();
-								return false;
-							end
-
-						else
-							if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-								if (i:GetDistance() > script_grind.combatScriptRange) then
-									MoveToTarget(iX, iY, iZ);
-									self.waitTimer = GetTimeEX() + 500;									
-								return;
-								end
-							else
-								script_grind.enemyObj = nil;
-								ClearTarget();
-								return false;
-							end
-						end
-					return true;
-					end
+	while i ~= 0 do
+		if t == 3 then
+			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() then
+				tx, ty, tz = i:GetPosition();
+				local range = GetDistance3D(mx, my, mz, tx, ty, tz);
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
+				if range <= aggro then
+					return i;
+				else
+					return nil;
 				end
 			end
-		i, t = GetNextObject(i);
 		end
-return false;
+	i, t = GetNextObject(i);
+	end
+return nil;
 end
-
 
 function script_grindEX:areWeSwimming()
 	if (GetLocalPlayer():GetHealthPercentage() >= 1) and (not GetLocalPlayer():IsDead()) then
@@ -268,8 +224,6 @@ function script_grindEX:doChecks()
 		if (not IsInCombat() or IsMounted()) then
 			if (vendorStatus == 1) then
 
-				script_grindEX:checkForTargetsOnHotspotRoute();
-
 				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 					self.message = "Killing stuff in our path.";
 					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
@@ -284,8 +238,6 @@ function script_grindEX:doChecks()
 				end
 			elseif (vendorStatus == 2) then
 			
-				script_grindEX:checkForTargetsOnHotspotRoute();
-
 				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 					self.message = "Killing stuff in our path.";
 					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	

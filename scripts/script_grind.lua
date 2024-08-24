@@ -1111,8 +1111,11 @@ function script_grind:run()
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			self.lastTarget = self.enemyObj:GetGUID();
 		end
-
-		self.enemyObj = script_grind:assignTarget();
+		
+		-- don't assign targets until we get to hotspot
+		if (self.hotspotReached) then
+			self.enemyObj = script_grind:assignTarget();
+		end
 
 		if (IsInCombat()) or (not PlayerHasTarget()) then
 			self.stealthRanOnce = false;
@@ -1155,7 +1158,7 @@ function script_grind:run()
 		end
 
 		-- Dont pull mobs before we reached our hotspot
-		if (not self.hotspotReached or IsMoving()) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+		if (not self.hotspotReached or IsMoving()) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) and (GetLocalPlayer():GetLevel() > 6) then
 			self.enemyObj = nil;
 			if (PlayerHasTarget()) then
 				ClearTarget();
