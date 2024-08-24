@@ -1031,14 +1031,10 @@ function script_grind:run()
 		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
 
 
-			--if (script_gather.gathering) then
-			--	if (self.killStuffAroundGatherNodes) and (script_gatherEX2:checkForTargetsOnGatherRoute()) then
-			--		self.message = "Killing stuff around gather node";
-			--		self.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-			--		return true;
-			--	end
-		--
-		--	end
+			if (not IsStealth() and script_gather.safeGather) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
+				self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+			
+			else
 			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
@@ -1064,6 +1060,7 @@ function script_grind:run()
 				end
 			return true;
 			
+			end
 			end
 		end
 		-- turn jump back on once gathering is done
@@ -1157,13 +1154,13 @@ function script_grind:run()
 			self.hotspotReached = true;
 		end
 
-		-- Dont pull mobs before we reached our hotspot
-		if (not self.hotspotReached) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+		-- Dont pull mobs before we reached our hotspot unless we are in aggro range
+		if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
 			self.enemyObj = nil;
 			if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 				ClearTarget();
 			end	
-		elseif (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
+		elseif (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
 			self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 		end
 

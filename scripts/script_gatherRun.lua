@@ -26,7 +26,7 @@ function script_gatherRun:gather()
 	end
 	
 	-- if gather node == 0 and we have a last node object then blacklist it (out of range or left minimap zone)
-	if (script_gather.nodeObj == 0 or script_gather.nodeObj == nil) then
+	if (script_gather.nodeObj == 0 or script_gather.nodeObj == nil) and (not script_gather:isNodeBlacklisted(script_gather.nodeGUID)) then
 		if (script_gather.lastNode ~= 0 and script_gather.lastNode ~= nil) then
 			script_gather:addNodeToBlacklist(script_gather.lastNode:GetGUID());
 			script_gather.nodeObj = 0;
