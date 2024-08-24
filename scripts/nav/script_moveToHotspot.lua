@@ -10,7 +10,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	--if (IsInCombat()) or (script_grindEX:checkForTargetsOnHotspotRoute() and script_grind.attackTargetsOnRoutes) then
 	--	return false;
 	--end
-	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
+	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
