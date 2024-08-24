@@ -517,23 +517,12 @@ function script_shaman:run(targetGUID)
 						return 4;
 					end
 				end
-			end
-
-			if (script_grind:isTargetBlacklisted(self.enemyObj:GetGUID())) then
-				if (not IsSpellInRange("Lightning Bolt")) and (not targetObj:IsInLineOfSight()) then
+			else
+				if (targetObj:GetDistance() <= self.meleeDistance) then
 					return 3;
 				end
-				if (IsMoving()) then
-					StopMoving();
-					return true;
-				end
-				if (not CastSpellByName("Lightning Bolt", targetObj)) then
-					self.waitTimer = GetTimeEX() + 2500;
-					script_grind:setWaitTimer(2500);
-					targetObj:FaceTarget();
-					return 4;
-				end
 			end
+
 
 				
 			-- Auto Attack

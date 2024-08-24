@@ -920,6 +920,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- claw if stealth opener used too many times
 			if (self.openerUsed > 3) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
 				if (localEnergy >= self.clawEnergy) then
 					CastSpellByName("Claw", targetObj);
 					targetObj:FaceTarget();
