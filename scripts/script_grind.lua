@@ -1031,8 +1031,10 @@ function script_grind:run()
 		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
 
 
-			if (not IsStealth() and script_gather.safeGather) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
-				self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+			if (not IsStealth()) and (script_gather.safeGather) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
+				if (self.enemyObj == nil or self.enemyObj == 0 and not IsInCombat()) then
+					self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+				end
 			
 			else
 			if (script_gatherRun:gather()) then
@@ -1160,7 +1162,7 @@ function script_grind:run()
 			if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 				ClearTarget();
 			end	
-		elseif (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
+		elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
 			self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 		end
 
