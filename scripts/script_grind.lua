@@ -738,7 +738,7 @@ function script_grind:run()
 		end
 	end
 	-- sit when we aren't doing anything - the bot doesn't do /afk automatically...
-	if (GetTimeEX() > self.timeToSit) and (IsStanding()) and (self.sitTimerSet) and (not IsInCombat()) then
+	if (GetTimeEX() > self.timeToSit) and (IsStanding()) and (self.sitTimerSet) and (not IsInCombat()) and (not IsMoving()) then
 		SitOrStand();
 		UseAction(script_grind.afkActionSlot, 0, 0);
 		self.timeToSit = 0;
@@ -1101,78 +1101,6 @@ function script_grind:run()
 		if (self.getSpells) and (script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) then
 			return;
 		end
-
-		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
-		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
-			if (not (self.hotSpotTimer > GetTimeEX())) then
-				self.hotSpotTimer = GetTimeEX() + 20000;
-			end
-
-			--Mount up
-			if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
-			and (not IsMounted()) and (not IsIndoors()) and (not HasForm())
-			and (script_grind.useMount)
-			then
-				if (IsMoving()) then
-					StopMoving();
-					return;
-				end
-				if (not IsIndoors()) and (not IsMoving()) then
-					if (script_helper:mountUp()) then
-						script_grind:setWaitTimer(4500);
-						self.waitTimer = GetTimeEX() + 4500;
-						return;
-					end
-				end
-			return true;
-			end
-
-			-- druid cat form
-			if (not IsMounted()) and (not self.useMount) and (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) and (not localObj:HasBuff("Cat Form")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) then
-				if (CastSpellByName("Cat Form")) then
-					self.waitTimer = GetTimeEX() + 500;
-					return 0;
-				end
-			end
-
-			-- Shaman Ghost Wolf 
-			--if (not IsMounted()) and (not self.useMount) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) and (not IsIndoors()) then
-			--		CastSpellByName('Ghost Wolf');
-			--		self.waitTimer = GetTimeEX() + 1500;
-			--		script_grind:setWaitTimer(1500);
-			--		return;
-			--	
-			--end
-			if (IsLooting()) or (IsCasting()) or (IsChanneling()) or (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				return;
-			end
-
-			if (self.lootObj ~= nil and self.lootObj ~= 0) then
-				if (script_grind:doLoot(localObj)) then
-					self.waitTimer = GetTimeEX() + 1000;
-					return true;
-				end
-			end
-
-			--if (self.attackTargetsOnRoutes) and (not IsStealth()) and (not self.hotspotReached) then
-			--		--script_grindEX:checkForTargetsOnHotspotRoute()
-			--	if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-			--		self.message = "Killing stuff in our path.";
-			--		script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());
-			--		return true;
-			--	elseif (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-			--
-			--		if (not self.hotspotReached) and (script_vendor.status == 0) then
-			--			self.message = script_moveToHotspot:moveToHotspot(localObj);	
-			--		end
-			--		if (PlayerHasTarget()) then
-			--			ClearTarget();
-			--		end
-			--	end
-			--elseif (not self.attackTargetsOnRoutes) or (not self.hotspotReached) then
-			--	self.message = script_moveToHotspot:moveToHotspot(localObj);
-			--end
-		end
 		
 		-- use kills to level tracker
 		if (self.useExpChecker) then
@@ -1191,7 +1119,7 @@ function script_grind:run()
 		end
 
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) and (self.hotspotReached) then
+			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) then
 				if (not GetLocalPlayer():HasBuff("Stealth") and not GetLocalPlayer():HasBuff("Prowl")) then
 					self.enemyObj:AutoAttack();
 				end
@@ -1227,8 +1155,13 @@ function script_grind:run()
 		end
 
 		-- Dont pull mobs before we reached our hotspot
-		if (not IsInCombat() and not self.hotspotReached) then
+		if (not self.hotspotReached or IsMoving()) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
 			self.enemyObj = nil;
+			if (PlayerHasTarget()) then
+				ClearTarget();
+			end
+		elseif (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
+			self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 		end
 
 		-- Dont pull if more than 1 add will be pulled check SafePull aggro
@@ -1643,6 +1576,66 @@ function script_grind:run()
 		--		end
 		--	end
 		--end
+
+
+		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
+		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) and (self.enemyObj == nil or self.enemyObj == 0) then
+			if (not (self.hotSpotTimer > GetTimeEX())) then
+				self.hotSpotTimer = GetTimeEX() + 20000;
+			end
+
+			--Mount up
+			if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
+			and (not IsMounted()) and (not IsIndoors()) and (not HasForm())
+			and (script_grind.useMount)
+			then
+				if (IsMoving()) then
+					StopMoving();
+					return;
+				end
+				if (not IsIndoors()) and (not IsMoving()) then
+					if (script_helper:mountUp()) then
+						script_grind:setWaitTimer(4500);
+						self.waitTimer = GetTimeEX() + 4500;
+						return;
+					end
+				end
+			return true;
+			end
+
+			-- druid cat form
+			if (not IsMounted()) and (not self.useMount) and (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) and (not localObj:HasBuff("Cat Form")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) then
+				if (CastSpellByName("Cat Form")) then
+					self.waitTimer = GetTimeEX() + 500;
+					return 0;
+				end
+			end
+
+			-- Shaman Ghost Wolf 
+			--if (not IsMounted()) and (not self.useMount) and (not script_grind.useMount) and (HasSpell('Ghost Wolf')) and (not localObj:HasBuff('Ghost Wolf')) and (not localObj:IsDead()) and (not IsIndoors()) then
+			--		CastSpellByName('Ghost Wolf');
+			--		self.waitTimer = GetTimeEX() + 1500;
+			--		script_grind:setWaitTimer(1500);
+			--		return;
+			--	
+			--end
+			if (IsLooting()) or (IsCasting()) or (IsChanneling()) or (self.lootObj ~= 0 and self.lootObj ~= nil) then
+				return;
+			end
+
+			if (self.lootObj ~= nil and self.lootObj ~= 0) then
+				if (script_grind:doLoot(localObj)) then
+					self.waitTimer = GetTimeEX() + 1000;
+					return true;
+				end
+			end
+
+			if (not self.hotspotReached) and (not IsInCombat()) then
+				self.message = script_moveToHotspot:moveToHotspot(localObj);
+				return true;
+			end
+		end
+
 
 		-- Use auto pathing or walk paths
 		if (self.autoPath) then
@@ -2399,18 +2392,21 @@ function script_grind:doLoot(localObj)
 	self.message = "Moving to loot...";
 
 
-	local _x, _y, _z = self.lootObj:GetPosition();
-	if (self.lootObj:GetDistance() > (self.lootDistance/2)) then
-		if (IsPathLoaded(5)) then
-			if (script_navEX:moveToLoot(localObj, _x, _y, _z)) then
-			self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-			return;
+	if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+		local _x, _y, _z = self.lootObj:GetPosition();
+		if (self.lootObj:GetDistance() > (self.lootDistance/2)) then
+			if (IsPathLoaded(5)) then
+				if (script_navEX:moveToLoot(localObj, _x, _y, _z)) then
+				self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+				return;
+				end
+			elseif (not IsPathLoaded(5)) then
+				
+				MoveToTarget(_x, _y, _z);
+				self.message = "Cannot find a path to loot target "..self.lootObj:GetDistance()"";
+				
+				return;
 			end
-		else
-			
-			MoveToTarget(_x, _y, _z);
-			
-			return;
 		end
 	end
 
