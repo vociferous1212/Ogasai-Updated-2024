@@ -336,23 +336,27 @@ if (GetPet() == 0 or GetPet() == nil) and (not IsCasting()) and (not IsChannelin
 		end
 		if (HasSpell("Curse of Agony")) and (not myTarget:HasDebuff("Curse of Agony")) and (currentTime > self.curseOfAgonyTimer) then
 			myTarget:FaceTarget();
-			script_warlock2:castCurseOfAgony(myTarget);
-			self.curseOfAgonyTimer = currentTime + 3000;
-			script_warlock2:setTimer(2);
-			return true;
+			if (script_warlock2:castCurseOfAgony(myTarget)) then
+				self.curseOfAgonyTimer = currentTime + 3000;
+				script_warlock2:setTimer(2);
+				return true;
+			end
 		end
 		if (HasSpell("Corruption")) and (not myTarget:HasDebuff("Corruption")) and (currentTime > self.corruptionTimer) then
 			myTarget:FaceTarget();
-			script_warlock2:castCorruption(myTarget);
-			self.corruptionTimer = currentTime + 2500;
-			script_warlock2:setTimer(2);
-			return true;
+			if (script_warlock2:castCorruption(myTarget)) then
+				self.corruptionTimer = currentTime + 2500;
+				script_warlock2:setTimer(2);
+				return true;
+			end
 		end
 		if (HasSpell("Immolate")) and (not myTarget:HasDebuff("Immolate")) and (currentTime > self.immolateTimer) then
 			myTarget:FaceTarget();
-			self.immolateTimer = currentTime + 4000;
-			script_warlock2:setTimer(2);
-			return true;
+			if (script_warlock2:castImmolate(myTarget)) then
+				self.immolateTimer = currentTime + 4000;
+				script_warlock2:setTimer(2);
+				return true;
+			end
 		end
 		if (HasSpell("Shadow Bolt")) and (myTarget:GetDistance() <= 27) and (myMana >= 20) and (not IsMoving()) and ( (targetHealth >= 0 and not localObj:HasRangedWeapon()) or (targetHealth > 30 and localObj:HasRangedWeapon()) ) then
 			myTarget:FaceTarget();
