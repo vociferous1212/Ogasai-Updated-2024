@@ -22,6 +22,7 @@ function script_grindMenu:setup()
 		script_paladin:setup();
 		script_warrior:setup();
 		script_rogue:setup();
+		script_warlock2:setup();
 	end
 
 	self.isSetup = true;
@@ -145,7 +146,11 @@ function script_grindMenu:menu()
 	elseif (class == 'Druid') then
 		script_druidEX:menu();
 	elseif (class == 'Warlock') then
-		script_warlockEX:menu();
+		if (script_warlock.usingThisScript) then
+			script_warlockEX:menu();
+		elseif (script_warlock2.usingThisScript) then
+			script_warlock2:menu();
+		end
 	elseif (class == 'Priest') then
 		script_priestMenu:menu();
 	elseif (class == 'Warrior') then

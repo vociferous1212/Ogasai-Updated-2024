@@ -61,6 +61,7 @@ script_warlock = {
 	consumeShadowsTimer = 0,
 	soulstoneTimer = 0,
 	useSoulstone = true,
+	usingThisScript = false,
 }
 
 function script_warlock:setup()
@@ -137,6 +138,8 @@ function script_warlock:setup()
 	end
 
 	script_warlockDOTS.waitTimer = GetTimeEX();
+
+	self.usingThisScript = true;
 	
 	self.isSetup = true;
 end
@@ -231,9 +234,9 @@ function script_warlock:run(targetGUID)
 	if (self.waitAfterCombat) and (HasPet()) then
 		if (IsInCombat()) and (not PlayerHasTarget()) and (not PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
 			self.message = "Waiting... Server says we are InCombat()";
-			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			if (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				ex, ey, ez = self.lootObj:GetPosition();
+			self.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
+			if (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
+				ex, ey, ez = script_grind.lootObj:GetPosition();
 				Move(ex, ey, ez);
 			end
 		elseif (IsInCombat()) and (not PlayerHasTarget()) and (PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
