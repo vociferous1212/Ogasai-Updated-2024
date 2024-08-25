@@ -334,10 +334,10 @@ function script_grind:setup()
 		self.skipHardPull = false;
 		self.blacklistTime = 20;
 	end
-	if (GetLocalPlayer():GetLevel() <= 22) then
-		self.getSpells = true;
-		self.useFPS = true;
-	end
+	--if (GetLocalPlayer():GetLevel() <= 22) then
+	--	self.getSpells = true;
+	--	self.useFPS = true;
+	--end
 
 	-- enable drawing unit info on screen
 	self.drawEnabled = true;

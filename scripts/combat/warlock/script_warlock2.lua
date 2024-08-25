@@ -366,7 +366,7 @@ if (GetPet() == 0 or GetPet() == nil) and (not IsCasting()) and (not IsChannelin
 			if (not IsAutoCasting("Shoot")) then
 				PetAttack();
 				CastSpellByName("Shoot");
-				script_warlock2:setTimer(0);
+				script_warlock2:setTimer(.5);
 				return true;
 			end
 		end
