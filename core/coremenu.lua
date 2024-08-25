@@ -39,6 +39,9 @@ function coremenu:draw()
 		LoadScript("Warlock", "scripts\\combat\\warlock\\script_warlock.lua");
 		AddScriptToCombat("Warlock", "script_warlock");
 
+		LoadScript("Warlock 2", "scripts\\combat\\warlock\\script_warlock2.lua");
+		AddScriptToCombat("Warlock 2", "script_warlock2");
+
 		LoadScript("Mage", "scripts\\combat\\script_mage.lua");
 		AddScriptToCombat("Mage", "script_mage");
 
