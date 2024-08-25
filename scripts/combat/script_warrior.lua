@@ -274,10 +274,13 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
 
-		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > 4.5 or IsMoving()) then
+		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance) then
 			if hstable[GetLocalPlayer():GetCasting()] then
 				SpellStopCasting();
 			
+			end
+			if (not IsAutoCasting("Attack")) then
+				targetObj:AutoAttack();
 			end
 		end
 
@@ -495,9 +498,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
 					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
-						if (not IsAutoCasting("Attack")) then
-							targetObj:AutoAttack();
-						end
 						CastSpellByName('Heroic Strike', targetObj);
 						targetObj:FaceTarget();
 					end

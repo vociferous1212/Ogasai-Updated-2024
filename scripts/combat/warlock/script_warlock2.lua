@@ -325,10 +325,11 @@ if (GetPet() == 0 or GetPet() == nil) and (not IsCasting()) and (not IsChannelin
 		end
 
 		if HasSpell("Life Tap") and not IsSpellOnCD("Life Tap") and (myHealth > 35) and (myMana < 15) then
-			CastSpellByName("Life Tap", localObj);
-			script_warlock2:setTimer(1.6);
-			self.message = "Using Life Tap!";
-			return true;
+			if (CastSpellByName("Life Tap", localObj)) then
+				script_warlock2:setTimer(1.6);
+				self.message = "Using Life Tap!";
+				return true;
+			end
 		end
 
 		if (IsCasting() or IsChanneling() or self.waitTimer > currentTime) then
