@@ -524,6 +524,13 @@ function script_grind:run()
 	-- show grinder window
 	script_grind:window();
 
+	if (script_warlock2.usingThisScript) then
+			EndWindow();
+		if (NewWindow("Warlock 2", 320, 320)) then
+			script_warlock2:menu();
+		end
+	end
+
 	if (script_grindMenu.showGarbageBox) then
 		collectgarbage(collect);
 	end
