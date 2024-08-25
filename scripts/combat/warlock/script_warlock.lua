@@ -61,7 +61,6 @@ script_warlock = {
 	consumeShadowsTimer = 0,
 	soulstoneTimer = 0,
 	useSoulstone = true,
-	usingThisScript = false,
 }
 
 function script_warlock:setup()
@@ -138,8 +137,6 @@ function script_warlock:setup()
 	end
 
 	script_warlockDOTS.waitTimer = GetTimeEX();
-
-	self.usingThisScript = true;
 	
 	self.isSetup = true;
 end

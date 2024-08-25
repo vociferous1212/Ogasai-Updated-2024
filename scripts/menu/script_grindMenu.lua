@@ -8,6 +8,7 @@ script_grindMenu = {
 	helpMenu = false,
 	showGarbageBox = false,
 	isSetup = false,
+	useOtherWarlockScript = false,
 
 }
 
@@ -146,9 +147,10 @@ function script_grindMenu:menu()
 	elseif (class == 'Druid') then
 		script_druidEX:menu();
 	elseif (class == 'Warlock') then
-		if (script_warlock.usingThisScript) then
+		wasClicked, self.useOtherWarlockScript = Checkbox("Use Warlock 2", self.useOtherWarlockScript);
+		if (not self.useOtherWarlockScript) then
 			script_warlockEX:menu();
-		elseif (script_warlock2.usingThisScript) then
+		elseif (self.useOtherWarlockScript) then
 			script_warlock2:menu();
 		end
 	elseif (class == 'Priest') then
