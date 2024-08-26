@@ -60,7 +60,7 @@ function script_gatherRun:gather()
 					script_druidEX:removeCatForm();
 				end
 				if (IsBearForm()) then 
-					cript_druidEX:removeBearForm();
+					script_druidEX:removeBearForm();
 				end
 				if (IsTravelForm) then
 					script_druidEX:removeTravelForm();
