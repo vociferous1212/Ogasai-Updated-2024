@@ -7,7 +7,27 @@ script_grindEX = {
 	allowSwim = true,
 	useThisVar = true,
 	waitTimer = 0,
+	blacklistAggroTargets = {},
+	blacklistAggroNum = 0,
 }
+
+function script_grindEX:addTargetToAggroBlacklist(targetGUID)
+	if (targetGUID ~= nil and targetGUID ~= 0 and targetGUID ~= '') then	
+		self.blacklistAggroTargets[self.blacklistAggroNum] = targetGUID;
+		self.blacklistAggroNum = self.blacklistAggroNum + 1;
+	end
+end
+
+-- check if target is blacklisted by table GUID
+function script_grindEX:isTargetAggroBlacklisted(targetGUID) 
+	for i=0,self.blacklistAggroNum do
+		if (targetGUID == self.blacklistAggroTargets[i]) then
+			return true;
+		end
+	end
+	return false;
+end
+
 
 function script_grindEX:returnTargetNearMyAggroRange()
 	local i, t = GetFirstObject();
@@ -16,7 +36,7 @@ function script_grindEX:returnTargetNearMyAggroRange()
 
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() then
+			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() and not script_grindEX:isTargetAggroBlacklisted(i:GetGUID()) then
 				tx, ty, tz = i:GetPosition();
 				local range = GetDistance3D(mx, my, mz, tx, ty, tz);
 				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
@@ -28,6 +48,7 @@ function script_grindEX:returnTargetNearMyAggroRange()
 						return i;
 					end
 				elseif (not script_grind.hotspotReached) and (not IsInCombat()) then	
+					script_grindEX:addTargetToAggroBlacklist(i:GetGUID());
 					if (PlayerHasTarget()) then
 						ClearTarget();
 					end

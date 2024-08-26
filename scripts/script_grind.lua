@@ -2431,7 +2431,7 @@ function script_grind:doLoot(localObj)
 				MoveToTarget(_x, _y, _z);
 				self.message = "Cannot find a path to loot target "..self.lootObj:GetDistance()"";
 				
-				return;
+				return true;
 			end
 		end
 	end
