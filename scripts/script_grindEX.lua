@@ -24,9 +24,10 @@ function script_grindEX:returnTargetNearMyAggroRange()
 					name = i:GetUnitName();
 					TargetByName(name);
 					if (UnitIsEnemy("target","player")) then
+						i:AutoAttack();
 						return i;
 					end
-				else	
+				elseif (not script_grind.hotspotReached) and (not IsInCombat()) then	
 					if (PlayerHasTarget()) then
 						ClearTarget();
 					end

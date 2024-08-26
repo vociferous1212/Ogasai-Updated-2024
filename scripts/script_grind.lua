@@ -786,12 +786,12 @@ function script_grind:run()
 
 	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
 
-		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_warrior.meleeDistance) then
+		if (HasSpell("Heroic Strike")) and (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_warrior.meleeDistance) then
 			if hstable[GetLocalPlayer():GetCasting()] then
 				SpellStopCasting();
 			
 			end
-if (not IsAutoCasting("Attack")) then
+			if (not IsAutoCasting("Attack")) then
 				self.enemyObj:AutoAttack();
 			end
 		end
@@ -1118,9 +1118,16 @@ if (not IsAutoCasting("Attack")) then
 
 		-- Assign the next valid target to be killed within the pull range
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not IsInCombat()) then
-			self.lastTarget = self.enemyObj:GetGUID();
+			if (not self.enemyObj:IsDead()) then
+				self.lastTarget = self.enemyObj:GetGUID();
+			end
 		end
-		
+		if (IsInCombat()) then
+			if (PlayerHasTarget()) then
+				self.enemyObj = GetLocalPlayer():GetUnitsTarget();
+				self.lastTarget = self.enemyObj:GetGUID();
+			end
+		end
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) then
 			self.enemyObj = script_grind:assignTarget();
@@ -1173,7 +1180,7 @@ if (not IsAutoCasting("Attack")) then
 				if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 					ClearTarget();
 				end	
-			elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached or IsMoving()) then
+			elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached) then
 				self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 			end
 		end
