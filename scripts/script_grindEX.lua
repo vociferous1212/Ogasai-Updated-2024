@@ -20,7 +20,7 @@ function script_grindEX:returnTargetNearMyAggroRange()
 				tx, ty, tz = i:GetPosition();
 				local range = GetDistance3D(mx, my, mz, tx, ty, tz);
 				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
-				if range <= aggro then
+				if range <= aggro and (not PlayerHasTarget()) then
 					name = i:GetUnitName();
 					TargetByName(name);
 					if (UnitIsEnemy("target","player")) then
