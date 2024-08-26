@@ -58,7 +58,7 @@ return false;
 end
 function script_firstAid:craftBandages()
 
-	if (not IsMoving()) then
+	if (not IsMoving()) and (IsStanding()) then
 		-- wool bandage
 		if (HasItem("Wool Cloth")) then
 			script_firstAid:openMenu();
