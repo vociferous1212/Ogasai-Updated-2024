@@ -699,10 +699,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		-- check heals and buffs
 		if (not IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (not HasForm()) then
 			if (script_druid:healsAndBuffs()) then
-				if (IsMoving()) then
-					StopMoving();
-				return true;
-				end
+				
 			return true;
 			end
 		end
@@ -739,6 +736,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
+
+-- check melee distance
+			if (IsBearForm() or IsCatForm()) and (targetObj:GetDistance() > self.meleeDistance) then
+				return 3;
+			end
 
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
@@ -873,10 +875,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
 					if (script_druid:healsAndBuffs()) then
-						if (IsMoving()) then
-							StopMoving();
-							return true;
-						end
+						
 					return true;
 					end
 				end
@@ -1213,10 +1212,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
 					if (script_druid:healsAndBuffs()) then
-						if (IsMoving()) then
-							StopMoving();
-							return true;
-						end
+						
 					return true;
 					end
 				end
@@ -1634,10 +1630,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
 					if (script_druid:healsAndBuffs()) then
-						if (IsMoving()) then
-							StopMoving();
-							return true;
-						end
+						
 					return true;
 					end
 				end
@@ -1794,10 +1787,7 @@ function script_druid:rest()
 	-- check heals and buffs
 	if (not IsLooting()) and (not IsDrinking()) and (not IsEating()) and (not localObj:HasBuff("Frenzied Regeneration")) and (not IsInCombat()) and (not script_checkDebuffs:hasSilence()) then
 		if (script_druid:healsAndBuffs()) then
-			if (IsMoving()) then
-				StopMoving();
-				return true;
-			end
+			
 		return true;
 		end
 	end	
