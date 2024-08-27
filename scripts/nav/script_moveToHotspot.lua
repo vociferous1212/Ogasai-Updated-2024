@@ -51,7 +51,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	
 		if (not script_grind.hotspotReached) and (script_getSpells.getSpellsStatus < 1) then
 			script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-		if (not IsMoving()) then
+		if (not IsMoving() and not IsPathLoaded(5)) then
 			Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		end
 		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";

@@ -40,17 +40,19 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist-1) then 
+	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
 		end
 	end
+	if (not IsMoving()) and ((_lx - _ix)^2 < 1) then
+		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+	end
 
-	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
 	if (GetTimeEX() > self.waitTimer) then
-		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2+4) then
-			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+			if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3) then	
+				GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 			--return "Generating a new path...";
 		end
 	end
@@ -67,10 +69,10 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 
 	if (IsMoving()) then
 		if (script_grind.nextToNodeDist < 6) then
-			self.waitTimer = GetTimeEX() + ((script_grind.nextToNodeDist*2) + (GetDistance3D(mX, mY, mZ ,_lx, _ly, _lz))*1000);
+			self.waitTimer = GetTimeEX() + ((script_grind.nextToNodeDist) + (GetDistance3D(mX, mY, mZ ,_lx, _ly, _lz))*1000);
 		end	-- Move to the next destination in the path
 	end
-		
+	
 	Move(_ix, _iy, _iz);
 
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
