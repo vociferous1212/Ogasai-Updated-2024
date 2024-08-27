@@ -703,6 +703,15 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			return true;
 			end
 		end
+
+-- use prowl before spamming auto attack and move in range of target!
+		if (not IsInCombat()) and (self.useCat) and (IsCatForm()) and (self.useStealth) and (HasSpell("Prowl")) and (not IsSpellOnCD("Prowl")) and (not IsStealth()) and (script_grind.lootObj == nil or script_grind.lootObj == 0) and (not script_checkDebuffs:hasPoison()) and (not localObj:HasDebuff("Rend")) and (IsStanding()) and (IsMoving()) then
+			CastSpellByName("Prowl");
+			if (script_grind.jump) then
+				JumpOrAscendStart();
+			end
+		end
+
 	
 
 	-- run backwards if target is entangled

@@ -104,7 +104,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 4.55, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 3.55, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -1681,9 +1681,15 @@ if (not IsAutoCasting("Attack")) then
 
 
 				-- check stealth rogue
-				if (script_rogue.useStealth) and (HasSpell("Stealth")) and (not IsSpellOnCD("Stealth")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) and (script_rogue.useStealth) then
-					CastSpellByName("Stealth", localObj);
-					self.waitTimer = GetTimeEX() + 1200;
+				if (script_rogue.useStealth or script_druid.useStealth) and (HasSpell("Stealth") or HasSpell("Prowl")) and (not IsSpellOnCD("Stealth") and not IsSpellOnCD("Prowl")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
+					if (HasSpell("Stealth")) then
+						CastSpellByName("Stealth", localObj);
+						self.waitTimer = GetTimeEX() + 1200;
+					end
+					if (HasSpell("Prowl")) then
+						CastSpellByName("Prowl", localObj);
+						self.waitTimer = GetTimeEX() + 1200;
+					end
 				end
 			end
 		else
