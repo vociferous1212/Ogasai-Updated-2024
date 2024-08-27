@@ -1656,7 +1656,7 @@ if (not IsAutoCasting("Attack")) then
 				end
 			end
 
-			if (not self.hotspotReached) and (not IsInCombat()) then
+			if (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
 				self.message = script_moveToHotspot:moveToHotspot(localObj);
 				return true;
 			end
@@ -2424,7 +2424,7 @@ function script_grind:doLoot(localObj)
 	self.message = "Moving to loot...";
 
 
-	if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+	if (self.lootObj ~= 0 and self.lootObj ~= nil) and not (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
 		local _x, _y, _z = self.lootObj:GetPosition();
 		if (self.lootObj:GetDistance() > (self.lootDistance/2)) then
 			if (IsPathLoaded(5)) then

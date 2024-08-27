@@ -144,7 +144,7 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 
 	
 if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script_grind.enemyObj:IsCasting()) then
-			if (script_navEX:moveToTarget(GetLocalPlayer(), pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
+			if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget()) then
 					script_grind.tickRate = 350;
 				end	
@@ -432,7 +432,7 @@ function script_checkAdds:avoid(pointX,pointY,pointZ, radius, safeDist)
 		
 
 		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not script_grind.enemyObj:IsCasting()) then
-			if (script_navEX:moveToTarget(GetLocalPlayer(), pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
+			if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
 				if (not script_grind.adjustTickRate) and (PlayerHasTarget()) then
 					script_grind.tickRate = 135;
 				end

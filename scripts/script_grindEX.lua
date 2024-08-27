@@ -191,8 +191,8 @@ function script_grindEX:doChecks()
 				if (script_helper:useMount()) then
 				end
 			end
-			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) and (HasSpell("Bear Form")) then
-				if (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) then
+			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) and (HasSpell("Bear Form")) and (not script_grindEX:areWeSwimming()) then
+				if (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 					script_druidEX2:catForm();
 				elseif (HasSpell("Travel Form")) then
 					script_druidEX:travelForm();
@@ -251,6 +251,7 @@ function script_grindEX:doChecks()
 		end
 
 		if (not IsInCombat() or IsMounted()) then
+
 			if (vendorStatus == 1) then
 
 				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
@@ -272,7 +273,7 @@ function script_grindEX:doChecks()
 					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
 				else
 
-					script_grind.message = "Selling to vendor...";
+					script_grind.message = "Selling to vendor...,";
 
 					if (script_vendor:sell()) then script_grind:setWaitTimer(100);
 						return true;

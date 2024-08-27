@@ -60,6 +60,7 @@ function script_checkDebuffs:hasMagic()
 		or (player:HasDebuff("Entangling Roots"))
 		or (player:HasDebuff("Sonic Burst"))
 		or (player:HasDebuff("Shadow Word: Pain"))
+		or (player:HasDebuff("Crystalline Slumber"))
 
 	
 	then
