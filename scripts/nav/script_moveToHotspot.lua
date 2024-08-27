@@ -57,6 +57,11 @@ function script_moveToHotspot:moveToHotspot(localObj)
 
 		
 	else
+		local hsDist = 0;
+		if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
+			hsDist = math.floor(script_nav:getDistanceToHotspot());
+		end
+
 		script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 	end
