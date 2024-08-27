@@ -914,7 +914,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- stealth opener
 			if (IsCatForm()) and (self.useCat) and (self.useStealth) and (IsStealth()) then
 				if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 4) and (HasSpell("Shred") and self.openerUsed < 3) or (not HasSpell("Shred")) then
+					
 					if (not CastSpellByName(self.stealthOpener)) then
+						if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+						local x, y, z = GetLocalPlayer():GetPosition();
+						local xx, yy, zz = script_grind.enemyObj:GetPosition();
+						Move(xx-math.cos(script_grind.enemyObj:GetAngle()), yy+math.sin(GetLocalPlayer():GetAngle()), zz);
+						end
 						self.waitTimer = GetTimeEX() + 1550;
 						script_grind:setWaitTimer(1550);
 						self.openerUsed = self.openerUsed + 1;

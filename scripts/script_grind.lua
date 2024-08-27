@@ -2430,11 +2430,11 @@ function script_grind:doLoot(localObj)
 			if (IsPathLoaded(5)) then
 				if (script_navEX:moveToLoot(localObj, _x, _y, _z)) then
 				self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-				return;
+				return true;
 				end
-			elseif (not IsPathLoaded(5)) then
+			elseif (not IsMoving() or not IsPathLoaded(5)) then
 				
-				MoveToTarget(_x, _y, _z);
+				Move(_x, _y, _z);
 				self.message = "Cannot find a path to loot target "..self.lootObj:GetDistance()"";
 				
 				return true;
