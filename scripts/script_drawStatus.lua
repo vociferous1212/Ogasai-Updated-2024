@@ -51,7 +51,7 @@ function script_drawStatus:draw()
 		end
 		if (not IsInCombat()) then
 			if (script_grind.hotspotReached) then
-			DrawText("Blacklist Loot After (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+17, 0, 255, 120);
+			DrawText("Blacklist Loot After (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+35, 0, 255, 120);
 			end
 		elseif (script_grind.hotspotReached) then
 		DrawText("Blacklist Loot After (" ..((script_grind.blacklistLootTimeVar)).." Sec): " ..(math.floor(((script_grind.blacklistLootTime - script_grind.blacklistLootTimeCheck)/1000)))..  "", x, y+35, 0, 255, 120);

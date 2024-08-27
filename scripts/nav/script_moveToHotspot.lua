@@ -50,12 +50,14 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		end
 	
 		if (not script_grind.hotspotReached) and (script_getSpells.getSpellsStatus < 1) then
-			self.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+			script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
+
 		end
 
 		
 	else
-		script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+		script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 	end
 	--elseif (script_nav.numSavedLocation >= 3) then

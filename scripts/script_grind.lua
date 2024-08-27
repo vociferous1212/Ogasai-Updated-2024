@@ -1473,7 +1473,7 @@ if (not IsAutoCasting("Attack")) then
 						self.message = script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					end
-					if (not IsMoving()) and (self.enemyObj:GetDistance() > self.combatScriptRange) then
+					if (not IsMoving()) and (self.enemyObj:GetDistance() > self.combatScriptRange) and (IsPathLoaded(5)) then
 						self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 						local px, py, pz = GetLocalPlayer():GetPosition();
 						local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
