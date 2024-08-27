@@ -2,6 +2,12 @@ script_druidEX = {
 
 }
 
+function script_druidEX:castCharge()
+	if (IsBearForm()) then
+		CastSpellByName("Feral Charge");
+		return true;
+	end
+end
 function script_druidEX:removeTravelForm()
 
 	if (GetLocalPlayer():HasBuff("Travel Form")) then

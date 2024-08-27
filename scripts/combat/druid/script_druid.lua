@@ -181,9 +181,6 @@ function script_druid:runBackwards(targetObj, range)
  		local moveX, moveY, moveZ = xT + xUV*16, yT + yUV*16, zT + zUV;		
  		if (distance < range and targetObj:IsInLineOfSight()) then 
 			Move(moveX, moveY, moveZ);
-			if (script_grind.jump) and (IsMoving()) then
-				JumpOrAscendStart();
-			end
  			return true;
  		end
 	end
@@ -533,8 +530,8 @@ function script_druid:healsAndBuffs()
 				self.waitTimer = GetTimeEX() + 1750; 
 				return true; 
 			end
-		elseif (HasSpell("Abolish Poison")) and (not localObj:HasBuff("Abolish Poison")) and (script_checkDebuffs:hasPoison()) and (localMana >= 45) and (not IsMoving()) and (IsStanding()) and (not IsSpellOnCD("Abolish Poison")) then
-			if (CastSpellByName("Abolish Poison", targetObj)) then
+		elseif (HasSpell("Abolish Poison")) and (not localObj:HasBuff("Abolish Poison")) and (script_checkDebuffs:hasPoison()) and (localMana >= 25) and (not IsMoving()) and (IsStanding()) and (not IsSpellOnCD("Abolish Poison")) then
+			if (CastSpellByName("Abolish Poison", localObj)) then
 				self.waitTimer = GetTimeEX() + 1750;
 				return true;
 			end
@@ -746,6 +743,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+-- use charge in bear form
+		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 10) then
+				targetObj:FaceTarget();
+				script_druidEX:castCharge();
+			end
+
 -- check melee distance
 			if (IsBearForm() or IsCatForm()) and (targetObj:GetDistance() > self.meleeDistance) then
 				return 3;
@@ -825,7 +828,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				JumpOrAscendStart();
 			end
 		end
-	
+
+-- use charge in bear form
+		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 10) then
+				targetObj:FaceTarget();
+				script_druidEX:castCharge();
+			end
+
 		-- face target
 		if (not IsMoving() and targetObj:GetDistance() <= self.meleeDistance) then
 				targetObj:FaceTarget();
@@ -977,11 +986,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- use charge in bear form
 			if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) then
-				if (self.useBear) and (IsBearForm()) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() > 10) then
-						targetObj:FaceTarget();
-					if (CastSpellByName("Feral Charge")) then
-						targetObj:FaceTarget();
-					end
+				if (self.useBear) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() > 10) then
+					targetObj:FaceTarget();
+					CastSpellByName("Feral Charge", targetObj);
 				end
 			end
 

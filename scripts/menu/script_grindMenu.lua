@@ -56,19 +56,19 @@ function script_grindMenu:menu()
 	end
 
 	--garbage collection info
-	local a = gcinfo();
-	if (self.showGarbageBox) then
-		Text("Garbage Data Lost " ..a);
-		if (self.showGarbageBox) then
-			SameLine();
-			Text(" - Can Cause Lag!");
-		end
-	end
-	wasClicked, self.showGarbageBox = Checkbox("Force Garbage Collect", self.showGarbageBox);
-	if (self.showGarbageBox) then
-		SameLine();
-		Text(" - Includes AddOns!");
-	end
+	--local a = gcinfo();
+	--if (self.showGarbageBox) then
+	--	Text("Garbage Data Lost " ..a);
+	--	if (self.showGarbageBox) then
+	--		SameLine();
+	--		Text(" - Can Cause Lag!");
+	--	end
+	--end
+	--wasClicked, self.showGarbageBox = Checkbox("Force Garbage Collect", self.showGarbageBox);
+	--if (self.showGarbageBox) then
+	--	SameLine();
+	--	Text(" - Includes AddOns!");
+	--end
 	wasClicked, script_grindMenu.adjustTickRate = Checkbox("Remove Timers...", script_grindMenu.adjustTickRate);
 		if (script_grindMenu.adjustTickRate) then
 			Text("Quick adjustment of tick rate / script reaction speed");
