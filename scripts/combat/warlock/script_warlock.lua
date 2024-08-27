@@ -227,31 +227,9 @@ function script_warlock:run(targetGUID)
 		return 4;
 	end
 
-	-- stuck in combat
-	if (self.waitAfterCombat) and (HasPet()) then
-		if (IsInCombat()) and (not PlayerHasTarget()) and (not PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
-			self.message = "Waiting... Server says we are InCombat()";
-			self.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
-			if (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
-				ex, ey, ez = script_grind.lootObj:GetPosition();
-				Move(ex, ey, ez);
-			end
-		elseif (IsInCombat()) and (not PlayerHasTarget()) and (PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
-			AssistUnit("Pet");
-			return 4;
-		end
-	end
-
-	-- force bot to attack pets target
-	if (GetNumPartyMembers() == 0) and (self.waitAfterCombat) and (IsInCombat()) and (HasPet()) and (playerHasTarget == 0) and (PetHasTarget()) then
-		if (GetPet():GetDistance() > 10) then
-			AssistUnit("pet");
-			PetFollow();
-		end
-	elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
-		--AssistUnit("pet");
-		self.message = "Stuck in combat! WAITING! 1";
-		return 4;
+	if (IsInCombat()) and (not PlayerHasTarget()) and (PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
+		AssistUnit("Pet");
+		return true;
 	end
 
 	-- dismiss imp if we have it for some reason and we don't want it
@@ -336,17 +314,6 @@ function script_warlock:run(targetGUID)
 		return 3;
 	end
 
-	-- force bot to attack pets target
-	if (GetNumPartyMembers() == 0) and (self.waitAfterCombat) and (IsInCombat()) and (HasPet()) and (not PlayerHasTarget()) and (not PetHasTarget()) then
-		if (GetPet():GetDistance() > 10) then
-			AssistUnit("pet");
-			PetFollow();
-		end
-	elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
-		--AssistUnit("pet");
-		self.message = "Stuck in combat! WAITING! 2";
-		return 4;
-	end
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
@@ -426,8 +393,12 @@ function script_warlock:run(targetGUID)
 
 -- Opener check range of ALL SPELLS
 				
-			if (targetObj:GetDistance() > 29) or (not targetObj:IsInLineOfSight()) then
+			if (targetObj:GetDistance() > 29) or (not targetObj:IsInLineOfSight()) or (localMana < 10 and not localObj:HasRangedWeapon() and targetObj:GetDistance() > 4.5) then
 				return 3;
+			end
+
+			if (IsInCombat()) and (not IsMoving()) then
+				targetObj:FaceTarget();
 			end
 
 		-- used to keep target acquired
@@ -459,7 +430,9 @@ function script_warlock:run(targetGUID)
 		end
 
 		if (self.warlockDOTS) and (script_grindEX:howManyEnemiesInRange(29) >= self.warlockDOTSCount) and (script_grind.enemiesAttackingUs() <= self.warlockDOTSCount) and (localMana >= 35) and (localHealth >= 45) then
-		
+				if (not script_grind.adjustTickRate) then
+					script_grind.tickRate = 150;
+				end
 				if (GetTimeEX() > script_warlockDOTS.corruptionTimer) then
 					if (script_warlockDOTS:corruption()) then
 						return true;
@@ -638,19 +611,6 @@ function script_warlock:run(targetGUID)
 				end
 			end
 
-			-- force bot to attack pets target
-			if (GetNumPartyMembers() == 0) and (self.waitAfterCombat) and (IsInCombat()) and (HasPet()) and (PlayerHasTarget()) then
-				if (PetHasTarget()) then
-					if (GetPet():GetDistance() > 10) then
-						AssistUnit("pet");
-						PetFollow();
-					end
-				elseif (HasPet()) and (not PetHasTarget()) then
-					--AssistUnit("pet");
-					self.message = "Stuck in combat! WAITING! 3";
-					return 4;
-				end
-			end
 
 			-- causes crashing after combat phase?
 			-- follow target if single target fear is active and moves out of spell ranged
@@ -1144,19 +1104,6 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 		end
 	end
 
-	-- force bot to attack pets target
-	if (GetNumPartyMembers() == 0) and (self.waitAfterCombat) and (IsInCombat()) and (HasPet()) and (not PlayerHasTarget()) then
-		if (not PetHasTarget()) then
-			if (GetPet():GetDistance() > 10) then
-				AssistUnit("pet");
-				PetFollow();
-			end
-		elseif (HasPet()) and (not PetHasTarget()) and (IsInCombat()) then
-			--AssistUnit("pet");
-			self.message = "Stuck in combat! WAITING! 4";
-			return 4;
-		end
-	end
 
 	-- Dark Pact instead of drink
 	if (HasSpell("Dark Pact")) and (IsStanding()) and (localMana < 75) and (HasPet()) then
