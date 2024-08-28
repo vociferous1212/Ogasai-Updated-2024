@@ -224,6 +224,9 @@ function script_vendor:repair()
 			script_unstuck:unstuck();
 			return true;
 		end
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+			vX, vY, vZ = GetTarget():GetPosition();
+		end
 		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			MoveToTarget(vX, vY, vZ);
 		end
@@ -338,9 +341,13 @@ function script_vendor:sell()
 			script_unstuck:unstuck();
 			return true;
 		end
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+			vX, vY, vZ = GetTarget():GetPosition();
+		end
 		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			MoveToTarget(vX, vY, vZ);
 		end
+		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
 			script_navEX:moveToTarget(localObj, vX, vY, vZ);
@@ -440,6 +447,9 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 		if (not script_unstuck:pathClearAuto(2)) then
 			script_unstuck:unstuck();
 			return true;
+		end
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+			vX, vY, vZ = GetTarget():GetPosition();
 		end
 		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			MoveToTarget(vX, vY, vZ);
@@ -577,6 +587,9 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 		if (not script_unstuck:pathClearAuto(2)) then
 			script_unstuck:unstuck();
 			return true;
+		end
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+			vX, vY, vZ = GetTarget():GetPosition();
 		end
 		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			MoveToTarget(vX, vY, vZ);
