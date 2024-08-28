@@ -121,7 +121,7 @@ _quest = {
 	questerMenuIncluded = include("scripts\\quester\\_questMenu.lua"),
 	questerGetItemToGatherIncluded = include("scripts\\quester\\_questGetItemToGather.lua"),
 	questerHandleVendorIncluded = include("scripts\\quester\\_questHandleVendor.lua"),
-	questerDBIncluded = include("scripts\\db\_questDB.lua"),
+	questerDBIncluded = include("scripts\\db\\_questDB.lua"),
 
 }
 
