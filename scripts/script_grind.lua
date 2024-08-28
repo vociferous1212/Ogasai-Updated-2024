@@ -1154,20 +1154,21 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 			end
 		end
 		if (IsInCombat()) then
-			if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
+			if (PlayerHasTarget()) then
 				self.enemyObj = GetLocalPlayer():GetUnitsTarget();
 				self.lastTarget = self.enemyObj:GetGUID();
 			end
 			local bestHP = 0;
 			local i, t = GetFirstObject();
 			while i ~= 0 do
-				if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+				if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 then
 					local hp = i:GetHealthPercentage();
 					if bestHP > hp then
 						bestHP = hp;
 
 						if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID()) then
 							self.enemyObj = i;
+							self.lastTarget = i;
 						end
 					end
 				end
