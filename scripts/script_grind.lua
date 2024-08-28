@@ -209,6 +209,7 @@ script_grind = {
 	useFPS = false,		-- use flight paths
 	eatHealth = 50,
 	drinkMana = 50,
+	autoAttackActionSlot = 0,
 }
 
 
@@ -785,16 +786,25 @@ if (not IsUsingNavmesh()) then UseNavmesh(true);
 		end
 	end
 
--- heroic strike stuck on and target moved away or we stopped casting auto attack
+-- heroic strike or maul stuck on and target moved away or we stopped casting auto attack
 
 	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true, [6807] = true, [6808] = true, [6809] = true, [7092] = true, [8972] = true, [9745] = true, [9880] = true, [9881] = true, [12161] = true, [20751] = true};
 
 		if (HasSpell("Heroic Strike") or HasSpell("Maul")) and (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.combatScriptRange) then
+			GetTarget():FaceTarget();
 			if hstable[GetLocalPlayer():GetCasting()] then
 				SpellStopCasting();
-			
 			end
-			if (not IsAutoCasting("Attack")) then
+
+			-- check for auto attack slot
+			if (IsAttackAction(self.autoAttackActionSlot) ~= 1) then
+				for i=0, 100 do
+					if IsAttackAction(i) then
+						self.autoAttackActionSlot = i;
+					end
+				end
+			end
+			if (IsCurrentAction(self.autoAttackActionSlot) ~= 1) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 				self.enemyObj:AutoAttack();
 			end
 		end

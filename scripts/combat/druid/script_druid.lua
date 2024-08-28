@@ -35,6 +35,7 @@ script_druid = {
 	clawEnergy = 45,
 	rakeEnergy = 40,
 	openerUsed = 0,
+	autoAttackActionSlot = 0,
 }
 
 
@@ -661,10 +662,12 @@ function script_druid:run(targetGUID)
 		-- stuck casting maul
 		local mtable = {[6807] = true, [6808] = true, [6809] = true, [7092] = true, [8972] = true, [9745] = true, [9880] = true, [9881] = true, [12161] = true, [20751] = true};
 
+		if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+			GetTarget():AutoAttack();
+		end
 		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance) then
 			if mtable[GetLocalPlayer():GetCasting()] then
 				SpellStopCasting();
-			
 			end
 		end
 
@@ -695,6 +698,9 @@ function script_druid:run(targetGUID)
 
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
+		if (IsInCombat()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+			GetTarget():AutoAttack();
+		end
 		return 4;
 	end
 
@@ -1216,9 +1222,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 	-- Combat -- start of combat phase! now in combat!
 
-	-- IN COMBAT
 
 	-- IN COMBAT
+
 
 
 
@@ -1234,7 +1240,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- reset vars
 			self.openerUsed = 0;
-
 
 
 			-- check heals and buffs
