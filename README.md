@@ -1,7 +1,7 @@
  # oGasai Scripts for WoW Classic
  Ogasaism
 
-If you find bugs you can message in Discord or make a pull request here. Or if the bot does anything you think it shouldn't be doing or if you have an idea you'd like implemented. I work full time and am currently enrolled in school full time so I am working on these in my spare time and cannot run the bot for hours on end watching for bugs - if you see something I have not seen and want the bot to function better.... This is being done as a hobby and as such, you will find bugs. You will also find many things not incorporated into other bot programs or many thing that will be different. This bot is made to just 'work' as is and the code is a mess.
+If you find bugs you can message in Discord or make a pull request here. Or if the bot does anything you think it shouldn't be doing or if you have an idea you'd like implemented. I work full time and am currently enrolled in school full time so I am working on these in my spare time and cannot run the bot for hours on end watching for bugs - if you see something I have not seen and want the bot to function better.... This is being done as a hobby and as such, you will find bugs. You will also find many things not incorporated into other bot programs or many thing that will be different. This bot is made to just 'work' as is and the code is a mess. With that being said... if you need help understanding the logic behind any of the code feel free to message on Discord. A lot of the stuff here is a 'proof of concept' just to prove a bot can do it and in hopes it will benefit others in the future. There is also a character limit that makes it very difficult to do heavy commenting on functions and the code.
 
 
  Current known bugs - 
