@@ -113,7 +113,7 @@ end
 function CallPet()
 	local pet = GetPet();
 
-	if (pet == 0) and (pet ~= nil) then
+	if (pet == 0) and (pet ~= nil) and (not IsSpellOnCD("Call Pet")) then
 		script_hunter.message = "pet is missing, calling pet...";
 		CastSpellByName("Call Pet");
 		return true;
@@ -131,7 +131,7 @@ function CastStealth()
 				script_grind:setWaitTimer(1500);
 				return true;
 			end
-		elseif (HasSpell("Prowl")) and (script_druid.useStealth) then
+		elseif (HasSpell("Prowl")) and (script_druid.useStealth) and (not IsSpellOnCD("Cat Form")) then
 			if (not HasForm()) then
 				if (HasSpell("Cat Form")) then
 					CastSpellByName("Cat Form");
