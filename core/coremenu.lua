@@ -67,7 +67,7 @@ function coremenu:draw()
 		LoadScript("Grinder", "scripts\\script_grind.lua");
 		AddScriptToMode("Grinder", "script_grind");
 
-		LoadScript("Quester", "scripts\\_quest.lua");
+		LoadScript("Quester", "scripts\\quester\\_quest.lua");
 		AddScriptToMode("Quester", "_quest");
 
 		LoadScript("Follower", "scripts\\follow\\script_follow.lua");
