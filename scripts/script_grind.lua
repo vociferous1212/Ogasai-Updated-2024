@@ -1158,22 +1158,22 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 				self.enemyObj = GetLocalPlayer():GetUnitsTarget();
 				self.lastTarget = self.enemyObj:GetGUID();
 			end
-			local bestHP = 0;
-			local i, t = GetFirstObject();
-			while i ~= 0 do
-				if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 then
-					local hp = i:GetHealthPercentage();
-					if bestHP > hp then
-						bestHP = hp;
-
-						if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID()) then
-							self.enemyObj = i;
-							self.lastTarget = i;
-						end
-					end
-				end
-			i, t = GetNextObject(i);
-			end
+			--local bestHP = 0;
+			--local i, t = GetFirstObject();
+			--while i ~= 0 do
+			--	if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 then
+			--		local hp = i:GetHealthPercentage();
+			--		if bestHP > hp then
+			--			bestHP = hp;
+			--
+			--			if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID()) then
+			--				self.enemyObj = i;
+			--				self.lastTarget = i:GetGUID();
+			--			end
+			--		end
+			--	end
+			--i, t = GetNextObject(i);
+			--end
 		end
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) then
