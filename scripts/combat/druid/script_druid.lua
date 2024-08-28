@@ -641,7 +641,7 @@ function script_druid:run(targetGUID)
 		-- stuck casting maul
 		local mtable = {[6807] = true, [6808] = true, [6809] = true, [7092] = true, [8972] = true, [9745] = true, [9880] = true, [9881] = true, [12161] = true, [20751] = true};
 
-		if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+		if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) and (not script_checkAdds:checkAdds()) and (not IsMoving()) then
 			GetTarget():AutoAttack();
 		end
 		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance) then
