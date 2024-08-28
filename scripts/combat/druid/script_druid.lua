@@ -395,7 +395,7 @@ function script_druid:healsAndBuffs()
 		-- Mark of the Wild
 		if (HasSpell("Mark of the Wild")) and (not IsMounted()) and (not localObj:HasBuff("Mark of the Wild")) and (localHealth >= self.healthToShift) and (not IsSpellOnCD("Mark of the Wild")) and (GetLocalPlayer():GetUnitsTarget() == 0 or GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Mark of the Wild")) then
 			if (IsInCombat() and script_grind.enemiesAttackingUs(10) < 2 and localMana >= 30) or (not IsInCombat() and localMana >= 25) then
-				if (not CastHeal("Mark of the Wild", localObj)) then
+				if (CastHeal("Mark of the Wild", localObj)) then
 					self.waitTimer = GetTimeEX() + 2500;
 					script_grind:setWaitTimer(1600);
 					return true;
@@ -413,33 +413,12 @@ function script_druid:healsAndBuffs()
 			if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID()) then
 
 
-				if not (CastSpellByName("Thorns", localObj)) then
+				if (CastSpellByName("Thorns", localObj)) then
 					self.waitTimer = GetTimeEX() + 2550;
 					script_grind:setWaitTimer(2050);
 					self.tickRate = 1500;
 					self.thornsTimer = GetTimeEX() + 600000;
 					return true;
-				end
-			end
-		end
-
-		-- Thorns
-		if (localMana > 15) and (HasSpell("Thorns")) and (not localObj:HasBuff("Thorns")) and (not IsMounted()) and (not IsSpellOnCD("Thorns")) and (not HasForm()) and (script_vendor:getStatus() == 0) and (GetLocalPlayer():GetUnitsTarget() == 0 or (GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Thorns"))) then
-			if (localHealth >= self.healthToShift) and (not IsMounted()) then
-
-				-- bot is still targeting vendors...
-				if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
-					ClearTarget();
-				end
-				if (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID()) then
-
-					if not (CastHeal("Thorns", localObj)) then
-						self.waitTimer = GetTimeEX() + 2550;
-						script_grind:setWaitTimer(2050);
-						self.tickRate = 1500;
-						self.thornsTimer = GetTimeEX() + 600000;
-						return true;
-					end
 				end
 			end
 		end
@@ -830,6 +809,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift or HasRegrowth)
 		and (IsStanding()) and (not IsDrinking()) and (not IsEating())
 		and (targetObj:GetLevel() <= localObj:GetLevel() + 2)
+		and (not IsSpellOnCD("Cat Form"))
 	then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 335;
@@ -965,7 +945,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					StopMoving();
 					return true;
 				end
-				if (localEnergy >= self.clawEnergy) then
+				if (localEnergy >= self.clawEnergy) and (not IsSpellOnCD("Claw")) then
 					CastSpellByName("Claw", targetObj);
 					targetObj:FaceTarget();
 					self.openerUsed = 0;
@@ -1088,7 +1068,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- Demoralizing Roar
-			if (HasSpell("Demoralizing Roar")) and (not targetObj:HasBuff("Demoralizing Roar")) and (localRage > 10) and (not targetObj:HasDebuff("Demoralizing Shout")) then
+			if (HasSpell("Demoralizing Roar")) and (not targetObj:HasBuff("Demoralizing Roar")) and (localRage > 10) and (not targetObj:HasDebuff("Demoralizing Shout")) and (not IsSpellOnCD("Demoralizing Roar")) then
 				if (CastSpellByName("Demoralizing Roar")) then
 					return 0;
 				end
@@ -1600,7 +1580,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- keep rake up
-				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") then
+				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and (not IsSpellOnCD("Rake")) then
 					if (CastSpellByName("Rake", targetObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						return 0;
@@ -1608,7 +1588,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Use Claw
-				if (localEnergy >= self.clawEnergy) then
+				if (localEnergy >= self.clawEnergy) and (not IsSpellOnCD("Claw")) then
 					if (not CastSpellByName("Claw")) then
 						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1600;

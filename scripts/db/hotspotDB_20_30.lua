@@ -4,11 +4,10 @@ function hotspotDB_20_30:setup()
 
 -- Duskwood
 
-	hotspotDB:addHotspot("Duskwood 20 - 21", "Alliance", 19, 25, -10811, 522.47, 35.07);
-	hotspotDB:addHotspot('Duskwood 21 - 25', "Alliance", 21, 25, -10759.08, 479.45, 35.19);	
-	hotspotDB:addHotspot("Duskwood 22 - 24", "Alliance", 21, 25, -10029.30, -783.62, 33.81);
-	hotspotDB:addHotspot("Duskwood 23 - 24", "Alliance", 23, 24, -10937.13, 1251.42, 49.95);
-	hotspotDB:addHotspot("Duskwood 22 - 24", "Alliance", 22, 24, -11077.7, 370.85, 29.51);
+	hotspotDB:addHotspot("Duskwood 20 - 21", "Alliance", 29, 21, -10811, 522.47, 35.07);
+	hotspotDB:addHotspot('Duskwood 21 - 23', "Alliance", 21, 23, -10759.08, 479.45, 35.19);	
+	hotspotDB:addHotspot("Duskwood 23 - 25", "Alliance", 23, 25, -10029.30, -783.62, 33.81);
+	hotspotDB:addHotspot("Duskwood 24 - 26", "Alliance", 24, 26, -11077.7, 370.85, 29.51);
 	hotspotDB:addHotspot("The Darkened Bank 22 - 24", "Alliance", 22, 24, -10078.23, -1067.3, 28.1);
 	hotspotDB:addHotspot("The Darkened Bank 20 - 22", "Alliance", 20, 22, -9962.79, -567.63, 35.56);
 	hotspotDB:addHotspot("The Darkened Bank 20 - 22", "Alliance", 20, 22, -10173.69, 144.11, 24.73);

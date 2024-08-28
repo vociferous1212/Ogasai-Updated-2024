@@ -822,7 +822,7 @@ function script_mage:run(targetGUID)
 						return 3;
 					end
 
-					if (not IsMoving()) then
+					if (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) then
 						if (CastSpellByName("Frostbolt", targetObj)) then
 							self.waitTimer = GetTimeEX() + 1850;
 							script_grind:setWaitTimer(1850);
@@ -883,7 +883,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- this is here to check for low level not having a wand yet
-			if (self.frostMage) and (not IsMoving()) and (not localObj:HasRangedWeapon()) and (targetHealth <= self.useWandHealth) then				
+			if (self.frostMage) and (not IsMoving()) and (not localObj:HasRangedWeapon()) and (targetHealth <= self.useWandHealth) and (not IsSpellOnCD("Frostbolt")) then				
 		
 				if (not targetObj:IsSpellInRange("Fireball")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
 					return 3;
@@ -1230,7 +1230,7 @@ end
 function script_mage.frostMagePull(targetObj)
 
 	-- recheck line of sight on target
-	if (not IsMounted()) and ( (not targetObj:IsInLineOfSight()) or  (targetObj:GetDistance() > 30 and not IsCasting() and not IsChanneling()) or (targetObj:GetDistance() > 30) ) and (PlayerHasTarget()) then
+	if (not IsMounted()) and ( (not targetObj:IsInLineOfSight()) or  (targetObj:GetDistance() > 30 and not IsCasting() and not IsChanneling()) or (targetObj:GetDistance() > 30) ) and (PlayerHasTarget()) and (not IsSpellOnCD("Frostbolt")) then
 		return 3;
 	else
 		if (IsMoving()) then

@@ -33,8 +33,6 @@ function vendorDB_30_40:setup()
 -- Desolace - Alliance
 	vendorDB:addVendor("Christi Galvanis", 0, 1, 405, false, false, false, false, false, 243.01, 1238.58, 192.15);
 	vendorDB:addVendor("Christi Galvanis", 0, 1, 405, false, false, true, false, false, 243.01, 1238.58, 192.15);
-	vendorDB:addVendor("Janet Hommers", 0, 1, 405, false, true, false, false, false, 255.03, 1257.52, 192.14);
-	vendorDB:addVendor("Janet Hommers", 0, 1, 405, false, false, true, false, false, 255.03, 1257.52, 192.14);
 	vendorDB:addVendor("Maxton Strang", 0, 1, 405, true, false, false, false, false, 202.83, 1179.18, 167.99);
 	vendorDB:addVendor("Maxton Strang", 0, 1, 405, false, false, false, false, false, 202.83, 1179.18, 167.99);
 
