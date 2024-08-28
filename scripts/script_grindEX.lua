@@ -158,6 +158,7 @@ function script_grindEX:doChecks()
 			return true;
 		end
 
+
 		-- run back if has vanish
 		if (localObj:HasBuff("Vanish")) then
 			script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z']); 

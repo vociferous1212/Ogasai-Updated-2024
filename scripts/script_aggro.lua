@@ -211,6 +211,7 @@ function script_aggro:safePullRecheck(target)
 	return true;
 end
 
+-- find a safe spot to ressurect
 function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius) 
 	local countUnitsInRange = 0;
 	local currentObj, typeObj = GetFirstObject();
@@ -220,51 +221,70 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 	local aggro = 0;
 	local aggroClosest = 0;
 
+	-- run object manager
 	while currentObj ~= 0 do
+
+		-- NPC type 3
  		if typeObj == 3 then
-			aggro = currentObj:GetLevel() - localObj:GetLevel() + 22;
-			local range = aggro + 5;
-			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then	
-				if (closestEnemy == 0) then
-					closestEnemy = currentObj;
-					aggroClosest = currentObj:GetLevel() - localObj:GetLevel() + 22;
-				else
-					local dist = currentObj:GetDistance();
-					if (dist < closestDist) then
-						closestDist = dist;
+
+			-- acceptable targets
+			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() then
+
+				-- set safe res distances based on level
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21;
+
+				-- extra safe range add 5 yards
+				local range = aggro + 5;
+
+				-- acceptable range to run avoid during ressurection
+				if currentObj:GetDistance() <= range then
+		
+					-- set closest enemy
+					if (closestEnemy == 0) then
 						closestEnemy = currentObj;
+						aggroClosest = currentObj:GetLevel() - localObj:GetLevel() + 21;
+				else
+						-- get nearest enemy from closest enemy position
+						local dist = currentObj:GetDistance();
+						local closestDist = 999
+
+						-- rerun object manager until you find closest target in range
+						if (dist < closestDist) then
+		
+							-- make that enemy the closest target
+							closestDist = dist;
+
+							-- closest enemy to avoid
+							closestEnemy = currentObj;
+						end
 					end
 				end
  			end
  		end
+
+		-- get next target
  		currentObj, typeObj = GetNextObject(currentObj);
  	end
 
 	-- avoid the closest mob
 	if (closestEnemy ~= 0) then
 
-			if (self.waitTimer > GetTimeEX()) then
-				return;
-			end
+			-- set res angle each return
+			self.currentRessAngle = self.currentRessAngle - 0.01;
 
-			self.currentRessAngle = self.currentRessAngle - .01;
+			-- set position to move each return
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
+
+			-- set res time
 			rTime = GetTimeEX();
 
-			if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-			end
+			-- move to point
+			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);			
 
-			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);
-
-			if (IsMoving()) then
-				self.waitTimer = GetTimeEX() + 150;
-			end
-
-		return true;	
+		return true;
 	end
 
-	return false;
+return false;
 end
 
 -- if we are close to blacklisted target true or false

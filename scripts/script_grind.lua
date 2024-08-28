@@ -524,6 +524,17 @@ function script_grind:run()
 	-- show grinder window
 	script_grind:window();
 
+if (not IsUsingNavmesh()) then UseNavmesh(true);
+		return true;
+	end
+	if (not LoadNavmesh()) then script_grind.message = "Make sure you have mmaps-files...";
+		return true;
+	end
+	if (GetLoadNavmeshProgress() ~= 1) then
+		script_grind.message = "Loading Nav Mesh! Please Wait!";
+		return;
+	end
+
 	if (script_warlock2.usingThisScript) then
 			EndWindow();
 		if (NewWindow("Warlock 2", 320, 320)) then
@@ -633,16 +644,6 @@ function script_grind:run()
 		end
 	end
 
-	if (not IsUsingNavmesh()) then UseNavmesh(true);
-		return true;
-	end
-	if (not LoadNavmesh()) then script_grind.message = "Make sure you have mmaps-files...";
-		return true;
-	end
-	if (GetLoadNavmeshProgress() ~= 1) then
-		script_grind.message = "Loading Nav Mesh! Please Wait!";
-		return true;
-	end
 	-- hotspot reached distance
 	if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
 		self.hotspotReached = false;
@@ -824,6 +825,24 @@ function script_grind:run()
 		end
 	end
 	end
+	-- walk away from target if pet target guid is the same guid as target targeting me
+	if (GetPet() ~= 0) and (script_hunter.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
+		if (targetObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
+			if (script_hunter:runBackwards(targetObj, 15)) then
+				script_grind.tickRate = 100;
+				script_rotation.tickRate = 135;
+				script_hunter.waitTimer = GetTimeEX() + 3000;
+				PetAttack();
+				self.message = "Moving away from target for range attacks...";
+if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) then
+				GetLocalPlayer():GetUnitsTarget():FaceTarget();
+			end
+
+				return true;
+			end	
+		end
+	end
+
 		
 	-- check party members
 	if (GetNumPartyMembers() >= 1) then
