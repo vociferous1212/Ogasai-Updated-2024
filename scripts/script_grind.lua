@@ -527,7 +527,7 @@ function script_grind:run()
 	-- show grinder window
 	script_grind:window();
 
-if (not IsUsingNavmesh()) then UseNavmesh(true);
+	if (not IsUsingNavmesh()) then UseNavmesh(true);
 		return true;
 	end
 	if (not LoadNavmesh()) then script_grind.message = "Make sure you have mmaps-files...";
@@ -804,7 +804,7 @@ if (not IsUsingNavmesh()) then UseNavmesh(true);
 					end
 				end
 			end
-			if (IsCurrentAction(self.autoAttackActionSlot) ~= 1) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+			if (IsCurrentAction(self.autoAttackActionSlot) ~= 1) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and (not script_checkAdds:checkAdds()) then
 				self.enemyObj:AutoAttack();
 			end
 		end
@@ -1715,7 +1715,7 @@ if (not IsAutoCasting("Attack")) then
 
 
 		-- Use auto pathing or walk paths
-		if (self.autoPath) then
+		if (self.autoPath) and (not IsInCombat()) then
 
 			-- continue to hotspot until we find a valid enemy...
 				-- move to a diff location if no valid enemies around?
