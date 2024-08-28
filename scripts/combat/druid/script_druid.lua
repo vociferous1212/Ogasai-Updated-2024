@@ -641,7 +641,7 @@ function script_druid:run(targetGUID)
 		-- stuck casting maul
 		local mtable = {[6807] = true, [6808] = true, [6809] = true, [7092] = true, [8972] = true, [9745] = true, [9880] = true, [9881] = true, [12161] = true, [20751] = true};
 
-		if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) and (not script_checkAdds:checkAdds()) then
+		if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) and (not script_checkAdds:checkAdds()) and (not IsMoving()) then
 			GetTarget():AutoAttack();
 		end
 		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance) then
@@ -678,7 +678,9 @@ function script_druid:run(targetGUID)
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
 		if (IsInCombat()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
-			GetTarget():AutoAttack();
+			if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+				GetTarget():AutoAttack();
+			end
 		end
 		return 4;
 	end
@@ -814,7 +816,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 335;
 		end
-		if (CastSpellByName("Cat Form")) then
+		if (not CastSpellByName("Cat Form")) then
 			self.waitTimer = GetTimeEX() + 1200;
 		end
 	end
@@ -850,7 +852,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					script_grind.tickRate = 125;
 				end
 				if (IsCatForm()) then
-					if (CastSpellByName("Cat Form")) then
+					if (not CastSpellByName("Cat Form")) then
 						self.wasInCombat = true;
 						self.runOnce = true;
 						self.waitTimer = GetTimeEX() + 500;
@@ -869,6 +871,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (IsInCombat()) and (script_grind.enemiesAttackingUs() == 1) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (localHealth >= self.healthToShift + 10 or hasRegrowth or hasRejuv) and (localMana >= self.shapeshiftMana) and (targetObj:GetLevel() <= localObj:GetLevel() +2) and (not IsDrinking()) and (not IsEating()) then
 			if (HasSpell("Cat Form")) then
 				CastSpellByName("Cat Form");
+				self.waitTimer = GetTimeEX() + 500;
 			end
 		end
 
@@ -1104,6 +1107,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- cast cat form
 			if (HasSpell("Cat Form")) then
 				CastSpellByName("Cat Form");
+				self.waitTimer = GetTimeEX() + 500;
 			end
 		end
 
@@ -1251,6 +1255,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (self.useCat and IsCatForm()) then
 				if (localEnergy < 40) and (localMana > self.shapeshiftMana * 2) and (targetHealth >= 35) and (localCP < 5) and (localHealth >= self.shapeshiftHealth + 30) then
 					if (CastSpellByName("Cat Form")) then
+						self.waitTimer = GetTimeEX() + 250;
 						return 0;
 					end
 				end
@@ -1500,7 +1505,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 100;
 				end
-				if (CastSpellByName("Cat Form")) then
+				if (not CastSpellByName("Cat Form")) then
 					self.waitTimer = GetTimeEX() + 800;
 				end
 			end
@@ -1828,7 +1833,7 @@ function script_druid:rest()
 		if (localMana <= self.drinkMana - 15 and self.shiftToDrink) 
 		or (localMana < 15)
 		then	
-			if (CastSpellByName("Cat Form")) then
+			if (not CastSpellByName("Cat Form")) then
 				self.waitTimer = GetTimeEX() + 1500;
 				script_grind:setWaitTimer(1000);
 			end
