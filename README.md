@@ -1,6 +1,9 @@
  # oGasai Scripts for WoW Classic
  Ogasaism
 
+If you find bugs you can message in Discord or make a pull request here. Or if the bot does anything you think it shouldn't be doing or if you have an idea you'd like implemented. I work full time and am currently enrolled in school full time so I am working on these in my spare time and cannot run the bot for hours on end watching for bugs - if you see something I have not seen and want the bot to function better....
+
+
  Current known bugs - 
  - checkbox to avoid blacklisted targets causes bot to walk circles around the target with no clear path to continue grinding
  - sometimes when creating a new hotspot (while moving) the bot does not understand you are at a hotspot and need to manually move out of range or change hotspots to resolve
