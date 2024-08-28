@@ -1,7 +1,9 @@
 _quest = {
 
+	message = "Quester",
 	pause = true,
 	isSetup = false,
+	currentDebugStatus = "Nothing",
 
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
@@ -58,6 +60,9 @@ _quest = {
 	vendorMenuIncluded = include("scripts\\menu\\script_vendorMenu.lua"),
 	pathMenuIncluded = include("scripts\\menu\\script_pathMenu.lua"),
 
+	questerMenuIncluded = include("scripts\\_questMenu.lua"),
+	questerGetItemToGatherIncluded = include("scripts\\_questGetItemToGather.lua"),
+	questerHandleVendorIncluded = include("scripts\\_questHandleVendor.lua"),
 }
 
 -- for some reason the .dll requires it to be named draw() without an error...
@@ -67,100 +72,36 @@ function _quest:draw() end
 function _quest:window()
 	EndWindow();
 	if(NewWindow("Quester", 320, 300)) then
-		_quest:menu();
+		_questMenu:menu();
 	end
+	-- color
+	local r, g, b = 0, 0, 0;
+	-- position
+	local y, x, width = 120, 25, 370;
+	local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
+	if (onScreen) then
+		y, x = tY-25, tX+75;
+	end
+		DrawText("Quester", x, y-4, r+255, g+255, b+0) y = y + 15;
+		DrawText("Quester Status:", x, y, r+255, g+255, b+0);
+		DrawText(self.message or "error", x + 115, y, 255, 255, 255);
+		DrawText("_______________", x, y+3, r+255, g+255, b);
+		y = y + 20; DrawText('Combat Script Status:', x, y, r+255, g+255, b+0); y = y + 15;
+		if (script_grind.showClassOptions) then RunCombatDraw(); end
+		DrawText("_____________________", x, y-12, r+255, g+255, b);
+		DrawText('Vendor - ' .. script_vendorMenu:getInfo(), x, y, r+255, g+255, b+0); y = y + 15;
+		DrawText('Vendor Status: ', x, y, r+255, g+255, b+0);
+		DrawText(script_vendor:getMessage(), x+105, y, 0, 255, 255);
 end
 
 --run setup
 function _quest:setup()
 
+	script_vendor:setup();
+	vendorDB:setup();
+	vendorDB:loadDBVendors();
 
 self.isSetup = true;
-end
-
--- menu items to draw in window() function
-function _quest:menu()
-
-	if (not self.pause) then
-		if (Button("Pause Bot")) then
-			script_paranoia.currentTime = GetTimeEX() + (45*1000);
-			self.pause = true;
-		end
-	else
-		if (Button("Resume Bot")) then
-			script_grind.myTime = GetTimeEX();
-			script_paranoia.currentTime = GetTimeEX() + (45*1000);
-			self.pause = false;
-		end
-	end
-
-	SameLine();
-	if (Button("Reload Scripts")) then
-		if (coremenu:reload()) then
-			coremenu:reload();
-		end
-
-		self.isSetup = false;
-	end
-
-	SameLine();
-	if (Button("Exit Bot")) then
-		StopBot();
-	end
-
-	SameLine();
-	Text(""..GetTimeStamp());
-
-	local class = UnitClass("player");
-	if (class == 'Mage') then
-		script_mageEX:menu();
-	elseif (class == 'Hunter') then
-		script_hunterEX:menu();
-	elseif (class == 'Rogue') then
-		script_rogueEX:menu();
-	elseif (class == 'Druid') then
-		script_druidEX:menu();
-	elseif (class == 'Warlock') then
-		wasClicked, script_grindMenu.useOtherWarlockScript = Checkbox("Use Warlock 2", script_grindMenu.useOtherWarlockScript);
-		if (not script_grindMenu.useOtherWarlockScript) then
-			script_warlockEX:menu();
-		elseif (script_grindMenu.useOtherWarlockScript) then
-			script_warlock2:menu();
-		end
-	elseif (class == 'Priest') then
-		script_priestMenu:menu();
-	elseif (class == 'Warrior') then
-		script_warriorEX:menu();
-	elseif (class == 'Paladin') then
-		script_paladinEX:menu();
-	elseif (class == 'Shaman') then
-		script_shamanEX:menu();
-	end
-	
-	if (CollapsingHeader("Quest Options")) then
-	
-		
-	end
-
-	script_miscMenu:menu();
-
-	script_lootMenu:menu();
-	
-	script_gatherMenu:menu();
-
-	script_displayOptionsMenu:menu();
-
-	if (CollapsingHeader("Trainers and Flight Path Options")) then
-		wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
-		wasClicked, script_grind.useFPS = Checkbox("Use Flight Paths (level 20 areas and under)", script_grind.useFPS);
-		
-	end
-
-	if (script_grindMenu.debugMenu) then
-		script_debugMenu:menu();
-	end
-
-	script_counterMenu:menu();
 end
 
 -- run the quester
@@ -169,6 +110,16 @@ function _quest:run()
 	-- draw the window
 	_quest:window();
 
+	if (not IsUsingNavmesh()) then UseNavmesh(true);
+		return true;
+	end
+	if (GetLoadNavmeshProgress() ~= 1) then
+		self.message = "Loading Nav Mesh! Please Wait!";
+		self.currentDebugStatus = "Loading Nav";
+		return;
+	end
+
+	-- return if we pause bot
 	if (self.pause) then
 		return;
 	end
@@ -176,20 +127,30 @@ function _quest:run()
 	-- run setup function once
 	if (not self.isSetup) then
 		_quest:setup();
+		self.currentDebugStatus = "Running Setup";
 	end
 
+	-- handle vendor stuff through vendor scripts
+	if (not IsInCombat()) then
+		local vendorStatus = script_vendor:getStatus();
+		if (vendorStatus > 1) then
+			_questHandleVendor:vendor();
+			return;
+		end
+	end
+
+	-- do something
 	if (GetTarget() ~= nil and GetTarget() ~= 0) and (not GetTarget():IsDead()) and (GetTarget():CanAttack()) then
 		RunCombatScript(GetTarget():GetGUID());
+		self.currentDebugStatus = "Running combat script";
 		if (GetTarget() ~= 0 and GetTarget() ~= nil and GetTarget():GetDistance() > script_grind.combatScriptRange) then
 			local x, y, z = GetTarget():GetPosition();
 			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+			self.currentDebugStatus = "Moving to target";
 			return true;
 		end
 	return true;
-	end
-
-	
-
+	end	
 
 end
 
@@ -199,29 +160,6 @@ function _quest:addQuestToDB()
 end
 function _quest:runGather()
 end
-function _quest:getItemToGather()
-	local i, t = GetFirstObject();
-	local bestDist = 9999;
-	local bestTarget = nil;
-	while i ~= 0 do
-		if (t == 5) then
-			if (ItemIsItemIDOfQuest) then
-			local dist = i:GetDistance();
-				if( dist < someRange and bestDist > dist) then
-					local _x, _y, _z = i:GetPosition();
-					if (not IsNodeBlacklisted(_x, _y, _z, 5)) then
-						bestDist = dist;
-						bestTarget = targetObj;
-						return i:GetGUID();
-					end
-				end
-			end
-		end
-		i, t = GetNextObject(i);
-	end
-
-end
-
 function _quest:getQuestArea()
 end
 function _quest:getQuestTarget()
