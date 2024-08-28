@@ -34,7 +34,6 @@ function script_grindEX:returnTargetNearMyAggroRange()
 	local i, t = GetFirstObject();
 	local mx, my, mz = GetLocalPlayer():GetPosition();
 	local tx, ty, tz = 0, 0, 0;
-
 	while i ~= 0 do
 		if t == 3 then
 			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() and not script_grindEX:isTargetAggroBlacklisted(i:GetGUID()) then
@@ -196,7 +195,7 @@ function script_grindEX:doChecks()
 			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) and (HasSpell("Bear Form")) and (not script_grindEX:areWeSwimming()) then
 				if (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 					script_druidEX2:catForm();
-				elseif (HasSpell("Travel Form")) and (GetTimeEX() > self.tryTravelFormTimer) then
+				elseif (HasSpell("Travel Form")) and (not localObj:HasBuff("Cat Form")) and (GetTimeEX() > self.tryTravelFormTimer) then
 					script_druidEX:travelForm();
 					self.tryTravelFormTimer = GetTimeEX() + 5000;
 				end

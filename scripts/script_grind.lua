@@ -893,7 +893,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 
 
 	-- do paranoia
-	if (not localObj:IsDead()) and (not script_getSpells:cityZones()) and (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) and (GetLocalPlayer():GetHealthPercentage() >= 1 and not GetLocalPlayer():IsDead()) then	
+	if (not GetLocalPlayer():IsDead() and GetLocalPlayer():GetHealthPercentage() >= 1) and (not script_getSpells:cityZones()) and (self.hotspotReached and script_nav:getDistanceToHotspot() <= self.distToHotSpot) and (not IsLooting()) and (not IsInCombat()) and (not IsMounted()) and (not IsCasting()) and (not IsChanneling()) and (script_grind.playerName ~= "Unknown") and (script_grind.otherName ~= "Unknown") and (script_vendor:getStatus() == 0) and ( (self.getSpells and script_getSpells.getSpellsStatus == 0) or not self.getSpells) then	
 				-- set paranoid used as true
 		if (script_paranoia:checkParanoia()) and (not self.pause) then
 				script_paranoia.paranoiaUsed = true;
@@ -1077,7 +1077,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 					self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 				end
 			
-			else
+			elseif (self.enemyObj == nil or self.enemyObj == 0) then
 			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
@@ -1387,7 +1387,9 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 
 			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) then
 				self.enemyObj = script_grind:assignTarget();
-				self.lastTarget = self.enemyObj:GetGUID();
+				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+					self.lastTarget = self.enemyObj:GetGUID();
+				end
 			end
 					
 
@@ -1619,7 +1621,7 @@ if (not IsAutoCasting("Attack")) then
 				end
 		
 				-- use travel form function
-				if (HasSpell("Travel Form")) then
+				if (HasSpell("Travel Form")) and (not localObj:HasBuff("Cat Form")) then
 					if (script_druidEX:travelForm()) then
 						--script_grind:setWaitTimer(2500);
 						script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
@@ -1853,6 +1855,22 @@ function script_grind:assignTarget()
 		end
 	-- get next target
 	i, targetType = GetNextObject(i);	
+	end
+
+	-- get the target with the lowest health attacking us
+	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
+		local i, t = GetFirstObject()
+		while i ~= 0 do
+			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+				local hp = i:GetHealthPercentage();
+				local bestHP = 1;
+				if bestHP < hp then
+					bestHP = hp;
+					return i;
+				end
+			end
+		i, t = GetNextObject(i);
+		end
 	end
 
 	-- Find the closest valid target if we have no target or we are not in combat

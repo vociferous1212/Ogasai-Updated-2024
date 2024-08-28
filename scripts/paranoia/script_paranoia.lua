@@ -44,6 +44,10 @@ function script_paranoia:checkParanoia()
 		end
 	end
 
+	if (localObj:IsDead()) then
+		return false;
+	end
+
 	-- don't allow sitting when paranoia range is too low
 	if (script_grind.paranoidRange <= 200) then
 		script_paranoia.sitParanoid = false;
