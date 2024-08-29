@@ -210,13 +210,28 @@ script_grind = {
 	eatHealth = 50,
 	drinkMana = 50,
 	autoAttackActionSlot = 0,
+	targetHasRangedWeaponTable = {},
+	targetHasRangedWeaponTableNum = 0,
 }
 
-
+-- ogasai target has ranged weapon doesn't work properly to detect when a ranged weapon is in use...
 function TargetHasRangedWeapon(target)
+	-- these are the GetCasting() spell IDs
+	local castingTable = {[6660] = true};
 	if target ~= nil and target ~= 0 then
-		if target:GetCasting() == 6660 then
-			return true;
+		for i=0,script_grind.targetHasRangedWeaponTableNum do
+			-- check if target is already known to have ranged weapon then return true
+			if (target:GetGUID() == script_grind.targetHasRangedWeaponTable[i]) then
+				return true;
+			end
+			-- if not target is known to have ranged weapon then add to table and return true
+			if (target:GetGUID() ~= script_grind.targetHasRangedWeaponTable[i]) then
+				if castingTable[target:GetCasting()] or (target:IsCasting()) then
+					script_grind.targetHasRangedWeaponTable[script_grind.targetHasRangedWeaponTableNum] = target:GetGUID();
+					script_grind.targetHasRangedWeaponTableNum = script_grind.targetHasRangedWeaponTableNum + 1;
+					return true;
+				end
+			end
 		end
 	end
 return false;
@@ -855,6 +870,9 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 		end
 	end
 
+	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
+		TargetHasRangedWeapon(target);
+	end
 		
 	-- check party members
 	if (GetNumPartyMembers() >= 1) then
@@ -1161,8 +1179,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 				self.lastTarget = self.enemyObj:GetGUID();
 			end
 
-		-- get the lowest health target in combat with us
-
+			-- get the lowest health target in combat with us
 			local i, t = GetFirstObject();
 			while i ~= 0 do
 				if t == 3 and not i:IsCritter() and not i:IsDead() and i:GetHealthPercentage() >= 1 and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 and self.enemyObj ~= 0 and self.enemyObj ~= nil and not self.enemyObj:IsDead() then
@@ -1178,6 +1195,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 			i, t = GetNextObject(i);
 			end
 		end
+
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) then
 			self.enemyObj = script_grind:assignTarget();
@@ -1199,6 +1217,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 					self.attackTimer = GetTimeEX() + 5000;
 				end
 			end
+
 			-- Fix bug, when not targeting correctly
 			if (self.lastTarget ~= self.enemyObj:GetGUID()) then
 				if (not IsMoving()) then

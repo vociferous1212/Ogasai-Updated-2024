@@ -13,7 +13,7 @@ function script_checkAdds:checkAdds()
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
 	if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and (not IsCasting()) then
-		if(script_grind:enemiesWithinRange() <= 3) and (script_grind.enemyObj:GetHealthPercentage() >= 25) then
+		if(script_grind:enemiesWithinRange() <= 3) and (script_grind.enemyObj:GetHealthPercentage() >= 25) and (not TargetHasRangedWeapon(script_grind.enemyObj)) then
 			if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 	
 				-- use unstuck script
