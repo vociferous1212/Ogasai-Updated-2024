@@ -1,59 +1,3 @@
---GetQuestItemLink - Returns an itemLink for a quest reward item.
---itemLink = GetQuestItemLink("type", index);
-
---GetQuestLogItemLink
---itemLink = GetQuestLogItemLink("type", index);
-
---AcceptQuest - Accept the specified quest.
---AcceptQuest()
-
---CompleteQuest - Complete the specified quest.
---CompleteQuest();
-
---GetNumQuestChoices - Returns the number of rewards for a completed quest.
---num = GetNumQuestChoices();
-
---GetNumQuestItems - Returns the number of items nessecary to complete a particular quest.
---GetNumQuestItems();
-
---GetNumQuestLeaderBoards([questIndex])   - Returns the number of available quest objectives.
---local numQuestLogLeaderBoards = GetNumQuestLeaderBoards([questID])
-
---GetNumQuestLogChoices - Returns the number of options someone has when getting a quest item.
---GetNumQuestLogChoices();
-
---GetNumQuestLogEntries - Returns the number of entries in the quest log.
---numEntries, numQuests = GetNumQuestLogEntries();
-
---GetNumQuestLogRewards - Returns the count of the rewards for a particular quest.
---GetNumQuestLogRewards();
-
---GetProgressText()
---GetProgressText();
-
---GetQuestGreenRange()   - Return for how many levels below you quests and mobs remain "green" (i.e. yield xp)
---
-
---GetQuestIndexForTimer - ?.
---
-
---GetQuestItemInfo - Returns basic information about the quest items.
---
-
---GetQuestItemLink - Returns an itemLink for a quest reward item.
---
-
---GetQuestLogChoiceInfo - Returns a bunch of data about a quest reward choice from the quest log.
---GetQuestLogItemLink - ?.
---GetQuestLogLeaderBoard(ldrIndex[, questIndex])   - Gets information about the objectives for a quest.
---GetQuestLogQuestText - Returns the description and objectives required for the specified quest.
---GetQuestLogRewardInfo - Returns a pile of reward item info.
-
---GetQuestLogTitle - Returns the string which is associated with the specific QuestLog Title in the game.
---GetTitleText - Retrieves the title of the quest while talking to the NPC about it.
---IsQuestCompletable - Returns true if a quest is possible to complete.
---IsUnitOnQuest(questIndex, "unit")   - Determine if the specified unit is on the given quest.
-
 _quest = {
 
 	message = "Quester",
@@ -62,6 +6,8 @@ _quest = {
 	currentDebugStatus = "Nothing",
 	waitTimer = 0,
 	tickRate = 500,
+	currentQuest = nil,
+	enemyTarget = nil,
 
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
@@ -164,6 +110,8 @@ function _quest:setup()
 	script_vendor:setup();
 	vendorDB:setup();
 	vendorDB:loadDBVendors();
+	_questDB:setup();
+
 
 	self.waitTimer = GetTimeEX();
 
@@ -209,37 +157,126 @@ function _quest:run()
 		end
 	end
 
+	local px, py, pz = GetLocalPlayer():GetPosition();
+	local curQuestGiver = _questDB:getQuestGiverName();
+	local curQuestName = _questDB:getQuestName();
+	local curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos();
+	local curGrindX, curGrindY, curGrindZ = _questDB:getQuestGrindPos();
+	local distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ);
+	local distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ);
 
 
+	-- set our current quest
+	for i=0, GetNumQuestLogEntries() do
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
+		if (curQuestName == title) then
+			self.currentQuest = curQuestName;
+		end
+	end
 
+	if (not IsInCombat()) then
+		script_grind.lootObj = script_nav:getLootTarget(50);
+		if (script_grind.lootObj ~= nil) then
+			if (script_grind.lootObj:GetDistance() <= 4) then
+				if (IsMoving()) then
+					StopMoving();
+					return true;
+				end
+			end
+			if (script_grind:doLoot(GetLocalPlayer())) then
+				self.waitTimer = GetTimeEX() + 1500;
+				return true;
+			end
+		return;
+		end
+	end
 
-
-	-- do something
-	if (GetTarget() ~= nil and GetTarget() ~= 0) and (not GetTarget():IsDead()) and (GetTarget():CanAttack()) then
-		RunCombatScript(GetTarget():GetGUID());
-		self.currentDebugStatus = "Running combat script";
-		if (GetTarget() ~= 0 and GetTarget() ~= nil and GetTarget():GetDistance() > script_grind.combatScriptRange) then
-			local x, y, z = GetTarget():GetPosition();
+	if (self.currentQuest ~= nil) then
+		local x, y, z = 0, 0, 0;
+		for i=0, _questDB.numQuests do
+			if self.currentQuest == _questDB.questList[i]['questName'] then
+				if _questDB.questList[i]['type'] == 0 then
+					x, y, z = _questDB:getReturnTargetPos();
+				end
+			end
+		end
+		if (GetDistance3D(px, py, pz, x, y, z) <= 4) then
+			local name = _questDB:getReturnTargetName();
+			TargetByName(name);
+			name = GetTarget();
+			if (GetTarget():UnitInteract()) then
+				self.waitTimer = GetTimeEX() + 2000;
+			end
+		end
+		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
 			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
-			self.currentDebugStatus = "Moving to target";
 			return true;
 		end
-	return true;
+	end
+		
+
+	-- run combat on good targets
+	if (self.enemyTarget ~= nil) or (IsInCombat()) then
+		if (PlayerHasTarget()) then
+			self.enemyTarget = GetTarget();
+		end
+		if (self.enemyTarget:IsDead()) then
+			self.enemyTarget = nil;
+		end
+		
+		-- do something
+		if self.enemyTarget ~= nil then
+			if not self.enemyTarget:IsDead() and self.enemyTarget:CanAttack() then
+				RunCombatScript(self.enemyTarget:GetGUID());
+				self.currentDebugStatus = "Running combat script";
+				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange) then
+					local x, y, z = self.enemyTarget:GetPosition();
+					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+					self.currentDebugStatus = "Moving to target";
+					return;
+				end
+			end
+		return true;
+		end
+	end
+
+	-- we have a quest so go to grind spot
+	if (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) then
+		script_navEX:moveToTarget(GetLocalPlayer(), curGrindX, curGrindY, curGrindZ);
+	end
+
+	-- move to quest giver
+	if (distToGiver > 4) and (self.currentQuest == nil) then
+		script_navEX:moveToTarget(GetLocalPlayer(), curQuestX, curQuestY, curQuestZ);
+	end
+	
+	-- interact with quest givers
+	if (distToGiver <= 4) and (self.currentQuest == nil) then
+		if curQuestGiver ~= nil then
+			TargetByName(curQuestGiver);
+			self.waitTimer = GetTimeEX() + 2000;
+			curQuestGiver = GetTarget();
+			local test = 0;
+			if (GetTarget():UnitInteract()) then
+				GetTarget():UnitInteract();
+				self.waitTimer = GetTimeEX() + 2000;
+				--for i=0, 5 do
+					--if curQuestName == GetGossipAvailableQuests() then
+					--	test = i;
+					--end
+				--end
+					
+				SelectGossipAvailableQuest(1);
+					AcceptQuest(1);
+
+			
+
+			end	
+		end
+	end
+	
+-- get a target
+	if (distToGrind <= 50) and (self.enemyTarget == nil) then
+		self.enemyTarget = _questDB:getTarget();
 	end	
-
-end
-
-function _quest:getQuestFromDB()
-end
-function _quest:addQuestToDB()
-end
-function _quest:runGather()
-end
-function _quest:getQuestArea()
-end
-function _quest:getQuestTarget()
-end
-function _quest:checkCurrentQuestStatus()
-end
-function _quest:checkInventoryItems()
 end
