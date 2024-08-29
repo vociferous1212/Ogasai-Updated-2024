@@ -259,6 +259,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 		end
 		return 4;
 	end
+	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
+		TargetHasRangedWeapon(target);
+	end
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then

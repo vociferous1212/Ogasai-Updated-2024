@@ -487,7 +487,7 @@ function script_druid:healsAndBuffs()
 			if (localHealth <= self.healingTouchHealth) and (localMana >= 25) and (not IsSpellOnCD("Healing Touch")) then
 				if (not IsCasting()) and (not IsChanneling()) then
 					if (not CastHeal("Healing Touch", localObj)) then
-						self.waitTimer = GetTimeEX() + 3000;
+						self.waitTimer = GetTimeEX() + 5000;
 						script_grind:setWaitTimer(3000);
 						return true;
 					end
@@ -669,6 +669,10 @@ function script_druid:run(targetGUID)
 		end
 	end 
 
+	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
+		TargetHasRangedWeapon(target);
+	end
+
 	-- stuck casting maul no auto attack on?
 	if (IsInCombat()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsBearForm())
 		and (IsCasting()) or (IsChanneling()) and (not IsAutoCasting("Attack")) then
@@ -742,19 +746,25 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
--- use charge in bear form
+		-- use charge in bear form
 		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 10) then
 				targetObj:FaceTarget();
 				script_druidEX:castCharge();
 			end
 
--- check melee distance
+			-- keep faerie fire up
+			if not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and (IsBearForm() or IsCatForm()) then
+				CastSpellByName("Faerie Fire (Feral)()");
+				targetObj:FaceTarget();
+			end
+
+			-- check melee distance
 			if (IsBearForm() or IsCatForm()) and (targetObj:GetDistance() > self.meleeDistance) then
 				return 3;
 			end
 
-
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
+			-- try to avoid adds in combat
+			if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
 						return true;
@@ -828,6 +838,15 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				JumpOrAscendStart();
 			end
 		end
+
+-- keep faerie fire up
+			if not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+				if HasSpell("Faerie Fire (Feral)") then
+					CastSpellByName("Faerie Fire (Feral)()");
+					targetObj:FaceTarget();
+					return 0;
+				end
+			end
 
 -- use charge in bear form
 		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 10) then
@@ -964,7 +983,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if not self.useStealth and targetObj:GetDistance() <= 30 then
+			if not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					targetObj:FaceTarget();
@@ -999,7 +1018,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") then
+			if not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				CastSpellByName("Faerie Fire (Feral)()");
 				targetObj:FaceTarget();
 				return 0;
@@ -1078,7 +1097,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") then
+			if not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				CastSpellByName("Faerie Fire (Feral)()");
 				targetObj:FaceTarget();
 				return 0;
@@ -1144,7 +1163,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	-- or level less than 10
 			----
 
-		if (not IsBearForm() and not IsCatForm()) or (isMoonkin) then
+		if (not IsBearForm() and not IsCatForm()) or (isMoonkin) and (not self.useBear and not self.useCat) then
 
 			-- move into line of sight
 			if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) and (localMana >= self.drinkMana) and (PlayerHasTarget())and (not IsInCombat()) then

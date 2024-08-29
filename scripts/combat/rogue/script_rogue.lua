@@ -251,6 +251,10 @@ function script_rogue:run(targetGUID)
 	if(targetObj == 0 or targetObj == nil) then
 		return 2;
 	end
+
+	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
+		TargetHasRangedWeapon(target);
+	end
 	
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then

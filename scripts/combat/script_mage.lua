@@ -113,9 +113,6 @@ function script_mage:isAddPolymorphed() -- check polymorph
 		if typeObj == 3 then
 			if (currentObj:HasDebuff("Polymorph")) then 
 				return true; 
-			else
-				script_mage.addPolymorphed = false;
-				return false;
 			end
 		end
 		currentObj, typeObj = GetNextObject(currentObj); 
@@ -671,7 +668,7 @@ function script_mage:run(targetGUID)
 
 			-- Check: Sort target selection if add is polymorphed
 			if (self.addPolymorphed) then
-				if(script_grind:enemiesAttackingUs(5) >= 1 and targetObj:HasDebuff('Polymorph')) then
+				if(script_grind:enemiesAttackingUs() >= 1 and targetObj:HasDebuff('Polymorph')) then
 					ClearTarget();
 					script_grind.tickRate = 250;
 					targetObj = script_mage:getTargetNotPolymorphed();
