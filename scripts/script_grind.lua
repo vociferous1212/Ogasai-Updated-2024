@@ -1077,7 +1077,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 					self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 				end
 			
-			elseif (self.enemyObj == nil or self.enemyObj == 0) then
+			elseif (script_grindEX:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) then
 			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
