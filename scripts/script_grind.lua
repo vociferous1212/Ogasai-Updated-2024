@@ -212,6 +212,8 @@ script_grind = {
 	autoAttackActionSlot = 0,
 	targetHasRangedWeaponTable = {},
 	targetHasRangedWeaponTableNum = 0,
+	autoBlacklistTimer = 0,
+	autoBlacklistTimerSet = false,
 }
 
 -- ogasai target has ranged weapon doesn't work properly to detect when a ranged weapon is in use...
@@ -439,6 +441,7 @@ function script_grind:setup()
 	script_nav.timer = GetTimeEX();
 	script_navEXCombat.timer = GetTimeEX();
 	script_grindEX.tryTravelFormTimer = GetTimeEX();
+	self.autoBlacklistTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -1091,11 +1094,11 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 
 
 			if (not IsStealth()) and (script_gather.safeGather) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
-				if (self.enemyObj == nil or self.enemyObj == 0 and not IsInCombat()) then
+				if (not IsStealth()) and (self.enemyObj == nil or self.enemyObj == 0 and not IsInCombat()) then
 					self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 				end
 			
-			elseif (script_grindEX:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) then
+			elseif (script_grindEX:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) or (IsStealth()) then
 			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...
@@ -1322,7 +1325,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 
 		-- Finish loot before we engage new targets or navigate - return
 		if (self.lootObj ~= nil and self.lootObj ~= 0 and (not IsInCombat() or script_grind:enemiesAttackingUs() ==0)) then
-			return; 
+			return;
 		else
 
 			-- blacklist loot message
@@ -1552,6 +1555,19 @@ if (not IsAutoCasting("Attack")) then
 					--	Move(_x, _y, _z);
 					--	return;
 					--end
+					if (IsMoving()) or (IsInCombat()) then
+						self.autoBlacklistTimer = GetTimeEX() - GetTimeEX();
+						self.autoBlacklistTimerSet = false;
+					end
+					if (not IsInCombat()) and (not IsMoving()) and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
+						self.autoBlacklistTimerSet = false;
+						script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
+						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting "..self.enemyObj:GetUnitName()..", "..math.floor(self.enemyObj:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
+					end
+					if (not IsInCombat()) and (not IsMoving()) and (not self.autoBlacklistTimerSet) then
+						self.autoBlacklistTimerSet = true;
+						self.autoBlacklistTimer = GetTimeEX() + 10000;
+					end
 					
 					-- set wait timer to move clicks
 					--if (IsMoving()) then
