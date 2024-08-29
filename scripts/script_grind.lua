@@ -1153,27 +1153,30 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 				self.lastTarget = self.enemyObj:GetGUID();
 			end
 		end
+	
+		-- force enemy obj var
 		if (IsInCombat()) then
 			if (PlayerHasTarget()) then
 				self.enemyObj = GetLocalPlayer():GetUnitsTarget();
 				self.lastTarget = self.enemyObj:GetGUID();
 			end
-			--local bestHP = 0;
-			--local i, t = GetFirstObject();
-			--while i ~= 0 do
-			--	if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 then
-			--		local hp = i:GetHealthPercentage();
-			--		if bestHP > hp then
-			--			bestHP = hp;
-			--
-			--			if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID()) then
-			--				self.enemyObj = i;
-			--				self.lastTarget = i:GetGUID();
-			--			end
-			--		end
-			--	end
-			--i, t = GetNextObject(i);
-			--end
+
+		-- get the lowest health target in combat with us
+
+			local i, t = GetFirstObject();
+			while i ~= 0 do
+				if t == 3 and not i:IsCritter() and not i:IsDead() and i:GetHealthPercentage() >= 1 and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 and self.enemyObj ~= 0 and self.enemyObj ~= nil and not self.enemyObj:IsDead() then
+					local hp = script_grind.enemyObj:GetHealthPercentage();
+					local ihp = i:GetHealthPercentage();
+					if (ihp < hp) then
+						if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID()) then
+							self.enemyObj = i;
+							self.lastTarget = i:GetGUID();
+						end
+					end
+				end
+			i, t = GetNextObject(i);
+			end
 		end
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) then
