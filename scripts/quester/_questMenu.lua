@@ -5,6 +5,8 @@ _questMenu = { addSetupFile = include("scripts\\db\\_questDBSetup.lua");
 function _questMenu:menu()
 
 	local wasClicked = false;
+	
+	Text("You may have to run grinder once to load mmaps...");
 
 	if (not _quest.pause) then
 		if (Button("Pause Bot")) then
@@ -66,6 +68,12 @@ function _questMenu:menu()
 
 	if (CollapsingHeader("Quest Options")) then
 		Text("Options:"); SameLine(); Text("Gather DB Stuff");
+		Text("");
+		Text("you might have to push it a few times... bug...");
+		if (Button("Mark Current Quest As Complete")) then
+			_questDB:turnQuestCompleted()	
+		end
+
 		_questDBSetup:menu();
 
 		if (Button("Add To DB")) then

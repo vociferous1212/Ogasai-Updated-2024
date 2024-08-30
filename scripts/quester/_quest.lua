@@ -5,9 +5,11 @@ _quest = {
 	isSetup = false,
 	currentDebugStatus = "Nothing",
 	waitTimer = 0,
-	tickRate = 500,
+	tickRate = 1500,
 	currentQuest = nil,
 	enemyTarget = nil,
+	targetKilledNum = 0,
+	isQuestComplete = false,
 
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
@@ -68,7 +70,9 @@ _quest = {
 	questerGetItemToGatherIncluded = include("scripts\\quester\\_questGetItemToGather.lua"),
 	questerHandleVendorIncluded = include("scripts\\quester\\_questHandleVendor.lua"),
 	questerDBIncluded = include("scripts\\db\\_questDB.lua"),
-
+	questerDBTargetsIncluded = include("scripts\\db\\_questDBTargets.lua"),
+	questerDBReturnQuestIncluded = include("scripts\\db\\_questDBReturnQuest.lua"),
+	questerEXIncluded = include("scripts\\quester\\_questEX.lua"),
 }
 
 -- for some reason the .dll requires it to be named draw() without an error...
@@ -145,6 +149,7 @@ function _quest:run()
 	-- run setup function once
 	if (not self.isSetup) then
 		_quest:setup();
+		_questDB:setup();
 		self.currentDebugStatus = "Running Setup";
 	end
 
@@ -157,6 +162,11 @@ function _quest:run()
 		end
 	end
 
+	if _questEX:doChecks() then
+		return;
+	end
+
+
 	local px, py, pz = GetLocalPlayer():GetPosition();
 	local curQuestGiver = _questDB:getQuestGiverName();
 	local curQuestName = _questDB:getQuestName();
@@ -165,69 +175,83 @@ function _quest:run()
 	local distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ);
 	local distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ);
 
+	if curQuestX == 0 then
+		self.message = "No quest!";
+	end
 
 	-- set our current quest
 	for i=0, GetNumQuestLogEntries() do
 		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
 		if (curQuestName == title) then
-			self.currentQuest = curQuestName;
+			self.currentQuest = title;
 		end
 	end
 
-	if (not IsInCombat()) then
-		script_grind.lootObj = script_nav:getLootTarget(50);
-		if (script_grind.lootObj ~= nil) then
-			if (script_grind.lootObj:GetDistance() <= 4) then
-				if (IsMoving()) then
-					StopMoving();
-					return true;
-				end
-			end
-			if (script_grind:doLoot(GetLocalPlayer())) then
-				self.waitTimer = GetTimeEX() + 1500;
-				return true;
-			end
-		return;
-		end
-	end
-
-	-- return a quest
-	if (self.currentQuest ~= nil) then
-		local x, y, z = 0, 0, 0;
-		for i=0, _questDB.numQuests do
+	-- check quest for completion
+	if self.currentQuest ~= nil and (not IsInCombat()) then
+		for i=0, _questDB.numQuests -1 do
+			if _questDB.questList[i]['completed'] ~= "nnil" then
 			if self.currentQuest == _questDB.questList[i]['questName'] then
 				if _questDB.questList[i]['type'] == 0 then
-					x, y, z = _questDB:getReturnTargetPos();
+					self.isQuestComplete = true;
 				end
+				if _questDB.questList[i]['type'] == 1 then
+					if _questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] == 0 then
+						if self.targetKilledNum >= _questDB.questList[i]['numKill'] then
+							self.isQuestComplete = true;
+						end
+					end
+				end
+				--if _questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] ~= 0 then
+				--if _questDB.questList[i]['numKill'] == self.targetKilledNum and _questDB.questList[i]['numKill2'] == self.targetKilledNum2 then
+				--end
+				--if _questDB.questList[i]['gatherName'] ~= 0 and _questDB.questList[i]['gatherName2'] == 0 then
+				-- if _questDB.questList[i]['numGather'] == self.targetGatherNum then
+				--end
+				--if _questDB.questList[i]['gatherName'] ~= 0 and _questDB.questList[i]['gatherName2'] ~= 0 then
+				-- if _questDB.questList[i]['numGather'] == self.targetGatherNum and _questDB.questList[i]['numGather2'] == self.targetGatherNum2 then	
+				--end
+			
 			end
-		end
-		if (GetDistance3D(px, py, pz, x, y, z) <= 4) then
-			local name = _questDB:getReturnTargetName();
-			TargetByName(name);
-			name = GetTarget();
-			if (GetTarget():UnitInteract()) then
-				self.waitTimer = GetTimeEX() + 2000;
-			end
-		end
-		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
-			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
-			return true;
+			end	
 		end
 	end
-		
+
+	if self.currentQuest ~= nil and self.isQuestComplete then
+		if _questDBReturnQuest:returnAQuest() then
+			self.message = "Returning quest!";
+			return;
+		end
+	end
 
 	-- run combat on good targets
-	if (self.enemyTarget ~= nil) or (IsInCombat()) then
+	if (self.enemyTarget ~= nil and self.enemyTarget ~= 0) or (IsInCombat()) then
+		-- get a target if we have none
 		if (PlayerHasTarget()) then
 			self.enemyTarget = GetTarget();
 		end
-		if (self.enemyTarget:IsDead()) then
+		-- if target is a quest target then count +1
+		if _quest.currentQuest ~= 0 then
+			for i=0, _questDB.numQuests -1 do
+				if _quest.currentQuest == _questDB.questList[i]['questName'] then
+					if self.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName'] or self.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2'] then
+						if self.enemyTarget:IsDead() and not _questDBTargets:isTargetAddedToKilledTable(self.enemyTarget:GetGUID()) then
+							_questDBTargets:addTargetToKilledTable(self.enemyTarget:GetGUID());
+							self.targetKilledNum = self.targetKilledNum + 1;
+						end
+					end
+				end
+			end
+		end
+		-- if target is dead then clear enemytarget var
+		if (self.enemyTarget ~= nil and self.enemyTarget ~= 0) and (self.enemyTarget:IsDead()) then
 			self.enemyTarget = nil;
 		end
 		
 		-- do something
-		if self.enemyTarget ~= nil then
+		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
 			if not self.enemyTarget:IsDead() and self.enemyTarget:CanAttack() then
+				self.message = "Running Combat";
 				RunCombatScript(self.enemyTarget:GetGUID());
 				self.currentDebugStatus = "Running combat script";
 				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange) then
@@ -239,14 +263,17 @@ function _quest:run()
 			end
 		return true;
 		end
+	
 	end
 
 	-- we have a quest so go to grind spot
-	if (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) then
+	if (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
+		self.message = "Moving to grind spot";
 		script_navEX:moveToTarget(GetLocalPlayer(), curGrindX, curGrindY, curGrindZ);
+		return true;
 	end
 
-	-- move to quest giver
+	-- move to quest giver to get quest
 	if (distToGiver > 4) and (self.currentQuest == nil) then
 		script_navEX:moveToTarget(GetLocalPlayer(), curQuestX, curQuestY, curQuestZ);
 self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
@@ -258,27 +285,23 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			TargetByName(curQuestGiver);
 			self.waitTimer = GetTimeEX() + 2000;
 			curQuestGiver = GetTarget();
-			local test = 0;
-			if (GetTarget():UnitInteract()) then
-				GetTarget():UnitInteract();
-				self.waitTimer = GetTimeEX() + 2000;
-				--for i=0, 5 do
-					--if curQuestName == GetGossipAvailableQuests() then
-					--	test = i;
-					--end
-				--end
-					
-				SelectGossipAvailableQuest(1);
-					AcceptQuest(1);
-
-			
-
-			end	
+			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
+				if (GetTarget():UnitInteract()) then
+					GetTarget():UnitInteract();
+					self.waitTimer = GetTimeEX() + 2000;	
+					SelectGossipAvailableQuest(1);
+					if (AcceptQuest(1)) then
+						self.currentQuest = curQuestName;
+					end
+				end
+			end
 		end
 	end
 	
--- get a target
-	if (distToGrind <= 50) and (self.enemyTarget == nil) then
-		self.enemyTarget = _questDB:getTarget();
-	end	
+	-- get a target
+	if (self.currentQuest ~= nil) then
+		if (distToGrind <= 50) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
+			self.enemyTarget = _questDB:getTarget();
+		end
+	end
 end
