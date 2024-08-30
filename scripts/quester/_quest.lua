@@ -191,6 +191,7 @@ function _quest:run()
 		end
 	end
 
+	-- return a quest
 	if (self.currentQuest ~= nil) then
 		local x, y, z = 0, 0, 0;
 		for i=0, _questDB.numQuests do
@@ -248,6 +249,7 @@ function _quest:run()
 	-- move to quest giver
 	if (distToGiver > 4) and (self.currentQuest == nil) then
 		script_navEX:moveToTarget(GetLocalPlayer(), curQuestX, curQuestY, curQuestZ);
+self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 	end
 	
 	-- interact with quest givers

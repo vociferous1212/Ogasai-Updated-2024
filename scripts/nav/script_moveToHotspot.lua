@@ -33,7 +33,10 @@ function script_moveToHotspot:moveToHotspot(localObj)
 					CastStealth();
 				end
 				if (not script_druid.useBear) and (not HasForm()) then
-					script_druidEX:travelForm();
+					if (GetTimeEX() > script_grindEX.tryTravelFormTimer) then
+						script_druidEX:travelForm();
+						script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
+					end
 				end
 			end
 			--CastGhostWolf();

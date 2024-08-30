@@ -1,4 +1,5 @@
-_questMenu = {}
+_questMenu = { addSetupFile = include("scripts\\db\\_questDBSetup.lua");
+}
 
 -- menu items to draw in window() function
 function _questMenu:menu()
@@ -60,8 +61,19 @@ function _questMenu:menu()
 		script_shamanEX:menu();
 	end
 	
+--[[faction, quest name, quest giver name, quest giver pos, mapID, minLevel, maxLevel, grind pos, type, kill number, gather number, return pos, return target name, kill target 1, kill target 2, gather target 1, gather target 2, is completed ]]--
+
+
 	if (CollapsingHeader("Quest Options")) then
-		Text("Options:");
+		Text("Options:"); SameLine(); Text("Gather DB Stuff");
+		_questDBSetup:menu();
+
+		if (Button("Add To DB")) then
+			--ToFile(
+			--db:add(
+		end
+		
+				
 	end
 	if (CollapsingHeader("Quest Kill Options")) then
 		Text("Options:");
