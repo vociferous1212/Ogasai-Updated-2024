@@ -520,8 +520,13 @@ function script_druid:healsAndBuffs()
 		end
 
 		-- remove curse
-		if (HasSpell("Remove Curse")) and (script_checkDebuffs:hasCurse()) and (not IsMoving()) and (IsStanding()) and (not IsSpellOnCD("Remove Curse")) then
+		if (HasSpell("Remove Curse")) and (script_checkDebuffs:hasCurse()) and (IsStanding()) and (not IsSpellOnCD("Remove Curse")) then
 			if (localMana >= 30) then
+if (not IsInCombat()) then
+				if (HasForm()) then
+					RemoveForm();
+				end
+			end
 				if (PlayerHasTarget()) and (localObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
 					ClearTarget();
 				end
@@ -652,6 +657,31 @@ function script_druid:run(targetGUID)
 			end
 		end
 
+		-- check heals and buffs
+		if (not IsInCombat()) and (not HasForm()) then
+			if (script_druid:healsAndBuffs()) then
+				return true;
+			end
+		end
+		-- remove curse of thorns - causes A LOT of damage and can easily kill you... best to just force the bot to remove this specific one at all times
+		if (HasSpell("Remove Curse")) and (localObj:HasDebuff("Curse of Thorns")) and (IsStanding()) and (not IsSpellOnCD("Remove Curse")) then
+			if (localMana >= 30) then
+				if (not IsInCombat()) then
+					if (HasForm()) then
+						RemoveForm();
+					end
+				end
+			end
+			if (localMana >= 30) and (not HasForm()) then
+				if (PlayerHasTarget()) and (localObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
+					ClearTarget();
+				end
+				if (CastSpellByName("Remove Curse", localObj)) then
+					self.waitTimer = GetTimeEX() + 1750;
+					return true;
+				end
+			end
+		end
 
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
