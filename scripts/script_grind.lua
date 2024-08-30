@@ -386,6 +386,8 @@ function script_grind:setup()
 	-- navigation script loaded
 	script_nav:setup();
 
+	-- load check debuffs
+
 	-- safer min level for low level botting
 	if (GetLocalPlayer():GetLevel() < 20) then
 		script_grind.minLevel = GetLocalPlayer():GetLevel() - 3;
@@ -2540,8 +2542,9 @@ function script_grind:doLoot(localObj)
 			elseif (not IsMoving() or not IsPathLoaded(5)) then
 				
 				Move(_x, _y, _z);
-				self.message = "Cannot find a path to loot target "..self.lootObj:GetDistance()"";
-				
+				if (self.lootObj ~= nil and self.lootObj ~= 0) then
+					self.message = "Cannot find a path to loot target "..self.lootObj:GetDistance()"";
+				end
 				return true;
 			end
 		end

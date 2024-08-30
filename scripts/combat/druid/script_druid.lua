@@ -427,18 +427,20 @@ function script_druid:healsAndBuffs()
 	-- if not IsBearForm() and not IsCatForm() and not IsTravelForm()
 	if (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (not localObj:IsStunned()) and (not IsMounted()) and (not script_checkDebuffs:hasSilence()) then
 
-		-- Check: Use Healing Potion 
-		if (localHealth < self.potionHealth) then 
-			if (script_helper:useHealthPotion()) then 
-				return 0; 
-			end 
-		end
-
-		-- Check: Use Mana Potion 
-		if (localMana < self.potionMana) then 
-			if (script_helper:useManaPotion()) then 
-				return 0; 
-			end 
+		if (IsInCombat()) then
+			-- Check: Use Healing Potion 
+			if (localHealth < self.potionHealth) then 
+				if (script_helper:useHealthPotion()) then 
+					return 0; 
+				end 
+			end
+	
+			-- Check: Use Mana Potion 
+			if (localMana < self.potionMana) then 
+				if (script_helper:useManaPotion()) then 
+					return 0; 
+				end 
+			end
 		end
 
 		-- Regrowth
