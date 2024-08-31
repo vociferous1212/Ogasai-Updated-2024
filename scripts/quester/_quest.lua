@@ -5,11 +5,12 @@ _quest = {
 	isSetup = false,
 	currentDebugStatus = "Nothing",
 	waitTimer = 0,
-	tickRate = 1500,
+	tickRate = 500,
 	currentQuest = nil,
 	enemyTarget = nil,
 	targetKilledNum = 0,
 	isQuestComplete = false,
+	needRest = false,
 
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
@@ -73,6 +74,8 @@ _quest = {
 	questerDBTargetsIncluded = include("scripts\\db\\_questDBTargets.lua"),
 	questerDBReturnQuestIncluded = include("scripts\\db\\_questDBReturnQuest.lua"),
 	questerEXIncluded = include("scripts\\quester\\_questEX.lua"),
+	questerCheckQuestCompletionIncluded = include("scripts\\quester\\_questCheckQuestCompletion.lua"),
+
 }
 
 -- for some reason the .dll requires it to be named draw() without an error...
@@ -115,6 +118,7 @@ function _quest:setup()
 	vendorDB:setup();
 	vendorDB:loadDBVendors();
 	_questDB:setup();
+	script_helper:setup();
 
 
 	self.waitTimer = GetTimeEX();
@@ -166,6 +170,15 @@ function _quest:run()
 		return;
 	end
 
+	_questCheckQuestCompletion:checkQuestForCompletion();
+
+	if self.currentQuest ~= nil and self.isQuestComplete then
+		if _questDBReturnQuest:returnAQuest() then
+			self.message = "Returning quest!";
+			return;
+		end
+	end
+
 
 	local px, py, pz = GetLocalPlayer():GetPosition();
 	local curQuestGiver = _questDB:getQuestGiverName();
@@ -184,43 +197,6 @@ function _quest:run()
 		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
 		if (curQuestName == title) then
 			self.currentQuest = title;
-		end
-	end
-
-	-- check quest for completion
-	if self.currentQuest ~= nil and (not IsInCombat()) then
-		for i=0, _questDB.numQuests -1 do
-			if _questDB.questList[i]['completed'] ~= "nnil" then
-			if self.currentQuest == _questDB.questList[i]['questName'] then
-				if _questDB.questList[i]['type'] == 0 then
-					self.isQuestComplete = true;
-				end
-				if _questDB.questList[i]['type'] == 1 then
-					if _questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] == 0 then
-						if self.targetKilledNum >= _questDB.questList[i]['numKill'] then
-							self.isQuestComplete = true;
-						end
-					end
-				end
-				--if _questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] ~= 0 then
-				--if _questDB.questList[i]['numKill'] == self.targetKilledNum and _questDB.questList[i]['numKill2'] == self.targetKilledNum2 then
-				--end
-				--if _questDB.questList[i]['gatherName'] ~= 0 and _questDB.questList[i]['gatherName2'] == 0 then
-				-- if _questDB.questList[i]['numGather'] == self.targetGatherNum then
-				--end
-				--if _questDB.questList[i]['gatherName'] ~= 0 and _questDB.questList[i]['gatherName2'] ~= 0 then
-				-- if _questDB.questList[i]['numGather'] == self.targetGatherNum and _questDB.questList[i]['numGather2'] == self.targetGatherNum2 then	
-				--end
-			
-			end
-			end	
-		end
-	end
-
-	if self.currentQuest ~= nil and self.isQuestComplete then
-		if _questDBReturnQuest:returnAQuest() then
-			self.message = "Returning quest!";
-			return;
 		end
 	end
 
@@ -254,11 +230,11 @@ function _quest:run()
 				self.message = "Running Combat";
 				RunCombatScript(self.enemyTarget:GetGUID());
 				self.currentDebugStatus = "Running combat script";
-				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange) then
+				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange or not self.enemyTarget:IsInLineOfSight()) then
 					local x, y, z = self.enemyTarget:GetPosition();
 					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 					self.currentDebugStatus = "Moving to target";
-					return;
+					return true;
 				end
 			end
 		return true;
@@ -288,7 +264,7 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
 				if (GetTarget():UnitInteract()) then
 					GetTarget():UnitInteract();
-					self.waitTimer = GetTimeEX() + 2000;	
+					self.waitTimer = GetTimeEX() + 2000;
 					SelectGossipAvailableQuest(1);
 					if (AcceptQuest(1)) then
 						self.currentQuest = curQuestName;
@@ -304,4 +280,48 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			self.enemyTarget = _questDB:getTarget();
 		end
 	end
+end
+
+function _quest:runRest()
+
+		local localObj = GetLocalPlayer();
+		local localHealth = localObj:GetHealthPercentage();
+		local localMana = localObj:GetManaPercentage();
+
+		self.needRest = true;
+
+	-- run the rest script for grind/combat
+	if(RunRestScript()) then
+		
+		self.message = "Resting...";
+
+		-- Stop moving
+		if (IsMoving()) and (not localObj:IsMovementDisabed()) then
+			StopMoving();
+			return true;
+		end
+
+		-- not in combat and pet doesn't have target then stop to rest if needed
+		if (not IsInCombat()) and (not petHasTarget) then
+			if (IsEating() and localHealth < 95)
+				or (IsDrinking() and localMana < 95)
+			then
+				return true;
+			end
+		end
+	
+		-- if done resting then stand up
+		if (IsEating() and localHealth >= 95 and IsDrinking() and localMana >= 95) 
+		or (not IsDrinking() and IsEating() and localHealth >= 95)
+		or (not IsEating() and IsDrinking() and localMana >= 95)
+		then
+			if (not IsStanding()) then
+				JumpOrAscendStart();
+				return false;
+			end
+		end
+	return true;	
+	end
+self.needRest = false;
+return false;
 end

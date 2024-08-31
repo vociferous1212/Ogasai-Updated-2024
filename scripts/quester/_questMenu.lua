@@ -85,9 +85,12 @@ function _questMenu:menu()
 	end
 	if (CollapsingHeader("Quest Kill Options")) then
 		Text("Options:");
+		Text("Number of targets kill for current quest - ".._quest.targetKilledNum.."");
 	end
 	if (CollapsingHeader("Quest Gather Options")) then
 		Text("Options:");
+	Text("Number of items gathered for current quest - ");
+
 	end
 	if (CollapsingHeader("Quest Debug Data")) then
 		Text("".._quest.currentDebugStatus.."");

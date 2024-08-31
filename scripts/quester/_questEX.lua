@@ -1,4 +1,4 @@
-_questEX = {getSpells = true,}
+_questEX = {getSpells = false,}
 
 function _questEX:doChecks()
 
@@ -16,13 +16,19 @@ function _questEX:doChecks()
 			end
 			if (not script_grind:doLoot(GetLocalPlayer())) then
 				if IsLooting() then
-					LootTarget();
+					if (not LootTarget()) then
+						LootTarget();
+					end
 				end
 				_quest.waitTimer = GetTimeEX() + 1500;
 				return true;
 			end
 		return true;
 		end
+	end
+
+	if _quest:runRest() then
+		return true;
 	end
 
 -- reset to allow bot to continue if we don't have the checkbox clicked...
