@@ -168,6 +168,16 @@ curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestNa
 		if (PlayerHasTarget()) then
 			self.enemyTarget = GetTarget();
 		end
+		if IsInCombat() and (self.enemyTarget ~= nil or self.enemyTarget == nil) then
+			if (self.enemyTarget ~= nil) then
+				if (script_grind:getTargetAttackingUs() ~= self.enemyTarget:GetGUID()) then
+					ClearTarget();
+					self.enemyTarget = script_grind:getTargetAttackingUs();
+				end
+			elseif (self.enemyTarget == nil) then
+				self.enemyTarget = script_grind:getTargetAttackingUs();
+			end
+		end
 		-- if target is a quest target then count +1
 		if _quest.currentQuest ~= 0 and self.enemyTarget ~= nil then
 			for i=0, _questDB.numQuests -1 do
@@ -192,6 +202,7 @@ curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestNa
 			local x, y, z = self.enemyTarget:GetPosition();
 			if (self.enemyTarget:GetDistance() > 4) then
 				Move(x, y, z);
+				return true;
 			else
 				self.enemyTarget = nil;
 			end
@@ -203,14 +214,14 @@ curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestNa
 				self.message = "Running Combat";
 				RunCombatScript(self.enemyTarget:GetGUID());
 				self.currentDebugStatus = "Running combat script";
-				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange or not self.enemyTarget:IsInLineOfSight()) then
+				-- move to target
+				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange) or (not self.enemyTarget:IsInLineOfSight()) then
 					local x, y, z = self.enemyTarget:GetPosition();
 					if (script_navEX:moveToTarget(GetLocalPlayer(), x, y, z)) then
 						self.currentDebugStatus = "Moving to target";
 					end
 				end
 			end
-		return true;
 		end
 	
 	end

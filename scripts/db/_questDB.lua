@@ -175,7 +175,7 @@ if (not self.isSetup) then
 	end
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 150 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
+			if i:GetDistance() <= 350 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
 				dist = i:GetDistance();
 				if bestDist > dist then
 					bestDist = dist;
@@ -189,6 +189,7 @@ if (not self.isSetup) then
 		end
 	i, t = GetNextObject(i);
 	end
+bestTarget:AutoAttack();
 return bestTarget;
 end
 
