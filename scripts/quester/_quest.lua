@@ -138,6 +138,16 @@ function _quest:run()
 		end
 	end
 
+	-- set our current quest
+	for y=0, _questDB.numQuests -1 do
+		for i=0, GetNumQuestLogEntries()  do
+			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
+			if title == _questDB.questList[y]['questName'] then
+				self.currentQuest = title;
+			end
+		end
+	end
+
 	local curQuestGiver = nil;
 	local curQuestName = nil;
 	local curQuestX, curQuestY, curQuestZ = 0, 0, 0;
@@ -145,17 +155,8 @@ function _quest:run()
 	local distToGiver = 0;
 	local distToGrind = 0;
 	local px, py, pz = GetLocalPlayer():GetPosition();
-	for i=0, _questDB.numQuests -1 do
-		if _questDB.questList[i]['completed'] ~= "nnil" then
-			if _questDB.questList[i]['mapID'] == GetMapID() then
-curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos(); curGrindX, curGrindY, curGrindZ = _questDB:getQuestGrindPos(); distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ); distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ); end end end
-	-- set our current quest
-	for i=0, GetNumQuestLogEntries() do
-		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
-		if (curQuestName == title) then
-			self.currentQuest = title;
-		end
-	end
+
+curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos(); curGrindX, curGrindY, curGrindZ = _questDB:getQuestGrindPos(); distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ); distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ)
 
 	if (distToGrind <= 50) and not self.grindspotReached then
 		self.grindSpotReached = true;

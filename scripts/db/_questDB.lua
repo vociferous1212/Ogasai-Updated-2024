@@ -1,8 +1,7 @@
 _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0,
 		includeElwynnNorthshire = include("scripts\\db\\_questDB_Elwynn_Northshire.lua"),
 		includeTeldrassShadowglen = include("scripts\\db\\_questDB_Teldrassil_Shadowglen.lua"),
-
-
+		includeDuskwood2025 = include("scripts\\db\\_questDB_Duskwood_20_25.lua"),
 }
 
 function _questDB:setup()
@@ -11,6 +10,7 @@ function _questDB:setup()
 
 --[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum)]]--
 
+	_questDB_Duskwood_20_25:setup();
 	_questDB_Teldrassil_Shadowglen:setup();
 	_questDB_Elwynn_Northshire:setup()
 
@@ -175,16 +175,16 @@ if (not self.isSetup) then
 	end
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 100 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
+			if i:GetDistance() <= 150 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
 				dist = i:GetDistance();
 				if bestDist > dist then
 					bestDist = dist;
 					bestTarget = i;
 				end
 				
-			--elseif i:GetDistance() <= 50 and not i:IsDead() then
-			--	i:AutoAttack();
-			--	return i;
+			elseif i:GetDistance() <= 50 and not i:IsDead() then
+				i:AutoAttack();
+				return i;
 			end
 		end
 	i, t = GetNextObject(i);

@@ -69,6 +69,11 @@ function _questDBReturnQuest:returnAQuest()
 					_quest.waitTimer = GetTimeEX() + 2000;				
 			return true;	
 			end
+			if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
+				_quest.message = "Moving to quest return target";
+				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+			return true;
+			end
 			end
 		return true;
 		end
