@@ -24,12 +24,14 @@ function _questDBReturnQuest:returnAQuest()
 				end
 			end
 		end
+
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) then
 
-			if _quest.isQuestComplete and xp ~= UnitXP("player") then
-				_questDB:turnQuestCompleted();
-				return true;
-			end
+			_quest.grindSpotReached = false;
+			_quest.targetKilledNum = 0;
+			_quest.targetKilledNum2 = 0;
+			_quest.gatheredNum = 0;
+			_quest.gatheredNum2 = 0;
 			
 			_quest.message = "Completing Quest";
 			local name = _questDB:getReturnTargetName();
@@ -59,24 +61,16 @@ function _questDBReturnQuest:returnAQuest()
 					GetQuestReward(rewardNum);
 					GetQuestReward(0);
 					GetQuestReward(QuestFrameRewardPanel, rewardNum);
-					for i=1, GetNumQuestChoices() do
+					_questDB:turnQuestCompleted();
+					for i=1, GetNumQuestChoices() -1 do
 						GetQuestReward(i);
-					end
-					_quest.waitTimer = GetTimeEX() + 2000;
-				
 
+					end
+					_quest.waitTimer = GetTimeEX() + 2000;				
 			return true;	
 			end
 			end
 		return true;
-		end
-		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
-			if (GetDistance3D(px, py, pz, x, y, z) < 20 and GetDistance3D(px, py, pz, x, y, z) > 4) then
-				xp = UnitXP("player");
-			end
-			_quest.message = "Moving to quest return target";
-			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
-			return true;
 		end
 	end
 return false;	

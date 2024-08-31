@@ -86,6 +86,8 @@ function _questMenu:menu()
 	if (CollapsingHeader("Quest Kill Options")) then
 		Text("Options:");
 		Text("Number of targets kill for current quest - ".._quest.targetKilledNum.."");
+		Text("Number of targets 2 kill for current quest - ".._quest.targetKilledNum2.."");
+
 	end
 	if (CollapsingHeader("Quest Gather Options")) then
 		Text("Options:");

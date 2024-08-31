@@ -9,55 +9,15 @@ _quest = {
 	currentQuest = nil,
 	enemyTarget = nil,
 	targetKilledNum = 0,
+	targetKilledNum2 = 0,
+	gartheredNum = 0,
+	gatheredNum2 = 0,
 	isQuestComplete = false,
 	needRest = false,
+	grindSpotReached = false,
 
-	aggroLoaded = include("scripts\\script_aggro.lua"),
-	expExtra = include("scripts\\script_expChecker.lua"),
-	unstuckLoaded = include("scripts\\script_unstuck.lua"),
-	paranoiaLoaded = include("scripts\\paranoia\\script_paranoia.lua"),
-	radarLoaded = include("scripts\\script_radar.lua"),
-	debuffCheck = include("scripts\\script_checkDebuffs.lua"),
-	omLoaded = include("scripts\\script_om.lua"),
-	navFunctionsLoaded 	= include("scripts\\nav\\script_nav.lua"),
-	runnerLoaded = include("scripts\\script_runner.lua"),
-	includeNavEX 		= include("scripts\\nav\\script_navEX.lua"),
-
-	helperLoaded = include("scripts\\script_helper.lua"),
-	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
-	talentLoaded = include("scripts\\script_talent.lua"),
-	includeDrawData = include("scripts\\script_drawData.lua"),
-	vendorLoaded = include("scripts\\script_vendor.lua"),
-	gatherLoaded = include("scripts\\gather\\script_gather.lua"),
-	grindExtra = include("scripts\\script_grindEX.lua"),
-	extraFunctionsLoaded = include("scripts\\script_extraFunctions.lua"),
-	getSpellsLoaded = include("scripts\\getTrainerSpells\\script_getSpells.lua"),
-	gatherEXLoaded = include("scripts\\gather\\script_gatherEX.lua"),
-	gatherEX2Loaded = include("scripts\\gather\\script_gatherEX2.lua"),
-	gatherRunLoaded = include("scripts\\gather\\script_gatherRun.lua"),
-	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
-	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
-
-	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
-	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
-	priestMenu = include("scripts\\combat\\script_priestMenu.lua"),
-	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
-	rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
-	paladinMenu = include("scripts\\combat\\script_paladinEX.lua"),
-	shamanMenu = include("scripts\\combat\\shaman\\script_shamanEX.lua"),
-	druidMenu = include("scripts\\combat\\druid\\script_druidEX.lua"),
-
-	paranoiaMenuLoaded = include("scripts\\menu\\script_paranoiaMenu.lua"),
+	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
-	gatherMenuLoaded = include("scripts\\menu\\script_gatherMenu.lua"),
-	targetMenu = include("scripts\\menu\\script_targetMenu.lua"),
-	counterMenuIncluded = include("scripts\\menu\\script_counterMenu.lua"),
-	lootMenuIncluded = include("scripts\\menu\\script_lootMenu.lua"),
-	miscMenuIncluded = include("scripts\\menu\\script_miscMenu.lua"),
-	displayOptionsMenuIncluded = include("scripts\\menu\\script_displayOptionsMenu.lua"),
-	vendorMenuIncluded = include("scripts\\menu\\script_vendorMenu.lua"),
-	pathMenuIncluded = include("scripts\\menu\\script_pathMenu.lua"),
-
 	questerMenuIncluded = include("scripts\\quester\\_questMenu.lua"),
 	questerGetItemToGatherIncluded = include("scripts\\quester\\_questGetItemToGather.lua"),
 	questerHandleVendorIncluded = include("scripts\\quester\\_questHandleVendor.lua"),
@@ -126,11 +86,16 @@ function _quest:run()
 	if (not IsUsingNavmesh()) then UseNavmesh(true);
 		return true;
 	end
+	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files...";
+		return true;
+	end
 	if (GetLoadNavmeshProgress() ~= 1) then
 		self.message = "Loading Nav Mesh! Please Wait!";
 		self.currentDebugStatus = "Loading Nav";
 		return;
 	end
+
+	script_grind.nextToNodeDist = 4.05
 
 	-- return if we pause bot
 	if (self.pause) then
@@ -149,20 +114,23 @@ function _quest:run()
 	end
 
 	-- handle vendor stuff through vendor scripts
-	if (not IsInCombat()) then
+	if (not IsInCombat()) and _questEX.bagsFull then
+		script_vendor:sell();
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 1) then
 			_questHandleVendor:vendor();
-			return;
+			return true;
+		else
+			_questEX.bagsFull = false;
 		end
 	end
 
+	script_grind.lootObj = script_nav:getLootTarget(50);
 	if _questEX:doChecks() then
-		return;
+		return true;
 	end
 
 	_questCheckQuestCompletion:checkQuestForCompletion();
-
 	if self.currentQuest ~= nil and self.isQuestComplete then
 		if _questDBReturnQuest:returnAQuest() then
 			self.message = "Returning quest!";
@@ -170,24 +138,27 @@ function _quest:run()
 		end
 	end
 
+	local curQuestGiver = nil;
+	local curQuestName = nil;
+	local curQuestX, curQuestY, curQuestZ = 0, 0, 0;
+	local curGrindX, curGrindY, curGrindZ = 0, 0, 0;
+	local distToGiver = 0;
+	local distToGrind = 0;
 	local px, py, pz = GetLocalPlayer():GetPosition();
-	local curQuestGiver = _questDB:getQuestGiverName();
-	local curQuestName = _questDB:getQuestName();
-	local curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos();
-	local curGrindX, curGrindY, curGrindZ = _questDB:getQuestGrindPos();
-	local distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ);
-	local distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ);
-
-	if curQuestX == 0 then
-		self.message = "No quest!";
-	end
-
+	for i=0, _questDB.numQuests -1 do
+		if _questDB.questList[i]['completed'] ~= "nnil" then
+			if _questDB.questList[i]['mapID'] == GetMapID() then
+curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos(); curGrindX, curGrindY, curGrindZ = _questDB:getQuestGrindPos(); distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ); distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ); end end end
 	-- set our current quest
 	for i=0, GetNumQuestLogEntries() do
 		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
 		if (curQuestName == title) then
 			self.currentQuest = title;
 		end
+	end
+
+	if (distToGrind <= 50) and not self.grindspotReached then
+		self.grindSpotReached = true;
 	end
 
 	-- run combat on good targets
@@ -197,13 +168,19 @@ function _quest:run()
 			self.enemyTarget = GetTarget();
 		end
 		-- if target is a quest target then count +1
-		if _quest.currentQuest ~= 0 then
+		if _quest.currentQuest ~= 0 and self.enemyTarget ~= nil then
 			for i=0, _questDB.numQuests -1 do
 				if _quest.currentQuest == _questDB.questList[i]['questName'] then
 					if self.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName'] or self.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2'] then
 						if self.enemyTarget:IsDead() and not _questDBTargets:isTargetAddedToKilledTable(self.enemyTarget:GetGUID()) then
-							_questDBTargets:addTargetToKilledTable(self.enemyTarget:GetGUID());
-							self.targetKilledNum = self.targetKilledNum + 1;
+							if self.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName'] then
+								_questDBTargets:addTargetToKilledTable(self.enemyTarget:GetGUID());
+								self.targetKilledNum = self.targetKilledNum + 1;
+							end
+							if self.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2'] then
+								_questDBTargets:addTargetToKilledTable(self.enemyTarget:GetGUID());
+								self.targetKilledNum2 = self.targetKilledNum2 + 1;
+							end
 						end
 					end
 				end
@@ -213,7 +190,7 @@ function _quest:run()
 		if (self.enemyTarget ~= nil and self.enemyTarget ~= 0) and (self.enemyTarget:IsDead()) then
 			local x, y, z = self.enemyTarget:GetPosition();
 			if (self.enemyTarget:GetDistance() > 4) then
-				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+				Move(x, y, z);
 			else
 				self.enemyTarget = nil;
 			end
@@ -227,9 +204,9 @@ function _quest:run()
 				self.currentDebugStatus = "Running combat script";
 				if (self.enemyTarget ~= nil and self.enemyTarget:GetDistance() > script_grind.combatScriptRange or not self.enemyTarget:IsInLineOfSight()) then
 					local x, y, z = self.enemyTarget:GetPosition();
-					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
-					self.currentDebugStatus = "Moving to target";
-					return true;
+					if (script_navEX:moveToTarget(GetLocalPlayer(), x, y, z)) then
+						self.currentDebugStatus = "Moving to target";
+					end
 				end
 			end
 		return true;
@@ -241,6 +218,7 @@ function _quest:run()
 	if (distToGiver > 4) and (self.currentQuest == nil) then
 		script_navEX:moveToTarget(GetLocalPlayer(), curQuestX, curQuestY, curQuestZ);
 self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
+		return true;
 	end
 	
 	-- interact with quest givers
@@ -252,27 +230,24 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
 				if (GetTarget():UnitInteract()) then
 					self.waitTimer = GetTimeEX() + 2000;
-					
 						SelectGossipAvailableQuest(1);
 						if (AcceptQuest()) then
 							self.currentQuest = curQuestName;
-						end
-					
-					
+						end					
 				end
 			end
 		end
 	end
 	
 	-- get a target
-	if (self.currentQuest ~= nil) then
-		if (distToGrind <= 50) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
+	if (self.currentQuest ~= nil) and (curGrindX ~= 0) and (self.grindSpotReached) then
+		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
 			self.enemyTarget = _questDB:getTarget();
 		end
 	end
 
 	-- we have a quest so go to grind spot
-	if (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
+	if curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
 		self.message = "Moving to grind spot";
 		script_navEX:moveToTarget(GetLocalPlayer(), curGrindX, curGrindY, curGrindZ);
 		return true;
@@ -286,27 +261,11 @@ function _quest:runRest()
 
 	-- run the rest script for grind/combat
 	if(RunRestScript()) then
-		
 		self.message = "Resting...";
-
 		_quest.waitTimer = GetTimeEX() + 2000;
+		if (IsMoving()) and (not localObj:IsMovementDisabed()) then StopMoving(); return true; end
 
-		-- Stop moving
-		if (IsMoving()) and (not localObj:IsMovementDisabed()) then
-			StopMoving();
-			return true;
-		end
-
-		-- not in combat and pet doesn't have target then stop to rest if needed
-		if (not IsInCombat()) and (not petHasTarget) then
-			if (IsEating() and localHealth < 95)
-				or (IsDrinking() and localMana < 95)
-			then
-				return true;
-			end
-		end
-	
-		-- if done resting then stand up
+		if (not IsInCombat()) and (not petHasTarget) then if (IsEating() and localHealth < 95) or (IsDrinking() and localMana < 95) then return true; end end
 		if (IsEating() and localHealth >= 95 and IsDrinking() and localMana >= 95) 
 		or (not IsDrinking() and IsEating() and localHealth >= 95)
 		or (not IsEating() and IsDrinking() and localMana >= 95)

@@ -1,10 +1,21 @@
 _questDBSetup = {}
 
 function _questDBSetup:menu()
-		-- faction, quest name, quest giver name
-		local a, b, c = 0, "", "";
-		-- quest giver pos
-		local d, e, f = 0, 0, 0;
+local a = "";
+local b, c = 0, "", "";
+local d, e, f = "", 0, 0;
+
+	if _questDB.curListQuest ~= nil and _questDB.numQuests ~= 0 and _questDB.numQuests ~= nil then
+	for i=0, _questDB.numQuests -1 do
+		if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+			z = _questDB.questList[i]
+			a = z['completed'];
+			b = z['faction'];
+			c = z['questName'];
+			d = z['giverName'];
+		end
+	end
+	end
 		-- mapID, minlevel, maxlevel
 		local g, h, i = 0, 0, 0;
 		--grind pos
@@ -23,35 +34,39 @@ SameLine();
 			--ToFile(
 			--db:add(
 		end
+		Text("Completed Status");
+		Text(""..a.."");
+		Separator();
 		Text("Faction 0 - Alliance. Faction 1 - Horde");
-		a = InputText("Faction", a);
+		Text(""..b.."");
+		Separator();
 		Text("Quest Name In Quest Log");
-		b = InputText("Quest Name", b);
+		Text(""..c.."");
+		Separator();
 		Text("Quest Giver Name");
-		c = InputText("Quest Giver Name", c);
+		Text(""..d.."");
 		Text("Quest Giver Pos X");
-		d = InputText("Quest Giver Pos X", d);
+		e = InputText("Quest Giver Pos X", d);
 		Text("Quest Giver Pos Y");
-		e = InputText("Quest Giver Pos Y", e);
+		f = InputText("Quest Giver Pos Y", e);
 		Text("Quest Giver Pos Z");
-		f = InputText("Quest Giver Pos Z", f);
-		Text("Quest MapID");
-		g = InputText("MapID", g);
-		h = InputText("MinLevel", h);
-		i = InputText("MaxLevel", i);
-		j = InputText("Grind Pos X", j);
-		k = InputText("Grind Pos Y", k);
-		l = InputText("Grind Pos Z", l);
-		m = InputText("Type", m);
-		n = InputText("Kill Number", n);
-		o = InputText("Gather Number", o);
-		p = InputText("Return Pos X", p);
-		q = InputText("Return Pos Y", q);
-		r = InputText("Return Pos Z", r);
-		s = InputText("Return Name", s);
-		t = InputText("Kill Target 1", t);
-		u = InputText("Kill Target 2", u);
-		v = InputText("Gather Target 1", v);
-		w = InputText("Gather Target 2", w);
-		x = InputText("Is Completed", x);
+		g = InputText("Quest Giver Pos Z", f);
+			Text("Quest MapID");
+		h = InputText("MapID", g);
+		i = InputText("MinLevel", h);
+		j = InputText("MaxLevel", i);
+		k = InputText("Grind Pos X", j);
+		l = InputText("Grind Pos Y", k);
+		m = InputText("Grind Pos Z", l);
+		n = InputText("Type", m);
+		o = InputText("Kill Number", n);
+		p = InputText("Gather Number", o);
+		q = InputText("Return Pos X", p);
+		r = InputText("Return Pos Y", q);
+		s = InputText("Return Pos Z", r);
+		t = InputText("Return Name", s);
+		u = InputText("Kill Target 1", t);
+		v = InputText("Kill Target 2", u);
+		w = InputText("Gather Target 1", v);
+		x = InputText("Gather Target 2", w);
 end

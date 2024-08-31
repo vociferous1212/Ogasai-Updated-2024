@@ -1,5 +1,6 @@
 _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0,
 		includeElwynnNorthshire = include("scripts\\db\\_questDB_Elwynn_Northshire.lua"),
+		includeTeldrassShadowglen = include("scripts\\db\\_questDB_Teldrassil_Shadowglen.lua"),
 
 
 }
@@ -8,11 +9,9 @@ function _questDB:setup()
 
 	-- type quest 1 = kill 2 = gather 0 = already completed
 
---[[is completed, faction, quest name, quest giver name, quest giver pos, mapID, minLevel, maxLevel, grind pos, type, kill number, gather number, return pos, return target name, kill target 1, kill target 2, gather target 1, gather target 2, rewardNum]]--
+--[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum)]]--
 
--- level 1 night elf starter quest
-_questDB:addQuest("no", 0, "The Balance of Nature", "Conservator Ilthalaine", 10354.408203125, 675.88238525391, 1329.5684814453, 141, 1, 4, 10328.900390625, 826.05200195313, 1326.380859375, 1, 7, 0, 10354.408203125, 675.88238525391, 1329.5684814453, "Conservator Ilthalaine", "Young Nightsaber", "Young Thistleboar", 0, 0, 0);
-
+	_questDB_Teldrassil_Shadowglen:setup();
 	_questDB_Elwynn_Northshire:setup()
 
 	self.isSetup = true;
@@ -20,7 +19,7 @@ _questDB:addQuest("no", 0, "The Balance of Nature", "Conservator Ilthalaine", 10
 end
 
 
-function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numGather, returnX, returnY, returnZ, returnTarget, enemyName, enemyName2, gatherName, gatherName2, rewardNum)
+function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum)
 	self.questList[self.numQuests] = {};
 	self.questList[self.numQuests]['completed'] = completed;
 	self.questList[self.numQuests]['faction']= faction;
@@ -39,14 +38,16 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['grindPos']['grindZ'] = grindZ;
 	self.questList[self.numQuests]['type'] = type;
 	self.questList[self.numQuests]['numKill'] = numKill;
+	self.questList[self.numQuests]['numKill2'] = numKill2;
 	self.questList[self.numQuests]['numGather'] = numGather;
+	self.questList[self.numQuests]['numGather2'] = numGather2;
 	self.questList[self.numQuests]['returnPos'] = {};
 	self.questList[self.numQuests]['returnPos']['returnX'] = returnX;
 	self.questList[self.numQuests]['returnPos']['returnY'] = returnY;
 	self.questList[self.numQuests]['returnPos']['returnZ'] = returnZ;
 	self.questList[self.numQuests]['returnTarget'] = returnTarget;
-	self.questList[self.numQuests]['targetName'] = enemyName;
-	self.questList[self.numQuests]['targetName2'] = enemyName2;
+	self.questList[self.numQuests]['targetName'] = targetName;
+	self.questList[self.numQuests]['targetName2'] = targetName2;
 	self.questList[self.numQuests]['gatherName'] = gatherName;
 	self.questList[self.numQuests]['gatherName2'] = gatherName2;
 	self.questList[self.numQuests]['rewardNum'] = rewardNum;
@@ -149,33 +150,46 @@ end
 function _questDB:getTarget()
 	local target = 0;
 	local target2 = 0;
+	local numKill = 0;
+	local numKill2 = 0;
 	local i, t = GetFirstObject();
+	local dist = 0;
+	local bestDist = 1000;
+	local bestTarget = nil;
 
 if (not self.isSetup) then
 		_questDB:setup();
 	end
 
-	if _quest.currentQuest ~= nil then
+	if _questDB.curListQuest ~= nil then
 		for i=0, self.numQuests -1 do
-			if self.questList[i]['questName'] == _quest.currentQuest then
-				target = self.questList[i]['targetName'];
-				target2 = self.questList[i]['targetName2'];
+			if self.questList[i]['completed'] == "no" then
+				if self.questList[i]['questName'] == self.curListQuest then
+					target = self.questList[i]['targetName'];
+					target2 = self.questList[i]['targetName2'];
+					numKill = self.questList[i]['numKill'];
+					numKill2 = self.questList[i]['numKill2'];
+				end
 			end
 		end
 	end
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 50 and (i:GetUnitName() == target or i:GetUnitName() == target2) and not i:IsDead() then
-				i:AutoAttack();
-				return i;
-			elseif script_grindEX:returnTargetNearMyAggroRange() ~= nil then
-				script_grindEX:returnTargetNearMyAggroRange():AutoAttack();
-				return script_grindEX:returnTargetNearMyAggroRange();
+			if i:GetDistance() <= 100 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
+				dist = i:GetDistance();
+				if bestDist > dist then
+					bestDist = dist;
+					bestTarget = i;
+				end
+				
+			--elseif i:GetDistance() <= 50 and not i:IsDead() then
+			--	i:AutoAttack();
+			--	return i;
 			end
 		end
 	i, t = GetNextObject(i);
 	end
-return nil;
+return bestTarget;
 end
 
 function _questDB:getReturnTargetPos()
