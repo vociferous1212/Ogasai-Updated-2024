@@ -15,6 +15,9 @@ _quest = {
 	isQuestComplete = false,
 	needRest = false,
 	grindSpotReached = false,
+	curGrindX = 0,
+	curGrindY = 0,
+	curGrindz = 0,
 
 	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -151,12 +154,15 @@ function _quest:run()
 	local curQuestGiver = nil;
 	local curQuestName = nil;
 	local curQuestX, curQuestY, curQuestZ = 0, 0, 0;
-	local curGrindX, curGrindY, curGrindZ = 0, 0, 0;
 	local distToGiver = 0;
 	local distToGrind = 0;
 	local px, py, pz = GetLocalPlayer():GetPosition();
 
-curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos(); curGrindX, curGrindY, curGrindZ = _questDB:getQuestGrindPos(); distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ); distToGrind = GetDistance3D(px, py, pz, curGrindX, curGrindY, curGrindZ)
+curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); curQuestX, curQuestY, curQuestZ = _questDB:getQuestStartPos();
+if (not self.grindSpotReached) then
+self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
+end
+distToGiver = GetDistance3D(px, py, pz, curQuestX, curQuestY, curQuestZ); distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.curGrindZ)
 
 	if (distToGrind <= 50) and not self.grindspotReached then
 		self.grindSpotReached = true;
@@ -252,16 +258,16 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 	end
 	
 	-- get a target
-	if (self.currentQuest ~= nil) and (curGrindX ~= 0) and (self.grindSpotReached) then
+	if (self.currentQuest ~= nil) and (self.curGrindX ~= 0) and (self.grindSpotReached) then
 		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
 			self.enemyTarget = _questDB:getTarget();
 		end
 	end
 
 	-- we have a quest so go to grind spot
-	if curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
+	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
 		self.message = "Moving to grind spot";
-		script_navEX:moveToTarget(GetLocalPlayer(), curGrindX, curGrindY, curGrindZ);
+		script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
 		return true;
 	end
 end
