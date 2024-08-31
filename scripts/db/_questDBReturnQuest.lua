@@ -33,9 +33,12 @@ function _questDBReturnQuest:returnAQuest()
 			
 			_quest.message = "Completing Quest";
 			local name = _questDB:getReturnTargetName();
-			TargetByName(name);
-			name = GetTarget();
-			if (GetTarget():UnitInteract()) then
+			if (GetTarget() == nil or GetTarget() == 0) or (GetTarget() ~= 0 and GetTarget() ~= nil and GetTarget():GetUnitName() ~= name) then
+				TargetByName(name);
+				name = GetTarget();
+			end
+			if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+				if (GetTarget():UnitInteract()) then
 
 				_quest.waitTimer = GetTimeEX() + 2000;
 				--for i=0, 5 do
@@ -43,9 +46,7 @@ function _questDBReturnQuest:returnAQuest()
 					--	test = i;
 					--end
 				--end
-
 				SelectGossipActiveQuest(1);
-
 				_quest.waitTimer = GetTimeEX() + 2000;
 				local rewardNum = 0;
 				for i=0, _questDB.numQuests -1 do
@@ -54,20 +55,24 @@ function _questDBReturnQuest:returnAQuest()
 						rewardNum = _questDB.questList[i]['rewardNum'];
 					end
 				end
-				if (not GetQuestReward()) then
+				
 					GetQuestReward(rewardNum);
-					GetQuestReward(1);
-					GetQuestReward(QuestFrameRewardPanel, 1);
+					GetQuestReward(0);
+					GetQuestReward(QuestFrameRewardPanel, rewardNum);
+					for i=1, GetNumQuestChoices() do
+						GetQuestReward(i);
+					end
 					_quest.waitTimer = GetTimeEX() + 2000;
-				end
+				
 
 			return true;	
+			end
 			end
 		return true;
 		end
 		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
-			if (GetDistance3D(px, py, pz, x, y, z) < 20 and GetDistance3D(px, py, pz, x, y, z) > 5) then
-				local xp = UnitXP("player");
+			if (GetDistance3D(px, py, pz, x, y, z) < 20 and GetDistance3D(px, py, pz, x, y, z) > 4) then
+				xp = UnitXP("player");
 			end
 			_quest.message = "Moving to quest return target";
 			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);

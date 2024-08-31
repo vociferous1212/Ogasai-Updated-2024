@@ -5,7 +5,7 @@ _quest = {
 	isSetup = false,
 	currentDebugStatus = "Nothing",
 	waitTimer = 0,
-	tickRate = 500,
+	tickRate = 300,
 	currentQuest = nil,
 	enemyTarget = nil,
 	targetKilledNum = 0,
@@ -18,17 +18,10 @@ _quest = {
 	paranoiaLoaded = include("scripts\\paranoia\\script_paranoia.lua"),
 	radarLoaded = include("scripts\\script_radar.lua"),
 	debuffCheck = include("scripts\\script_checkDebuffs.lua"),
-	drawStatusScript = include("scripts\\script_drawStatus.lua"),
-	drawStatusEXScript = include("scripts\\script_drawStatusEX.lua"),
 	omLoaded = include("scripts\\script_om.lua"),
 	navFunctionsLoaded 	= include("scripts\\nav\\script_nav.lua"),
 	runnerLoaded = include("scripts\\script_runner.lua"),
 	includeNavEX 		= include("scripts\\nav\\script_navEX.lua"),
-	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
-	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
-	firstAidLoaded 		= include("scripts\\professions\\script_firstAid.lua"),
-	fpDBLoaded 		= include("scripts\\db\\fpDB.lua"),
-	goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
 
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
@@ -58,9 +51,7 @@ _quest = {
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
 	gatherMenuLoaded = include("scripts\\menu\\script_gatherMenu.lua"),
 	targetMenu = include("scripts\\menu\\script_targetMenu.lua"),
-	grindPartyMenuIncluded = include("scripts\\menu\\script_grindPartyMenu.lua"),
 	counterMenuIncluded = include("scripts\\menu\\script_counterMenu.lua"),
-	debugMenuIncluded = include("scripts\\menu\\script_debugMenu.lua"),
 	lootMenuIncluded = include("scripts\\menu\\script_lootMenu.lua"),
 	miscMenuIncluded = include("scripts\\menu\\script_miscMenu.lua"),
 	displayOptionsMenuIncluded = include("scripts\\menu\\script_displayOptionsMenu.lua"),
@@ -179,7 +170,6 @@ function _quest:run()
 		end
 	end
 
-
 	local px, py, pz = GetLocalPlayer():GetPosition();
 	local curQuestGiver = _questDB:getQuestGiverName();
 	local curQuestName = _questDB:getQuestName();
@@ -221,7 +211,12 @@ function _quest:run()
 		end
 		-- if target is dead then clear enemytarget var
 		if (self.enemyTarget ~= nil and self.enemyTarget ~= 0) and (self.enemyTarget:IsDead()) then
-			self.enemyTarget = nil;
+			local x, y, z = self.enemyTarget:GetPosition();
+			if (self.enemyTarget:GetDistance() > 4) then
+				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+			else
+				self.enemyTarget = nil;
+			end
 		end
 		
 		-- do something
@@ -242,13 +237,6 @@ function _quest:run()
 	
 	end
 
-	-- we have a quest so go to grind spot
-	if (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
-		self.message = "Moving to grind spot";
-		script_navEX:moveToTarget(GetLocalPlayer(), curGrindX, curGrindY, curGrindZ);
-		return true;
-	end
-
 	-- move to quest giver to get quest
 	if (distToGiver > 4) and (self.currentQuest == nil) then
 		script_navEX:moveToTarget(GetLocalPlayer(), curQuestX, curQuestY, curQuestZ);
@@ -263,12 +251,14 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			curQuestGiver = GetTarget();
 			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
 				if (GetTarget():UnitInteract()) then
-					GetTarget():UnitInteract();
 					self.waitTimer = GetTimeEX() + 2000;
-					SelectGossipAvailableQuest(1);
-					if (AcceptQuest(1)) then
-						self.currentQuest = curQuestName;
-					end
+					
+						SelectGossipAvailableQuest(1);
+						if (AcceptQuest()) then
+							self.currentQuest = curQuestName;
+						end
+					
+					
 				end
 			end
 		end
@@ -280,20 +270,26 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			self.enemyTarget = _questDB:getTarget();
 		end
 	end
+
+	-- we have a quest so go to grind spot
+	if (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
+		self.message = "Moving to grind spot";
+		script_navEX:moveToTarget(GetLocalPlayer(), curGrindX, curGrindY, curGrindZ);
+		return true;
+	end
 end
 
 function _quest:runRest()
-
-		local localObj = GetLocalPlayer();
-		local localHealth = localObj:GetHealthPercentage();
-		local localMana = localObj:GetManaPercentage();
-
+		if (IsInCombat()) or (IsLooting()) then return false; end
+	local localObj = GetLocalPlayer(); local localHealth = localObj:GetHealthPercentage(); local localMana = localObj:GetManaPercentage();
 		self.needRest = true;
 
 	-- run the rest script for grind/combat
 	if(RunRestScript()) then
 		
 		self.message = "Resting...";
+
+		_quest.waitTimer = GetTimeEX() + 2000;
 
 		-- Stop moving
 		if (IsMoving()) and (not localObj:IsMovementDisabed()) then
