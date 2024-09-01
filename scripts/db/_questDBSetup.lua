@@ -1,22 +1,20 @@
 _questDBSetup = {}
 
 function _questDBSetup:menu()
+
+
+	if (Button("List Quests")) then
+		for i=0, _questDB.numQuests -1 do
+			a = _questDB.questList[i]['questName'];
+			b = _questDB.questList[i]['completed'];
+			DEFAULT_CHAT_FRAME:AddMessage(""..a..", | Complete - "..b.."");
+		end
+	end
+
 local a = "";
 local b, c = 0, "", "";
 local d, e, f = "", 0, 0;
-
-	if _questDB.curListQuest ~= nil and _questDB.numQuests ~= 0 and _questDB.numQuests ~= nil then
-	for i=0, _questDB.numQuests -1 do
-		if _questDB.questList[i]['questName'] == _questDB.curListQuest then
-			z = _questDB.questList[i]
-			a = z['completed'];
-			b = z['faction'];
-			c = z['questName'];
-			d = z['giverName'];
-		end
-	end
-	end
-		-- mapID, minlevel, maxlevel
+-- mapID, minlevel, maxlevel
 		local g, h, i = 0, 0, 0;
 		--grind pos
 		local j, k, l = 0, 0, 0;
@@ -28,12 +26,66 @@ local d, e, f = "", 0, 0;
 		local s, t, u = "", "", "";
 		-- gather target 1, gather target 2, is completed
 		local v, w, x = "", "", "";
+		local y, aa, bb, cc = 0, 0, 0, 0;
+
+
+
+		if _quest.currentQuest ~= nil then
+		Text("_quest.currentQuest - ".._quest.currentQuest);
+		else
+		Text("_quest.currentQuest - NIL");
+		end
+		if _questDB.curListQuest ~= nil then
+		Text("_questDB.curListQuest - ".._questDB.curListQuest);
+		end
+		if _quest.isQuestComplete then
+		Text("_quest.isQuestComplete - true");
+		else
+		Text("_quest.isQuestComplete - false");
+		end
+
+	if _questDB.curListQuest ~= nil and _questDB.numQuests ~= 0 and _questDB.numQuests ~= nil then
+	for i=0, _questDB.numQuests -1 do
+		if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+
+			z = _questDB.questList[i]
+			a = z['completed'];
+			b = z['faction'];
+			c = z['questName'];
+			d = z['giverName'];
+			--e = z['pos']['x'];
+			--f = z['pos']['y'];
+			--g = z['pos']['z'];
+			h = z['mapID'];
+			--i = z['minLevel'];
+			--j = z['maxLevel'];
+			--k = z['grindPos']['grindX']
+			--l = z['grindPos']['grindY']
+			--m = z['grindPos']['grindZ']
+			n = z['type'];
+			o = z['numKill'];
+			p = z['numKill2'];
+			q = z['numGather'];
+			r = z['numGather2'];
+			--s = z['returnPos']['returnX'];
+			--t = z['returnPos']['returnY'];
+			--u = z['returnPos']['returnZ'];
+			v = z['returnTarget'];
+			w = z['targetName'];
+			x = z['targetName2'];
+			y = z['gatherName'];
+			aa = z['gatherName2'];
+			bb = z['rewardNum'];
+			cc = z['desc'];
+			
+		end
+	end
+	end
+		
 		 Text("Debug stuff");
 SameLine();
-		if (Button("Add To DB")) then 
-			--ToFile(
-			--db:add(
-		end
+		--(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum, desc)
+
 		Text("Completed Status");
 		Text(""..a.."");
 		Separator();
@@ -45,28 +97,67 @@ SameLine();
 		Separator();
 		Text("Quest Giver Name");
 		Text(""..d.."");
-		Text("Quest Giver Pos X");
-		e = InputText("Quest Giver Pos X", d);
-		Text("Quest Giver Pos Y");
-		f = InputText("Quest Giver Pos Y", e);
-		Text("Quest Giver Pos Z");
-		g = InputText("Quest Giver Pos Z", f);
-			Text("Quest MapID");
-		h = InputText("MapID", g);
-		i = InputText("MinLevel", h);
-		j = InputText("MaxLevel", i);
-		k = InputText("Grind Pos X", j);
-		l = InputText("Grind Pos Y", k);
-		m = InputText("Grind Pos Z", l);
-		n = InputText("Type", m);
-		o = InputText("Kill Number", n);
-		p = InputText("Gather Number", o);
-		q = InputText("Return Pos X", p);
-		r = InputText("Return Pos Y", q);
-		s = InputText("Return Pos Z", r);
-		t = InputText("Return Name", s);
-		u = InputText("Kill Target 1", t);
-		v = InputText("Kill Target 2", u);
-		w = InputText("Gather Target 1", v);
-		x = InputText("Gather Target 2", w);
+		--Separator();
+		--Text("Quest Giver Pos X");
+		--Text(""..e.."");
+		--Separator();
+		--Text("Quest Giver Pos Y");
+		--Text(""..f.."");
+		--Separator();
+		--Text("Quest Giver Pos Z");
+		--Text(""..g.."");
+		Separator();
+		Text("Quest MapID");
+		Text(""..h.."");
+		Separator();
+		Text("minLevel")
+		Text(""..i.."");
+		Separator();
+		Text("maxLevel");
+		Text(""..j.."");
+		Separator();
+		--Text("Grind Pos X");
+		--Text(""..k.."");
+		--Separator();
+		--Text("Grind Pos Y");
+		--Text(""..l.."");
+		--Separator();
+		--Text("Grind Pos Z");
+		--Text(""..m.."");
+		Separator();
+		Text("Type");
+		Text(""..n.."");
+		Separator();
+		Text("Kill Number");
+		Text(""..o.."");
+		Separator();
+		Text("Gather Number");
+		Text(""..p.."");
+		Separator();
+		Text(""..q.."");
+		Separator();
+		Text(""..r.."");
+		Separator();
+		--Text(""..s.."");
+		--Separator();
+		--Text(""..t.."");
+		--Separator();
+		--Text(""..u.."");
+		Separator();
+		Text(""..v.."");
+		Separator();
+		Text(""..w.."");
+		Separator();
+		Text(""..x.."");
+		Separator();
+		Text(""..y.."");
+		Separator();
+		Text(""..aa.."");
+		Separator();
+		Text(""..bb.."");
+		Separator();
+		if cc ~= nil then
+		Text(""..cc.."");
+		end
+	
 end

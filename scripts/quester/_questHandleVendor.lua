@@ -1,6 +1,10 @@
 _questHandleVendor = {}
 
 function _questHandleVendor:vendor()
+
+	if (_quest.waitTimer > GetTimeEX()) then
+		return;
+	end
 	if (not IsInCombat()) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus == 1) then

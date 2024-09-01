@@ -18,3 +18,56 @@ function _questDBTargets:isTargetAddedToKilledTable(target)
 	end
 return false;
 end
+
+function _questDBTargets:getTarget()
+	local target = 0;
+	local target2 = 0;
+	local numKill = 0;
+	local numKill2 = 0;
+	local i, t = GetFirstObject();
+	local dist = 0;
+	local bestDist = 1000;
+	local bestTarget = nil;
+
+	if _questDB.curListQuest ~= nil then
+		for i=0, _questDB.numQuests -1 do
+			if _questDB.questList[i]['completed'] == "no" then
+				if _questDB.questList[i]['questName'] ~= "nnil" then
+
+				if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+					target = _questDB.questList[i]['targetName'];
+					target2 = _questDB.questList[i]['targetName2'];
+					numKill = _questDB.questList[i]['numKill'];
+					numKill2 = _questDB.questList[i]['numKill2'];
+				end
+				end
+			end
+		end
+	end
+	local weHaveQuestTarget = false;
+	while i ~= 0 do
+		if t == 3 then
+			if i:GetDistance() <= 200 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
+				dist = i:GetDistance();
+				if bestDist > dist then
+					bestDist = dist;
+					bestTarget = i;
+					weHaveQuestTarget = true;
+				end
+			end
+			if (not weHaveQuestTarget) then
+					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= aggro then
+					dist = i:GetDistance();
+					if bestDist > dist then
+						bestDist = dist;
+						bestTarget = i;	
+					end
+				end
+			end	
+		end
+	i, t = GetNextObject(i);
+	end
+bestTarget:AutoAttack();
+return bestTarget;
+end

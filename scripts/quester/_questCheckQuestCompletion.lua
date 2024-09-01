@@ -7,7 +7,7 @@ function _questCheckQuestCompletion:checkQuestForCompletion()
 -- check quest for completion
 	if _quest.currentQuest ~= nil and (not IsInCombat()) then
 		for i=0, _questDB.numQuests -1 do
-			if _questDB.questList[i]['completed'] ~= "nnil" then
+			if _questDB.questList[i]['completed'] == "no" then
 				
 				if _quest.currentQuest == _questDB.questList[i]['questName'] then
 					for y=0, GetNumQuestLogEntries() do
@@ -15,6 +15,8 @@ function _questCheckQuestCompletion:checkQuestForCompletion()
 						if title == _questDB.questList[i]['questName'] then
 							if isComplete == 1 then
 								isItCompleted = true;
+							else
+								_quest.isQuestComplete = false;
 							end
 						end
 					end	
@@ -22,7 +24,7 @@ function _questCheckQuestCompletion:checkQuestForCompletion()
 						_quest.isQuestComplete = true;
 					end
 					if _questDB.questList[i]['type'] == 1 then
-						if _questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] == 0 then
+						if (_questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] == 0) or isItCompleted then
 							if _quest.targetKilledNum >= _questDB.questList[i]['numKill'] or isItCompleted then
 								_quest.isQuestComplete = true;
 							end

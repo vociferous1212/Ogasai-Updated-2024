@@ -81,18 +81,12 @@ function _questMenu:menu()
 			_quest.grindSpotReached = true;
 			_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
 		end
-		Text("you might have to push it a few times... bug...");
+
 		if (Button("Mark Current Quest As Complete")) then
-			_questDB:turnQuestCompleted()	
+			_questDB:turnQuestCompleted();
 		end
 
 		_questDBSetup:menu();
-
-		if (Button("Add To DB")) then
-			--ToFile(
-			--db:add(
-		end
-		
 				
 	end
 	if (CollapsingHeader("Quest Kill Options")) then

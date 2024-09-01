@@ -1,4 +1,4 @@
-_questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0,
+_questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, curDesc = nil,
 		includeElwynnNorthshire = include("scripts\\db\\_questDB_Elwynn_Northshire.lua"),
 		includeTeldrassShadowglen = include("scripts\\db\\_questDB_Teldrassil_Shadowglen.lua"),
 		includeDuskwood2025 = include("scripts\\db\\_questDB_Duskwood_20_25.lua"),
@@ -19,8 +19,9 @@ function _questDB:setup()
 end
 
 
-function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum)
+function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum, desc)
 	self.questList[self.numQuests] = {};
+	
 	self.questList[self.numQuests]['completed'] = completed;
 	self.questList[self.numQuests]['faction']= faction;
 	self.questList[self.numQuests]['questName'] = questName;
@@ -51,36 +52,30 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['gatherName'] = gatherName;
 	self.questList[self.numQuests]['gatherName2'] = gatherName2;
 	self.questList[self.numQuests]['rewardNum'] = rewardNum;
-
+	self.questList[self.numQuests]['desc'] = desc;
 	self.numQuests = self.numQuests + 1;
 
 end
-
-
--- we need to run a check for faction first and foremost...
-
-
-
 
 function _questDB:getQuestStartPos()
 local x, y, z = 0, 0, 0;
 local dist = 0;
 local bestDist = 10000;
-	if (not self.isSetup) then
-		_questDB:setup();
-	end
-
+local a = nil;
 	for i=0, self.numQuests -1 do
 		if self.questList[i]['completed'] ~= "nnil" then
-			if self.questList[i]['mapID'] == GetMapID() then
-					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
+			if self.questList[i]['questName'] ~= "nnil" then
+				if self.questList[i]['mapID'] == GetMapID() then
 
-				-- set our quest to be checked through rest of script?
-				self.curListQuest = self.questList[i]['questName'];
+					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
+					-- set our quest to be checked through rest of script?
+				
+					self.curListQuest = self.questList[i]['questName']
+					self.curDesc = self.questList[i]['desc'];
+				end
 			end
 		end
 	end
-
 return x, y, z;
 end
 
@@ -89,12 +84,9 @@ local name = "";
 local dist = 0;
 local bestDist = 10000;
 
-if (not self.isSetup) then
-		_questDB:setup();
-	end
-
 	for i=0, self.numQuests -1 do
-		if self.questList[i]['completed'] ~= "nnil" then
+		if self.questList[i]['completed'] == "no" then
+			if self.questList[i]['questName'] ~= "nnil" then
 			if self.questList[i]['mapID'] == GetMapID() then
 
 			local dist = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
@@ -106,6 +98,7 @@ if (not self.isSetup) then
 					if self.questList[i]['questName'] == self.curListQuest then
 						name = self.questList[i]['giverName'];
 					end
+			end
 			end
 		end
 	end
@@ -123,14 +116,13 @@ end
 function _questDB:getQuestGrindPos()
 local x, y, z = 0, 0, 0;
 
-if (not self.isSetup) then
-		_questDB:setup();
-	end
 
 	for i=0, self.numQuests -1 do
-		if self.questList[i]['completed'] ~= "nnil" then
+		if self.questList[i]['completed'] == "no" then
+			if (self.questList[i]['questName'] ~= "nnil") then
 			if self.questList[i]['questName'] == _quest.currentQuest then
 				x, y, z = self.questList[i]['grindPos']['grindX'], self.questList[i]['grindPos']['grindY'], self.questList[i]['grindPos']['grindZ'];
+			end
 			end
 		end
 	end
@@ -138,73 +130,16 @@ if (not self.isSetup) then
 return x, y, z;
 end
 
-function _questDB:getObjectives()
-
-	-- entry 1...
-	ToggleQuestLog()
-	SelectQuestLogEntry(1);
-	local desc, type, done = GetQuestLogLeaderBoard(1, 2)
-	DEFAULT_CHAT_FRAME:AddMessage(desc);
-end
-
-function _questDB:getTarget()
-	local target = 0;
-	local target2 = 0;
-	local numKill = 0;
-	local numKill2 = 0;
-	local i, t = GetFirstObject();
-	local dist = 0;
-	local bestDist = 1000;
-	local bestTarget = nil;
-
-if (not self.isSetup) then
-		_questDB:setup();
-	end
-
-	if _questDB.curListQuest ~= nil then
-		for i=0, self.numQuests -1 do
-			if self.questList[i]['completed'] == "no" then
-				if self.questList[i]['questName'] == self.curListQuest then
-					target = self.questList[i]['targetName'];
-					target2 = self.questList[i]['targetName2'];
-					numKill = self.questList[i]['numKill'];
-					numKill2 = self.questList[i]['numKill2'];
-				end
-			end
-		end
-	end
-	while i ~= 0 do
-		if t == 3 then
-			if i:GetDistance() <= 350 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
-				dist = i:GetDistance();
-				if bestDist > dist then
-					bestDist = dist;
-					bestTarget = i;
-				end
-				
-			elseif i:GetDistance() <= 50 and not i:IsDead() then
-				i:AutoAttack();
-				return i;
-			end
-		end
-	i, t = GetNextObject(i);
-	end
-bestTarget:AutoAttack();
-return bestTarget;
-end
-
 function _questDB:getReturnTargetPos()
 local x, y, z = 0, 0, 0;
-
-if (not self.isSetup) then
-		_questDB:setup();
-	end
 	
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
-		if self.questList[i]['completed'] ~= "nnil" then
+		if self.questList[i]['completed'] == "no" then
+			if self.questList[i]['questName'] ~= "nnil" then
 			if self.questList[i]['questName'] == self.curListQuest then
 				x, y, z = self.questList[i]['returnPos']['returnX'], self.questList[i]['returnPos']['returnY'], self.questList[i]['returnPos']['returnZ'];
+			end
 			end
 		end
 	end
@@ -216,14 +151,13 @@ end
 function _questDB:getReturnTargetName()	
 local x, y, z = 0, 0, 0;
 
-if (not self.isSetup) then
-		_questDB:setup();
-	end
 
 	for i=0, self.numQuests -1 do
-		if self.questList[i]['completed'] ~= "nnil" then
+		if self.questList[i]['completed'] == "no" then
+			if self.questList[i]['questName'] ~= "nil" then
 			if self.questList[i]['questName'] == self.curListQuest then
 				name = self.questList[i]['returnTarget'];
+			end
 			end
 		end
 	end
@@ -232,21 +166,24 @@ return name;
 end
 
 function _questDB:turnQuestCompleted()
-
-if (not self.isSetup) then
-		_questDB:setup();
-	end
-
-	for i=0, self.numQuests do
-		if self.questList[i]['questName'] == self.curListQuest then
-			if self.questList[i]['completed'] ~= "nnil" then
-				self.questList[i]['completed'] = "nnil";
-				_quest.currentQuest = nil;
-				self.curListQuest = nil;
-				DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete");
-				return true;
+	if self.curListQuest ~= nil then
+	for i=0, self.numQuests -1 do
+		if self.questList[i]['desc'] == _questDB.curDesc then
+			if self.questList[i]['questName'] == self.curListQuest then
+				if self.questList[i]['completed'] == "no" then
+					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
+					self.curListQuest = nil;
+					_quest.currentQuest = nil;
+					self.questList[i]['completed'] = "nnil";
+					self.questList[i]['questName'] = "nnil";
+					_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
+					_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
+					return true;
+					
+				end
 			end
 		end
+	end
 	end
 return false;
 end

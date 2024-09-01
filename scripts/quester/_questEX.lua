@@ -90,3 +90,43 @@ function _questEX:doChecks()
 		end
 return false;
 end
+
+-- get a target attacking us returns a currentObj:GetGUID()
+function _questEX:getTargetAttackingUs() 
+
+	local i, t = GetFirstObject(); 
+
+	-- run object manager
+	while i ~= 0 do 
+		
+		-- NPC type 3
+    		if t == 3 then
+	
+			-- acceptable targets
+			if (i:CanAttack() and not i:IsDead()) and (i:IsInLineOfSight()) and (not i:IsCritter()) then
+
+			-- get targets target - target of target
+			local localObj = GetLocalPlayer();
+			local targetTarget = i:GetUnitsTarget();
+
+				-- target has a target and distance less than 50 (limit object manager by distance)
+				if (targetTarget ~= 0 and targetTarget ~= nil) and (i:GetDistance() < 50) then
+
+					-- if target is targeting me then
+					if (targetTarget:GetGUID() == localObj:GetGUID()) then
+	
+						-- return target
+						return i;
+					end
+				end	
+
+            		end 
+       		end
+
+	-- get next target
+	i, t = GetNextObject(i); 
+	end
+
+	-- return nil if no target
+	return nil;
+end
