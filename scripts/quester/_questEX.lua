@@ -6,7 +6,8 @@ function _questEX:doChecks()
 	if (AreBagsFull()) then
 		self.bagsFull = true;
 	end
--- Check: If our gear is yellow
+
+	-- Check: If our gear is yellow
 		for i = 1, 16 do
 		local status = GetInventoryAlertStatus('' .. i);
 			if (status ~= nil) then 
@@ -18,7 +19,7 @@ function _questEX:doChecks()
 			end
 		end
 
--- Check bags if they are full
+	-- Check bags if they are full
 		local inventoryFull = true;
 		for i = 1, 5 do 
 			if (i ~= 0) then 
@@ -39,13 +40,11 @@ function _questEX:doChecks()
 			return false;
 		end
 
-
-
--- loot objects
+	-- loot objects
 	if (not IsInCombat()) then
 		script_grind.lootObj = script_nav:getLootTarget(50);
 		if (script_grind.lootObj ~= nil) then
-			self.message = "Looting";
+			_quest.message = "Looting";
 			if (script_grind.lootObj:GetDistance() <= 4) then
 				if (IsMoving()) then
 					StopMoving();

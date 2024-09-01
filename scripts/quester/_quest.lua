@@ -23,6 +23,8 @@ _quest = {
 	curQuestY = 0,
 	curQuestZ = 0,
 	weHaveQuest = fasle,
+	autoComplete = true,
+	xp = 0,
 
 	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -32,6 +34,7 @@ _quest = {
 	questerDBIncluded = include("scripts\\db\\_questDB.lua"),
 	questerDBTargetsIncluded = include("scripts\\db\\_questDBTargets.lua"),
 	questerDBReturnQuestIncluded = include("scripts\\db\\_questDBReturnQuest.lua"),
+	questerDBGatherIncluded = include("scripts\\db\\_questDBGather.lua"),
 	questerEXIncluded = include("scripts\\quester\\_questEX.lua"),
 	questerCheckQuestCompletionIncluded = include("scripts\\quester\\_questCheckQuestCompletion.lua"),
 	questerDoCombatIncluded = include("scripts\\quester\\_questDoCombat.lua"),
@@ -82,6 +85,9 @@ function _quest:setup()
 	end
 	script_helper:setup();
 	self.usingQuester = true;
+	if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
+		self.autoComplete = false;
+	end
 
 	_questDBReturnQuest.waitTimer = GetTimeEX();
 	self.waitTimer = GetTimeEX();
@@ -114,12 +120,8 @@ function _quest:run()
 		return;
 	end
 
-	if (self.waitTimer + self.tickRate > GetTimeEX()) then
-		return;
-	end
-
 -- handle vendor stuff through vendor scripts
-	if (not IsInCombat()) and _questEX.bagsFull then
+	if (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus == 0) then
 			script_vendor:sell();
@@ -127,11 +129,13 @@ function _quest:run()
 		end
 		if (vendorStatus > 1) then
 			_questHandleVendor:vendor();
-			return true;
-		else
-			_questEX.bagsFull = false;
+			return;
 		end
 	return true;
+	end
+
+	if (self.waitTimer + self.tickRate > GetTimeEX()) then
+		return;
 	end
 
 	-- run setup function once
@@ -140,13 +144,15 @@ function _quest:run()
 		self.currentDebugStatus = "Running Setup";
 	end
 
-	
-
 	script_grind.lootObj = script_nav:getLootTarget(50);
 	if _questEX:doChecks() then
 		return true;
 	end
-
+	if self.currentQuest ~= _questDB.curListQuest and self.autoComplete then
+		_questDB:turnQuestCompleted()
+		self.waitTimer = GetTimeEX() + 200;
+	end
+	self.xp = UnitXP("Player");
 	_questCheckQuestCompletion:checkQuestForCompletion();
 	if self.currentQuest ~= nil and self.isQuestComplete then
 		if _questDBReturnQuest:returnAQuest() then
@@ -217,13 +223,18 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 		end
 	end
 	
+-- gather quest object
+--if dist to hotspot reached then
+--if _questDBGather:getObject() ~= 0 then
+--_questDBGather:gatherObject()
+--end
 	-- get a target
-	if (self.currentQuest ~= nil) and (self.curGrindX ~= 0) and (self.grindSpotReached) then
+	if ((self.currentQuest ~= nil) and (self.curGrindX ~= 0) and (self.grindSpotReached)) or (IsInCombat()) then
 		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
 			self.enemyTarget = _questDBTargets:getTarget();
 		end
 	end
-	if script_grind.lootObj == nil then
+	if script_grind.lootObj == nil or IsInCombat() then
 		_questDoCombat:doCombat();
 	end
 	-- we have a quest so go to grind spot
@@ -235,6 +246,28 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 end
 
 function _quest:runRest()
+		if (IsInCombat()) or (IsLooting()) then return false; end
+	local localObj = GetLocalPlayer(); local localHealth = localObj:GetHealthPercentage(); local localMana = localObj:GetManaPercentage();
+		self.needRest = true;
 
+	-- run the rest script for grind/combat
+	if(RunRestScript()) then
+		self.message = "Resting...";
+		_quest.waitTimer = GetTimeEX() + 2000;
+		if (IsMoving()) and (not localObj:IsMovementDisabed()) then StopMoving(); return true; end
+
+		if (not IsInCombat()) and (not petHasTarget) then if (IsEating() and localHealth < 95) or (IsDrinking() and localMana < 95) then return true; end end
+		if (IsEating() and localHealth >= 95 and IsDrinking() and localMana >= 95) 
+		or (not IsDrinking() and IsEating() and localHealth >= 95)
+		or (not IsEating() and IsDrinking() and localMana >= 95)
+		then
+			if (not IsStanding()) then
+				JumpOrAscendStart();
+				return false;
+			end
+		end
+	return true;	
+	end
+self.needRest = false;
 return false;
 end

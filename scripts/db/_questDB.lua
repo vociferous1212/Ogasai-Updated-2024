@@ -8,7 +8,7 @@ function _questDB:setup()
 
 	-- type quest 1 = kill 2 = gather 0 = already completed
 
---[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum)]]--
+--[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum)]]--
 
 	_questDB_Duskwood_20_25:setup();
 	_questDB_Teldrassil_Shadowglen:setup();
@@ -19,9 +19,8 @@ function _questDB:setup()
 end
 
 
-function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum, desc)
+function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum, desc)
 	self.questList[self.numQuests] = {};
-	
 	self.questList[self.numQuests]['completed'] = completed;
 	self.questList[self.numQuests]['faction']= faction;
 	self.questList[self.numQuests]['questName'] = questName;
@@ -49,8 +48,8 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['returnTarget'] = returnTarget;
 	self.questList[self.numQuests]['targetName'] = targetName;
 	self.questList[self.numQuests]['targetName2'] = targetName2;
-	self.questList[self.numQuests]['gatherName'] = gatherName;
-	self.questList[self.numQuests]['gatherName2'] = gatherName2;
+	self.questList[self.numQuests]['gatherID'] = gatherID;
+	self.questList[self.numQuests]['gatherID2'] = gatherID2;
 	self.questList[self.numQuests]['rewardNum'] = rewardNum;
 	self.questList[self.numQuests]['desc'] = desc;
 	self.numQuests = self.numQuests + 1;
@@ -62,20 +61,33 @@ local x, y, z = 0, 0, 0;
 local dist = 0;
 local bestDist = 10000;
 local a = nil;
-	for i=0, self.numQuests -1 do
-		if self.questList[i]['completed'] ~= "nnil" then
-			if self.questList[i]['questName'] ~= "nnil" then
-				if self.questList[i]['mapID'] == GetMapID() then
-
-					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
-					-- set our quest to be checked through rest of script?
-				
-					self.curListQuest = self.questList[i]['questName']
-					self.curDesc = self.questList[i]['desc'];
+	--if _quest.isQuestComplete then
+	--	for y=0, _questDB.numQuests -1 do
+	--		if _questDB.questList[y]['questName'] ~= "nnil" then
+	--			if _questDB.questList[y]['questName'] == _quest.currentQuest then
+	--				x, y, z = self.questList[y]['pos']['x'], self.questList[y]['pos']['y'], self.questList[y]['pos']['z'];
+	--				self.curListQuest = self.questList[y]['questName'];
+	--				self.curDesc = GetObjectiveText(1);
+	--			end	
+	--		end
+	--	end
+	--end
+	--if not _quest.isQuestComplete then
+		for i=0, self.numQuests -1 do
+			if self.questList[i]['completed'] ~= "nnil" then
+				if self.questList[i]['questName'] ~= "nnil" then
+					if self.questList[i]['mapID'] == GetMapID() then
+	
+						x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
+						-- set our quest to be checked through rest of script?
+					
+						self.curListQuest = self.questList[i]['questName']
+						self.curDesc = self.questList[i]['desc'];
+					end
 				end
 			end
 		end
-	end
+	--end
 return x, y, z;
 end
 
@@ -172,6 +184,7 @@ function _questDB:turnQuestCompleted()
 			if self.questList[i]['questName'] == self.curListQuest then
 				if self.questList[i]['completed'] == "no" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
+					ToFile(""..self.curListQuest.." - completed");
 					self.curListQuest = nil;
 					_quest.currentQuest = nil;
 					self.questList[i]['completed'] = "nnil";

@@ -1,8 +1,7 @@
 _questDBSetup = {}
 
 function _questDBSetup:menu()
-
-
+	Text("My XP - ".._quest.xp);
 	if (Button("List Quests")) then
 		for i=0, _questDB.numQuests -1 do
 			a = _questDB.questList[i]['questName'];
@@ -10,34 +9,20 @@ function _questDBSetup:menu()
 			DEFAULT_CHAT_FRAME:AddMessage(""..a..", | Complete - "..b.."");
 		end
 	end
-
-local a = "";
-local b, c = 0, "", "";
-local d, e, f = "", 0, 0;
--- mapID, minlevel, maxlevel
-		local g, h, i = 0, 0, 0;
-		--grind pos
-		local j, k, l = 0, 0, 0;
-		-- type, kill number, gather number
-		local m, n, o = 0, 0, 0;
-		-- return pos
-		local p, q, r = 0, 0, 0;
-		-- return target name, kill target 1, kill target 2
-		local s, t, u = "", "", "";
-		-- gather target 1, gather target 2, is completed
-		local v, w, x = "", "", "";
-		local y, aa, bb, cc = 0, 0, 0, 0;
-
-
-
+local a = ""; local b, c = 0, "", ""; local d, e, f = "", 0, 0; local g, h, i = 0, 0, 0; local j, k, l = 0, 0, 0; local m, n, o = 0, 0, 0; local p, q, r = 0, 0, 0; local s, t, u = "", "", ""; local v, w, x = "", "", ""; local y, aa, bb, cc = 0, 0, 0, 0;
 		if _quest.currentQuest ~= nil then
+		Text("Current quester quest to run");
 		Text("_quest.currentQuest - ".._quest.currentQuest);
 		else
+		Text("Current quester quest to run");
 		Text("_quest.currentQuest - NIL");
 		end
+		Text("");
+		Text("Current questDB quest being checked");
 		if _questDB.curListQuest ~= nil then
 		Text("_questDB.curListQuest - ".._questDB.curListQuest);
 		end
+		Text("");
 		if _quest.isQuestComplete then
 		Text("_quest.isQuestComplete - true");
 		else
@@ -73,17 +58,18 @@ local d, e, f = "", 0, 0;
 			v = z['returnTarget'];
 			w = z['targetName'];
 			x = z['targetName2'];
-			y = z['gatherName'];
-			aa = z['gatherName2'];
+			y = z['gatherID'];
+			aa = z['gatherID2'];
 			bb = z['rewardNum'];
 			cc = z['desc'];
 			
 		end
 	end
 	end
+		Text("");
 		
 		 Text("Debug stuff");
-SameLine();
+		Separator();
 		--(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum, desc)
 
 		Text("Completed Status");

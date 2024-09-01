@@ -15,7 +15,7 @@ function _questHandleVendor:vendor()
 	
 		elseif (vendorStatus == 2) then
 			_quest.message = "Selling to vendor...,";
-			if (script_vendor:sell()) then _quest:setTimer(100);
+			if (script_vendor:sell()) then  _quest:setTimer(100);
 				return true;
 			end
 		elseif (vendorStatus == 3) then
@@ -29,6 +29,8 @@ function _questHandleVendor:vendor()
 			if (script_vendor:continueBuy()) then _quest:setTimer(100);
 				return true;
 			end
+		else
+			_questEX.bagsFull = false;
 		end
 	end
 return false;

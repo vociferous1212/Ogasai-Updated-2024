@@ -2,7 +2,16 @@ _questDB_Teldrassil_Shadowglen = {isSetup = false}
 
 function _questDB_Teldrassil_Shadowglen:setup()
 
---[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum)]]--
+--[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum, desc)]]--
+
+-- added extra kills to make you level faster but needs to be changed to check for items...
+_questDB:addQuest("no", 0, "Webwood Venom", "Gilshalan Windwalker", 10417.700195313, 871.19396972656, 1319.4086914063, 141, 1, 6, 10735.243164063, 925.56115722656, 1333.4985351563, 1, 20, 0, 0, 0, 10417.700195313, 871.19396972656, 1319.4086914063, "Gilshalan Windwalker", "Webwood Spider", 0, 0, 0, 4, "Bring 10 Webwood Venom Sacs to Gilshalan Windwalker at Aldrassil.");
+
+--_questDB:addQuest("no", 0, "Iverron's Antidote", "Dirania Silvershine", 10407.200195313, 713.79400634766, 1321.6176757813, 141, 1, 6, 10668.392578125, 878.42413330078, 1319.3364257813, 2, 0, 0, 7, 4, 10407.200195313, 713.79400634766, 1321.6176757813, "Dirania Silvershine", "Webwood Spider", 0, 2090, 253, "Webwood Ichor", 0, "Collect 7 Hyacinth Mushrooms, 4 Moonpetal Lilies, and 1 Webwood Ichor for Dirania Silveshine in Shadowglen.");
+
+_questDB:addQuest("no", 0, "A Friend in Need", "Iverron", 10711.599609375, 1034.9100341797, 1347.2602539063, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 10407.200195313, 713.79400634766, 1321.6176757813, "Dirania Silvershine", 0, 0, 0, 0, 0, "Speak to Dirania Silvershine in Shadowglen.");
+
+_questDB:addQuest("no", 0, "A Good Friend", "Dirania Silvershine", 10407.200195313, 713.79400634766, 1321.6176757813, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 10711.599609375, 1034.9100341797, 1347.2602539063, "Iverron", 0, 0, 0, 0, 0, "Find Iverron by the cave to the north.");
 
 _questDB:addQuest("no", 0, "The Woodland Protector", "Tarindrella", 10297.985351563, 871.41156005859, 1335.6091308594, 141, 1, 6, 10281.4140625, 948.26000976563, 1337.7951660156, 1, 8, 0, 0, 0, 10297.985351563, 871.41156005859, 1335.6091308594, "Tarindrella", "Grell", "Grellkin", 0, 0, 3, "Collect 8 Fel Moss and bring them to Tarindrella.");
 

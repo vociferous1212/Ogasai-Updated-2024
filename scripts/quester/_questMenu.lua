@@ -75,8 +75,10 @@ function _questMenu:menu()
 		Text("Options:"); SameLine(); Text("Gather DB Stuff");
 		Text("");
 
-
-
+		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
+		Text("Until bot reaches current quest in quest log");
+		Text("YOU MUST HAVE A QUEST IN QUEST LOG");
+		Separator();
 		if (Button("Current Spot Is Grind Spot")) then
 			_quest.grindSpotReached = true;
 			_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
