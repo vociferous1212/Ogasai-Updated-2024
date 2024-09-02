@@ -91,7 +91,7 @@ if (localObj:IsDead()) then
 		end
 
 	-- loot objects
-	if (not IsInCombat()) then
+	if (not IsInCombat()) and not script_grind.skipLooting then
 		script_grind.lootObj = script_nav:getLootTarget(50);
 		if (script_grind.lootObj ~= nil) then
 			_quest.message = "Looting";

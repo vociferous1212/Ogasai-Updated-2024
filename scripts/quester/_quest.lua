@@ -118,28 +118,9 @@ function _quest:run()
 
 	script_grind.nextToNodeDist = 4.05
 
-	if _questDB.curListQuest == nil then
-		self.message = "No quest or no quest in level range in DB! Going to grind...";
-		script_grind:run();
-		script_grind.pause = false;
-		_quest.pause = true;
-		--local x, y, z = GetLocalPlayer():GetPosition();
-		--if GetDistance3D(x, y, z, 10735.243164063, 925.56115722656, 1333.4985351563) > 50 then
-		--	if script_navEX:moveToTarget(GetLocalPlayer(), 10735.243164063, 925.56115722656, 1333.4985351563) then
-		--		return true;
-		--	end
-		--end
-		-- get a target
-		--if (self.enemyTarget == nil) then
-		--	self.enemyTarget = _questDBTargets:getTarget()
-		--elseif (self.enemyTaget ~= nil) then
-		--	_questDoCombat:doCombat();
-		--end
-		return;
-	end
-
 	-- return if we pause bot
 	if (self.pause) then
+		script_grind.pause = true;
 		return;
 	end
 
@@ -159,7 +140,7 @@ function _quest:run()
 	return true;
 	end
 
-	if (self.waitTimer + self.tickRate > GetTimeEX()) then
+	if (self.waitTimer + self.tickRate > GetTimeEX()) and script_grind.pause then
 		return;
 	end
 
@@ -169,15 +150,33 @@ function _quest:run()
 		self.currentDebugStatus = "Running Setup";
 	end
 
-	script_grind.lootObj = script_nav:getLootTarget(50);
-	if _questEX:doChecks() then
-		if script_grind.lootObj ~= nil then
-			if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
-				ClearTarget();
-			end
+	if script_grind.pause then
+		if not script_grind.skipLooting then
+		script_grind.lootObj = script_nav:getLootTarget(50);
 		end
-	return true;
+		if _questEX:doChecks() then
+			if script_grind.lootObj ~= nil then
+				if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
+					ClearTarget();
+				end
+			end
+		return true;
+		end
+	
+		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() then
+			_questDoCombat:doCombat();
+			return true;
+		end
 	end
+	
+	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
+		_questDB:turnQuestCompleted()
+		_quest.weCompletedQuest = false;
+		_quest.isQuestComplete = false;
+		_quest.currentDesc = nil;
+		_questDB.curDesc = nil;
+	end
+
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
 	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
@@ -186,20 +185,12 @@ function _quest:run()
 		end
 	end
 
-	if (not IsInCombat()) then
-		self.xp = UnitXP("Player");
-	end
-
 	_questCheckQuestCompletion:checkQuestForCompletion();
 	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) then
 		if _questDBReturnQuest:returnAQuest() then
 			self.message = "Returning quest!";
-			return true;
+		return true;
 		end
-	end
-
-	if (not IsInCombat()) then
-		self.xp = UnitXP("Player");
 	end
 
 	-- set our current quest
@@ -280,10 +271,7 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			self.enemyTarget = _questDBTargets:getTarget();
 		end
 	end
-	if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() then
-		_questDoCombat:doCombat();
-		return true;
-	end
+
 	-- we have a quest so go to grind spot
 	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
 		self.message = "Moving to grind spot";
@@ -291,6 +279,15 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 		return true;
 	end
 
+	-- run grinder until we get a quest
+	if _questDB.curListQuest == nil then
+		self.message = "No quest or no quest in level range in DB! Going to grind...";
+		self.message = script_grind.message;
+		script_grind:run();
+		script_grind.pause = false;
+	elseif not script_grind.pause then
+		script_grind.pause = true;
+	end
 end
 
 function _quest:runRest()

@@ -13,39 +13,19 @@ function _questDBReturnQuest:returnAQuest()
 	end
 
 	-- return a quest
-	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) then
-
-		if _quest.xp ~= UnitXP("player") then
-			_questDB:turnQuestCompleted()
-			_quest.isQuestComplete = false;
-			_quest.currentQuest = nil;
-			_questDB.curListQuest = nil;
-		end
+	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete then
 
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
 		for i=0, _questDB.numQuests -1 do
 			if _quest.currentQuest == _questDB.questList[i]['questName'] then
-
-				if _questDB.questList[i]['type'] == 0 then
+				if _quest.currentDesc == _questDB.questList[i]['desc'] then
 					x, y, z = _questDB:getReturnTargetPos();
-				end
-
-				if _questDB.questList[i]['type'] == 1 then
-					if _quest.isQuestComplete then	
-						x, y, z = _questDB:getReturnTargetPos();
-					end
 				end
 			end
 		end
 
-		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
-			if _quest.xp ~= UnitXP("player") then
-				_questDB:turnQuestCompleted()
-				_quest.isQuestComplete = false;
-				_quest.currentQuest = nil;
-				_questDB.curListQuest = nil;
-			end
+		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
 			_quest.grindSpotReached = false;
 			_quest.targetKilledNum = 0;
@@ -63,8 +43,11 @@ function _questDBReturnQuest:returnAQuest()
 			if (GetTarget() ~= 0 and GetTarget() ~= nil) and not IsMoving() then
 					_quest.waitTimer = GetTimeEX() + 2000;
 				if not IsMoving() and (GetTarget():UnitInteract()) then
+
+					_quest.weCompletedQuest = true;
 					
-					self.waitTimer = GetTimeEX() + 5000;
+					self.waitTimer = GetTimeEX() + 2000;
+
 
 						CompleteQuest();
 						SelectGossipActiveQuest(1)
@@ -84,26 +67,20 @@ function _questDBReturnQuest:returnAQuest()
 								end
 							end
 						end
+
+
 					
 						if (not GetQuestReward(rewardNum)) then
 							self.waitTimer = GetTimeEX() + 2000;
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
-							if _quest.xp ~= UnitXP("player") then
-								_questDB:turnQuestCompleted()
-								_quest.isQuestComplete = false;
-								_quest.currentQuest = nil;
-								_questDB.curListQuest = nil;
-							end
+							CompleteQuest();
 						end
-						if _quest.xp ~= UnitXP("player") then
-							_questDB:turnQuestCompleted()
-							_quest.isQuestComplete = false;
-							_quest.currentQuest = nil;
-							_questDB.curListQuest = nil;
-						end
-				end
+					return true;	
+					end
+			return true;
 			end
+		return true;
 		end
 		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
 			if (not IsInCombat()) and PlayerHasTarget() then

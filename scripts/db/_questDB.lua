@@ -65,21 +65,15 @@ local bestDist = 10000;
 		if self.questList[i]['completed'] ~= "nnil" then
 			if self.questList[i]['questName'] ~= "nnil" then
 				if self.questList[i]['mapID'] == GetMapID() then
+
 					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 
 					-- set our quest to be checked through rest of script?
-					if _quest.currentDesc == nil then
+						--if _quest.currentDesc == nil then
 						_questDB.curDesc = self.questList[i]['desc'];
 						_questDB.curListQuest = self.questList[i]['questName'];
-					-- we have a quest in quest log so check that quest
-					else
-						_questDB.curDesc = _quest.currentDesc; 
-						for i=0, self.numQuests -1 do
-							if self.questList[i]['desc'] == _questDB.curDesc then
-								_questDB.curListQuest = self.questList[i]['questName'];
-							end
-						end
-					end		
+
+		
 				end
 			end
 		end
@@ -95,7 +89,7 @@ local bestDist = 10000;
 	for i=0, self.numQuests -1 do
 		if self.questList[i]['completed'] == "no" then
 			if self.questList[i]['questName'] ~= "nnil" then
-			if self.questList[i]['mapID'] == GetMapID() then
+				if self.questList[i]['mapID'] == GetMapID() then
 
 			local dist = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 
@@ -159,6 +153,7 @@ end
 
 function _questDB:getReturnTargetName()	
 local x, y, z = 0, 0, 0;
+local name = nil;
 
 
 	for i=0, self.numQuests -1 do
@@ -178,8 +173,8 @@ function _questDB:turnQuestCompleted()
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
 		--(if desc == quest being checked and quest being checked ~= nil) or (quest being checked ~= nil and quester current quest == nil) or (there's no quest objective
-		if (self.questList[i]['desc'] == _quest.currentDesc and not _quest.currentDesc == nil) or (self.questList[i]['desc'] == _questDB.curDesc and _questDB.curDesc ~= nil and _quest.currentQuest == nil) or (GetObjectiveText(1) == nil and _quest.currentQuest ~= _questDB.curListQuest) then
-			if self.questList[i]['questName'] == self.curListQuest then
+		if (self.questList[i]['desc'] == _quest.currentDesc and _quest.currentDesc ~= nil) or (self.questList[i]['desc'] == _questDB.curDesc and _questDB.curDesc ~= nil and _quest.currentQuest == nil) or (GetObjectiveText(1) == nil and _quest.currentQuest ~= _questDB.curListQuest) or (not _quest.isQuestCompleted) then
+			if self.questList[i]['questName'] == self.curListQuest and self.questList[i]['desc'] == _questDB.curDesc then
 				if self.questList[i]['completed'] == "no" and self.questList[i]['questName'] ~= "nnil" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
 					ToFile(""..self.curListQuest.." - completed");
