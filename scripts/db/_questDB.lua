@@ -7,8 +7,13 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 function _questDB:setup()
 --[[
 --type quest - 1 = kill | 2 = gather | 0 = already completed | 3 = ?
---completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum)
+
+--completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum)
+
 ]]--
+	--_questDB:addQuest("no", 0, "Denalan's Earth", "Syral Bladeleaf", 9872.259765625, 959.27801513672, 1308.0705566406, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9506.919921875, 713.76599121094, 1255.8875732422, "Denalan", 0, 0, 0, 0, 0, 0, "Bring the package of Rare Earth to Denalan at Lake Al'Ameth.");
+
+	_questDB:addQuest("no", 0, "Zenn's Bidding", "Zenn Foulhoof", 9925.73046875, 737.07000732422, 1315.8277587891, 141, 6, 10, 9766.2744140625, 640.22064208984, 1296.651367187, 1, 10, 10, 10, 0, 0, 9925.73046875, 737.07000732422, 1315.8277587891, "Zenn Foulhoof", "Nightsaber", "Strigid Owl", "Webwood Lurker", 0, 0, 1, "Bring Zenn Foulhoof outside of Dolanaar 3 Nightsaber Fangs, 3 Strigid Owl Feathers and 3 swatches of Webwood Spider Silk.");
 
 	_questDB_Duskwood_20_25:setup();
 	_questDB_Teldrassil_Shadowglen:setup();
@@ -20,7 +25,7 @@ function _questDB:setup()
 end
 
 
-function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum, desc)
+function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc)
 	self.questList[self.numQuests] = {};
 	self.questList[self.numQuests]['completed'] = completed;
 	self.questList[self.numQuests]['faction']= faction;
@@ -40,6 +45,7 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['type'] = type;
 	self.questList[self.numQuests]['numKill'] = numKill;
 	self.questList[self.numQuests]['numKill2'] = numKill2;
+	self.questList[self.numQuests]['numKill3'] = numKill3;
 	self.questList[self.numQuests]['numGather'] = numGather;
 	self.questList[self.numQuests]['numGather2'] = numGather2;
 	self.questList[self.numQuests]['returnPos'] = {};
@@ -49,6 +55,7 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['returnTarget'] = returnTarget;
 	self.questList[self.numQuests]['targetName'] = targetName;
 	self.questList[self.numQuests]['targetName2'] = targetName2;
+	self.questList[self.numQuests]['targetName3'] = targetName3;
 	self.questList[self.numQuests]['gatherID'] = gatherID;
 	self.questList[self.numQuests]['gatherID2'] = gatherID2;
 	self.questList[self.numQuests]['rewardNum'] = rewardNum;
@@ -65,6 +72,7 @@ local bestDist = 10000;
 		if self.questList[i]['completed'] ~= "nnil" then
 			if self.questList[i]['questName'] ~= "nnil" then
 				if self.questList[i]['mapID'] == GetMapID() then
+					if GetLocalPlayer():GetLevel() >= self.questList[i]['minLevel'] and GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] then
 
 					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 
@@ -72,6 +80,7 @@ local bestDist = 10000;
 						--if _quest.currentDesc == nil then
 						_questDB.curDesc = self.questList[i]['desc'];
 						_questDB.curListQuest = self.questList[i]['questName'];
+					end
 
 		
 				end
@@ -193,4 +202,32 @@ function _questDB:turnQuestCompleted()
 	end
 	end
 return false;
+end
+function _questDB:turnOldQuestCompleted()
+local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
+		
+	if (not _quest.isQuestCompleted)then
+		for i=0, _questDB.numQuests -1 do
+			if self.questList[i]['questName'] == self.curListQuest then
+				if self.questList[i]['questName'] ~= _quest.currentQuest then
+					if self.questList[i]['completed'] == "no" then
+						if self.questList[i]['questName'] ~= "nnil" then
+							if self.questList[i]['questName'] ~= title then
+							DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
+							self.questList[i]['completed'] = "nnil";
+							self.questList[i]['questName'] = "nnil";
+							ToFile(""..self.curListQuest.." - completed");
+							self.curListQuest = nil;
+							self.curDesc = nil;
+							_quest.currentQuest = nil;
+							_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
+							_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
+						return true;
+			end 
+		end
+end
+end
+end
+end
+end
 end

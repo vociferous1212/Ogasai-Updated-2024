@@ -30,6 +30,11 @@ function _questDoCombat:doCombat()
 								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
 								_quest.targetKilledNum2 = _quest.targetKilledNum2 + 1;
 							end
+							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName3'] then
+								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
+								_quest.targetKilledNum3 = _quest.targetKilledNum3 + 1;
+							end
+
 						end
 					end
 				end

@@ -37,8 +37,10 @@ function _questDBTargets:getTarget()
 				if _questDB.questList[i]['desc'] == _quest.currentDesc then
 					target = _questDB.questList[i]['targetName'];
 					target2 = _questDB.questList[i]['targetName2'];
+					target3 = _questDB.questList[i]['targetName3'];
 					numKill = _questDB.questList[i]['numKill'];
 					numKill2 = _questDB.questList[i]['numKill2'];
+					numKill3 = _questDB.questList[i]['numKill3'];
 				end
 				end
 				end
@@ -48,7 +50,7 @@ function _questDBTargets:getTarget()
 	local weHaveQuestTarget = false;
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 200 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2)) and not i:IsDead() then
+			if i:GetDistance() <= 200 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == target and _quest.targetKilledNum3 < numKill3)) and not i:IsDead() then
 				dist = i:GetDistance();
 				if bestDist > dist then
 					bestDist = dist;

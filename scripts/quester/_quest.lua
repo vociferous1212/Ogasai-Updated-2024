@@ -11,6 +11,7 @@ _quest = {
 	enemyTarget = nil,
 	targetKilledNum = 0,
 	targetKilledNum2 = 0,
+	targetKilledNum3 = 0,
 	gartheredNum = 0,
 	gatheredNum2 = 0,
 	isQuestComplete = false,
@@ -78,13 +79,16 @@ end
 
 --run setup
 function _quest:setup()
-
+	script_grind:setup();
+	script_gather:setup();
+	script_grind.getSpells = true;
 	script_vendor:setup();
 	vendorDB:setup();
 	vendorDB:loadDBVendors();
 	if (not _questDB.isSetup) then
 		_questDB:setup();
 	end
+	_questDBGather.waitTimer = GetTimeEX();
 	script_helper:setup();
 	self.usingQuester = true;
 	if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
@@ -101,8 +105,36 @@ end
 -- run the quester
 function _quest:run()
 
-	-- draw the window
 	_quest:window();
+	script_drawStatusEX:drawSetup()
+	-- draw object manager and end debug window
+	if (script_grind.showOM) then
+		EndWindow();
+		GetObjectsAroundMe();
+	end
+	if (not HasSpell("First Aid")) then
+		script_grind.useFirstAid = false;
+	end
+	-- display radar
+	if (script_radar.showRadar) then
+		script_radar:draw()
+	end
+
+	-- display exp checker
+	if (script_grind.useExpChecker) and (IsInCombat()) then
+		script_expChecker:menu();
+	end
+	
+	-- draw chests
+	if (script_grind.drawChests) then
+		script_gather:drawChestNodes();
+	end
+	-- draw fishing pools
+	if (script_gatherEX.drawFishingPools) then
+		script_gatherEX:drawFishNodes();
+	end	
+
+
 
 	if (not IsUsingNavmesh()) then UseNavmesh(true);
 		return true;
@@ -125,7 +157,7 @@ function _quest:run()
 	end
 
 	-- handle vendor stuff through vendor scripts
-	if (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) then
+	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 1) then
 			_questHandleVendor:vendor();
@@ -180,7 +212,7 @@ function _quest:run()
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
 	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
-		if (_questDB:turnQuestCompleted()) then
+		if (_questDB:turnOldQuestCompleted()) then
 		self.waitTimer = GetTimeEX() + 500;
 		end
 	end

@@ -18,9 +18,12 @@ function _questDBReturnQuest:returnAQuest()
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
 		for i=0, _questDB.numQuests -1 do
 			if _quest.currentQuest == _questDB.questList[i]['questName'] then
-				if _quest.currentDesc == _questDB.questList[i]['desc'] then
+				--if _quest.currentDesc == _questDB.questList[i]['desc'] then
+				--	x, y, z = _questDB:getReturnTargetPos();
+				--end
+				--if _quest.currentDesc == nil and _questDB.questList[i]['desc'] ~= nil then
 					x, y, z = _questDB:getReturnTargetPos();
-				end
+				--end
 			end
 		end
 
