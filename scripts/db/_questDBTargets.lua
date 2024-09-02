@@ -33,12 +33,13 @@ function _questDBTargets:getTarget()
 		for i=0, _questDB.numQuests -1 do
 			if _questDB.questList[i]['completed'] == "no" then
 				if _questDB.questList[i]['questName'] ~= "nnil" then
-
 				if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+				if _questDB.questList[i]['desc'] == _quest.currentDesc then
 					target = _questDB.questList[i]['targetName'];
 					target2 = _questDB.questList[i]['targetName2'];
 					numKill = _questDB.questList[i]['numKill'];
 					numKill2 = _questDB.questList[i]['numKill2'];
+				end
 				end
 				end
 			end

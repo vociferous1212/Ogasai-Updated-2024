@@ -29,8 +29,6 @@ function _questHandleVendor:vendor()
 			if (script_vendor:continueBuy()) then _quest:setTimer(100);
 				return true;
 			end
-		else
-			_questEX.bagsFull = false;
 		end
 	end
 return false;

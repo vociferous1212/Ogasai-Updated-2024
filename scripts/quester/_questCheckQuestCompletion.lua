@@ -30,10 +30,9 @@ function _questCheckQuestCompletion:checkQuestForCompletion()
 							end
 						end
 						if _questDB.questList[i]['targetName'] ~= 0 and _questDB.questList[i]['targetName2'] ~= 0 then
-							if _questDB.questList[i]['numKill'] == _quest.targetKilledNum and _questDB.questList[i]['numKill2'] == _quest.targetKilledNum2 then	
-								if (_quest.targetKilledNum >= _questDB.questList[i]['numKill'] and _quest.targetKilledNum2 >= _questDB.questList[i]['numKill2']) or isItCompleted then
+							if (_questDB.questList[i]['numKill'] <= _quest.targetKilledNum and _questDB.questList[i]['numKill2'] <= _quest.targetKilledNum2) or isItCompleted then
 									_quest.isQuestComplete = true;
-								end
+							
 							end
 						end
 					end

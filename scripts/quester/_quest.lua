@@ -24,8 +24,9 @@ _quest = {
 	curQuestZ = 0,
 	weHaveQuest = fasle,
 	autoComplete = true,
+	currentDesc = nil,
+	returningQuest = false,
 	xp = 0,
-	curDesc = nil,
 
 	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -90,6 +91,7 @@ function _quest:setup()
 		self.autoComplete = false;
 	end
 
+	self.xp = UnitXP("Player");
 	_questDBReturnQuest.waitTimer = GetTimeEX();
 	self.waitTimer = GetTimeEX();
 
@@ -116,21 +118,43 @@ function _quest:run()
 
 	script_grind.nextToNodeDist = 4.05
 
+	if _questDB.curListQuest == nil then
+		self.message = "No quest or no quest in level range in DB! Going to grind...";
+		script_grind:run();
+		script_grind.pause = false;
+		_quest.pause = true;
+		--local x, y, z = GetLocalPlayer():GetPosition();
+		--if GetDistance3D(x, y, z, 10735.243164063, 925.56115722656, 1333.4985351563) > 50 then
+		--	if script_navEX:moveToTarget(GetLocalPlayer(), 10735.243164063, 925.56115722656, 1333.4985351563) then
+		--		return true;
+		--	end
+		--end
+		-- get a target
+		--if (self.enemyTarget == nil) then
+		--	self.enemyTarget = _questDBTargets:getTarget()
+		--elseif (self.enemyTaget ~= nil) then
+		--	_questDoCombat:doCombat();
+		--end
+		return;
+	end
+
 	-- return if we pause bot
 	if (self.pause) then
 		return;
 	end
 
--- handle vendor stuff through vendor scripts
+	-- handle vendor stuff through vendor scripts
 	if (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) then
 		local vendorStatus = script_vendor:getStatus();
+		if (vendorStatus > 1) then
+			_questHandleVendor:vendor();
+			return true;
+		else
+			_questEX.bagsFull = false;
+		end
 		if (vendorStatus == 0) then
 			script_vendor:sell();
 			return true;
-		end
-		if (vendorStatus > 1) then
-			_questHandleVendor:vendor();
-			return;
 		end
 	return true;
 	end
@@ -147,14 +171,23 @@ function _quest:run()
 
 	script_grind.lootObj = script_nav:getLootTarget(50);
 	if _questEX:doChecks() then
-		return true;
+		if script_grind.lootObj ~= nil then
+			if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
+				ClearTarget();
+			end
+		end
+	return true;
 	end
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
-	if ((GetNumQuestLogEntries() ~= 0 and  _questDB.curDesc ~= self.curDesc) or (GetNumQuestLogEntries() ~= nil and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
+	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
 		if (_questDB:turnQuestCompleted()) then
 		self.waitTimer = GetTimeEX() + 500;
 		end
+	end
+
+	if (not IsInCombat()) then
+		self.xp = UnitXP("Player");
 	end
 
 	_questCheckQuestCompletion:checkQuestForCompletion();
@@ -165,7 +198,9 @@ function _quest:run()
 		end
 	end
 
-	self.xp = UnitXP("Player");
+	if (not IsInCombat()) then
+		self.xp = UnitXP("Player");
+	end
 
 	-- set our current quest
 	for y=0, _questDB.numQuests -1 do
@@ -174,7 +209,7 @@ function _quest:run()
 			if _questDB.questList[y]['completed'] == "no" then
 				if _questDB.questList[y]['questName'] ~= "nnil" then
 					if title == _questDB.questList[y]['questName'] then
-						self.curDesc = GetObjectiveText(1);
+						_quest.currentDesc = GetObjectiveText(1);
 						self.currentQuest = title;
 						self.weHaveQuest = true;
 					end
@@ -190,6 +225,8 @@ function _quest:run()
 	local distToGrind = 0;
 	local px, py, pz = GetLocalPlayer():GetPosition();
 
+		-- SET MARKERS / AUTO PATH NODES WHEN AN ENEMY IS KILLED FOR NEW SELF.GRIND X,Y,Z
+		-- COUNT TARGETS AROUND AND CHANGE PATHS ACCORDINGLY?
 
 curQuestGiver = _questDB:getQuestGiverName();
 curQuestName = _questDB:getQuestName();
@@ -202,6 +239,9 @@ end
 
 	if (distToGrind <= 50) and not self.grindspotReached then
 		self.grindSpotReached = true;
+	end
+	if (distToGrind >= 250) and self.grindSpotReached then
+		self.grindSpotReached = false;
 	end
 
 	-- move to quest giver to get quest
@@ -235,37 +275,20 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 --_questDBGather:gatherObject()
 --end
 	-- get a target
-	if ((self.currentQuest ~= nil) and (self.curGrindX ~= 0) and (self.grindSpotReached)) or (IsInCombat()) then
+	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached) or (IsInCombat()) or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached) then
 		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
 			self.enemyTarget = _questDBTargets:getTarget();
 		end
 	end
-	if script_grind.lootObj == nil or IsInCombat() then
+	if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() then
 		_questDoCombat:doCombat();
+		return true;
 	end
 	-- we have a quest so go to grind spot
 	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
 		self.message = "Moving to grind spot";
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
 		return true;
-	end
-
-
-	if _questDB.curListQuest == nil then
-		self.message = "No quest or no quest in level range in DB! Going to grind...";
-		local x, y, z = GetLocalPlayer():GetPosition();
-		if GetDistance3D(x, y, z, 10735.243164063, 925.56115722656, 1333.4985351563) > 50 then
-			if script_navEX:moveToTarget(GetLocalPlayer(), 10735.243164063, 925.56115722656, 1333.4985351563) then
-				return true;
-			end
-		end
-		-- get a target
-		if (self.enemyTarget == nil) then
-			self.enemyTarget = _questDBTargets:getTarget()
-		elseif (self.enemyTaget ~= nil) then
-			_questDoCombat:doCombat();
-		end
-
 	end
 
 end
@@ -278,7 +301,7 @@ function _quest:runRest()
 	-- run the rest script for grind/combat
 	if(RunRestScript()) then
 		self.message = "Resting...";
-		_quest.waitTimer = GetTimeEX() + 2000;
+		
 		if (IsMoving()) and (not localObj:IsMovementDisabed()) then StopMoving(); return true; end
 
 		if (not IsInCombat()) and (not petHasTarget) then if (IsEating() and localHealth < 95) or (IsDrinking() and localMana < 95) then return true; end end

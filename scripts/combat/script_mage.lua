@@ -377,6 +377,7 @@ function script_mage:run(targetGUID)
 				if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) then
 					targetObj:FaceTarget();
 					targetObj:CastSpell("Shoot");
+					self.waitTimer = GetTimeEX() + 250;
 				return true;
 				end
 			end
@@ -786,6 +787,7 @@ function script_mage:run(targetGUID)
 				if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) then
 					targetObj:FaceTarget();
 					targetObj:CastSpell("Shoot");
+					self.waitTimer = GetTimeEX() + 250;
 					return true;
 				end
 			end

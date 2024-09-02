@@ -1,11 +1,11 @@
-_questEX = {getSpells = false, bagsFull = false,}
+_questEX = {bagsFull = false,}
 
 function _questEX:doChecks()
 	local localObj = GetLocalPlayer();
 
 if (localObj:IsDead()) then
 
-			script_grind.message = "Waiting to ressurect...";
+			_quest.message = "Waiting to ressurect...";
 
 			-- use soul stone
 			--if (localObj:HasBuff("Soul Stone")) and (localObj:IsDead()) and (not IsGhost()) then
@@ -14,13 +14,13 @@ if (localObj:IsDead()) then
 			--end
 
 			-- Release body
-			if (not IsGhost()) and (not script_paranoia:checkParanoia(30)) then
+			if (not IsGhost()) then
 				if (not RepopMe()) then
-					if (self.useThisVar) then
+					if (script_grindEX.useThisVar) then
 						script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
-						self.useThisVar = false;
+						script_grindEX.useThisVar = false;
 					end
-					script_grind.message = "Walking to corpse...";
+					_quest.message = "Walking to corpse...";
 					return true;
 				end
 				return true;
@@ -35,18 +35,18 @@ if (localObj:IsDead()) then
 				if (script_grind.safeRess) then
 					local rx, ry, rz = GetCorpsePosition();
 					if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
-						script_grind.message = "Finding a safe spot to ress...";
+						_quest.message = "Finding a safe spot to ress...";
 						return true;
 					else
 						if (script_aggro.rTime > GetTimeEX()) then
 							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
-							script_grind.message = "Finding a safe spot to ress...";
+							_quest.message = "Finding a safe spot to ress...";
 							return true;
 						end
 					end
 				end
 				RetrieveCorpse();
-				self.useThisVar = true;
+				script_grindEX.useThisVar = true;
 			end
 			return true;
 		end
@@ -95,9 +95,10 @@ if (localObj:IsDead()) then
 		script_grind.lootObj = script_nav:getLootTarget(50);
 		if (script_grind.lootObj ~= nil) then
 			_quest.message = "Looting";
-			if (script_grind.lootObj:GetDistance() <= 4) then
+			if (script_grind.lootObj:GetDistance() <= script_grind.lootDistance) then
 				if (IsMoving()) then
 					StopMoving();
+					return true;
 				end
 			end
 			if (not script_grind:doLoot(GetLocalPlayer())) then
@@ -105,8 +106,8 @@ if (localObj:IsDead()) then
 					if (not LootTarget()) then
 						LootTarget();
 					end
+					_quest.waitTimer = GetTimeEX() + 1500;
 				end
-				_quest.waitTimer = GetTimeEX() + 1500;
 				return true;
 			end
 		return true;
@@ -117,26 +118,33 @@ if (localObj:IsDead()) then
 		return true;
 	end
 
--- reset to allow bot to continue if we don't have the checkbox clicked...
-		if (not self.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
+	-- reset to allow bot to continue if we don't have the checkbox clicked...
+	if (not script_grind.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
+		script_getSpells.getSpellsStatus = 0;
+	end
+	if (script_grind.getSpells) and (not IsInCombat()) then
+		if script_getSpells.getSpellsStatus > 0 then
+			return;
+		end
+	end
+	-- go to trainer and get spells
+	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) then
+		if (script_getSpells:checkForSpellsNeeded()) then
+			if (PlayerHasTarget()) then
+				ClearTarget();
+			end
+			_quest.message = "Moving to class trainer for spells";
+			if (IsMoving()) and (not _quest.pause) then
+				if (not script_unstuck:pathClearAuto(2)) then
+					script_unstuck:unstuck();
+						return true;
+				end
+			end
+		return true;
+		else
 			script_getSpells.getSpellsStatus = 0;
 		end
-		
-		-- go to trainer and get spells
-		if (self.getSpells) and (not _quest.pause) and (not IsInCombat()) then
-			if (script_getSpells:checkForSpellsNeeded()) then
-				_quest.message = "Moving to class trainer for spells";
-				if (IsMoving()) and (not _quest.pause) then
-					if (not script_unstuck:pathClearAuto(2)) then
-						script_unstuck:unstuck();
-							return true;
-					end
-				end
-				return;
-			else
-				script_getSpells.getSpellsStatus = 0;
-			end
-		end
+	end
 return false;
 end
 

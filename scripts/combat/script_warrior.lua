@@ -221,6 +221,10 @@ function script_warrior:run(targetGUID)	-- main content of script
 		self.enableCharge = false;
 	end
 
+	if (_quest.usingQuester) and (IsInCombat()) and (not script_grind:isAnyTargetTargetingMe()) and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99)) then
+		return;
+	end 
+
 	-- Check: If Mainhand is broken stop bot
 	isMainHandBroken = GetInventoryItemBroken("player", 16);
 	

@@ -39,8 +39,8 @@ function _questDoCombat:doCombat()
 		if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) and (_quest.enemyTarget:IsDead()) then
 			local x, y, z = _quest.enemyTarget:GetPosition();
 			if (_quest.enemyTarget:GetDistance() > 4) then
-				Move(x, y, z);
-				return true;
+				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+				return;
 			else
 				_quest.enemyTarget = nil;
 			end
@@ -55,10 +55,9 @@ function _questDoCombat:doCombat()
 				-- move to target
 				if (_quest.enemyTarget ~= nil and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange) or (not _quest.enemyTarget:IsInLineOfSight()) then
 					local x, y, z = _quest.enemyTarget:GetPosition();
-					if (script_navEX:moveToTarget(GetLocalPlayer(), x, y, z)) then
-						_quest.currentDebugStatus = "Moving to target";
-						return true;
-					end
+					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+					_quest.currentDebugStatus = "Moving to target";
+				return true;
 				end
 			end
 		end

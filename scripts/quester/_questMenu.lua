@@ -83,10 +83,19 @@ function _questMenu:menu()
 			_quest.grindSpotReached = true;
 			_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
 		end
+		if _quest.grindSpotReached then
+			Text("Grind Spot Reached!");
+		elseif not _quest.grindSpotReached then
+			Text("Grind Spot NOT Reached!");
+		end
+	
+		Text("");
 
 		if (Button("Mark Current Quest As Complete")) then
 			_questDB:turnQuestCompleted();
 		end
+		Text("You cannot mark your current quest as complete...");
+		Text("");
 
 		_questDBSetup:menu();
 				

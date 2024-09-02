@@ -1,28 +1,20 @@
 _questDBSetup = {}
 
 function _questDBSetup:menu()
-	Text("My XP - ".._quest.xp);
-	if (Button("List Quests")) then
+
+	Text("GetMyFaction "..GetMyFaction());
+	if (Button("List Quests By My GetMapID()")) then
 		for i=0, _questDB.numQuests -1 do
+			if GetMapID() == _questDB.questList[i]['mapID'] then
 			a = _questDB.questList[i]['questName'];
 			b = _questDB.questList[i]['completed'];
 			DEFAULT_CHAT_FRAME:AddMessage(""..a..", | Complete - "..b.."");
+			end
 		end
 	end
 local a = ""; local b, c = 0, "", ""; local d, e, f = "", 0, 0; local g, h, i = 0, 0, 0; local j, k, l = 0, 0, 0; local m, n, o = 0, 0, 0; local p, q, r = 0, 0, 0; local s, t, u = "", "", ""; local v, w, x = "", "", ""; local y, aa, bb, cc = 0, 0, 0, 0;
-		if _quest.currentQuest ~= nil then
-		Text("Current quester quest to run");
-		Text("_quest.currentQuest - ".._quest.currentQuest);
-		else
-		Text("Current quester quest to run");
-		Text("_quest.currentQuest - NIL");
-		end
-		Text("");
-		Text("Current questDB quest being checked");
-		if _questDB.curListQuest ~= nil then
-		Text("_questDB.curListQuest - ".._questDB.curListQuest);
-		end
-		Text("");
+if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_quest.currentQuest - ".._quest.currentQuest); else Text("Current quester quest to run"); Text("_quest.currentQuest - NIL"); end if _quest.currentDesc ~= nil then Text("_quest.currentDesc - ".._quest.currentDesc); else Text("_quest.currentDesc - NIL"); end Text(""); Text("Current questDB quest being checked"); if _questDB.curListQuest ~= nil then Text("_questDB.curListQuest - ".._questDB.curListQuest); if _questDB.curDesc ~= nil then Text("_questDB.curDesc - ".._questDB.curDesc); else Text("_questDB.curDesc - NIL"); end end
+			Text("");
 		if _quest.isQuestComplete then
 		Text("_quest.isQuestComplete - true");
 		else
@@ -70,8 +62,6 @@ local a = ""; local b, c = 0, "", ""; local d, e, f = "", 0, 0; local g, h, i = 
 		
 		 Text("Debug stuff");
 		Separator();
-		--(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherName, gatherName2, rewardNum, desc)
-
 		Text("Completed Status");
 		Text(""..a.."");
 		Separator();

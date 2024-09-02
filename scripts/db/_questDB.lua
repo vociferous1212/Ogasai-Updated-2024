@@ -4,13 +4,11 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 		includeDuskwood2025 = include("scripts\\db\\_questDB_Duskwood_20_25.lua"),
 		includeDunMoroghColdridge = include("scripts\\db\\_questDB_DunMorogh_Coldridge.lua"),
 }
-
 function _questDB:setup()
-
-	-- type quest 1 = kill 2 = gather 0 = already completed
-
---[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum)]]--
-
+--[[
+--type quest - 1 = kill | 2 = gather | 0 = already completed | 3 = ?
+--completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum)
+]]--
 
 	_questDB_Duskwood_20_25:setup();
 	_questDB_Teldrassil_Shadowglen:setup();
@@ -63,34 +61,29 @@ function _questDB:getQuestStartPos()
 local x, y, z = 0, 0, 0;
 local dist = 0;
 local bestDist = 10000;
-local a = nil;
-	--if _quest.isQuestComplete then
-	--	for y=0, _questDB.numQuests -1 do
-	--		if _questDB.questList[y]['questName'] ~= "nnil" then
-	--			if _questDB.questList[y]['questName'] == _quest.currentQuest then
-	--				x, y, z = self.questList[y]['pos']['x'], self.questList[y]['pos']['y'], self.questList[y]['pos']['z'];
-	--				self.curListQuest = self.questList[y]['questName'];
-	--				self.curDesc = GetObjectiveText(1);
-	--			end	
-	--		end
-	--	end
-	--end
-	--if not _quest.isQuestComplete then
-		for i=0, self.numQuests -1 do
-			if self.questList[i]['completed'] ~= "nnil" then
-				if self.questList[i]['questName'] ~= "nnil" then
-					if self.questList[i]['mapID'] == GetMapID() then
-	
-						x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
-						-- set our quest to be checked through rest of script?
-					
-						self.curListQuest = self.questList[i]['questName']
-						self.curDesc = self.questList[i]['desc'];
-					end
+	for i=0, self.numQuests -1 do
+		if self.questList[i]['completed'] ~= "nnil" then
+			if self.questList[i]['questName'] ~= "nnil" then
+				if self.questList[i]['mapID'] == GetMapID() then
+					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
+
+					-- set our quest to be checked through rest of script?
+					if _quest.currentDesc == nil then
+						_questDB.curDesc = self.questList[i]['desc'];
+						_questDB.curListQuest = self.questList[i]['questName'];
+					-- we have a quest in quest log so check that quest
+					else
+						_questDB.curDesc = _quest.currentDesc; 
+						for i=0, self.numQuests -1 do
+							if self.questList[i]['desc'] == _questDB.curDesc then
+								_questDB.curListQuest = self.questList[i]['questName'];
+							end
+						end
+					end		
 				end
 			end
 		end
-	--end
+	end
 return x, y, z;
 end
 
@@ -131,12 +124,13 @@ end
 function _questDB:getQuestGrindPos()
 local x, y, z = 0, 0, 0;
 
-
 	for i=0, self.numQuests -1 do
 		if self.questList[i]['completed'] == "no" then
 			if (self.questList[i]['questName'] ~= "nnil") then
 			if self.questList[i]['questName'] == _quest.currentQuest then
+			if self.questList[i]['desc'] == _quest.currentDesc then
 				x, y, z = self.questList[i]['grindPos']['grindX'], self.questList[i]['grindPos']['grindY'], self.questList[i]['grindPos']['grindZ'];
+			end
 			end
 			end
 		end
@@ -183,12 +177,14 @@ end
 function _questDB:turnQuestCompleted()
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
-		if (self.questList[i]['desc'] == _questDB.curDesc and not _questDB.curDesc == nil) or (_questDB.curDesc ~= nil and _quest.currentQuest == nil) or (GetObjectiveText(1) ~= self.curDesc and _quest.currentQuest ~= _questDB.curListQuest) then
+		--(if desc == quest being checked and quest being checked ~= nil) or (quest being checked ~= nil and quester current quest == nil) or (there's no quest objective
+		if (self.questList[i]['desc'] == _quest.currentDesc and not _quest.currentDesc == nil) or (self.questList[i]['desc'] == _questDB.curDesc and _questDB.curDesc ~= nil and _quest.currentQuest == nil) or (GetObjectiveText(1) == nil and _quest.currentQuest ~= _questDB.curListQuest) then
 			if self.questList[i]['questName'] == self.curListQuest then
 				if self.questList[i]['completed'] == "no" and self.questList[i]['questName'] ~= "nnil" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
 					ToFile(""..self.curListQuest.." - completed");
 					self.curListQuest = nil;
+					self.curDesc = nil;
 					_quest.currentQuest = nil;
 					self.questList[i]['completed'] = "nnil";
 					self.questList[i]['questName'] = "nnil";

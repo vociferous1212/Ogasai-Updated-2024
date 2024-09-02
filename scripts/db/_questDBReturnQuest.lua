@@ -15,6 +15,13 @@ function _questDBReturnQuest:returnAQuest()
 	-- return a quest
 	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) then
 
+		if _quest.xp ~= UnitXP("player") then
+			_questDB:turnQuestCompleted()
+			_quest.isQuestComplete = false;
+			_quest.currentQuest = nil;
+			_questDB.curListQuest = nil;
+		end
+
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
 		for i=0, _questDB.numQuests -1 do
 			if _quest.currentQuest == _questDB.questList[i]['questName'] then
@@ -34,11 +41,11 @@ function _questDBReturnQuest:returnAQuest()
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
 			if _quest.xp ~= UnitXP("player") then
-								_questDB:turnQuestCompleted()
-								_quest.isQuestComplete = false;
-								_quest.currentQuest = nil;
-								_questDB.curListQuest = nil;
-							end
+				_questDB:turnQuestCompleted()
+				_quest.isQuestComplete = false;
+				_quest.currentQuest = nil;
+				_questDB.curListQuest = nil;
+			end
 
 			_quest.grindSpotReached = false;
 			_quest.targetKilledNum = 0;
@@ -82,15 +89,19 @@ function _questDBReturnQuest:returnAQuest()
 							self.waitTimer = GetTimeEX() + 2000;
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
-						end
-	if _quest.xp ~= UnitXP("player") then
+							if _quest.xp ~= UnitXP("player") then
 								_questDB:turnQuestCompleted()
 								_quest.isQuestComplete = false;
 								_quest.currentQuest = nil;
 								_questDB.curListQuest = nil;
 							end
-
-
+						end
+						if _quest.xp ~= UnitXP("player") then
+							_questDB:turnQuestCompleted()
+							_quest.isQuestComplete = false;
+							_quest.currentQuest = nil;
+							_questDB.curListQuest = nil;
+						end
 				end
 			end
 		end
