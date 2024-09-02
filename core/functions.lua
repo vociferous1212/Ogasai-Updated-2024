@@ -172,3 +172,13 @@ function RemoveForm()
 	script_shamanEX2:removeGhostWolf();
 return false;
 end
+function GetMyFaction()
+	local myFaction = nil;
+	-- faction check - 0 for alliance and 1 for horde
+	if (GetFaction() == 115 or GetFaction() == 3 or GetFaction() == 4 or GetFaction() == 1) then
+		myFaction = 0;
+	else
+		myFaction = 1;
+	end
+return myFaction;
+end
