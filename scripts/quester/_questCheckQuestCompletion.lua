@@ -3,13 +3,14 @@ _questCheckQuestCompletion = {}
 function _questCheckQuestCompletion:checkQuestForCompletion()
 
 	local isItCompleted = false;
+local questDescription, questObjectives = GetQuestLogQuestText();
 
 -- check quest for completion
 	if _quest.currentQuest ~= nil and (not IsInCombat()) then
 		for i=0, _questDB.numQuests -1 do
 			if _questDB.questList[i]['completed'] == "no" then
 				
-				if _quest.currentQuest == _questDB.questList[i]['questName'] and GetObjectiveText(1) == _questDB.curDesc
+				if _quest.currentQuest == _questDB.questList[i]['questName'] and questObjectives == _questDB.curDesc
  then
 					for y=0, GetNumQuestLogEntries() do
 						local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(y);

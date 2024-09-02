@@ -229,10 +229,11 @@ function _quest:run()
 	for y=0, _questDB.numQuests -1 do
 		for i=0, GetNumQuestLogEntries()  do
 			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
+			local questDescription, questObjectives = GetQuestLogQuestText();
 			if _questDB.questList[y]['completed'] == "no" then
 				if _questDB.questList[y]['questName'] ~= "nnil" then
 					if title == _questDB.questList[y]['questName'] then
-						_quest.currentDesc = GetObjectiveText(1);
+						_quest.currentDesc = questObjectives;
 						self.currentQuest = title;
 						self.weHaveQuest = true;
 					end

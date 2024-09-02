@@ -177,10 +177,11 @@ return name;
 end
 
 function _questDB:turnQuestCompleted()
+local questDescription, questObjectives = GetQuestLogQuestText();
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
 		--(if desc == quest being checked and quest being checked ~= nil) or (quest being checked ~= nil and quester current quest == nil) or (there's no quest objective
-		if (self.questList[i]['desc'] == _quest.currentDesc and _quest.currentDesc ~= nil) or (self.questList[i]['desc'] == _questDB.curDesc and _questDB.curDesc ~= nil and _quest.currentQuest == nil) or (GetObjectiveText(1) == nil and _quest.currentQuest ~= _questDB.curListQuest) or (not _quest.isQuestCompleted) then
+		if (self.questList[i]['desc'] == _quest.currentDesc and _quest.currentDesc ~= nil) or (self.questList[i]['desc'] == _questDB.curDesc and _questDB.curDesc ~= nil and _quest.currentQuest == nil) or (questObjectives == nil and _quest.currentQuest ~= _questDB.curListQuest) or (not _quest.isQuestCompleted) then
 			if self.questList[i]['questName'] == self.curListQuest and self.questList[i]['desc'] == _questDB.curDesc then
 				if self.questList[i]['completed'] == "no" and self.questList[i]['questName'] ~= "nnil" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);

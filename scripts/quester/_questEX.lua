@@ -3,7 +3,14 @@ _questEX = {bagsFull = false,}
 function _questEX:doChecks()
 	local localObj = GetLocalPlayer();
 
-if (localObj:IsDead()) then
+
+	if GetNumQuestLogEntries() == 0 then
+		_quest.weHaveQuest = false;
+	end
+
+
+	-- if we are dead
+	if (localObj:IsDead()) then
 
 			_quest.message = "Waiting to ressurect...";
 
@@ -124,7 +131,7 @@ if (localObj:IsDead()) then
 	end
 	
 	-- go to trainer and get spells
-	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) then
+	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and _quest.weHaveQuest then
 		if (script_getSpells:checkForSpellsNeeded()) then
 			if (PlayerHasTarget()) then
 				ClearTarget();
