@@ -1,3 +1,5 @@
+https://discord.com/channels/255957722141425664/255957722141425664
+ 
  # oGasai Scripts for WoW Classic
  Ogasaism
 
