@@ -1,6 +1,56 @@
 _questEX = {getSpells = false, bagsFull = false,}
 
 function _questEX:doChecks()
+	local localObj = GetLocalPlayer();
+
+if (localObj:IsDead()) then
+
+			script_grind.message = "Waiting to ressurect...";
+
+			-- use soul stone
+			--if (localObj:HasBuff("Soul Stone")) and (localObj:IsDead()) and (not IsGhost()) then
+				--accept text
+			--return
+			--end
+
+			-- Release body
+			if (not IsGhost()) and (not script_paranoia:checkParanoia(30)) then
+				if (not RepopMe()) then
+					if (self.useThisVar) then
+						script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
+						self.useThisVar = false;
+					end
+					script_grind.message = "Walking to corpse...";
+					return true;
+				end
+				return true;
+			end
+
+			-- Ressurrect within the ress distance to our corpse
+			local _lx, _ly, _lz = localObj:GetPosition();
+			if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
+				script_nav:moveToNav(localObj, GetCorpsePosition());
+				return true;
+			else
+				if (script_grind.safeRess) then
+					local rx, ry, rz = GetCorpsePosition();
+					if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
+						script_grind.message = "Finding a safe spot to ress...";
+						return true;
+					else
+						if (script_aggro.rTime > GetTimeEX()) then
+							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
+							script_grind.message = "Finding a safe spot to ress...";
+							return true;
+						end
+					end
+				end
+				RetrieveCorpse();
+				self.useThisVar = true;
+			end
+			return true;
+		end
+
 
 	-- if bags full then set true
 	if (AreBagsFull()) then

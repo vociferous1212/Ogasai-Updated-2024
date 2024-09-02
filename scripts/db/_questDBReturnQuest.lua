@@ -33,7 +33,7 @@ function _questDBReturnQuest:returnAQuest()
 
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
-if _quest.xp ~= UnitXP("player") then
+			if _quest.xp ~= UnitXP("player") then
 								_questDB:turnQuestCompleted()
 								_quest.isQuestComplete = false;
 								_quest.currentQuest = nil;
@@ -83,9 +83,16 @@ if _quest.xp ~= UnitXP("player") then
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
 						end
+	if _quest.xp ~= UnitXP("player") then
+								_questDB:turnQuestCompleted()
+								_quest.isQuestComplete = false;
+								_quest.currentQuest = nil;
+								_questDB.curListQuest = nil;
+							end
+
+
 				end
 			end
-		return true;
 		end
 		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
 			if (not IsInCombat()) and PlayerHasTarget() then

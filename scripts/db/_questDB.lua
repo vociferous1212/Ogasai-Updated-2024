@@ -2,6 +2,7 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 		includeElwynnNorthshire = include("scripts\\db\\_questDB_Elwynn_Northshire.lua"),
 		includeTeldrassShadowglen = include("scripts\\db\\_questDB_Teldrassil_Shadowglen.lua"),
 		includeDuskwood2025 = include("scripts\\db\\_questDB_Duskwood_20_25.lua"),
+		includeDunMoroghColdridge = include("scripts\\db\\_questDB_DunMorogh_Coldridge.lua"),
 }
 
 function _questDB:setup()
@@ -10,9 +11,11 @@ function _questDB:setup()
 
 --[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, gatherID, gatherID2, rewardNum)]]--
 
+
 	_questDB_Duskwood_20_25:setup();
 	_questDB_Teldrassil_Shadowglen:setup();
-	_questDB_Elwynn_Northshire:setup()
+	_questDB_Elwynn_Northshire:setup();
+	_questDB_DunMorogh_Coldridge:setup();
 
 	self.isSetup = true;
 
@@ -180,9 +183,9 @@ end
 function _questDB:turnQuestCompleted()
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
-		if self.questList[i]['desc'] == _questDB.curDesc then
+		if (self.questList[i]['desc'] == _questDB.curDesc and not _questDB.curDesc == nil) or (_questDB.curDesc ~= nil and _quest.currentQuest == nil) or (GetObjectiveText(1) ~= self.curDesc and _quest.currentQuest ~= _questDB.curListQuest) then
 			if self.questList[i]['questName'] == self.curListQuest then
-				if self.questList[i]['completed'] == "no" then
+				if self.questList[i]['completed'] == "no" and self.questList[i]['questName'] ~= "nnil" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
 					ToFile(""..self.curListQuest.." - completed");
 					self.curListQuest = nil;

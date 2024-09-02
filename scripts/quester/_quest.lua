@@ -25,6 +25,7 @@ _quest = {
 	weHaveQuest = fasle,
 	autoComplete = true,
 	xp = 0,
+	curDesc = nil,
 
 	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -148,18 +149,23 @@ function _quest:run()
 	if _questEX:doChecks() then
 		return true;
 	end
-	if self.currentQuest ~= _questDB.curListQuest and self.autoComplete then
-		_questDB:turnQuestCompleted()
-		self.waitTimer = GetTimeEX() + 200;
-	end
-	self.xp = UnitXP("Player");
-	_questCheckQuestCompletion:checkQuestForCompletion();
-	if self.currentQuest ~= nil and self.isQuestComplete then
-		if _questDBReturnQuest:returnAQuest() then
-			self.message = "Returning quest!";
-			return;
+	-- if desc doesn't match desc then complete quest
+	-- or if name ~= name and no desc found
+	if ((GetNumQuestLogEntries() ~= 0 and  _questDB.curDesc ~= self.curDesc) or (GetNumQuestLogEntries() ~= nil and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
+		if (_questDB:turnQuestCompleted()) then
+		self.waitTimer = GetTimeEX() + 500;
 		end
 	end
+
+	_questCheckQuestCompletion:checkQuestForCompletion();
+	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) then
+		if _questDBReturnQuest:returnAQuest() then
+			self.message = "Returning quest!";
+			return true;
+		end
+	end
+
+	self.xp = UnitXP("Player");
 
 	-- set our current quest
 	for y=0, _questDB.numQuests -1 do
@@ -168,8 +174,8 @@ function _quest:run()
 			if _questDB.questList[y]['completed'] == "no" then
 				if _questDB.questList[y]['questName'] ~= "nnil" then
 					if title == _questDB.questList[y]['questName'] then
+						self.curDesc = GetObjectiveText(1);
 						self.currentQuest = title;
-						self.currentDesc = GetObjectiveText(1);
 						self.weHaveQuest = true;
 					end
 				end	
@@ -243,6 +249,25 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
 		return true;
 	end
+
+
+	if _questDB.curListQuest == nil then
+		self.message = "No quest or no quest in level range in DB! Going to grind...";
+		local x, y, z = GetLocalPlayer():GetPosition();
+		if GetDistance3D(x, y, z, 10735.243164063, 925.56115722656, 1333.4985351563) > 50 then
+			if script_navEX:moveToTarget(GetLocalPlayer(), 10735.243164063, 925.56115722656, 1333.4985351563) then
+				return true;
+			end
+		end
+		-- get a target
+		if (self.enemyTarget == nil) then
+			self.enemyTarget = _questDBTargets:getTarget()
+		elseif (self.enemyTaget ~= nil) then
+			_questDoCombat:doCombat();
+		end
+
+	end
+
 end
 
 function _quest:runRest()

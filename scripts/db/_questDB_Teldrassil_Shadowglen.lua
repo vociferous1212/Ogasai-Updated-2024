@@ -13,7 +13,7 @@ _questDB:addQuest("no", 0, "A Friend in Need", "Iverron", 10711.599609375, 1034.
 
 _questDB:addQuest("no", 0, "A Good Friend", "Dirania Silvershine", 10407.200195313, 713.79400634766, 1321.6176757813, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 10711.599609375, 1034.9100341797, 1347.2602539063, "Iverron", 0, 0, 0, 0, 0, "Find Iverron by the cave to the north.");
 
-_questDB:addQuest("no", 0, "The Woodland Protector", "Tarindrella", 10297.985351563, 871.41156005859, 1335.6091308594, 141, 1, 6, 10281.4140625, 948.26000976563, 1337.7951660156, 1, 8, 0, 0, 0, 10297.985351563, 871.41156005859, 1335.6091308594, "Tarindrella", "Grell", "Grellkin", 0, 0, 3, "Collect 8 Fel Moss and bring them to Tarindrella.");
+_questDB:addQuest("no", 0, "The Woodland Protector", "Tarindrella", 10297.985351563, 871.41156005859, 1335.6091308594, 141, 1, 6, 10281.4140625, 948.26000976563, 1337.7951660156, 1, 20, 0, 0, 0, 10297.985351563, 871.41156005859, 1335.6091308594, "Tarindrella", "Grell", "Grellkin", 0, 0, 3, "Collect 8 Fel Moss and bring them to Tarindrella.");
 
 -- level 1 night elf start quest # 3
 _questDB:addQuest("no", 0, "The Woodland Protector", "Melithar Staghelm", 10389.799804688, 763.47698974609, 1319.9537353516, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 10298.233398438, 870.58386230469, 1335.6284179688, "Tarindrella", 0, 0, 0, 0, 0, "Seek out the dryad known as Tarindrella.");

@@ -68,6 +68,10 @@ function _questDBTargets:getTarget()
 		end
 	i, t = GetNextObject(i);
 	end
+if (bestTarget == nil) then
+	_quest.message = "No quest targets in range!";
+elseif (bestTarget ~= nil) then
 bestTarget:AutoAttack();
+end
 return bestTarget;
 end
