@@ -122,11 +122,7 @@ if (localObj:IsDead()) then
 	if (not script_grind.getSpells or GetLocalPlayer():IsDead() or IsGhost()) then
 		script_getSpells.getSpellsStatus = 0;
 	end
-	if (script_grind.getSpells) and (not IsInCombat()) then
-		if script_getSpells.getSpellsStatus > 0 then
-			return;
-		end
-	end
+	
 	-- go to trainer and get spells
 	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) then
 		if (script_getSpells:checkForSpellsNeeded()) then
@@ -141,8 +137,12 @@ if (localObj:IsDead()) then
 				end
 			end
 		return true;
-		else
-			script_getSpells.getSpellsStatus = 0;
+		end
+	end
+	-- tell bot to continue
+	if (script_grind.getSpells) and (not IsInCombat()) then
+		if script_getSpells.getSpellsStatus > 0 then
+			return true;
 		end
 	end
 return false;

@@ -9,7 +9,8 @@ function _questCheckQuestCompletion:checkQuestForCompletion()
 		for i=0, _questDB.numQuests -1 do
 			if _questDB.questList[i]['completed'] == "no" then
 				
-				if _quest.currentQuest == _questDB.questList[i]['questName'] then
+				if _quest.currentQuest == _questDB.questList[i]['questName'] and GetObjectiveText(1) == _questDB.curDesc
+ then
 					for y=0, GetNumQuestLogEntries() do
 						local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(y);
 						if title == _questDB.questList[i]['questName'] then
