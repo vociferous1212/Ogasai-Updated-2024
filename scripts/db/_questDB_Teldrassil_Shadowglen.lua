@@ -9,10 +9,14 @@ function _questDB_Teldrassil_Shadowglen:setup()
 _questDB:addQuest("no", 0, "Dolanaar Delivery", "Porthannius", 10214.299804688, 700.55297851563, 1360.6042480469, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9802.2099609375, 982.60797119141, 1313.8966064453, "Innkeeper Keldamyr", 0, 0, 0, 0, 0, 2, "Bring the Dolanaar Delivery to Innkeeper Keldamyr.");
 
 -- added extra kills to make you level faster but needs to be changed to check for items...
+_questDB:addQuest("no", 0, "Webwood Egg", "Gilshalan Windwalker", 10417.700195313, 871.19396972656, 1319.4086914063, 141, 1, 6, 10902.611328125, 915.03839111328, 1323.9932861328, 2, 20, 0, 0, 1, 0, 10417.700195313, 871.19396972656, 1319.4086914063, "Gilshalan Windwalker", "Webwood Spider", "Githyiss the Vile", 0, 378, 0, 3, "Bring a Webwood Egg to Gilshalan in Aldrassil.");
+
+-- added extra kills to make you level faster but needs to be changed to check for items...
 _questDB:addQuest("no", 0, "Webwood Venom", "Gilshalan Windwalker", 10417.700195313, 871.19396972656, 1319.4086914063, 141, 1, 6, 10735.243164063, 925.56115722656, 1333.4985351563, 1, 20, 0, 0, 0, 0, 10417.700195313, 871.19396972656, 1319.4086914063, "Gilshalan Windwalker", "Webwood Spider", 0, 0, 0, 0, 4, "Bring 10 Webwood Venom Sacs to Gilshalan Windwalker at Aldrassil.");
 
---needs checked thoroughly
---_questDB:addQuest("no", 0, "Iverron's Antidote", "Dirania Silvershine", 10407.200195313, 713.79400634766, 1321.6176757813, 141, 1, 6, 10668.392578125, 878.42413330078, 1319.3364257813, 2, 0, 0, 7, 4, 10407.200195313, 713.79400634766, 1321.6176757813, "Dirania Silvershine", "Webwood Spider", 0, 2090, 253, "Webwood Ichor", 0, "Collect 7 Hyacinth Mushrooms, 4 Moonpetal Lilies, and 1 Webwood Ichor for Dirania Silveshine in Shadowglen.");
+_questDB:addQuest("no", 0, "Iverron's Antidote", "Dirania Silvershine", 10407.200195313, 713.79400634766, 1321.6176757813, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10711.599609375, 1034.9100341797, 1347.2602539063, "Iverron", 0, 0, 0, 0, 0, 2, "Bring Iverron's Antidote to Iverron before the time limit is up. Iverron can be found by the cave to the north.");
+
+_questDB:addQuest("no", 0, "Iverron's Antidote", "Dirania Silvershine", 10407.200195313, 713.79400634766, 1321.6176757813, 141, 1, 6, 10660.979492188, 893.12902832031, 1319.2253417969, 2, 10, 0, 0, 7, 4, 10407.200195313, 713.79400634766, 1321.6176757813, "Dirania Silvershine", "Webwood Spider", 0, 0, 2090, 253, 0, "Collect 7 Hyacinth Mushrooms, 4 Moonpetal Lilies, and 1 Webwood Ichor for Dirania Silveshine in Shadowglen.");
 
 _questDB:addQuest("no", 0, "A Friend in Need", "Iverron", 10711.599609375, 1034.9100341797, 1347.2602539063, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10407.200195313, 713.79400634766, 1321.6176757813, "Dirania Silvershine", 0, 0, 0, 0, 0, 0, "Speak to Dirania Silvershine in Shadowglen.");
 

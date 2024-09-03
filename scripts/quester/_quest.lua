@@ -12,7 +12,7 @@ _quest = {
 	targetKilledNum = 0,
 	targetKilledNum2 = 0,
 	targetKilledNum3 = 0,
-	gartheredNum = 0,
+	gatheredNum = 0,
 	gatheredNum2 = 0,
 	isQuestComplete = false,
 	needRest = false,
@@ -212,8 +212,13 @@ function _quest:run()
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
 	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
+		if IsMoving() then
+			StopMoving();
+			return true;
+		end
 		if (_questDB:turnOldQuestCompleted()) then
-		self.waitTimer = GetTimeEX() + 500;
+			self.waitTimer = GetTimeEX() + 500;
+		return;
 		end
 	end
 
@@ -293,11 +298,16 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 		end
 	end
 	
--- gather quest object
---if dist to hotspot reached then
---if _questDBGather:getObject() ~= 0 then
---_questDBGather:gatherObject()
---end
+	-- gather quest object
+	if self.grindSpotReached then
+		if not IsInCombat() then
+			if _questDBGather:run() then
+				self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName().."";
+				return true;
+			end
+		end
+	end
+
 	-- get a target
 	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached) or (IsInCombat()) or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached) then
 		if (self.enemyTarget == nil) and (not self.isQuestComplete) then

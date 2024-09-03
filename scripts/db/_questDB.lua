@@ -14,8 +14,8 @@ function _questDB:setup()
 ]]--
 
 	_questDB_Duskwood_20_25:setup();
-	_questDB_Teldrassil_Shadowglen:setup();
 	_questDB_Teldrassil_Dolanaar:setup()
+	_questDB_Teldrassil_Shadowglen:setup();
 	_questDB_Elwynn_Northshire:setup();
 	_questDB_DunMorogh_Coldridge:setup();
 

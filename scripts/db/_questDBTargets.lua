@@ -50,7 +50,7 @@ function _questDBTargets:getTarget()
 	local weHaveQuestTarget = false;
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 200 and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == target and _quest.targetKilledNum3 < numKill3)) and not i:IsDead() then
+			if not i:IsDead() and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == target and _quest.targetKilledNum3 < numKill3)) then
 				dist = i:GetDistance();
 				if bestDist > dist then
 					bestDist = dist;
@@ -71,10 +71,10 @@ function _questDBTargets:getTarget()
 		end
 	i, t = GetNextObject(i);
 	end
-if (bestTarget == nil) then
-	_quest.message = "No quest targets in range!";
-elseif (bestTarget ~= nil) then
-bestTarget:AutoAttack();
-end
+	if (bestTarget == nil) then
+		_quest.message = "No quest targets in range!";
+	elseif (bestTarget ~= nil) then
+		bestTarget:AutoAttack();
+	end
 return bestTarget;
 end
