@@ -5,10 +5,10 @@ function script_priestMenu:menu()
 
 	local localObj = GetLocalPlayer();
 	-- obtain class from game using wow api
-	local class = UnitClass("player");
+	local _ , class = UnitClass("player");
 
 	-- if we are priest then show menu
-	if (class == 'Priest') then
+	if (class == 'PRIEST') then
 
 		local wasClicked = false;
 

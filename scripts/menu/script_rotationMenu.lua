@@ -39,24 +39,24 @@ function script_rotationMenu:menu()
 	Separator();
 
 	-- Load combat menu by class
-	local class = UnitClass("player");
-	if (class == 'Mage') then
+	local _ , class = UnitClass("player");
+	if (class == 'MAGE') then
 		script_mageEX:menu();
-	elseif (class == 'Hunter') then
+	elseif (class == 'HUNTER') then
 		script_hunterEX:menu();
-	elseif (class == 'Warlock') then
+	elseif (class == 'WARLOCK') then
 		script_warlockEX:menu();
-	elseif (class == 'Paladin') then
+	elseif (class == 'PALADIN') then
 		script_paladinEX:menu();
-	elseif (class == 'Druid') then
+	elseif (class == 'DRUID') then
 		script_druidEX:menu();
-	elseif (class == 'Priest') then
+	elseif (class == 'PRIEST') then
 		script_priestMenu:menu();
-	elseif (class == 'Warrior') then
+	elseif (class == 'WARRIOR') then
 		script_warriorEX:menu();
-	elseif (class == 'Rogue') then
+	elseif (class == 'ROGUE') then
 		script_rogueEX:menu();
-	elseif (class == 'Shaman') then
+	elseif (class == 'SHAMAN') then
 		script_shamanEX:menu();
 	end	
 

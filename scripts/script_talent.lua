@@ -173,25 +173,25 @@ function script_talent:setup()
 		}
 
 		-- Set talent table depending on the class
-		local class, _ = UnitClass("player");
+		local _ , class = UnitClass("player");
 
-		if (class == "Paladin") then
+		if (class == "PALADIN") then
 			self.currentTalentTable = self.palaTalents;
-		elseif (class == "Warrior") then
+		elseif (class == "WARRIOR") then
 			self.currentTalentTable = self.warTalents;
-		elseif (class == "Rogue") then
+		elseif (class == "ROGUE") then
 			self.currentTalentTable = self.rogueTalents;
-		elseif (class == "Druid") then
+		elseif (class == "DRUID") then
 			self.currentTalentTable = self.druidTalents;
-		elseif (class == "Priest") then
+		elseif (class == "PRIEST") then
 			self.currentTalentTable = self.priestTalents;
-		elseif (class == "Mage") then
+		elseif (class == "MAGE") then
 			self.currentTalentTable = self.mageTalents;
-		elseif (class == "Hunter") then
+		elseif (class == "HUNTER") then
 			self.currentTalentTable = self.hunterTalents;
-		elseif (class == "Warlock") then
+		elseif (class == "WARLOCK") then
 			self.currentTalentTable = self.lockTalents;
-		elseif (class == "Shaman") then
+		elseif (class == "SHAMAN") then
 			self.currentTalentTable = self.shamTalents;
 		end
 

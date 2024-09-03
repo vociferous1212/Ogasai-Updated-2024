@@ -49,66 +49,66 @@ function script_followHealsAndBuffs:healAndBuff()
 			--end
 				
 
-			local class = UnitClass('player');
+			local _, class = UnitClass('player');
 
 			-- shaman heals and buffs
-			if (class == 'Shaman') then
+			if (class == 'SHAMAN') then
 				if (script_shamanFollowerHeals:HealsAndBuffs()) then
 					return true;
 				end
 			end
 
 			-- priest heals and buffs
-			if (class == 'Priest') then
+			if (class == 'PRIEST') then
 				if (script_priestFollowerHeals:HealsAndBuffs()) then
 					return true;
 				end	
 			end
 
 			-- mage buffs
-			if (class == 'Mage') then
+			if (class == 'MAGE') then
 				if (script_mageFollowerHeals:HealsAndBuffs()) then
 					return true;
 				end
 			end
 
 			-- druid heals and buffs
-			if (class == 'Druid') then
+			if (class == 'DRUID') then
 				if (script_druidFollowerHeals:HealsAndBuffs()) then
 					return true;
 				end
 			end
 
 			-- paladin heals and buffs
-			if (class == 'Paladin') then
+			if (class == 'PALADIN') then
 				if (script_paladinFollowerHeals:HealsAndBuffs()) then
 					return true;
 				end
 			end
 
 			-- hunter buffs
-			--if (class == 'Hunter') then
+			--if (class == 'HUNTER') then
 			--	if (script_hunterFollowerHeals:HealsAndBuffs()) then
 			--		return true;
 			--	end
 			--end
 
 			-- warlock buffs
-			--if (class == 'Warlock') then
+			--if (class == 'WARLOCK') then
 			--	if (script_warlockFollowerHeals:HealsAndBuffs()) then
 			--		return true;
 			--	end
 			--end
 
 			-- rogue buffs??
-			--if (class == 'Rogue') then
+			--if (class == 'ROGUE') then
 			--	if (script_rogueFollowerHeals:HealsAndBuffs()) then
 			--		return true;
 			--	end
 			--end
 
 			-- warrior heals... and buffs
-			--if (class == 'Warrior') then
+			--if (class == 'WARRIOR') then
 			--	if (script_warriorFollowerHeals:HealsAndBuffs()) then
 			--		return true;
 			--	end

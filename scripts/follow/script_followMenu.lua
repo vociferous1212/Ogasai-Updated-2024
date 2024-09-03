@@ -42,9 +42,12 @@ function script_followMenu:menu()
 			wasClicked, script_follow.followMember = Checkbox("Follow Party Member", script_follow.followMember);
 			wasClicked, script_follow.unstuck = Checkbox("Use UnStuck Script", script_follow.unstuck);
 			wasClicked, script_follow.randomFollow = Checkbox("Randomly Adjust Follow Distance", script_follow.randomFollow);
-			if (UnitClass('player') == "Hunter") then
-				script_follow.randomFollow = false;
+
+			local _, class = UnitClass("player")
+			if class == "HUNTER" then
+				script_follow.randomFollow = false
 			end
+
 			if (script_follow.randomFollow) then
 				local followTimer = math.floor( (script_follow.followTimer - GetTimeEX()) / 1000);
 				SameLine();
@@ -69,30 +72,30 @@ function script_followMenu:menu()
 	
 		end
 			-- Load combat menu by class
-	local class = UnitClass("player");
+	local _, class = UnitClass("player");
 
 
-	if (class == 'Mage') then
+	if (class == 'MAGE') then
 		script_mageEX:menu();
-	elseif (class == 'Hunter') then
+	elseif (class == 'HUNTER') then
 		script_hunterEX:menu();
-	elseif (class == 'Warlock') then
+	elseif (class == 'WARLOCK') then
 		script_warlockEX:menu();
-	elseif (class == 'Paladin') then
+	elseif (class == 'PALADIN') then
 		script_paladinEX:menu();
-	elseif (class == 'Druid') and (script_follow.assistInCombat) then
+	elseif (class == 'DRUID') and (script_follow.assistInCombat) then
 		script_druidEX:menu();
-	elseif (class == 'Priest') then
+	elseif (class == 'PRIEST') then
 		script_priestMenu:menu();
-	elseif (class == 'Warrior') then
+	elseif (class == 'WARRIOR') then
 		script_warriorEX:menu();
-	elseif (class == 'Rogue') then
+	elseif (class == 'ROGUE') then
 		script_rogueEX:menu();
-	elseif (class == 'Shaman') then
+	elseif (class == 'SHAMAN') then
 		script_shamanEX:menu();
 	end	
 
-	if (class == 'Priest') and (CollapsingHeader("Priest Group Heals - Follower Script")) then
+	if (class == 'PRIEST') and (CollapsingHeader("Priest Group Heals - Follower Script")) then
 
 
 		-- turn ALL heals on/off for group
@@ -141,7 +144,7 @@ function script_followMenu:menu()
 		script_priestFollowerHeals.partyHealHealth = SliderInt("Heal Below Health %", 1, 99, script_priestFollowerHeals.partyHealHealth);
 	end
 
-	if  (class == 'Paladin') and (CollapsingHeader("Paladin Group Heals Follower Script")) then
+	if  (class == 'PALADIN') and (CollapsingHeader("Paladin Group Heals Follower Script")) then
 
 		-- turn ALL heals on/off for group
 		wasClicked, script_paladinFollowerHeals.enableHeals = Checkbox("Turn On/Off all heals for the group!", script_paladinFollowerHeals.enableHeals);
@@ -162,7 +165,7 @@ function script_followMenu:menu()
 		script_paladinFollowerHeals.bopHealth = SliderInt("BoP Below Health %", 1, 25, script_paladinFollowerHeals.bopHealth);
 	end
 
-	if (class == 'Druid') and (CollapsingHeader("Druid Group Heals Follower Script")) then
+	if (class == 'DRUID') and (CollapsingHeader("Druid Group Heals Follower Script")) then
 
 		-- turn ALL heals on/off for group
 		wasClicked, script_druidFollowerHeals.enableHeals = Checkbox("Turn On/Off all heals for the group!", script_druidFollowerHeals.enableHeals);
@@ -193,7 +196,7 @@ function script_followMenu:menu()
 		Separator();
 	end
 
-	if (class == 'Shaman') and (CollapsingHeader("Shaman Group Heals Follower Script")) then
+	if (class == 'SHAMAN') and (CollapsingHeader("Shaman Group Heals Follower Script")) then
 
 		Text("CURRENTLY BROKEN UNKNOWN ISSUE");
 		-- turn ALL heals on/off for group
