@@ -213,6 +213,7 @@ function _quest:run()
 
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
+	if (script_getSpells.getSpellsStatus == 0) then
 	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
 		if IsMoving() then
 			StopMoving();
@@ -222,6 +223,7 @@ function _quest:run()
 			self.waitTimer = GetTimeEX() + 500;
 		return;
 		end
+	end
 	end
 
 	_questCheckQuestCompletion:checkQuestForCompletion();
