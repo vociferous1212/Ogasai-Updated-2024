@@ -6,6 +6,9 @@ function _questDBGather:getObject()
 		if _quest.currentQuest ~= nil then
 			for i=0, _questDB.numQuests -1 do if _questDB.questList[i]['desc'] == _quest.currentDesc then self.gatherTarget = _questDB.questList[i]['gatherID']; self.gatherTarget2 = _questDB.questList[i]['gatherID2']; self.gatherNum = _questDB.questList[i]['numGather']; self.gatherNum2 = _questDB.questList[i]['numGather2']; end end
 			
+
+ 		_questDBGather:getItemsInInventory()
+
 		local i, t = GetFirstObject();					
 		while i ~= 0 do
 			if t == 5 then
@@ -47,7 +50,7 @@ function _questDBGather:run()
 	-- move to object
 	if _questDBGather:gatherObject() then return true; end
 	
-	if self.gatheringTarget:GetDistance() <= 4 then if (HasForm()) then if (IsCatForm()) then script_druidEX:removeCatForm(); end if (IsBearForm()) then  script_druidEX:removeBearForm();
+	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil and self.gatheringTarget:GetDistance() <= 4 then if (HasForm()) then if (IsCatForm()) then script_druidEX:removeCatForm(); end if (IsBearForm()) then  script_druidEX:removeBearForm();
 			end
 			if (IsTravelForm) then
 				script_druidEX:removeTravelForm();

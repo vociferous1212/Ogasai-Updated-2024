@@ -7,6 +7,10 @@ function _questEX:doChecks()
 	if GetNumQuestLogEntries() == 0 then
 		_quest.weHaveQuest = false;
 	end
+	-- reset vendor message after selling/repairing
+	if (script_vendor.status == 0) then
+		script_vendor.message = "idle...";
+	end
 
 
 	-- if we are dead
