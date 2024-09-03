@@ -55,7 +55,7 @@ function _questDoCombat:doCombat()
 		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
 			if not _quest.enemyTarget:IsDead() and _quest.enemyTarget:CanAttack() then
 				_quest.message = "Running Combat";
-				if IsInCombat() then
+				if IsInCombat() and not IsMoving() then
 					_quest.enemyTarget:FaceTarget();
 				end
 				RunCombatScript(_quest.enemyTarget:GetGUID());

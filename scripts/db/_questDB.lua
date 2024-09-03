@@ -208,6 +208,7 @@ return false;
 end
 function _questDB:turnOldQuestCompleted()
 local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
+	local questDescription, questObjectives = GetQuestLogQuestText();
 	if (not _quest.isQuestCompleted)then
 		for i=0, _questDB.numQuests -1 do
 			if self.questList[i]['questName'] == self.curListQuest then
@@ -216,6 +217,7 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 			if _quest.currentDesc ~= _questDB.curDesc then
 			if self.questList[i]['questName'] ~= title then
 			if self.questList[i]['desc'] ~= _quest.currentDesc then
+				if questObjectives ~= self.questList[i]['desc'] then
 				DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
 				self.questList[i]['completed'] = "nnil";
 				self.questList[i]['questName'] = "nnil";
@@ -226,7 +228,7 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 				_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
 				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
 			return true;
-			end end end end end end
+			end end end end end end end
 		end
 	end
 end

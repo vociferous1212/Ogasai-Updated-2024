@@ -295,7 +295,9 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 					self.waitTimer = GetTimeEX() + 2000;
 						SelectGossipAvailableQuest(1);
 						if (AcceptQuest()) then
+							local questDescription, questObjectives = GetQuestLogQuestText();
 							self.currentQuest = curQuestName;
+							self.currentDesc = questObjectives;
 						end					
 				end
 			end

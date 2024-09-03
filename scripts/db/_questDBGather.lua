@@ -28,7 +28,7 @@ function _questDBGather:getObject()
 return bestTarget;
 end
 function _questDBGather:gatherObject()
-	if self.gatheringTarget ~= 0 then
+	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil then
 		local dist = self.gatheringTarget:GetDistance();
 		local x, y, z = self.gatheringTarget:GetPosition();
 		if dist > 3 then
