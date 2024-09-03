@@ -307,7 +307,7 @@ function script_grind:setup()
 
 	-- Classes that don't use mana
 	local _ , class = UnitClass('player');
-	if (class == "WARRIOR" or class == "ROGUE");
+	if (class == "WARRIOR") or (class == "ROGUE");
 		self.useMana = false;
 		self.restMana = 0;
 	end
