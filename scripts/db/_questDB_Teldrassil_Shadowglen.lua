@@ -8,6 +8,10 @@ function _questDB_Teldrassil_Shadowglen:setup()
 
 _questDB:addQuest("no", 0, "Dolanaar Delivery", "Porthannius", 10214.299804688, 700.55297851563, 1360.6042480469, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9802.2099609375, 982.60797119141, 1313.8966064453, "Innkeeper Keldamyr", 0, 0, 0, 0, 0, 2, "Bring the Dolanaar Delivery to Innkeeper Keldamyr.");
 
+_questDB:addQuest("no", 0, "Crown of the Earth", "Tenaron Stormgrip", 10492.5, 807.28002929688, 1397.2683105469, 141, 1, 6, 10712.326171875, 763.5146484375, 1321.3764648438, 3, 0, 0, 0, 0, 0, 10492.5, 807.28002929688, 1397.2683105469, "Tenaron Stormgrip", 0, 0, 0, 0, 0, 0, "Fill the Crystal Phial and bring it back to Tenaron Stormgrip atop Aldrassil.", "Crystal Phial");
+
+_questDB:addQuest("no", 0, "Tenaron's Summons", "Gilshalan Windwalker", 10417.700195313, 871.19396972656, 1319.4086914063, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10492.5, 807.28002929688, 1397.2683105469, "Tenaron Stormgrip", 0, 0, 0, 0, 0, 0, "Speak with Tenaron Stormgrip atop Aldrassil in Shadowglen.");
+
 -- added extra kills to make you level faster but needs to be changed to check for items...
 _questDB:addQuest("no", 0, "Webwood Egg", "Gilshalan Windwalker", 10417.700195313, 871.19396972656, 1319.4086914063, 141, 1, 6, 10902.611328125, 915.03839111328, 1323.9932861328, 2, 20, 0, 0, 1, 0, 10417.700195313, 871.19396972656, 1319.4086914063, "Gilshalan Windwalker", "Webwood Spider", "Githyiss the Vile", 0, 378, 0, 3, "Bring a Webwood Egg to Gilshalan in Aldrassil.");
 

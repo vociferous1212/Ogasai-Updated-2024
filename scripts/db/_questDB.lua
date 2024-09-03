@@ -23,7 +23,7 @@ function _questDB:setup()
 
 end
 
-function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc)
+function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc, useItem)
 	self.questList[self.numQuests] = {};
 	self.questList[self.numQuests]['completed'] = completed;
 	self.questList[self.numQuests]['faction']= faction;
@@ -58,6 +58,7 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['gatherID2'] = gatherID2;
 	self.questList[self.numQuests]['rewardNum'] = rewardNum;
 	self.questList[self.numQuests]['desc'] = desc;
+	self.questList[self.numQuests]['useItem'] = useItem;
 	self.numQuests = self.numQuests + 1;
 
 end
@@ -78,6 +79,9 @@ local bestDist = 10000;
 						--if _quest.currentDesc == nil then
 						_questDB.curDesc = self.questList[i]['desc'];
 						_questDB.curListQuest = self.questList[i]['questName'];
+						_quest.currentType = _questDB.questList[i]['type'];
+						_quest.usingItem = _questDB.questList[i]['useItem'];
+
 					end
 
 		

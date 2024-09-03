@@ -28,6 +28,8 @@ _quest = {
 	currentDesc = nil,
 	returningQuest = false,
 	xp = 0,
+	currentType = nil,
+	usingItem = nil,
 
 	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -297,24 +299,18 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			end
 		end
 	end
-	
-	-- gather quest object
-	if self.grindSpotReached then
-		if not IsInCombat() then
-			if _questDBGather:run() then
-				self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName().."";
-				return true;
-			end
+
+	if self.currentType == 3 and (self.curGrindX ~= 0) then
+		
+		if distToGrind <= 5 then UseItem(self.usingItem) return true;
+		else script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
 		end
-	end
+	end	
+	-- gather quest object
+	if self.grindSpotReached then if not IsInCombat() then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..""; return true; end end end
 
 	-- get a target
-	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached) or (IsInCombat()) or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached) then
-		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
-			self.enemyTarget = _questDBTargets:getTarget();
-		end
-	end
-
+	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached) or (IsInCombat()) or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached) then if (self.enemyTarget == nil) and (not self.isQuestComplete) then self.enemyTarget = _questDBTargets:getTarget(); end end
 	-- we have a quest so go to grind spot
 	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
 		self.message = "Moving to grind spot";
@@ -328,6 +324,7 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 		self.message = script_grind.message;
 		script_grind:run();
 		script_grind.pause = false;
+		return true;
 	elseif not script_grind.pause then
 		script_grind.pause = true;
 	end
