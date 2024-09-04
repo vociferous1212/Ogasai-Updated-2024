@@ -340,7 +340,7 @@ function script_grind:setup()
 		self.vendorRefill = false;
 	end
 
-	if (UnitClass("Player") == "ROGUE" or GetMyClass() == "ROGUE") and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
+	if ((UnitClass("Player") == "ROGUE" or GetMyClass() == "ROGUE") and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
 		self.blacklistTime = 60;
 	end
 
