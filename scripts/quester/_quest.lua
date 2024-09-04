@@ -160,9 +160,7 @@ if (self.pause) then script_grind.pause = true; return; end
 	if IsChanneling() or IsCasting() then
 		return;
 	end
-	for i=0, GetNumQuestLogEntries()  do
-	local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
-	end
+	
 	-- run setup function once
 	if (not self.isSetup) then
 		_quest:setup();
@@ -192,7 +190,8 @@ if (self.pause) then script_grind.pause = true; return; end
 	if self.currentType == 99 and not self.isQuestComplete and GetNumQuestLogEntries() > 0 then
 		self.message = "Edge case quest... doing specific routine";
 		_questEdgeCaseQuest:run() return true;
-	end
+	elseif self.currentType == 99 and self.isQuestComplete and GetNumQuestLogEntries() == 0 then _questDB:turnQuestCompleted(); self.currentType = 0; end
+		
 
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 		if (_questDB:turnQuestCompleted()) then
@@ -203,13 +202,7 @@ if (self.pause) then script_grind.pause = true; return; end
 		end
 	end
 
-_questCheckQuestCompletion:checkQuestForCompletion();
-	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) then
-		if _questDBReturnQuest:returnAQuest() then
-			self.message = "Returning quest!";
-		return true;
-		end
-	end
+
 
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
@@ -227,18 +220,20 @@ _questCheckQuestCompletion:checkQuestForCompletion();
 	end
 	end
 
-	
-
 	-- set our current quest
 	for y=0, _questDB.numQuests -1 do
 		for i=0, GetNumQuestLogEntries()  do
 			local questDescription, questObjectives = GetQuestLogQuestText();
 			if _questDB.questList[y]['completed'] == "no" then
 				if _questDB.questList[y]['questName'] ~= "nnil" then
-					if title == _questDB.questList[y]['questName'] then
-						_quest.currentDesc = questObjectives; _quest.gossipOption = _questDB.questList[i]['gossipOption'];
-						self.currentQuest = title;
-						self.weHaveQuest = true;
+					for i=0, GetNumQuestLogEntries()  do
+						local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
+
+						if title == _questDB.questList[y]['questName'] then
+							_quest.currentDesc = questObjectives; _quest.gossipOption = _questDB.questList[i]['gossipOption'];
+							self.currentQuest = title;
+							self.weHaveQuest = true;
+						end
 					end
 				end	
 			end
