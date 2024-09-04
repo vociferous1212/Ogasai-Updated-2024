@@ -5,12 +5,9 @@ function _questDBReturnQuest:returnAQuest()
 	if (not _questDB.isSetup) then
 		_questDB:setup();
 	end
+
 	local px, py, pz = GetLocalPlayer():GetPosition();
 	local x, y, z = 0, 0, 0;
-
-	if (self.waitTimer > GetTimeEX()) then
-		return;
-	end
 
 	-- return a quest
 	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete then
@@ -22,7 +19,7 @@ function _questDBReturnQuest:returnAQuest()
 				--	x, y, z = _questDB:getReturnTargetPos();
 				--end
 				--if _quest.currentDesc == nil and _questDB.questList[i]['desc'] ~= nil then
-					x, y, z = _questDB:getReturnTargetPos();
+			x, y, z = _questDB:getReturnTargetPos();
 				--end
 			end
 		end
@@ -30,11 +27,16 @@ function _questDBReturnQuest:returnAQuest()
 
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
+			if (self.waitTimer > GetTimeEX()) then
+				return;
+			end
+
 			_quest.grindSpotReached = false;
 			_quest.targetKilledNum = 0;
 			_quest.targetKilledNum2 = 0;
 			_quest.gatheredNum = 0;
 			_quest.gatheredNum2 = 0;
+			_quest.currentType = 0;
 			
 			_quest.message = "Completing Quest";
 
@@ -53,7 +55,10 @@ function _questDBReturnQuest:returnAQuest()
 
 
 						CompleteQuest();
-						SelectGossipActiveQuest(1)
+						SelectGossipActiveQuest(1);
+						--SelectActiveQuest(1);
+
+						
 
 					--for i=0, 5 do
 						--if curQuestName == GetGossipAvailableQuests() then
@@ -74,24 +79,24 @@ function _questDBReturnQuest:returnAQuest()
 
 					
 						if (not GetQuestReward(rewardNum)) then
+							SelectActiveQuest(1);
 							self.waitTimer = GetTimeEX() + 2000;
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
 							CompleteQuest();
+							--ClearTarget();
 						end
 					return true;	
 					end
 			return true;
 			end
-		return true;
-		end
-		if (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
+		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
 			if (not IsInCombat()) and PlayerHasTarget() then
 				ClearTarget();
 			end
 			_quest.message = "Moving to quest return target";
 			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
-			return true;
+		return;
 		end
 	return true;
 	end

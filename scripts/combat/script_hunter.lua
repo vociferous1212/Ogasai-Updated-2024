@@ -187,7 +187,6 @@ function script_hunter:run(targetGUID)
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
 
-
 	if (localObj:IsDead()) then
 		return 0;
 	end
@@ -303,6 +302,16 @@ function script_hunter:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0 and targetObj ~= nil) then
 
+	-- check for auto attack slot
+	if (IsAttackAction(script_grind.autoAttackActionSlot) ~= 1) and targetObj:GetDistance() <= 10 then
+		for i=0, 20 do
+			if IsAttackAction(i) then
+				script_grind.autoAttackActionSlot = i;
+			end
+		end
+	end
+
+
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
@@ -348,11 +357,13 @@ function script_hunter:run(targetGUID)
 		end
 
 		-- Auto Attack
-		if (targetObj:GetDistance() < 35) and (targetObj:IsInLineOfSight()) then
+		if (targetObj:GetDistance() < 35) and targetObj:GetDistance() >= 12 and (targetObj:IsInLineOfSight()) then
 			if (self.hasPet) then
 				PetAttack();
 			end
+			if (not IsAutoCasting("Auto Shot")) then
 			targetObj:AutoAttack();
+			end
 		end
 
 		-- Check: if we target player pets/totems
@@ -366,6 +377,8 @@ function script_hunter:run(targetGUID)
 			end
 		end 
 
+
+			
 		-- check pet range
 		if (GetPet() ~= 0) then
 			if (self.hasPet) and (GetPet() ~= 0) and (GetPet():GetDistance() > 35) and (GetLocalPlayer():GetUnitsTarget() == 0) then 
@@ -519,10 +532,9 @@ function script_hunter:run(targetGUID)
 
 			--Racial
 			if (not IsMoving()) and (targetObj:GetDistance() <= 6) then
-				if (IsAutoCasting("Auto Attack")) then
+				if (IsCurrentAction(script_grind.autoAttackActionSlot) == 1) then
 					CheckRacialSpells();
 					self.waitTimer = GetTimeEX() + 200;
-					return 0;
 				end
 			end
 		
@@ -695,8 +707,8 @@ function script_hunter:run(targetGUID)
 				end
 			end
 
-				if (not IsAutoCasting("Attack")) then
-					targetObj:AutoAttack();
+				if targetObj:GetDistance() <= 10 and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+					CastSpellByName("Attack");
 				end
 
 				if (targetObj:GetDistance() > self.meleeDistance) and (GetNumPartyMembers() == 0) and (script_grind.isTargetingMe(targetObj)) then
@@ -712,10 +724,9 @@ function script_hunter:run(targetGUID)
 						if (not IsMoving()) then
 							targetObj:FaceTarget();
 						end
-						if (CastSpellByName("Raptor Strike")) then
+						CastSpellByName("Raptor Strike")
 							targetObj:FaceTarget();
 							return 0;
-						end
 					end
 				end
 					
@@ -723,6 +734,10 @@ function script_hunter:run(targetGUID)
 				if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and (localMana > 10) and (targetHealth < 35) then
 					CastSpellByName("Wing Clip");
 					return 0;
+				end
+
+				if targetObj:GetDistance() <= 10 and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+					CastSpellByName("Attack");
 				end
 
 			end -- melee auto attack
@@ -1084,8 +1099,10 @@ function script_hunter:hunterPull(targetObj)
 			end
 
 			if (not self.hasPet) then
-				if (targetObj:GetDistance() < 12) then
-					targetObj:AutoAttack();
+				if (targetObj:GetDistance() <= 10) then
+					if (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+						CastSpellByName("Attack");
+					end
 				else
 					return 3;
 				end

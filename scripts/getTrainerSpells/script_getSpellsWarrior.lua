@@ -34,7 +34,7 @@ function script_getSpellsWarrior:getTrainerTargetWarrior()
 		-- Human starter area
 		if (GetFaction() == 1 and not a and not b and not c and not e and not f) or (script_getSpells:humanZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = -8918.3603515625, -208.4109954834, 82.125961303711;
+				vX, vY, vZ = -8918.3603515625, -208.4109954834, 82.125419616699;
 				script_getSpells.trainerTarget = "Llane Beshere";
 			end
 			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then

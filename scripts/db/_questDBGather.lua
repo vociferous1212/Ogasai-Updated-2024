@@ -43,7 +43,7 @@ return false;
 end
 function _questDBGather:run()
 
-
+	if self.waitTimer > GetTimeEX() then return true; end
 	-- get object
 		self.gatheringTarget = _questDBGather:getObject();
 		
@@ -58,22 +58,22 @@ function _questDBGather:run()
 		end		
 		if (IsMoving()) then
 			StopMoving();
-			self.waitTimer = GetTimeEX() + 950;
+			_quest.waitTimer = GetTimeEX() + 950;
 			return true;
 		end
 		if (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
 			self.gatheringTarget:GameObjectInteract();
-			self.waitTimer = GetTimeEX() + 1650;
+			if IsMoving() then StopMoving(); return true; end
+			_quest.waitTimer = GetTimeEX() + 1650;
 			return true;
 		end
 		if (not LootTarget()) and (self.gatheringTarget:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
-			self.waitTmer = GetTimeEX() + 4550;
+			_quest.waitTmer = GetTimeEX() + 4550;
 			return true;
 		end
-		if (IsLooting()) then self.waitTimer = GetTimeEX() + 2500; if (LootTarget()) or (IsLooting()) then return true; end end end
-		self.waitTimer = GetTimeEX() + 450;
-	return;
-	
+		if (IsLooting()) then self.waitTimer = GetTimeEX() + 2500; if (LootTarget()) or (IsLooting()) then _quest.waitTimer = GetTimeEX() + 450; return true; end end end
+		
+return false;
 end
 function _questDBGather:getItemsInInventory()
 	-- run inventory and find item name that matches current _questDB quest name or _quest current quest name 

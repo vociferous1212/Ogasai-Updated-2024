@@ -4,12 +4,13 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 		includeTeldrassDolanaar = include("scripts\\db\\_questDB_Teldrassil_Dolanaar.lua"),
 		includeDuskwood2025 = include("scripts\\db\\_questDB_Duskwood_20_25.lua"),
 		includeDunMoroghColdridge = include("scripts\\db\\_questDB_DunMorogh_Coldridge.lua"),
+		includeDurotarValleyOfTrialsl = include("scripts\\db\\_questDB_Durotar_ValleyOfTrials.lua"),
 }
 function _questDB:setup()
 --[[
 --type quest - 1 = kill | 2 = gather | 0 = already completed | 3 = ?
 
---completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum)
+--(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, useItem, gossipOption)
 
 ]]--
 
@@ -18,12 +19,13 @@ function _questDB:setup()
 	_questDB_Teldrassil_Shadowglen:setup();
 	_questDB_Elwynn_Northshire:setup();
 	_questDB_DunMorogh_Coldridge:setup();
+	_questDB_Durotar_ValleyOfTrials:setup();
 
 	self.isSetup = true;
 
 end
 
-function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc, useItem)
+function _questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc, useItem, gossipOption)
 	self.questList[self.numQuests] = {};
 	self.questList[self.numQuests]['completed'] = completed;
 	self.questList[self.numQuests]['faction']= faction;
@@ -59,6 +61,7 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 	self.questList[self.numQuests]['rewardNum'] = rewardNum;
 	self.questList[self.numQuests]['desc'] = desc;
 	self.questList[self.numQuests]['useItem'] = useItem;
+	self.questList[self.numQuests]['gossipOption'] = gossipOption;
 	self.numQuests = self.numQuests + 1;
 
 end
@@ -81,6 +84,7 @@ local bestDist = 10000;
 						_questDB.curListQuest = self.questList[i]['questName'];
 						_quest.currentType = _questDB.questList[i]['type'];
 						_quest.usingItem = _questDB.questList[i]['useItem'];
+						_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 
 					end
 
@@ -184,12 +188,11 @@ function _questDB:turnQuestCompleted()
 local questDescription, questObjectives = GetQuestLogQuestText();
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
-		--(if desc == quest being checked and quest being checked ~= nil) or (quest being checked ~= nil and quester current quest == nil) or (there's no quest objective
-		if (self.questList[i]['desc'] == _quest.currentDesc and _quest.currentDesc ~= nil) or (self.questList[i]['desc'] == _questDB.curDesc and _questDB.curDesc ~= nil and _quest.currentQuest == nil) or (questObjectives == nil and _quest.currentQuest ~= _questDB.curListQuest) or (not _quest.isQuestCompleted) then
+		if (self.questList[i]['desc'] == _quest.currentDesc) or (self.questList[i]['desc'] == _questDB.curDesc and _quest.currentQuest == nil) or (questObjectives == nil and _quest.currentQuest ~= _questDB.curListQuest) then
 			if self.questList[i]['questName'] == self.curListQuest and self.questList[i]['desc'] == _questDB.curDesc then
 				if self.questList[i]['completed'] == "no" and self.questList[i]['questName'] ~= "nnil" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
-					ToFile(""..self.curListQuest.." - completed");
+					--ToFile(""..self.curListQuest.." - completed");
 					self.curListQuest = nil;
 					self.curDesc = nil;
 					_quest.currentQuest = nil;
@@ -209,26 +212,26 @@ end
 function _questDB:turnOldQuestCompleted()
 local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
 	local questDescription, questObjectives = GetQuestLogQuestText();
-	if (not _quest.isQuestCompleted)then
+	if (not _quest.isQuestCompleted) then
 		for i=0, _questDB.numQuests -1 do
 			if self.questList[i]['questName'] == self.curListQuest then
 			if self.questList[i]['completed'] == "no" then
 			if self.questList[i]['questName'] ~= "nnil" then
 			if _quest.currentDesc ~= _questDB.curDesc then
-			if self.questList[i]['questName'] ~= title then
-			if self.questList[i]['desc'] ~= _quest.currentDesc then
+			--if self.questList[i]['questName'] ~= title then
+			if self.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 and _quest.currentType ~= 99 then
 				if questObjectives ~= self.questList[i]['desc'] then
 				DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
 				self.questList[i]['completed'] = "nnil";
 				self.questList[i]['questName'] = "nnil";
-				ToFile(""..self.curListQuest.." - completed");
+				--ToFile(""..self.curListQuest.." - completed");
 				self.curListQuest = nil;
 				self.curDesc = nil;
-				_quest.currentQuest = nil;
+				--_quest.currentQuest = nil;
 				_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
 				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
 			return true;
-			end end end end end end end
+			end end end end end end --end
 		end
 	end
 end
