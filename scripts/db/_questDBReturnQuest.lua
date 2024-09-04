@@ -96,6 +96,7 @@ function _questDBReturnQuest:returnAQuest()
 			end
 			_quest.message = "Moving to quest return target";
 			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+			if not IsMoving() then Move(x, y, z); end
 		return;
 		end
 	return true;
