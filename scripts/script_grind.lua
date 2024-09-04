@@ -2246,12 +2246,7 @@ function script_grind:enemyIsValid(i)
 			and not (skipDragonkin and i:GetCreatureType() == 'Dragonkin') 
 			and not (skipGiant and i:GetCreatureType() == 'Giant') 
 			and not (skipMechanical and i:GetCreatureType() == 'Mechanical') 
-			and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
-			--local tarPosX, tarPosY, tarPosZ = i:GetPosition();
-			--local myPosX, myPosY, myPosZ = GetLocalPlayer():GetPosition();
-			--local posZ = tarPosZ - myPosZ;
-			--if (posZ < 9) and (posZ > -9) then
-			) then
+			and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))) then
 			return true;
 		end
 
