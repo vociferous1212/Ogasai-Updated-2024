@@ -10,6 +10,9 @@ end
 function _questEX:doChecks()
 	local localObj = GetLocalPlayer();
 
+	if (not HasSpell("First Aid")) then script_grind.useFirstAid = false; end
+	if GetNumQuestLogEntries() > 1 then self.message = "Bot only does 1 quest at a time..."; end
+	 script_grind.nextToNodeDist = 4.05; NavmeshSmooth(5.8);
 
 	if GetNumQuestLogEntries() == 0 then
 		_quest.weHaveQuest = false;
@@ -18,10 +21,16 @@ function _questEX:doChecks()
 	if (script_vendor.status == 0) then
 		script_vendor.message = "idle...";
 	end
-if (not HasSpell("First Aid")) then script_grind.useFirstAid = false; end
-	if GetNumQuestLogEntries() > 1 then self.message = "Bot only does 1 quest at a time..."; end
-	 script_grind.nextToNodeDist = 4.05; NavmeshSmooth(5.8);
 
+	-- run gatherer scripts
+	if not IsInCombat() and not localObj:IsDead() then
+		if script_gatherRun:gather() then
+			if (IsLooting()) then
+				_quest:setTimer(5000);
+			end
+			return true;
+		end
+	end
 
 	-- if we are dead
 	if (localObj:IsDead()) then
