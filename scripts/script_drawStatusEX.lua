@@ -27,7 +27,4 @@ function script_drawStatusEX:drawSetup()
 	if (not script_grind.drawEnabled and script_grind.showClassOptions) then
 		RunCombatDraw();
 	end
-	if (not script_grind.drawEnabled) then
-		return;
-	end
 end

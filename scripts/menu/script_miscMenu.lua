@@ -1,6 +1,7 @@
 script_miscMenu = {}
 
 function script_miscMenu:menu()
+
 	if (CollapsingHeader("Talents, Paranoia & Misc Options")) then
 
 		if (GetLocalPlayer():GetLevel() >= 40) then

@@ -47,7 +47,7 @@ function script_grindEX:returnTargetNearMyAggroRange()
 						i:AutoAttack();
 						return i;
 					end
-				elseif (not script_grind.hotspotReached) and (not IsInCombat()) then	
+				elseif (not script_grind.hotspotReached or _quest.usingQuester) and (not IsInCombat()) then	
 					script_grindEX:addTargetToAggroBlacklist(i:GetGUID());
 					if (PlayerHasTarget()) then
 						ClearTarget();

@@ -299,15 +299,12 @@ end
 
 function script_grind:setup()
 
-	-- should tell the bot to keep variables if disconnected or switching areas (loading screens)
-	PersistLoadingScreen(true);
-
 	-- used to auto select vendors based on position of last known position
 	myLastX, myLastY, myLastZ = GetLocalPlayer():GetPosition();
 
 	-- Classes that don't use mana
 	local _ , class = UnitClass('player');
-	if (class == "WARRIOR") or (class == "ROGUE");
+	if (class == "WARRIOR") or (class == "ROGUE") then
 		self.useMana = false;
 		self.restMana = 0;
 	end
@@ -325,16 +322,16 @@ function script_grind:setup()
 		
 	end
 
-	if (class == "HUNTER") then
+	if (strfind("Hunter", class)) then
 		script_hunter.waitAfterCombat = true;
 	end
 
-	if (class == "WARLOCK") then
+	if (strfind("Warlock", class)) then
 		script_warlock.waitAfterCombat = true;
 	end
-
+	
 	-- No refill as mage or at level 1
-	if (class == "MAGE") then
+	if (strfind("Mage", class)) then
 		self.vendorRefill = false;
 	end
 
@@ -343,7 +340,7 @@ function script_grind:setup()
 		self.vendorRefill = false;
 	end
 
-	if (class == "ROGUE" and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
+	if (UnitClass("Player") == "Rogue" and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
 		self.blacklistTime = 60;
 	end
 
@@ -1381,7 +1378,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 
 			-- pet stays in combat on some server cores while returning to player
 				-- force bot to finish combat...
-			if (class == "WARLOCK") or (class == "HUNTER") and (GetNumPartyMembers() == 0) then
+			if (UnitClass('player') == "Warlock") or (UnitClass('player') == "Hunter") and (GetNumPartyMembers() == 0) then
 
 				-- force bot to attack pets target
 				if (script_warlock.waitAfterCombat or script_hunter.waitAfterCombat)
