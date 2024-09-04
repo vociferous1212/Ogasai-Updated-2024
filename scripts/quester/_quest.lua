@@ -1,7 +1,5 @@
 _quest = {
 
-	-- if we have a quest and are out of level range in DB it doesn't find a grind spot? something...
-
 	message = "Quester",
 	usingQuester = false,
 	pause = true,
@@ -32,11 +30,11 @@ _quest = {
 	xp = 0,
 	currentType = nil,
 	usingItem = nil,
-	gossipOption = nil,
 
 	grindIncluded = include("scripts\\script_grind.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
 	questerMenuIncluded = include("scripts\\quester\\_questMenu.lua"),
+	questerGetItemToGatherIncluded = include("scripts\\quester\\_questGetItemToGather.lua"),
 	questerHandleVendorIncluded = include("scripts\\quester\\_questHandleVendor.lua"),
 	questerDBIncluded = include("scripts\\db\\_questDB.lua"),
 	questerDBTargetsIncluded = include("scripts\\db\\_questDBTargets.lua"),
@@ -45,10 +43,6 @@ _quest = {
 	questerEXIncluded = include("scripts\\quester\\_questEX.lua"),
 	questerCheckQuestCompletionIncluded = include("scripts\\quester\\_questCheckQuestCompletion.lua"),
 	questerDoCombatIncluded = include("scripts\\quester\\_questDoCombat.lua"),
-	questerRunRestIncluded = include("scripts\\quester\\_questRunRest.lua"),
-	questerEdgeCaseQuestIncluded = include("scripts\\quester\\_questEdgeCaseQuest.lua"),
-
-
 
 }
 
@@ -89,7 +83,7 @@ end
 function _quest:setup()
 	script_grind:setup();
 	script_gather:setup();
-	--script_grind.getSpells = true;
+	script_grind.getSpells = true;
 	script_vendor:setup();
 	vendorDB:setup();
 	vendorDB:loadDBVendors();
@@ -101,8 +95,6 @@ function _quest:setup()
 	self.usingQuester = true;
 	if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
 		self.autoComplete = false;
-		self.weHaveQuest = false;
-		self.isQuestComplete = false;
 	end
 
 	self.xp = UnitXP("Player");
@@ -122,27 +114,56 @@ function _quest:run()
 		EndWindow();
 		GetObjectsAroundMe();
 	end
+	if (not HasSpell("First Aid")) then
+		script_grind.useFirstAid = false;
+	end
 	-- display radar
-	if (script_radar.showRadar) then script_radar:draw() end
+	if (script_radar.showRadar) then
+		script_radar:draw()
+	end
 
 	-- display exp checker
-	if (script_grind.useExpChecker) and (IsInCombat()) then script_expChecker:menu(); end
+	if (script_grind.useExpChecker) and (IsInCombat()) then
+		script_expChecker:menu();
+	end
 	
 	-- draw chests
-	if (script_grind.drawChests) then script_gather:drawChestNodes(); end
+	if (script_grind.drawChests) then
+		script_gather:drawChestNodes();
+	end
 	-- draw fishing pools
 	if (script_gatherEX.drawFishingPools) then
 		script_gatherEX:drawFishNodes();
+	end	
+
+
+
+	if (not IsUsingNavmesh()) then UseNavmesh(true);
+		return true;
 	end
-	if _questEX:doStartChecks() then return; end
-	
+	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files...";
+		return true;
+	end
+	if (GetLoadNavmeshProgress() ~= 1) then
+		self.message = "Loading Nav Mesh! Please Wait!";
+		self.currentDebugStatus = "Loading Nav";
+		return;
+	end
+
+	script_grind.nextToNodeDist = 4.05
+
 	-- return if we pause bot
-if (self.pause) then script_grind.pause = true; return; end
+	if (self.pause) then
+		script_grind.pause = true;
+		return;
+	end
+
 	-- handle vendor stuff through vendor scripts
-	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
+	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 1) then
 			_questHandleVendor:vendor();
+			grindSpotReached = false;
 			return true;
 		else
 			_questEX.bagsFull = false;
@@ -157,10 +178,7 @@ if (self.pause) then script_grind.pause = true; return; end
 	if (self.waitTimer + self.tickRate > GetTimeEX()) and script_grind.pause then
 		return;
 	end
-	if IsChanneling() or IsCasting() then
-		return;
-	end
-	
+
 	-- run setup function once
 	if (not self.isSetup) then
 		_quest:setup();
@@ -168,12 +186,11 @@ if (self.pause) then script_grind.pause = true; return; end
 	end
 
 	if script_grind.pause then
-		if not script_grind.skipLooting and not _questEX.bagsFull then
-			script_grind.lootObj = script_nav:getLootTarget(50);
+		if not script_grind.skipLooting then
+		script_grind.lootObj = script_nav:getLootTarget(50);
 		end
-
 		if _questEX:doChecks() then
-			if script_grind.lootObj ~= nil and not _questEX.bagsFull then
+			if script_grind.lootObj ~= nil then
 				if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
 					ClearTarget();
 				end
@@ -182,58 +199,53 @@ if (self.pause) then script_grind.pause = true; return; end
 		end
 	
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() then
-			_questDoCombat:doCombat()
+			_questDoCombat:doCombat();
 			return true;
 		end
 	end
-
-	if self.currentType == 99 and not self.isQuestComplete and GetNumQuestLogEntries() > 0 then
-		self.message = "Edge case quest... doing specific routine";
-		_questEdgeCaseQuest:run() return true;
-	elseif self.currentType == 99 and self.isQuestComplete and GetNumQuestLogEntries() == 0 then _questDB:turnQuestCompleted(); self.currentType = 0; end
-		
-
+	
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
-		if (_questDB:turnQuestCompleted()) then
+		_questDB:turnQuestCompleted()
 		_quest.weCompletedQuest = false;
 		_quest.isQuestComplete = false;
 		_quest.currentDesc = nil;
 		_questDB.curDesc = nil;
-		end
 	end
-
-
 
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
 	if (script_getSpells.getSpellsStatus == 0) then
-	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc and self.currentType ~= 99) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest and self.currentType ~= 99)) and self.autoComplete then
+	if ((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc) or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) and self.autoComplete then
 		if IsMoving() then
 			StopMoving();
 			return true;
 		end
 		if (_questDB:turnOldQuestCompleted()) then
-			self.message = "Completing previous quests in list";
 			self.waitTimer = GetTimeEX() + 500;
 		return;
 		end
 	end
 	end
 
+	_questCheckQuestCompletion:checkQuestForCompletion();
+	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) then
+		if _questDBReturnQuest:returnAQuest() then
+			self.message = "Returning quest!";
+		return true;
+		end
+	end
+
 	-- set our current quest
 	for y=0, _questDB.numQuests -1 do
 		for i=0, GetNumQuestLogEntries()  do
+			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
 			local questDescription, questObjectives = GetQuestLogQuestText();
 			if _questDB.questList[y]['completed'] == "no" then
 				if _questDB.questList[y]['questName'] ~= "nnil" then
-					for i=0, GetNumQuestLogEntries()  do
-						local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
-
-						if title == _questDB.questList[y]['questName'] then
-							_quest.currentDesc = questObjectives; _quest.gossipOption = _questDB.questList[i]['gossipOption'];
-							self.currentQuest = title;
-							self.weHaveQuest = true;
-						end
+					if title == _questDB.questList[y]['questName'] then
+						_quest.currentDesc = questObjectives;
+						self.currentQuest = title;
+						self.weHaveQuest = true;
 					end
 				end	
 			end
@@ -259,9 +271,6 @@ if (not self.grindSpotReached) then
 self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
 end
 
-	--need to recheck before bot gets into movement phase...
-	if GetNumQuestLogEntries() > 0 then _questDB:turnOldQuestCompleted(); end
-
 	if (distToGrind <= 50) and not self.grindspotReached then
 		self.grindSpotReached = true;
 	end
@@ -285,23 +294,20 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
 				if (GetTarget():UnitInteract()) then
 					self.waitTimer = GetTimeEX() + 2000;
+						SelectGossipAvailableQuest(1);
 						if (AcceptQuest()) then
 							local questDescription, questObjectives = GetQuestLogQuestText();
 							self.currentQuest = curQuestName;
 							self.currentDesc = questObjectives;
-						else
-						SelectGossipAvailableQuest(_quest.gossipOption);
-						SelectAvaialbleQuest(_quest.gossipOption);
-						SelectActiveQuest(_quest.gossipOption);
 						end					
 				end
 			end
 		end
 	end
 
-	if self.currentType == 3 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete then
+	if self.currentType == 3 and not IsInCombat() and (self.curGrindX ~= 0) then
 		if distToGrind <= 5 then UseItem(self.usingItem) return true;
-			elseif distToGrind > 5 then if script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ) then self.message = "Type quest == 3"; if not IsMoving() then Move(self.curQuestX, self.curQuestY, self.curQuestZ) end return true; end return true;
+			else script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
 		end	
 	end
 	-- gather quest object
@@ -309,11 +315,10 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 	-- get a target
 	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached) or (IsInCombat()) or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached) then if (self.enemyTarget == nil) and (not self.isQuestComplete) then self.enemyTarget = _questDBTargets:getTarget(); end end
 	-- we have a quest so go to grind spot
-	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and not IsInCombat() and (not self.isQuestComplete) then
+	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 50) and (self.currentQuest ~= nil) and (self.enemyTarget == nil) and (not self.isQuestComplete) then
 		self.message = "Moving to grind spot";
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
-			return true;
-	
+		return true;
 	end
 
 	-- run grinder until we get a quest
@@ -328,6 +333,29 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 	end
 end
 
-function _quest:runRest() 
-	--_questRunRest:runRest();
+function _quest:runRest()
+		if (IsInCombat()) or (IsLooting()) then return false; end
+	local localObj = GetLocalPlayer(); local localHealth = localObj:GetHealthPercentage(); local localMana = localObj:GetManaPercentage();
+		self.needRest = true;
+
+	-- run the rest script for grind/combat
+	if(RunRestScript()) then
+		self.message = "Resting...";
+		
+		if (IsMoving()) and (not localObj:IsMovementDisabed()) then StopMoving(); return true; end
+
+		if (not IsInCombat()) and (not petHasTarget) then if (IsEating() and localHealth < 95) or (IsDrinking() and localMana < 95) then return true; end end
+		if (IsEating() and localHealth >= 95 and IsDrinking() and localMana >= 95) 
+		or (not IsDrinking() and IsEating() and localHealth >= 95)
+		or (not IsEating() and IsDrinking() and localMana >= 95)
+		then
+			if (not IsStanding()) then
+				JumpOrAscendStart();
+				return false;
+			end
+		end
+	return true;	
+	end
+self.needRest = false;
+return false;
 end

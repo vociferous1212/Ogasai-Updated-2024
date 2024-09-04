@@ -8,9 +8,6 @@ function _questDoCombat:doCombat()
 			_quest.enemyTarget = GetTarget();
 		end
 		if IsInCombat() and (_quest.enemyTarget ~= nil or _quest.enemyTarget == nil) then
-			if (GetTarget() ~= 0 and GetTarget() ~= nil and GetTarget():IsTapped() and not GetTarget():IsTappedByMe()) then
-				ClearTarget(); self.enemyTarget = nil;
-			end
 			if (_quest.enemyTarget ~= nil) and (_questEX:getTargetAttackingUs() ~= nil) then
 				if (_questEX:getTargetAttackingUs() ~= _quest.enemyTarget:GetGUID()) then
 					_quest.enemyTarget = _questEX:getTargetAttackingUs();
@@ -59,9 +56,6 @@ function _questDoCombat:doCombat()
 			if not _quest.enemyTarget:IsDead() and _quest.enemyTarget:CanAttack() then
 				_quest.message = "Running Combat";
 				if IsInCombat() and not IsMoving() then
-					if _quest.enemyTarget:GetDistance() <= script_grind.combatScriptRange then
-						_quest.enemyTarget:AutoAttack();
-					end
 					_quest.enemyTarget:FaceTarget();
 				end
 				RunCombatScript(_quest.enemyTarget:GetGUID());
@@ -71,7 +65,7 @@ function _questDoCombat:doCombat()
 					local x, y, z = _quest.enemyTarget:GetPosition();
 					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 					_quest.currentDebugStatus = "Moving to target";
-				return;
+				return true;
 				end
 			end
 		end
