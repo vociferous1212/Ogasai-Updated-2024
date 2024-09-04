@@ -4,8 +4,6 @@ function _questDB_Teldrassil_Shadowglen:setup()
 
 --[[completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherName, gatherName2, rewardNum, desc, useItem, gossipOption)]]--
 
-----_questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherName, gatherName2, rewardNum, desc);
-
 _questDB:addQuest("no", 0, "Dolanaar Delivery", "Porthannius", 10214.299804688, 700.55297851563, 1360.6042480469, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9802.2099609375, 982.60797119141, 1313.8966064453, "Innkeeper Keldamyr", 0, 0, 0, 0, 0, 2, "Bring the Dolanaar Delivery to Innkeeper Keldamyr.", 0, 1);
 
 _questDB:addQuest("no", 0, "Crown of the Earth", "Tenaron Stormgrip", 10492.5, 807.28002929688, 1397.2683105469, 141, 1, 6, 10712.326171875, 763.5146484375, 1321.3764648438, 3, 0, 0, 0, 0, 0, 10492.5, 807.28002929688, 1397.2683105469, "Tenaron Stormgrip", 0, 0, 0, 0, 0, 0, "Fill the Crystal Phial and bring it back to Tenaron Stormgrip atop Aldrassil.", "Crystal Phial", 1);

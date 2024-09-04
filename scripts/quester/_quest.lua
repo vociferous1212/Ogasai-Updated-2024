@@ -167,25 +167,13 @@ if (self.pause) then script_grind.pause = true; return; end
 		self.currentDebugStatus = "Running Setup";
 	end
 
-	if script_grind.pause then
-		if not script_grind.skipLooting and not _questEX.bagsFull then
-			script_grind.lootObj = script_nav:getLootTarget(50);
-		end
+	if script_grind.pause then if not script_grind.skipLooting and not _questEX.bagsFull then script_grind.lootObj = script_nav:getLootTarget(50); end
 
-		if _questEX:doChecks() then
-			if script_grind.lootObj ~= nil and not _questEX.bagsFull then
-				if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
-					ClearTarget();
-				end
-			end
-		return true;
-		end
+		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return true; end
 	
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() then
-			_questDoCombat:doCombat()
-			return true;
-		end
-	end
+			_questDoCombat:doCombat();
+			if GetLocalPlayer():GetLevel() > 5 then if script_checkAdds:checkAdds() then return true; end end return true; end end
 
 	if self.currentType == 99 and not self.isQuestComplete and GetNumQuestLogEntries() > 0 then
 		self.message = "Edge case quest... doing specific routine";
@@ -202,8 +190,6 @@ if (self.pause) then script_grind.pause = true; return; end
 		end
 	end
 
-
-
 	-- if desc doesn't match desc then complete quest
 	-- or if name ~= name and no desc found
 	if (script_getSpells.getSpellsStatus == 0) then
@@ -214,7 +200,7 @@ if (self.pause) then script_grind.pause = true; return; end
 		end
 		if (_questDB:turnOldQuestCompleted()) then
 			self.message = "Completing previous quests in list";
-			self.waitTimer = GetTimeEX() + 500;
+			--_quest:setTimer(500)
 		return;
 		end
 	end
@@ -253,7 +239,7 @@ self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
 end
 
 	--need to recheck before bot gets into movement phase...
-	if GetNumQuestLogEntries() > 0 then if _questDB:turnOldQuestCompleted() then _quest.waitTimer = GetTimeEX() + 300; end end
+	if GetNumQuestLogEntries() > 0 then if _questDB:turnOldQuestCompleted() then _quest:setTimer(550); return true; end end
 	if (distToGrind <= 50) and not self.grindspotReached then
 		self.grindSpotReached = true;
 	end
@@ -271,8 +257,8 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 	if (distToGiver <= 4) and (self.currentQuest == nil) then
 		if curQuestGiver ~= nil then
 			TargetByName(curQuestGiver);
-			self.waitTimer = GetTimeEX() + 2000;
-			curQuestGiver = GetTarget(); if (GetTarget() ~= nil) and (GetTarget() ~= 0) then if (GetTarget():UnitInteract()) then self.waitTimer = GetTimeEX() + 2000;
+			_quest:setTimer(2000);
+			curQuestGiver = GetTarget(); if (GetTarget() ~= nil) and (GetTarget() ~= 0) then if (GetTarget():UnitInteract()) then _quest:setTimer(2000);
 			if (AcceptQuest()) then local questDescription, questObjectives = GetQuestLogQuestText(); self.currentQuest = curQuestName; self.currentDesc = questObjectives;
 						else
 						SelectGossipAvailableQuest(_quest.gossipOption); SelectAvaialbleQuest(_quest.gossipOption); SelectActiveQuest(_quest.gossipOption); end	 end end end end

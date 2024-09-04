@@ -188,7 +188,7 @@ function _questDB:turnQuestCompleted()
 local questDescription, questObjectives = GetQuestLogQuestText();
 	if self.curListQuest ~= nil then
 	for i=0, self.numQuests -1 do
-		if (self.questList[i]['desc'] == _quest.currentDesc) or (self.questList[i]['desc'] == _questDB.curDesc and _quest.currentQuest == nil) or (questObjectives == nil and _quest.currentQuest ~= _questDB.curListQuest) then
+		if (self.questList[i]['desc'] == _quest.currentDesc) or (self.questList[i]['desc'] == _questDB.curDesc and _quest.currentQuest == nil) or (questObjectives == nil and _quest.currentQuest ~= _questDB.curListQuest) or (_quest.isQuestCompleted and GetNumQuestLogEntries() < 1) then
 			if self.questList[i]['questName'] == self.curListQuest and self.questList[i]['desc'] == _questDB.curDesc then
 				if self.questList[i]['completed'] == "no" and self.questList[i]['questName'] ~= "nnil" then
 					DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
@@ -218,7 +218,7 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 			if self.questList[i]['completed'] == "no" then
 			if self.questList[i]['questName'] ~= "nnil" then
 			if _quest.currentDesc ~= _questDB.curDesc then
-			--if self.questList[i]['questName'] ~= title then
+			if self.questList[i]['questName'] ~= title then
 			if self.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 and _quest.currentType ~= 99 then
 				if questObjectives ~= self.questList[i]['desc'] then
 				DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
@@ -227,11 +227,11 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 				--ToFile(""..self.curListQuest.." - completed");
 				self.curListQuest = nil;
 				self.curDesc = nil;
-				--_quest.currentQuest = nil;
+				_quest.currentQuest = nil;
 				_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
 				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
 			return true;
-			end end end end end end --end
+			end end end end end end end
 		end
 	end
 end
