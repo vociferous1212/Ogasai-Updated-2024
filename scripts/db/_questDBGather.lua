@@ -43,6 +43,10 @@ return false;
 end
 function _questDBGather:run()
 
+	if _quest.isQuestComplete then
+		return false;
+	end
+
 	if self.waitTimer > GetTimeEX() then return true; end
 	-- get object
 		self.gatheringTarget = _questDBGather:getObject();

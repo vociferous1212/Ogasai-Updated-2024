@@ -20,7 +20,7 @@ function _questEX:doChecks()
 	end
 if (not HasSpell("First Aid")) then script_grind.useFirstAid = false; end
 	if GetNumQuestLogEntries() > 1 then self.message = "Bot only does 1 quest at a time..."; end
-	 script_grind.nextToNodeDist = 4.05; NavmeshSmooth(5.5);
+	 script_grind.nextToNodeDist = 4.05; NavmeshSmooth(5.8);
 
 
 	-- if we are dead
