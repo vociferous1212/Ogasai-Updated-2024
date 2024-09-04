@@ -304,7 +304,7 @@ function script_grind:setup()
 
 	-- Classes that don't use mana
 	local _ , class = UnitClass('player');
-	if (class == "WARRIOR") or (class == "ROGUE") then
+	if (class == "WARRIOR" or GetMyClass() == "WARRIOR") or (class == "ROGUE" or GetMyClass() == "ROGUE") then
 		self.useMana = false;
 		self.restMana = 0;
 	end
@@ -322,16 +322,16 @@ function script_grind:setup()
 		
 	end
 
-	if (strfind("Hunter", class)) then
+	if (strfind("HUNTER", class)) or GetMyClass() == "HUNTER" then
 		script_hunter.waitAfterCombat = true;
 	end
 
-	if (strfind("Warlock", class)) then
+	if (strfind("WARLOCK", class)) or GetMyClass() == "WARLOCK" then
 		script_warlock.waitAfterCombat = true;
 	end
 	
 	-- No refill as mage or at level 1
-	if (strfind("Mage", class)) then
+	if (strfind("MAGE", class)) or GetMyClass() == "MAGE" then
 		self.vendorRefill = false;
 	end
 
@@ -340,7 +340,7 @@ function script_grind:setup()
 		self.vendorRefill = false;
 	end
 
-	if (UnitClass("Player") == "Rogue" and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
+	if (UnitClass("Player") == "ROGUE" or GetMyClass() == "ROGUE") and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
 		self.blacklistTime = 60;
 	end
 
@@ -1378,7 +1378,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 
 			-- pet stays in combat on some server cores while returning to player
 				-- force bot to finish combat...
-			if (UnitClass('player') == "Warlock") or (UnitClass('player') == "Hunter") and (GetNumPartyMembers() == 0) then
+			if (UnitClass('player') == "WARLOCK" or GetMyClass() == "WARLOCK") or (UnitClass('player') == "HUNTER" or GetMyClass() == "HUNTER") and (GetNumPartyMembers() == 0) then
 
 				-- force bot to attack pets target
 				if (script_warlock.waitAfterCombat or script_hunter.waitAfterCombat)
