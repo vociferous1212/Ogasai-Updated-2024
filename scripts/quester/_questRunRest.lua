@@ -9,12 +9,12 @@ function _questRunRest:runRest()
 	local localMana = localObj:GetManaPercentage();
 	
 
-	self.needRest = true;
+	_quest.needRest = true;
 
 	-- run the rest script for grind/combat
 	if(RunRestScript()) then
 
-		self.message = "Resting...";
+		_quest.message = "Resting...";
 
 		if (IsMoving()) and (not localObj:IsMovementDisabed()) then
 			StopMoving();
@@ -37,6 +37,6 @@ function _questRunRest:runRest()
 	return true;
 	end
 
-self.needRest = false;
+_quest.needRest = false;
 return false;
 end

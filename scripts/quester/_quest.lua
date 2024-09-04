@@ -296,4 +296,4 @@ self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
 	-- run grinder until we get a quest
 	if _questDB.curListQuest == nil then self.message = "No quest or no quest in level range in DB! Going to grind..."; self.message = script_grind.message; script_grind:run(); script_grind.pause = false; return true; elseif not script_grind.pause then script_grind.pause = true; end end
 
-function _quest:runRest() _questRunRest:runRest(); end
+function _quest:runRest() if _questRunRest:runRest() then return true; end end
