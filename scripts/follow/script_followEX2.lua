@@ -9,17 +9,17 @@ function script_followEX2:setup()
 	vendorDB:loadDBVendors();
 	script_vendor:setup();
 
-	local class = UnitClass('player');
+	local _ , class = UnitClass('player');
 	
-	if class == "Mage" 
-		or class == "Warlock"
-		or class == "Rogue"
-		or class == "Warrior"
-		or class == "Hunter" then
+	if class == "MAGE" 
+		or class == "WARLOCK"
+		or class == "ROGUE"
+		or class == "WARRIOR"
+		or class == "HUNTER" then
 		
 		script_follow.assistInCombat = true;
 	end
-	if class == "Priest" or class == "Paladin" or class == "Shaman" or class == "Druid" then
+	if class == "PRIEST" or class == "PALADIN" or class == "SHAMAN" or class == "DRUID" then
 		script_follow.assistInCombat = true;
 		script_follow.dpsHP = 75;
 	end
@@ -87,8 +87,8 @@ function script_followEX2:playersTargetingUs() -- returns number of players atta
 end
 
 function script_followEX2:IsTargetingPet(i)
-		local class = UnitClass("player");
-	if (not class == 'Warlock') then
+		local _ , class = UnitClass("player");
+	if (not class == 'WARLOCK') then
 			local pet = GetPet();
 		if (pet ~= nil and pet ~= 0 and not pet:IsDead()) then
 			if (i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0) then

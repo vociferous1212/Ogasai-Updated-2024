@@ -41,7 +41,7 @@ function script_followDoCombat:run()
 				script_follow.combatError = RunCombatScript(enemy:GetGUID());
 	
 				-- set combat conditions by class
-				local class = UnitClass('player');
+				local _ , class = UnitClass('player');
 	
 				-- get combat errors from combat scripts
 
