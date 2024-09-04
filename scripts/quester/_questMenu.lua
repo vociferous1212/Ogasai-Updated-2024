@@ -1,4 +1,6 @@
-_questMenu = { addSetupFile = include("scripts\\db\\_questDBSetup.lua");
+_questMenu = { 
+	
+	addSetupFile = include("scripts\\db\\_questDBSetup.lua");
 }
 
 -- menu items to draw in window() function
@@ -75,6 +77,21 @@ function _questMenu:menu()
 		Text("Options:"); SameLine(); Text("Gather DB Stuff");
 		Text("");
 
+		if Button("Add Current Target Info To Log File") then
+			ToFile("Quest Giver");
+			local x, y, z = GetTarget():GetPosition();
+			ToFile(x..", "..y..", "..z);
+			ToFile(GetTarget():GetUnitName());
+			ToFile("Map ID - "..GetMapID());
+			ToFile("Quest Objectives - "..GetObjectiveText(1));
+			ToFile("");
+		end
+		if Button("Add Current Location To Log File") then
+			ToFile("Grind/return Location");
+			local x, y, z = GetLocalPlayer():GetPosition();
+			ToFile(x..", "..y..", "..z);
+			ToFile("");
+		end
 		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
 		Text("Until bot reaches current quest in quest log");
 		Text("YOU MUST HAVE A QUEST IN QUEST LOG");

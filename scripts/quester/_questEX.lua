@@ -1,5 +1,12 @@
 _questEX = {bagsFull = false,}
 
+function _questEX:doStartChecks()
+if (not IsUsingNavmesh()) then UseNavmesh(true); return true; end
+	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files..."; return true; end
+	if (GetLoadNavmeshProgress() ~= 1) then self.message = "Loading Nav Mesh! Please Wait!"; self.currentDebugStatus = "Loading Nav"; return true; end
+return false;
+end
+
 function _questEX:doChecks()
 	local localObj = GetLocalPlayer();
 
@@ -11,6 +18,9 @@ function _questEX:doChecks()
 	if (script_vendor.status == 0) then
 		script_vendor.message = "idle...";
 	end
+if (not HasSpell("First Aid")) then script_grind.useFirstAid = false; end
+	if GetNumQuestLogEntries() > 1 then self.message = "Bot only does 1 quest at a time..."; end
+	 script_grind.nextToNodeDist = 4.05; NavmeshSmooth(5.5);
 
 
 	-- if we are dead
@@ -80,31 +90,44 @@ function _questEX:doChecks()
 			end
 		end
 
-	-- Check bags if they are full
+		-- Check bags if they are full
 		local inventoryFull = true;
-		for i = 1, 5 do 
-			if (i ~= 0) then 
-				for y=1,GetContainerNumSlots(i-1) do 
-					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
-					if (itemCount == 0 or itemCount == nil) then 
-						inventoryFull = false; 
-					end 
-				end
+		if GetMyClass() ~= "HUNTER" then
+			for i = 1, 5 do 
+				if (i ~= 0) then 
+					for y=1,GetContainerNumSlots(i-1) do 
+						local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
+						if (itemCount == 0 or itemCount == nil) then 
+							inventoryFull = false; 
+						end 
+					end
+				end 
 			end 
-		end 
-	
+		elseif GetMyClass() == "HUNTER" then
+			for i = 1, 4 do 
+				if (i ~= 0) then 
+					for y=1,GetContainerNumSlots(i-1) do 
+						local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
+						if (itemCount == 0 or itemCount == nil) then 
+							inventoryFull = false; 
+						end 
+					end
+				end 
+			end 
+		end
 		-- Tell the grinder we cant loot
 		if (inventoryFull) then
 			self.bagsFull = true;
 		end
-		if self.bagsFull then
+		if self.bagsFull then 
 			return false;
 		end
+	if script_grind.skipLooting then script_grind.lootObj = nil; end
 
 	-- loot objects
 	if (not IsInCombat()) and not script_grind.skipLooting then
-		script_grind.lootObj = script_nav:getLootTarget(50);
-		if (script_grind.lootObj ~= nil) then
+		if script_grind.lootObj == nil then script_grind.lootObj = script_nav:getLootTarget(50); end
+		if (script_grind.lootObj ~= nil) and not script_grind.skipLooting and not script_grindEX.bagsFull then
 			_quest.message = "Looting";
 			if (script_grind.lootObj:GetDistance() <= script_grind.lootDistance) then
 				if (IsMoving()) then
@@ -136,7 +159,7 @@ function _questEX:doChecks()
 	
 	-- go to trainer and get spells
 	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and _quest.weHaveQuest then
-		if (script_getSpells:checkForSpellsNeeded()) then
+		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
 			if (PlayerHasTarget()) then
 				ClearTarget();
 			end
