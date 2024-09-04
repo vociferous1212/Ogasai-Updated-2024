@@ -89,7 +89,7 @@ end
 function _quest:setup()
 	script_grind:setup();
 	script_gather:setup();
-	--script_grind.getSpells = true;
+	script_grind.getSpells = true;
 	script_vendor:setup();
 	vendorDB:setup();
 	vendorDB:loadDBVendors();
@@ -253,7 +253,7 @@ self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
 end
 
 	--need to recheck before bot gets into movement phase...
-	if GetNumQuestLogEntries() > 0 then _questDB:turnOldQuestCompleted(); end
+	if GetNumQuestLogEntries() > 0 then if _questDB:turnOldQuestCompleted() then _quest.waitTimer = GetTimeEX() + 300; end end
 	if (distToGrind <= 50) and not self.grindspotReached then
 		self.grindSpotReached = true;
 	end
