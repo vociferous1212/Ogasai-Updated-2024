@@ -328,23 +328,12 @@ function _questEX:doChecks()
 
 			if (script_grind:doLoot(GetLocalPlayer())) then
 
-				if IsLooting() then
-					_quest:setTimer(500);
-
-					if not LootTarget() then
-
-						_quest:setTimer(500);
-						LootTarget();
-
-					end
-
-				_quest:setTimer(800);
-
-				end
+			if not IsMoving() then
+				_quest:setTimer (250);
+			end
 
 			return true;
 			end
-		return true;
 		end
 	end
 
