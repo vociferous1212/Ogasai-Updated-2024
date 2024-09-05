@@ -57,7 +57,7 @@ bestDist = dist;
 		end
 	i, t = GetNextObject(i);
 	end
-	if bestTarget == nil then _quest.message = "No quest targets in range!"; _quest.grindspotReached = false; if _quest.currentType == 2 and not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
+	if bestTarget == nil then _quest.message = "No quest targets in range!"; if _quest.currentType == 2 and not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
 
 elseif bestTarget ~= nil then bestTarget:AutoAttack(); end return bestTarget; end
 

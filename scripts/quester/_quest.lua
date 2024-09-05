@@ -147,7 +147,7 @@ function _quest:run()
 		if (vendorStatus > 1) then
 			_questHandleVendor:vendor();
 			return true;
-		else
+		elseif (vendorStatus == 0) then
 			_questEX.bagsFull = false;
 		end
 
