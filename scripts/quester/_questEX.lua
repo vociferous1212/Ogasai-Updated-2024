@@ -350,7 +350,7 @@ function _questEX:doChecks()
 	end
 	
 	-- go to trainer and get spells
-	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and _quest.weHaveQuest then
+	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and _quest.weHaveQuest and _quest.isQuestComplete then
 
 		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
 

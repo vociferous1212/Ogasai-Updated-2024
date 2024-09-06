@@ -152,20 +152,13 @@ function _quest:run()
 	
 	-- if desc doesn't match desc then complete quest or if name ~= name and no desc found
 	-- our quest doesn't match DB quest...
-	if (script_getSpells.getSpellsStatus == 0) and script_grind.pause then
+	if (script_getSpells.getSpellsStatus == 0) and distToGiver ~= nil and script_grind.pause then
 
 		-- if we want to auto complete the quests
 		if self.autoComplete and
-
 			-- descriptions don't match then
-			(
-			(GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc and self.currentType ~= 99)
-
-			-- or
-
-			--quest names don't match then
-			or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest and self.currentType ~= 99)
-			) then
+			((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc and self.currentType ~= 99)
+			or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest and self.currentType ~= 99)) then
 
 				if IsMoving() then
 					StopMoving();
