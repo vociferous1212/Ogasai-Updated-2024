@@ -20,6 +20,7 @@ function _questHandleVendor:vendor()
 			if (script_vendor:repair()) then
 				
 				_quest:setTimer(100);
+				_quest.grindSpotReached = false;
 
 			return true;
 			end
@@ -31,6 +32,8 @@ function _questHandleVendor:vendor()
 			if (script_vendor:sell()) then
 			
 				_quest:setTimer(100);
+				_quest.grindSpotReached = false;
+
 
 			return true;
 			end
@@ -42,6 +45,8 @@ function _questHandleVendor:vendor()
 			if (script_vendor:continueBuyAmmo()) then 
 
 				_quest:setTimer(100);
+				_quest.grindSpotReached = false;
+
 
 			return true; 
 			end
@@ -53,6 +58,8 @@ function _questHandleVendor:vendor()
 			if (script_vendor:continueBuy()) then
 			
 				_quest:setTimer(100);
+				_quest.grindSpotReached = false;
+
 			
 			return true;
 			end

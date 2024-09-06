@@ -230,11 +230,11 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 	local questDescription, questObjectives = GetQuestLogQuestText();
 	if (not _quest.isQuestCompleted) then
 		for i=0, _questDB.numQuests -1 do
-			if self.questList[i]['questName'] == self.curListQuest then
 			if self.questList[i]['completed'] == "no" then
 			if self.questList[i]['questName'] ~= "nnil" then
-			if _quest.currentDesc ~= _questDB.curDesc then
+			if self.questList[i]['questName'] == self.curListQuest then
 			if self.questList[i]['questName'] ~= title then
+			if _quest.currentDesc ~= _questDB.curDesc then
 			if self.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 and _quest.currentType ~= 99 then
 				if questObjectives ~= self.questList[i]['desc'] and GetObjectiveText(1) ~= self.questList[i]['desc'] then
 				DEFAULT_CHAT_FRAME:AddMessage("Old quest marked as complete - "..self.curListQuest);

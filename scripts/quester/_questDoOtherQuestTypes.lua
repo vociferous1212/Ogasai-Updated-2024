@@ -12,9 +12,10 @@ function _questDoOtherQuestTypes()
 
 		_quest.message = "Type quest == 3";
 
+		if not HasItem(_quest.usingItem) then _quest.message = "No quest item to use!"; end
+		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() and HasItem(_quest.usingItem) then
 
-		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() and HasItem(_quest.UsingItem) then
-
+			
 			UseItem(_quest.usingItem)
 
 			_quest.isQuestComplete = true;

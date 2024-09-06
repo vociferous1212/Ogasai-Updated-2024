@@ -331,6 +331,7 @@ function _questEX:doChecks()
 
 			return true;
 			end
+			if PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then ClearTarget(); end
 		end
 	end
 

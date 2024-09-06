@@ -7,6 +7,9 @@ _questMenu = {
 function _questMenu:menu()
 
 	local wasClicked = false;
+
+	Text("Reaction Speed - need for testing | 3 = 3 seconds");
+	_quest.tickRate = SliderFloat("Tick Rate", 0, 3.5, _quest.tickRate);
 	
 	--nav mesh progress
 	local qqq = math.floor(GetLoadNavmeshProgress()*100);

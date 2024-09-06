@@ -120,7 +120,7 @@ function _questDBReturnQuest:returnAQuest()
 					end
 			return true;
 			end
-		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) then
+		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and (script_grind.lootObj == nil or script_grind.skipLooting) then
 			if (not IsInCombat()) and PlayerHasTarget() then
 				ClearTarget();
 			end
