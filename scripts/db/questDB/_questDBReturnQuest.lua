@@ -122,7 +122,8 @@ function _questDBReturnQuest:returnAQuest()
 			return true;
 			end
 		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and (script_grind.lootObj == nil or script_grind.skipLooting) then
-			if (not IsInCombat()) and PlayerHasTarget() then
+			local name = _questDB:getReturnTargetName();
+			if (not IsInCombat()) and PlayerHasTarget() and GetTarget():GetUnitName() ~= name then
 				ClearTarget();
 			end
 			_quest.message = "Moving to quest return target";
