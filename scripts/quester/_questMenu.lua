@@ -80,22 +80,39 @@ function _questMenu:menu()
 
 		Text("");
 
-		if Button("Add Current Target Info To Log File") then
-			ToFile("Quest Giver");
-			local x, y, z = GetTarget():GetPosition();
-			ToFile(x..", "..y..", "..z);
-			ToFile(GetTarget():GetUnitName());
-			ToFile("Map ID - "..GetMapID());
-			ToFile("Quest Objectives - "..GetObjectiveText(1));
-			ToFile("");
-		end
-		SameLine();
-		if Button("Add Current Location To Log File") then
-			ToFile("Grind/return Location");
-			local x, y, z = GetLocalPlayer():GetPosition();
-			ToFile(x..", "..y..", "..z);
-			ToFile("");
-		end
+local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
+local questDescription, desc = GetQuestLogQuestText(1);
+
+local giverName = "";
+local qx, qy, qz = 0, 0, 0;
+local reward = 0;
+if (Button("Get Info 1")) then
+	
+	giverName = GetTarget():GetUnitName();
+	qx, qy, qz = GetTarget():GetPosition();
+	reward = GetNumQuestLogRewards();
+end
+local gx, gy, gz = 0, 0, 0;
+local atarget = 0;
+SameLine();
+Text("Target quest giver and have quest in quest log");
+
+if (Button("Get Info 2")) then
+gx, gy, gz = GetLocalPlayer():GetPosition();
+if GetTarget() ~= nil and GetTarget() ~= 0 then
+	atarget = GetTarget():GetUnitName();
+end
+end
+SameLine();
+Text("Go to grind spot and target something to kill if applicable");
+
+if Button("Add To Log File") then
+ToFile('_questDB:addQuest("no, 1, "'..title..'", "'..giverName..'", '..qx..', '..qy..', '..qz..', '..GetMapID()..', MINLEVEL, MAXLEVEL, '..gx..', '..gy..', '..gz..', TYPE, NUMKILL, NUMKILL, NUMKILL, GATHERNUM, GATHERNUM, RETURNX, RETURNY, RETURNZ, RETURNTARGET, "'..atarget..'", KILLTARGET, KILLTARGET, GATHERID, GATHERID, '..reward..', "'..desc..'", 0, GOSSIPOPTION);');
+end
+SameLine();
+Text("Add data from these 2 buttons to log file");
+
+Text("");
 
 		-- quest auto complete button
 		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
@@ -129,20 +146,21 @@ function _questMenu:menu()
 
 	if (CollapsingHeader(">>> |+| Quest Kill Options")) then
 		Text("Options:");
+		Text("Prioritize other targets when kill num reached");
 		Text("Target Name - ".._questDBTargets.target.."");
-		Text("Number of targets killed for current quest - ".._quest.targetKilledNum.."");
+		_quest.targetKilledNum = SliderInt("Already Killed Num", 0, 20, _quest.targetKilledNum);
 		Text("Target Name2 - ".._questDBTargets.target2.."");
-		Text("Number of targets2 killed for current quest - ".._quest.targetKilledNum2.."");
+		_quest.targetKilledNum2 = SliderInt("Already Killed Num2", 0, 20, _quest.targetKilledNum2);
 		Text("Target Name3 - ".._questDBTargets.target3.."");
-		Text("Number of targets3 killed for current quest - ".._quest.targetKilledNum3.."");
+		_quest.targetKilledNum3 = SliderInt("Already Killed Num3", 0, 20, _quest.targetKilledNum3);
 	end
 
 	if (CollapsingHeader(">>> |+| Quest Gather Options")) then
 		Text("Options:");
-		Text("Number of items needed to gather for current quest - ".._quest.gatheredNum.."");
 		Text("ID of item to gather for current quest - ".._questDBGather.gatherTarget);
-		Text("Number of items2 needed to gather for current quest - ".._quest.gatheredNum2.."");
+		_quest.gatheredNum = SliderInt("Already Gathered Num", 0, 10, _quest.gatheredNum);
 		Text("ID of item2 to gather for current quest - ".._questDBGather.gatherTarget);
+		_quest.gatheredNum2 = SliderInt("Already Gathered Num2", 0, 10, _quest.gatheredNum2);
 	end
 
 	if (CollapsingHeader(">>> |+| DB info")) then

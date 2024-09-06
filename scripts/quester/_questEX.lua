@@ -1,4 +1,4 @@
-_questEX = {bagsFull = false,}
+_questEX = {bagsFull = false, jumpTimer = 3000}
 
 
 -- do checks before we can even start the bot
@@ -32,6 +32,17 @@ function _questEX:doChecks()
 
 	local localObj = GetLocalPlayer();
 
+	if GetTimeEX() > (_quest.tickRate*1000) + self.jumpTimer then
+		local jumpRandom = random(0, 10);
+		if (jumpRandom == 10 and IsMoving() and not IsInCombat()) then
+			local randomTimer = math.random(3000, 6000);
+			self.jumpTimer = GetTimeEX() + randomTimer;
+			JumpOrAscendStart();
+		end
+	end
+
+
+
 	-- reset blacklist target timer
 	if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
 
@@ -56,7 +67,6 @@ function _questEX:doChecks()
 		self.message = "Bot only does 1 quest at a time...";
 
 	end
-
 
 	script_grind.nextToNodeDist = 4.05;
 	
@@ -133,25 +143,18 @@ function _questEX:doChecks()
 
 		else
 			if (script_grind.safeRess) then
-
-				local rx, ry, rz = GetCorpsePosition();
-
-				if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
-
-					_quest.message = "Finding a safe spot to ress...";
-
-					return true;
-
-				else
-
-					script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
-
-					_quest.message = "Finding a safe spot to ress...";
-
-				return true;
+					local rx, ry, rz = GetCorpsePosition();
+					if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
+						script_grind.message = "Finding a safe spot to ress...";
+						return true;
+					else
+						if (script_aggro.rTime > GetTimeEX()) then
+							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
+							script_grind.message = "Finding a safe spot to ress...";
+							return true;
+						end
+					end
 				end
-			end
-
 		RetrieveCorpse();
 
 		script_grindEX.useThisVar = true;
