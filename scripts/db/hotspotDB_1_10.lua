@@ -37,19 +37,19 @@ function hotspotDB_1_10:setup()
 	hotspotDB:addHotspot("The Tundrid Hills 8 - 10", "Alliance", 8, 10, -5749.6, -1135.85, 381.56, 30);
 	hotspotDB:addHotspot("Dun Morogh 10 - 12", "Alliance", 10, 12, -5593.85, -1674.8, 398.33, 31);
 -- Mulgore
-	hotspotDB:addHotspot("Red Cloud Mesa 1 - 2", "Horde", 1, 2, -2889.91, -418.89, 48.47);
-	hotspotDB:addHotspot("Red Cloud Mesa 2 - 3", "Horde", 2, 3, -3488.8, -215.55, 87.16);
-	hotspotDB:addHotspot("Red Cloud Mesa 3 - 4", "Horde", 3, 4, -3385.37, -713.98, 72.89);
-	hotspotDB:addHotspot("Red Cloud Mesa 4 - 5", "Horde", 4, 5, -3271.87, -1050.56, 114.52);
-	hotspotDB:addHotspot("Brambleblade Ravine 4 - 5", "Horde", 4, 5, -2965.81, -947.1, 57.73);
-	hotspotDB:addHotspot("Mulgore 6 - 7", "Horde", 6, 7, -2617.18, -507.52, -4.55);
-	hotspotDB:addHotspot("Mulgore 7 - 8", "Horde", 7, 8, -2212.96, -3.77, 13.95);
-	hotspotDB:addHotspot("Mulgore 8 - 10", "Horde", 8, 10, -1714.66, 148.69, 3.22);
-	hotspotDB:addHotspot("The Golden Plains 8 - 10", "Horde", 8, 10, -1540.09, -302.32, -33.12);
-	hotspotDB:addHotspot("The Golden Plains 9 - 11", "Horde", 9, 11, -1202.89, -721.11, -55.54);
-	hotspotDB:addHotspot("Mulgore 10 - 12", "Horde", 10, 12, -743.25, -489.87, -25.12);
-	hotspotDB:addHotspot("Mulgore 9 - 11", "Horde", 9, 11, -2098.48, -965.92, 18.38);
-	hotspotDB:addHotspot("Mulgore 10 - 12", "Horde", 10, 12, -2311.24, -1396.28, 24.69);
+	hotspotDB:addHotspot("Red Cloud Mesa 1 - 2", "Tauren", 1, 2, -2889.91, -418.89, 48.47);
+	hotspotDB:addHotspot("Red Cloud Mesa 2 - 3", "Tauren", 2, 3, -3488.8, -215.55, 87.16);
+	hotspotDB:addHotspot("Red Cloud Mesa 3 - 4", "Tauren", 3, 4, -3385.37, -713.98, 72.89);
+	hotspotDB:addHotspot("Red Cloud Mesa 4 - 5", "Tauren", 4, 5, -3271.87, -1050.56, 114.52);
+	hotspotDB:addHotspot("Brambleblade Ravine 4 - 5", "Tauren", 4, 5, -2965.81, -947.1, 57.73);
+	hotspotDB:addHotspot("Mulgore 6 - 7", "Tauren", 6, 7, -2617.18, -507.52, -4.55);
+	hotspotDB:addHotspot("Mulgore 7 - 8", "Tauren", 7, 8, -2212.96, -3.77, 13.95);
+	hotspotDB:addHotspot("Mulgore 8 - 10", "Tauren", 8, 10, -1714.66, 148.69, 3.22);
+	hotspotDB:addHotspot("The Golden Plains 8 - 10", "Tauren", 8, 10, -1540.09, -302.32, -33.12);
+	hotspotDB:addHotspot("The Golden Plains 9 - 11", "Tauren", 9, 11, -1202.89, -721.11, -55.54);
+	hotspotDB:addHotspot("Mulgore 10 - 12", "Tauren", 10, 12, -743.25, -489.87, -25.12);
+	hotspotDB:addHotspot("Mulgore 9 - 11", "Tauren", 9, 11, -2098.48, -965.92, 18.38);
+	hotspotDB:addHotspot("Mulgore 10 - 12", "Tauren", 10, 12, -2311.24, -1396.28, 24.69);
 -- Durotar
 	hotspotDB:addHotspot("Valley of Trials 1 - 1", "Horde", 1, 1, -462.48, -4245.62, 49.02);
 	hotspotDB:addHotspot("Valley of Trials 2 - 2", "Horde", 2, 2, -198.38, -4281.58, 66.48);

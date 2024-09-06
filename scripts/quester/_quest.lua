@@ -73,26 +73,9 @@ function _quest:run()
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
 		return;
 	end
+	if not self.pause and not script_grind.pause then script_grind:run(); end
 
-	-- handle vendor stuff through vendor scripts
-	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
 
-		local vendorStatus = script_vendor:getStatus();
-
-		if (vendorStatus > 1) then
-			_questHandleVendor:vendor();
-			return true;
-		elseif (vendorStatus == 0) then
-			_questEX.bagsFull = false;
-		end
-
-		if (vendorStatus == 0) then
-			script_vendor:sell();
-			return true;
-		end
-
-	return true;
-	end
 
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
 
@@ -264,7 +247,7 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 	end
 	-- move to quest giver to get quest
 	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) then
-
+if not script_grind.pause then StopMoving(); script_grind.pause = true; end
 		-- move to quest return target location
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ);
 
@@ -274,6 +257,7 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 		if not IsMoving() then
 			Move(self.curQuestX, self.curQuestY, self.curQuestZ);
 		end
+		
 
 	return true;
 	end
@@ -298,9 +282,9 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 	if self.curGrindX ~= 0 and self.currentQuest ~= nil and not IsInCombat() and not self.isQuestComplete and not IsLooting() and (script_grind.lootObj == nil or script_grind.skipLooting) then
 		if (distToGrind > 80 and self.currentType ~= 3 and self.currentType ~= 4 and not self.grindSpotReached) or (self.currentType == 3 or self.currentType == 4 or self.curentType == 5 and distToGrind > 5) then
 			if self.currentType ~= 3 and self.currentType ~= 4 and self.currentType ~= 5 and not self.isQuestComplete and self.enemyTarget == nil then
-				if distToGiver > 20 then
-				_questDBTargets:getTarget();
-				else if PlayerHasTarget() and GetTarget():CanAttack() then ClearTarget(); end end
+				--if distToGiver > 20 then
+				--_questDBTargets:getTarget();
+				--else if PlayerHasTarget() and not GetTarget():CanAttack() then ClearTarget(); end end
 			end
 	
 			self.message = "Moving to grind spot";
@@ -317,6 +301,6 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 	end
 
 	-- run grinder until we get a quest
-	if _questDB.curListQuest == nil then self.message = "No quest or no quest in level range in DB! Going to grind..."; self.message = script_grind.message; script_grind:run(); script_grind.pause = false; return; elseif not script_grind.pause then script_grind.pause = true; end end
+	if _questDB.curListQuest == nil then self.message = "No quest or no quest in level range in DB! Going to grind..."; self.message = script_grind.message; script_grind.pause = false; end end
 
 function _quest:runRest() if _questRunRest:runRest() then return true; end end
