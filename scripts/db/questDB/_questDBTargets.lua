@@ -1,4 +1,4 @@
-_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false, target = 0, target1 = 0, target2 = 0}
+_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false, target = 0, target1 = 0, target2 = 0, target3 = 0;}
 function _questDBTargets:addTargetToKilledTable(target)
 	if target ~= nil and target ~= 0 and target ~= "" then
 	self.targetKilledTable[self.targetKilledTableNum] = target;
@@ -36,7 +36,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 
 	while i ~= 0 do
 		if t == 3 then
-			if not i:IsDead() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == target3 and _quest.targetKilledNum3 < numKill3)) then
+			if not i:IsDead() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) then
 
 				dist = i:GetDistance();
 				if bestDist > dist then

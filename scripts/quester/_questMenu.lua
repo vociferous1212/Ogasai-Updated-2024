@@ -131,9 +131,9 @@ function _questMenu:menu()
 		Text("Options:");
 		Text("Target Name - ".._questDBTargets.target.."");
 		Text("Number of targets killed for current quest - ".._quest.targetKilledNum.."");
-		Text("Target Name2 - ".._questDBTargets.target.."");
+		Text("Target Name2 - ".._questDBTargets.target2.."");
 		Text("Number of targets2 killed for current quest - ".._quest.targetKilledNum2.."");
-		Text("Target Name3 - ".._questDBTargets.target.."");
+		Text("Target Name3 - ".._questDBTargets.target3.."");
 		Text("Number of targets3 killed for current quest - ".._quest.targetKilledNum3.."");
 	end
 

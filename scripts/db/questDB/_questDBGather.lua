@@ -1,12 +1,20 @@
 _questDBGather = {waitTimer = 0, gatherTarget = 0, gatherTarget2 = 0, gatheringTarget = 0, gatherNum = 0, gatherNum2 = 0, gatherTargetName = nil, gatherTargetName2 = nil,}
 
 function _questDBGather:getObject()
+
 	local bestDist = 1000;
 	local bestTarget = nil;
-		if _quest.currentQuest ~= nil then
-			for i=0, _questDB.numQuests -1 do if _questDB.questList[i]['desc'] == _quest.currentDesc then self.gatherTarget = _questDB.questList[i]['gatherID']; self.gatherTarget2 = _questDB.questList[i]['gatherID2']; self.gatherNum = _questDB.questList[i]['numGather']; self.gatherNum2 = _questDB.questList[i]['numGather2']; end end
-			
 
+	if _quest.currentQuest ~= nil then
+		for i=0, _questDB.numQuests -1 do
+			if _questDB.questList[i]['desc'] == _quest.currentDesc then
+				self.gatherTarget = _questDB.questList[i]['gatherID'];
+				self.gatherTarget2 = _questDB.questList[i]['gatherID2'];
+				self.gatherNum = _questDB.questList[i]['numGather'];
+				self.gatherNum2 = _questDB.questList[i]['numGather2'];
+			end
+		end
+			
  		_questDBGather:getItemsInInventory()
 
 		local i, t = GetFirstObject();					
