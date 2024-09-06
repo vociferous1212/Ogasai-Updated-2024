@@ -1,4 +1,4 @@
-_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0}
+_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false,}
 function _questDBTargets:addTargetToKilledTable(target)
 	if target ~= nil and target ~= 0 and target ~= "" then
 	self.targetKilledTable[self.targetKilledTableNum] = target;
@@ -33,31 +33,59 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 			end
 		end
 	end
-	local weHaveQuestTarget = false;
+
 	while i ~= 0 do
 		if t == 3 then
 			if not i:IsDead() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == target3 and _quest.targetKilledNum3 < numKill3)) then
+
 				dist = i:GetDistance();
 				if bestDist > dist then
 					bestDist = dist;
 					bestTarget = i;
-					weHaveQuestTarget = true;
+					self.weHaveQuestTarget = true;
 				end
 			end
-			if (not weHaveQuestTarget) then
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 25;
-				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) and not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= aggro then
-					dist = i:GetDistance();
-					if bestDist > dist then
-bestDist = dist;
-						bestTarget = i;	
-					end
-				end
-			end	
 		end
 	i, t = GetNextObject(i);
 	end
-	if bestTarget == nil then _quest.message = "No quest targets in range!"; if _quest.currentType == 2 and not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
+	if not self.weHaveQuestTarget then
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
+				if script_grind:enemyIsValid(i) and i:GetDistance() <= 200 then
+					dist = i:GetDistance();
+					if bestDist > dist then
+						bestDist = dist;
+						bestTarget = i;
+					end
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
+	if not IsInCombat() then
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			-- acceptable targets
+			if t == 3 then
+			if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= 50 then
+	
+				local px, py, pz = GetLocalPlayer();
+				local x, y, z = i:GetPosition();
+				local dist = GetDistance3D(px, py, pz, x, y, z);
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
+
+				-- save the closest mob or mobs attacking us
+				if dist <= aggro then
+					bestTarget = i;
+				end
+			end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
+
+	if bestTarget == nil then _quest.message = "No quest targets in range!"; self.weHaveQuestTarget = false; if _quest.currentType == 2 and not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
 
 elseif bestTarget ~= nil then bestTarget:AutoAttack(); end return bestTarget; end
 

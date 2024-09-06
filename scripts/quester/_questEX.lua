@@ -144,14 +144,11 @@ function _questEX:doChecks()
 
 				else
 
-					if (script_aggro.rTime > GetTimeEX()) then
+					script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
 
-						script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
+					_quest.message = "Finding a safe spot to ress...";
 
-						_quest.message = "Finding a safe spot to ress...";
-
-					return true;
-					end
+				return true;
 				end
 			end
 
@@ -324,13 +321,13 @@ function _questEX:doChecks()
 					return true;
 
 				end
+
+				if not IsMoving() then
+					_quest:setTimer (250);
+				end
 			end
 
 			if (script_grind:doLoot(GetLocalPlayer())) then
-
-			if not IsMoving() then
-				_quest:setTimer (250);
-			end
 
 			return true;
 			end

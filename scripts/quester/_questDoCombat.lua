@@ -38,16 +38,15 @@ function _questDoCombat:doCombat()
 
 			end
 
-			--if (_quest.enemyTarget ~= nil) and (_questDBTargets:getTargetAttackingUs() ~= nil) then
+			if (_quest.enemyTarget ~= nil) and (_questDBTargets:getTargetAttackingUs() ~= nil) and not script_grind:isTargetingMe(_quest.enemyTarget) then
 
-			--	if (_questDBTargets:getTargetAttackingUs() ~= _quest.enemyTarget:GetGUID()) then
+				if (_questDBTargets:getTargetAttackingUs() ~= _quest.enemyTarget:GetGUID()) then
 
-			--		_quest.enemyTarget = _questDBTargets:getTargetAttackingUs();
+					_quest.enemyTarget = _questDBTargets:getTargetAttackingUs();
 
-			--	end
+				end
 
-			--else
-			if (_quest.enemyTarget == nil) then
+			elseif (_quest.enemyTarget == nil) and _quest.currentType ~= 3 and _quest.currentType ~= 4 then
 
 				_quest.enemyTarget = _questDBTargets:getTargetAttackingUs();
 
@@ -104,7 +103,7 @@ function _questDoCombat:doCombat()
 
 			local x, y, z = _quest.enemyTarget:GetPosition();
 
-			if (_quest.enemyTarget:GetDistance() > 4) then
+			if (_quest.enemyTarget:GetDistance() > 5) then
 
 				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 
@@ -112,6 +111,9 @@ function _questDoCombat:doCombat()
 
 			else
 
+
+				_quest:setTimer(1000);
+				ClearTarget();
 				_quest.enemyTarget = nil;
 
 			end
@@ -126,8 +128,9 @@ function _questDoCombat:doCombat()
 
 		end
 
+		_questDoCombat:getLowestHealthTargetAttackingUs();
 
-	-- do something
+		-- do something
 		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
 
 			if not _quest.enemyTarget:IsDead() and _quest.enemyTarget:CanAttack() then
@@ -149,7 +152,7 @@ function _questDoCombat:doCombat()
 				RunCombatScript(_quest.enemyTarget:GetGUID());
 
 				-- move to target
-				if (_quest.enemyTarget ~= nil and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange) or (not _quest.enemyTarget:IsInLineOfSight() and _quest.enemyTarget:GetDistance() > 3) and not IsCasting() and not IsChanneling() then
+				if (_quest.enemyTarget ~= nil and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange) or (not _quest.enemyTarget:IsInLineOfSight() and _quest.enemyTarget:GetDistance() > 6) and not IsCasting() and not IsChanneling() then
 
 					local x, y, z = _quest.enemyTarget:GetPosition();
 
@@ -175,4 +178,41 @@ function _questDoCombat:doCombat()
 		end
 	
 	end
+end
+
+-- get the lowest health target in combat with us
+function _questDoCombat:getLowestHealthTargetAttackingUs()
+
+	local bestTarget = nil;
+
+
+	local i, t = GetFirstObject();
+
+	while i ~= 0 do
+
+		if t == 3 and not i:IsCritter() and not i:IsDead() and i:GetHealthPercentage() >= 1 and i:CanAttack() and script_grind:isTargetingMe(i) and script_grind:enemiesAttackingUs() > 1 and _quest.enemyTarget ~= 0 and _quest.enemyTarget ~= nil and not _quest.enemyTarget:IsDead() then
+
+			local hp = _quest.enemyTarget:GetHealthPercentage();
+
+			local ihp = i:GetHealthPercentage();
+
+			if ihp < hp then
+
+				if PlayerHasTarget() and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID() then
+
+					_quest.enemyTarget = i;
+
+					bestTarget = i;
+
+				end
+
+			end
+
+		end
+
+	i, t = GetNextObject(i);
+
+	end
+
+return bestTarget;
 end

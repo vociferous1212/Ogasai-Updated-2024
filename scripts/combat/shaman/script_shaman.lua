@@ -512,15 +512,16 @@ function script_shaman:run(targetGUID)
 						StopMoving();
 						return true;
 					end
-					if (not CastSpellByName("Lightning Bolt", targetObj)) then
+					if (CastSpellByName("Lightning Bolt", targetObj)) then
 						self.waitTimer = GetTimeEX() + 2500;
 						script_grind:setWaitTimer(2500);
 						targetObj:FaceTarget();
 						return 4;
 					end
 				end
-			else
+			elseif not IsCasting() and not IsChanneling() then
 				if (targetObj:GetDistance() <= self.meleeDistance) then
+					targetObj:AutoAttack();
 					return 3;
 				end
 			end

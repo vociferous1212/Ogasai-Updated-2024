@@ -29,6 +29,12 @@ function _questRunRest:runRest()
 		return true;
 		end
 
+		if PlayerHasTarget() and not script_grind:isAnyTargetTargetingMe() and not IsInCombat() then
+
+			ClearTarget();
+
+		end
+
 		if (not IsInCombat()) and (not petHasTarget) then
 
 			if (IsEating() and localHealth < 95) or (IsDrinking() and localMana < 95) then

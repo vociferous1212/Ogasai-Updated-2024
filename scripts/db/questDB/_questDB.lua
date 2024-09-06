@@ -17,14 +17,23 @@ function _questDB:setup()
 
 ]]--
 
+
 	_questDB_Duskwood_20_25:setup();
+
+	-- teldrassil
 	_questDB_Teldrassil_Dolanaar:setup()
 	_questDB_Teldrassil_Shadowglen:setup();
+
+
 	_questDB_Elwynn_Northshire:setup();
 	_questDB_DunMorogh_Coldridge:setup();
+
+	-- durotar
 	_questDB_Durotar_ValleyOfTrials:setup();
-	_questDB_Mulgore_CampNarache:setup();
+
+	-- mulgore
 	_questDB_Mulgore_BloodhoofVillage:setup();
+	_questDB_Mulgore_CampNarache:setup();
 
 	self.isSetup = true;
 

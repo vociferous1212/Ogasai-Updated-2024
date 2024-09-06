@@ -2,7 +2,7 @@ _questHandleVendor = {}
 
 function _questHandleVendor:vendor()
 
-	if (_quest.waitTimer > GetTimeEX()) then
+	if (_quest.waitTimer - _quest.tickRate > GetTimeEX()) then
 
 	return;
 	end

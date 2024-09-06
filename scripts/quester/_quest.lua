@@ -2,35 +2,7 @@ _quest = {
 
 	-- if we have a quest and are out of level range in DB it doesn't find a grind spot? something...
 
-	message = "Quester",
-	usingQuester = false,
-	pause = true,
-	isSetup = false,
-	waitTimer = 0,
-	tickRate = 300,
-	currentQuest = nil,
-	enemyTarget = nil,
-	targetKilledNum = 0,
-	targetKilledNum2 = 0,
-	targetKilledNum3 = 0,
-	gatheredNum = 0,
-	gatheredNum2 = 0,
-	isQuestComplete = false,
-	needRest = false,
-	grindSpotReached = false,
-	curGrindX = 0,
-	curGrindY = 0,
-	curGrindz = 0,
-	curQuestX = 0,
-	curQuestY = 0,
-	curQuestZ = 0,
-	weHaveQuest = fasle,
-	autoComplete = true,
-	currentDesc = nil,
-	returningQuest = false,
-	xp = 0, currentType = nil,
-	usingItem = nil,
-	gossipOption = nil,
+	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 300, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 400;
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 
@@ -54,21 +26,13 @@ function _quest:setup()
 	if not _questIncludeFiles.isSetup then
 		_questIncludeFiles:setup()
 	end
-
 	script_grind:setup();
-
 	script_talent:setup();
-
 	script_gather:setup();
-
 	script_grind.getSpells = true;
-
 	script_vendor:setup();
-
 	vendorDB:setup();
-
 	vendorDB:loadDBVendors();
-
 	if (not _questDB.isSetup) then
 		_questDB:setup();
 	end
@@ -86,15 +50,10 @@ function _quest:setup()
 	end
 
 	self.xp = UnitXP("Player");
-
 	_questDBReturnQuest.waitTimer = GetTimeEX();
-
 	_questDoCombat.waitTimer = GetTimeEX();
-
 	_questDoCombat.blacklistTimer = GetTimeEX();
-
 	_questDoCombat.targetingTimer = GetTimeEX();
-
 	self.waitTimer = GetTimeEX();
 
 self.isSetup = true;
@@ -136,6 +95,7 @@ function _quest:run()
 	-- return if we pause bot
 	if (self.pause) then
 		script_grind.pause = true;
+		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
 		return;
 	end
 
@@ -274,7 +234,7 @@ function _quest:run()
 
 	
 	-- return a completed quest to quest return target
-	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) then
+	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) and not IsLooting() then
 
 		-- run return quest script
 		if _questDBReturnQuest:returnAQuest() then
@@ -298,22 +258,14 @@ function _quest:run()
 	-- TO DO   TODO
 		-- SET MARKERS / AUTO PATH NODES WHEN AN ENEMY IS KILLED FOR NEW SELF.GRIND X,Y,Z - COUNT TARGETS AROUND AND CHANGE PATHS ACCORDINGLY?
 
-
-
 curQuestGiver = _questDB:getQuestGiverName();
-
 curQuestName = _questDB:getQuestName();
-
 self.curQuestX, self.curQuestY, self.curQuestZ = _questDB:getQuestStartPos();
-
 distToGiver = GetDistance3D(px, py, pz, self.curQuestX, self.curQuestY, self.curQuestZ);
-
 distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.curGrindZ);
 
 	if (not self.grindSpotReached) then
-
 		self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
-
 	end
 
 	-- remove old quest entries from table / completed quests
@@ -335,7 +287,7 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 	end
 
 	-- move back to grind spot when distance reached
-	if (distToGrind >= 200) and self.grindSpotReached then
+	if (distToGrind >= self.distToGrindFromHotspot) and self.grindSpotReached then
 		self.grindSpotReached = false;
 	end
 
@@ -359,21 +311,13 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 	if (distToGiver <= 4) and (self.currentQuest == nil) then
 
 		if curQuestGiver ~= nil then
-
 			TargetByName(curQuestGiver);
-
 			_quest:setTimer(2000);
-
 			curQuestGiver = GetTarget();
-
 			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
-
 				if (GetTarget():UnitInteract()) then
-
 					_quest:setTimer(2000);
-
 					if (AcceptQuest()) then
-				
 						local questDescription, questObjectives = GetQuestLogQuestText();
 						self.currentQuest = curQuestName;
 						self.currentDesc = questObjectives;
@@ -386,34 +330,13 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 		end
 	end
 
-	if self.currentType == 3 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete then
+	if self.currentType == 3 or self.currentType == 4 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
 
-		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() then
-
-			UseItem(self.usingItem)
-
-			self.isQuestComplete = true;
-
-			--return true;
-
-		elseif distToGrind > 5 then
-		
-			if script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ) then
-			
-				self.message = "Type quest == 3";
-				
-				if not IsMoving() then
-
-					Move(self.curQuestX, self.curQuestY, self.curQuestZ);
-
-				end
+		if _questDoOtherQuestTypes() then
 			return true;
-			end
-		
-		end	
+		end
 	end
-
-
+		
 	-- gather quest object
 	if self.currentType == 2 and not IsInCombat() then
 
@@ -425,11 +348,10 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 		end
 	end
 
-
 	-- get a target
-	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached)
+	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4)
 		or (IsInCombat())
-		or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached) then
+		or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4) then
 
 		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
 
@@ -439,46 +361,26 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 	end
 
 	-- we have a quest so go to grind spot
-	if self.curGrindX ~= 0 and (not self.grindSpotReached) and (distToGrind > 80) and (self.currentQuest ~= nil) and not IsInCombat() and (not self.isQuestComplete) then
-
-		self.message = "Moving to grind spot";
-
-		script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
-		
-		if not IsMoving() then
-		
-			Move(self.curGrindX, self.curGrindY, self.curGrindZ);
-
+	if self.curGrindX ~= 0 and self.currentQuest ~= nil and not IsInCombat() and not self.isQuestComplete and not IsLooting() and (script_grind.lootObj == nil or script_grind.skipLooting) then
+		if (distToGrind > 80 and self.currentType ~= 3 and self.currentType ~= 4 and not self.grindSpotReached) or (self.currentType == 3 or self.currentType == 4 and distToGrind > 5) then
+			if self.currentType ~= 3 and self.currentType ~= 4 and not self.isQuestComplete and self.enemyTarget == nil then
+				_questDBTargets:getTarget();
+			end
+	
+			self.message = "Moving to grind spot";
+	
+			script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
+			
+			if not IsMoving() then
+			
+				Move(self.curGrindX, self.curGrindY, self.curGrindZ);
+	
+			end
+		return true;
 		end
-	return true;
 	end
-
 
 	-- run grinder until we get a quest
-	if _questDB.curListQuest == nil then
+	if _questDB.curListQuest == nil then self.message = "No quest or no quest in level range in DB! Going to grind..."; self.message = script_grind.message; script_grind:run(); script_grind.pause = false; return; elseif not script_grind.pause then script_grind.pause = true; end end
 
-		self.message = "No quest or no quest in level range in DB! Going to grind...";
-
-		self.message = script_grind.message;
-
-		script_grind:run();
-
-		script_grind.pause = false;
-
-		return;
-
-	elseif not script_grind.pause then
-
-		script_grind.pause = true;
-
-	end
-
-end
-
-function _quest:runRest()
-
-	if _questRunRest:runRest() then
-
-	return true;
-	end
-end
+function _quest:runRest() if _questRunRest:runRest() then return true; end end
