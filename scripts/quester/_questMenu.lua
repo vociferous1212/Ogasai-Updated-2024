@@ -3,7 +3,6 @@ _questMenu = {
 	addSetupFile = include("scripts\\db\\questDB\\_questDBSetup.lua");
 }
 
--- menu items to draw in window() function
 function _questMenu:menu()
 
 	local wasClicked = false;
@@ -18,6 +17,7 @@ function _questMenu:menu()
 	end
 
 
+	-- pause bot
 	if (not _quest.pause) then
 		if (Button("Pause Bot")) then
 			script_paranoia.currentTime = GetTimeEX() + (45*1000);
@@ -73,11 +73,11 @@ function _questMenu:menu()
 		script_shamanEX:menu();
 	end
 	
---[[faction, quest name, quest giver name, quest giver pos, mapID, minLevel, maxLevel, grind pos, type, kill number, gather number, return pos, return target name, kill target 1, kill target 2, gather target 1, gather target 2, is completed ]]--
+	if (CollapsingHeader("Quester")) then
+	if (CollapsingHeader(">>> |+| Quest Options")) then
 
-
-	if (CollapsingHeader("Quest Options")) then
 		Text("Options:"); SameLine(); Text("Gather DB Stuff");
+
 		Text("");
 
 		if Button("Add Current Target Info To Log File") then
@@ -89,15 +89,20 @@ function _questMenu:menu()
 			ToFile("Quest Objectives - "..GetObjectiveText(1));
 			ToFile("");
 		end
+		SameLine();
 		if Button("Add Current Location To Log File") then
 			ToFile("Grind/return Location");
 			local x, y, z = GetLocalPlayer():GetPosition();
 			ToFile(x..", "..y..", "..z);
 			ToFile("");
 		end
+
+		-- quest auto complete button
 		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
 		Text("Until bot reaches current quest in quest log");
 		Text("YOU MUST HAVE A QUEST IN QUEST LOG");
+
+		-- grind spot reached
 		Separator();
 		if (Button("Current Spot Is Grind Spot")) then
 			_quest.grindSpotReached = true;
@@ -108,28 +113,41 @@ function _questMenu:menu()
 		elseif not _quest.grindSpotReached then
 			Text("Grind Spot NOT Reached!");
 		end
+		Separator();
+		Text("Distance To Travel From Grindspot");
+		_quest.distToGrindFromHotspot = SliderInt("Distance From Grindspot", 50, 600, _quest.distToGrindFromHotspot);
+		
 	
-		Text("");
+		Separator();
 
 		if (Button("Mark Current DB Quest As Complete")) then
 			_questDB:turnQuestCompleted();
 		end
 		Text("You cannot mark your current quest in quest log as complete...");
-		Text("");
+		Text("");			
+	end
 
+	if (CollapsingHeader(">>> |+| Quest Kill Options")) then
+		Text("Options:");
+		Text("Target Name - ".._questDBTargets.target.."");
+		Text("Number of targets killed for current quest - ".._quest.targetKilledNum.."");
+		Text("Target Name2 - ".._questDBTargets.target.."");
+		Text("Number of targets2 killed for current quest - ".._quest.targetKilledNum2.."");
+		Text("Target Name3 - ".._questDBTargets.target.."");
+		Text("Number of targets3 killed for current quest - ".._quest.targetKilledNum3.."");
+	end
+
+	if (CollapsingHeader(">>> |+| Quest Gather Options")) then
+		Text("Options:");
+		Text("Number of items needed to gather for current quest - ".._quest.gatheredNum.."");
+		Text("ID of item to gather for current quest - ".._questDBGather.gatherTarget);
+		Text("Number of items2 needed to gather for current quest - ".._quest.gatheredNum2.."");
+		Text("ID of item2 to gather for current quest - ".._questDBGather.gatherTarget);
+	end
+
+	if (CollapsingHeader(">>> |+| DB info")) then
 		_questDBSetup:menu();
-				
 	end
-	if (CollapsingHeader("Quest Kill Options")) then
-		Text("Options:");
-		Text("Number of targets kill for current quest - ".._quest.targetKilledNum.."");
-		Text("Number of targets 2 kill for current quest - ".._quest.targetKilledNum2.."");
-
-	end
-	if (CollapsingHeader("Quest Gather Options")) then
-		Text("Options:");
-	Text("Number of items gathered for current quest - ");
-
 	end
 
 	script_miscMenu:menu();

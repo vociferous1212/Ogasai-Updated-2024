@@ -1,4 +1,4 @@
-_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false,}
+_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false, target = 0, target1 = 0, target2 = 0}
 function _questDBTargets:addTargetToKilledTable(target)
 	if target ~= nil and target ~= 0 and target ~= "" then
 	self.targetKilledTable[self.targetKilledTableNum] = target;
@@ -21,9 +21,9 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 		if _questDB.questList[i]['questName'] ~= "nnil" then
 		if _questDB.questList[i]['questName'] == _questDB.curListQuest then
 						if _questDB.questList[i]['desc'] == _quest.currentDesc then
-							target = _questDB.questList[i]['targetName'];
-							target2 = _questDB.questList[i]['targetName2'];
-							target3 = _questDB.questList[i]['targetName3'];
+							self.target = _questDB.questList[i]['targetName'];
+							self.target2 = _questDB.questList[i]['targetName2'];
+							self.target3 = _questDB.questList[i]['targetName3'];
 							numKill = _questDB.questList[i]['numKill'];
 							numKill2 = _questDB.questList[i]['numKill2'];
 							numKill3 = _questDB.questList[i]['numKill3'];
