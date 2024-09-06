@@ -2,7 +2,7 @@ _quest = {
 
 	-- if we have a quest and are out of level range in DB it doesn't find a grind spot? something...
 
-	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 1.5, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 400;
+	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 1, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 350;
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 
@@ -94,36 +94,21 @@ function _quest:run()
 	return true;
 	end
 
-	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then
-		return;
-	end
+	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
 
-	if IsChanneling() or IsCasting() then
-		return;
-	end
+	if IsChanneling() or IsCasting() then return; end
 	
 	-- run setup function once
-	if (not self.isSetup) then
-		_quest:setup();
-	end
+	if (not self.isSetup) then _quest:setup(); end
 
 	-- if we are not running the grinder then do this stuff
 	if script_grind.pause then
 
 		-- get loot target 
-		if not script_grind.skipLooting and not _questEX.bagsFull then
-			script_grind.lootObj = script_nav:getLootTarget(50);
-		end
+		if not script_grind.skipLooting and not _questEX.bagsFull then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end
 
 		-- do quester script checks
-		if _questEX:doChecks() then
-			if script_grind.lootObj ~= nil and not _questEX.bagsFull then
-				if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
-					ClearTarget();
-				end
-			end
-		return;
-		end
+		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end
 	
 		-- do quester script combat routine
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() then
@@ -164,7 +149,7 @@ function _quest:run()
 
 		-- remove quest from DB so we can continue with script
 		if (_questDB:turnQuestCompleted()) then
-			self.tickRate = .5;
+			self.tickRate = .3;
 			-- reset variables
 			_quest.weCompletedQuest = false;
 			_quest.isQuestComplete = false;
@@ -197,7 +182,7 @@ function _quest:run()
 
 			-- turn the quest complete in the DB
 			if (_questDB:turnOldQuestCompleted()) then
-				self.tickRate = .5;
+				self.tickRate = .3;
 				self.message = "Completing previous quests in list";
 				_quest:setTimer(250)
 			return;
@@ -209,7 +194,7 @@ function _quest:run()
 	_questCheckQuestCompletion:checkQuestForCompletion();
 
 	
-	self.tickRate = 1.5;
+	self.tickRate = 1;
 
 	-- return a completed quest to quest return target
 	if self.currentQuest ~= nil and self.isQuestComplete and (not IsInCombat()) and not IsLooting() then

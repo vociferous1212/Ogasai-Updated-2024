@@ -112,7 +112,7 @@ function _questDoCombat:doCombat()
 			else
 
 				if not script_grind:isAnyTargetTargetingMe() then
-				_quest:setTimer(1000);
+				_quest:setTimer(500);
 				ClearTarget();
 				_quest.enemyTarget = nil;
 				end

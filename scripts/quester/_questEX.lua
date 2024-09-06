@@ -304,7 +304,7 @@ function _questEX:doChecks()
 
 		if script_grind.lootObj == nil then
 
-			script_grind.lootObj = script_nav:getLootTarget(50);
+			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
 
 		end
 
@@ -329,9 +329,8 @@ function _questEX:doChecks()
 
 			if (script_grind:doLoot(GetLocalPlayer())) then
 
-			return true;
-			end
-			if PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then ClearTarget(); end
+				return true;
+			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then ClearTarget(); end
 		end
 	end
 

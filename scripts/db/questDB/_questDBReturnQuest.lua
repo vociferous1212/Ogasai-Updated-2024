@@ -64,6 +64,7 @@ function _questDBReturnQuest:returnAQuest()
 			_quest.grindSpotReached = false;
 			_quest.targetKilledNum = 0;
 			_quest.targetKilledNum2 = 0;
+			_quest.targetKilledNum3 = 0;
 			_quest.gatheredNum = 0;
 			_quest.gatheredNum2 = 0;
 			_quest.currentType = 0;

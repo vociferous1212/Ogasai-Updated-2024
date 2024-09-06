@@ -1886,19 +1886,21 @@ function script_grind:assignTarget()
 	end
 
 	-- Instantly return the last target if we attacked it and it's still alive and we are in combat
-	if (self.enemyObj ~= 0 and self.enemyObj ~= nil and not self.enemyObj:IsDead() and IsInCombat()) then
+	if ((self.enemyObj ~= 0 and self.enemyObj ~= nil and not self.enemyObj:IsDead()) or (_quest.enemyTarget ~= 0 and _quest.enemyTarget ~= nil and not _quest.enemyTarget:IsDead())) and IsInCombat() then
 
-		-- check if enemyObj is targeting me
-		if (script_grind:isTargetingMe2(self.enemyObj) 
+		if self.enemyObj ~= nil and self.enemyObj ~= 0 then
 
-			-- or tareting pet
-			or script_grind:isTargetingPet(self.enemyObj) 
-
-			-- or is tapped by me
-			or self.enemyObj:IsTappedByMe()) then
-
-			-- return target
+			-- check if enemyObj is targeting me
+			if script_grind:isTargetingMe2(self.enemyObj) or script_grind:isTargetingPet(self.enemyObj) or self.enemyObj:IsTappedByMe() then
+	
 			return self.enemyObj;
+			end
+		end
+		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
+			if script_grind:isTargetingMe2(_quest.enemyTarget) or script_grind:isTargetingPet(_quest.enemyTarget) or _quest.enemyTarget:IsTappedByMe() then
+
+			return _quest.enemyTarget;
+			end
 		end
 	end
 
@@ -1940,9 +1942,10 @@ function script_grind:assignTarget()
 			-- if that enemy is valid
 			if (script_grind:enemyIsValid(i)) then
 
-				-- save the closest mob or mobs attacking us
-				if (mobDistance > i:GetDistance()) and (i:GetDistance() < self.distToHotSpot) then
+				local x, y, z = GetLocalPlayer();
 
+				-- save the closest mob or mobs attacking us
+				if mobDistance > i:GetDistance() and ((i:GetDistance() < self.distToHotSpot and not _quest.usingQuester) or (_quest.usingQuester and i:GetDistance() < GetDistance3D(x, y, z, _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ))) then
 					-- get taret position
 					local _x, _y, _z = i:GetPosition();
 
@@ -2127,7 +2130,7 @@ function script_grind:enemyIsValid(i)
 		end
 
 	-- add target to blacklist not a safe pull from aggro script
-		if (self.hotspotReached) and (self.skipHardPull) and (i:GetDistance() <= 65)and  (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) then	
+		if (self.hotspotReached or _quest.usingQuester) and (self.skipHardPull) and (i:GetDistance() <= 65)and  (not script_aggro:safePull(i)) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() >= GetLocalPlayer():GetLevel() -3) then	
 			script_grind:addTargetToBlacklist(i:GetGUID());
 		end
 		
