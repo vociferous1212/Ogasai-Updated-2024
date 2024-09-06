@@ -13,7 +13,7 @@ function _questDoOtherQuestTypes()
 		_quest.message = "Type quest == 3";
 
 
-		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() then
+		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() and HasItem(_quest.UsingItem) then
 
 			UseItem(_quest.usingItem)
 
@@ -69,5 +69,41 @@ function _questDoOtherQuestTypes()
 		end
 
 	end
+
+if _quest.currentType == 5 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
+
+		_quest.message = "Type quest == 5";
+
+		-- use item position
+
+		local x, y, z = _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ;
+
+		if GetDistance3D(px, py, pz, x, y, z) < 10 and HasItem(_quest.usingItem) then
+
+			UseItem(_quest.usingItem)
+
+			--return true;
+
+		return true;
+		elseif distToGrind > 5 then
+		
+			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+	
+				
+			if not IsMoving() then
+
+				Move(_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+
+			end
+
+		return true;
+		elseif distToGrind <= 10 and not HasItem(_quest.usingItem) then
+
+			_quest.isQuestComplete = true;
+
+		end
+
+	end
+
 return false;
 end

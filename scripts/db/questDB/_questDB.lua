@@ -237,7 +237,7 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 			if self.questList[i]['questName'] ~= title then
 			if self.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 and _quest.currentType ~= 99 then
 				if questObjectives ~= self.questList[i]['desc'] and GetObjectiveText(1) ~= self.questList[i]['desc'] then
-				DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - "..self.curListQuest);
+				DEFAULT_CHAT_FRAME:AddMessage("Old quest marked as complete - "..self.curListQuest);
 				self.questList[i]['completed'] = "nnil";
 				self.questList[i]['questName'] = "nnil";
 				--ToFile(""..self.curListQuest.." - completed");

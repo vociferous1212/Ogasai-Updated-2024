@@ -2,7 +2,7 @@ _quest = {
 
 	-- if we have a quest and are out of level range in DB it doesn't find a grind spot? something...
 
-	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 300, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 400;
+	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 700, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 400;
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 
@@ -26,38 +26,13 @@ function _quest:setup()
 	if not _questIncludeFiles.isSetup then
 		_questIncludeFiles:setup()
 	end
-	script_grind:setup();
-	script_talent:setup();
-	script_gather:setup();
-	script_grind.getSpells = true;
-	script_vendor:setup();
-	vendorDB:setup();
-	vendorDB:loadDBVendors();
+	script_grind:setup(); script_talent:setup(); script_gather:setup(); script_grind.getSpells = true; 	script_vendor:setup(); vendorDB:setup(); vendorDB:loadDBVendors();
 	if (not _questDB.isSetup) then
 		_questDB:setup();
 	end
+	_questDBGather.waitTimer = GetTimeEX(); script_helper:setup(); self.usingQuester = true; if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then self.autoComplete = false; self.weHaveQuest = false; self.isQuestComplete = false; end
 
-	_questDBGather.waitTimer = GetTimeEX();
-
-	script_helper:setup();
-
-	self.usingQuester = true;
-
-	if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
-		self.autoComplete = false;
-		self.weHaveQuest = false;
-		self.isQuestComplete = false;
-	end
-
-	self.xp = UnitXP("Player");
-	_questDBReturnQuest.waitTimer = GetTimeEX();
-	_questDoCombat.waitTimer = GetTimeEX();
-	_questDoCombat.blacklistTimer = GetTimeEX();
-	_questDoCombat.targetingTimer = GetTimeEX();
-	self.waitTimer = GetTimeEX();
-
-self.isSetup = true;
-end
+	self.xp = UnitXP("Player"); _questDBReturnQuest.waitTimer = GetTimeEX(); _questDoCombat.waitTimer = GetTimeEX(); _questDoCombat.blacklistTimer = GetTimeEX(); _questDoCombat.targetingTimer = GetTimeEX(); self.waitTimer = GetTimeEX(); self.isSetup = true; end
 
 -- run the quester
 function _quest:run()
@@ -242,22 +217,14 @@ function _quest:run()
 		return true;
 		end
 	end
-
-
 	-- set our current quest
-	_questSetQuest:setOurCurrentQuest();	
-
-
+	_questSetQuest:setOurCurrentQuest();
 	--get a quest giver to obtain a quest from
 	local curQuestGiver = nil;
 	local curQuestName = nil;
 	local distToGiver = 0;
 	local distToGrind = 0;
 	local px, py, pz = GetLocalPlayer():GetPosition();
-
-	-- TO DO   TODO
-		-- SET MARKERS / AUTO PATH NODES WHEN AN ENEMY IS KILLED FOR NEW SELF.GRIND X,Y,Z - COUNT TARGETS AROUND AND CHANGE PATHS ACCORDINGLY?
-
 curQuestGiver = _questDB:getQuestGiverName();
 curQuestName = _questDB:getQuestName();
 self.curQuestX, self.curQuestY, self.curQuestZ = _questDB:getQuestStartPos();
@@ -285,12 +252,28 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 	if (distToGrind <= 80) and not self.grindspotReached then
 		self.grindSpotReached = true;
 	end
-
 	-- move back to grind spot when distance reached
 	if (distToGrind >= self.distToGrindFromHotspot) and self.grindSpotReached then
 		self.grindSpotReached = false;
 	end
-
+if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToGiver = GetTarget():GetDistance(); end
+-- interact with quest givers
+	if (distToGiver <= 4) and (self.currentQuest == nil) then
+		if curQuestGiver ~= nil then TargetByName(curQuestGiver); _quest:setTimer(2000); curQuestGiver = GetTarget(); if (GetTarget() ~= nil) and (GetTarget() ~= 0) then if (GetTarget():UnitInteract()) then _quest:setTimer(2000);
+					if (AcceptQuest()) then
+						local questDescription, questObjectives = GetQuestLogQuestText();
+						self.currentQuest = curQuestName;
+						self.currentDesc = questObjectives;
+						_questDB.curDesc = questObjectives;
+					else
+						SelectGossipAvailableQuest(_quest.gossipOption);
+						SelectAvailableQuest(_quest.gossipOption);
+					end
+				end 
+			end 
+		end
+		return;
+	end
 	-- move to quest giver to get quest
 	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) then
 
@@ -306,31 +289,8 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 
 	return true;
 	end
-	
-	-- interact with quest givers
-	if (distToGiver <= 4) and (self.currentQuest == nil) then
 
-		if curQuestGiver ~= nil then
-			TargetByName(curQuestGiver);
-			_quest:setTimer(2000);
-			curQuestGiver = GetTarget();
-			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
-				if (GetTarget():UnitInteract()) then
-					_quest:setTimer(2000);
-					if (AcceptQuest()) then
-						local questDescription, questObjectives = GetQuestLogQuestText();
-						self.currentQuest = curQuestName;
-						self.currentDesc = questObjectives;
-					else
-						SelectGossipAvailableQuest(_quest.gossipOption);
-						SelectAvailableQuest(_quest.gossipOption);
-					end
-				end 
-			end 
-		end
-	end
-
-	if self.currentType == 3 or self.currentType == 4 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
+	if self.currentType == 3 or self.currentType == 4 or self.currentType == 5 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
 
 		if _questDoOtherQuestTypes() then
 			return true;
@@ -338,33 +298,21 @@ distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.cur
 	end
 		
 	-- gather quest object
-	if self.currentType == 2 and not IsInCombat() then
-
-		if _questDBGather:run() then
-
-			self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName().."";
-
-		return true;
-		end
-	end
+	if self.currentType == 2 and not IsInCombat() then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..""; return true; end end
 
 	-- get a target
-	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4)
+	if (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4 and self.currentType ~= 5)
 		or (IsInCombat())
-		or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4) then
-
-		if (self.enemyTarget == nil) and (not self.isQuestComplete) then
-
-			self.enemyTarget = _questDBTargets:getTarget();
-
-		end
-	end
+		or (not IsInCombat() and script_grind.lootObj == nil and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4 and self.currentType ~= 5) then
+	if (self.enemyTarget == nil) and (not self.isQuestComplete) then self.enemyTarget = _questDBTargets:getTarget(); end end
 
 	-- we have a quest so go to grind spot
 	if self.curGrindX ~= 0 and self.currentQuest ~= nil and not IsInCombat() and not self.isQuestComplete and not IsLooting() and (script_grind.lootObj == nil or script_grind.skipLooting) then
-		if (distToGrind > 80 and self.currentType ~= 3 and self.currentType ~= 4 and not self.grindSpotReached) or (self.currentType == 3 or self.currentType == 4 and distToGrind > 5) then
-			if self.currentType ~= 3 and self.currentType ~= 4 and not self.isQuestComplete and self.enemyTarget == nil then
+		if (distToGrind > 80 and self.currentType ~= 3 and self.currentType ~= 4 and not self.grindSpotReached) or (self.currentType == 3 or self.currentType == 4 or self.curentType == 5 and distToGrind > 5) then
+			if self.currentType ~= 3 and self.currentType ~= 4 and self.currentType ~= 5 and not self.isQuestComplete and self.enemyTarget == nil then
+				if distToGiver > 20 then
 				_questDBTargets:getTarget();
+				else if PlayerHasTarget() and GetTarget():CanAttack() then ClearTarget(); end end
 			end
 	
 			self.message = "Moving to grind spot";

@@ -16,13 +16,13 @@ if GetMyClass() == "SHAMAN" then
 
 	_questDB:addQuest("no", 1, "Call of Earth", "Minor Manifestation of Earth", -3031.3601074219, -720.8330078125, 44.890098571777, 215, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2882.2600097656, -250.20100402832, 53.906074523926, "Seer Ravenfeather", 0, 0, 0, 0, 0, 0, "Bring the Rough Quartz to Seer Ravenfeather in Camp Narache.", 0, 1);
 
-	_questDB:addQuest("no", 1, "Call of Earth", "Seer Ravenfeather", -2882.2600097656, -250.20100402832, 53.906074523926, 215, 4, 8, -3033.298828125, -719.48992919922, 44.524024963379, 3, 0, 0, 0, 0, 0, -3031.3601074219, -720.8330078125, 44.890098571777, "Minor Manifestation of Earth", 0, 0, 0, 0, 0, 0, "Find Kodo Rock and drink the Earth Sapta.", "Earth Sapta", 0);
+	_questDB:addQuest("no", 1, "Call of Earth", "Seer Ravenfeather", -2882.2600097656, -250.20100402832, 53.906074523926, 215, 4, 8, -3033.298828125, -719.48992919922, 44.524024963379, 5, 0, 0, 0, 0, 0, -3031.3601074219, -720.8330078125, 44.890098571777, "Minor Manifestation of Earth", 0, 0, 0, 0, 0, 0, "Find Kodo Rock and drink the Earth Sapta.", "Earth Sapta", 0);
 
 	_questDB:addQuest("no", 1, "Call of Earth", "Seer Ravenfeather", -2882.2600097656, -250.20100402832, 53.906074523926, 215, 4, 8, -3027.4916992188, -1242.7445068359, 76.664749145508, 1, 20, 0, 0, 0, 0, -2882.2600097656, -250.20100402832, 53.906074523926, "Seer Ravenfeather", "Bristleback Shaman", 0, 0, 0, 0, 0, "Bring 2 applications of Ritual Salve to Seer Ravenfeather in Camp Narache.", 0, 1);
 
 end
 
-_questDB:addQuest("no", 1, "Rite of Strength", "Seer Graytongue", -3430.3100585938, -139.2799987793, 103.0778427124, 215, 3, 6, -3169.2238769531, -1054.2880859375, 54.741600036621, 1, 20, 20, 0, 0, 0, -2877.9499511719, -221.83000183105, 54.820789337158, "Chief Hawkwind", "Bristleback Quilboar", "Bristleback Shaman", 0, 0, 0, 6, "Kill Bristlebacks in Brambleblade Ravine and bring 12 Bristleback Belts to Chief Hawkwind in Camp Narache.", 0, 1);
+_questDB:addQuest("no", 1, "Rite of Strength", "Seer Graytongue", -3430.3100585938, -139.2799987793, 103.0778427124, 215, 3, 6, -3169.2238769531, -1054.2880859375, 54.741600036621, 1, 20, 20, 0, 0, 0, -2877.9499511719, -221.83000183105, 54.820789337158, "Chief Hawkwind", "Bristleback Quilboar", "Bristleback Shaman", 0, 0, 0, 5, "Kill Bristlebacks in Brambleblade Ravine and bring 12 Bristleback Belts to Chief Hawkwind in Camp Narache.", 0, 1);
 
 _questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820789337158, 215, 3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3426.2470703125, -139.44728088379, 101.6287689209, "Seer Graytongue", 0, 0, 0, 0, 0, 0, "Travel to Seer Graytongue who lives in the hills directly south of Camp Narache.", 0, 0);
 
