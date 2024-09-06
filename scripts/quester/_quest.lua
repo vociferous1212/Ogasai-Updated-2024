@@ -73,8 +73,17 @@ function _quest:run()
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
 		return;
 	end
-	if not self.pause and not script_grind.pause then script_grind:run(); end
+	if not script_grind.pause then script_grind:run(); end
+	-- handle vendor stuff through vendor scripts
+	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 1) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 
+		if (vendorStatus == 0) then
+			script_vendor:sell();
+			return true;
+		end
+
+	return true;
+	end
 
 
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
@@ -247,7 +256,7 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 	end
 	-- move to quest giver to get quest
 	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) then
-if not script_grind.pause then StopMoving(); script_grind.pause = true; end
+
 		-- move to quest return target location
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ);
 
@@ -257,7 +266,6 @@ if not script_grind.pause then StopMoving(); script_grind.pause = true; end
 		if not IsMoving() then
 			Move(self.curQuestX, self.curQuestY, self.curQuestZ);
 		end
-		
 
 	return true;
 	end

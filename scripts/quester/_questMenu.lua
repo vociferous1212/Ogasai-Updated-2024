@@ -111,10 +111,10 @@ function _questMenu:menu()
 	
 		Text("");
 
-		if (Button("Mark Current Quest As Complete")) then
+		if (Button("Mark Current DB Quest As Complete")) then
 			_questDB:turnQuestCompleted();
 		end
-		Text("You cannot mark your current quest as complete...");
+		Text("You cannot mark your current quest in quest log as complete...");
 		Text("");
 
 		_questDBSetup:menu();
