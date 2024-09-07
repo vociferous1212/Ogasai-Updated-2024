@@ -12,24 +12,14 @@ _quest = {
 function _quest:draw() end
 
 -- draw the window
-function _quest:window()
-	_questWindow:window();
-end
+function _quest:window() _questWindow:window(); end
 
-function _quest:setTimer(miliSeconds)
-	self.waitTimer = GetTimeEX() + miliSeconds;
-end
+function _quest:setTimer(miliSeconds) self.waitTimer = GetTimeEX() + miliSeconds; end
 
 --run setup
 function _quest:setup()
-
-	if not _questIncludeFiles.isSetup then
-		_questIncludeFiles:setup()
-	end
-	script_grind:setup(); script_talent:setup(); script_gather:setup(); script_grind.getSpells = true; 	script_vendor:setup(); vendorDB:setup(); vendorDB:loadDBVendors();
-	if (not _questDB.isSetup) then
-		_questDB:setup();
-	end
+	if not _questIncludeFiles.isSetup then _questIncludeFiles:setup() end
+	script_grind:setup(); script_talent:setup(); script_gather:setup(); script_grind.getSpells = true; 	script_vendor:setup(); vendorDB:setup(); vendorDB:loadDBVendors(); if (not _questDB.isSetup) then _questDB:setup(); end
 	_questDBGather.waitTimer = GetTimeEX(); script_helper:setup(); self.usingQuester = true; if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then self.autoComplete = false; self.weHaveQuest = false; self.isQuestComplete = false; end
 	_questEX.jumpTimer = GetTimeEX();
 	self.xp = UnitXP("Player"); _questDBReturnQuest.waitTimer = GetTimeEX(); _questDoCombat.waitTimer = GetTimeEX(); _questDoCombat.blacklistTimer = GetTimeEX(); _questDoCombat.targetingTimer = GetTimeEX(); self.waitTimer = GetTimeEX(); self.isSetup = true; end
@@ -39,15 +29,10 @@ function _quest:run()
 
 	-- show quester window
 	_quest:window();
-
 	-- show info on screen
 	script_drawStatusEX:drawSetup();
-
 	-- draw object manager and end debug window
-	if (script_grind.showOM) then
-		EndWindow();
-		GetObjectsAroundMe();
-	end
+	if (script_grind.showOM) then EndWindow(); GetObjectsAroundMe(); end
 
 	-- display radar
 	if (script_radar.showRadar) then script_radar:draw() end
@@ -58,33 +43,22 @@ function _quest:run()
 	-- draw chests
 	if (script_grind.drawChests) then script_gather:drawChestNodes(); end
 	-- draw fishing pools
-	if (script_gatherEX.drawFishingPools) then
-		script_gatherEX:drawFishNodes();
-	end
+	if (script_gatherEX.drawFishingPools) then script_gatherEX:drawFishNodes(); end
 
 	-- do other checks that happen when the bot is paused or unpaused
-	if _questEX:doStartChecks() then
-		return;
-	end
+	if _questEX:doStartChecks() then return; end
 	
 	-- return if we pause bot
-	if (self.pause) then
-		script_grind.pause = true;
-		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
-		return;
-	end
-	if not script_grind.pause then script_grind:run(); end
+	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
+
+	--if not script_grind.pause then script_grind:run(); end
+
 	-- handle vendor stuff through vendor scripts
-	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 1) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
+	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 
-		if (vendorStatus == 0) then
-			script_vendor:sell();
-			return true;
-		end
-
+		if (vendorStatus == 0) then script_vendor:sell(); return true; end
 	return true;
 	end
-
 
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
 
@@ -101,41 +75,25 @@ function _quest:run()
 
 		-- do quester script checks
 		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end
-	
+		
 		-- do quester script combat routine
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() then
-
 			-- run combat routine on a good target
 			_questDoCombat:doCombat();
-
-			-- move away from adds if we can
-			if GetLocalPlayer():GetLevel() > 5 then
-				if script_checkAdds:checkAdds() then
-					return;
-				end
-			end
-		return true;
-		end
-	end
+		return true; end end
 
 	-- run edge case quest with their own navigation and targeting arguments
 	if self.currentType == 99 and not self.isQuestComplete and GetNumQuestLogEntries() > 0 then
-
 		self.message = "Edge case quest... doing specific routine";
-
 		-- run the quest script
 		_questEdgeCaseQuest:run()
-
 		return true;
-
 	-- else if the quest is complete then turn it complete and continue
 	elseif self.currentType == 99 and self.isQuestComplete and GetNumQuestLogEntries() == 0 then
-
 		-- turn the quest complete and continue
 		_questDB:turnQuestCompleted();
 		self.currentType = 0;
 	end 
-
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
@@ -167,9 +125,9 @@ function _quest:run()
 
 			-- turn the quest complete in the DB
 			if (_questDB:turnOldQuestCompleted()) then
-				self.tickRate = .3;
+				self.tickRate = .2;
 				self.message = "Completing previous quests in list";
-				_quest:setTimer(250)
+				_quest:setTimer(150)
 			return;
 			end
 		end
@@ -178,7 +136,6 @@ function _quest:run()
 	-- do check to see if our quest is complete or not
 	_questCheckQuestCompletion:checkQuestForCompletion();
 
-	
 	self.tickRate = 1;
 
 	-- return a completed quest to quest return target
@@ -204,23 +161,15 @@ self.curQuestX, self.curQuestY, self.curQuestZ = _questDB:getQuestStartPos();
 distToGiver = GetDistance3D(px, py, pz, self.curQuestX, self.curQuestY, self.curQuestZ);
 distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.curGrindZ);
 
-	if (not self.grindSpotReached) then
-		self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
-	end
+	if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos(); end
 
 	-- remove old quest entries from table / completed quests
 	--need to recheck before bot gets into movement phase...
 	if GetNumQuestLogEntries() > 0 and _questDB.curDesc ~= _quest.currentDesc then
 
 		-- turn quests as complete in DB
-		if _questDB:turnOldQuestCompleted() then
-
-			_quest:setTimer(250);
-
-		return true;
-		end
-	end
-
+		if _questDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
+	if not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then if script_gatherRun:gather() then _quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder..""; return; end end
 	-- grind spot reached distance
 	if (distToGrind <= 80) and not self.grindspotReached then
 		self.grindSpotReached = true;
@@ -234,7 +183,7 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 	if (distToGiver <= 4) and (self.currentQuest == nil) then
 		if curQuestGiver ~= nil then TargetByName(curQuestGiver); _quest:setTimer(2000); curQuestGiver = GetTarget(); if (GetTarget() ~= nil) and (GetTarget() ~= 0) then if (GetTarget():UnitInteract()) then _quest:setTimer(2000);
 					if (AcceptQuest()) then
-						local questDescription, questObjectives = GetQuestLogQuestText();
+						local questDescription, questObjectives = GetQuestLogQuestText(1);
 						self.currentQuest = curQuestName;
 						self.currentDesc = questObjectives;
 						_questDB.curDesc = questObjectives;

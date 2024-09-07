@@ -1,15 +1,58 @@
 _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, curDesc = nil,
 
-		includeElwynnNorthshire = include("scripts\\db\\questDB\\_questDB_Elwynn_Northshire.lua"),
-		includeTeldrassShadowglen = include("scripts\\db\\questDB\\_questDB_Teldrassil_Shadowglen.lua"),
-		includeTeldrassDolanaar = include("scripts\\db\\questDB\\_questDB_Teldrassil_Dolanaar.lua"),
-		includeDuskwood2025 = include("scripts\\db\\questDB\\_questDB_Duskwood_20_25.lua"),
-		includeDunMoroghColdridge = include("scripts\\db\\questDB\\_questDB_DunMorogh_Coldridge.lua"),
-		includeDurotarValleyOfTrials = include("scripts\\db\\questDB\\_questDB_Durotar_ValleyOfTrials.lua"),
-		includeMulgoreCampNarache = include("scripts\\db\\questDB\\_questDB_Mulgore_CampNarache.lua"),
-		includeMulgoreBloodhoofVillage = include("scripts\\db\\questDB\\_questDB_Mulgore_BloodhoofVillage.lua"),
+	-- eastern kingdoms
+		-- elwynn
+		includeElwynnNorthshire = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Elwynn_Northshire.lua"),
+	
+		includeElwynnGoldshire = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Elwynn_Goldshire.lua"),
+
+
+		-- dun morogh
+		includeDunMoroghColdridge = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_DunMorogh_Coldridge.lua"),
+	
+		includeDunMoroghKharanos = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_DunMorogh_Kharanos.lua"),
+
+
+		-- duskwood
+		includeDuskwood_20_25 = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Duskwood_20_25.lua"),
+
+
+
+		-- tirisfal glades
+		includeTirisfalDeathknell = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Tirisfal_Deathknell.lua"),
+	
+		incldueTirisfallBrill = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Tirisfal_Brill.lua"),
+
+
+	-- kalimdor
+
+		-- teldrassil
+		includeTeldrassShadowglen = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Teldrassil_Shadowglen.lua"),
+
+		includeTeldrassDolanaar = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Teldrassil_Dolanaar.lua"),
+
+
+		-- durotar
+		includeDurotarValleyOfTrials = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Durotar_ValleyOfTrials.lua"),
+
+		includeDurotarRazorHill = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Durotar_RazorHill.lua"),
+
+
+		-- mulgore
+		includeMulgoreCampNarache = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Mulgore_CampNarache.lua"),
+
+		includeMulgoreBloodhoofVillage = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Mulgore_BloodhoofVillage.lua"),
+
+		
+		-- barrens
+		includeBarrens_10_15 = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Barrens_10_15.lua"),
+
+		includeBarrens_15_20 = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Barrens_15_20.lua"),
+
+
 		
 }
+
 function _questDB:setup()
 
 --type quest - 1 = kill | 2 = gather | 0 = already completed | 3 = use item | 4 = use item | 5 = use item | 99 = edge case
@@ -17,23 +60,40 @@ function _questDB:setup()
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, desc, rewardNum, useItem, gossipOption)
 
 
+	-- 10-20
 
-	_questDB_Duskwood_20_25:setup();
+		-- duskwood
+		_questDB_Duskwood_20_25:setup();
 
-	-- teldrassil
-	_questDB_Teldrassil_Dolanaar:setup()
-	_questDB_Teldrassil_Shadowglen:setup();
+		-- barrens
+		_questDB_Barrens_15_20:setup();
+		_questDB_Barrens_10_15:setup();
 
+	-- 1-10
 
-	_questDB_Elwynn_Northshire:setup();
-	_questDB_DunMorogh_Coldridge:setup();
+		-- tirisfal glades
+		_questDB_Tirisfal_Brill:setup()
+		_questDB_Tirisfal_Deathknell:setup()
 
-	-- durotar
-	_questDB_Durotar_ValleyOfTrials:setup();
+		-- teldrassil
+		_questDB_Teldrassil_Dolanaar:setup()
+		_questDB_Teldrassil_Shadowglen:setup();
+		
+		-- elwynn	
+		_questDB_Elwynn_Goldshire:setup()
+		_questDB_Elwynn_Northshire:setup();
 
-	-- mulgore
-	_questDB_Mulgore_BloodhoofVillage:setup();
-	_questDB_Mulgore_CampNarache:setup();
+		-- dun morogh
+		_questDB_DunMorogh_Kharanos:setup();
+		_questDB_DunMorogh_Coldridge:setup();
+
+		-- durotar
+		_questDB_Durotar_RazorHill:setup();
+		_questDB_Durotar_ValleyOfTrials:setup();
+
+		-- mulgore
+		_questDB_Mulgore_BloodhoofVillage:setup();
+		_questDB_Mulgore_CampNarache:setup();
 
 	self.isSetup = true;
 
@@ -193,8 +253,12 @@ function _questDB:getReturnTargetPos()
 
 					if self.questList[i]['questName'] == self.curListQuest then
 
-						x, y, z = self.questList[i]['returnPos']['returnX'], self.questList[i]['returnPos']['returnY'], self.questList[i]['returnPos']['returnZ'];
+						if self.questList[i]['desc'] == _quest.currentDesc then
 
+							x, y, z = self.questList[i]['returnPos']['returnX'], self.questList[i]['returnPos']['returnY'], self.questList[i]['returnPos']['returnZ'];
+
+
+						end
 					end
 				end
 			end
@@ -216,8 +280,11 @@ function _questDB:getReturnTargetName()
 			if self.questList[i]['questName'] ~= "nil" then
 
 				if self.questList[i]['questName'] == self.curListQuest then
+				
+					if self.questList[i]['desc'] == self.curDesc then
 
-					name = self.questList[i]['returnTarget'];
+						name = self.questList[i]['returnTarget'];
+					end
 				end
 			end
 		end

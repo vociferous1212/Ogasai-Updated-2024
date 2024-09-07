@@ -80,6 +80,19 @@ function _questMenu:menu()
 
 		Text("");
 
+	if Button("Add To File...") then
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1)
+		local questDescription, descr = GetQuestLogQuestText();
+		ToFile(""..title.."");
+		local x, y, z = GetLocalPlayer():GetPosition();
+		ToFile(x..", "..y..", "..z);
+		ToFile(GetMapID());
+		ToFile(GetTarget():GetUnitName())
+		ToFile(""..descr.."");
+		ToFile(" ________________________________________________ ");
+		Text("");
+	end
+
 local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
 local questDescription, desc = GetQuestLogQuestText(1);
 

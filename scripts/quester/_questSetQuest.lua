@@ -27,7 +27,8 @@ function _questSetQuest:setOurCurrentQuest()
 						if title == _questDB.questList[y]['questName'] then
 
 
-							_quest.currentDesc = questObjectives; _quest.gossipOption = _questDB.questList[i]['gossipOption'];
+							_quest.currentDesc = questObjectives;
+							_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 
 
 							_quest.currentQuest = title;

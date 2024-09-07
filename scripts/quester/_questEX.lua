@@ -3,31 +3,20 @@ _questEX = {bagsFull = false, jumpTimer = 3000}
 
 -- do checks before we can even start the bot
 function _questEX:doStartChecks()
-
 	if not IsUsingNavmesh() then
-
 		UseNavmesh(true);
-
 	return true;
 	end
-
 	if (not LoadNavmesh()) then
-
 		self.message = "Make sure you have mmaps-files...";
-
 	return true;
 	end
-
 	if (GetLoadNavmeshProgress() ~= 1) then
-	
 		self.message = "Loading Nav Mesh! Please Wait!";
-		
 	return true;
 	end
-
 return false;
 end
-
 function _questEX:doChecks()
 
 	local localObj = GetLocalPlayer();
@@ -41,64 +30,28 @@ function _questEX:doChecks()
 		end
 	end
 
-
-
 	-- reset blacklist target timer
 	if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
-
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
-
 	end
-
 	if script_grindEX:returnTargetNearMyAggroRange() ~= nil then
-
 		_quest.enemyTarget = script_grindEX:returnTargetNearMyAggroRange();
-
 	end
-
 	if (not HasSpell("First Aid")) then
-
 		script_grind.useFirstAid = false;
-
 	end
-
 	if GetNumQuestLogEntries() > 1 then
-
 		self.message = "Bot only does 1 quest at a time...";
-
 	end
-
 	script_grind.nextToNodeDist = 4.05;
-	
 	NavmeshSmooth(3.44);
-
-
 	if GetNumQuestLogEntries() == 0 then
-
 		_quest.weHaveQuest = false;
-
 	end
 
 	-- reset vendor message after selling/repairing
 	if (script_vendor.status == 0) then
-
 		script_vendor.message = "idle...";
-
-	end
-
-	-- run gatherer scripts
-	if not IsInCombat() and not localObj:IsDead() then
-
-		if script_gatherRun:gather() then
-
-			if (IsLooting()) then
-
-				_quest:setTimer(5000);
-
-			end
-
-		return true;
-		end
 	end
 
 	-- if we are dead
@@ -106,11 +59,6 @@ function _questEX:doChecks()
 
 		_quest.message = "Waiting to ressurect...";
 
-		-- use soul stone
-		--if (localObj:HasBuff("Soul Stone")) and (localObj:IsDead()) and (not IsGhost()) then
-			--accept text
-		--return
-		--end
 
 		-- Release body
 		if (not IsGhost()) then
@@ -172,7 +120,7 @@ function _questEX:doChecks()
 
 			_quest.message = "Checking/learning talent: " .. script_talent:getNextTalentName();
 
-		return;
+		return true;
 		end
 	end
 
@@ -187,6 +135,8 @@ function _questEX:doChecks()
 			if not HasSpell("Blessing of Might") then
 
 				if script_buffOtherPlayers:doBuffs() then
+					
+					_quest.message = "Buffing other players";
 
 					if not IsStanding() then
 
@@ -200,6 +150,8 @@ function _questEX:doChecks()
 			elseif HasSpell("Blessing of Might") then
 
 				if script_buffOtherPlayers:doBuffsPaladin() then
+
+					_quest.message = "Buffing other players";
 
 					if IsStanding() then
 
@@ -223,15 +175,16 @@ function _questEX:doChecks()
 	-- Check: If our gear is yellow
 		for i = 1, 16 do
 
+		local numItemsBroken = 0;
 		local status = GetInventoryAlertStatus('' .. i);
 
-			if (status ~= nil) then 
+			numItemsBroken = numItemsBroken + 1;
+
+			if (status ~= nil) and (numItemsBroken > 3 or status >= 4) then 
 
 				if (status >= 3 and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
 
-					script_vendor:repair(); 
-
-					self.newTargetTime = GetTimeEX();
+					script_vendor:repair();
 
 				return true;
 				end
@@ -313,7 +266,7 @@ function _questEX:doChecks()
 
 		if script_grind.lootObj ~= nil and not script_grind.skipLooting and not script_grindEX.bagsFull then
 
-			_quest.message = "Looting";
+			_quest.message = "Looting "..script_grind.lootObj:GetUnitName()..", "..math.floor(script_grind.lootObj:GetDistance()).."";
 
 			if (script_grind.lootObj:GetDistance() <= script_grind.lootDistance) then
 
@@ -340,7 +293,7 @@ function _questEX:doChecks()
 
 	-- run rest script
 	if _quest:runRest() then
-
+		_quest.message = "Running Rest Script";
 		return true;
 
 	end
@@ -358,36 +311,20 @@ function _questEX:doChecks()
 		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
 
 			if (PlayerHasTarget()) then
-
 				ClearTarget();
-
 			end
-
 			_quest.message = "Moving to class trainer for spells";
-
 			if (IsMoving()) and (not _quest.pause) then
-
 				if (not script_unstuck:pathClearAuto(2)) then
-
 					script_unstuck:unstuck();
-
 				return true;
 				end
 			end
-
 		return true;
 		end
 	end
-
-
 	-- tell bot to continue
-	if (script_grind.getSpells) and (not IsInCombat()) then
-
-		if script_getSpells.getSpellsStatus > 0 then
-
-		return true;
-		end
-	end
+	if (script_grind.getSpells) and (not IsInCombat()) then if script_getSpells.getSpellsStatus > 0 then return true; end end
 
 return false;
 end

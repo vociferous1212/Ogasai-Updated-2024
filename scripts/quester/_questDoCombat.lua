@@ -136,7 +136,7 @@ function _questDoCombat:doCombat()
 
 			if not _quest.enemyTarget:IsDead() and _quest.enemyTarget:CanAttack() then
 
-				_quest.message = "Running Combat";
+				_quest.message = "Running Combat ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd)";
 
 				if IsInCombat() and not IsMoving() then
 

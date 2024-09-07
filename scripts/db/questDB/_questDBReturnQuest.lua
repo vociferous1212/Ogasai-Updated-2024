@@ -43,20 +43,20 @@ function _questDBReturnQuest:returnAQuest()
 
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
-			-- set return target name
-			local name = _questDB:getReturnTargetName();
-
-			if GetTarget() ~= 0 and GetTarget() ~= nil then
-
-				-- if target is quest return target
-				if GetTarget():GetUnitName() == name then
-
-					-- chase moving quest targets... get their position again
-					x, y, z = GetTarget():GetPosition();
-
+				-- set return target name
+				local name = _questDB:getReturnTargetName();
+	
+				if GetTarget() ~= 0 and GetTarget() ~= nil then
+	
+					-- if target is quest return target
+					if GetTarget():GetUnitName() == name then
+	
+						-- chase moving quest targets... get their position again
+						x, y, z = GetTarget():GetPosition();
+	
+					end
 				end
-			end
-
+			
 			if (self.waitTimer > GetTimeEX()) then
 				return;
 			end
@@ -127,7 +127,11 @@ function _questDBReturnQuest:returnAQuest()
 				ClearTarget();
 			end
 			_quest.message = "Moving to quest return target";
-			script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+			--if (GetDistance3D(px, py, pz, x, y, z) < 25) then
+				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+			--else
+				--script_runner:run(x, y, z)
+			--end
 			if not IsMoving() then Move(x, y, z); end
 		return;
 		end
@@ -136,7 +140,35 @@ function _questDBReturnQuest:returnAQuest()
 return false;	
 end
 
+function _questDBReturnQuest:getReturnTargetID()
 
---frame:RegisterEvent("QUEST_TURNED_IN") 
---frame:SetScript("OnEvent", handlerFunc). To unregister an event,
---use frame:UnregisterEvent("eventName").
+	local id = nil;
+
+	for i=0, _questDB.numQuests -1 do
+
+		if _questDB.questList[i]['completed'] == "no" then
+
+			if _questDB.questList[i]['questName'] ~= "nil" then
+
+				if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+				
+					if _questDB.questList[i]['desc'] == _questDB.curDesc then
+						id = _questDB.questList[i]['name'];
+					end
+				end
+			end
+		end
+	end
+
+	local i, t = GetFirstObject();
+	while i ~= 0 do
+		if t == 5 then
+			if id == i:GetObjectDisplayID() then
+				return id;
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+
+return nil;
+end

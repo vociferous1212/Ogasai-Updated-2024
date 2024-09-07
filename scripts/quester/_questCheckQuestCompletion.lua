@@ -12,6 +12,8 @@ _questCheckQuestCompletion = {}
 
 -- 5 have an item but need to use it elsewhere to complete
 
+-- 6 get an item at grind and use it elsewhere to complete
+
 function _questCheckQuestCompletion:checkQuestForCompletion()
 
 	local isItCompleted = false;

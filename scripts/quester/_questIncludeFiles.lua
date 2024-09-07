@@ -24,10 +24,9 @@ _questIncludeFiles = {
 	questerWindowIncluded = include("scripts\\quester\\_questWindow.lua"),
 	setCurrentQuestIncluded = include("scripts\\quester\\_questSetQuest.lua"),
 
-	questerDoOtherQuestTypesLoaded = include("scripts\\quester\\_questDoOtherQuestTypes.lua");
+	questerDoOtherQuestTypesLoaded = include("scripts\\quester\\_questDoOtherQuestTypes.lua"),
 
-
-
+	questGetTargetAttackingUsLoaded = include("scripts\\quester\\_questGetTargetAttackingUs.lua"), 
 
 
 }

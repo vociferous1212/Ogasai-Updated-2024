@@ -4,7 +4,6 @@ function _questDBGather:getObject()
 
 	local bestDist = 1000;
 	local bestTarget = nil;
-
 	if _quest.currentQuest ~= nil then
 		for i=0, _questDB.numQuests -1 do
 			if _questDB.questList[i]['desc'] == _quest.currentDesc then
@@ -13,10 +12,8 @@ function _questDBGather:getObject()
 				self.gatherNum = _questDB.questList[i]['numGather'];
 				self.gatherNum2 = _questDB.questList[i]['numGather2'];
 			end
-		end
-			
+		end	
  		_questDBGather:getItemsInInventory()
-
 		local i, t = GetFirstObject();					
 		while i ~= 0 do
 			if t == 5 then
@@ -50,29 +47,17 @@ function _questDBGather:gatherObject()
 return false;
 end
 function _questDBGather:run()
-
 	if _quest.isQuestComplete then
 		return false;
 	end
-
 	if self.waitTimer > GetTimeEX() then return true; end
 	-- get object
 		self.gatheringTarget = _questDBGather:getObject();
-		
 	-- move to object
 	if _questDBGather:gatherObject() then return true; end
-	
-	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil and self.gatheringTarget:GetDistance() <= 4 then if (HasForm()) then if (IsCatForm()) then script_druidEX:removeCatForm(); end if (IsBearForm()) then  script_druidEX:removeBearForm();
-			end
-			if (IsTravelForm) then
-				script_druidEX:removeTravelForm();
-			end
-		end		
-		if (IsMoving()) then
-			StopMoving();
-			_quest.waitTimer = GetTimeEX() + 950;
-			return true;
-		end
+	if (not self.gatheringTarget:IsTapped() or self.gatheringTarget:IsTappedByMe()) and self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil and self.gatheringTarget:GetDistance() <= 4 then if (HasForm()) then if (IsCatForm()) then script_druidEX:removeCatForm(); end if (IsBearForm()) then  script_druidEX:removeBearForm();
+			end if (IsTravelForm) then script_druidEX:removeTravelForm(); end end		
+		if (IsMoving()) then StopMoving(); _quest.waitTimer = GetTimeEX() + 950; return true; end
 		if (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
 			self.gatheringTarget:GameObjectInteract();
 			if IsMoving() then StopMoving(); return true; end
@@ -83,20 +68,13 @@ function _questDBGather:run()
 			_quest.waitTmer = GetTimeEX() + 4550;
 			return true;
 		end
-		if (IsLooting()) then self.waitTimer = GetTimeEX() + 2500; if (LootTarget()) or (IsLooting()) then _quest.waitTimer = GetTimeEX() + 450; return true; end end end
-		
-return false;
-end
+		if (IsLooting()) then self.waitTimer = GetTimeEX() + 2500; if (LootTarget()) or (IsLooting()) then _quest.waitTimer = GetTimeEX() + 450; return true; end end end return false; end
 function _questDBGather:getItemsInInventory()
 	-- run inventory and find item name that matches current _questDB quest name or _quest current quest name 
 	for i = 0,5 do 
 		for y=0,GetContainerNumSlots(i) do 
-			if (GetContainerItemLink(i,y) ~= nil) then _,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)"); itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink); 
-if itemName == self.gatheringTargetName then texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
-	_quest.gatheredNum = itemCount; end if itemName == self.gatheringTargetName2 then texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
-				 _quest.gatheredNum2 = itemCount; end
-			end
-		end 
-	end
-return false;
-end
+			if (GetContainerItemLink(i,y) ~= nil) then
+			_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)"); itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink); 
+				if itemName == self.gatheringTargetName then
+					texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
+	_quest.gatheredNum = itemCount; end if itemName == self.gatheringTargetName2 then texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y); _quest.gatheredNum2 = itemCount; end end end  end return false; end

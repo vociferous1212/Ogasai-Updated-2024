@@ -108,3 +108,5 @@ if _quest.currentType == 5 and not IsInCombat() and (_quest.curGrindX ~= 0) and 
 
 return false;
 end
+
+-- type 6 is we get an item at grind spot, quest is not completed, and need to go to a different return target to complete
