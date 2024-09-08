@@ -1,6 +1,15 @@
 _questDoOtherQuestTypes2 = {}
 
-function _questDoOtherQuestTypes2()
+function _questDoOtherQuestTypes2:run()
+
+
+	local px, py, pz = GetLocalPlayer():GetPosition();
+
+	local distToGiver = GetDistance3D(px, py, pz, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
+
+	local distToGrind = GetDistance3D(px, py, pz, _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+
+
 
 	-- get an item from vendor being used for 1 quest right now
 	if _quest.currentType == 7 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then

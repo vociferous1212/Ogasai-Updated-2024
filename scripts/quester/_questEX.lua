@@ -71,15 +71,11 @@ function _questEX:doChecks()
 	-- Check: Spend talent points
 	if not IsInCombat() and not localObj:IsDead() and script_grind.autoTalent then
 		if script_talent:learnTalents() then
-
 			_quest:setTimer(500);
-
 			_quest.message = "Checking/learning talent: " .. script_talent:getNextTalentName();
 
-		return true;
-		end
-	end
-	if GetTarget() == 0 or GetTarget() == nil and GetPet() ~= 0 and GetPet() ~= nil then
+		return true; end end
+	if not _quest.isQuestComplete and GetTarget() == 0 or GetTarget() == nil and GetPet() ~= 0 and GetPet() ~= nil then
 		if GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil then
 			_quest.enemyTarget = GetPet():GetUnitsTarget();
 		end
@@ -87,18 +83,12 @@ function _questEX:doChecks()
 	-- buff other players
 	if not script_getSpells:cityZones() and not IsInCombat() and GetTimeEX() > script_grind.buffTimer and script_buffOtherPlayers.enableBuffs
 		and localObj:GetManaPercentage() >= 40 and script_vendor.status == 0 and IsStanding() then
-
 		if HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Fortitude") or HasSpell("Blessing of Might") then
 			script_grind.buffTimer = GetTimeEX() + 5500;
 			if not HasSpell("Blessing of Might") then
 				if script_buffOtherPlayers:doBuffs() then
 					_quest.message = "Buffing other players";
-					if not IsStanding() then
-						JumpOrAscendStart();
-					end
-				return true;
-				end
-			elseif HasSpell("Blessing of Might") then
+					if not IsStanding() then JumpOrAscendStart(); end return true; end elseif HasSpell("Blessing of Might") then
 				if script_buffOtherPlayers:doBuffsPaladin() then
 					_quest.message = "Buffing other players";
 					if IsStanding() then

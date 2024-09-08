@@ -162,24 +162,11 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 					else
 						SelectGossipAvailableQuest(_quest.gossipOption);
 						SelectAvailableQuest(_quest.gossipOption);
-					end
-				end 
-			end 
-		end
-		return;
-	end
+					end end end end return; end
 	-- move to quest giver to get quest
 	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) then
-
-		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ);
-		self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)";
-		if not IsMoving() then
-			Move(self.curQuestX, self.curQuestY, self.curQuestZ);
-		end
-	return true;
-	end
-
-	if self.currentType == 3 or self.currentType == 4 or self.currentType == 5 or self.currentType == 7 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
+		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ); self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)"; if not IsMoving() then Move(self.curQuestX, self.curQuestY, self.curQuestZ); end return true; end
+	if (self.currentType == 3 or self.currentType == 4 or self.currentType == 5 or self.currentType == 7  or self.currentType == 8) and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
 		if _questDoOtherQuestTypes() then return true; end end	
 	-- gather quest object
 	if self.currentType == 2 and not IsInCombat() then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..", "..math.floor(_questDBGather.gatheringTarget:GetDistance()).." (yd)"; return true; end end

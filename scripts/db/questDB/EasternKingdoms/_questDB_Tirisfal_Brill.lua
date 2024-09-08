@@ -6,12 +6,30 @@ function _questDB_Tirisfal_Brill:setup()
 
 
 --_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
---_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z,
+--_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
+--_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
 
+--_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 1497, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11766.2700195313, 66.626197814941, -46.321395874023, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
+--_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1711.5899658203, 57.167198181152, -62.289268493652, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
 
+_questDB:addQuest("no", 1, "Return to the Magistrate", "Deathguard Linnea", 2022.3299560547, 74.045997619629, 36.445594787598, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2305.9099121094, 265.16400146484, 38.669918060303, "Magistrate Sevren", 0, 0, 0, 0, 0, 0, "Return to Magistrate Sevren in Brill.", 0, 2);
+
+_questDB:addQuest("no", 1, "Forsaken Duties", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669918060303, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2022.3299560547, 74.045997619629, 36.445835113525, "Deathguard Linnea", 0, 0, 0, 0, 0, 0, "Speak with Deathguard Linnea.", 0, 2);
+
+-- good spot to add class quest and deter from our route and auto skip quests below when we have a viable pet
+if GetMyClass() == "WARLOCK" then
+_questDB:addQuest("no", 1, "Forsaken Duties", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669918060303, 1497, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2022.3299560547, 74.045997619629, 36.445835113525, "Deathguard Linnea", 0, 0, 0, 0, 0, 0, "Speak with Deathguard Linnea.", 0, 2);
+_questDB:addQuest("no", 1, "The Binding", "Carendin Halgar", 1711.5899658203, 57.167198181152, -62.289268493652, 1497, 10, 14, 1704.5838623047, 41.459735870361, -63.84313583374, 3, 1, 0, 0, 0, 0, 1711.5899658203, 57.167198181152, -62.289268493652, "Carendin Halgar", "Summoned Voidwalker", 0, 0, 0, 0, 0, "Using the Runes of Summoning, summon and subdue a voidwalker, then return the Runes of Summoning to Carendin Halgar in the Magic Quarter of the Undercity.", "Runes of Summoning", 1);
+_questDB:addQuest("no", 1, "Creature of the Void", "Carendin Halgar", 1711.5899658203, 57.167198181152, -62.289161682129, 85, 10, 14, 1886.8020019531, 755.23516845703, 39.53235244751, 2, 0, 0, 0, 1, 0, 1711.5899658203, 57.167198181152, -62.289161682129, "Carendin Halgar", 
+0, 0, 0, 10, 0, 0, "Recover Egalin's Grimoire and bring it to Carendin Halgar in the Temple of the Damned.", 0, 1);
+_questDB:addQuest("no", 1, "Creature of the Void", "Carendin Halgar", 1711.5899658203, 57.167198181152, -62.289161682129, 1497, 10, 14, 1886.8020019531, 755.23516845703, 39.53235244751, 2, 0, 0, 0, 1, 0, 1711.5899658203, 57.167198181152, -62.289161682129, "Carendin Halgar", 
+0, 0, 0, 10, 0, 0, "Recover Egalin's Grimoire and bring it to Carendin Halgar in the Temple of the Damned.", 0, 1);
+_questDB:addQuest("no", 1, "Halgar's Summons", "Ageron Kargal", 2250.6201171875, 248.95500183105, 41.114952087402, 1497, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1711.5899658203, 57.167198181152, -62.289161682129, "Carendin Halgar", 0, 0, 0, 0, 0, 0, "Speak with Carendin Halgar in the Undercity.", 0, 1);
+_questDB:addQuest("no", 1, "Halgar's Summons", "Ageron Kargal", 2250.6201171875, 248.95500183105, 41.114952087402, 85, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1711.5899658203, 57.167198181152, -62.289161682129, "Carendin Halgar", 0, 0, 0, 0, 0, 0, "Speak with Carendin Halgar in the Undercity.", 0, 1);
+end
 
 -- grind x,y,z offset here so we can do a lot of grinding - it's a good spot to grind
-_questDB:addQuest("no", 1, "Graverobbers", "Magistrate Sevren",  2278.080078125, 295.58700561523, 35.146938323975, 85, 8, 12, 2552.9765625, 411.65158081055, 29.183498382568, 1, 8, 5, 0, 0, 0, 2278.080078125, 295.58700561523, 35.146938323975, "Magistrate Sevren", "Rot Hide Graverobber", "Rot Hide Mongrel", 0, 0, 0, 0, "Kill Rot Hide Graverobbers and Rot Hide Mongrels.  \n\nBring 8 Embalming Ichors to Magistrate Sevren in Brill.", 0, 1);
+_questDB:addQuest("no", 1, "Graverobbers", "Magistrate Sevren",  2278.080078125, 295.58700561523, 35.146938323975, 85, 8, 12, 2552.9765625, 411.65158081055, 29.183498382568, 1, 8, 5, 0, 0, 0, 2305.9099121094, 265.16400146484, 38.669918060303, "Magistrate Sevren", "Rot Hide Graverobber", "Rot Hide Mongrel", 0, 0, 0, 2, "Kill Rot Hide Graverobbers and Rot Hide Mongrels.  \n\nBring 8 Embalming Ichors to Magistrate Sevren in Brill.", 0, 1);
 
 
 _questDB:addQuest("no", 1, "At War With The Scarlet Crusade", "Executor Zygand", 2278.080078125, 295.58700561523, 35.146938323975, 85, 8, 12, 1886.8020019531, 755.23516845703, 39.53235244751, 1, 1, 3, 3, 0, 0, 2278.080078125, 295.58700561523, 35.146938323975, "Executor Zygand", "Captain Perrine", "Scarlet Zealot", "Scarlet Missionary", 0, 0, 0, "Executor Zygand in Brill wants you to kill Captain Perrine, 3 Scarlet Zealots and 3 Scarlet Missionaries.", 0, 1);

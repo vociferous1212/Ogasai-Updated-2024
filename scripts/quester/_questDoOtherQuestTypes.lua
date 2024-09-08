@@ -15,10 +15,33 @@ function _questDoOtherQuestTypes()
 		if not HasItem(_quest.usingItem) then _quest.message = "No quest item to use!"; end
 		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() and HasItem(_quest.usingItem) then
 
-			
-			UseItem(_quest.usingItem)
+			local cooldownTime = GetTimeEX();
+			local usedItem = false;
 
-			_quest.isQuestComplete = true;
+			for i=0, 6 do
+				for y=0,GetContainerNumSlots(i) do 
+					if (GetContainerItemLink(i,y) ~= nil) then
+						_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+						itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+   						itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+						if (itemName == _quest.usingItem) then
+							local cooldown = GetContainerItemCooldown(i, y);
+							cooldownTime = cooldown;
+						end	
+					end
+				end
+			end
+			if (cooldownTime == 0) and not usedItem then
+		
+				UseItem(_quest.usingItem)
+
+				_quest.isQuestComplete = true;
+				usedItem = true;
+			else
+				_questDoCombat:doCombat();
+				usedItem = false;
+				return false;
+			end
 
 		return true;
 		elseif distToGrind > 5 then
@@ -106,7 +129,7 @@ if _quest.currentType == 5 and not IsInCombat() and (_quest.curGrindX ~= 0) and 
 
 	end
 
-	if (_questDoOtherQuestTypes2()) then
+	if (_questDoOtherQuestTypes2:run()) then
 		return true;
 	end
 
