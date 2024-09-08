@@ -44,7 +44,7 @@ local localObj = GetLocalPlayer();
 			end end end end
 
 	if (AreBagsFull()) then
-		self.bagsFull = true;
+		_questEX.bagsFull = true;
 	end
 
 	-- Check: If our gear is yellow
@@ -93,10 +93,10 @@ local localObj = GetLocalPlayer();
 
 		-- Tell the grinder we cant loot
 		if (inventoryFull) then
-			self.bagsFull = true;
+			_questEX.bagsFull = true;
 		end
 		
-		if self.bagsFull then
+		if _questEX.bagsFull then
 			return false;
 		end
 
