@@ -54,7 +54,7 @@ local localObj = GetLocalPlayer();
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
-	if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (localObj:GetHealthPercentage() < 5 and IsInCombat()) then if script_navEX:moveToTarget(localObj, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ) then _quest.message = "Running out of combat"; return; end return; end
+	if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (localObj:GetHealthPercentage() < 5 and IsInCombat()) then if script_navEX:moveToTarget(localObj, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ) then _quest.message = "Running out of combat"; return true; end return true; end
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then GetTarget():FaceTarget(); end _quest:setTimer(1000); return; end
 	if (not self.isSetup) then _quest:setup(); end
 	if script_grind.pause then
