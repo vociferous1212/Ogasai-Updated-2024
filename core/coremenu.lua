@@ -79,6 +79,9 @@ function coremenu:draw()
 		LoadScript("Fishing", "scripts\\gather\\script_fish.lua");
 		AddScriptToMode("Fishing", "script_fish");
 
+		LoadScript("Test Enviornment", "scripts\\testEnviornment.lua");
+		AddScriptToMode("Test Enviornment", "testEnviornment");
+
 		-- Nav Mesh Runner by Rot, Improved by Logitech
 		--LoadScript("Runner", "scripts\\script_runner.lua");
 		--AddScriptToMode("Runner", "script_runner");
