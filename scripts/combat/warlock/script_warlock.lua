@@ -267,6 +267,7 @@ function script_warlock:run(targetGUID)
 
 	-- Check: Do nothing if we are channeling, casting
 	if (IsChanneling() or IsCasting()) then
+		self.waitTimer = GetTimeEX() + 1000;
 		return 4;
 	end
 
@@ -368,6 +369,25 @@ function script_warlock:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0 and targetObj ~= nil) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasSilence()) then
 
+		local immolateTable = {[348] = true, [707] = true, [1094] = true, [2941] = true, [11665] = true, [11667] = true, [11668] = true, [265309] = true}
+		local corruptionTable = {[172] = true, [6222] = true, [6223] = true, [7648] = true, [11671] = true, [11672] = true}
+		if (targetObj:HasDebuff("Immolate")) and (IsCasting() or IsChanneling()) then
+			if immolateTable[GetSpellCasting()] then
+				local x, y, z = GetLocalPlayer():GetPosition();
+				StopSpellCasting();
+				Move(x+1, y+1, z);
+			end
+
+		end
+
+		if (targetObj:HasDebuff("Corruption")) and (IsCasting() or IsChanneling()) then
+			if corruptionTable[GetSpellCasting()] then
+				local x, y, z = GetLocalPlayer():GetPosition();
+				StopSpellCasting();
+				Move(x+1, y+1, z);
+			end
+
+		end
 		-- in group with a mage? run backwards on frost nova!
 		if (GetNumPartyMembers() >= 1) then
 			if (targetObj:HasDebuff("Frost Nova")) or (targetObj:HasDebuff("Frostbite")) then
@@ -538,7 +558,7 @@ function script_warlock:run(targetGUID)
 						StopMoving();
 						return true;
 					end
-					self.waitTimer = GetTimeEX() + 750;
+					self.waitTimer = GetTimeEX() + 1550;
 					script_grind:setWaitTimer(750);
 					self.tickRate = 1750;
 					script_rotation.tickRate = 1750;
@@ -546,7 +566,7 @@ function script_warlock:run(targetGUID)
 				if (not IsMoving()) and (not script_warlockFunctions:targetHasCorruption(targetObj)) then
 					script_warlockFunctions:petAttack();
 					if not (IsCasting()) and (not IsChanneling()) then
-						if (script_warlockFunctions:castCorruption(targetObj)) then
+						if (not script_warlockFunctions:castCorruption(targetObj)) then
 							script_warlockFunctions:petAttack();
 							targetObj:FaceTarget();
 							self.waitTimer = GetTimeEX() + 2050 - self.corruptionCastTime;
@@ -933,14 +953,14 @@ function script_warlock:run(targetGUID)
 						StopMoving();
 						return true;
 					end
-					self.waitTimer = GetTimeEX() + 750;
+					self.waitTimer = GetTimeEX() + 1550;
 					script_grind:setWaitTimer(750);
 					if (IsCasting()) or (IsChanneling()) then
 						return;
 					end
-					if (script_warlockFunctions:castImmolate(targetObj)) then
+					if (not script_warlockFunctions:castImmolate(targetObj)) then
 						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 3250;
+						self.waitTimer = GetTimeEX() + 4250;
 						script_grind:setWaitTimer(3250);
 						return 4;
 					else
@@ -963,7 +983,7 @@ function script_warlock:run(targetGUID)
 					script_rotation.waitTimer = GetTimeEX() + 1550;
 				if (not IsMoving()) and (not script_warlockFunctions:targetHasCorruption(targetObj)) then
 					if not (IsCasting()) and (not IsChanneling()) then
-						if (script_warlockFunctions:castCorruption(targetObj)) then
+						if (not script_warlockFunctions:castCorruption(targetObj)) then
 							targetObj:FaceTarget();
 							self.waitTimer = GetTimeEX() + 1500 - self.corruptionCastTime;
 							script_grind:setWaitTimer(1500 - self.corruptionCastTime);

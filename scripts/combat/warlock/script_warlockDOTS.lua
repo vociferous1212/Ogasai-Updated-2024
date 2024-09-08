@@ -77,7 +77,7 @@ function script_warlockDOTS:corruption()
 							currentObj:FaceTarget();
 							script_warlockFunctions:cast('Corruption', currentObj);
 							self.corruptionTimer = GetTimeEX() + 2500;
-							script_warlock.waitTimer = GetTimeEX() + 1500;
+							script_warlock.waitTimer = GetTimeEX() + 2000;
 							ClearTarget();
 							return; 
 						end 
@@ -106,8 +106,8 @@ function script_warlockDOTS:immolate()
 							end
 							currentObj:FaceTarget();
 							if (script_warlockFunctions:cast('Immolate', currentObj)) then 
-								self.imolateTimer = GetTimeEX() + 4000;
-								script_warlock.waitTimer = GetTimeEX() + 2000;
+								self.immolateTimer = GetTimeEX() + 4000;
+								script_warlock.waitTimer = GetTimeEX() + 2500;
 								return true; 
 							end
 						end 
@@ -138,7 +138,7 @@ function script_warlockDOTS:curseOfAgony()
 							if (not script_warlockFunctions:cast('Curse of Agony', currentObj)) then 
 								currentObj:FaceTarget();
 								self.curseOfAgonyTimer = GetTimeEX() + 2000;
-								script_warlock.waitTimer = GetTimeEX() + 1500;
+								script_warlock.waitTimer = GetTimeEX() + 2000;
 								ClearTarget();
 								return true; 
 							end

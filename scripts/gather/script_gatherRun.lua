@@ -78,7 +78,8 @@ function script_gatherRun:gather()
 			end
 			if (not LootTarget()) and (script_gather.nodeObj:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
 				script_gather.timer = GetTimeEX() + 4550;
-				script_grind:setWaitTimer(5000);
+				script_grind:setWaitTimer(2500);
+				_quest:setTimer(2500);
 			end
 			if (IsLooting()) then
 			script_gather.lastNode = 0;
@@ -87,6 +88,7 @@ function script_gatherRun:gather()
 					if (script_gather.collectHerbs) then
 						script_gather.waitTimer = GetTimeEX() + 2500;
 						script_grind:setWaitTimer(5000);
+						_quest:setTimer(5000);
 					end
 				end
 				if (script_gather.timerSet) then
