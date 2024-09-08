@@ -20,7 +20,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 				vX, vY, vZ = 1839.0300292969, 1636.5400390625, 96.933532714844;
 				script_getSpells.trainerTarget = "Maximillion";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 2259.0500488281, 250.31700134277, 41.114887237549;
 				script_getSpells.trainerTarget = "Rupert Boch";
 			end
@@ -37,7 +37,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 				vX, vY, vZ = -6048.7900390625, 391.07900292969, 398.9580078125;
 				script_getSpells.trainerTarget = "Alamar Grimm";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -5640, -528.80102539063, 404.29623413086;
 				script_getSpells.trainerTarget = "Gimrizz Shadowcog";
 			end
@@ -53,7 +53,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 				vX, vY, vZ = -8926.740234375, -195.5890045166, 80.588554382324;
 				script_getSpells.trainerTarget = "Drusilla La Salle";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -9472.7998046875, -5.3266100883484, 49.794696807861;
 				script_getSpells.trainerTarget = "Maximillian Crowe";
 			end
@@ -69,7 +69,7 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 				vX, vY, vZ = -639.34399414063, -4230.1899414063, 38.134117126465;
 				script_getSpells.trainerTarget = "Frang";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 356.19198608398, -4837.9501953125, 11.089032173157;
 				script_getSpells.trainerTarget = "Dhugru Gorelust";
 			end
@@ -97,7 +97,7 @@ function script_getSpellsWarlock:checkForSpellsNeededWarlock()
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 6) and (myMoney >= 200) and (not HasSpell("Life Tap")) then
+		elseif (myLevel >= 7) and (myMoney >= 200) and (not HasSpell("Life Tap")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

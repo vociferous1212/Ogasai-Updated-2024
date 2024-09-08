@@ -84,7 +84,7 @@ script_grind = {
 	lootCheck = {},
 	minLevel = GetLocalPlayer():GetLevel()-5,
 	maxLevel = GetLocalPlayer():GetLevel()+2,
-	ressDistance = 34,
+	ressDistance = 29,
 	combatError = 0,
 	autoTalent = false,
 	myX = 0,
@@ -666,7 +666,7 @@ function script_grind:run()
 
 	-- hotspot reached distance
 	if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
-		self.hotspotReached = false;
+		self.hotspotReached = true;
 	end	
 
 	-- go to FP buttons
@@ -854,10 +854,12 @@ function script_grind:run()
 		end
 	end
 	end
+
+	if self.enemyObj ~= nil and self.enemyObj ~= 0 then
 	-- walk away from target if pet target guid is the same guid as target targeting me
-	if (GetPet() ~= 0) and (script_hunter.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
-		if (targetObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
-			if (script_hunter:runBackwards(targetObj, 15)) then
+	if (GetPet() ~= 0) and (script_hunter.hasPet and not HasSpell("Shadow Bolt")) and (not script_grind:isTargetingMe(self.enemyObj)) and (GetTarget():GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj:IsInLineOfSight()) then
+		if (self.enemyObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
+			if (script_hunter:runBackwards(self.enemyObj, 15)) then
 				script_grind.tickRate = 100;
 				script_rotation.tickRate = 135;
 				script_hunter.waitTimer = GetTimeEX() + 3000;
@@ -870,6 +872,7 @@ if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) 
 				return true;
 			end	
 		end
+	end
 	end
 
 	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
@@ -2086,13 +2089,13 @@ function script_grind:isTargetingGroupBool()
 end
 
 
-function script_grind:isTargetingMe(i) 
+function script_grind:isTargetingMe(target) 
 	local localPlayer = GetLocalPlayer();
 	if (localPlayer ~= nil and localPlayer ~= 0 and not localPlayer:IsDead()) then
-		if (i) ~= nil then
-		if (i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0) then
-			return i:GetUnitsTarget():GetGUID() == localPlayer:GetGUID();
-		end
+		if (target) ~= nil then
+			if (target:GetUnitsTarget() ~= nil and target:GetUnitsTarget() ~= 0) then
+				return target:GetUnitsTarget():GetGUID() == localPlayer:GetGUID();
+			end
 		end
 	end
 	return false;
@@ -2383,6 +2386,16 @@ function script_grind:doLoot(localObj)
 
 		if (not self.adjustTickRate) then
 			script_grind.tickRate = 50;
+		end
+
+		if GetLocalPlayer():GetHealthPercentage() < 75 then
+			if not script_grindEX:isLootSafeToLoot() then
+				script_grind:runRest();
+				_quest.message = "Loot is not safe to gather... resting..."
+				script_grind.message = "Loot is not safe to gather... resting..."
+				return true;
+			end
+			
 		end
 
 		--if (self.lootObj ~= nil) and (self.lootObj ~= 0) and (not IsLooting()) then

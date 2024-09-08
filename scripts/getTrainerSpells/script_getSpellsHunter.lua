@@ -21,7 +21,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 				vX, vY, vZ = -6091.7900390625, 365.14099121094, 395.5400390625;
 				script_getSpells.trainerTarget = "Thorgas Grimson";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -5618.5400390625, -454.0710144043, 407.65930175781;
 				script_getSpells.trainerTarget = "Grif Wildheart";
 			end
@@ -37,7 +37,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 				vX, vY, vZ = 10458.5, 827.86798095703, 1380.939453125;
 				script_getSpells.trainerTarget = "Ayanna Everstride";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 9812.330078125, 928.80603027344, 1308.1091308594;
 				script_getSpells.trainerTarget = "Dazalar";
 			end
@@ -53,7 +53,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 				vX, vY, vZ = -635.46197509766, -4227.5200195313, 38.133941650391;
 				script_getSpells.trainerTarget = "Jen'shan";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 275.34100341797, -4704, 11.625081062317;
 				script_getSpells.trainerTarget = "Thotar";
 			end
@@ -69,7 +69,7 @@ function script_getSpellsHunter:getTrainerTargetHunter()
 				vX, vY, vZ = -2865.3999023438, -225.73100280762, 54.820751190186;
 				script_getSpells.trainerTarget = "Lanka Farshot";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -2180.2199707031, -408.81600952148, -4.6015024185181;
 				script_getSpells.trainerTarget = "Yaw Sharpmane";
 			end
@@ -98,11 +98,11 @@ local localObj = GetLocalPlayer();
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 6) and (myMoney >= 200) and (not HasSpell("Hunter's Mark")) then
+		elseif (myLevel >= 7) and (myMoney >= 200) and (not HasSpell("Hunter's Mark")) then
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 8) and (myMoney >= 600) and (not HasSpell("Concussive Shot")) then
+		elseif (myLevel >= 8) and (myMoney >= 700) and (not HasSpell("Concussive Shot")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

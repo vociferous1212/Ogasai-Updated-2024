@@ -24,7 +24,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 				vX, vY, vZ = -6056.08984375, 388.17498779297, 392.76116943359;
 				script_getSpells.trainerTarget = "Marryk Nurribit";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -5586.9399414063, -537.17297363281, 403.54071044922;
 				script_getSpells.trainerTarget = "Magis Sparkmantle";
 			end
@@ -40,7 +40,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 				vX, vY, vZ = -8851.5703125, -188.23399353027, 89.314559936523;
 				script_getSpells.trainerTarget = "Khelden Bremen";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -9471.669921875, 34.451000213623, 63.820621490479;
 				script_getSpells.trainerTarget = "Zaldimar Wefhellt";
 			end
@@ -56,7 +56,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 				vX, vY, vZ = -625.29602050781, -4210.169921875, 38.134181976318;
 				script_getSpells.trainerTarget = "Mai'ah";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -839.28698730469, -4939.830078125, 20.990133285522;
 				script_getSpells.trainerTarget = "Un'Thuwa";
 			end
@@ -72,7 +72,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 				vX, vY, vZ = 1847.3900146484, 1635.5200195313, 96.933547973633;
 				script_getSpells.trainerTarget = "Isabella";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 2256.8100585938, 233.21899414063, 41.114883422852;
 				script_getSpells.trainerTarget = "Cain Firesong";
 			end
@@ -99,11 +99,11 @@ function script_getSpellsMage:checkForSpellsNeededMage()
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 6) and (myMoney >= 300) and (not HasSpell("Conjure Food")) then
+		elseif (myLevel >= 7) and (myMoney >= 300) and (not HasSpell("Conjure Food")) then
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 8) and (myMoney >= 600) and (not HasSpell("Polymorph")) then
+		elseif (myLevel >= 8) and (myMoney >= 700) and (not HasSpell("Polymorph")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

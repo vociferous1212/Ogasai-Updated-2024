@@ -233,11 +233,8 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 				-- set safe res distances based on level
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21;
 
-				-- extra safe range add 5 yards
-				local range = aggro + 3;
-
 				-- acceptable range to run avoid during ressurection
-				if currentObj:GetDistance() <= range then
+				if currentObj:GetDistance() <= aggro then
 		
 					-- set closest enemy
 					if (closestEnemy == 0) then
@@ -276,7 +273,7 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 			rX, rY, rZ = corpseX+ressRadius*math.cos(self.currentRessAngle), corpseY+ressRadius*math.sin(self.currentRessAngle), corpseZ;
 
 			-- set res time
-			self.rTime = GetTimeEX();
+			rTime = GetTimeEX();
 
 			-- move to point
 			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);			

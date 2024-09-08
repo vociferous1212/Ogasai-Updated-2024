@@ -12,6 +12,33 @@ script_grindEX = {
 	tryTavelFormTimer = 0,
 }
 
+function script_grindEX:isLootSafeToLoot()
+
+local numberOfEnemiesInRange = 0;
+local i, t = GetFirstObject();
+
+	if script_grind.lootObj ~= nil then
+		while i ~= 0 do
+			if t == 3 then
+				if i:CanAttack() and not i:IsCritter() and not i:IsDead() and not i:GetGUID() == script_grind.lootObj:GetGUID() then
+					local x, y, z = script_grind.lootObj:GetPosition();
+					local tx, ty, tz = i:GetPosition();
+					local dist = GetDistance3D(x, y, z, tx, ty, tz);
+					if dist > 20 then
+						numberOfEnemiesInRange = numberOfEnemiesInRange + 1;
+						
+					end
+					if numberOfEnemiesInRange >= 1 then
+						return false;
+					end
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
+return true;
+end
+
 function script_grindEX:addTargetToAggroBlacklist(targetGUID)
 	if (targetGUID ~= nil and targetGUID ~= 0 and targetGUID ~= '') then	
 		self.blacklistAggroTargets[self.blacklistAggroNum] = targetGUID;

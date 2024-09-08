@@ -1,8 +1,8 @@
 script_runner = {
         nRcombo = 0, -- selected destination number (combo box)
-        runit = false, 
+        runit = true, 
         distDestination = 0,
-	useNaveMesh = false,
+	useNaveMesh = true,
 	lastnavIndex = 0,
         nextNodeDistance = 5,
         tx = 0,
@@ -20,7 +20,7 @@ script_runner = {
 	destination = {},
 	destinationName = {},
 	destNum = 1,
-	isSetup = false,
+	isSetup = true,
 	tic = 150,
 	timer = 0,
 	destinationChanged = false,
@@ -354,13 +354,9 @@ function script_runner:draw()
 	script_runner:drawAggroCircles();
 end
 
-function script_runner:run()
+function script_runner:run(x, y, z)
 
-	-- Setup destinations
-	if (not self.isSetup) then
-		script_runner:setup();
-		return;
-	end
+
 
 	if (GetTimeEX() < self.timer) then
 		return;
@@ -371,22 +367,30 @@ function script_runner:run()
 	-- Update player coordinates
 	local localObj = GetLocalPlayer();
 	local my_x, my_y, my_z = localObj:GetPosition();
-	local d_x, d_y, d_z = self.tx, self.ty, self.tz;
 
-	-- Update distance to destination
-	self.distDestination = GetDistance3D(my_x, my_y, my_z, self.tx, self.ty, self.tz);
+	self.distDestination = GetDistance3D(my_x, my_y, my_z, x, y, z);
 
-	if (self.avoidAggro) then
+
+		-- Destination reached	
+		if (GetPathSize(5) <= self.lastnavIndex) then
+			self.lastnavIndex = GetPathSize(5)-1;
+			--self.runit = false;
+			StopMoving();
+			--rP("Destination " .. tostring(self.destination[self.nRcombo+1].name .. ' reached...'));
+			return;
+		end
+
+
 		if (script_runner:avoidToAggro(self.safeDistance)) then 
 			self.avoidTimer = GetTimeEX()+250;
 			-- Generate a new navmesh path if we are avoiding mobs
 			if (self.genTime < GetTimeEX()) then
 				self.genTime = GetTimeEX() + 500;
-				GeneratePath(my_x, my_y, my_z, d_x, d_y, d_z);
+				GeneratePath(my_x, my_y, my_z, x, y, z);
 			end
-			return; 
+			return false; 
 		end
-	end 
+
 
 	if (self.avoidTimer > GetTimeEX()) then
 		return;
@@ -396,44 +400,9 @@ function script_runner:run()
 		return;
 	end
 
-	-- If the target destination has changed, generate a new path
-	if(self.dx ~= self.tx or self.dy ~= self.ty or self.dz ~= self.tz) then
-
-		-- update destination position
-		self.dx, self.dy, self.dz = d_x, d_y, d_z;
-
-		-- reset node index
-		self.lastnavIndex = 1; 
 		
-		-- generate a new path
-		GeneratePath(my_x, my_y, my_z, d_x, d_y, d_z);
-	end	
 
-	-- Return until path has been generated
-	if (not IsPathLoaded(5)) then
-
-		if (IsMoving()) then
-			StopMoving();
-		end
-		
-		if (not self.generating and self.genTimer < GetTimeEX()) then
-			rP("Generating path to " .. tostring(self.destination[self.nRcombo+1].name) .. '...');
-			self.generating = true;
-			self.genTimer = GetTimeEX() + 4500;
-		end
-		
-		if (GetTimeEX() > self.genTimer and self.generating) then
-			self.generating = false;
-			self.runit = false;
-			self.dx = 0;
-			ClearPath(5);
-			rP("Failed to generate path to " .. tostring(self.destination[self.nRcombo+1].name) .. '...');
-		end
 	
-		return;
-	else
-		self.generating = false;
-	end
 
 	-- Get the next node's position
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
@@ -443,14 +412,6 @@ function script_runner:run()
 		-- If we are close to the next path node, increase our nav node index
 		self.lastnavIndex = 1 + self.lastnavIndex;	
 
-		-- Destination reached	
-		if (GetPathSize(5) <= self.lastnavIndex and self.runit) then
-			self.lastnavIndex = GetPathSize(5)-1;
-			self.runit = false;
-			StopMoving();
-			rP("Destination " .. tostring(self.destination[self.nRcombo+1].name .. ' reached...'));
-			return;
-		end
 	end
 
 	-- Move to the next node in the path

@@ -20,7 +20,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 				vX, vY, vZ = -6056.740234375, 393.54800415039, 392.75955200195;
 				script_getSpells.trainerTarget = "Branstock Khalder";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then			
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then			
 				vX, vY, vZ = -5590.5600585938, -529.65698242188, 399.65194702148;
 				script_getSpells.trainerTarget = "Maxan Anvol";
 			end
@@ -36,7 +36,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 				vX, vY, vZ = -8853.58984375, -193.33599853516, 81.932304382324;
 				script_getSpells.trainerTarget = "Priestess Anetta";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -9460.75, 33.133800506592, 63.820713043213;
 				script_getSpells.trainerTarget = "Priestess Josetta";
 			end
@@ -52,7 +52,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 				vX, vY, vZ = 10458.799804688, 801.62298583984, 1346.7547607422;
 				script_getSpells.trainerTarget = "Shanda";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 9905.4404296875, 985.43298339844, 1313.83203125;
 				script_getSpells.trainerTarget = "Laurna Morninglight";
 			end
@@ -68,7 +68,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 				vX, vY, vZ = -617.39501953125, -4202.3999023438, 38.134056091309;
 				script_getSpells.trainerTarget = "Ken'jai";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 294.88400268555, -4831.490234375, 10.524134635925;
 				script_getSpells.trainerTarget = "Tai'jin";
 			end
@@ -84,7 +84,7 @@ function script_getSpellsPriest:getTrainerTargetPriest()
 				vX, vY, vZ = 1848.3199462891, 1627.6300048828, 96.933753967285;
 				script_getSpells.trainerTarget = "Dark Cleric Duesten";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 2265.1999511719, 251.05400085449, 41.114849090576;
 				script_getSpells.trainerTarget = "Dark Cleric Beryl";
 			end
@@ -113,7 +113,7 @@ local localObj = GetLocalPlayer();
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 6) and (myMoney >= 200) and (not HasSpell("Power Word: Shield")) then
+		elseif (myLevel >= 7) and (myMoney >= 200) and (not HasSpell("Power Word: Shield")) then
 			if (script_getSpells:run()) then
 				return true;
 			end
@@ -137,7 +137,7 @@ local localObj = GetLocalPlayer();
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 18) and (myMoney >= 6000) and (not HasSpell("Dispel Magic")) then
+		elseif (myLevel >= 18) and (myMoney >= 7000) and (not HasSpell("Dispel Magic")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

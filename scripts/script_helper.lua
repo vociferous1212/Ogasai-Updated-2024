@@ -324,12 +324,14 @@ function script_helper:eat()
 			if (UseItem(self.food[i])) then
 				self.waitTimer = GetTimeEX() + 1200;
 				script_grind:setWaitTimer(1200);
+				_quest:setTimer(1200);
 				return true;
 			end
 		end
 	end
 	self.waitTimer = GetTimeEX() + 1200;
 	script_grind:setWaitTimer(1200);
+	_quest:setTimer(1200);
 	return false;
 end
 
@@ -339,12 +341,14 @@ function script_helper:drinkWater()
 			if (UseItem(self.water[i])) then
 				self.waitTimer = GetTimeEX() + 1600;
 				script_grind:setWaitTimer(1600);
+				_quest:setTimer(1600);
 				return true;
 			end
 		end
 	end
 	self.waitTimer = GetTimeEX() + 1200;
 	script_grind:setWaitTimer(1200);
+	_quest:setTimer(1800);
 	return false;
 end
 

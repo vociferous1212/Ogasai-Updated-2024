@@ -20,7 +20,7 @@ function script_getSpellsPaladin:getTrainerTargetPaladin()
 				vX, vY, vZ = -6120.6801757813, 382.08898925781, 395.54284667969;
 				script_getSpells.trainerTarget = "Bromos Grummner";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -5586.759765625, -542.16302490234, 403.54095458984;
 				script_getSpells.trainerTarget = "Azar Stronghammer";
 			end
@@ -36,7 +36,7 @@ function script_getSpellsPaladin:getTrainerTargetPaladin()
 				vX, vY, vZ = -8914.5703125, -215.01600646973, 82.116622924805;
 				script_getSpells.trainerTarget = "Brother Sammuel";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -9468.1396484375, 108.9759979248, 57.477275848389;
 				script_getSpells.trainerTarget = "Brother Wilhelm";
 			end
@@ -65,7 +65,7 @@ local localObj = GetLocalPlayer();
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 6) and (myMoney >= 300) and (not HasSpell("Seal of the Crusader")) then
+		elseif (myLevel >= 7) and (myMoney >= 300) and (not HasSpell("Seal of the Crusader")) then
 			if (script_getSpells:run()) then
 				return true;
 			end
@@ -85,7 +85,7 @@ local localObj = GetLocalPlayer();
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 16) and (myMoney >= 6000) and (not HasSpell("Retribution Aura")) then
+		elseif (myLevel >= 16) and (myMoney >= 7000) and (not HasSpell("Retribution Aura")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

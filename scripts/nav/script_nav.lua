@@ -122,7 +122,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 
 		-- Check: If we reached the last location index
-	if (self.currentGoToLocation > (self.numSavedLocation - 1)) then
+	if (self.currentGoToLocation > (self.numSavedLocation)) then
 		self.currentGoToLocation = 0;
 	end
 	
