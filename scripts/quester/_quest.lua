@@ -26,7 +26,7 @@ function _quest:setup()
 
 -- run the quester
 function _quest:run()
-
+local localObj = GetLocalPlayer();
 	-- show quester window
 	_quest:window();
 	-- show info on screen
@@ -45,36 +45,26 @@ function _quest:run()
 	-- draw fishing pools
 	if (script_gatherEX.drawFishingPools) then script_gatherEX:drawFishNodes(); end
 
-	-- do other checks that happen when the bot is paused or unpaused
 	if _questEX:doStartChecks() then return; end
 	
-	-- return if we pause bot
 	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
-
 	--if not script_grind.pause then script_grind:run(); end
 
 	-- handle vendor stuff through vendor scripts
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
-
-		if (vendorStatus == 0) then script_vendor:sell(); return true; end
-	return true;
-	end
+		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
+	if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (localObj:GetHealthPercentage() < 5 and IsInCombat()) then if script_navEX:moveToTarget(localObj, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ) then _quest.message = "Running out of combat"; return; end return; end
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then GetTarget():FaceTarget(); end _quest:setTimer(1000); return; end
-	-- run setup function once
 	if (not self.isSetup) then _quest:setup(); end
-	-- if we are not running the grinder then do this stuff
 	if script_grind.pause then
-		-- get loot target 
 		if not script_grind.skipLooting and not _questEX.bagsFull then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end
-		-- do quester script checks
 		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return; end
 		-- do quester script combat routine
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and not _quest.isQuestComplete then
 			if IsCasting() or IsChanneling() then return; end
 			self.tickRate = 1.75;
 			_questEX:doChecks();
-			-- run combat routine on a good target
 			_questDoCombat:doCombat();
 		return true; end end
 	-- run edge case quest with their own navigation and targeting arguments
@@ -141,7 +131,7 @@ local curQuestGiver = nil; local curQuestName = nil; local distToGiver = 0; loca
 		-- turn quests as complete in DB
 		if _questDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
 	
-if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then if script_gatherRun:gather() then _quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder..""; return; end end
+if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then if script_gatherRun:gather() then _quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder..""; return true; end end
 
 	-- grind spot reached distance
 	if (distToGrind <= 80) and not self.grindspotReached then
@@ -183,19 +173,7 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 				--_questDBTargets:getTarget();
 				--else if PlayerHasTarget() and not GetTarget():CanAttack() then ClearTarget(); end end
 			end
-	
 			self.message = "Moving to grind spot";
-	
 			script_navEX:moveToTarget(GetLocalPlayer(), self.curGrindX, self.curGrindY, self.curGrindZ);
-			
-			if not IsMoving() then
-			
-				Move(self.curGrindX, self.curGrindY, self.curGrindZ);
-	
-			end
-		return true;
-		end
-	end
-end
-
+			if not IsMoving() then Move(self.curGrindX, self.curGrindY, self.curGrindZ); end return true; end end end
 function _quest:runRest() if _questRunRest:runRest() then return true; end end

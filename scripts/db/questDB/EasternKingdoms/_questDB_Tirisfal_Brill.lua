@@ -9,6 +9,13 @@ function _questDB_Tirisfal_Brill:setup()
 --_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
 --_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
 
+
+_questDB:addQuest("no", 1, "The Haunted Mills", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 1, 0, 0, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Devlin Agamand", 0, 0, 0, 0, 0, "Slay Devlin Agamand, and bring Devlin's Remains to Coleman Farthing in Brill.", 0, 1);
+
+_questDB:addQuest("no", 1, "The Mills Overrun", "Deathguard Dillinger", 2287.6599121094, 403.37200927734, 33.921539306641, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 5, 10, 0, 0, 0, 2287.6599121094, 403.37200927734, 33.921539306641, "Deathguard Dillinger", "Darkeye Bonecaster", "Rattlecage Soldier", 0, 0, 0, 2, "Gather 5 Notched Ribs and 3 Blackened Skulls, then return to Deathguard Dillinger in Brill.", 0, 1);
+
+_questDB:addQuest("no", 1, "A New Plague", "Apothecary Johaan", 2259.0400390625, 347.04800415039, 36.019496917725, 85, 10, 14, 2526.1013183594, 1349.7479248047, 21.122644424438, 1, 10, 10, 10, 0, 0, 2259.0400390625, 347.04800415039, 36.019496917725, "Apothecary Johaan", "Vile Fin Puddlejumper", "Vile Fin Minor Oracle", "Vile Fin Muckdweller", 0, 0, 1, "Apothecary Johaan of the town of Brill needs 5 Vile Fin Scales from Murlocs in Tirisfal Glades.", 0, 1);
+
 --_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 1497, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11766.2700195313, 66.626197814941, -46.321395874023, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
 --_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1711.5899658203, 57.167198181152, -62.289268493652, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
 

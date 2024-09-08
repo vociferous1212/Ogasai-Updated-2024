@@ -19,6 +19,7 @@ _questIncludeFiles = {
 
 	questerHandleVendorIncluded = include("scripts\\quester\\_questHandleVendor.lua"),
 	questerEXIncluded = include("scripts\\quester\\_questEX.lua"),
+	questerEX2Included = include("scripts\\quester\\_questEX2.lua"),
 	questerCheckQuestCompletionIncluded = include("scripts\\quester\\_questCheckQuestCompletion.lua"),
 	questerDoCombatIncluded = include("scripts\\quester\\_questDoCombat.lua"),
 	questerRunRestIncluded = include("scripts\\quester\\_questRunRest.lua"),

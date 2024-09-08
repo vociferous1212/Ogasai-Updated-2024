@@ -8,6 +8,9 @@ function _questDoCombat:doCombat()
 	return;
 	end
 
+if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetLocalPlayer():GetHealthPercentage() < 5 and IsInCombat()) then if script_navEX:moveToTarget(GetLocalPlayer(), _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ) then _quest.message = "Running out of combat"; return true; end return true; end
+
+
 	-- run combat on good targets
 	if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) or IsInCombat() then
 
