@@ -148,7 +148,7 @@ Text("");
 		Separator();
 
 		if (Button("Mark Current DB Quest As Complete")) then
-			_questDB:turnQuestCompleted();
+			_questDBHandleDB:turnQuestCompleted();
 		end
 		Text("You cannot mark your current quest in quest log as complete...");
 		Text("");			

@@ -153,7 +153,7 @@ function _questDBReturnQuest:getReturnTargetID()
 				if _questDB.questList[i]['questName'] == _questDB.curListQuest then
 				
 					if _questDB.questList[i]['desc'] == _questDB.curDesc then
-						id = _questDB.questList[i]['name'];
+						id = _questDB.questList[i]['giverName'];
 					end
 				end
 			end

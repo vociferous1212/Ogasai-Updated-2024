@@ -6,15 +6,19 @@ function _questDB_Tirisfal_Brill:setup()
 
 
 --_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
---_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
---_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
 
+_questDB:addQuest("no", 1, "Delivery to Silverpine Forest", "Apothecary Johaan", 2259.0400390625, 347.04800415039, 36.019256591797, 85, 10, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 522.44897460938, 1652.3000488281, 125.65983581543, "Apothecary Renferrel", 0, 0, 0, 0, 0, 0, "Take Apothecary Johaan's findings to Apothecary Renferrel in Silverpine Forest.", 0, 1);
+
+_questDB:addQuest("no", 1, "A New Plague", "Apothecary Johaan", 2259.0400390625, 347.04800415039, 36.019496917725, 85, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2288.9399414063, 234.30299377441, 27.08900642395, "Captured Mountaineer", 0, 0, 0, 0, 0, 0, "Bring Johaan's Special Drink to the Captured Mountaineer.", 0, 2);
+
+_questDB:addQuest("no", 1, "A New Plague", "Apothecary Johaan", 2259.0400390625, 347.04800415039, 36.019287109375, 85, 10, 14, 2177.5637207031, -826.71911621094, 81.086936950684, 1, 10, 0, 0, 0, 0, 2259.0400390625, 347.04800415039, 36.019287109375, "Apothecary Johaan", "Vicious Night Web Spider", 0, 0, 0, 0, 1, "Apothecary Johaan in the town of Brill wants you to bring him 4 samples of venom from a Vicious Night Web Spider.", 0, 1);
 
 _questDB:addQuest("no", 1, "At War With The Scarlet Crusade", "Executor Zygand", 2278.080078125, 295.58700561523, 35.146919250488, 85, 10, 14, 2146.4699707031, -528.41998291016, 81.697105407715, 1, 1, 5, 0, 0, 0, 2278.080078125, 295.58700561523, 35.146919250488, "Executor Zygand", "Captain Vachon", "Scarlet Friar", 0, 0, 0, 0, "Executor Zygand in Brill has commissioned you to slay Captain Vachon and 5 Scarlet Friars.", 0, 1);
 
-_questDB:addQuest("no", 1, "Wanted: Maggot Eye", 17, 2285.2604980469, 288.98291015625, 35.18314743042, 85, 10, 14, 2910.6999511719, 382.54699707031, 31.484004974365, 1, 1, 0, 0, 0, 0, 2278.080078125, 295.58700561523, 35.146938323975, "Executor Zygand", "Maggot Eye", 0, 0, 0, 0, 2, "Kill Maggot Eye and return to Executor Zygand in Brill with his paw for a reward.", 0, 1);
+-- can be added back once code is cleaned up
+--_questDB:addQuest("no", 1, "Wanted: Maggot Eye", 17, 2285.2604980469, 288.98291015625, 35.18314743042, 85, 10, 14, 2910.6999511719, 382.54699707031, 31.484004974365, 1, 1, 0, 0, 0, 0, 2278.080078125, 295.58700561523, 35.146938323975, "Executor Zygand", "Maggot Eye", 0, 0, 0, 0, 2, "Kill Maggot Eye and return to Executor Zygand in Brill with his paw for a reward.", 0, 1);
 
-_questDB:addQuest("no", 1, "Speak with Sevren", "", 2262.2600097656, 244.25700378418, 33.633808135986, 85, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2305.9099121094, 265.16400146484, 38.669960021973, "Magistrate Sevren", 0, 0, 0, 0, 0, 0, "Speak with Magistrate Sevren in Brill.", 0, 1);
+_questDB:addQuest("no", 1, "Speak with Sevren", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633808135986, 85, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2305.9099121094, 265.16400146484, 38.669960021973, "Magistrate Sevren", 0, 0, 0, 0, 0, 0, "Speak with Magistrate Sevren in Brill.", 0, 1);
 
 _questDB:addQuest("no", 1, "Deaths in the Family", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2810.7724609375, 909.91204833984, 117.80563354492, 1, 1, 1, 1, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Gregor Agamand", "Nissa Agamand", "Thurman Agamand", 0, 0, 0, "Bring Gregor's Remains, Nissa's Remains and Thurman's Remains to Coleman Farthing in Brill.", 0, 1);
 
@@ -24,12 +28,11 @@ _questDB:addQuest("no", 1, "The Mills Overrun", "Deathguard Dillinger", 2287.659
 
 _questDB:addQuest("no", 1, "A New Plague", "Apothecary Johaan", 2259.0400390625, 347.04800415039, 36.019496917725, 85, 10, 14, 2526.1013183594, 1349.7479248047, 21.122644424438, 1, 10, 10, 10, 0, 0, 2259.0400390625, 347.04800415039, 36.019496917725, "Apothecary Johaan", "Vile Fin Puddlejumper", "Vile Fin Minor Oracle", "Vile Fin Muckdweller", 0, 0, 1, "Apothecary Johaan of the town of Brill needs 5 Vile Fin Scales from Murlocs in Tirisfal Glades.", 0, 1);
 
---_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 1497, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11766.2700195313, 66.626197814941, -46.321395874023, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
---_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1711.5899658203, 57.167198181152, -62.289268493652, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
+_questDB:addQuest("no", 1, "The Prodigal Lich", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669910430908, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1766.2700195313, 66.626197814941, -46.321281433105, "Bethor Iceshard", 0, 0, 0, 0, 0, 0, "Present Sevren's Orders to Bethor Iceshard in the Undercity.", 0, 1);
 
 _questDB:addQuest("no", 1, "Return to the Magistrate", "Deathguard Linnea", 2022.3299560547, 74.045997619629, 36.445594787598, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2305.9099121094, 265.16400146484, 38.669918060303, "Magistrate Sevren", 0, 0, 0, 0, 0, 0, "Return to Magistrate Sevren in Brill.", 0, 2);
 
-_questDB:addQuest("no", 1, "Forsaken Duties", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669918060303, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2022.3299560547, 74.045997619629, 36.445835113525, "Deathguard Linnea", 0, 0, 0, 0, 0, 0, "Speak with Deathguard Linnea.", 0, 2);
+_questDB:addQuest("no", 1, "Forsaken Duties", "Magistrate Sevren", 2305.9099121094, 265.16400146484, 38.669918060303, 85, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2022.3299560547, 74.045997619629, 36.445835113525, "Deathguard Linnea", 0, 0, 0, 0, 0, 0, "Speak with Deathguard Linnea.", 0, 1);
 
 -- good spot to add class quest and deter from our route and auto skip quests below when we have a viable pet
 if GetMyClass() == "WARLOCK" then

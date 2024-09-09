@@ -2,7 +2,7 @@ _quest = {
 
 	-- if we have a quest and are out of level range in DB it doesn't find a grind spot? something...
 
-	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 1, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 350;
+	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 1, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 350, currentMapID = 0,
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 
@@ -43,7 +43,9 @@ local localObj = GetLocalPlayer();
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
-	if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (localObj:GetHealthPercentage() < 5 and IsInCombat()) then if script_navEX:moveToTarget(localObj, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ) then _quest.message = "Running out of combat"; return true; end return true; end
+	if script_grind:enemiesAttackingUs() > 2 or (localObj:GetHealthPercentage() < 5 and IsInCombat()) then
+		local x, y z = 0, 0, 0;
+		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; return true; end end return true; end
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then GetTarget():FaceTarget(); end _quest:setTimer(1000); return; end
 	if (not self.isSetup) then _quest:setup(); end
 	if script_grind.pause then
@@ -65,14 +67,14 @@ local localObj = GetLocalPlayer();
 	-- else if the quest is complete then turn it complete and continue
 	elseif self.currentType == 99 and self.isQuestComplete and GetNumQuestLogEntries() == 0 then
 		-- turn the quest complete and continue
-		_questDB:turnQuestCompleted();
+		_questDBHandleDB:turnQuestCompleted();
 		self.currentType = 0;
 	end 
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
 		-- remove quest from DB so we can continue with script
-		if (_questDB:turnQuestCompleted()) then
+		if (_questDBHandleDB:turnQuestCompleted()) then
 			self.tickRate = .3;
 			-- reset variables
 			_quest.weCompletedQuest = false;
@@ -92,7 +94,7 @@ local localObj = GetLocalPlayer();
 			or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest and self.currentType ~= 99)) then
 				if IsMoving() then StopMoving(); return true; end
 			-- turn the quest complete in the DB
-			if (_questDB:turnOldQuestCompleted()) then
+			if (_questDBHandleDB:turnOldQuestCompleted()) then
 				self.tickRate = .2;
 				self.message = "Completing previous quests in list";
 				_quest:setTimer(150)
@@ -117,8 +119,7 @@ local curQuestGiver = nil; local curQuestName = nil; local distToGiver = 0; loca
 
 	if GetNumQuestLogEntries() > 0 and _questDB.curDesc ~= _quest.currentDesc then
 
-		-- turn quests as complete in DB
-		if _questDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
+		if _questDBHandleDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
 	
 if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then if script_gatherRun:gather() then _quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder..""; return true; end end
 
