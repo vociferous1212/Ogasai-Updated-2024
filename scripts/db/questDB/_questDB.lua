@@ -344,6 +344,8 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 
 				if self.questList[i]['questName'] == self.curListQuest then
 
+				if self.questList[i]['desc'] == self.curDesc then
+
 				if self.questList[i]['questName'] ~= title then
 
 				if _quest.currentDesc ~= _questDB.curDesc then
@@ -360,7 +362,7 @@ local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency
 					_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
 					_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
 			return true;
-			end end end end end end end
+			end end end end end end end end
 		end
 	end
 end

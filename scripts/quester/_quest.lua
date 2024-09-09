@@ -7,16 +7,9 @@ _quest = {
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 
 }
-
--- for some reason the .dll requires it to be named draw() without an error...
 function _quest:draw() end
-
--- draw the window
 function _quest:window() _questWindow:window(); end
-
 function _quest:setTimer(miliSeconds) self.waitTimer = GetTimeEX() + miliSeconds; end
-
---run setup
 function _quest:setup()
 	if not _questIncludeFiles.isSetup then _questIncludeFiles:setup() end
 	script_grind:setup(); script_talent:setup(); script_gather:setup(); script_grind.getSpells = true; 	script_vendor:setup(); vendorDB:setup(); vendorDB:loadDBVendors(); if (not _questDB.isSetup) then _questDB:setup(); end
@@ -36,7 +29,6 @@ local localObj = GetLocalPlayer();
 
 	-- display radar
 	if (script_radar.showRadar) then script_radar:draw() end
-
 	-- display exp checker
 	if (script_grind.useExpChecker) and (IsInCombat()) then script_expChecker:menu(); end
 	
@@ -44,12 +36,9 @@ local localObj = GetLocalPlayer();
 	if (script_grind.drawChests) then script_gather:drawChestNodes(); end
 	-- draw fishing pools
 	if (script_gatherEX.drawFishingPools) then script_gatherEX:drawFishNodes(); end
-
 	if _questEX:doStartChecks() then return; end
-	
 	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
 	--if not script_grind.pause then script_grind:run(); end
-
 	-- handle vendor stuff through vendor scripts
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
@@ -59,10 +48,10 @@ local localObj = GetLocalPlayer();
 	if (not self.isSetup) then _quest:setup(); end
 	if script_grind.pause then
 		if not script_grind.skipLooting and not _questEX.bagsFull then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end
-		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return; end
+		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return true; end
 		-- do quester script combat routine
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and not _quest.isQuestComplete then
-			if IsCasting() or IsChanneling() then return; end
+			if IsCasting() or IsChanneling() then return true; end
 			self.tickRate = 1.75;
 			_questEX:doChecks();
 			_questDoCombat:doCombat();

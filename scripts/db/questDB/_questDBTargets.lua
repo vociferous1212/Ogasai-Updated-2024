@@ -36,7 +36,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 
 	while i ~= 0 do
 		if t == 3 then
-			if not i:IsDead() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) and not script_grind:isTargetBlacklisted(i:GetGUID()) and script_aggro:safePullRecheck(i) then
+			if not i:IsDead() and i:CanAttack() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) and not script_grind:isTargetBlacklisted(i:GetGUID()) then
 
 				dist = i:GetDistance();
 				if bestDist > dist then
@@ -51,7 +51,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 	if not self.weHaveQuestTarget then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
-			if t == 3 and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
+			if t == 3 and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_aggro:safePullRecheck(i) then
 				if script_grind:enemyIsValid(i) and i:GetDistance() <= 200 then
 					dist = i:GetDistance();
 					if bestDist > dist then
@@ -87,7 +87,8 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 
 	if bestTarget == nil then _quest.message = "No quest targets in range!"; self.weHaveQuestTarget = false; if _quest.currentType == 2 and not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
 
-elseif bestTarget ~= nil then bestTarget:AutoAttack(); end return bestTarget; end
+--elseif bestTarget ~= nil then bestTarget:AutoAttack();
+end return bestTarget; end
 
 -- get a target attacking us returns a currentObj:GetGUID()
 function _questDBTargets:getTargetAttackingUs() 

@@ -114,6 +114,11 @@ local localObj = GetLocalPlayer();
 		if script_grind.lootObj == nil then
 			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
 		end
+		if script_grind.lootObj ~= nil then
+			if script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
+				script_grind.lootObj = nil;
+			end
+		end
 
 		if ((script_grind.lootObj ~= nil and not IsInCombat()) or (IsInCombat() and not script_grind:isAnyTargetTargetingMe()))
 		and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then

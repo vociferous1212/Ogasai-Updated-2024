@@ -10,6 +10,14 @@ function _questDB_Tirisfal_Brill:setup()
 --_questDB:addQuest("no", 1, "", "", x, y, z, 85, 1, 6, x, y, z, 
 
 
+_questDB:addQuest("no", 1, "At War With The Scarlet Crusade", "Executor Zygand", 2278.080078125, 295.58700561523, 35.146919250488, 85, 10, 14, 2146.4699707031, -528.41998291016, 81.697105407715, 1, 1, 5, 0, 0, 0, 2278.080078125, 295.58700561523, 35.146919250488, "Executor Zygand", "Captain Vachon", "Scarlet Friar", 0, 0, 0, 0, "Executor Zygand in Brill has commissioned you to slay Captain Vachon and 5 Scarlet Friars.", 0, 1);
+
+_questDB:addQuest("no", 1, "Wanted: Maggot Eye", 17, 2285.2604980469, 288.98291015625, 35.18314743042, 85, 10, 14, 2910.6999511719, 382.54699707031, 31.484004974365, 1, 1, 0, 0, 0, 0, 2278.080078125, 295.58700561523, 35.146938323975, "Executor Zygand", "Maggot Eye", 0, 0, 0, 0, 2, "Kill Maggot Eye and return to Executor Zygand in Brill with his paw for a reward.", 0, 1);
+
+_questDB:addQuest("no", 1, "Speak with Sevren", "", 2262.2600097656, 244.25700378418, 33.633808135986, 85, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2305.9099121094, 265.16400146484, 38.669960021973, "Magistrate Sevren", 0, 0, 0, 0, 0, 0, "Speak with Magistrate Sevren in Brill.", 0, 1);
+
+_questDB:addQuest("no", 1, "Deaths in the Family", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2810.7724609375, 909.91204833984, 117.80563354492, 1, 1, 1, 1, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Gregor Agamand", "Nissa Agamand", "Thurman Agamand", 0, 0, 0, "Bring Gregor's Remains, Nissa's Remains and Thurman's Remains to Coleman Farthing in Brill.", 0, 1);
+
 _questDB:addQuest("no", 1, "The Haunted Mills", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 1, 0, 0, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Devlin Agamand", 0, 0, 0, 0, 0, "Slay Devlin Agamand, and bring Devlin's Remains to Coleman Farthing in Brill.", 0, 1);
 
 _questDB:addQuest("no", 1, "The Mills Overrun", "Deathguard Dillinger", 2287.6599121094, 403.37200927734, 33.921539306641, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 5, 10, 0, 0, 0, 2287.6599121094, 403.37200927734, 33.921539306641, "Deathguard Dillinger", "Darkeye Bonecaster", "Rattlecage Soldier", 0, 0, 0, 2, "Gather 5 Notched Ribs and 3 Blackened Skulls, then return to Deathguard Dillinger in Brill.", 0, 1);

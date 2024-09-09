@@ -4,6 +4,7 @@ function _questEX:doStartChecks()
 	if not IsUsingNavmesh() then UseNavmesh(true); return true; end
 	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files..."; return true; end
 	if (GetLoadNavmeshProgress() ~= 1) then self.message = "Loading Nav Mesh! Please Wait!"; return true; end
+		if _quest.enemyTarget ~= nil then if not _quest.enemyTarget:CanAttack() then _quest.enemyTarget = nil; end end
 return false;
 end
 function _questEX:doChecks()

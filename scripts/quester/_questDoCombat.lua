@@ -15,7 +15,7 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 	if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) or IsInCombat() then
 
 		-- get a target if we have none
-		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 then
+		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 and GetTarget():CanAttack() then
 
 			_quest.enemyTarget = GetTarget();
 
@@ -25,7 +25,6 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 		if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
 			self.blacklistTimer = GetTimeEX() + 10000;
 		end
-
 		-- we are in combat or we have a target
 		if IsInCombat() and (_quest.enemyTarget ~= nil or _quest.enemyTarget == nil) then
 
@@ -109,7 +108,7 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 
 				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 
-				return;
+				return true;
 
 			else
 
@@ -139,6 +138,10 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 			end
 		end
 
+		if not _quest.enemyTarget:CanAttack() then
+			_quest.enemyTarget = nil;
+		end
+
 		-- do something
 		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
 
@@ -146,7 +149,7 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 
 				_quest.message = "Running Combat ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd)";
 
-				if IsInCombat() and not IsMoving() then
+				if IsInCombat() and not IsMoving() and _quest.enemyTarget:CanAttack() then
 
 					if _quest.enemyTarget:GetDistance() <= script_grind.combatScriptRange then
 
@@ -157,7 +160,10 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 				_quest.enemyTarget:FaceTarget();
 
 				end
-
+	if not _quest.enemyTarget:CanAttack() then
+			_quest.enemyTarget = nil;
+		end
+				
 				RunCombatScript(_quest.enemyTarget:GetGUID());
 
 				-- move to target
@@ -181,7 +187,7 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 	
 					end
 
-				return;
+				return true;
 				end
 			end
 		end
