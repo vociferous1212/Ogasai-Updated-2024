@@ -155,7 +155,7 @@ function _questDB:getQuestStartPos()
 
 				if self.questList[i]['faction'] == GetMyFaction() then
 
-					if _quest.currentQuest ~= nil and (GetMapID() == 1537 or GetMapID() == 1519 or GetMapID() == 1657 or GetMapID() == 1637 or GetMapID() == 1638 or GetMapID() == 1497) then
+					if _quest.currentQuest ~= nil and (GetMapID() == 1537 or GetMapID() == 1519 or GetMapID() == 1657 or GetMapID() == 1637 or GetMapID() == 1638 or GetMapID() == 1497 or GetMapID() ~= _quest.currentMapID) then
 						myMapID = _quest.currentMapID;
 					else
 						myMapID = GetMapID();

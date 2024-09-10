@@ -8,9 +8,12 @@ function _questDoOtherQuestTypes()
 
 	local distToGrind = GetDistance3D(px, py, pz, _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 
-	if _quest.currentType == 3 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
+	if _quest.currentType == 99 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then _questEdgeCaseQuest:run() return true; end
 
+	if _quest.currentType == 3 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
 		_quest.message = "Type quest == 3";
+
+		-- type 3 is use an item an xyz and quest is marked complete 
 
 		if not HasItem(_quest.usingItem) then _quest.message = "No quest item to use!"; end
 		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() and HasItem(_quest.usingItem) then
@@ -47,24 +50,18 @@ function _questDoOtherQuestTypes()
 		elseif distToGrind > 5 then
 		
 			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
-			
-				
 			if not IsMoving() then
-
 				Move(_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
-
 			end
-
 		return true;
 		end	
 	end
 
+	-- type 4 is use an item at specified location and the item is gone after use
 	if _quest.currentType == 4 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
-
 		_quest.message = "Type quest == 4";
 
 		-- use item position
-
 		local x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ;
 
 		if GetDistance3D(px, py, pz, x, y, z) < 10 and HasItem(_quest.usingItem) then
@@ -94,7 +91,8 @@ function _questDoOtherQuestTypes()
 
 	end
 
-if _quest.currentType == 5 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
+	-- type 5 is we use an item and go somewhere else to complete it
+	if _quest.currentType == 5 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
 
 		_quest.message = "Type quest == 5";
 
@@ -136,4 +134,3 @@ if _quest.currentType == 5 and not IsInCombat() and (_quest.curGrindX ~= 0) and 
 return false;
 end
 
--- type 6 is we get an item at grind spot, quest is not completed, and need to go to a different return target to complete

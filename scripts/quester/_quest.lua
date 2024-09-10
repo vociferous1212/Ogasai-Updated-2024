@@ -58,18 +58,7 @@ local localObj = GetLocalPlayer();
 			_questEX:doChecks();
 			_questDoCombat:doCombat();
 		return true; end end
-	-- run edge case quest with their own navigation and targeting arguments
-	if self.currentType == 99 and not self.isQuestComplete and GetNumQuestLogEntries() > 0 then
-		self.message = "Edge case quest... doing specific routine";
-		-- run the quest script
-		_questEdgeCaseQuest:run()
-		return true;
-	-- else if the quest is complete then turn it complete and continue
-	elseif self.currentType == 99 and self.isQuestComplete and GetNumQuestLogEntries() == 0 then
-		-- turn the quest complete and continue
-		_questDBHandleDB:turnQuestCompleted();
-		self.currentType = 0;
-	end 
+	
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
@@ -90,8 +79,8 @@ local localObj = GetLocalPlayer();
 		-- if we want to auto complete the quests
 		if self.autoComplete and
 			-- descriptions don't match then
-			((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc and self.currentType ~= 99)
-			or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest and self.currentType ~= 99)) then
+			((GetNumQuestLogEntries() ~= 0 and _questDB.curDesc ~= _quest.currentDesc)
+			or (GetNumQuestLogEntries() ~= 0 and _questDB.curListQuest ~= self.currentQuest)) then
 				if IsMoving() then StopMoving(); return true; end
 			-- turn the quest complete in the DB
 			if (_questDBHandleDB:turnOldQuestCompleted()) then
@@ -113,6 +102,7 @@ local localObj = GetLocalPlayer();
 	end
 	-- set our current quest
 	_questSetQuest:setOurCurrentQuest();
+
 	--get a quest giver to obtain a quest from
 local curQuestGiver = nil; local curQuestName = nil; local distToGiver = 0; local distToGrind = 0; local px, py, pz = GetLocalPlayer():GetPosition(); curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); self.curQuestX,  self.curQuestY, self.curQuestZ = _questDB:getQuestStartPos(); distToGiver = GetDistance3D(px, py, pz, self.curQuestX, self.curQuestY, self.curQuestZ); distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.curGrindZ);
 	if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos(); end
@@ -128,7 +118,7 @@ if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and n
 		self.grindSpotReached = true;
 	end
 	-- move back to grind spot when distance reached
-	if (distToGrind >= self.distToGrindFromHotspot) and self.grindSpotReached then
+	if (distToGrind >= self.distToGrindFromHotspot) and self.grindSpotReached or IsSwimming() then
 		self.grindSpotReached = false;
 	end
 if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToGiver = GetTarget():GetDistance(); end
@@ -146,7 +136,7 @@ if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToG
 	-- move to quest giver to get quest
 	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) then
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ); self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)"; if not IsMoving() then Move(self.curQuestX, self.curQuestY, self.curQuestZ); end return true; end
-	if (self.currentType == 3 or self.currentType == 4 or self.currentType == 5 or self.currentType == 7  or self.currentType == 8) and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
+	if self.currentType ~= 1 and self.currentType ~= 2 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
 		if _questDoOtherQuestTypes() then return true; end end	
 	-- gather quest object
 	if self.currentType == 2 and not IsInCombat() then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..", "..math.floor(_questDBGather.gatheringTarget:GetDistance()).." (yd)"; return true; end end

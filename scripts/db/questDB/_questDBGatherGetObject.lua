@@ -30,7 +30,7 @@ function _questDBGatherGetObject:getObject()
 
 			if t == 5 then
 
-				if (self.gatherTarget == i:GetObjectDisplayID() and _quest.gatheredNum < self.gatherNum) or (self.gatherTarget2 == i:GetObjectDisplayID() and _quest.gatheredNum2 < self.gatherNum2) and script_gather:isNodeSafeToGather(i) then
+				if not _questDBGather:isNodeBlacklisted(i:GetGUID()) and (self.gatherTarget == i:GetObjectDisplayID() and _quest.gatheredNum < self.gatherNum) or (self.gatherTarget2 == i:GetObjectDisplayID() and _quest.gatheredNum2 < self.gatherNum2) and script_gather:isNodeSafeToGather(i) then
 
 					if self.gatherTarget == i:GetObjectDisplayID() then
 

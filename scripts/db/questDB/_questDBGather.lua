@@ -6,12 +6,34 @@ _questDBGather = {	waitTimer = 0,
 			gatherNum2 = 0,
 			gatherTargetName = nil,
 			gatherTargetName2 = nil,
+			blacklistTable = {},
+			blacklistTableNum = 0,
 
 }
 
+
+-- add node to blacklist table by GUID
+function _questDBGather:addNodeToBlacklist(target) 
+	if (target ~= nil and target ~= 0) then
+		self.blacklistTable[self.blacklistTableNum] = target;
+		self.blacklistTableNum = self.blacklistTableNum + 1;
+	end
+end
+
+-- check if node is blacklisted by table GUID
+function _questDBGather:isNodeBlacklisted(target) 
+	for i=0, self.blacklistTableNum do
+		if (target == self.blacklistTable[i]) then
+			return true;
+		end
+	end
+return false;
+end
+
+
 function _questDBGather:gatherObject()
 
-	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil then
+	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil and not _questDBGather:isNodeBlacklisted(self.gatheringTarget:GetGUID())then
 
 		local dist = self.gatheringTarget:GetDistance();
 
@@ -46,10 +68,15 @@ function _questDBGather:run()
 		return true;
 
 	end
-	
+		
 	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil then
+		if _questDBGather:isNodeBlacklisted(self.gatheringTarget:GetGUID()) then
+			self.gatheringTarget = _questDBGatherGetObject:getObject();
+		end
 
-		if (not self.gatheringTarget:IsTapped() or self.gatheringTarget:IsTappedByMe()) and self.gatheringTarget:GetDistance() <= 4 then
+
+		if (not self.gatheringTarget:IsTapped() or self.gatheringTarget:IsTappedByMe()) and self.gatheringTarget:GetDistance() <= 4 then			
+
 			if (HasForm()) then
 
 				if (IsCatForm()) then
@@ -103,6 +130,10 @@ function _questDBGather:run()
 			if (not LootTarget()) and (self.gatheringTarget:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
 				_quest:setTimer(4550);
 
+				if self.gatheringTarget:GetObjectDisplayID() == 210 then
+					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID())
+				end
+
 			return true;
 
 			end
@@ -114,6 +145,8 @@ function _questDBGather:run()
 				if (LootTarget()) or (IsLooting()) then
 
 					_quest:setTimer(450);
+
+
 
 					return true;
 

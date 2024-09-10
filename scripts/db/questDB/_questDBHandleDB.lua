@@ -64,7 +64,7 @@ function _questDBHandleDB:turnOldQuestCompleted()
 
 								if _quest.currentDesc ~= _questDB.curDesc then
 
-									if _questDB.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 and _quest.currentType ~= 99 then
+									if _questDB.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 then
 
 										if questObjectives ~= _questDB.questList[i]['desc'] and GetObjectiveText(1) ~= _questDB.questList[i]['desc'] then
 

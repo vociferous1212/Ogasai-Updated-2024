@@ -3,6 +3,17 @@ _questEX2 = {}
 function _questEX2:doChecks()
 local localObj = GetLocalPlayer();
 
+	if localObj:HasDebuff("Ressurection Sickness") then
+		if IsMoving() then
+			StopMoving();
+			return true;
+		end
+		if IsStanding() then
+			SitOrStand();
+		end
+		_quest:setTimer(60000);
+	end
+
 	-- delete items 
 	if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then
 		script_deleteItems:checkDeleteItems();

@@ -29,7 +29,7 @@ function _questSetQuest:setOurCurrentQuest()
 
 							_quest.currentDesc = questObjectives;
 							_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-
+							_quest.currentMapID = _questDB.questList[i]['mapID'];
 
 							_quest.currentQuest = title;
 

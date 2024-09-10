@@ -18,6 +18,7 @@ function _questEdgeCaseQuest:isBlacklistedTarget(target)
 return false;
 end
 
+-- lazy peons... you lazy peon...
 function _questEdgeCaseQuest:run()
 
 	local title = nil; local isComplete = 0;
@@ -87,6 +88,103 @@ function _questEdgeCaseQuest:run()
 						self.targetReached = false;
 					end
 					script_navEX:moveToTarget(GetLocalPlayer(), -737.55145263672, -4168.05859375, 30.284696578979);
+				end
+
+			end
+	return true;
+	end
+
+		if isComplete ~= 1 and title == "Practical Prey" then
+
+			local i, t = GetFirstObject();
+			local target = nil;
+			local dist = nil;
+			local bestDist = 1000;
+				while i ~= 0 do
+					if t == 3 then
+						if not i:IsDead() and i:GetUnitName() == "Durotar Tiger" then
+							dist = i:GetDistance();
+							if bestDist > dist then
+								bestDist = dist;
+								target = i;
+							end
+						end
+					end
+				i, t = GetNextObject(i);
+				end
+			if target ~= nil then
+				local dist = target:GetDistance();
+				if dist > 3 then
+					local x, y, z = target:GetPosition();
+					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+					if GetTarget() == 0 or GetTarget() == nil then
+						target:AutoAttack();
+					elseif GetTarget() ~= 0 and GetTarget() ~= nil then
+						if GetTarget():GetGUID() ~= target:GetGUID() then
+							ClearTarget();
+						end
+					end
+				end
+			elseif target == nil then
+				local x, y, z = GetLocalPlayer():GetPosition();
+				if GetDistance3D(x, y, z, -1382.1340332031, -5183.8759765625, 2.2133538722992) <= 10 then	
+					self.targetReached = true;
+				elseif not self.targetReached then		
+					script_navEX:moveToTarget(GetLocalPlayer(), -1382.1340332031, -5183.8759765625, 2.2133538722992);
+				end
+				if self.targetReached then
+					if GetDistance3D(x, y, z, -1265.0356445313, -5327.2377929688, 2.622528553009) <= 10 then
+						self.targetReached = false;
+					end
+					script_navEX:moveToTarget(GetLocalPlayer(), -1126.0758056641, -5127.5122070313, 2.9460308551788);
+				end
+
+			end
+	return true;
+	end
+		if isComplete ~= 1 and title == "Thwarting Kolkar Aggression" then
+
+			local i, t = GetFirstObject();
+			local target = nil;
+			local dist = nil;
+			local bestDist = 1000;
+				while i ~= 0 do
+					if t == 5 then
+						if i:GetObjectDisplayID() == "210" then
+							dist = i:GetDistance();
+							if bestDist > dist then
+								bestDist = dist;
+								target = i;
+							end
+						end
+					end
+				i, t = GetNextObject(i);
+				end
+			if target ~= nil then
+				local dist = target:GetDistance();
+				if dist > 3 then
+					local x, y, z = target:GetPosition();
+					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+					if GetTarget() == 0 or GetTarget() == nil then
+						target:AutoAttack();
+					elseif GetTarget() ~= 0 and GetTarget() ~= nil then
+						if GetTarget():GetGUID() ~= target:GetGUID() then
+							ClearTarget();
+						end
+					end
+				end
+			elseif target == nil then
+				local x, y, z = GetLocalPlayer():GetPosition();
+				if GetDistance3D(x, y, z, -1382.1340332031, -5183.8759765625, 2.2133538722992) <= 10 then	
+					self.targetReached = true;
+				elseif not self.targetReached then		
+					script_navEX:moveToTarget(GetLocalPlayer(), -1382.1340332031, -5183.8759765625, 2.2133538722992);
+				end
+				if self.targetReached then
+					if GetDistance3D(x, y, z, -1265.0356445313, -5327.2377929688, 2.622528553009) <= 10 then
+						self.targetReached = false;
+					end
+					script_navEX:moveToTarget(GetLocalPlayer(), -1126.0758056641, -5127.5122070313, 2.9460308551788);
 				end
 
 			end
