@@ -1,4 +1,4 @@
-_questEX2 = {}
+_questEX2 = {checkBagTimer = 0}
 
 function _questEX2:doChecks()
 local localObj = GetLocalPlayer();
@@ -12,6 +12,12 @@ local localObj = GetLocalPlayer();
 			SitOrStand();
 		end
 		_quest:setTimer(60000);
+	end
+
+	-- check inventory for bag every 5 minutes...
+	if not IsInCombat() and not IsMoving() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
+		_questEquipItems:checkInventoryForBags();
+		self.checkBagTimer = GetTimeEX() + 300000;
 	end
 
 	-- delete items 

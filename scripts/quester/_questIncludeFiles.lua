@@ -33,7 +33,7 @@ _questIncludeFiles = {
 	questDoOtherQuestTypes2Loaded = include("scripts\\quester\\_questDoOtherQuestTypes2.lua"),
 
 	questRessAtGYLoaded = include("scripts\\quester\\_questRessAtGY.lua"),
-
+	questEquipItemsLoaded = include("scripts\\quester\\_questEquipItems.lua"),
 
 
 }

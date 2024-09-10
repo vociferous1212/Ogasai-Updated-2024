@@ -15,7 +15,7 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 	if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) or IsInCombat() then
 
 		-- get a target if we have none
-		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 and GetTarget():CanAttack() then
+		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 and GetTarget():CanAttack() and not GetTarget():IsDead() then
 
 			_quest.enemyTarget = GetTarget();
 

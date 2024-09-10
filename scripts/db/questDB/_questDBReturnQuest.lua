@@ -98,17 +98,21 @@ function _questDBReturnQuest:returnAQuest()
 					--end
 					
 						local rewardNum = 0;
+						local rewardNumRandom = 0;
 						for i=0, _questDB.numQuests -1 do
 							if _questDB.questList[i]['completed'] == "no" then
 								--GetNumQuestChoices();
 								if _quest.currentQuest == _questDB.questList[i]['questName'] then
 									rewardNum = _questDB.questList[i]['rewardNum'];
+									rewardNumRandom = _questDB.questList[i]['rewardNum'];
 								end
 							end
 						end
-
-
-					
+							
+						if rewardNum > 0 then
+							rewardNum = math.random(1, rewardNumRandom);
+						end
+						
 						if (not GetQuestReward(rewardNum)) then
 							SelectActiveQuest(1);
 							self.waitTimer = GetTimeEX() + 2000;
