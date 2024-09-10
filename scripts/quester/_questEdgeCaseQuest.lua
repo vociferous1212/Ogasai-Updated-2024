@@ -150,7 +150,7 @@ function _questEdgeCaseQuest:run()
 			local bestDist = 1000;
 				while i ~= 0 do
 					if t == 5 then
-						if i:GetObjectDisplayID() == "210" then
+						if i:GetObjectDisplayID() == "210" and not _questDBGather:isNodeBlacklisted(i:GetGUID()) then
 							dist = i:GetDistance();
 							if bestDist > dist then
 								bestDist = dist;

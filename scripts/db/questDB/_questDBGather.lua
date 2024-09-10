@@ -70,12 +70,13 @@ function _questDBGather:run()
 	end
 		
 	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil then
+
 		if _questDBGather:isNodeBlacklisted(self.gatheringTarget:GetGUID()) then
 			self.gatheringTarget = _questDBGatherGetObject:getObject();
 		end
 
 
-		if (not self.gatheringTarget:IsTapped() or self.gatheringTarget:IsTappedByMe()) and self.gatheringTarget:GetDistance() <= 4 then			
+		if (not self.gatheringTarget:IsTapped() or self.gatheringTarget:IsTappedByMe()) and self.gatheringTarget:GetDistance() <= 4 and not _questDBGather:isNodeBlacklisted(self.gatheringTarget:GetGUID()) then			
 
 			if (HasForm()) then
 
@@ -121,7 +122,13 @@ function _questDBGather:run()
 
 				end
 
+
+if self.gatheringTarget:GetObjectDisplayID() == 210 then
+					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID())
+				end
 				_quest:setTimer(1650);
+
+
 
 			return true;
 
@@ -129,10 +136,6 @@ function _questDBGather:run()
 
 			if (not LootTarget()) and (self.gatheringTarget:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
 				_quest:setTimer(4550);
-
-				if self.gatheringTarget:GetObjectDisplayID() == 210 then
-					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID())
-				end
 
 			return true;
 
