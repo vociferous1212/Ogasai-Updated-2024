@@ -12,6 +12,27 @@ script_grindEX = {
 	tryTavelFormTimer = 0,
 }
 
+function script_grindEX:howManyEnemiesTargetingMe()
+	local i, t = GetFirstObject();
+	local numTargetingMe = 0;
+	while i ~= 0 do
+		if t == 3 then
+			if i:GetDistance() <= 50 then
+				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
+						if i:GetHealthPercentage() > 15 and i:GetLevel() >= GetLocalPlayer():GetLevel() -3 then
+							numTargetingMe = numTargetingMe + 1;
+						end
+					end
+				end
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+
+return numTargetingMe;
+end
+
 function script_grindEX:isLootSafeToLoot()
 
 local numberOfEnemiesInRange = 0;

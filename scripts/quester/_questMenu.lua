@@ -93,37 +93,6 @@ function _questMenu:menu()
 local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
 local questDescription, desc = GetQuestLogQuestText(1);
 
-local giverName = "";
-local qx, qy, qz = 0, 0, 0;
-local reward = 0;
-if (Button("Get Info 1")) then
-	
-	giverName = GetTarget():GetUnitName();
-	qx, qy, qz = GetTarget():GetPosition();
-	reward = GetNumQuestLogRewards();
-end
-local gx, gy, gz = 0, 0, 0;
-local atarget = 0;
-SameLine();
-Text("Target quest giver and have quest in quest log");
-
-if (Button("Get Info 2")) then
-gx, gy, gz = GetLocalPlayer():GetPosition();
-if GetTarget() ~= nil and GetTarget() ~= 0 then
-	atarget = GetTarget():GetUnitName();
-end
-end
-SameLine();
-Text("Go to grind spot and target something to kill if applicable");
-
-if Button("Add To Log File") then
-ToFile('_questDB:addQuest("no, 1, "'..title..'", "'..giverName..'", '..qx..', '..qy..', '..qz..', '..GetMapID()..', MINLEVEL, MAXLEVEL, '..gx..', '..gy..', '..gz..', TYPE, NUMKILL, NUMKILL, NUMKILL, GATHERNUM, GATHERNUM, RETURNX, RETURNY, RETURNZ, RETURNTARGET, "'..atarget..'", KILLTARGET, KILLTARGET, GATHERID, GATHERID, '..reward..', "'..desc..'", 0, GOSSIPOPTION);');
-end
-SameLine();
-Text("Add data from these 2 buttons to log file");
-
-Text("");
-
 		-- quest auto complete button
 		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
 		Text("Until bot reaches current quest in quest log");
@@ -150,30 +119,22 @@ Text("");
 		if (Button("Mark Current DB Quest As Complete")) then
 			_questDBHandleDB:turnQuestCompleted();
 		end
-		Text("You cannot mark your current quest in quest log as complete...");
-		Text("");			
-	end
+		Text("You cannot mark a complete quest in quest log as complete...");
+		Text("");	
 
-	if (CollapsingHeader(">>> |+| Quest Kill Options")) then
-		Text("Options:");
-		Text("Prioritize other targets when kill num reached");
-		Text("Target Name - ".._questDBTargets.target.."");
-		_quest.targetKilledNum = SliderInt("Already Killed Num", 0, 20, _quest.targetKilledNum);
-		Text("Target Name2 - ".._questDBTargets.target2.."");
-		_quest.targetKilledNum2 = SliderInt("Already Killed Num2", 0, 20, _quest.targetKilledNum2);
-		Text("Target Name3 - ".._questDBTargets.target3.."");
-		_quest.targetKilledNum3 = SliderInt("Already Killed Num3", 0, 20, _quest.targetKilledNum3);
-	end
 
-	if (CollapsingHeader(">>> |+| Quest Gather Options")) then
-		Text("Options:");
-		Text("ID of item to gather for current quest - ".._questDBGather.gatherTarget);
-		_quest.gatheredNum = SliderInt("Already Gathered Num", 0, 10, _quest.gatheredNum);
-		Text("ID of item2 to gather for current quest - ".._questDBGather.gatherTarget);
-		_quest.gatheredNum2 = SliderInt("Already Gathered Num2", 0, 10, _quest.gatheredNum2);
+if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_quest.currentQuest - ".._quest.currentQuest); else Text("Current quester quest to run"); Text("_quest.currentQuest - NIL"); end if _quest.currentDesc ~= nil then Text("_quest.currentDesc - ".._quest.currentDesc); else Text("_quest.currentDesc - NIL"); end Text(""); Text("Current questDB quest being checked"); if _questDB.curListQuest ~= nil then Text("_questDB.curListQuest - ".._questDB.curListQuest); if _questDB.curDesc ~= nil then Text("_questDB.curDesc - ".._questDB.curDesc); else Text("_questDB.curDesc - NIL"); end end
+			Text("");
+		if _quest.isQuestComplete then
+		Text("_quest.isQuestComplete - true");
+		else
+		Text("_quest.isQuestComplete - false");
+		end		
 	end
 
 	if (CollapsingHeader(">>> |+| DB info")) then
+
+
 		_questDBSetup:menu();
 	end
 			

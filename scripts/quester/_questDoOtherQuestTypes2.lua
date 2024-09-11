@@ -93,7 +93,7 @@ function _questDoOtherQuestTypes2:run()
 	end	
 	
 	-- type 10 is use a wind ride master to city
-	if _quest.currentType == 10 and not IsInCombat() and (_quest.curGrindX ~= 0) and not quest.isQuestComplete and not IsLooting() then
+	if _quest.currentType == 10 and not IsInCombat() and (_quest.curGrindX ~= 0) then
 
 		if _quest.waitTimer > GetTimeEX() then return; end
 
@@ -127,17 +127,15 @@ function _questDoOtherQuestTypes2:run()
 					end
 				end
 				if script_goToFP:run() then
-				else
-					local name = GetLocalPlayer();
-					TargetByName(name);
-					if UnitOnTaxi("player") then
-						_quest.pause = true;
-					end
+					return true;
 				end
 			end
 
 		return true;
 		end
 
-return false;
-end
+	-- type 11 explore quest go to specific spot and that's it. 
+	if _quest.currentType == 8 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
+		if dist > 10 and not _quest.isQuestComplete then
+			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+		end end return false; end

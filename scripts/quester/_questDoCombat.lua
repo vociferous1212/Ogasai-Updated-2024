@@ -130,17 +130,17 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 
 		end
 
-		_questDoCombat:getLowestHealthTargetAttackingUs();
-
 		if GetPet() ~= 0 and GetPet() ~= nil and GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 and  GetTarget() ~= 0 and GetTarget() ~= nil then
 			if GetPet():GetUnitsTarget():GetGUID() ~= GetTarget():GetGUID() then
 				_quest.enemyTarget = GetPet():GetUnitsTarget();
 			end
 		end
 
-		if not _quest.enemyTarget:CanAttack() then
+		if _quest.enemyTarget ~= nil then if not _quest.enemyTarget:CanAttack() then
 			_quest.enemyTarget = nil;
-		end
+		end end
+
+		_questDoCombat:getLowestHealthTargetAttackingUs();
 
 		-- do something
 		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
@@ -160,9 +160,9 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 				_quest.enemyTarget:FaceTarget();
 
 				end
-	if not _quest.enemyTarget:CanAttack() then
-			_quest.enemyTarget = nil;
-		end
+				if not _quest.enemyTarget:CanAttack() or (_quest.enemyTarget:IsTapped() and not _quest.enemyTarget:IsTappedByMe() and not script_grind:isTargetingMe(_quest.enemyTarget:GetGUID())) then
+					_quest.enemyTarget = nil;
+				end
 				
 				RunCombatScript(_quest.enemyTarget:GetGUID());
 
@@ -213,13 +213,9 @@ function _questDoCombat:getLowestHealthTargetAttackingUs()
 
 			if ihp < hp then
 
-				if PlayerHasTarget() and GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID() then
+				_quest.enemyTarget = i;
 
-					_quest.enemyTarget = i;
-
-					bestTarget = i;
-
-				end
+				bestTarget = i;
 
 			end
 

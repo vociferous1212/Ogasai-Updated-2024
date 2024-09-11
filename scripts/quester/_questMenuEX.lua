@@ -110,12 +110,73 @@ function _questMenuEX:menu()
 					end
 				end
 
+				if CollapsingHeader(">>> |+| Silverpine Forest") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 130 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+						end
+					end
+				end
 
 
 
-			end
-			
+
+			end -- end eastern kingdoms
+
 			if CollapsingHeader("Kalimdor") then
+
+				if CollapsingHeader(">>> |+| Teldrassil") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 141 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+						end
+					end
+				end
+
 				if CollapsingHeader(">>> |+| Mulgore") then
 					local num = 0;
 					local minlevel = 0;
@@ -144,6 +205,66 @@ function _questMenuEX:menu()
 						end
 					end
 				end
+				if CollapsingHeader(">>> |+| Durotar") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 14 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
+				if CollapsingHeader(">>> |+| The Barrens") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 17 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
+
+
+
+
 
 			end
 		end

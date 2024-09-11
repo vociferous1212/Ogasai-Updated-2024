@@ -1,10 +1,32 @@
-_questEX = {bagsFull = false, jumpTimer = 3000, breathTimer = 0,}
+_questEX = {bagsFull = false, jumpTimer = 3000, breathTimer = 0, standingInFireTimer = 0}
 
 function _questEX:doStartChecks()
 	if not IsUsingNavmesh() then UseNavmesh(true); return true; end
 	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files..."; return true; end
 	if (GetLoadNavmeshProgress() ~= 1) then self.message = "Loading Nav Mesh! Please Wait!"; return true; end
 		if _quest.enemyTarget ~= nil then if not _quest.enemyTarget:CanAttack() then _quest.enemyTarget = nil; end end
+	if PlayerHasTarget() and _quest.currentType == 10 then
+		if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
+			if UnitOnTaxi("player") then
+				_quest.pause = true;
+			end
+		end
+	end
+	if _quest.currentType == 10 and _quest.pause then
+		if PlayerHasTarget() then
+			if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
+				if not UnitOnTaxi("Player") then
+					_quest.pause = false;
+				end
+			end
+		end
+	end
+
+	if GetTimeEX() > self.standingInFireTimer then
+	script_helper:areWeStandingInFire()
+	self.standingInFireTimer = GetTimeEX() + 5000;
+	end
+
 return false;
 end
 function _questEX:doChecks()
@@ -55,7 +77,7 @@ function _questEX:doChecks()
 		local _lx, _ly, _lz = localObj:GetPosition();
 		local _rtx, _rty, _rtz = _questDB:getReturnTargetPos();
 
-		if _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorsePosition()) > 100 then
+		if GetCorpsePosition() ~= nil and _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorsePosition()) > 100 then
 		
 			_questRessAtGY:ressurect();
 			return true;

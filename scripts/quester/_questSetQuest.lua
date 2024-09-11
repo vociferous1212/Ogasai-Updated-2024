@@ -9,7 +9,7 @@ function _questSetQuest:setOurCurrentQuest()
 		for i=0, GetNumQuestLogEntries()  do
 
 			-- get the objectives for the quest to match in DB
-			local questDescription, questObjectives = GetQuestLogQuestText();
+			local questDescription, questObjectives = GetQuestLogQuestText(1);
 
 			-- if the quest is not completed
 			if _questDB.questList[y]['completed'] == "no" then
@@ -30,6 +30,8 @@ function _questSetQuest:setOurCurrentQuest()
 							_quest.currentDesc = questObjectives;
 							_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 							_quest.currentMapID = _questDB.questList[i]['mapID'];
+							_quest.currentType = _questDB.questList[i]['type'];
+							_quest.usingItem = _questDB.questList[i]['useItem'];
 
 							_quest.currentQuest = title;
 

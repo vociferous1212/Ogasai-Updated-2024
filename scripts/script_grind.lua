@@ -286,7 +286,7 @@ function GetObjectsAroundMe()
 				if t ~= 3 and t ~= 4 then
 					if (i:GetDistance() <= 300) then
 						for ooo = 0, 1 -1 do
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetObjectDisplayID().." ID");
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetObjectDisplayID().." ID | "..i:GetGUID());
 						end
 					end
 				end
