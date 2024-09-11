@@ -352,7 +352,7 @@ if (IsCasting()) or (IsChanneling()) then
 	-- Check: Lightning Shield
 	if (IsStanding()) and (HasSpell("Lightning Shield")) and (localMana >= 35)
 	and (not localObj:HasBuff("Lightning Shield")) and (IsStanding()) then
-		if (not Cast("Lightning Shield", localObj)) then
+		if (not CastSpellByName("Lightning Shield")) then
 			self.waitTimer = GetTimeEX() + 1500;
 			return true;
 		end

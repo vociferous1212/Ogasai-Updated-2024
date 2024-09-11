@@ -17,14 +17,6 @@ function _questDBSetup:menu()
 
 local a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, aa, bb, cc, dd, ee, ff, gg = "", 0, "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", 0, 0, 0, "", "", 0;
 
-if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_quest.currentQuest - ".._quest.currentQuest); else Text("Current quester quest to run"); Text("_quest.currentQuest - NIL"); end if _quest.currentDesc ~= nil then Text("_quest.currentDesc - ".._quest.currentDesc); else Text("_quest.currentDesc - NIL"); end Text(""); Text("Current questDB quest being checked"); if _questDB.curListQuest ~= nil then Text("_questDB.curListQuest - ".._questDB.curListQuest); if _questDB.curDesc ~= nil then Text("_questDB.curDesc - ".._questDB.curDesc); else Text("_questDB.curDesc - NIL"); end end
-			Text("");
-		if _quest.isQuestComplete then
-		Text("_quest.isQuestComplete - true");
-		else
-		Text("_quest.isQuestComplete - false");
-		end
-
 	if _questDB.curListQuest ~= nil and _questDB.numQuests ~= 0 and _questDB.numQuests ~= nil then
 	for i=0, _questDB.numQuests -1 do
 		if _questDB.questList[i]['questName'] == _questDB.curListQuest then

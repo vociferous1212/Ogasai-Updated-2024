@@ -13,6 +13,15 @@ function _questDBTargets:isTargetAddedToKilledTable(target)
 	end end end
 return false;
 end
+function _questDBTargets:isItTapped()
+	local i, t = GetFirstObject()
+	while i ~= 0 do
+	if t == 3 then
+	if i:GetDistance() <= 50 then
+	if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
+	if i:GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID() then
+	return true;
+	end end end end i, t = GetNextObject(i); end return false; end
 function _questDBTargets:getTarget()
 local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; local i, t = GetFirstObject(); local dist = 0; local bestDist = 1000; local bestTarget = nil;
 	if _questDB.curListQuest ~= nil then 
@@ -36,7 +45,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 
 	while i ~= 0 do
 		if t == 3 then
-			if not i:IsDead() and i:CanAttack() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) and not script_grind:isTargetBlacklisted(i:GetGUID()) then
+			if not _questDBTargets:isItTapped() and not i:IsDead() and i:CanAttack() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) and not script_grind:isTargetBlacklisted(i:GetGUID()) then
 
 				dist = i:GetDistance();
 				if bestDist > dist then
@@ -51,7 +60,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 	if not self.weHaveQuestTarget then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
-			if t == 3 and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_aggro:safePullRecheck(i) then
+			if t == 3 and not _questDBTargets:isItTapped() and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_aggro:safePullRecheck(i) then
 				if script_grind:enemyIsValid(i) and i:GetDistance() <= 200 then
 					dist = i:GetDistance();
 					if bestDist > dist then
@@ -68,7 +77,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 		while i ~= 0 do
 			-- acceptable targets
 			if t == 3 then
-			if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= 30 then
+			if not _questDBTargets:isItTapped() and not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= 30 then
 	
 				local px, py, pz = GetLocalPlayer();
 				local x, y, z = i:GetPosition();
@@ -129,4 +138,21 @@ function _questDBTargets:getTargetAttackingUs()
 
 -- return nil if no target
 return nil;
+end
+
+function _questDBTargets:killStuffAroundUs()
+	if not _quest.isQuestComplete and not IsInCombat() and _quest.enemyTarget == nil then
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 and i:GetDistance() <= 50 then
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= aggro then
+					if (script_grind:enemyIsValid(i) or script_grind:isTargetingMe(i)) then
+						_quest.enemyTarget = i;
+					end
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
 end
