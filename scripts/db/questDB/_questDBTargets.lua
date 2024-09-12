@@ -1,4 +1,4 @@
-_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false, target = 0, target1 = 0, target2 = 0, target3 = 0;}
+_questDBTargets = {targetKilledTable = {}, targetKilledTableNum = 0, weHaveQuestTarget = false, target = 0, target2 = 0, target3 = 0;}
 function _questDBTargets:addTargetToKilledTable(target)
 	if target ~= nil and target ~= 0 and target ~= "" then
 	self.targetKilledTable[self.targetKilledTableNum] = target;

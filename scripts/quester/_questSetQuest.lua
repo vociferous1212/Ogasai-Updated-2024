@@ -27,14 +27,19 @@ function _questSetQuest:setOurCurrentQuest()
 						if title == _questDB.questList[y]['questName'] then
 
 
+							-- set our variables for bot to run quester on ( it may already do this )
+
 							_quest.currentDesc = questObjectives;
+
 							_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+
 							_quest.currentMapID = _questDB.questList[i]['mapID'];
+
 							_quest.currentType = _questDB.questList[i]['type'];
+
 							_quest.usingItem = _questDB.questList[i]['useItem'];
 
 							_quest.currentQuest = title;
-
 
 							_quest.weHaveQuest = true;
 

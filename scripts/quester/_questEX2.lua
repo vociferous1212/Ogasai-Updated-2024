@@ -14,10 +14,10 @@ local localObj = GetLocalPlayer();
 		_quest:setTimer(60000);
 	end
 
-	-- check inventory for bag every 5 minutes... if we have none in slot 4 already
+	-- check inventory for bag every 3 minutes... if we have none in slot 4 already
 	if not IsInCombat() and not IsMoving() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
 		_questEquipItems:checkInventoryForBags();
-		self.checkBagTimer = GetTimeEX() + 300000;
+		self.checkBagTimer = GetTimeEX() + 180000;
 	end
 
 	-- delete items 

@@ -25,6 +25,7 @@ script_paladin = {
 }
 
 function script_paladin:setup()
+	local localObj = GetLocalPlayer();
 	if (not HasSpell("Retribution Aura")) and (not HasSpell("Sanctity Aura")) and (not localObj:HasBuff("Stoneskin")) then
 		self.aura = "Devotion Aura";	
 	elseif (not HasSpell("Sanctity Aura")) and (HasSpell("Retribution Aura")) then
@@ -592,8 +593,6 @@ function script_paladin:rest()
 		self.message = "Resting to full hp/mana...";
 		return true;
 	end
-
--- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 		local tickRandom = random(450, 800);
 		if (IsMoving()) or (not IsInCombat()) then
@@ -607,7 +606,6 @@ function script_paladin:rest()
 	-- Don't need to rest
 	return false;
 end
-
 function script_paladin:window()
 	if (self.isChecked) then
 		EndWindow();

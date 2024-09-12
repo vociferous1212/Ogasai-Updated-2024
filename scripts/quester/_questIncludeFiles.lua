@@ -31,6 +31,7 @@ _questIncludeFiles = {
 
 	questGetTargetAttackingUsLoaded = include("scripts\\quester\\_questGetTargetAttackingUs.lua"), 
 	questDoOtherQuestTypes2Loaded = include("scripts\\quester\\_questDoOtherQuestTypes2.lua"),
+	questDoOtherQuestTypes2Loaded = include("scripts\\quester\\_questDoOtherQuestTypes3.lua"),
 
 	questRessAtGYLoaded = include("scripts\\quester\\_questRessAtGY.lua"),
 	questEquipItemsLoaded = include("scripts\\quester\\_questEquipItems.lua"),

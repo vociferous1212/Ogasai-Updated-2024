@@ -134,8 +134,8 @@ function _questDoOtherQuestTypes2:run()
 		return true;
 		end
 
-	-- type 11 explore quest go to specific spot and that's it. 
-	if _quest.currentType == 8 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
-		if dist > 10 and not _quest.isQuestComplete then
-			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
-		end end return false; end
+	if (_questDoOtherQuestTypes3:run()) then
+		return true;
+	end
+
+return false; end

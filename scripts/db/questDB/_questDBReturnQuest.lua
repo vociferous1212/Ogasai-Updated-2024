@@ -72,13 +72,14 @@ function _questDBReturnQuest:returnAQuest()
 			_quest.message = "Completing Quest";
 
 			local name = _questDB:getReturnTargetName();
-			if (GetTarget() == nil or GetTarget() == 0) or (GetTarget() ~= 0 and GetTarget() ~= nil and GetTarget():GetUnitName() ~= name) then
+			local id = _questDBReturnQuest:getReturnTargetID();
+			if id == nil and (GetTarget() == nil or GetTarget() == 0) or (GetTarget() ~= 0 and GetTarget() ~= nil and GetTarget():GetUnitName() ~= name) then
 				TargetByName(name);
 				name = GetTarget();
 			end
-			if (GetTarget() ~= 0 and GetTarget() ~= nil) and not IsMoving() then
+			if ((GetTarget() ~= 0 and GetTarget() ~= nil) or id ~= nil) and not IsMoving() then
 					_quest.waitTimer = GetTimeEX() + 2000;
-				if not IsMoving() and (GetTarget():UnitInteract()) then
+				if not IsMoving() and ((id ~= nil and id:GameObjectInteract()) or (GetTarget():UnitInteract())) then
 
 					_quest.weCompletedQuest = true;
 					
@@ -157,7 +158,7 @@ function _questDBReturnQuest:getReturnTargetID()
 				if _questDB.questList[i]['questName'] == _questDB.curListQuest then
 				
 					if _questDB.questList[i]['desc'] == _questDB.curDesc then
-						id = _questDB.questList[i]['giverName'];
+						id = _questDB.questList[i]['returnTarget'];
 					end
 				end
 			end
@@ -166,10 +167,8 @@ function _questDBReturnQuest:getReturnTargetID()
 
 	local i, t = GetFirstObject();
 	while i ~= 0 do
-		if t == 5 then
-			if id == i:GetObjectDisplayID() then
-				return id;
-			end
+		if id == i:GetObjectDisplayID() then
+			return i;
 		end
 	i, t = GetNextObject(i);
 	end

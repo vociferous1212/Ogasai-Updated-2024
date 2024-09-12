@@ -9,20 +9,17 @@ local questDescription, questObjectives = GetQuestLogQuestText(1);
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc, useItem, gossipOption)
 
 --_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
+
+_questDB:addQuest("no", 1, "Samophlange", "Sputtervalve", -902.03601074219, -3759.3999023438, 11.467498779297, 17, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 826.44879150391, -2688.2624511719, 91.794792175293, 356, 0, 0, 0, 0, 0, 0, "Access the control console at the Venture Company research site.", 0, 1);
 
 
+_questDB:addQuest("no", 1, "The Stagnant Oasis", "Tonga Runetotem", -544.99200439453, -2672.7700195313, 95.787666320801, 17, 10, 20, -1274.1221923828, -3010.5280761719, 71.332313537598, 2, 0, 0, 0, 1, 0, -544.99200439453, -2672.7700195313, 95.787666320801, "Tonga Runetotem", 0, 0, 0, 344, 0, 0, "Return to Tonga at The Crossroads, after investigating the Stagnant Oasis.", 0, 1);
 
---_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
+_questDB:addQuest("no", 1, "Echeyakee", "Sergra Darkthorn", -482.47500610352, -2670.1899414063, 97.349342346191, 17, 10, 20, 451.17373657227, -3028.6164550781, 91.66682434082, 12, 1, 0, 0, 0, 0, -482.47500610352, -2670.1899414063, 97.349342346191, "Sergra Darkthorn", "Echeyakee", 0, 0, 0, 0, 0, "Bring Echeyakee's Hide to Sergra Darkthorn at the Crossroads.", "Horn of Echeyakee", 1);
+
+_questDB:addQuest("no", 1, "Fungal Spores", "Apothecary Helbrim", -424.5419921875, -2589.8798828125, 95.816268920898, 17, 10, 20, 14.257271766663, -1954.8227539063, 89.170928955078, 2, 0, 0, 0, 4, 0, -424.5419921875, -2589.8798828125, 95.816268920898, "Apothecary Helbrim", 0, 0, 0, 359, 0, 0, "Bring 4 Fungal Spores to Apothecary Helbrim at the Crossroads.", 0, 1);
+
+_questDB:addQuest("no", 1, "Centaur Bracers", "Regthar Deathgate", -307.13598632813, -1971.9499511719, 96.396713256836, 17, 10, 20, -19.236053466797, -1945.3198242188, 92.257858276367, 1, 10, 10, 0, 0, 0, -307.13598632813, -1971.9499511719, 96.396713256836, "Regthar Deathgate", "Kolkar Wrangler", "Kolkar Stormer", 0, 0, 0, 3, "Bring 15 Centaur Bracers to Regthar Deathgate, west of the Crossroads.", 0, 2);
 
 _questDB:addQuest("no", 1, "Prowlers of the Barrens", "Sergra Darkthorn", -482.47500610352, -2670.1899414063, 97.349342346191, 17, 13, 20, -1142.6600341797, -3314.1499023438, 91.804168701172, 1, 10, 0, 0, 0, 0, -482.47500610352, -2670.1899414063, 97.349342346191, "Sergra Darkthorn", "Savannah Prowler", 0, 0, 0, 0, 0, "Collect 7 Prowler Claws from Savannah Prowlers for Sergra Darkthorn in the Crossroads.", 0, 1);
 
