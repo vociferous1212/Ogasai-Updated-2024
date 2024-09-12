@@ -77,11 +77,12 @@ function _questEX:doChecks()
 		local _lx, _ly, _lz = localObj:GetPosition();
 		local _rtx, _rty, _rtz = _questDB:getReturnTargetPos();
 
-		if GetCorpsePosition() ~= nil and _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorsePosition()) > 100 then
+		if GetCorpsePosition() ~= nil then
+			if _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorsePosition()) > 100 then
 		
-			_questRessAtGY:ressurect();
-			return true;
-		else
+				_questRessAtGY:ressurect();
+				return true;
+			else
 
 		
 		-- Ressurrect within the ress distance to our corpse
@@ -100,7 +101,7 @@ function _questEX:doChecks()
 							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
 							script_grind.message = "Finding a safe spot to ress...";
 							return true;
-						end end end RetrieveCorpse(); script_grindEX.useThisVar = true; end return true; end end
+						end end end RetrieveCorpse(); script_grindEX.useThisVar = true; end return true; end end end
 	if _questEX2:doChecks() then
 		return true;
 	end

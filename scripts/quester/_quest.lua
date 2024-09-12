@@ -39,7 +39,7 @@ local localObj = GetLocalPlayer();
 	if script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2 then
 		local x, y z = 0, 0, 0;
 		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; return true; end end return true; end
-	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then GetTarget():FaceTarget(); end _quest:setTimer(1000); return; end
+	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then GetTarget():FaceTarget(); end _quest:setTimer(500); return; end
 	if (not self.isSetup) then _quest:setup(); end
 	if script_grind.pause then
 		if not script_grind.skipLooting and not _questEX.bagsFull and not IsLooting() then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end

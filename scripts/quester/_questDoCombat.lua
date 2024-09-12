@@ -152,9 +152,9 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 				if IsInCombat() and not IsMoving() and _quest.enemyTarget:CanAttack() then
 
 					if _quest.enemyTarget:GetDistance() <= script_grind.combatScriptRange then
-
-						_quest.enemyTarget:AutoAttack();
-
+						if _quest.enemyTarget ~= nil then
+							_quest.enemyTarget:AutoAttack();
+						end
 					end
 
 				_quest.enemyTarget:FaceTarget();
@@ -163,7 +163,11 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 				if not _quest.enemyTarget:CanAttack() or (_quest.enemyTarget:IsTapped() and not _quest.enemyTarget:IsTappedByMe() and not script_grind:isTargetingMe(_quest.enemyTarget:GetGUID())) then
 					_quest.enemyTarget = nil;
 				end
-				
+				if self.enemyTarget ~= nil then
+					if not self.enemyTarget:IsTappedByMe() then
+						self.enemyTarget = nil;
+					end
+				end
 				RunCombatScript(_quest.enemyTarget:GetGUID());
 
 				-- move to target

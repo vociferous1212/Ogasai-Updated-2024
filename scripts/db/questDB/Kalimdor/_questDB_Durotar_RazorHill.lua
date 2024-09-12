@@ -29,16 +29,5 @@ _questDB:addQuest("no", 1, "A Peon's Burden", "Ukor", -599.44897460938, -4715.31
 
 _questDB:addQuest("no", 1, "Report to Orgnil", "Master Gadrin", -825.63598632813, -4920.759765625, 19.358600616455, 14, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 287.26501464844, -4724.8798828125, 13.131739616394, "Orgnil Soulscar", 0, 0, 0, 0, 0, 0, "Speak with Orgnil Soulscar in Razor Hill.", 0, 2);
 
-if GetMyClass() == "SHAMAN" then
-	if questObjectives == "Find Kranal Fiss in the Barrens." then
-
-		--call of fire
-		_questDB:addQuest("no", 1, "Call of Fire", "Kranal Fiss", 260.59149169922, -3042.9353027344, 96.310523986816, 14, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, -265.56140136719, -4000.3620605469, 169.64166259766, "Telf Joolam", 0, 0, 0, 0, 0, 0, "Bring the Torch of the Dormant Flame to Telf Joolam in Durotar.", 0, 0);
-	end
-end
-
-
-
-
 self.isSetup = true;
 end
