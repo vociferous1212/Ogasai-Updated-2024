@@ -28,6 +28,9 @@ end
 if GetMyClass() == "WARRIOR" then
 _questDB:addQuest("no", 0, "Simple Letter", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939300537109, 12, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8918.3603515625, -208.4109954834, 82.125419616699, "Llane Beshere", 0, 0, 0, 0, 0, 0, "Read the Simple Letter and speak to Llane Beshere in Northshire Abbey.", 0, 2);
 end
+if GetMyClass() == "PALADIN" then
+_questDB:addQuest("no", 0, "Consecrated Letter", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939643859863, 12, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8914.5703125, -215.01600646973, 82.116500854492, "Brother Sammuel", 0, 0, 0, 0, 0, 0, "Read the Consecrated Letter and speak to Brother Sammuel in Northshire Abbey.", 0, 2);
+end
 
 --level 1 human quest # 4
 _questDB:addQuest("no", 0, "Kobold Camp Cleanup", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939300537109, 12, 1, 6, -8765.392578125, -189.02615356445, 84.626686096191, 1, 20, 0, 0, 0, 0, -8902.58984375, -162.60600280762, 81.939300537109, "Marshal McBride", "Kobold Vermin", 0, 0, 0, 0, 0, "Kill 10 Kobold Vermin, then return to Marshal McBride.", 0, 1);

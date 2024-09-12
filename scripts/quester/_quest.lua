@@ -36,25 +36,18 @@ local localObj = GetLocalPlayer();
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
-	if script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2 then
-		local x, y z = 0, 0, 0;
+	if script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2 then local x, y z = 0, 0, 0;
 		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then CastSpellByName("Earthbind Totem"); end return true; end end return true; end
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then GetTarget():FaceTarget(); end _quest:setTimer(500); return; end
 	if (not self.isSetup) then _quest:setup(); end
 	if script_grind.pause then
 		if not script_grind.skipLooting and not _questEX.bagsFull and not IsLooting() then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end
 		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return true; end
-		-- do quester script combat routine
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and not _quest.isQuestComplete then
 			if IsCasting() or IsChanneling() then return true; end
-			self.tickRate = 1.5;
-			_questEX:doChecks();
-			_questDoCombat:doCombat();
-		return true; end end
-	
-	-- kill targets around us
+			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
+			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end	
 	_questDBTargets:killStuffAroundUs();
-
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
@@ -88,7 +81,7 @@ local localObj = GetLocalPlayer();
 		end
 	end
 
-	_questCheckQuestCompletion:checkQuestForCompletion(); self.tickRate = 1;
+	_questCheckQuestCompletion:checkQuestForCompletion(); self.tickRate = .3;
 
 	-- return a completed quest to quest return target
 	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() then
