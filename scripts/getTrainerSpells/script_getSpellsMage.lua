@@ -77,7 +77,7 @@ function script_getSpellsMage:getTrainerTargetMage()
 				script_getSpells.trainerTarget = "Cain Firesong";
 			end
 			-- Undercity trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = 1813.7399902344, 56.413799285889, -47.387073516846;
 				script_getSpells.trainerTarget = "Anastasia Hartwell";
 			end
@@ -99,7 +99,7 @@ function script_getSpellsMage:checkForSpellsNeededMage()
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 7) and (myMoney >= 300) and (not HasSpell("Conjure Food")) then
+		elseif (myLevel >= 6) and (myMoney >= 300) and (not HasSpell("Conjure Food")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

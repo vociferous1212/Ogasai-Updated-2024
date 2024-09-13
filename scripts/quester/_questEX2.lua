@@ -121,10 +121,10 @@ local localObj = GetLocalPlayer();
 			script_grind.lootObj = nil;
 		end
 		
-		if (not script_grind.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
-			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
-			script_grind.timerSet = true;
-		end
+		--if (not script_grind.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
+		--	script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
+		--	script_grind.timerSet = true;
+		--end
 
 	-- loot objects
 	if (not IsInCombat()) and not script_grind.skipLooting then
@@ -136,9 +136,7 @@ local localObj = GetLocalPlayer();
 		if ((script_grind.lootObj ~= nil and not IsInCombat()) or (IsInCombat() and not script_grind:isAnyTargetTargetingMe()))
 		and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
 if script_grind.lootObj ~= nil then
-			if script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
-				script_grind.lootObj = nil;
-			end
+			
 		end
 
 			_quest.message = "Looting "..script_grind.lootObj:GetUnitName()..", "..math.floor(script_grind.lootObj:GetDistance()).." (yd)";

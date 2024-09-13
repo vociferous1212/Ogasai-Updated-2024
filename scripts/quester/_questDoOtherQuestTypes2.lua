@@ -93,17 +93,25 @@ function _questDoOtherQuestTypes2:run()
 		if _quest.waitTimer > GetTimeEX() then return; end
 
 		_quest.message = "Type quest == 10";
-
+			local x, y, z = 0, 0, 0;
 			local px, py, pz = GetLocalPlayer():GetPosition();
-			local x, y, z = -437.1369934082, -2596, 95.787612915039;
-
+			if _quest.currentQuest == "A Bundle of Hides" then
+				x, y, z = -437.1369934082, -2596, 95.787612915039;
+			elseif _quest.currentQuest == "Continue to Stormwind" then
+				x, y, z = -10628.299804688, 1037.2700195313, 34.110454559326;
+			end
 			if GetDistance3D(px, py, pz, x, y, z) > 4 then
 
 				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 
 			elseif GetDistance3D(px, py, pz, x, y, z) <= 4 then
+				local name = "";
 				_quest:setTimer(1500);
-				local name = "Devrak";
+				if _quest.currentQuest == "A Bundle of Hides" then
+					name = "Devrak";
+				elseif _quest.currentQuest == "Continue to Stormwind" then
+					name = "Thor";
+				end
 				if GetTarget() ~= nil and GetTarget() ~= 0 then
 					if GetTarget():GetUnitName() ~= name then
 						TargetByName(name);

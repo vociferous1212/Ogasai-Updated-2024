@@ -1,14 +1,15 @@
 _questDoCombat = {waitTimer = 0, blacklistTimer = 0, targetingTimer = 0}
 
 function _questDoCombat:doCombat()
-
+	if IsInCombat() and IsLooting() then LootTarget() end
 	-- don't do anything if we are busy
 	if IsChanneling() or IsCasting() then
 	
 	return;
 	end
-
-if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetLocalPlayer():GetHealthPercentage() < 5 and IsInCombat()) then if script_navEX:moveToTarget(GetLocalPlayer(), _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ) then _quest.message = "Running out of combat"; return true; end return true; end
+if _quest.currentQuest ~= "Princess Must Die!" then
+if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and localObj:GetHealthPercentage() <= 50 then local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
+		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then CastSpellByName("Earthbind Totem"); end return true; end end return true; end end
 
 
 	-- run combat on good targets
@@ -168,6 +169,8 @@ if not _quest.isQuestComplete and script_grind:enemiesAttackingUs() > 2 or (GetL
 						self.enemyTarget = nil;
 					end
 				end
+				-- grab some stuff from grinder like check adds conditions that are set to grinder only. we can run the same target
+				script_grind.enemyObj = _quest.enemyTarget;
 				RunCombatScript(_quest.enemyTarget:GetGUID());
 
 				-- move to target

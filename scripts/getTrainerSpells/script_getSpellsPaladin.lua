@@ -25,7 +25,7 @@ function script_getSpellsPaladin:getTrainerTargetPaladin()
 				script_getSpells.trainerTarget = "Azar Stronghammer";
 			end
 			-- ironforge trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = -4601.6499023438, -896.46801757813, 502.76681518555;
 				script_getSpells.trainerTarget = "Brandur Ironhammer";
 			end
@@ -41,7 +41,7 @@ function script_getSpellsPaladin:getTrainerTargetPaladin()
 				script_getSpells.trainerTarget = "Brother Wilhelm";
 			end
 			-- stormwind trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = -8577.5, 881.46600341797, 106.51903533936;
 				script_getSpells.trainerTarget = "Lord Grayson Shadowbreaker";
 			end
@@ -65,7 +65,7 @@ local localObj = GetLocalPlayer();
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 7) and (myMoney >= 300) and (not HasSpell("Seal of the Crusader")) then
+		elseif (myLevel >= 6) and (myMoney >= 300) and (not HasSpell("Seal of the Crusader")) then
 			if (script_getSpells:run()) then
 				return true;
 			end

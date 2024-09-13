@@ -26,12 +26,12 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 				vX, vY, vZ = -6093.75, 404.91799926758, 395.53692626953;
 				script_getSpells.trainerTarget = "Solm Hargrin";
 			end
-			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -5604.4399414063, -540.32299804688, 399.09655761719;
 				script_getSpells.trainerTarget = "Hogral Bakkan";
 			end
 			-- ironforge trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = -4648.419921875, -1131.7199707031, 508.55133056641;
 				script_getSpells.trainerTarget = "Ormyr Flinteye";
 			end
@@ -42,12 +42,12 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 				vX, vY, vZ = -8863.4697265625, -210.9049987793, 80.572006225586;
 				script_getSpells.trainerTarget = "Jorik Kerridan";
 			end
-			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -9465.7900390625, 12.645400047302, 63.821369171143;
 				script_getSpells.trainerTarget = "Keryn Sylvius";
 			end
 			-- stormwind trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = -8752.2998046875, 377.5719909668, 101.05635070801;
 				script_getSpells.trainerTarget = "Osborne the Night Man";
 			end
@@ -58,12 +58,12 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 				vX, vY, vZ = 10519.099609375, 778.01397705078, 1329.5992431641;
 				script_getSpells.trainerTarget = "Frahun Shadewhisper";
 			end
-			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 9790.3095703125, 943.86999511719, 1308.7780761719;
 				script_getSpells.trainerTarget = "Jannok Breezesong";
 			end
 			-- Darnassus trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = 10083.700195313, 2546.8701171875, 1295.0402832031;
 				script_getSpells.trainerTarget = "Syurna";
 			end
@@ -74,12 +74,12 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 				vX, vY, vZ = -588.70300292969, -4144.9399414063, 41.02010345459;
 				script_getSpells.trainerTarget = "Rwag";
 			end
-			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 268.13000488281, -4710.9399414063, 17.488662719727;
 				script_getSpells.trainerTarget = "Kaplak";
 			end
 			-- Orgrimmar trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then
+			if (GetLocalPlayer():GetLevel() >= 11) then
 				vX, vY, vZ = 1771.2099609375, -4284.419921875, 7.7534546852112;
 				script_getSpells.trainerTarget = "Shenthul";
 			end
@@ -90,12 +90,12 @@ function script_getSpellsRogue:getTrainerTargetRogue()
 				vX, vY, vZ = 1859.6500244141, 1563.3000488281, 94.306686401367;
 				script_getSpells.trainerTarget = "David Trias";
 			end
-			if (GetLocalPlayer():GetLevel() >= 7 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 2271.0400390625, 242.99699401855, 41.114879608154;
 				script_getSpells.trainerTarget = "Marion Call";
 			end
 			-- Undercity trainer
-			if (GetLocalPlayer():GetLevel() >= 10) then				
+			if (GetLocalPlayer():GetLevel() >= 11) then				
 				vX, vY, vZ = 1419.8000488281, 55.702098846436, -62.278587341309;
 				script_getSpells.trainerTarget = "Miles Dexter";
 			end
@@ -122,7 +122,7 @@ function script_getSpellsRogue:checkForSpellsNeededRogue()
 			if (script_getSpells:run()) then
 				return true;
 			end
-		elseif (myLevel >= 7) and (myMoney >= 200) and (not HasSpell("Gouge")) then
+		elseif (myLevel >= 6) and (myMoney >= 200) and (not HasSpell("Gouge")) then
 			if (script_getSpells:run()) then
 				return true;
 			end
