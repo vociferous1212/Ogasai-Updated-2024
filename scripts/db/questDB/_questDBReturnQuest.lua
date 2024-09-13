@@ -126,7 +126,7 @@ function _questDBReturnQuest:returnAQuest()
 					end
 			return true;
 			end
-		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and (script_grind.lootObj == nil or script_grind.skipLooting) then
+		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and ((script_grind.lootObj == nil or script_grind.skipLooting) or (script_grind.lootObj ~= nil and script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()))) then
 			local name = _questDB:getReturnTargetName();
 			if (not IsInCombat()) and PlayerHasTarget() and GetTarget():GetUnitName() ~= name then
 				ClearTarget();

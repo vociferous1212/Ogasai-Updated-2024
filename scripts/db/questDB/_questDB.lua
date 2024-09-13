@@ -6,6 +6,8 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 	
 		includeElwynnGoldshire = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Elwynn_Goldshire.lua"),
 
+		includeWestfall = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Westfall.lua"),
+
 		-- dun morogh
 		includeDunMoroghColdridge = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_DunMorogh_Coldridge.lua"),
 	
@@ -20,7 +22,6 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 		incldueTirisfallBrill = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Tirisfal_Brill.lua"),
 
 		includeSilverpineForest = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_SilverpineForest.lua"),
-
 
 	-- kalimdor
 
@@ -68,6 +69,9 @@ function _questDB:setup()
 		_questDB_Barrens_10_15:setup();
 
 		_questDB_SilverpineForest:setup();
+		
+		_questDB_Westfall:setup();
+
 
 	-- 1-10
 
