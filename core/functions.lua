@@ -184,6 +184,6 @@ return myFaction;
 end
 function GetMyClass()
 	local class = "";
-	if HasSpell("Heroic Strike") then class = "WARRIOR" elseif HasSpell("Sinister Strike") then class = "ROGUE" elseif HasSpell("Seal of Righteousness") then class = "PALADIN" elseif HasSpell("Lightning Bolt") then class = "SHAMAN" elseif HasSpell("Frostbolt") then class = "MAGE" elseif HasSpell("Wrath") then class = "DRUID" elseif HasSpell("Shadow Bolt") then class = "WARLOCK" elseif HasSpell("Smite") then class = "PRIEST" elseif HasSpell("Raptor Strike") then class = "HUNTER" end
+	if HasSpell("Heroic Strike") then class = "WARRIOR" elseif HasSpell("Sinister Strike") then class = "ROGUE" elseif HasSpell("Seal of Righteousness") then class = "PALADIN" elseif HasSpell("Lightning Bolt") then class = "SHAMAN" elseif HasSpell("Fireball") then class = "MAGE" elseif HasSpell("Wrath") then class = "DRUID" elseif HasSpell("Shadow Bolt") then class = "WARLOCK" elseif HasSpell("Smite") then class = "PRIEST" elseif HasSpell("Raptor Strike") then class = "HUNTER" end
 return class;
 end
