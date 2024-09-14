@@ -23,7 +23,14 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 
 		includeSilverpineForest = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_SilverpineForest.lua"),
 
+		includeLochModan = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_LochModan.lua"),
+
+
+
+
 	-- kalimdor
+
+		includeDarkshore = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Darkshore.lua"),
 
 		-- teldrassil
 		includeTeldrassShadowglen = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Teldrassil_Shadowglen.lua"),
@@ -71,6 +78,11 @@ function _questDB:setup()
 		_questDB_SilverpineForest:setup();
 		
 		_questDB_Westfall:setup();
+
+		_questDB_LochModan:setup();
+
+		_questDB_Darkshore:setup();
+
 
 
 	-- 1-10

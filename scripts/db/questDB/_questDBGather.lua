@@ -123,7 +123,7 @@ function _questDBGather:run()
 				end
 
 
-if self.gatheringTarget:GetObjectDisplayID() == 210 then
+if self.gatheringTarget:GetObjectDisplayID() == 210 or self.gatheringTarget:GetUnitName() == "The Fall of Ameth'Aran" or self.gatheringTarget:GetUnitName() == "The Lay of Ameth'Aran" and not IsInCombat() and not IsChanneling() and not IsCasting() then
 					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID())
 				end
 				_quest:setTimer(1650);

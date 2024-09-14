@@ -190,5 +190,8 @@ function _questEdgeCaseQuest:run()
 			end
 	return true;
 	end
+	if _questEdgeCaseQuest2:run() then
+			return true;
+		end
 return false;
 end

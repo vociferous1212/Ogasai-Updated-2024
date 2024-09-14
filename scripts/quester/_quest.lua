@@ -42,7 +42,7 @@ local localObj = GetLocalPlayer();
 	if script_grind.pause then
 		if not script_grind.skipLooting and not _questEX.bagsFull and not IsLooting() then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end
 		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return true; end
-		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and not _quest.isQuestComplete then
+		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and (not _quest.isQuestComplete or distToGiver ~= nil and distToGiver <= 20) then
 			if IsCasting() or IsChanneling() then return true; end
 			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
 			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end	

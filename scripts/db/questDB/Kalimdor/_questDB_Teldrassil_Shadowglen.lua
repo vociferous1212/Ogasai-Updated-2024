@@ -6,6 +6,8 @@ function _questDB_Teldrassil_Shadowglen:setup()
 
 _questDB:addQuest("no", 0, "Dolanaar Delivery", "Porthannius", 10214.299804688, 700.55297851563, 1360.6042480469, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9802.2099609375, 982.60797119141, 1313.8966064453, "Innkeeper Keldamyr", 0, 0, 0, 0, 0, 2, "Bring the Dolanaar Delivery to Innkeeper Keldamyr.", 0, 1);
 
+_questDB:addQuest("no", 0, "Crown of the Earth", "Tenaron Stormgrip", 10492.5, 807.28002929688, 1397.2681884766, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9736.91015625, 956.06298828125, 1294.1107177734, "Corithras Moonrage", 0, 0, 0, 0, 0, 0, "Bring the Partially Filled Vessel to Corithras Moonrage in Dolanaar.", 0, 1);
+
 _questDB:addQuest("no", 0, "Crown of the Earth", "Tenaron Stormgrip", 10492.5, 807.28002929688, 1397.2683105469, 141, 1, 6, 10712.326171875, 763.5146484375, 1321.3764648438, 3, 0, 0, 0, 0, 0, 10492.5, 807.28002929688, 1397.2683105469, "Tenaron Stormgrip", 0, 0, 0, 0, 0, 0, "Fill the Crystal Phial and bring it back to Tenaron Stormgrip atop Aldrassil.", "Crystal Phial", 1);
 
 _questDB:addQuest("no", 0, "Tenaron's Summons", "Gilshalan Windwalker", 10417.700195313, 871.19396972656, 1319.4086914063, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10492.5, 807.28002929688, 1397.2683105469, "Tenaron Stormgrip", 0, 0, 0, 0, 0, 0, "Speak with Tenaron Stormgrip atop Aldrassil in Shadowglen.", 0, 1);
