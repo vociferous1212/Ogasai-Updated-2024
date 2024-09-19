@@ -13,14 +13,14 @@ function _questDBGatherGetInventory:getItemsInInventory()
 			
 			itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink); 
 
-				if itemName == self.gatheringTargetName then
+				if itemName == _questDBGather.gatherTargetName then
 
 					texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
 
 					_quest.gatheredNum = itemCount;
 				end
 
-				if itemName == self.gatheringTargetName2 then
+				if itemName == _questDBGather.gatherTargetName2 then
 					
 					texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
 

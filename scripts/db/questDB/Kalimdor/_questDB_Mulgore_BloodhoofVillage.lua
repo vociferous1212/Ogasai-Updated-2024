@@ -47,8 +47,5 @@ _questDB:addQuest("no", 1, "Rite of Vision", "Baine Bloodhoof", -2333.5400390625
 
 _questDB:addQuest("no", 1, "A Task Unfinished", "Antur Fallow", -3066.0200195313, 68.800201416016, 79.383514404297, 215, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2363.7182617188, -348.39907836914, -8.9568128585815, "Innkeeper Kauth", 0, 0, 0, 0, 0, 1, "Bring the Bundle of Furs to Innkeeper Kauth in Bloodhoof Village.", 0, 1);
 
-_questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820850372314, 215, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2335.01171875, -391.26531982422, -7.9884948730469, "Baine Bloodhoof", 0, 0, 0, 0, 0, 0, "Take the Totem of Hawkwind to Baine Bloodhoof in Bloodhoof Village. Follow the road out of Camp Narache.", 0, 1);
-
-
 self.isSetup = true;
 end

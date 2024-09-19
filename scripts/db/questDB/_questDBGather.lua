@@ -71,6 +71,21 @@ function _questDBGather:run()
 		
 	if self.gatheringTarget ~= 0 and self.gatheringTarget ~= nil then
 
+		for i=0, _questDB.numQuests -1 do
+			if _questDB.curDesc == _questDB.questList[i]['desc'] then
+				if _questDB.questList[i]['gatherID'] ~= 0 then
+					if self.gatheringTarget:GetObjectDisplayID() == _questDB.questList[i]['gatherID'] then
+						self.gatherTargetName = self.gatheringTarget:GetUnitName();
+					end
+				end
+				if _questDB.questList[i]['gatherID2'] ~= 0 then
+					if self.gatheringTarget:GetObjectDisplayID() == _questDB.questList[i]['gatherID2'] then
+						self.gatherTargetName2 = self.gatheringTarget:GetUnitName();
+					end
+				end
+			end
+		end
+
 		if _questDBGather:isNodeBlacklisted(self.gatheringTarget:GetGUID()) then
 			self.gatheringTarget = _questDBGatherGetObject:getObject();
 		end
