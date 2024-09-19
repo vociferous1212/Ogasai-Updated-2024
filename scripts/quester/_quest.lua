@@ -45,8 +45,7 @@ local localObj = GetLocalPlayer();
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and (not _quest.isQuestComplete or distToGiver ~= nil and distToGiver <= 20) then
 			if IsCasting() or IsChanneling() then return true; end
 			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
-			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end	
-	_questDBTargets:killStuffAroundUs();
+			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end if GetNumQuestLogEntries() > 0 then _questDBTargets:killStuffAroundUs(); end
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 

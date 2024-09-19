@@ -369,8 +369,13 @@ function script_vendor:sell()
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 			vendorTarget = GetTarget();
 		end
-
-		if (vendorTarget ~= nil) then
+		if GetTarget() ~= 0 and GetTarget() ~= nil then
+			if GetTarget():GetUnitName() ~= vendor['name'] then
+				ClearTarget();
+			end
+		end
+		if GetTarget() ~= nil and GetTarget() ~= 0 then
+		if (vendorTarget ~= nil) and GetTarget():GetUnitName() == vendor['name'] then
 			
 			self.message = 'Selling...';
 			if (not IsVendorWindowOpen()) then
@@ -392,6 +397,7 @@ function script_vendor:sell()
 				
 			end
 			return true;
+		end
 		end
 	end
 	return false;
