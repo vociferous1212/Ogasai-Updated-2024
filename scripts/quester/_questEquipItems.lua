@@ -18,6 +18,7 @@ end
 
 function _questEquipItems:bagsSetup()
 	_questEquipItems:addBagsToTable("Small Brown Pouch");
+	_questEquipItems:addBagsToTable("Small Red Pouch");
 	_questEquipItems:addBagsToTable("Small Black Pouch");
 	_questEquipItems:addBagsToTable("Small Blue Pouch");
 	_questEquipItems:addBagsToTable("Small Green Pouch");

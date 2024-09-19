@@ -1,6 +1,7 @@
 _questDoCombat = {waitTimer = 0, blacklistTimer = 0, targetingTimer = 0}
 
 function _questDoCombat:doCombat()
+	local localObj = GetLocalPlayer():GetHealthPercentage();
 	if IsInCombat() and IsLooting() then LootTarget() end
 	-- don't do anything if we are busy
 	if IsChanneling() or IsCasting() then
@@ -8,7 +9,7 @@ function _questDoCombat:doCombat()
 	return;
 	end
 if _quest.currentQuest ~= "Princess Must Die!" then
-if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and localObj:GetHealthPercentage() <= 50 then local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
+if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 50 then local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
 		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then CastSpellByName("Earthbind Totem"); end return true; end end return true; end end
 
 
