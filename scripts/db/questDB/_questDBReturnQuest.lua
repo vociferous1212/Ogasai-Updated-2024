@@ -2,6 +2,9 @@ _questDBReturnQuest = {waitTimer = 0}
 
 function _questDBReturnQuest:returnAQuest()
 
+	local id = _questDBReturnQuest:getReturnTargetID();
+
+
 	if (not _questDB.isSetup) then
 		_questDB:setup();
 	end
@@ -20,9 +23,15 @@ function _questDBReturnQuest:returnAQuest()
 				--end
 				--if _quest.currentDesc == nil and _questDB.questList[i]['desc'] ~= nil then
 
+		
 		x, y, z = _questDB:getReturnTargetPos();
 
 				--end
+			end
+		end
+		if id ~= nil then
+			if _questDBReturnQuest:getReturnTargetID():GetDistance() <= 10 then
+			x, y, z = _questDBReturnQuest:getReturnTargetID():GetPosition();
 			end
 		end
 
@@ -84,7 +93,6 @@ function _questDBReturnQuest:returnAQuest()
 					_quest.weCompletedQuest = true;
 					
 					self.waitTimer = GetTimeEX() + 2000;
-
 
 						CompleteQuest();
 						SelectGossipActiveQuest(1);

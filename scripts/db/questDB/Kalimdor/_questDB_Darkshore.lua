@@ -3,11 +3,14 @@ _questDB_Darkshore = {isSetup = false}
 function _questDB_Darkshore:setup()
 --_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
 --_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
---_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
---_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
---_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
---_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
 
+_questDB:addQuest("no", 0, "The Fragments Within", 4612, 6206.6669921875, -158.9248046875, 80.923851013184, 148, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6437.8706054688, 473.11392211914, 7.8072023391724, "Sentinel Glynda Nal'Shea", 0, 0, 0, 0, 0, 3, "Report back what you have found to Sentinel Glynda Nal'Shea in Auberdine.", 0, 1);
+
+_questDB:addQuest("no", 0, "As Water Cascades", "Sentinel Glynda Nal'Shea", 6437.8706054688, 473.11392211914, 7.8072023391724, 148, 10, 20, 6412.5942382813, 467.15744018555, 8.1310997009277, 3, 0, 0, 0, 0, 0, 6197.1791992188, -148.30267333984, 72.640937805176, 4612, 0, 0, 0, 0, 0, 0, "Fill the Empty Water Tube at the Auberdine moonwell, and then investigate the red crystal along Darkshore's eastern mountain wall.", "Empty Water Tube", 1);
+
+_questDB:addQuest("no", 0, "The Red Crystal", "Sentinel Glynda Nal'Shea", 6437.919921875, 471.82037353516, 7.8553757667542, 148, 10, 20, 6205.7104492188, -156.80058288574, 80.877410888672, 2, 0, 0, 0, 1, 0, 6437.919921875, 471.82037353516, 7.8553757667542, "Sentinel Glynda Nal'Shea", 0, 0, 0, 4612, 0, 0, "Travel east of Auberdine and look for a large, red crystal along Darkshore's eastern mountain range.  Report back what you find to Sentinel Glynda Nal'Shea in Auberdine.", 0, 1);
+
+_questDB:addQuest("no", 0, "How Big a Threat?", "Terenthis", 6434.58984375, 362.80700683594, 13.94153213501, 148, 10, 20, 6049.4765625, 367.88168334961, 22.146409988403, 1, 8, 5, 0, 0, 0, 6434.58984375, 362.80700683594, 13.94153213501, "Terenthis", "Blackwood Pathfinder", "Blackwood Windtalker", 0, 0, 0, 0, "Kill 8 Blackwood Pathfinders and 5 Windtalkers and return to Terenthis in Auberdine.", 0, 1);
 
 _questDB:addQuest("no", 0, "The Fall of Ameth'Aran", "Sentinel Tysha Moonblade", 5725.0297851563, 301.93099975586, 20.957235336304, 148, 10, 20, 5577.0434570313, 146.55838012695, 29.101161956787, 2, 0, 0, 0, 2, 0, 5725.0297851563, 301.93099975586, 20.957235336304, "Sentinel Tysha Moonblade", 0, 0, 0, 403, 0, 0, "Study the tablets which tell of Ameth'Aran and of its fall, then return to Sentinel Tysha Moonblade in Darkshore.", 0, 1);
 
