@@ -45,7 +45,8 @@ local localObj = GetLocalPlayer();
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and (not _quest.isQuestComplete or distToGiver ~= nil and distToGiver <= 20) then
 			if IsCasting() or IsChanneling() then return true; end
 			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
-			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end if GetNumQuestLogEntries() > 0 then _questDBTargets:killStuffAroundUs(); end
+			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end
+			--if GetNumQuestLogEntries() > 0 then _questDBTargets:killStuffAroundUs(); end
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
@@ -98,6 +99,7 @@ local localObj = GetLocalPlayer();
 
 	--get a quest giver to obtain a quest from
 local curQuestGiver = nil; local curQuestName = nil; local distToGiver = 0; local distToGrind = 0; local px, py, pz = GetLocalPlayer():GetPosition(); curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); self.curQuestX,  self.curQuestY, self.curQuestZ = _questDB:getQuestStartPos(); distToGiver = GetDistance3D(px, py, pz, self.curQuestX, self.curQuestY, self.curQuestZ); distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.curGrindZ);
+if distToGiver > 5 and PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then self.curQuestX, self.curQuestY, self.curQuestZ = GetTarget():GetPosition(); distToGiver = GetDistance3D(px, py, pz, self.curQuestX, self.curQuestY, self.curQuestZ); end
 	if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos(); end
 
 	if GetNumQuestLogEntries() > 0 and _questDB.curDesc ~= _quest.currentDesc then
@@ -114,7 +116,6 @@ if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and n
 	if (distToGrind >= self.distToGrindFromHotspot) and self.grindSpotReached then
 		self.grindSpotReached = false;
 	end
-if PlayerHasTarget() and GetTarget():GetUnitName() == curQuestGiver then distToGiver = GetTarget():GetDistance(); end
 	if (distToGiver <= 4) and (self.currentQuest == nil) then
 		if curQuestGiver ~= nil then TargetByName(curQuestGiver); _quest:setTimer(2000); curQuestGiver = GetTarget(); if (GetTarget() ~= nil) and (GetTarget() ~= 0) then if (GetTarget():UnitInteract()) then _quest:setTimer(2000); if GetTarget() == nil then StopMoving(); return; end
 					if (AcceptQuest()) then

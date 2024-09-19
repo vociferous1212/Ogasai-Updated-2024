@@ -1,4 +1,4 @@
-_questEX = {bagsFull = false, jumpTimer = 3000, breathTimer = 0, standingInFireTimer = 0}
+_questEX = {bagsFull = false, jumpTimer = 6000, breathTimer = 0, standingInFireTimer = 0}
 
 function _questEX:doStartChecks()
 	if not IsUsingNavmesh() then UseNavmesh(true); return true; end
@@ -33,9 +33,9 @@ function _questEX:doChecks()
 
 	local localObj = GetLocalPlayer();
 
-	if GetTimeEX() > (_quest.tickRate*1000) + self.jumpTimer then
+	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() then
 		local jumpRandom = random(0, 10);
-		if (jumpRandom == 10 and IsMoving() and not IsInCombat()) then local randomTimer = math.random(3000, 10000); self.jumpTimer = GetTimeEX() + randomTimer; JumpOrAscendStart(); end end
+		if (jumpRandom == 10 and IsMoving() and not IsInCombat()) then local randomTimer = math.random(3000, 12000); self.jumpTimer = GetTimeEX() + randomTimer; JumpOrAscendStart(); end end
 	if not localObj:IsDead() then if _quest:runRest() then _questDoCombat.blacklistTimer = GetTimeEX() + 10000; _quest:setTimer(500); return true; end end
 	local sx, sy, sz = 0, 0, 0;
 	if not IsSwimming() then sx, sy, sz = localObj:GetPosition(); self.breathTimer = GetTimeEX() + 45000; end
