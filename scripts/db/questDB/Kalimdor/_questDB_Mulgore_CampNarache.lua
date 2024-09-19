@@ -8,7 +8,7 @@ function _questDB_Mulgore_CampNarache:setup()
 
 --[[(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc, useItem, gossipOption)]]--
 
-_questDB:addQuest("no", 1, "?", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820861816406, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, x, y, z, "Baine Bloodhoof", 0, 0, 0, 0, 0, n, "Take the Totem of Hawkwind to Baine Bloodhoof in Bloodhoof Village. Follow the road out of Camp Narache.", 0, 1);
+_questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820861816406, 215, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2333.5400390625, -393.07299804688, -8.0124425888062, "Baine Bloodhoof", 0, 0, 0, 0, 0, 2, "Take the Totem of Hawkwind to Baine Bloodhoof in Bloodhoof Village. Follow the road out of Camp Narache.", 0, 1);
 
 _questDB:addQuest("no", 1, "Break Sharptusk!", "Brave Windfeather", -2920.3586425781, -254.90600585938, 52.97253036499, 215, 4, 8, -2940.2119140625, -1217.6257324219, 61.54547882080, 1, 1, 0, 0, 0, 0, -2920.3586425781, -254.90600585938, 52.97253036499, "Brave Windfeather", "Chief Sharptusk Thornmantle", 0, 0, 0, 0, 2, "Bring the head of Chief Sharptusk Thornmantle to Brave Windfeather in Red Cloud Mesa.", 0, 1);
 
@@ -31,6 +31,10 @@ _questDB:addQuest("no", 1, "The Battleboars", "Grull Hawkwind", -2912.6999511719
 _questDB:addQuest("no", 1, "A Humble Task", "Greatmother Hawkwind", -3052.5400390625, -522.49798583984, 26.931287765503, 215, 2, 6, -3052.5400390625, -522.49798583984, 26.93128776550, 2, 0, 0, 0, 1, 0, -2877.9499511719, -221.83000183105, 54.820861816406, "Chief Hawkwind", 0, 0, 0, 297, 0, 0, "Take a Water Pitcher from the water well.\n\nReturn the pitcher to Chief Hawkwind in Camp Narache which is northwest from the water well.", 0, 0);
 
 _questDB:addQuest("no", 1, "A Humble Task", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820861816406, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3052.5400390625, -522.49798583984, 26.931287765503, "Greathmother Hawkwind", 0, 0, 0, 0, 0, 0, "Chief Hawkwind wants you to search for his mother near the water well to the southeast of Camp Narache.", 0, 0);
+
+if GetMyClass() == "DRUID" then
+_questDB:addQuest("no", 1, "Verdant Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.5700683594, -268.59100341797, 53.916873931885, "Gart Mistrunner", 0, 0, 0, 0, 0, 0, "Read the Verdant Note and speak to Gart Mistrunner in Camp Narache.", 0, 2);
+end
 
 _questDB:addQuest("no", 1, "The Hunt Continues", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940914154053, 215, 1, 6, -3400.8754882813, -299.08343505859, 68.37378692627,  1, 20, 0, 0, 0, 0, -2912.6999511719, -257.54000854492, 52.94091415405, "Grull Hawkwind", "Mountain Cougar", 0, 0, 0, 0, 2, "Grull Hawkwind in Camp Narache wants you to bring him 10 Mountain Cougar Pelts.", 0, 1);
 
