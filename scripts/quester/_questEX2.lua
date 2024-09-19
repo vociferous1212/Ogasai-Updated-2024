@@ -126,6 +126,7 @@ local localObj = GetLocalPlayer();
 		--	script_grind.timerSet = true;
 		--end
 
+script_grind:lootAndSkin();
 	-- loot objects
 	if (not IsInCombat()) and not script_grind.skipLooting then
 		if script_grind.lootObj == nil then
