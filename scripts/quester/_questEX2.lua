@@ -1,4 +1,4 @@
-_questEX2 = {checkBagTimer = 0}
+_questEX2 = {checkBagTimer = 0, flipVendor = true, vendorBetweenQuests = true}
 
 function _questEX2:doChecks()
 local localObj = GetLocalPlayer();
@@ -12,6 +12,20 @@ local localObj = GetLocalPlayer();
 			SitOrStand();
 		end
 		_quest:setTimer(60000);
+	end
+
+	if GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
+		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
+			_quest.enemyTarget = GetPet():GetUnitsTarget();
+			if not _quest.enemyTarget:IsDead() then
+				_quest.enemyTarget:AutoAttack();
+			end
+		end
+	end
+
+	if _questEX2.vendorBetweenQuests and _quest.questIsComplete and _questEX2.flipVendor then
+		script_vendor.status = 2
+		_questEX2.flipVendor = false;
 	end
 
 	-- check inventory for bag every 3 minutes... if we have none in slot 4 already
@@ -132,7 +146,12 @@ script_grind:lootAndSkin();
 		if script_grind.lootObj == nil then
 			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
 		end
-		
+
+		if script_grind.lootObj ~= nil then
+			if script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
+				script_grind.lootObj = nil;
+			end
+		end
 
 		if ((script_grind.lootObj ~= nil and not IsInCombat()) or (IsInCombat() and not script_grind:isAnyTargetTargetingMe()))
 		and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
@@ -149,15 +168,15 @@ if script_grind.lootObj ~= nil then
 					return true;
 				end
 				if not IsMoving() then
-					_quest:setTimer (150);
+					_quest:setTimer(150);
 				end
 			end
 
-			if (script_grind:doLoot(localObj)) then
-				return true;
-			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
-				ClearTarget();
-			end
+			--if (script_grind:doLoot(localObj)) then	
+			--	return true;
+			--elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
+			--	ClearTarget();
+			--end
 		end
 	end
 

@@ -16,8 +16,18 @@ local title = nil; local isComplete = 0;
 		end
 
 
+	-- druid quest level 10 horde?
 	if isComplete ~= 1 and title == "asdf" then
-	return true;
+		if GetMapID() ~= 493 then
+			if HasSpell("Teleport Moonglade") then
+				CastSpellByName("Teleport Moonglade");
+			end
+		end
+		local px, py, pz = GetLocalPlayer():GetPosition();
+
+		-- need quest return target here
+		local tx, ty, tz = x, y, z;
+		
 	end
-return false;
-end
+	return false;
+	end

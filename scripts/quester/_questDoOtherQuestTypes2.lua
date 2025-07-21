@@ -95,7 +95,8 @@ function _questDoOtherQuestTypes2:run()
 		_quest.message = "Type quest == 10";
 			local x, y, z = 0, 0, 0;
 			local px, py, pz = GetLocalPlayer():GetPosition();
-			if _quest.currentQuest == "A Bundle of Hides" then
+			-- barrens
+			if _quest.currentQuest == "A Bundle of Hides" or _quest.currentQuest == "Ride to Orgrimmar" then
 				x, y, z = -437.1369934082, -2596, 95.787612915039;
 			elseif _quest.currentQuest == "Continue to Stormwind" then
 				x, y, z = -10628.299804688, 1037.2700195313, 34.110454559326;
@@ -107,7 +108,7 @@ function _questDoOtherQuestTypes2:run()
 			elseif GetDistance3D(px, py, pz, x, y, z) <= 4 then
 				local name = "";
 				_quest:setTimer(1500);
-				if _quest.currentQuest == "A Bundle of Hides" then
+				if _quest.currentQuest == "A Bundle of Hides" or _quest.currentQuest == "Ride to Orgrimmar" then
 					name = "Devrak";
 				elseif _quest.currentQuest == "Continue to Stormwind" then
 					name = "Thor";

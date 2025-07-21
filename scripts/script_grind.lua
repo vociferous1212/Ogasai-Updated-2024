@@ -68,7 +68,7 @@ script_grind = {
 	stopWhenFull = false,	-- stop when bags are full
 	hsWhenFull = false,	-- hearthstone when bags are full
 	useMount = false,	-- use mount
-	disMountRange = 32,	-- defunct setting
+	checkBagTimer = GetTimeEX(),
 	mountTimer = GetTimeEX(),	-- defunct setting
 	enemyObj = nil,	-- enemyObj stops a bug
 	lootObj = nil,	-- lootObj stops a bug
@@ -615,7 +615,13 @@ function script_grind:run()
 			Exit();
 		end
 	end
-		
+
+	-- check inventory for bag every 3 minutes... if we have none in slot 4 already
+	if not IsInCombat() and not IsMoving() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
+		_questEquipItems:checkInventoryForBags();
+		self.checkBagTimer = GetTimeEX() + 180000;
+	end
+	
 	-- if bags full then set true
 	if (AreBagsFull()) then
 		self.bagsFull = true;
@@ -855,22 +861,23 @@ function script_grind:run()
 	end
 	end
 
-	if self.enemyObj ~= nil and self.enemyObj ~= 0 then
+	if self.enemyObj ~= nil and self.enemyObj ~= 0 and GetPet() ~= nil and GetTarget() ~= nil and GetTarget() ~= 0 then
 	-- walk away from target if pet target guid is the same guid as target targeting me
 	if (GetPet() ~= 0) and (script_hunter.hasPet and not HasSpell("Shadow Bolt")) and (not script_grind:isTargetingMe(self.enemyObj)) and (GetTarget():GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj:IsInLineOfSight()) then
-		if (self.enemyObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
-			if (script_hunter:runBackwards(self.enemyObj, 15)) then
-				script_grind.tickRate = 100;
-				script_rotation.tickRate = 135;
-				script_hunter.waitTimer = GetTimeEX() + 3000;
-				PetAttack();
-				self.message = "Moving away from target for range attacks...";
-if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) then
-				GetLocalPlayer():GetUnitsTarget():FaceTarget();
-			end
-
+		if (self.enemyObj:GetUnitsTarget():GetGUID() ~= 0 and self.enemyObj:GetUnitsTarget():GetGUID() ~= nil) then
+			if (self.enemyObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
+				if (script_hunter:runBackwards(self.enemyObj, 15)) then
+					script_grind.tickRate = 100;
+					script_rotation.tickRate = 135;
+					script_hunter.waitTimer = GetTimeEX() + 3000;
+					PetAttack();
+					self.message = "Moving away from target for range attacks...";
+					if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 15) and (not IsMoving()) then
+						GetLocalPlayer():GetUnitsTarget():FaceTarget();
+					end
 				return true;
-			end	
+			end
+		end
 		end
 	end
 	end
@@ -1777,7 +1784,7 @@ if (not IsAutoCasting("Attack")) then
 						CastSpellByName("Stealth", localObj);
 						self.waitTimer = GetTimeEX() + 1200;
 					end
-					if (HasSpell("Prowl")) then
+					if (HasSpell("Prowl")) and IsCatForm() then
 						CastSpellByName("Prowl", localObj);
 						self.waitTimer = GetTimeEX() + 1200;
 					end
@@ -2463,7 +2470,7 @@ function script_grind:doLoot(localObj)
 		end
 
 		if (IsLooting()) then
-			self.waitTimer = GetTimeEX() + 650;
+			self.waitTimer = GetTimeEX() + 950;
 		end
 
 		-- interact with object if we are not looting
@@ -2550,8 +2557,9 @@ function script_grind:doLoot(localObj)
 			elseif (not IsMoving() or not IsPathLoaded(5)) then
 				
 				Move(_x, _y, _z);
-				if (self.lootObj ~= nil and self.lootObj ~= 0) then
-					self.message = "Cannot find a path to loot target "..self.lootObj:GetDistance()"";
+				if (self.lootObj ~= nil and self.lootObj ~= 0) and (self.lootObj:GetDistance() ~= nil and self.lootObj:GetDistance() ~= 0) then
+					self.message = "Cannot find a path to loot target";
+						-- "..self.lootObj:GetDistance()"";
 				end
 				return true;
 			end
@@ -2559,6 +2567,8 @@ function script_grind:doLoot(localObj)
 	end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
+	if (self.lootObj ~= 0 and self.lootObj ~= nil) then
+	if (self.lootObj:GetDistance() ~= nil and self.lootObj:GetDistance() ~= 0) then
 	if (self.lootObj:GetDistance() <= self.lootDistance) then
 		if (IsMoving()) then
 			StopMoving();
@@ -2566,6 +2576,7 @@ function script_grind:doLoot(localObj)
 		self.waitTimer = GetTimeEX() + 250;
 		--script_nav:resetNavigate();
 	end
+	end end
 end
 
 function script_grind:getSkinTarget(lootRadius)

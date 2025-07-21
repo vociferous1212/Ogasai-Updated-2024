@@ -1,21 +1,8 @@
 _quest = {
-
-	-- if we have a quest and are out of level range in DB it doesn't find a grind spot? something...
-
-	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 1, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 350, currentMapID = 0,
-
+	message = "Quester", usingQuester = false, pause = true, isSetup = false, waitTimer = 0, tickRate = 1, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0, isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0, curGrindY = 0, curGrindz = 0, curQuestX = 0, curQuestY = 0, curQuestZ = 0, weHaveQuest = fasle, autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil, usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 350, currentMapID = 0, killStuffOnRoute = true,
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
-
 }
-function _quest:draw() end
-function _quest:window() _questWindow:window(); end
-function _quest:setTimer(miliSeconds) self.waitTimer = GetTimeEX() + miliSeconds; end
-function _quest:setup()
-	if not _questIncludeFiles.isSetup then _questIncludeFiles:setup() end
-	script_grind:setup(); script_talent:setup(); script_gather:setup(); if GetLocalPlayer():GetLevel() < 10 then script_grind.getSpells = true; end script_vendor:setup(); vendorDB:setup(); vendorDB:loadDBVendors(); if (not _questDB.isSetup) then _questDB:setup(); end
-	_questDBGather.waitTimer = GetTimeEX(); script_helper:setup(); self.usingQuester = true; if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then self.autoComplete = false; self.weHaveQuest = false; self.isQuestComplete = false; end
-	_questEX.jumpTimer = GetTimeEX(); _questEX.breathTimer = GetTimeEX(); _questEX2.checkBagTimer = GetTimeEX(); _questEX.standingInFireTimer = GetTimeEX();
-	self.xp = UnitXP("Player"); _questDBReturnQuest.waitTimer = GetTimeEX(); _questDoCombat.waitTimer = GetTimeEX(); _questDoCombat.blacklistTimer = GetTimeEX(); _questDoCombat.targetingTimer = GetTimeEX(); self.waitTimer = GetTimeEX(); self.isSetup = true; end
+function _quest:draw() end function _quest:window() _questWindow:window(); end function _quest:setTimer(miliSeconds) self.waitTimer = GetTimeEX() + miliSeconds; end function _quest:setup() if not _questIncludeFiles.isSetup then _questIncludeFiles:setup() end script_grind:setup(); script_talent:setup(); script_gather:setup(); if GetLocalPlayer():GetLevel() < 10 then script_grind.getSpells = true; end script_vendor:setup(); vendorDB:setup(); vendorDB:loadDBVendors(); if (not _questDB.isSetup) then _questDB:setup(); end _questDBGather.waitTimer = GetTimeEX(); script_helper:setup(); self.usingQuester = true; if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then self.autoComplete = false; self.weHaveQuest = false; self.isQuestComplete = false; end _questEX.jumpTimer = GetTimeEX(); _questEX.breathTimer = GetTimeEX(); _questEX2.checkBagTimer = GetTimeEX(); _questEX.standingInFireTimer = GetTimeEX(); self.xp = UnitXP("Player"); _questDBReturnQuest.waitTimer = GetTimeEX(); _questDoCombat.waitTimer = GetTimeEX(); _questDoCombat.blacklistTimer = GetTimeEX(); _questDoCombat.targetingTimer = GetTimeEX(); self.waitTimer = GetTimeEX(); self.isSetup = true; if GetLocalPlayer():GetLevel() < 6 then self.killStuffOnRoute = false; end end
 
 -- run the quester
 function _quest:run()
@@ -31,7 +18,7 @@ local localObj = GetLocalPlayer();
 	if (script_gatherEX.drawFishingPools) then script_gatherEX:drawFishNodes(); end
 	if _questEX:doStartChecks() then return; end
 	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
-	--if not script_grind.pause then script_grind:run(); end
+	--if not script_grind.pause then script_grind:run(); end if _questDB.curDesc == nil then script_grind.pause = false; end
 	-- handle vendor stuff through vendor scripts
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
@@ -46,7 +33,9 @@ local localObj = GetLocalPlayer();
 			if IsCasting() or IsChanneling() then return true; end
 			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
 			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end
-			--if GetNumQuestLogEntries() > 0 then _questDBTargets:killStuffAroundUs(); end
+			-- kill stuff on way to quest objectives
+			if GetNumQuestLogEntries() ~= nil and self.killStuffOnRoute and (not _quest.isQuestComplete or _quest.killStuffOnRoute) then _questDBTargets:killStuffAroundUs(); end
+	
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
@@ -58,6 +47,7 @@ local localObj = GetLocalPlayer();
 			_quest.isQuestComplete = false;
 			_quest.currentDesc = nil;
 			_questDB.curDesc = nil;
+			_questEX2.flipVendor = true;
 		end
 	end
 	
@@ -80,10 +70,12 @@ local localObj = GetLocalPlayer();
 		end
 	end
 
+if self.currentType == 10 and _quest.currentQuest ~= nil and ((not script_getSpells:cityZones() and self.usingItem == 0) or (self.currentMapID ~= GetMapID() and self.usingItem ~= 0)) then script_goToFP:run() return true; end
+
 	_questCheckQuestCompletion:checkQuestForCompletion(); self.tickRate = .3;
 
 	-- return a completed quest to quest return target
-	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() then
+	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and (script_grind.lootObj == nil or script_grind.bagsFull) and (not IsInCombat() or not self.killStuffOnRoute) then
 		if _questDBReturnQuest:returnAQuest() then
 			self.enemyTarget = nil;
 			self.message = "Returning quest!";
@@ -92,10 +84,6 @@ local localObj = GetLocalPlayer();
 	end
 	-- set our current quest
 	_questSetQuest:setOurCurrentQuest();
-
-
-	if self.currentType == 10 and ((not script_getSpells:cityZones() and self.usingItem == 0) or (self.currentMapID ~= GetMapID() and self.usingItem ~= 0)) then script_goToFP:run() return true; end
-
 
 	--get a quest giver to obtain a quest from
 local curQuestGiver = nil; local curQuestName = nil; local distToGiver = 0; local distToGrind = 0; local px, py, pz = GetLocalPlayer():GetPosition(); curQuestGiver = _questDB:getQuestGiverName(); curQuestName = _questDB:getQuestName(); self.curQuestX,  self.curQuestY, self.curQuestZ = _questDB:getQuestStartPos(); distToGiver = GetDistance3D(px, py, pz, self.curQuestX, self.curQuestY, self.curQuestZ); distToGrind = GetDistance3D(px, py, pz, self.curGrindX, self.curGrindY, self.curGrindZ);
@@ -128,9 +116,9 @@ if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and n
 						SelectAvailableQuest(_quest.gossipOption);
 					end end end end return; end
 	-- move to quest giver to get quest
-	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) and ((script_grind.lootObj == nil and not script_grindEX.bagsFull) or (script_grind.lootObj ~= nil and script_grind.skipLooting) or (script_grind.lootObj ~= nil and _questEX.bagsFull) or (script_grind.lootObj == nil and not script_grind.skipLooting) or script_grind.lootObj ~= nil) then
+	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) and ((script_grind.lootObj == nil and not script_grindEX.bagsFull) or (script_grind.lootObj ~= nil and script_grind.skipLooting) or (script_grind.lootObj ~= nil and _questEX.bagsFull) or (script_grind.lootObj == nil and not script_grind.skipLooting) or script_grind.lootObj ~= nil) and not IsCasting() and not IsChanneling() then
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ); self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)"; if not IsMoving() then Move(self.curQuestX, self.curQuestY, self.curQuestZ); end return true; end
-	if self.currentType ~= 1 and self.currentType ~= 2 and not IsInCombat() and (self.curGrindX ~= 0) and not self.isQuestComplete and not IsLooting() then
+	if self.currentType ~= 1 and self.currentType ~= 2 and not IsInCombat() and not self.isQuestComplete and not IsLooting() then
 		if _questDoOtherQuestTypes() then return true; end end	
 	-- gather quest object
 	if self.currentType == 2 and not IsInCombat() then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..", "..math.floor(_questDBGather.gatheringTarget:GetDistance()).." (yd)"; return true; end end

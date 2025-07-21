@@ -97,6 +97,18 @@ local questDescription, desc = GetQuestLogQuestText(1);
 		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
 		Text("Until bot reaches current quest in quest log");
 		Text("YOU MUST HAVE A QUEST IN QUEST LOG");
+		Text("");
+
+		if _quest.killStuffOnRoute then
+			Text("Min Level to Grind");
+			script_grind.minLevel = SliderInt("Min Level to Grind", 0, 60, script_grind.minLevel);
+		end
+		--Text("Grind targets moving from quest to quest");
+		wasClicked, _quest.killStuffOnRoute = Checkbox("Grind En Route", _quest.killStuffOnRoute);
+		SameLine();
+		wasClicked, _questDB.minMaxLevel = Checkbox("Disable Level Req", _questDB.minMaxLevel);
+		SameLine();
+		wasClicked, _questEX2.vendorBetweenQuests = Checkbox("Vendor Between Quests", _questEX2.vendorBetweenQuests);
 
 		-- grind spot reached
 		Separator();

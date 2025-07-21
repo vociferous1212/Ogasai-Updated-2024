@@ -19,11 +19,14 @@ function _questDoOtherQuestTypes3:run()
 
 	-- type 12 use an item and kill a specific target
 	if _quest.currentType == 12 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
-		if HasItem(_quest.usingItem) and dist > 10 then
+		if HasItem(_quest.usingItem) and distToGrind > 10 then
 			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+			return true;
 		end
 		if distToGrind <= 10 and HasItem(_quest.usingItem) then
 			UseItem(_quest.usingItem);
+			if IsMoving() then StopMoving(); end
+			return true;
 		end
 		local i, t = GetFirstObject();
 		while i ~= 0 do

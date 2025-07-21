@@ -39,6 +39,7 @@ function _questEdgeCaseQuest:run()
 			local target = nil;
 			local dist = nil;
 			local bestDist = 1000;
+			_quest.currentType = 99;
 				while i ~= 0 do
 					if t == 3 then
 						if i:GetUnitName() == "Lazy Peon" then

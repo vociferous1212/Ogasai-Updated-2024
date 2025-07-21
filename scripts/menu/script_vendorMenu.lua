@@ -1,5 +1,5 @@
 script_vendorMenu = {
-	quiverBag = 4,
+	quiverBag = 5,
 	ammoName = "",
 }
 
