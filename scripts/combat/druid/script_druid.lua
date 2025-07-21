@@ -11,7 +11,7 @@ script_druid = {
 	potionHealth = 18,
 	potionMana = 20,
 	isSetup = false,
-	meleeDistance = 3.9,
+	meleeDistance = 4.5,
 	waitTimer = 0,
 	stopIfMHBroken = true,
 	useCat = false,		-- is cat form selected
@@ -612,6 +612,10 @@ function script_druid:run(targetGUID)
 	local localCP = GetComboPoints("player", "target");
 	local isMoonkin = localObj:HasBuff("Moonkin Form");
 	script_grind.combatScriptRange = self.meleeDistance;
+	if not HasForm() and localMana >= 30 then
+		script_grind.combatScriptRange = 27;
+	else script_grind.combatScriptRange = self.meleeDistance;
+	end
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
 
@@ -712,6 +716,10 @@ function script_druid:run(targetGUID)
 	end
 
 	-- Check: Do nothing if we are channeling or casting or wait timer
+
+	if (IsDrinking() and localMana < 95 and not IsInCombat()) or (IsEating() and localHealth < 95 and not IsInCombat()) and (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX()) then
+		return 4;
+	end
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
 		if (IsInCombat()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
 			if (GetTarget() ~= 0 and GetTarget() ~= nil) then
@@ -1198,7 +1206,8 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (not IsBearForm() and not IsCatForm()) or (isMoonkin) and (not self.useBear and not self.useCat) then
 
 			-- move into line of sight
-			if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) and (localMana >= self.drinkMana) and (PlayerHasTarget())and (not IsInCombat()) then
+			if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) and (localMana >= self.drinkMana) and (PlayerHasTarget()) and (not IsInCombat()) then
+				targetObj:AutoAttack();
 				return 3;
 			end
 
@@ -1218,6 +1227,8 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- Wrath to pull if no moonfire spell
 			if (not HasSpell("Moonfire")) and (localMana >= self.drinkMana) and (not IsMoving()) and (targetObj:GetDistance() <= 30) then
 				if (CastSpellByName("Wrath", targetObj)) then
+				if IsMoving() then StopMoving(); return true; end
+
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1950;
 					script_grind:setWaitTimer(1950);
@@ -1393,7 +1404,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- check line of sight and move to target
-				if (not targetObj:IsInLineOfSight()) and (IsBearForm()) then
+				if (not targetObj:IsInLineOfSight()) and (IsBearForm()) or (targetObj:GetDistance() > self.meleeDistance) then
 					return 3;
 				end
 
@@ -1418,7 +1429,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					if (targetObj:GetDistance() < self.meleeDistance) and (not IsMoving()) then
 						targetObj:FaceTarget();
 					end
-					if (targetObj:GetDistance() > self.meleeDistance) and (IsInCombat()) and (PlayerHasTarget()) then
+					if ((targetObj:GetDistance() > self.meleeDistance) and (IsInCombat()) and (PlayerHasTarget()) and HasForm()) or (not HasForm() and localMana <= 30 and not IsCasting() and not IsChanneling()) then
 						return 3;
 					end
 				end
@@ -1984,6 +1995,8 @@ function script_druid:rest()
 	-- Continue resting
 	if(localHealth < 98 and IsEating() or localMana < 98 and IsDrinking()) then
 		self.message = "Resting up to full HP/Mana...";
+		self.waitTimer = GetTimeEX() + 1500;
+		script_grind.waitTimer = GetTimeEX() + 1500;
 		return true;
 	end
 

@@ -66,7 +66,7 @@ function script_hunterEX:petChecks()
 	end
 
 	-- Check: If pet is dismissed then Call pet 
-	if (GetPet() == 0) and (script_hunter.hasPet) and (IsStanding()) then
+	if (GetPet() == 0) and (script_hunter.hasPet) and (IsStanding()) and (not IsMounted()) then
 		script_hunter.message = "Pet is missing, calling pet...";
 		if (IsMoving()) or (not IsStanding()) then
 			StopMoving();
@@ -77,13 +77,17 @@ function script_hunterEX:petChecks()
 	end
 
 	-- Check: If pet is dead, then revive pet
-	if (script_hunter.hasPet) and (GetPet():IsDead()) and (not IsInCombat()) and (HasSpell("Revive Pet")) then	
+	if GetLocalPlayer():GetLevel() >= 10 and not IsMounted() then
+	if (GetPet() == nil or GetPet() == 0) or (GetPet() ~= 0 and GetPet():IsDead()) then
+	if (script_hunter.hasPet) and (GetPet() ~= nil and GetPet():IsDead()) and (not IsInCombat()) and (HasSpell("Revive Pet")) then	
 		script_hunter.message = "Pet is dead, reviving pet...";
 		if (IsMoving()) or (not IsStanding()) then 
 			StopMoving(); 
 			return true; 
 		end
+		if GetPet() == 0 then
 		CastSpellByName("Call Pet");
+		end
 		if (localMana > 60) then 
 			CastSpellByName('Revive Pet'); 
 			script_hunter.waitTimer = GetTimeEX() + 1850;
@@ -92,7 +96,7 @@ function script_hunterEX:petChecks()
 			script_hunter.message = "Pet is dead, need more mana to ress it...";
 			return true; 
 		end
-	end
+	end end end
 
 	-- Check: Stop if we ran out of pet food in the "pet food slot"
 	if (script_hunter.stopWhenNoPetFood) and (script_hunter.hasPet) and (not IsInCombat()) then

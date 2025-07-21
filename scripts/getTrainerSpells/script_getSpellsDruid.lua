@@ -27,7 +27,7 @@ function script_getSpellsDruid:getTrainerTargetDruid()
 				vX, vY, vZ = 10464, 829.53802490234, 1380.9401855469;
 				script_getSpells.trainerTarget = "Mardant Strongoak";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() > 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 9741.91015625, 966, 1293.6934814453;
 				script_getSpells.trainerTarget = "Kal";
 			end
@@ -43,7 +43,7 @@ function script_getSpellsDruid:getTrainerTargetDruid()
 				vX, vY, vZ = -2873.5700683594, -268.59100341797, 53.916931152344;
 				script_getSpells.trainerTarget = "Gart Mistrunner";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() > 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -2315.75, -442.63400268555, -5.4382953643799;
 				script_getSpells.trainerTarget = "Gennia Runetotem";
 			end

@@ -1,4 +1,4 @@
-_questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, curDesc = nil,
+_questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, curDesc = nil, minMaxLevel = true,
 
 	-- eastern kingdoms
 		-- elwynn
@@ -179,9 +179,9 @@ function _questDB:getQuestStartPos()
 
 					if (self.questList[i]['mapID'] == myMapID) then
 
-					if GetLocalPlayer():GetLevel() >= self.questList[i]['minLevel'] then
+					if GetLocalPlayer():GetLevel() >= self.questList[i]['minLevel'] or not _questDB.minMaxLevel then
 
-						if GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] then
+						if GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] or not _questDB.minMaxLevel then
 
 							x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 

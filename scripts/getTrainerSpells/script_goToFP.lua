@@ -94,7 +94,7 @@ function script_goToFP:run()
 			TargetByName(self.fpTarget);
 			if (not self.timerSet) then
 				self.timerSet = true;
-				self.goToFPTimer = GetTimeEX() + 8000;
+				self.goToFPTimer = GetTimeEX() + 10000;
 			end
 
 			-- get target
@@ -142,7 +142,7 @@ function script_goToFP:run()
 					if (script_getSpells:cityZones()) then
 						fpDB:removeFP();
 					end
-					self.goToFPTimer = GetTimeEX() + 500;
+					self.goToFPTimer = GetTimeEX() + 2500;
 				end
 					
 			
@@ -209,6 +209,7 @@ function script_goToFP:run()
 								self.getFPStatus = 0;
 								self.fx, self.fy, self.fz = 0, 0, 0;
 								self.fpTarget = "";
+								self.goToFPTimer = GetTimeEX() + 240000
 							end
 						end
 					end

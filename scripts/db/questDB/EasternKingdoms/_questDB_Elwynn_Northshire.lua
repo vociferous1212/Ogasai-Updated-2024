@@ -20,7 +20,7 @@ _questDB:addQuest("no", 0, "Grape Manifest", "Milly Osworth", -8850.2900390625, 
 
 _questDB:addQuest("no", 0, "Milly's Harvest", "Milly Osworth", -8850.2900390625, -224.0299987793, 81.696632385254, 12, 4, 6, -9052.9287109375, -344.13021850586, 73.452621459961, 2, 0, 0, 0, 8, 0, -8850.2900390625, -224.0299987793, 81.696632385254, "Milly Osworth", 0, 0, 0, 3012, 0, 0, "Bring 8 crates of Milly's Harvest to Milly Osworth at Northshire Abbey.", 0, 1);
 
---_questDB:addQuest("no", 0, "Milly Osworth", "Deputy Willem", -8933.5400390625, -136.52299499512, 83.262565612793, 12, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8850.2900390625, -224.0299987793, 81.696632385254, "Milly Osworth", 0, 0, 0, 0, 0, 0, "Speak with Milly Osworth.", 0, 2);
+_questDB:addQuest("no", 0, "Milly Osworth", "Deputy Willem", -8933.5400390625, -136.52299499512, 83.262565612793, 12, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8850.2900390625, -224.0299987793, 81.696632385254, "Milly Osworth", 0, 0, 0, 0, 0, 0, "Speak with Milly Osworth.", 0, 2);
 
 if GetMyClass() == "WARLOCK" then
 	_questDB:addQuest("no", 0, "The Stolen Tome", "Drusilla La Salle", -8926.740234375, -195.5890045166, 80.588661193848, 12, 4, 6, -8957.1142578125, -431.03259277344, 64.767768859863, 2, 0, 0, 0, 1, 0, -8926.740234375, -195.5890045166, 80.588661193848, "Drusilla La Salle", 0, 0, 0, 107, 0, 0, "Retrieve the Powers of the Void for Drusilla La Salle.", 0, 1);

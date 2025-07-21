@@ -28,6 +28,10 @@ if GetMyClass() == "WARRIOR" then
 _questDB:addQuest("no", 1, "Simple Parchment", "Gornek", -600.13201904297, -4186.1899414063, 41.089050292969, 14, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -639.34399414063, -4230.1899414063, 38.134117126465, "Frang", 0, 0, 0, 0, 0, 0, "Read the Simple Parchment and speak to Frang in the Valley of Trials.", 0, 2);
 end
 
+if GetMyClass() == "HUNTER" then
+_questDB:addQuest("no", 1, "Etched Parchment", "Gornek", -600.13201904297, -4186.1899414063, 41.089050292969, 14, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -635.46197509766, -4227.5200195313, 38.133941650391, "Jen'shan", 0, 0, 0, 0, 0, 0, "Read the Etched Parchment and speak to Jen'shan in the Valley of Trials.", 0, 2);
+end
+
 _questDB:addQuest("no", 1, "Cutting Teeth", "Gornek", -600.13201904297, -4186.1899414063, 41.089050292969, 14, 1, 6, -467.72756958008, -4308.0942382813, 47.28205871582, 1, 10, 0, 0, 0, 0, -600.13201904297, -4186.1899414063, 41.089050292969, "Gornek", "Mottled Boar", 0, 0, 0, 0, 2, "Kill 10 Mottled Boars then return to Gornek at the Den.", 0, 1);
 
 _questDB:addQuest("no", 1, "Your Place In The World", "Kaltunk", -607.43402099609, -4251.330078125, 38.956043243408, 14, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -600.13201904297, -4186.1899414063, 41.089050292969, "Gornek", 0, 0, 0, 0, 0, 0, "Speak with Gornek. You recall Kaltunk marking your map with his location and mentioning that Gornek resided in the Den, a building to the west. \n\n", 0, 1);

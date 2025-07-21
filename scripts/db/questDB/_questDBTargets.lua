@@ -141,14 +141,20 @@ return nil;
 end
 
 function _questDBTargets:killStuffAroundUs()
-	if not _quest.isQuestComplete and not IsInCombat() and _quest.enemyTarget == nil then
+	--not _quest.isQuestComplete and
+	if (not IsInCombat() and _quest.enemyTarget == nil) or (IsInCombat()) or (GetPet() ~= nil and GetPet() ~= 0 and GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0) then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
-			if t == 3 and i:GetDistance() <= 50 then
-				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= aggro then
+			if t == 3 and i:GetDistance() <= 38 then
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 24.5;
+				if GetMyClass() == "HUNTER" then
+					aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 30.5;
+				end
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= aggro and i:IsInLineOfSight() then
 					if (script_grind:enemyIsValid(i) or script_grind:isTargetingMe(i)) then
 						_quest.enemyTarget = i;
+						i:AutoAttack();
+						i:FaceTarget();
 					end
 				end
 			end

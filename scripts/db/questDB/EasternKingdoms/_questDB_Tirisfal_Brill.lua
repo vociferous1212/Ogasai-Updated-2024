@@ -22,7 +22,7 @@ _questDB:addQuest("no", 1, "Speak with Sevren", "Coleman Farthing", 2262.2600097
 
 _questDB:addQuest("no", 1, "Deaths in the Family", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2810.7724609375, 909.91204833984, 117.80563354492, 1, 1, 1, 1, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Gregor Agamand", "Nissa Agamand", "Thurman Agamand", 0, 0, 0, "Bring Gregor's Remains, Nissa's Remains and Thurman's Remains to Coleman Farthing in Brill.", 0, 1);
 
-_questDB:addQuest("no", 1, "The Haunted Mills", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 1, 0, 0, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Devlin Agamand", 0, 0, 0, 0, 0, "Slay Devlin Agamand, and bring Devlin's Remains to Coleman Farthing in Brill.", 0, 1);
+_questDB:addQuest("no", 1, "The Haunted Mills", "Coleman Farthing", 2262.2600097656, 244.25700378418, 33.633823394775, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 1, 0, 0, 0, 0, 2262.2600097656, 244.25700378418, 33.633823394775, "Coleman Farthing", "Devlin Agamand", 0, 0, 0, 0, 0, "Slay Devlin Agamand, and bring Devlin's Remains to Coleman Farthing in Brill.", 0, 2);
 
 _questDB:addQuest("no", 1, "The Mills Overrun", "Deathguard Dillinger", 2287.6599121094, 403.37200927734, 33.921539306641, 85, 10, 14, 2626.076171875, 954.88610839844, 110.75506591797, 1, 5, 10, 0, 0, 0, 2287.6599121094, 403.37200927734, 33.921539306641, "Deathguard Dillinger", "Darkeye Bonecaster", "Rattlecage Soldier", 0, 0, 0, 2, "Gather 5 Notched Ribs and 3 Blackened Skulls, then return to Deathguard Dillinger in Brill.", 0, 1);
 

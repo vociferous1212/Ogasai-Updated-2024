@@ -10,8 +10,17 @@ local questDescription, questObjectives = GetQuestLogQuestText(1);
 
 --_questDB:addQuest("no", 1, "", "", xyz, 17, 10, 20, xyz, type
 
-_questDB:addQuest("no", 1, "Samophlange", "Sputtervalve", -902.03601074219, -3759.3999023438, 11.467498779297, 17, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 826.44879150391, -2688.2624511719, 91.794792175293, 356, 0, 0, 0, 0, 0, 0, "Access the control console at the Venture Company research site.", 0, 1);
+_questDB:addQuest("no", 1, "Return to the Crossroads.", "Doras", 1676.25, -4313.4501953125, 61.567657470703, 1637, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -403.67999267578, -2709.3400878906, 97.538192749023, "Zargh", 0, 0, 0, 0, 0, 1, "Buy a wind rider to the Crossroads from the wind rider master Doras, then bring Gryshka's Letter to Zargh at the Crossroads.", "Gryshka's Letter", 1);
 
+_questDB:addQuest("no", 1, "Return to the Crossroads.", "Doras", 1676.25, -4313.4501953125, 61.567657470703, 17, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -403.67999267578, -2709.3400878906, 97.538192749023, "Zargh", 0, 0, 0, 0, 0, 1, "Buy a wind rider to the Crossroads from the wind rider master Doras, then bring Gryshka's Letter to Zargh at the Crossroads.", "Gryshka's Letter", 1);
+
+_questDB:addQuest("no", 1, "Doras the Wind Rider Master", "Innkeeper Gryshka", 1633.9899902344, -4439.3701171875, 15.433469772339, 17, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1676.25, -4313.4501953125, 61.567657470703, "Doras", 0, 0, 0, 0, 0, 1, "Bring Gryshka's Letter to Doras in Orgrimmar.", "Gryshka's Letter", 1);
+
+_questDB:addQuest("no", 1, "Ride to Orgrimmar", "Devrak", -437.1369934082, -2596, 95.787567138672, 1637, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, 1633.9899902344, -4439.3701171875, 15.433815002441, "Innkeeper Gryshka", 0, 0, 0, 0, 0, 1, "Buy a wind rider to Orgrimmar from the wind rider master Devrak, then bring Zargh's Meats to Gryshka in Orgrimmar.", 0, 1);
+
+_questDB:addQuest("no", 1, "Ride to Orgrimmar", "Devrak", -437.1369934082, -2596, 95.787567138672, 17, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, 1633.9899902344, -4439.3701171875, 15.433815002441, "Innkeeper Gryshka", 0, 0, 0, 0, 0, 1, "Buy a wind rider to Orgrimmar from the wind rider master Devrak, then bring Zargh's Meats to Gryshka in Orgrimmar.", 0, 1);
+
+_questDB:addQuest("no", 1, "Altered Beings", "Tonga Runetotem", -544.99200439453, -2672.7700195313, 95.787773132324, 17, 10, 20, -1198.5767822266, -2969.6372070313, 87.591041564941, 1, 10, 0, 0, 0, 0, -544.99200439453, -2672.7700195313, 95.787773132324, "Tonga Runetotem", "Oasis Snapjaw", 0, 0, 0, 0, 1, "Bring 8 Altered Snapjaw Shells to Tonga Runetotem at the Crossroads.", 0, 1);
 
 _questDB:addQuest("no", 1, "The Stagnant Oasis", "Tonga Runetotem", -544.99200439453, -2672.7700195313, 95.787666320801, 17, 10, 20, -1274.1221923828, -3010.5280761719, 71.332313537598, 2, 0, 0, 0, 1, 0, -544.99200439453, -2672.7700195313, 95.787666320801, "Tonga Runetotem", 0, 0, 0, 344, 0, 0, "Return to Tonga at The Crossroads, after investigating the Stagnant Oasis.", 0, 1);
 
