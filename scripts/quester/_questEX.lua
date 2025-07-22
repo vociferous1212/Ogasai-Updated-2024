@@ -33,7 +33,7 @@ function _questEX:doChecks()
 
 	local localObj = GetLocalPlayer();
 
-	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() then
+	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() and script_grind.jump then
 		local jumpRandom = random(0, 10);
 		if (jumpRandom == 10 and IsMoving() and not IsInCombat()) then local randomTimer = math.random(3000, 12000); self.jumpTimer = GetTimeEX() + randomTimer; JumpOrAscendStart(); end end
 	if not localObj:IsDead() then if _quest:runRest() then _questDoCombat.blacklistTimer = GetTimeEX() + 10000; _quest:setTimer(500); return true; end end

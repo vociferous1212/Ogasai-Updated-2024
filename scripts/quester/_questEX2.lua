@@ -14,7 +14,7 @@ local localObj = GetLocalPlayer();
 		_quest:setTimer(60000);
 	end
 
-	if GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
+	if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
 		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
 			_quest.enemyTarget = GetPet():GetUnitsTarget();
 			if not _quest.enemyTarget:IsDead() then
@@ -49,7 +49,7 @@ local localObj = GetLocalPlayer();
 		end
 	end
 
-	if not _quest.isQuestComplete and GetTarget() == 0 or GetTarget() == nil then
+	if _quest.killStuffOnRoute and IsInCombat() and not _quest.isQuestComplete and GetTarget() == 0 or GetTarget() == nil then
 		if GetPet() ~= 0 and GetPet() ~= nil then
 			if GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil then
 				_quest.enemyTarget = GetPet():GetUnitsTarget();
@@ -153,8 +153,7 @@ script_grind:lootAndSkin();
 			end
 		end
 
-		if ((script_grind.lootObj ~= nil and not IsInCombat()) or (IsInCombat() and not script_grind:isAnyTargetTargetingMe()))
-		and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
+		if script_grind.lootObj ~= nil and not IsInCombat() and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
 if script_grind.lootObj ~= nil then
 			
 		end
@@ -196,7 +195,7 @@ if script_grind.lootObj ~= nil then
 		script_getSpells.getSpellsStatus = 0;
 	end
 
-	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() then
+	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() and not IsInCombat() then
 		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
 			if (PlayerHasTarget()) then
 				ClearTarget();

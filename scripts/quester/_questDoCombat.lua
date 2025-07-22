@@ -33,27 +33,17 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 			-- clear target if it is not tapped by me (don't attack others targets)
 			if GetTarget() ~= 0 and GetTarget() ~= nil then
 				if GetTarget():IsTapped() and not GetTarget():IsTappedByMe() then
-
 					ClearTarget();
-				
 					_quest.enemyTarget = nil;
-				
 				end
-
 			end
 
 			if (_quest.enemyTarget ~= nil) and (_questDBTargets:getTargetAttackingUs() ~= nil) and not script_grind:isTargetingMe(_quest.enemyTarget) and script_grind:enemiesAttackingUs() < 3 then
-
 				if (_questDBTargets:getTargetAttackingUs() ~= _quest.enemyTarget:GetGUID()) then
-
 					_quest.enemyTarget = _questDBTargets:getTargetAttackingUs();
-
 				end
-
 			elseif (_quest.enemyTarget == nil) and _quest.currentType ~= 3 and _quest.currentType ~= 4 then
-
 				_quest.enemyTarget = _questDBTargets:getTargetAttackingUs();
-
 			end
 		end
 
@@ -84,18 +74,12 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 
 
 		-- if target is dead then clear enemytarget var
-		if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) and (_quest.enemyTarget:IsDead()) then
-
+		if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) and (_quest.enemyTarget:IsDead()) and not IsInCombat() then
 			local x, y, z = _quest.enemyTarget:GetPosition();
-
 			if (_quest.enemyTarget:GetDistance() > 5) and ( (GetPet() == nil or GetPet() == 0) or (GetPet() ~= nil and GetPet() ~= 0 and (GetPet():GetUnitsTarget() == nil or GetPet():GetUnitsTarget() == 0)) ) then
-
 				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
-
 				return true;
-
 			else
-
 				if not script_grind:isAnyTargetTargetingMe() then
 				_quest:setTimer(500);
 				ClearTarget();

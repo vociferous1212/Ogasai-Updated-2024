@@ -864,7 +864,7 @@ function script_grind:run()
 	if self.enemyObj ~= nil and self.enemyObj ~= 0 and GetPet() ~= nil and GetTarget() ~= nil and GetTarget() ~= 0 then
 	-- walk away from target if pet target guid is the same guid as target targeting me
 	if (GetPet() ~= 0) and (script_hunter.hasPet and not HasSpell("Shadow Bolt")) and (not script_grind:isTargetingMe(self.enemyObj)) and (GetTarget():GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj:IsInLineOfSight()) then
-		if (self.enemyObj:GetUnitsTarget():GetGUID() ~= 0 and self.enemyObj:GetUnitsTarget():GetGUID() ~= nil) then
+		if self.enemyObj ~= nil and (self.enemyObj:GetUnitsTarget():GetGUID() ~= 0 and self.enemyObj:GetUnitsTarget():GetGUID() ~= nil) then
 			if (self.enemyObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
 				if (script_hunter:runBackwards(self.enemyObj, 15)) then
 					script_grind.tickRate = 100;
@@ -1568,6 +1568,9 @@ if (not IsAutoCasting("Attack")) then
 						self.autoBlacklistTimer = GetTimeEX() - GetTimeEX();
 						self.autoBlacklistTimerSet = false;
 					end
+					if IsEating() or IsDrinking() then
+						self.autoBlacklistTimer = GetTimeEX() + 10000;
+					end
 					if (not IsInCombat()) and (not IsMoving()) and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
 						self.autoBlacklistTimerSet = false;
 						script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
@@ -2099,7 +2102,7 @@ end
 function script_grind:isTargetingMe(target) 
 	local localPlayer = GetLocalPlayer();
 	if (localPlayer ~= nil and localPlayer ~= 0 and not localPlayer:IsDead()) then
-		if (target) ~= nil then
+		if (target) ~= nil and target ~= 0 then
 			if (target:GetUnitsTarget() ~= nil and target:GetUnitsTarget() ~= 0) then
 				return target:GetUnitsTarget():GetGUID() == localPlayer:GetGUID();
 			end

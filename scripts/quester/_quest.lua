@@ -28,14 +28,14 @@ local localObj = GetLocalPlayer();
 	if (not self.isSetup) then _quest:setup(); end
 	if script_grind.pause then
 		if not script_grind.skipLooting and not _questEX.bagsFull and not IsLooting() then script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance); end
-		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return true; end
+		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if not IsInCombat() and (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return true; end
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and (not _quest.isQuestComplete or distToGiver ~= nil and distToGiver <= 20) then
 			if IsCasting() or IsChanneling() then return true; end
 			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
 			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end
 			-- kill stuff on way to quest objectives
-			if GetNumQuestLogEntries() ~= nil and self.killStuffOnRoute and (not _quest.isQuestComplete or _quest.killStuffOnRoute) then _questDBTargets:killStuffAroundUs(); end
-	
+			if GetNumQuestLogEntries() ~= nil and self.killStuffOnRoute then _questDBTargets:killStuffAroundUs(); end
+	if IsInCombat() and IsLooting() then LootTarget(); end
 	-- if we have completed a quest then turn the quest complete in the DB and turn name to "nnil"
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 
@@ -75,7 +75,7 @@ if self.currentType == 10 and _quest.currentQuest ~= nil and ((not script_getSpe
 	_questCheckQuestCompletion:checkQuestForCompletion(); self.tickRate = .3;
 
 	-- return a completed quest to quest return target
-	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and (script_grind.lootObj == nil or script_grind.bagsFull) and (not IsInCombat() or not self.killStuffOnRoute) then
+	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil then
 		if _questDBReturnQuest:returnAQuest() then
 			self.enemyTarget = nil;
 			self.message = "Returning quest!";
@@ -116,12 +116,12 @@ if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and n
 						SelectAvailableQuest(_quest.gossipOption);
 					end end end end return; end
 	-- move to quest giver to get quest
-	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) and ((script_grind.lootObj == nil and not script_grindEX.bagsFull) or (script_grind.lootObj ~= nil and script_grind.skipLooting) or (script_grind.lootObj ~= nil and _questEX.bagsFull) or (script_grind.lootObj == nil and not script_grind.skipLooting) or script_grind.lootObj ~= nil) and not IsCasting() and not IsChanneling() then
+	if (self.curQuestX ~= 0) and (distToGiver > 4) and (self.currentQuest == nil) and ((script_grind.lootObj == nil and not script_grindEX.bagsFull) or (script_grind.lootObj ~= nil and script_grind.skipLooting) or (script_grind.lootObj ~= nil and _questEX.bagsFull) or (script_grind.lootObj == nil and not script_grind.skipLooting) or script_grind.lootObj == nil) and not IsCasting() and not IsChanneling() then
 		script_navEX:moveToTarget(GetLocalPlayer(), self.curQuestX, self.curQuestY, self.curQuestZ); self.message = "Retrieving a quest, "..math.floor(distToGiver).." (yd)"; if not IsMoving() then Move(self.curQuestX, self.curQuestY, self.curQuestZ); end return true; end
 	if self.currentType ~= 1 and self.currentType ~= 2 and not IsInCombat() and not self.isQuestComplete and not IsLooting() then
 		if _questDoOtherQuestTypes() then return true; end end	
 	-- gather quest object
-	if self.currentType == 2 and not IsInCombat() then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..", "..math.floor(_questDBGather.gatheringTarget:GetDistance()).." (yd)"; return true; end end
+	if self.currentType == 2 and not IsInCombat() and script_grind.lootObj == nil then if _questDBGather:run() then self.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..", "..math.floor(_questDBGather.gatheringTarget:GetDistance()).." (yd)"; return true; end end
 	-- get a target
 	if not GetLocalPlayer():IsDead() and  not self.needRest and GetTimeEX() > _questDoCombat.targetingTimer and (self.currentQuest ~= nil and self.curGrindX ~= 0 and self.grindSpotReached and self.currentType ~= 3 and self.currentType ~= 4 and self.currentType ~= 5 and self.currentType ~= 11)
 		or (IsInCombat())
