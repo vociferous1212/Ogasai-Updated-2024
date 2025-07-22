@@ -138,8 +138,8 @@ function _questDBGather:run()
 				end
 
 
-if self.gatheringTarget:GetObjectDisplayID() == 210 or self.gatheringTarget:GetUnitName() == "The Fall of Ameth'Aran" or self.gatheringTarget:GetUnitName() == "The Lay of Ameth'Aran" and not IsInCombat() and not IsChanneling() and not IsCasting() then
-					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID())
+if self.gatheringTarget:GetObjectDisplayID() == 210 or self.gatheringTarget:GetObjectDisplayID() == 347 or self.gatheringTarget:GetObjectDisplayID() == 31 or self.gatheringTarget:GetUnitName() == "The Fall of Ameth'Aran" or self.gatheringTarget:GetUnitName() == "The Lay of Ameth'Aran" and not IsInCombat() and not IsChanneling() and not IsCasting() then
+					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID());
 				end
 				_quest:setTimer(1650);
 
@@ -171,6 +171,7 @@ if self.gatheringTarget:GetObjectDisplayID() == 210 or self.gatheringTarget:GetU
 				end
 			end
 		end
+		LootTarget();
 	end
 return false;
 end

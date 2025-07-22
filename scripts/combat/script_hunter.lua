@@ -358,7 +358,7 @@ function script_hunter:run(targetGUID)
 		end
 
 		-- Auto Attack
-		if (targetObj:GetDistance() < 35) and targetObj:GetDistance() >= 12 and (targetObj:IsInLineOfSight()) then
+		if (targetObj:GetDistance() < 35) and targetObj:GetDistance() >= 10 and (targetObj:IsInLineOfSight()) then
 			if (self.hasPet) then
 				PetAttack();
 			end
@@ -462,8 +462,10 @@ function script_hunter:run(targetGUID)
 
 			-- force auto shot if in combat
 			if (IsInCombat()) then
-				if (not IsAutoCasting("Auto Shot")) and (targetObj:GetDistance() > 15) and (targetObj:GetDistance() < 30) and (targetObj:IsInLineOfSight()) then
-					targetObj:FaceTarget();
+				if (not IsAutoCasting("Auto Shot")) and (targetObj:GetDistance() > 10) and (targetObj:GetDistance() < 30) and (targetObj:IsInLineOfSight()) then
+					if not IsMoving() then
+						targetObj:FaceTarget();
+					end
 					CastSpellByName("Auto Shot");
 					PetAttack();
 					return 0;
@@ -1065,7 +1067,7 @@ function script_hunter:hunterPull(targetObj)
 			end
 
 			-- auto shot
-			if (not IsAutoCasting("Auto Shot")) and (targetObj:IsInLineOfSight()) and (IsStanding()) and (targetObj:GetDistance() >=9) then
+			if (not IsAutoCasting("Auto Shot")) and (targetObj:IsInLineOfSight()) and (IsStanding()) and (targetObj:GetDistance() >= 10) then
 				if (not IsMoving()) then
 							targetObj:FaceTarget();
 						end

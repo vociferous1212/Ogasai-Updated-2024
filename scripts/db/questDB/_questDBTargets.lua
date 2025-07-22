@@ -146,7 +146,7 @@ function _questDBTargets:killStuffAroundUs()
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 and i:GetDistance() <= 38 then
-				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 24.5;
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 22.5;
 				if GetMyClass() == "HUNTER" then
 					aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 30.5;
 				end

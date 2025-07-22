@@ -27,7 +27,6 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		return false;
 	end
 
-	script_priest.waitTimer = self.waitTimer;
 
 	-- get target health percentage
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat()) then
@@ -69,7 +68,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		if (script_priest.useShadowGuard) and (HasSpell("Shadowguard")) and (not localObj:HasBuff("Shadowguard")) and (not IsSpellOnCD("Shadowguard")) and (localMana >= 15) then
 			if (not CastSpellByName("Shadowguard")) then
 				self.waitTimer = GetTimeEX() + 1500;
-				return true;
+				return 0;
 			end
 		end
 	
@@ -130,7 +129,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		end
 
 		-- Cast Greater Heal
-		if (not script_priest.shadowForm) then	-- if not in shadowform
+		if (not script_priest.shadowForm) and HasSpell("Greater Heal") then
 			if (localMana >= 20) and (localHealth <= script_priest.greaterHealHP) then
 				if (CastHeal("Greater Heal", localObj)) then
 					script_grind:setWaitTimer(1500);
@@ -140,7 +139,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		end	
 	
 		-- Cast Heal(spell)
-		if (not script_priest.shadowForm) then	-- if not in shadowform
+		if (not script_priest.shadowForm) and HasSpell("Heal") then
 			if (localMana >= 15) and (localHealth <= script_priest.healHP) then
 				if (CastHeal("Heal", localObj)) then
 					script_grind:setWaitTimer(1500);
@@ -150,26 +149,27 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		end
 	
 		-- Cast Flash Heal
-		if (not script_priest.shadowForm) then	-- if not in shadowform
+		if (not script_priest.shadowForm) and HasSpell("Flash Heal") then
 			if (localMana >= 8) and (localHealth <= script_priest.flashHealHP) then
 					script_priestEX:castFlashHeal();
 					script_grind:setWaitTimer(1700);
-					return true;
+					return 0;
 			end
 		end
 	
 		-- Cast Lesser Heal
-		if (not script_priest.shadowForm) then	-- if not in shadowform
-			if (localLevel < 20) then	-- don't use this when we get flash heal ELSE very low mana
+		if (not script_priest.shadowForm) then
+			if not HasSpell("Flash Heal") then
 				if (localMana >= 10) and (localHealth <= script_priest.lesserHealHP) then
 					if (CastHeal("Lesser Heal", localObj)) then
 						script_grind:setWaitTimer(1700);
-						return 0;	-- if cast return true
+						return 0;
 					end
 				end
+			end
 	
 			-- ELSE IF player level >= 20
-			elseif (localLevel >= 20) then
+			if HasSpell("Flash Heal") then
 				if (localMana <= 8) and (localHealth <= script_priest.flashHealHP) then
 					if (CastHeal("Lesser Heal", localObj)) then
 						script_grind:setWaitTimer(1700);
@@ -184,7 +184,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 			if (localMana > 20) and (HasSpell("Cure Disease")) then
 				CastSpellByName("Cure Disease", localObj);
 				script_grind:setWaitTimer(1750);
-				return true;
+				return 0;
 			end
 		end
 	

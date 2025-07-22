@@ -23,7 +23,7 @@ _questDB:addQuest("no", 0, "A Favor for Evershine", "Rejold Barleybrew", -5378.3
 
 _questDB:addQuest("no", 0, "Evershine", "Pilot Bellowfiz", -5466.5297851563, -632.14099121094, 393.75518798828, 1, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5378.3999023438, 315.29098510742, 394.10610961914, "Rejold Barleybrew", 0, 0, 0, 0, 0, 0, "Get a cask of Evershine from Rejold Barleybrew in Brewnall Village.", 0, 1);
 
-_questDB:addQuest("no", 0, "Stocking Jetstream", "Pilot Bellowfiz", -5466.5297851563, -632.14099121094, 393.75518798828, 1, 6, 12, -5578.4033203125, -689.48742675781, 407.41049194336, 1, 10, 10, 0, 0, 0, -5466.5297851563, -632.14099121094, 393.75518798828, "Pilot Bellowfiz", "Young Black Bear", "Large Crag Boar", 0, 0, 0, 0, "Gather 4 Chunks of Boar Meat and 2 Thick Bear Furs, and deliver them to Pilot Bellowfiz at Steelgrill's Depot.", 0, 1);
+_questDB:addQuest("no", 0, "Stocking Jetsteam", "Pilot Bellowfiz", -5466.5297851563, -632.14099121094, 393.75518798828, 1, 6, 12, -5578.4033203125, -689.48742675781, 407.41049194336, 1, 10, 10, 0, 0, 0, -5466.5297851563, -632.14099121094, 393.75518798828, "Pilot Bellowfiz", "Young Black Bear", "Large Crag Boar", 0, 0, 0, 0, "Gather 4 Chunks of Boar Meat and 2 Thick Bear Furs, and deliver them to Pilot Bellowfiz at Steelgrill's Depot.", 0, 1);
 
 _questDB:addQuest("no", 0, "Beer Basted Boar Ribs", "Ragnar Thunderbrew", -5596.2099609375, -504.13198852539, 400.6311340332, 1, 6, 12, -5822.9809570313, -621.12133789063, 398.41220092773, 7, 10, 10, 0, 0, 0, -5596.2099609375, -504.13198852539, 400.6311340332, "Ragnar Thunderbrew", "Crag Boar", "Large Crag Boar", 0, 0, 0, 0, "Ragnar Thunderbrew in Kharanos wants 6 Crag Boar Ribs and a mug of Rhapsody Malt.", "Rhapsody Malt", 1);
 
@@ -31,7 +31,7 @@ _questDB:addQuest("no", 0, "Ammo for Rumbleshot", "Loslor Rudge", -5499.70019531
 
 _questDB:addQuest("no", 0, "Tools for Steelgrill", "Tharek Blackstone", -5573.7797851563, -464.45498657227, 401.96267700195, 1, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5488.990234375, -682.33001708984, 394.3528137207, "Beldin Steelgrill", 0, 0, 0, 0, 0, 0, "Deliver Steelgrill's Tools to Beldin Steelgrill.", 0, 1);
 
-_questDB:addQuest("no", 0, "Supplies to Tannok", "Hands Springsprocket", -5590.8100585938, -523.34399414063, 399.65145874023, 1, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5590.8100585938, -523.34399414063, 399.65145874023, "Tannok Frosthammer", 0, 0, 0, 0, 0, 2, "Deliver the Crate of Inn Supplies to Tannok Frosthammer in Kharanos.", 0, 1);
+_questDB:addQuest("no", 0, "Supplies to Tannok", "Hands Springsprocket", -6248.83984375, 135.04200744629, 431.58996582031, 1, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5590.8100585938, -523.34399414063, 399.65145874023, "Tannok Frosthammer", 0, 0, 0, 0, 0, 2, "Deliver the Crate of Inn Supplies to Tannok Frosthammer in Kharanos.", 0, 1);
 
 self.isSetup = true;
 end

@@ -317,7 +317,7 @@ script_priestEX.waitTimer = self.waitTimer;
 		end
 
 		-- Don't attack if we should rest first
-		if ((localHealth < self.eatHealth or (localMana < self.drinkMana or localObj:HasBuff("Spirit Tap") and localMana < self.drinkMana/1.5)) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) then
+		if ((localHealth < self.eatHealth or (localMana < self.drinkMana or localObj:HasBuff("Spirit Tap") and localMana < self.drinkMana/1.5)) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) and not IsInCombat() then
 				self.message = "Need rest...";
 				return 4;
 		end
@@ -397,14 +397,16 @@ script_priestEX.waitTimer = self.waitTimer;
 			
 			-- smite low level wouldn't cast for some reason kept defaulting to auto attack
 			-- also used before we have mind blast
-			if (not HasSpell("Mind Blast")) and (targetObj:GetDistance() < 28) and (localMana > 10) and (not IsMoving()) then
+			if (not HasSpell("Mind Blast")) and (targetObj:GetDistance() <= 30) and (localMana > 10) and (not IsMoving()) then
 				if (IsMoving()) then
 					StopMoving();
 				end
 				targetObj:FaceTarget();
-				CastSpellByName("Smite", targetObj);
+				if CastSpellByName("Smite", targetObj) then
 				self.waitTimer = GetTimeEX() + 2650;
 				targetObj:FaceTarget();
+				return 0;
+				end
 			end
 
 			-- Devouring Plague to pull
@@ -443,7 +445,7 @@ if (IsMoving()) then
 			elseif (HasSpell("Shadow Word: Pain")) and (not targetObj:HasDebuff("Shadow Word: Pain")) and (IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 				if (Cast("Shadow Word: Pain", targetObj)) then
 					targetObj:FaceTarget();
-					self.waitTimer = GetTimeEX() + 1850;
+					self.waitTimer = GetTimeEX() + 1950;
 					return 0; -- keep trying until cast
 				end
 
@@ -595,7 +597,7 @@ script_priestEX.waitTimer = self.waitTimer;
 			-- Check: Keep Shadow Word: Pain up
 			if (not targetObj:HasDebuff("Shadow Word: Pain")) and (HasSpell("Shadow Word: Pain")) and (localMana >= self.swpMana) and (targetHealth >= 20) then
 				if (Cast("Shadow Word: Pain", targetObj)) then 
-					self.waitTimer = GetTimeEX() + 1550;
+					self.waitTimer = GetTimeEX() + 1750;
 					self.message = "Keeping DoT up!";
 					return; -- keep trying until cast
 				end

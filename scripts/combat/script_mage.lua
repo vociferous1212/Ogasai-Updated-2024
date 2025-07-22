@@ -949,6 +949,8 @@ if (not IsMounted()) then
 		end
 	end
 
+if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then if IsMoving() then StopMoving(); return true; end end
+
 	--Create Water
 	local waterIndex = -1;
 	for i=0,self.numWater do
