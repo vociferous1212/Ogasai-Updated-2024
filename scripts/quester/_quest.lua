@@ -12,14 +12,10 @@ local localObj = GetLocalPlayer();
 	if (script_grind.showOM) then EndWindow(); GetObjectsAroundMe(); end
 	if (script_radar.showRadar) then script_radar:draw() end
 	if (script_grind.useExpChecker) and (IsInCombat()) then script_expChecker:menu(); end
-	-- draw chests
 	if (script_grind.drawChests) then script_gather:drawChestNodes(); end
-	-- draw fishing pools
 	if (script_gatherEX.drawFishingPools) then script_gatherEX:drawFishNodes(); end
 	if _questEX:doStartChecks() then return; end
 	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
-	--if not script_grind.pause then script_grind:run(); end if _questDB.curDesc == nil then script_grind.pause = false; end
-	-- handle vendor stuff through vendor scripts
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then local vendorStatus = script_vendor:getStatus(); if (vendorStatus > 0) then _questHandleVendor:vendor(); return true; elseif (vendorStatus == 0) then _questEX.bagsFull = false; end
 		if (vendorStatus == 0) then script_vendor:sell(); return true; end return true; end
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
@@ -31,6 +27,7 @@ local localObj = GetLocalPlayer();
 		if _questEX:doChecks() then if script_grind.lootObj ~= nil and not _questEX.bagsFull then if not IsInCombat() and (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then ClearTarget(); end end return; end if script_grind.lootObj ~= nil and IsLooting() then return true; end
 		if (script_grind.lootObj == nil and self.enemyTarget ~= nil) or IsInCombat() and not GetLocalPlayer():IsDead() and (not _quest.isQuestComplete or distToGiver ~= nil and distToGiver <= 20) then
 			if IsCasting() or IsChanneling() then return true; end
+			if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and self.enemyTarget:IsDead() then script_grind.monsterKillCount = script_grind.monsterKillCount + 1; self.enemyTarget = nil end
 			if IsInCombat() then self.tickRate = 1.5; elseif not IsInCombat() then self.tickRate = .3; end
 			_questEX:doChecks(); _questDoCombat:doCombat(); return true; end end
 			-- kill stuff on way to quest objectives

@@ -7,6 +7,7 @@ _questIncludeFiles = {
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
 	questerMenuIncluded = include("scripts\\quester\\_questMenu.lua"),
 	questerMenuEXIncluded = include("scripts\\quester\\_questMenuEX.lua"),
+	questerMenuEX2Included = include("scripts\\quester\\_questMenuEX2.lua"),
 
 	questerDBIncluded = include("scripts\\db\\questDB\\_questDB.lua"),
 	questerDBTargetsIncluded = include("scripts\\db\\questDB\\_questDBTargets.lua"),

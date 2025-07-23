@@ -73,7 +73,6 @@ function _questMenu:menu()
 	if (CollapsingHeader("Quester")) then
 	if (CollapsingHeader(">>> |+| Quest Options")) then
 
-		Text("Options:"); SameLine(); Text("Gather DB Stuff");
 
 		Text("");
 
@@ -131,7 +130,7 @@ local questDescription, desc = GetQuestLogQuestText(1);
 		if (Button("Mark Current DB Quest As Complete")) then
 			_questDBHandleDB:turnQuestCompleted();
 		end
-		Text("You cannot mark a complete quest in quest log as complete...");
+		Text("Mark current DB quest as completed");
 		Text("");	
 
 
@@ -144,11 +143,11 @@ if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_
 		end		
 	end
 
-	if (CollapsingHeader(">>> |+| DB info")) then
+	--if (CollapsingHeader(">>> |+| DB info")) then
 
 
-		_questDBSetup:menu();
-	end
+	--	_questDBSetup:menu();
+	--end
 			
 -- end quest options
 end

@@ -14,6 +14,12 @@ local localObj = GetLocalPlayer();
 		_quest:setTimer(60000);
 	end
 
+		local myMoney = GetMoney();
+		if (myMoney ~= script_grind.currentMoney) then
+			script_grind.moneyObtainedCount = myMoney - script_grind.currentMoney;
+		end
+
+
 	if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
 		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
 			_quest.enemyTarget = GetPet():GetUnitsTarget();

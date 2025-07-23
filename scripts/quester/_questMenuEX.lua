@@ -3,8 +3,6 @@ _questMenuEX = {}
 
 function _questMenuEX:menu()
 
-
-
 	wasClicked, _questMenu.showDBInfo = Checkbox("Show All Quests", _questMenu.showDBInfo);
 
 	if _questMenu.showDBInfo then
@@ -21,7 +19,6 @@ function _questMenuEX:menu()
 			
 	local wasClicked = false;
 			if CollapsingHeader("Eastern Kingdoms") then
-
 				if CollapsingHeader(">>> |+| Tirisfal Glades") then
 					local num = 0;
 					local minlevel = 0;
@@ -167,7 +164,6 @@ function _questMenuEX:menu()
 						end
 					end
 				end
-
 				if CollapsingHeader(">>> |+| Silverpine Forest") then
 					local num = 0;
 					local minlevel = 0;
@@ -197,8 +193,10 @@ function _questMenuEX:menu()
 						end
 					end
 				end
+				
 
 
+				_questMenuEX2:menuEasternKingdom();
 
 
 			end -- end eastern kingdoms
@@ -230,11 +228,9 @@ function _questMenuEX:menu()
 								compl = "No";
 							end
 							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
-
 						end
 					end
 				end
-
 				if CollapsingHeader(">>> |+| Mulgore") then
 					local num = 0;
 					local minlevel = 0;
@@ -319,10 +315,6 @@ function _questMenuEX:menu()
 						end
 					end
 				end
-
-
-
-
 
 			end
 		end

@@ -50,7 +50,7 @@ function _questEX:doChecks()
 		self.message = "Bot only does 1 quest at a time...";
 	end
 	script_grind.nextToNodeDist = 3;
-	NavmeshSmooth(3);
+	NavmeshSmooth(2);
 	if GetNumQuestLogEntries() == 0 then
 		_quest.weHaveQuest = false;
 	end
@@ -65,6 +65,7 @@ function _questEX:doChecks()
 		if (not IsGhost()) then
 			if (not RepopMe()) then
 				if (script_grindEX.useThisVar) then
+					_quest:setTimer(1500);
 					script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
 					script_grindEX.useThisVar = false;
 				end
@@ -77,7 +78,7 @@ function _questEX:doChecks()
 		local _lx, _ly, _lz = localObj:GetPosition();
 		local _rtx, _rty, _rtz = _questDB:getReturnTargetPos();
 
-		if GetCorpsePosition() ~= nil then
+		if GetCorpsePosition() ~= nil and GetCorpsePosition() ~= 0 then
 			if _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorsePosition()) > 100 then
 		
 				_questRessAtGY:ressurect();
