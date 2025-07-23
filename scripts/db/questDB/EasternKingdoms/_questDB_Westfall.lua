@@ -21,7 +21,12 @@ _questDB:addQuest("no", 0, "Westfall Stew", "Verna Furlbrow", -9853.0498046875, 
 
 _questDB:addQuest("no", 0, "Poor Old Blanchy", "Verna Furlbrow", -9853.0498046875, 919.5419921875, 30.278553009033, 40, 10, 20, -9954.966796875, 1056.0358886719, 38.842483520508, 2, 0, 0, 0, 8, 0, -9853.0498046875, 919.5419921875, 30.278553009033, "Verna Furlbrow", 0, 0, 0, 252, 0, 0, "Verna Furlbrow in Westfall wants you to bring her 8 Handfuls of Oats.", 0, 1);
 
+_questDB:addQuest("no", 0, "Return to Lewis", "Dungar Longdrink", -8835.759765625, 490.08401489258, 109.6157913208, 1519, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -10500.599609375, 1021.5900268555, 60.527679443359, "Quartermaster Lewis", 0, 0, 0, 0, 0, 0, "Buy a gryphon ride to Sentinel Hill from the gryphon master Dungar Longdrink, then take Osric's Crate to Lewis at Sentinel Hill.", "Osric's Crate", 1);
+
 _questDB:addQuest("no", 0, "Return to Lewis", "Dungar Longdrink", -8835.759765625, 490.08401489258, 109.6157913208, 40, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -10500.599609375, 1021.5900268555, 60.527679443359, "Quartermaster Lewis", 0, 0, 0, 0, 0, 0, "Buy a gryphon ride to Sentinel Hill from the gryphon master Dungar Longdrink, then take Osric's Crate to Lewis at Sentinel Hill.", "Osric's Crate", 1);
+
+_questDB:addQuest("no", 0, "Dungar Longdrink", "Osric Strang", -8702.2802734375, 382.05200195313, 103.72564697266, 1519, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8835.759765625, 490.08401489258, 109.6157913208, "Dungar Longdrink", 0, 0, 0, 0, 0, 0, "Bring Osric's Crate to Dungar Longdrink the gryphon master.", "Osric's Crate", 1);
+
 
 _questDB:addQuest("no", 0, "Dungar Longdrink", "Osric Strang", -8702.2802734375, 382.05200195313, 103.72564697266, 40, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8835.759765625, 490.08401489258, 109.6157913208, "Dungar Longdrink", 0, 0, 0, 0, 0, 0, "Bring Osric's Crate to Dungar Longdrink the gryphon master.", "Osric's Crate", 1);
 

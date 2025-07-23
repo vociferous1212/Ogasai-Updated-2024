@@ -24,8 +24,8 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 		includeSilverpineForest = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_SilverpineForest.lua"),
 
 		includeLochModan = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_LochModan.lua"),
-
-
+		
+		includeLochModan = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_StranglethornVale.lua"),
 
 
 	-- kalimdor
@@ -65,6 +65,11 @@ function _questDB:setup()
 
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, desc, rewardNum, useItem, gossipOption)
 
+
+	-- 30-40
+	
+		-- stranglethorn vale
+		_questDB_StranglethornVale:setup();
 
 	-- 10-20
 
@@ -169,7 +174,7 @@ function _questDB:getQuestStartPos()
 
 			if self.questList[i]['questName'] ~= "nnil" then
 
-				if self.questList[i]['faction'] == GetMyFaction() then
+				if self.questList[i]['faction'] == GetMyFaction() or (self.questList[i]['faction'] == 2 and GetMapID() == self.questList[i]['mapID']) then
 
 					if _quest.currentQuest ~= nil and (GetMapID() == 1537 or GetMapID() == 1519 or GetMapID() == 1657 or GetMapID() == 1637 or GetMapID() == 1638 or GetMapID() == 1497 or GetMapID() ~= _quest.currentMapID) then
 						myMapID = _quest.currentMapID;

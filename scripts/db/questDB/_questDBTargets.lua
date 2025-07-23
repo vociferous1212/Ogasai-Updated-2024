@@ -93,8 +93,8 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 		i, t = GetNextObject(i);
 		end
 	end
-
-	if bestTarget == nil then _quest.message = "No quest targets in range!"; self.weHaveQuestTarget = false; if _quest.currentType == 2 and not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
+	--_quest.currentType == 2 and
+	if bestTarget == nil then _quest.message = "No quest targets in range!"; self.weHaveQuestTarget = false; if not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
 
 --elseif bestTarget ~= nil then bestTarget:AutoAttack();
 end return bestTarget; end
@@ -151,7 +151,7 @@ function _questDBTargets:killStuffAroundUs()
 					aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 30.5;
 				end
 				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= aggro and i:IsInLineOfSight() then
-					if (script_grind:enemyIsValid(i) or script_grind:isTargetingMe(i)) then
+					if ((script_grind:enemyIsValid(i) and (script_aggro:safePull(i) or script_aggro:safePullRecheck(i))) or script_grind:isTargetingMe(i)) then
 						_quest.enemyTarget = i;
 						i:AutoAttack();
 						i:FaceTarget();

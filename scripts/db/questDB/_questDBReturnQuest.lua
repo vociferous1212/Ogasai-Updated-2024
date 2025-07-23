@@ -52,6 +52,8 @@ function _questDBReturnQuest:returnAQuest()
 
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
+				if HasForm() then RemoveForm(); end
+
 				-- set return target name
 				local name = _questDB:getReturnTargetName();
 	

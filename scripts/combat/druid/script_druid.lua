@@ -793,7 +793,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and (IsBearForm() or IsCatForm()) then
+			if HasForm() and not self.useStealth and not targetObj:IsDead() and targetObj:IsInLineOfSight() and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and (IsBearForm() or IsCatForm()) then
 				CastSpellByName("Faerie Fire (Feral)()");
 				targetObj:FaceTarget();
 			end
@@ -1615,7 +1615,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Rip with 3 CPs
-				if (localCP >= 3) and (localEnergy >= 30) and (not HasSpell("Ferocious Bite")) and (not targetObj:HasDebuff("Rip")) and (targetObj:GetCreatureType() ~= "Elemental") then
+				if (localCP >= 3) and (localEnergy >= 30) and (not HasSpell("Ferocious Bite")) and (not targetObj:HasDebuff("Rip")) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") then
 					if (script_druidEX2:castRip("Rip")) then
 						self.waitTimer = GetTimeEX() + 1000;
 						return 0;
@@ -1647,7 +1647,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- keep rake up
-				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and (not IsSpellOnCD("Rake")) then
+				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") and (not IsSpellOnCD("Rake")) then
 					if (CastSpellByName("Rake", targetObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						return 0;
