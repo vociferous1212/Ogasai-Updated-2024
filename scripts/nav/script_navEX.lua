@@ -47,7 +47,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 		end
 	end
 	if (not IsMoving()) and ((_lx - _ix)^2 < 1) then
-		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
 
 	if (GetTimeEX() > self.waitTimer) then

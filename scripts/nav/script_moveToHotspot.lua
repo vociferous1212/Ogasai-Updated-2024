@@ -29,7 +29,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 				if (HasSpell("Stealth")) then
 					CastStealth();
 				end
-				if (not script_druid.useBear) and (GetLocalPlayer():HasBuff("Cat Form")) then
+				if script_druid.useStealth and (not script_druid.useBear) and (GetLocalPlayer():HasBuff("Cat Form")) then
 					CastStealth();
 				end
 				if (not script_druid.useBear) and (not HasForm()) then
