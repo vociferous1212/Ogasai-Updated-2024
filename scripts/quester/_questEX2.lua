@@ -1,4 +1,4 @@
-_questEX2 = {checkBagTimer = 0, flipVendor = true, vendorBetweenQuests = true}
+_questEX2 = {checkBagTimer = 0, flipVendor = true, vendorBetweenQuests = true, sellVendorX = 0, sellVendorY = 0, sellVendorZ = 0}
 
 function _questEX2:doChecks()
 local localObj = GetLocalPlayer();
@@ -18,8 +18,8 @@ local localObj = GetLocalPlayer();
 		if (myMoney ~= script_grind.currentMoney) then
 			script_grind.moneyObtainedCount = myMoney - script_grind.currentMoney;
 		end
-
-
+	
+	if IsInCombat() then if (script_checkAdds:checkAdds()) then script_om:FORCEOM(); DEFAULT_CHAT_FRAME:AddMessage("test"); return true; end end
 	if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
 		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
 			_quest.enemyTarget = GetPet():GetUnitsTarget();
@@ -27,11 +27,14 @@ local localObj = GetLocalPlayer();
 				_quest.enemyTarget:AutoAttack();
 			end
 		end
-	end
+	end			
 
-	if _questEX2.vendorBetweenQuests and _quest.questIsComplete and _questEX2.flipVendor then
-		script_vendor.status = 2
-		_questEX2.flipVendor = false;
+	if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor then
+		local x, y, z = GetLocalPlayer():GetPosition();
+		if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
+			script_vendor.status = 2
+			_questEX2.flipVendor = false;
+		end
 	end
 
 	-- check inventory for bag every 3 minutes... if we have none in slot 4 already
@@ -172,9 +175,10 @@ if script_grind.lootObj ~= nil then
 					StopMoving();
 					return true;
 				end
-				if not IsMoving() then
+				if not IsMoving() and not IsLooting() and not IsInCombat() then
 					_quest:setTimer(150);
 				end
+				if IsLooting() then LootTarget(); _quest:setTimer(350); end
 			end
 
 			--if (script_grind:doLoot(localObj)) then	
@@ -185,7 +189,7 @@ if script_grind.lootObj ~= nil then
 		end
 	end
 
-	if IsInCombat() and PlayerHasTarget() then
+	if IsInCombat() and PlayerHasTarget() and GetNumPartyMembers() < 1 then
 		if (not script_grind:isAnyTargetTargetingMe() and GetTarget():GetHealthPercentage() > 99) then
 			if IsMoving() then
 				StopMoving();

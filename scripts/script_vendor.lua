@@ -220,6 +220,7 @@ function script_vendor:repair()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
+
 		if (not script_unstuck:pathClearAuto(2)) then
 			script_unstuck:unstuck();
 			return true;
@@ -337,6 +338,7 @@ function script_vendor:sell()
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
+		_questEX2.sellVendorX, _questEX2.sellVendorY, _questEX2.sellVendorZ = vX, vY, vZ;
 		if (not script_unstuck:pathClearAuto(2)) then
 			script_unstuck:unstuck();
 			return true;

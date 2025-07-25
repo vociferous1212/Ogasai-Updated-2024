@@ -25,7 +25,9 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 
 		includeLochModan = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_LochModan.lua"),
 		
-		includeLochModan = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_StranglethornVale.lua"),
+		includeSTV = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_StranglethornVale.lua"),
+
+		includeRRMountains = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_RedridgeMountains.lua"),
 
 
 	-- kalimdor
@@ -68,15 +70,15 @@ function _questDB:setup()
 
 	-- 30-40
 	
-		-- stranglethorn vale
 		_questDB_StranglethornVale:setup();
 
-	-- 10-20
+	-- 20-30
 
-		-- duskwood
 		_questDB_Duskwood_20_25:setup();
 
-		-- barrens
+	-- 10-20
+		_questDB_RedridgeMountains:setup();
+
 		_questDB_Barrens_15_20:setup();
 		_questDB_Barrens_10_15:setup();
 
@@ -92,23 +94,18 @@ function _questDB:setup()
 
 	-- 1-10
 
-		-- tirisfal glades
 		_questDB_Tirisfal_Brill:setup()
 		_questDB_Tirisfal_Deathknell:setup()
 
-		-- teldrassil
 		_questDB_Teldrassil_Dolanaar:setup()
 		_questDB_Teldrassil_Shadowglen:setup();
 		
-		-- elwynn	
 		_questDB_Elwynn_Goldshire:setup()
 		_questDB_Elwynn_Northshire:setup();
 
-		-- dun morogh
 		_questDB_DunMorogh_Kharanos:setup();
 		_questDB_DunMorogh_Coldridge:setup();
 
-		-- durotar
 		_questDB_Durotar_RazorHill:setup();
 		_questDB_Durotar_ValleyOfTrials:setup();
 
@@ -186,7 +183,7 @@ function _questDB:getQuestStartPos()
 
 					if GetLocalPlayer():GetLevel() >= self.questList[i]['minLevel'] or not _questDB.minMaxLevel then
 
-						if GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] or not _questDB.minMaxLevel then
+						if GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] then
 
 							x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 

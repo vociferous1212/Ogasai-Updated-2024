@@ -109,6 +109,8 @@ local questDescription, desc = GetQuestLogQuestText(1);
 		SameLine();
 		wasClicked, _questEX2.vendorBetweenQuests = Checkbox("Vendor Between Quests", _questEX2.vendorBetweenQuests);
 
+		Text("It is best to complete low level quests.");
+		Text("Start your new zone ~5 levels higher than required.");
 		-- grind spot reached
 		Separator();
 		if (Button("Current Spot Is Grind Spot")) then

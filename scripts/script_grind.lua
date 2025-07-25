@@ -672,7 +672,8 @@ function script_grind:run()
 
 	-- hotspot reached distance
 	if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
-		self.hotspotReached = true;
+		self.hotspotReached = false;
+		self.message = "Moving back to hotspot";
 	end	
 
 	-- go to FP buttons
@@ -1787,7 +1788,7 @@ if (not IsAutoCasting("Attack")) then
 						CastSpellByName("Stealth", localObj);
 						self.waitTimer = GetTimeEX() + 1200;
 					end
-					if (HasSpell("Prowl")) and IsCatForm() then
+					if script_druid.useStealth and (HasSpell("Prowl")) and IsCatForm() then
 						CastSpellByName("Prowl", localObj);
 						self.waitTimer = GetTimeEX() + 1200;
 					end
@@ -1883,7 +1884,7 @@ function script_grind:assignTarget()
 		if (targetType == 3) then
 		
 			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 				
 				-- run another object manager
 				if (script_grind:isTargetingGroup(i)) then
@@ -2770,6 +2771,11 @@ function script_grind:isAnyTargetTargetingMe()
 		if (targetType == 3) then
 			if (i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil) then
 				if (i:GetUnitsTarget():GetGUID() == player:GetGUID()) then 
+					return true
+				end
+			end
+			if GetPet() ~= 0 and GetPet() ~= nil then
+				if (i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then 
 					return true
 				end
 			end

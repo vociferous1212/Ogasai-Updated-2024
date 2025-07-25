@@ -11,13 +11,13 @@ function _questDBGatherGetObject:getObject()
 
 			if _questDB.questList[i]['desc'] == _quest.currentDesc then
 
-				self.gatherTarget = _questDB.questList[i]['gatherID'];
+				_questDBGather.gatherTarget = _questDB.questList[i]['gatherID'];
 
-				self.gatherTarget2 = _questDB.questList[i]['gatherID2'];
+				_questDBGather.gatherTarget2 = _questDB.questList[i]['gatherID2'];
 
-				self.gatherNum = _questDB.questList[i]['numGather'];
+				_questDBGather.gatherNum = _questDB.questList[i]['numGather'];
 
-				self.gatherNum2 = _questDB.questList[i]['numGather2'];
+				_questDBGather.gatherNum2 = _questDB.questList[i]['numGather2'];
 
 			end
 		end
@@ -30,15 +30,15 @@ function _questDBGatherGetObject:getObject()
 
 			if t == 5 then
 
-				if not _questDBGather:isNodeBlacklisted(i:GetGUID()) and (self.gatherTarget == i:GetObjectDisplayID() and _quest.gatheredNum < self.gatherNum) or (self.gatherTarget2 == i:GetObjectDisplayID() and _quest.gatheredNum2 < self.gatherNum2) and script_gatherEX2:isNodeSafeToGather(i) then
+				if not _questDBGather:isNodeBlacklisted(i:GetGUID()) and (_questDBGather.gatherTarget == i:GetObjectDisplayID() and _quest.gatheredNum < _questDBGather.gatherNum) or (_questDBGather.gatherTarget2 == i:GetObjectDisplayID() and _quest.gatheredNum2 < _questDBGather.gatherNum2) and script_gatherEX2:isNodeSafeToGather(i) then
 
-					if self.gatherTarget == i:GetObjectDisplayID() then
+					if _questDBGather.gatherTarget == i:GetObjectDisplayID() then
 
-						self.gatheringTargetName = i:GetUnitName();
+						_questDBGather.gatheringTargetName = i:GetUnitName();
 
-					elseif self.gatherTarget2 == i:GetObjectDisplayID() then
+					elseif _questDBGather.gatherTarget2 == i:GetObjectDisplayID() then
 
-						self.gatheringTargetName2 = i:GetUnitName();
+						_questDBGather.gatheringTargetName2 = i:GetUnitName();
 
 					end
 

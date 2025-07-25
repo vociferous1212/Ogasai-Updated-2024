@@ -16,7 +16,7 @@ function script_checkAdds:checkAdds()
 
 	-- check if there are adds and avoid those adds. call this to run avoid adds
 	if (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= 0 and questEnemy ~= nil) and (not IsCasting()) then
-		if script_grind:enemiesWithinRange() <= 3 and ((grindEnemy ~= 0 and grindEnemy ~= nil and grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(gindEnemy)) or (questEnemy ~= 0 and questEnemy ~= nil and questEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(questEnemy.enemyObj))) then
+		if script_grind:enemiesWithinRange() <= 3 and ((grindEnemy ~= 0 and grindEnemy ~= nil and grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(gindEnemy)) or (questEnemy ~= 0 and questEnemy ~= nil and questEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(questEnemy))) then
 
 			if (script_checkAdds:avoidToAggro(self.checkAddsRange)) then
 	
