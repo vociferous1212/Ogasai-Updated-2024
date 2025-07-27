@@ -18,10 +18,13 @@ function _questDoOtherQuestTypes2:run()
 				x, y, z = 2259.7299804688, 275.5710144043, 34.837535858154;
 			elseif _quest.currentQuest == "Beer Basted Boar Ribs" then
 				x, y, z = -5601.6000976563, -531.20300292969, 399.65356445313;
+			elseif _quest.currentQuest == "Soothing Turtle Bisque" then
+				x, y, z = -773.91900634766, -499.29400634766, 18.849189758301;
 			end
 			if GetDistance3D(px, py, pz, x, y, z) > 4 then
 				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 			elseif GetDistance3D(px, py, pz, x, y, z) <= 4 then
+				if HasForm() then RemoveForm(); end
 				local name = "";
 				_quest:setTimer(1500);
 
@@ -29,6 +32,8 @@ function _questDoOtherQuestTypes2:run()
 					name = "Abigail Shiel";
 				elseif _quest.currentQuest == "Beer Basted Boar Ribs" then
 					name = "Innkeeper Belm";
+				elseif _quest.currentQuest == "Soothing Turtle Bisque" then
+					name = "Micha Yance";
 				end
 
 				if GetTarget() ~= nil and GetTarget() ~= 0 then

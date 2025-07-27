@@ -2,6 +2,9 @@ _questEX2 = {checkBagTimer = 0, flipVendor = true, vendorBetweenQuests = true, s
 
 function _questEX2:doChecks()
 local localObj = GetLocalPlayer();
+	
+	-- thousand needles... shimmering flats grind area.
+	if GetMapID() == 400 then _quest.distToGrindFromHotspot = 500; end
 
 	if localObj:HasDebuff("Ressurection Sickness") then
 		if IsMoving() then
@@ -148,8 +151,8 @@ local localObj = GetLocalPlayer();
 		--	script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 		--	script_grind.timerSet = true;
 		--end
-
-script_grind:lootAndSkin();
+if not IsInCombat() then
+script_grind:lootAndSkin(); end
 	-- loot objects
 	if (not IsInCombat()) and not script_grind.skipLooting then
 		if script_grind.lootObj == nil then
