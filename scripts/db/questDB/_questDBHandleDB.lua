@@ -29,6 +29,8 @@ function _questDBHandleDB:turnQuestCompleted()
 						_quest.currentQuest = nil;
 
 						_questDB.questList[i]['completed'] = "nnil";
+			
+						CloseQuest();
 
 						--_questDB.questList[i]['questName'] = "nnil";
 						_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();

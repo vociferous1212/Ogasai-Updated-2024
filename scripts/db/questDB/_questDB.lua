@@ -29,6 +29,9 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 
 		includeRRMountains = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_RedridgeMountains.lua"),
 
+		includeHillsbrad = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_HillsbradFoothills.lua"),
+
+
 
 	-- kalimdor
 
@@ -57,6 +60,9 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 
 		includeBarrens_15_20 = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Barrens_15_20.lua"),
 
+		includeThousandNeedles = include("scripts\\db\\questDB\\Kalimdor\\_questDB_ThousandNeedles.lua"),
+
+
 
 		
 }
@@ -71,7 +77,10 @@ function _questDB:setup()
 	-- 30-40
 	
 		_questDB_StranglethornVale:setup();
+		_questDB_ThousandNeedles:setup();
 
+	-- 25-35
+		_questDB_HillsbradFoothills:setup();
 	-- 20-30
 
 		_questDB_Duskwood_20_25:setup();

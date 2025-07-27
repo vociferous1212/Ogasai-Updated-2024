@@ -623,6 +623,7 @@ function script_druid:run(targetGUID)
 	if (not script_grind.adjustTickRate) then
 
 		local tickRandom = math.random(450, 750);
+		if IsCatForm() then tickRandom = 250; self.waitTimer = self.waitTimer - 500; end
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -787,13 +788,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
 		-- use charge in bear form
-		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 10) then
+		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 11) then
 				targetObj:FaceTarget();
 				script_druidEX:castCharge();
 			end
 
 			-- keep faerie fire up
-			if HasForm() and not self.useStealth and not targetObj:IsDead() and targetObj:IsInLineOfSight() and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and (IsBearForm() or IsCatForm()) then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and not targetObj:IsDead() and targetObj:IsInLineOfSight() and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and (IsBearForm() or IsCatForm()) then
 				CastSpellByName("Faerie Fire (Feral)()");
 				targetObj:FaceTarget();
 			end
@@ -880,7 +881,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		end
 
 -- keep faerie fire up
-			if HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					targetObj:FaceTarget();
@@ -889,7 +890,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 -- use charge in bear form
-		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 10) then
+		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 11) then
 				targetObj:FaceTarget();
 				script_druidEX:castCharge();
 			end
@@ -982,7 +983,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- stealth opener
 			if (IsCatForm()) and (self.useCat) and (self.useStealth) and (IsStealth()) then
-				if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 50) and (targetObj:GetDistance() <= 4) and (HasSpell("Shred") and self.openerUsed < 3) or (not HasSpell("Shred")) then
+				if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 60) and (targetObj:GetDistance() <= 4) and (HasSpell("Shred") and self.openerUsed < 3) or (not HasSpell("Shred")) then
 					
 					if (not CastSpellByName(self.stealthOpener)) then
 						if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
@@ -1023,7 +1024,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					targetObj:FaceTarget();
@@ -1046,7 +1047,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- use charge in bear form
 			if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) then
-				if (self.useBear) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() > 10) then
+				if (self.useBear) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() <= 11) then
 					targetObj:FaceTarget();
 					CastSpellByName("Feral Charge", targetObj);
 				end
@@ -1058,7 +1059,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				CastSpellByName("Faerie Fire (Feral)()");
 				targetObj:FaceTarget();
 				return 0;
@@ -1137,7 +1138,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- keep faerie fire up
-			if HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				CastSpellByName("Faerie Fire (Feral)()");
 				targetObj:FaceTarget();
 				return 0;
@@ -1438,7 +1439,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- use charge in bear form
 				if (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) then
-					if (self.useBear) and (IsBearForm()) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() > 10) then
+					if (self.useBear) and (IsBearForm()) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() >= 11) then
 						CastSpellByName("Feral Charge");
 						return 4;
 					end
@@ -1474,7 +1475,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- keep faerie fire up
-				if HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					return 0;
 				end
@@ -1608,7 +1609,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- keep faerie fire up
-				if HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					self.waitTimer = GetTimeEX() + 1600;
 					return 0;
