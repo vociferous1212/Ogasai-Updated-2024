@@ -38,6 +38,10 @@ function script_rotation:run()
 	if (not self.isSetup) then 
 		script_rotation:setup(); 
 	end
+	--if (self.waitTimer > GetTimeEX()) then
+	--	return;
+	--end
+	--if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end
 	if (script_rotationMenu.pause) then 
 		self.message = "Paused by user..."; 
 		return; 

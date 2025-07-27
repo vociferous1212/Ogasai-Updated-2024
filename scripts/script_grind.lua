@@ -1569,10 +1569,10 @@ if (not IsAutoCasting("Attack")) then
 						self.autoBlacklistTimer = GetTimeEX() - GetTimeEX();
 						self.autoBlacklistTimerSet = false;
 					end
-					if IsEating() or IsDrinking() then
+					if IsEating() or IsDrinking() or IsLooting() or (PlayerHasTarget() and IsMoving()) then
 						self.autoBlacklistTimer = GetTimeEX() + 10000;
 					end
-					if (not IsInCombat()) and (not IsMoving()) and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
+					if (not IsInCombat()) and (not IsMoving()) and not IsDrinking() and not IsEating() and not IsLooting() and not IsCasting() and not IsChanneling() and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
 						self.autoBlacklistTimerSet = false;
 						script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
 						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting "..self.enemyObj:GetUnitName()..", "..math.floor(self.enemyObj:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
@@ -2775,8 +2775,10 @@ function script_grind:isAnyTargetTargetingMe()
 				end
 			end
 			if GetPet() ~= 0 and GetPet() ~= nil then
-				if (i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then 
-					return true
+				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+					if (i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then 
+						return true
+					end
 				end
 			end
 		end
