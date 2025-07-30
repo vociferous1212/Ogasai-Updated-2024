@@ -6,6 +6,7 @@ script_rotation = {
 	combatError = 0,
 	message = 'Rotation',
 	enemyObj = 0,
+	usingRotation = false,
 	useExpChecker = true,
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	gatherLoaded = include("scripts\\gather\\script_gather.lua"),
@@ -35,6 +36,8 @@ function script_rotation:window() -- stuff here runs continous
 end
 
 function script_rotation:run()
+
+	if script_rotationMenu.pause then self.usingRotation = false; else self.usingRotation = true; end
 	if (not self.isSetup) then 
 		script_rotation:setup(); 
 	end

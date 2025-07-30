@@ -1108,7 +1108,7 @@ function script_grind:run()
 					self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
 				end
 			
-			elseif (script_grindEX:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) or (IsStealth()) then
+			elseif (script_grindEX:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) or (IsStealth())  or (not script_gather.safeGather) then
 			if (script_gatherRun:gather()) then
 
 					-- turn off jump for gathering...

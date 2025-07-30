@@ -37,7 +37,7 @@ function script_counterMenu:menu()
 		local test = (moneyObtainedCount - moneyObtainedCountSilver * 100);
 
 		-- copper from gold when we have gold??
-		local test2 = (moneyObtainedCount - moneyObtainedCountSilver) / 100;
+		local test2 = (moneyObtainedCountSilver) - (moneyObtainedCountGold * 10000);
 		
 	
 		-- less than 100 copper
