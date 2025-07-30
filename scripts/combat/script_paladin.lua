@@ -41,17 +41,10 @@ function script_paladin:setup()
 		self.blessing = "Blessing of Might";
 	end
 	--set holy light health no flash of light
-	if (not HasSpell("Flash of Light")) then
-		self.holyLightHealth = 66;
-	end
+	if (not HasSpell("Flash of Light")) then self.holyLightHealth = 66; end
 	-- set bubble hearth false if no divine shield
-	if (not HasSpell("Divine Shield")) then
-		self.useBubbleHearth = false;
-	end
-	self.waitTimer = GetTimeEX();
-	script_paladinEX.waitTimer = GetTimeEX();
-	script_paladinEX.holyLightTimer = GetTimeEX();
-	self.isSetup = true;
+	if (not HasSpell("Divine Shield")) then self.useBubbleHearth = false; end
+	self.waitTimer = GetTimeEX(); script_paladinEX.waitTimer = GetTimeEX(); script_paladinEX.holyLightTimer = GetTimeEX(); self.isSetup = true;
 end
 
 -- Run backwards if the target is within range
@@ -232,7 +225,7 @@ function script_paladin:run(targetGUID)
 				end
 			end
 
-			if (targetObj:GetDistance() <= self.meleeDistance) then
+			if (targetObj:GetDistance() <= self.meleeDistance + 1) then
 				if (not IsAutoCasting("Attack")) then
 					targetObj:AutoAttack();
 					targetObj:FaceTarget();
@@ -240,8 +233,8 @@ function script_paladin:run(targetGUID)
 					script_grind:setWaitTimer(1000);
 					return 0;
 				end
+					targetObj:FaceTarget();
 			end
-				
 		-- Combat WE ARE NOW IN COMBAT
 
 		else	

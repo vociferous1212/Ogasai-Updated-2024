@@ -36,4 +36,8 @@ function vendorDB_30_40:setup()
 	vendorDB:addVendor("Maxton Strang", 0, 1, 405, true, false, false, false, false, 202.83, 1179.18, 167.99);
 	vendorDB:addVendor("Maxton Strang", 0, 1, 405, false, false, false, false, false, 202.83, 1179.18, 167.99);
 
+-- Badlands - Both
+	vendorDB:addVendor("Jazzrik", 0, 0, 3, false, false, false, false, false, -6760.19, -3135.56, 241.16);
+	vendorDB:addVendor("Jazzrik", 0, 0, 3, true, false, false, false, false, -6760.19, -3135.56, 241.16);
+
 end

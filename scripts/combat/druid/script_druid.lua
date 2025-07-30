@@ -172,7 +172,7 @@ end
 -- Run backwards if the target is within range
 function script_druid:runBackwards(targetObj, range) 
 	local localObj = GetLocalPlayer();
- 	if targetObj ~= 0 and (not script_checkDebuffs:hasDisabledMovement()) then
+ 	if targetObj ~= 0 and (not script_checkDebuffs:hasDisabledMovement()) and not script_rotation.usingRotation then
  		local xT, yT, zT = targetObj:GetPosition();
  		local xP, yP, zP = localObj:GetPosition();
  		local distance = targetObj:GetDistance();
@@ -786,6 +786,8 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
+
+		if targetObj:IsDead() then self.waitTimer = GetTimeEX() + 1500; ClearTarget(); end
 
 		-- use charge in bear form
 		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 11) then
