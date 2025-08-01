@@ -452,6 +452,11 @@ function script_shaman:run(targetGUID)
 		CastSpellByName("Ghost Wolf");
 	end	
 
+	if IsInCombat() and not script_grind:isAnyTargetTargetingMe() and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() > 95)) then
+		script_grind.message = "Stuck in combat! Waiting...";
+		return 4;
+	end
+			
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	

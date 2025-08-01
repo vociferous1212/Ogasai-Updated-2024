@@ -208,17 +208,28 @@ function script_druid:draw()
 end
 
 function script_druid:healsAndBuffs()
+	
+	local localMana = 0;
+	local localRage = 0;
+	local localEnergy = 0;
+
+	if GetLocalPlayer():HasBuff("Omen of Clarity") then
+		localMana = 100;
+		localRage = 100;
+		localEnergy = 100;
+	else
+		localMana = localObj:GetManaPercentage();
+		localRage = localObj:GetRagePercentage();
+		localEnergy = localObj:GetEnergyPercentage();
+	end
 
 	local localObj = GetLocalPlayer();
 	local localHealth = localObj:GetHealthPercentage();
-	local localMana = localObj:GetManaPercentage();
-	local localRage = localObj:GetRagePercentage();
 	local localLevel = localObj:GetLevel();
 	local hasRejuv = localObj:HasBuff("Rejuvenation"); 
 	local hasRegrowth = localObj:HasBuff("Regrowth");
 	local myTarget = GetLocalPlayer():GetUnitsTarget();
 	local localCP = GetComboPoints("player", "target");
-	local localEnergy = localObj:GetEnergyPercentage();
 
 
 
@@ -261,7 +272,7 @@ function script_druid:healsAndBuffs()
 
 	-- shapeshift out of bear form to heal
 	if ( (IsBearForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and (not hasRejuv) and (not hasRegrowth) )
-	or ( (IsBearForm() ) and (localHealth <= 65) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
+	or ( (IsBearForm() ) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
@@ -276,7 +287,7 @@ function script_druid:healsAndBuffs()
 
 	-- shapeshift out of cat form to heal
 	if ( (IsCatForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and (not hasRejuv) and (not hasRegrowth) )
-	or ( (IsCatForm()) and (localHealth <= self.healthToShift) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
+	or ( (IsCatForm()) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
 
 		if (not script_grind.adjustTickRate) then
@@ -289,6 +300,22 @@ function script_druid:healsAndBuffs()
 		end
 	end
 
+	-- nature's grasp
+	if IsInCombat() and HasSpell("Nature's Grasp") and not IsSpellOnCD("Nature's Grasp") and not HasForm() and not IsIndoors() and localHealth <= 55 then
+		CastSpellByName("Nature's Grasp", localObj);
+		self.waitTimer = GetTimeEX() + 1650;
+		script_grind:setWaitTimer(1650);
+		return true;
+		-- may have to set a nature's grasp timer for 1 minute and reset here every cast because isindoors doesn't work all the time
+	end
+
+	-- omen of clarity
+	if HasSpell("Omen of Clarity") and not localObj:HasBuff("Omen of Clarity") and localMana >= 10 and not HasForm() then
+		CastSpellByName("Omen of Clarity", localObj);
+		self.waitTimer = GetTimeEX() + 1650;
+		script_grind:setWaitTimer(1650);
+		return true;
+	end
 
 	-- heal - we left form out of combat
 	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (localHealth <= 65) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) and (IsStanding()) and (not IsMounted()) then
@@ -299,7 +326,7 @@ function script_druid:healsAndBuffs()
 	end
 
 	-- heal - we left form out of combat regrowth
-	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not HasForm()) and (localHealth <= 60) and (localMana >= 35) and (not hasRegrowth) and (not IsMoving()) and (IsStanding()) and (not IsMounted()) and (not IsCasting()) and (not self.hasRegrowth) then
+	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not HasForm()) and (localHealth <= 70) and (localMana >= 35) and (not hasRegrowth) and (not IsMoving()) and (IsStanding()) and (not IsMounted()) and (not IsCasting()) and (not self.hasRegrowth) then
 			self.tickRate = 1500;
 		if (IsMoving()) then
 			StopMoving();
@@ -377,20 +404,10 @@ function script_druid:healsAndBuffs()
 
 		-- Innervate
 		if (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana) then
-			if (CastSpellByName("Innervate", localObj)) then
-				self.waitTimer = GetTimeEX() + 3500;
-				return true;
-			end
+			CastSpellByName("Innervate", localObj);
+			self.waitTimer = GetTimeEX() + 3500;
+			return true;
 		end
-
-		-- Nature's Grasp
-		-- run backwards if health is low enough and target is rooted?
-		--if (HasSpell("Nature's Grasp")) and (not IsSpellOnCD("Nature's Grasp")) and (not localObj:HasBuff("Nature's Grasp")) and (IsInCombat()) and (localMana >= self.shapeshiftMana) then
-		--	if (CastSpellByName("Nature's Grasp", localObj)) then
-		--		self.waitTimer = GetTimeEX() + 1750;
-		--		return true;
-		--	end
-		--end
 
 		-- Mark of the Wild
 		if (HasSpell("Mark of the Wild")) and (not IsMounted()) and (not localObj:HasBuff("Mark of the Wild")) and (localHealth >= self.healthToShift) and (not IsSpellOnCD("Mark of the Wild")) and (GetLocalPlayer():GetUnitsTarget() == 0 or GetLocalPlayer():GetUnitsTarget() ~= 0 and not GetLocalPlayer():GetUnitsTarget():HasBuff("Mark of the Wild")) then
@@ -540,16 +557,6 @@ if (not IsInCombat()) then
 
 --------------------------
 
-	-- keep auto attack on - turns off when healing - stops casting when low mana can't heal can't shift
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
-			if (not IsAutoCasting("Attack")) and (not IsMoving()) and (IsInCombat()) then
-				script_grind.enemyObj:AutoAttack();
-				return true;
-			end
-		end
-	end
-
 	-- if we have regrowth and rejuvenation and 2 or more targets are attacking us then cast healing touch
 	if (HasSpell("Regrowth")) and (hasRegrowth or hasRejuv) and (script_grind:enemiesAttackingUs(10) > 2) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < self.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
 		if (not IsCasting()) and (not IsChanneling()) then
@@ -573,6 +580,15 @@ if (not IsInCombat()) then
 		end
 	end
 
+	-- keep auto attack on - turns off when healing - stops casting when low mana can't heal can't shift
+	if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
+			if (not IsAutoCasting("Attack")) and (not IsMoving()) and (IsInCombat()) then
+				script_grind.enemyObj:AutoAttack();
+				return true;
+			end
+		end
+	end
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
@@ -599,16 +615,27 @@ end
 
 function script_druid:run(targetGUID)
 
+	local localMana = 0;
+	local localRage = 0;
+	local localEnergy = 0;
+
 	if(not self.isSetup) then
 		script_druid:setup();
 	end
-	
+
+	if GetLocalPlayer():HasBuff("Omen of Clarity") then
+		localMana = 100;
+		localRage = 100;
+		localEnergy = 100;
+	else
+		localMana = localObj:GetManaPercentage();
+		localRage = localObj:GetRagePercentage();
+		localEnergy = localObj:GetEnergyPercentage();
+	end
+
 	local localObj = GetLocalPlayer();
 	local localHealth = localObj:GetHealthPercentage();
-	local localMana = localObj:GetManaPercentage();
 	local localLevel = localObj:GetLevel();
-	local localRage = localObj:GetRagePercentage();
-	local localEnergy = localObj:GetEnergyPercentage();
 	local localCP = GetComboPoints("player", "target");
 	local isMoonkin = localObj:HasBuff("Moonkin Form");
 	script_grind.combatScriptRange = self.meleeDistance;
@@ -756,7 +783,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	
 
 	-- run backwards if target is entangled
-				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) then
+				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) and not IsCatForm() and not IsBearForm() then
 					if (script_druid:runBackwards(targetObj, 12)) then
 						self.waitTimer = GetTimeEX() + 500;
 					return 4;
@@ -1703,7 +1730,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end 
 				end	
 					-- run backwards if target is entangled
-				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) then
+				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) and not IsCatForm() and not IsBearForm() then
 					if (script_druid:runBackwards(targetObj, 12)) then
 						self.waitTimer = GetTimeEX() + 500;
 					return 4;
