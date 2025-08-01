@@ -799,6 +799,7 @@ function script_grind:run()
 		script_grind.newTargetTime = GetTimeEX();
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
+		self.autoBlacklistTimer = GetTimeEX() + 10000;
 		return;
 	end
 
@@ -848,7 +849,7 @@ function script_grind:run()
 	end
 	end
 	-- run backwards target has entangling roots
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetManaPercentage() >= 25) then
+	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetManaPercentage() >= 25) and not IsBearForm() and not IsCatForm() then
 		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Entangling Roots")) and (not script_checkDebuffs:hasDisabledMovement()) and (not script_grindEX:areWeSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
 		if (script_druid:runBackwards(targetObj, 10)) then -- Moves if the target is closer than 7 yards
 			script_grind.tickRate = 0;
@@ -1026,18 +1027,6 @@ function script_grind:run()
 		CloseTradeSkill();
 	end
 
-
-
-
-
-
-
-
-
-
-
-
-
 	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) and (not script_checkAdds:checkAdds()) then
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (self.enemyObj:GetDistance() <= 30) then
@@ -1047,6 +1036,7 @@ function script_grind:run()
 			end
 		end
 	end
+
 
 
 		-- Do all checks

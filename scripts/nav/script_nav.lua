@@ -127,7 +127,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- Check: Move to the next location index
-	local _lx, _ly, _lz = localObj:GetPosition();
+	local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
 	local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
 	if (currentDist < 5 
 		or self.savedLocations[self.currentGoToLocation]['level'] < minLevel

@@ -41,7 +41,8 @@ local localObj = GetLocalPlayer();
 	end
 
 	-- check inventory for bag every 3 minutes... if we have none in slot 4 already
-	if not IsInCombat() and not IsMoving() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
+	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
+		 CheckBagsForBetterGear();
 		_questEquipItems:checkInventoryForBags();
 		self.checkBagTimer = GetTimeEX() + 180000;
 	end
