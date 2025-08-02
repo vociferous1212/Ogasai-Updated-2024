@@ -17,6 +17,7 @@ function script_deleteItems:setup()
 
 	script_deleteItems:addDeleteItem("Flute of Xavaric");
 	script_deleteItems:addDeleteItem("OOX-22/FE Distress Beacon");
+	script_deleteItems:addDeleteItem("00X-22/FE Distress Beacon");
 	script_deleteItems:addDeleteItem("OOX-17/TN Distress Beacon");
 	script_deleteItems:addDeleteItem("OOX-09/HL Distress Beacon");
 	script_deleteItems:addDeleteItem("Mangled Journal");

@@ -42,43 +42,33 @@ function script_expChecker:targetLevels()
 
 	-- get zero difference of target levels and player levels, used for exp calculation
 	local level = GetLocalPlayer():GetLevel();
-	if (level <= 7) then
-		zeroDiff =  5;
+	
 
-	elseif (level >= 8) and (level <= 9) then
-		zeroDiff =  6;
-
-	elseif (level >= 10) and (level <= 11) then
-		zeroDiff =  7;
-
-	elseif (level >= 12) and (level <= 15) then
-		zeroDiff =  8;
-
-	elseif (level >= 16) and (level <= 19) then
-		zeroDiff =  9;
-
-	elseif (level >= 20) and (level <= 29) then
-		zeroDiff = 11;
-
-	elseif (level >= 30) and (level <= 39) then
-		zeroDiff = 12;
-
-	elseif (level >= 40) and (level <= 44) then
-		zeroDiff = 13;
-
-	elseif (level >= 45) and (level <= 49) then
-		zeroDiff = 14;
-
-	elseif (level >= 50) and (level <= 54) then
-		zeroDiff = 15;
-
-	elseif (level >= 55) and (level <= 59) then
-		zeroDiff = 16;
-
-	elseif (level >= 60) then
-		zeroDiff = 17;
-
-	end
+if (level <= 7) then
+    zeroDiff = 5;
+elseif (level >= 8) and (level <= 9) then
+    zeroDiff = 6;
+elseif (level >= 10) and (level <= 11) then
+    zeroDiff = 7;
+elseif (level >= 12) and (level <= 15) then
+    zeroDiff = 8;
+elseif (level >= 16) and (level <= 19) then
+    zeroDiff = 9;
+elseif (level >= 20) and (level <= 29) then
+    zeroDiff = 10; -- Changed from 11
+elseif (level >= 30) and (level <= 39) then
+    zeroDiff = 11; -- Changed from 12
+elseif (level >= 40) and (level <= 44) then
+    zeroDiff = 12; -- Changed from 13
+elseif (level >= 45) and (level <= 49) then
+    zeroDiff = 13; -- Changed from 14
+elseif (level >= 50) and (level <= 54) then
+    zeroDiff = 14; -- Changed from 15
+elseif (level >= 55) and (level <= 59) then
+    zeroDiff = 15; -- Changed from 16
+elseif (level >= 60) then
+    zeroDiff = 16; -- Changed from 17
+end
 
         -- rested exp calculation per mob targeted
 	if (GetLocalPlayer():GetLevel() < 60) then 

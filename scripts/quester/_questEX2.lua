@@ -1,4 +1,4 @@
-_questEX2 = {checkBagTimer = 0, flipVendor = true, vendorBetweenQuests = true, sellVendorX = 0, sellVendorY = 0, sellVendorZ = 0}
+_questEX2 = {checkBagTimer = 0, checkInvTimer = 0, flipVendor = true, vendorBetweenQuests = true, sellVendorX = 0, sellVendorY = 0, sellVendorZ = 0}
 
 function _questEX2:doChecks()
 local localObj = GetLocalPlayer();
@@ -31,7 +31,6 @@ local localObj = GetLocalPlayer();
 			end
 		end
 	end			
-
 	if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor then
 		local x, y, z = GetLocalPlayer():GetPosition();
 		if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
@@ -40,13 +39,12 @@ local localObj = GetLocalPlayer();
 		end
 	end
 
-	-- check inventory for bag every 3 minutes... if we have none in slot 4 already
+	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then CheckBagsForBetterGear(); self.checkInvTimer = GetTimeEX() + 180000; end
 	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
 		 CheckBagsForBetterGear();
 		_questEquipItems:checkInventoryForBags();
 		self.checkBagTimer = GetTimeEX() + 180000;
 	end
-
 	-- delete items 
 	if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then
 		script_deleteItems:checkDeleteItems();
@@ -134,7 +132,6 @@ local localObj = GetLocalPlayer();
 				end 
 			end 
 		end
-
 		-- Tell the grinder we cant loot
 		if (inventoryFull) then
 			_questEX.bagsFull = true;
@@ -204,7 +201,6 @@ if script_grind.lootObj ~= nil then
 		return true;
 		end
 	end
-
 	if (not script_grind.getSpells or localObj:IsDead() or IsGhost()) then
 		script_getSpells.getSpellsStatus = 0;
 	end
@@ -214,7 +210,6 @@ if script_grind.lootObj ~= nil then
 			if (PlayerHasTarget()) then
 				ClearTarget();
 			end
-
 			_quest.message = "Moving to class trainer for spells";
 			if (IsMoving()) and (not _quest.pause) then
 				if (not script_unstuck:pathClearAuto(2)) then
@@ -225,7 +220,6 @@ if script_grind.lootObj ~= nil then
 		return true;
 		end
 	end
-
 	if (script_grind.getSpells) and (not IsInCombat()) then
 		if script_getSpells.getSpellsStatus > 0 then
 			return true;

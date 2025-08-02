@@ -1,5 +1,6 @@
 _questEquipItems = {isBagsSetup = false, bagTable = {}, bagTableNum = 0}
 
+--if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 -- check to see if we have bags or not
 function _questEquipItems:checkMyBags()
 
@@ -69,11 +70,13 @@ function _questEquipItems:checkInventoryForBags()
 return false;
 end
 
-function CheckBagsForBetterGear()
 
+
+function CheckBagsForBetterGear()
 
     local _, playerClass = UnitClass("player")
     local playerLevel = UnitLevel("player")
+    local isLowLevel = playerLevel <= 8
 
     local slotNames = {
         [1] = "Head", [3] = "Shoulders", [5] = "Chest", [6] = "Waist",
@@ -82,7 +85,7 @@ function CheckBagsForBetterGear()
         [14] = "Trinket 2", [15] = "Back", [16] = "Main Hand",
         [17] = "Off Hand", [18] = "Ranged"
     }
-    
+
     local validEquipTypes = {
         ["INVTYPE_HEAD"] = true, ["INVTYPE_SHOULDER"] = true, ["INVTYPE_CHEST"] = true,
         ["INVTYPE_WAIST"] = true, ["INVTYPE_LEGS"] = true, ["INVTYPE_FEET"] = true,
@@ -117,6 +120,43 @@ function CheckBagsForBetterGear()
         ["DRUID"] = { ["Dagger"] = true, ["Mace"] = true, ["Staff"] = true, ["Polearm"] = true, ["Fist"] = true }
     }
 
+    local statPriorities = {
+        ["ROGUE"] = "Agility",
+        ["DRUID"] = "Agility",
+        ["HUNTER"] = "Agility",
+        ["SHAMAN"] = "Agility",
+        ["WARRIOR"] = "Strength",
+        ["PALADIN"] = "Strength",
+        ["MAGE"] = "Intellect",
+        ["WARLOCK"] = "Stamina",
+        ["PRIEST"] = "Intellect"
+    }
+
+    local function GetStatScore(itemName, priorityStat)
+        if not itemName then return 0 end
+        local score = 0
+        if priorityStat == "Agility" and string.find(itemName, "of Agility") then
+            score = 10
+        elseif priorityStat == "Strength" and string.find(itemName, "of Strength") then
+            score = 10
+        elseif priorityStat == "Intellect" and string.find(itemName, "of Intellect") then
+            score = 10
+        elseif priorityStat == "Stamina" and string.find(itemName, "of Stamina") then
+            score = 10
+        end
+        return score
+    end
+
+    local function GetItemScore(itemRarity, isLowLevel)
+        local score = itemRarity or 0
+        if isLowLevel and score == 0 then
+            score = 5  -- Boost grey items (rarity 0) at low levels
+        elseif isLowLevel then
+            score = score - 1  -- Reduce white (rarity 1) priority to favor grey
+        end
+        return score
+    end
+
     OpenAllBags()
 
     for bagID = 0, 4 do
@@ -137,7 +177,10 @@ function CheckBagsForBetterGear()
                             if itemStackCount == "INVTYPE_HEAD" or itemStackCount == "INVTYPE_SHOULDER" or itemStackCount == "INVTYPE_CHEST" or
                                itemStackCount == "INVTYPE_WAIST" or itemStackCount == "INVTYPE_LEGS" or itemStackCount == "INVTYPE_FEET" or
                                itemStackCount == "INVTYPE_WRIST" or itemStackCount == "INVTYPE_HAND" then
-                                if classArmorProfs["Leather"] or classArmorProfs["Mail"] or classArmorProfs["Plate"] or classArmorProfs["Cloth"] then
+                                if (classArmorProfs["Cloth"] and string.find(itemName, "Cloth")) or
+                                   (classArmorProfs["Leather"] and string.find(itemName, "Leather")) or
+                                   (classArmorProfs["Mail"] and string.find(itemName, "Mail")) or
+                                   (classArmorProfs["Plate"] and string.find(itemName, "Plate")) then
                                     isEquippable = true
                                 end
                             elseif itemStackCount == "INVTYPE_CLOAK" and classArmorProfs["Cloth"] then
@@ -166,7 +209,7 @@ function CheckBagsForBetterGear()
                                     )) then
                                     isEquippable = true
                                 end
-                            -- Non-armor/weapon (e.g., rings, trinkets)
+                            -- Non-armor/weapon
                             elseif itemStackCount == "INVTYPE_FINGER" or itemStackCount == "INVTYPE_TRINKET" then
                                 isEquippable = true
                             end
@@ -188,7 +231,7 @@ function CheckBagsForBetterGear()
                                 elseif itemStackCount == "INVTYPE_WEAPONOFFHAND" or itemStackCount == "INVTYPE_SHIELD" then targetSlot = 17
                                 elseif itemStackCount == "INVTYPE_RANGED" or itemStackCount == "INVTYPE_THROWN" then targetSlot = 18
                                 end
-                                
+
                                 if targetSlot then
                                     local slotsToCheck = { targetSlot }
                                     if itemStackCount == "INVTYPE_FINGER" then
@@ -196,22 +239,46 @@ function CheckBagsForBetterGear()
                                     elseif itemStackCount == "INVTYPE_TRINKET" then
                                         slotsToCheck = { 13, 14 }
                                     end
-                                    
+
+                                    local itemStatScore = GetStatScore(itemName, statPriorities[playerClass])
+                                    local itemScore = GetItemScore(itemRarity, isLowLevel)
+
                                     for _, slotID in ipairs(slotsToCheck) do
                                         local equippedItemLink = GetInventoryItemLink("player", slotID)
+                                        local equippedStatScore = 0
                                         local equippedRarity = -1
+                                        local equippedScore = -1
+                                        local equippedName = "None"
+
                                         if equippedItemLink then
                                             local _, _, parsedEquippedLink = string.find(equippedItemLink, "(item:%d+)")
                                             if parsedEquippedLink then
-                                                local _, _, rarity = GetItemInfo(parsedEquippedLink)
-                                                if rarity then
-                                                    equippedRarity = rarity
+                                                equippedName, _, equippedRarity = GetItemInfo(parsedEquippedLink)
+                                                if equippedName and equippedRarity then
+                                                    equippedStatScore = GetStatScore(equippedName, statPriorities[playerClass])
+                                                    equippedScore = GetItemScore(equippedRarity, isLowLevel)
                                                 end
                                             end
                                         end
-                                        
-                                        if equippedRarity < itemRarity then
+
+                                        local shouldEquip = false
+                                        if isLowLevel then
+                                            if itemScore > equippedScore then
+                                                shouldEquip = true
+                                            elseif itemScore == equippedScore and itemStatScore > equippedStatScore then
+                                                shouldEquip = true
+                                            end
+                                        else
+                                            if itemStatScore > equippedStatScore then
+                                                shouldEquip = true
+                                            elseif itemStatScore == equippedStatScore and itemRarity > equippedRarity then
+                                                shouldEquip = true
+                                            end
+                                        end
+
+                                        if shouldEquip then
                                             UseItem(itemName)
+					if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
                                         end
                                     end
                                 end

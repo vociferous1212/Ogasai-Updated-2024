@@ -799,7 +799,7 @@ function script_grind:run()
 		script_grind.newTargetTime = GetTimeEX();
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
-		self.autoBlacklistTimer = GetTimeEX() + 10000;
+		self.autoBlacklistTimer = GetTimeEX() + 15000;
 		return;
 	end
 
@@ -1320,6 +1320,8 @@ function script_grind:run()
 				self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
+						self.autoBlacklistTimer = GetTimeEX() + 15000;
+
 		return 4;
 		end	
 
@@ -1560,7 +1562,7 @@ if (not IsAutoCasting("Attack")) then
 						self.autoBlacklistTimerSet = false;
 					end
 					if IsEating() or IsDrinking() or IsLooting() or (PlayerHasTarget() and IsMoving()) then
-						self.autoBlacklistTimer = GetTimeEX() + 10000;
+						self.autoBlacklistTimer = GetTimeEX() + 15000;
 					end
 					if (not IsInCombat()) and (not IsMoving()) and not IsDrinking() and not IsEating() and not IsLooting() and not IsCasting() and not IsChanneling() and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
 						self.autoBlacklistTimerSet = false;
@@ -1569,7 +1571,7 @@ if (not IsAutoCasting("Attack")) then
 					end
 					if (not IsInCombat()) and (not IsMoving()) and (not self.autoBlacklistTimerSet) then
 						self.autoBlacklistTimerSet = true;
-						self.autoBlacklistTimer = GetTimeEX() + 10000;
+						self.autoBlacklistTimer = GetTimeEX() + 15000;
 					end
 					
 					-- set wait timer to move clicks
@@ -2466,6 +2468,8 @@ function script_grind:doLoot(localObj)
 		if (IsLooting()) then
 			self.waitTimer = GetTimeEX() + 950;
 		end
+
+if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 
 		-- interact with object if we are not looting
 		if(not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
