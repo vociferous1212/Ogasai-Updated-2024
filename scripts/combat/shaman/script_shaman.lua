@@ -454,6 +454,8 @@ function script_shaman:run(targetGUID)
 
 	if IsInCombat() and not script_grind:isAnyTargetTargetingMe() and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() > 95)) then
 		script_grind.message = "Stuck in combat! Waiting...";
+						script_grind.autoBlacklistTimer = GetTimeEX() + 10000;
+
 		return 4;
 	end
 			

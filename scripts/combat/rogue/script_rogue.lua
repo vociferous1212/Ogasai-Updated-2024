@@ -407,7 +407,7 @@ function script_rogue:run(targetGUID)
 			--stuck in combat
 			if (not PlayerHasTarget()) and (IsInCombat()) and (script_grind.enemiesAttackingUs() == 0 and (not targetObj:HasDebuff("Gouge"))) and (GetNumPartyMembers() < 1) then
 				self.message = "Stuck in combat... Waiting...";
-				return;
+				return 4;
 			end
 		
 			-- Opener
@@ -757,7 +757,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- Don't attack if we should rest first
 			if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
-				and targetHealth > 99 and not targetObj:IsStunned()) then
+				and targetHealth > 99 and not targetObj:IsStunned()) and not IsInCombat() then
 				self.message = "Need rest...";
 				return 4;
 			end

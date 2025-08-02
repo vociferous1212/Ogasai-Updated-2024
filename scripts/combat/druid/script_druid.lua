@@ -212,6 +212,8 @@ function script_druid:healsAndBuffs()
 	local localMana = 0;
 	local localRage = 0;
 	local localEnergy = 0;
+	local localObj = GetLocalPlayer();
+
 
 	if GetLocalPlayer():HasBuff("Omen of Clarity") then
 		localMana = 100;
@@ -223,7 +225,6 @@ function script_druid:healsAndBuffs()
 		localEnergy = localObj:GetEnergyPercentage();
 	end
 
-	local localObj = GetLocalPlayer();
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();
 	local hasRejuv = localObj:HasBuff("Rejuvenation"); 
@@ -403,8 +404,8 @@ function script_druid:healsAndBuffs()
 	if (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (not IsMounted()) and (not script_checkDebuffs:hasSilence()) then
 
 		-- Innervate
-		if (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana) then
-			CastSpellByName("Innervate", localObj);
+		if (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana + 10) then
+			CastSpell("Innervate");
 			self.waitTimer = GetTimeEX() + 3500;
 			return true;
 		end
@@ -618,6 +619,8 @@ function script_druid:run(targetGUID)
 	local localMana = 0;
 	local localRage = 0;
 	local localEnergy = 0;
+	local localObj = GetLocalPlayer();
+
 
 	if(not self.isSetup) then
 		script_druid:setup();
@@ -633,7 +636,6 @@ function script_druid:run(targetGUID)
 		localEnergy = localObj:GetEnergyPercentage();
 	end
 
-	local localObj = GetLocalPlayer();
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();
 	local localCP = GetComboPoints("player", "target");

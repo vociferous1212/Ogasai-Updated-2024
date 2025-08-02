@@ -28,7 +28,8 @@ _questDB:addQuest("no", 0, "The Emerald Dreamcatcher", "Tallonkai Swiftroot", 98
 
 _questDB:addQuest("no", 0, "Gnarlpine Corruption", "Gaerolas Talvethren", 9845.150390625, 440.92999267578, 1317.1828613281, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9887.5302734375, 965.53997802734, 1313.814453125, "Athridas Bearmantle", 0, 0, 0, 0, 0, 0, "Return to Athridas Bearmantle in Dolanaar.", 0, 1);
 
-_questDB:addQuest("no", 0, "A Troubling Breeze", "Athridas Bearmantle", 9887.5302734375, 965.53997802734, 1313.8148193359, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9845.150390625, 440.92999267578, 1317.1828613281, "Gaerolas Talvethren", 0, 0, 0, 0, 0, 0, "Seek out Gaerolas Talvethren in Starbreeze Village.", 0, 1);
+-- why in the world does this need a new line to read the quest objectives correctly?? time wasted... thanks blizzard!
+_questDB:addQuest("no", 0, "A Troubling Breeze", "Athridas Bearmantle", 9887.5302734375, 965.53997802734, 1313.8148193359, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9845.150390625, 440.92999267578, 1317.1828613281, "Gaerolas Talvethren", 0, 0, 0, 0, 0, 0, "Seek out Gaerolas Talvethren in Starbreeze Village.\n", 0, 1);
 
 _questDB:addQuest("no", 0, "Seek Redemption!", "Syral Bladeleaf", 9872.259765625, 959.27801513672, 1308.0705566406, 141, 6, 10, 9973.609375, 406.53604125977, 1307.3420410156, 2, 0, 0, 0, 3, 0, 9925.73046875, 737.07000732422, 1315.8264160156, "Zenn Foulhoof", 0, 0, 0, 425, 0, 0, "Collect 3 Fel Cones and give them to Zenn Foulhoof outside of Dolanaar.", 0, 1);
 
@@ -36,7 +37,7 @@ _questDB:addQuest("no", 0, "Timberling Seeds", "Denalan", 9505.830078125, 712.35
 
 _questDB:addQuest("no", 0, "Timberling Sprouts", "Denalan", 9505.830078125, 712.35198974609, 1255.8856201172, 141, 6, 10, 9552.548828125, 687.78588867188, 1265.2369384766, 2, 0, 0, 0, 12, 0, 9505.830078125, 712.35198974609, 1255.8856201172, "Denalan", 0, 0, 0, 391, 0, 2, "Bring 12 Timberling Sprouts to Denalan at Lake Al'Ameth.", 0, 2);
 
-_questDB:addQuest("no", 0, "Denalan's Earth", "Syral Bladeleaf", 9872.259765625, 959.27801513672, 1308.0705566406, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9506.919921875, 713.76599121094, 1255.8875732422, "Denalan", 0, 0, 0, 0, 0, 0, "Bring the package of Rare Earth to Denalan at Lake Al'Ameth.");
+_questDB:addQuest("no", 0, "Denalan's Earth", "Syral Bladeleaf", 9872.259765625, 959.27801513672, 1308.0705566406, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9506.919921875, 713.76599121094, 1255.8875732422, "Denalan", 0, 0, 0, 0, 0, 0, "Bring the package of Rare Earth to Denalan at Lake Al'Ameth.", 0, 2);
 
 _questDB:addQuest("no", 0, "Crown of the Earth", "Corithras Moonrage", 9736.91015625, 956.06298828125, 1294.1107177734, 141, 6, 10, 9860.1923828125, 587.9375, 1300.7536621094, 3, 0, 0, 0, 0, 0, 9736.91015625, 956.06298828125, 1294.1107177734, "Corithras Moonrage", 0, 0, 0, 0, 0, 0, "Fill the Jade Phial and bring it back to Corithras Moonrage in Dolanaar.", "Jade Phial", 1);
 
