@@ -288,4 +288,3 @@ function script_unstuck:run()
 		StopMoving();
 	end
 end
-

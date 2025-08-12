@@ -1,174 +1,186 @@
-script_checkDebuffs = {
+script_checkDebuffs = {}
 
-}
+-- Helper function to check if a unit has any debuffs/buffs from a list
+local function checkUnitEffects(unit, effectList, isBuff)
+    if (unit == nil or not unit:IsValid()) then
+        return false;
+    end
+    for effect in pairs(effectList) do
+        if (isBuff and unit:HasBuff(effect)) or (not isBuff and unit:HasDebuff(effect)) then
+            return true;
+        end
+    end
+    return false;
+end
 
--- use script_checkDebuffs:functionName(); as a boolean true or false.
--- returns true if player has debuff
--- returns false if player does not has debuff
-
--- make check for not specific debuffs like rend
+-- Curse debuffs (dispellable by Druids/Mages)
 function script_checkDebuffs:hasCurse()
-
-	local player = GetLocalPlayer();
-
-	if (player:HasDebuff("Curse of Mending")) or (player:HasDebuff("Curse of the Shadowhorn")) or (player:HasDebuff("Curse of Recklessness")) or (player:HasDebuff("Curse of Thule")) or (player:HasDebuff("Curse of Thorns")) then
-		return true;
-	end
-return false;
+    local curses = {
+        ["Curse of Mending"] = true,
+        ["Curse of the Shadowhorn"] = true,
+        ["Curse of Recklessness"] = true,
+        ["Curse of Thule"] = true,
+        ["Curse of Thorns"] = true,
+        ["Curse of Weakness"] = true, -- Reduces melee attack power/armor; dispel in PvE/PvP
+        ["Curse of Agony"] = true, -- DoT; dispel in PvP, medium raid priority
+        ["Curse of Doom"] = true, -- High-damage DoT; dispel in PvP, low raid priority
+        ["Curse of the Elements"] = true, -- Increases Fire/Frost damage taken; high raid priority, don’t dispel
+        ["Curse of Shadow"] = true -- Increases Arcane/Shadow damage taken; high raid priority, don’t dispel
+    };
+    return checkUnitEffects(GetLocalPlayer(), curses, false);
 end
 
+-- Poison debuffs (dispellable by Druids/Paladins)
 function script_checkDebuffs:hasPoison()
-	local player = GetLocalPlayer();
-	if (player:HasDebuff("Weak Poison")) or (player:HasDebuff("Corrosive Poison")) or (player:HasDebuff("Poison")) or (player:HasDebuff("Slowing Poison")) or (player:HasDebuff("Poisoned Shot")) or (player:HasDebuff("Venom Spit")) or (player:HasDebuff("Bottle of Poison")) or (player:HasDebuff("Venom Sting")) or (player:HasDebuff("Touch of Zanzil")) or (player:HasDebuff("Webwood Lurker's Poison")) or (player:HasDebuff("Deadly Poison")) then
-		return true;
-	end
-return false;
+    local poisons = {
+        ["Weak Poison"] = true,
+        ["Corrosive Poison"] = true,
+        ["Poison"] = true,
+        ["Slowing Poison"] = true,
+        ["Poisoned Shot"] = true,
+        ["Venom Spit"] = true,
+        ["Bottle of Poison"] = true,
+        ["Venom Sting"] = true,
+        ["Touch of Zanzil"] = true,
+        ["Webwood Lurker's Poison"] = true,
+        ["Deadly Poison"] = true,
+        ["Serpent Sting"] = true, -- DoT; dispel in PvP, avoid in raids (low priority)
+        ["Viper Sting"] = true -- Drains mana; dispel in PvP for mana classes, low raid priority
+    };
+    return checkUnitEffects(GetLocalPlayer(), poisons, false);
 end
 
+-- Disease debuffs (dispellable by Paladins/Priests)
 function script_checkDebuffs:hasDisease()
-
-	local player = GetLocalPlayer();
-
-	if (player:HasDebuff("Rabies"))
-		or (player:HasDebuff("Fevered Fatigue"))
-		or (player:HasDebuff("Dark Sludge"))
-		or (player:HasDebuff("Infected Bite"))
-		or (player:HasDebuff("Wandering Plague"))
-		or (player:HasDebuff("Plague Mind"))
-		or (player:HasDebuff("Fevered Fatigue"))
-		or (player:HasDebuff("Tetanus")) 
-		or (player:HasDebuff("Creeping Mold"))
-		or (player:HasDebuff("Diseased Slime"))
-	
-		then
-
-		return true;
-	end
-return false;
+    local diseases = {
+        ["Rabies"] = true,
+        ["Fevered Fatigue"] = true, -- Removed duplicate
+        ["Dark Sludge"] = true,
+        ["Infected Bite"] = true,
+        ["Wandering Plague"] = true,
+        ["Plague Mind"] = true,
+        ["Tetanus"] = true,
+        ["Creeping Mold"] = true,
+        ["Diseased Slime"] = true,
+        ["Infected Wound"] = true, -- Increases cast time, reduces healing; dispel in PvE/PvP
+        ["Plague"] = true -- DoT, spreads; dispel immediately in raids
+    };
+    return checkUnitEffects(GetLocalPlayer(), diseases, false);
 end
 
+-- Magic debuffs (dispellable by Priests/Mages/Paladins)
 function script_checkDebuffs:hasMagic()
-
-
-	local player = GetLocalPlayer();
-
-	if (player:HasDebuff("Faerie Fire")) 
-		or (player:HasDebuff("Sleep"))
-		or (player:HasDebuff("Sap Might"))
-		or (player:HasDebuff("Frost Nova"))
-		or (player:HasDebuff("Fear"))
-		or (player:HasDebuff("Entangling Roots"))
-		or (player:HasDebuff("Sonic Burst"))
-		or (player:HasDebuff("Shadow Word: Pain"))
-		or (player:HasDebuff("Crystalline Slumber"))
-
-	
-	then
-
-		return true;
-
-	end
-return false;
-
+    local magic = {
+        ["Faerie Fire"] = true, -- Reduces armor; high raid priority, don’t dispel
+        ["Sleep"] = true,
+        ["Sap Might"] = true,
+        ["Frost Nova"] = true,
+        ["Fear"] = true,
+        ["Entangling Roots"] = true,
+        ["Sonic Burst"] = true,
+        ["Shadow Word: Pain"] = true, -- DoT; medium raid priority, dispel in PvP
+        ["Crystalline Slumber"] = true,
+        ["Winter’s Chill"] = true, -- Increases Frost crit; high raid priority, don’t dispel
+        ["Shadow Weaving"] = true, -- Increases Shadow damage; high raid priority, don’t dispel
+        ["Improved Shadow Bolt"] = true, -- Increases Shadow damage; high raid priority, don’t dispel
+        ["Hunter’s Mark"] = true, -- Increases ranged attack power; medium raid priority, dispel in PvP
+        ["Polymorph"] = true -- Incapacitates; dispel in PvP
+    };
+    return checkUnitEffects(GetLocalPlayer(), magic, false);
 end
 
+-- Movement-disabling debuffs (mixed types, check for bot navigation)
 function script_checkDebuffs:hasDisabledMovement()
-
-	local player = GetLocalPlayer();
-
-	if (player:HasDebuff("Web"))
-		or (player:HasDebuff("Net"))
-		or (player:HasDebuff("Frost Nova"))
-		or (player:HasDebuff("Entangling Roots"))
-		or (player:HasDebuff("Slowing Poison"))
-
-
-	then
-	
-		return true;
-
-	end
-return false;
+    local movement = {
+        ["Web"] = true,
+        ["Net"] = true,
+        ["Frost Nova"] = true,
+        ["Entangling Roots"] = true,
+        ["Slowing Poison"] = true,
+        ["Hamstring"] = true, -- Reduces movement speed (Warrior); dispel with immunities
+        ["Wing Clip"] = true -- Reduces movement speed (Hunter); dispel with immunities
+    };
+    return checkUnitEffects(GetLocalPlayer(), movement, false);
 end
 
--- pet debuff checks
+-- Physical/unclassified debuffs (generally undispellable except by immunities)
+function script_checkDebuffs:hasPhysical()
+    local physical = {
+        ["Sunder Armor"] = true, -- Reduces armor; high raid priority, don’t dispel
+        ["Deep Wounds"] = true, -- Bleed DoT; low raid priority, avoid in raids
+        ["Demoralizing Shout"] = true, -- Reduces attack power; medium raid priority, don’t dispel
+        ["Thunder Clap"] = true, -- Reduces attack speed; low raid priority, avoid unless Thunderfury
+        ["Faerie Fire"] = true -- Reduces armor; high raid priority, don’t dispel
+    };
+    return checkUnitEffects(GetLocalPlayer(), physical, false);
+end
+
+-- Pet debuffs (expanded for movement-disabling and stuns)
 function script_checkDebuffs:petDebuff()
+    local _, class = UnitClass("player");
+    if (class ~= "HUNTER" and class ~= "WARLOCK") or GetLocalPlayer():GetLevel() < 10 then
+        return false;
+    end
 
-		local _ , class = UnitClass('player');
+    local pet = GetPet();
+    if (pet == nil or pet:GetPointer() == 0) then
+        return false;
+    end
 
-	if (class == 'HUNTER' or class == 'WARLOCK') and (GetLocalPlayer():GetLevel() >= 10) and (GetPet() ~= 0) then
-		local pet = GetPet();
-	
-		if (pet:HasDebuff("Web"))
-	
-	
-		then
-	
-			return true;
-		end
-	end
-return false;
+    local petDebuffs = {
+        ["Web"] = true,
+        ["Net"] = true,
+        ["Frost Nova"] = true,
+        ["Entangling Roots"] = true,
+        ["Slowing Poison"] = true,
+        ["Stun"] = true,
+        ["Fear"] = true,
+        ["Hamstring"] = true,
+        ["Wing Clip"] = true,
+        ["Polymorph"] = true
+    };
+    return checkUnitEffects(pet, petDebuffs, false);
 end
 
--- undead will of the forsaken
+-- Undead Will of the Forsaken debuffs (usable by undead players)
 function script_checkDebuffs:undeadForsaken()
-		
-		local player = GetLocalPlayer();
-	
-	if (player:HasDebuff("Sleep"))
-		or (player:HasDebuff("Fear"))
-		or (player:HasDebuff("Mind Control"))
-
-	then
-
-		return true;
-
-	end
-return false;
-
+    local forsaken = {
+        ["Sleep"] = true,
+        ["Fear"] = true,
+        ["Mind Control"] = true,
+        ["Polymorph"] = true -- Added for consistency
+    };
+    return checkUnitEffects(GetLocalPlayer(), forsaken, false);
 end
 
+-- Silence debuffs (prevents spellcasting)
 function script_checkDebuffs:hasSilence()
-
-		local player = GetLocalPlayer();
-
-	if (player:HasDebuff("Silence"))
-	or (player:HasDebuff("Sonic Burst"))
-	or (player:HasDebuff("Overwhelming Stench"))
-
-	then
-	
-		return true;
-	
-	end
-return false;
+    local silences = {
+        ["Silence"] = true,
+        ["Sonic Burst"] = true,
+        ["Overwhelming Stench"] = true,
+        ["Counterspell - Silenced"] = true -- Silences after Counterspell; dispel in PvP
+    };
+    return checkUnitEffects(GetLocalPlayer(), silences, false);
 end
 
+-- Enemy buffs (raid-relevant buffs to dispel)
 function script_checkDebuffs:enemyBuff()
-	
-	local localObj = GetLocalPlayer();
-	local hasTarget = localObj:GetUnitsTarget();
-	
-	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-		if (hasTarget ~= 0) then
+    local localObj = GetLocalPlayer();
+    if (not PlayerHasTarget() or script_grind.enemyObj == nil or not script_grind.enemyObj:IsValid()) then
+        return false;
+    end
 
-			local enemy = script_grind.enemyObj;
-	
-			if (enemy:HasBuff("Power Word:Shield")) 
-			or (enemy:HasBuff("Quick Flame Ward"))
-			or (enemy:HasBuff("Rejuvenation"))
-			or (enemy:HasBuff("Regrowth"))
-			or (enemy:HasBuff("Renew"))
-			or (enemy:HasBuff("Mana Shield"))
-			
-
-
-			then
-			
-			return true;
-	
-			end
-		end
-	end
-return false;
+    local enemyBuffs = {
+        ["Power Word: Shield"] = true,
+        ["Quick Flame Ward"] = true,
+        ["Rejuvenation"] = true,
+        ["Regrowth"] = true,
+        ["Renew"] = true,
+        ["Mana Shield"] = true,
+        ["Divine Shield"] = true, -- Immunity; dispel with Mass Dispel
+        ["Ice Block"] = true, -- Immunity; wait out
+        ["Blessing of Protection"] = true -- Physical immunity; dispel with Purge/Mass Dispel
+    };
+    return checkUnitEffects(script_grind.enemyObj, enemyBuffs, true);
 end

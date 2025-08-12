@@ -1,6 +1,6 @@
 script_grindEX = {
 	currMapID = GetMapID(), 
-	avoidBlacklisted = false,
+	avoidBlacklisted = true,
 	unstuckTime = GetTimeEX(),
 	deathCounter = 0,
 	logoutOnHearth = false,
@@ -151,23 +151,6 @@ function script_grindEX:doChecks()
 			if (HasSoulstone()) then
 				UseSoulstone();
 				return;
-			end
-		end
-
-	-- Clear dead/blacklisted/tapped targets
-		if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			-- Save location for auto pathing
-			if (script_grind.hotspotReached and script_grind.enemyObj:IsDead() and script_grind.enemyObj:GetLevel() >= script_grind.minLevel and script_grind.enemyObj:GetLevel() <= script_grind.maxLevel) then 
-				script_nav:saveTargetLocation(script_grind.enemyObj, script_grind.enemyObj:GetLevel());
-			end
-			if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-				if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
-					or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
-					or script_grind.enemyObj:IsDead()) then
-						script_grind.waitTimer = GetTimeEX() + 1200;
-						script_grind.enemyObj = nil;
-						ClearTarget();
-				end
 			end
 		end
 

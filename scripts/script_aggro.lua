@@ -299,7 +299,7 @@ function script_aggro:closeToBlacklistedTargets()
 	while currentObj ~= 0 do
 		
 		-- acceptable targets
-		if (currentObj:CanAttack())
+		if (currentObj:CanAttack()) and script_grind.lastAvoidTarget ~= nil
 			and (not currentObj:IsDead())
 			and (not currentObj:IsCritter())
 			and (not script_grind:isTargetingMe(currentObj))
