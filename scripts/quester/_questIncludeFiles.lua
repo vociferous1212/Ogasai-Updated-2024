@@ -37,8 +37,14 @@ _questIncludeFiles = {
 
 	questRessAtGYLoaded = include("scripts\\quester\\_questRessAtGY.lua"),
 	questEquipItemsLoaded = include("scripts\\quester\\_questEquipItems.lua"),
+	questSetupLoaded = include("scripts\\quester\\_questSetup.lua"),
+	questSortQuest = include("scripts\\quester\\_questSortCurrentQuest.lua"),
+	questGetQuestGiver = include("scripts\\quester\\_questGetQuestGiver.lua"),
+	questRetrieveQuest = include("scripts\\quester\\_questRetrieveQuest.lua"),
+	questMoveToGrindSpot = include("scripts\\quester\\_questMoveToGrindSpot.lua"),
+	questAcceptQuest = include("scripts\\quester\\_questAcceptQuest.lua"),
 
-
+_questAcceptQuest.lua
 }
 
 function _questIncludeFiles:setup()

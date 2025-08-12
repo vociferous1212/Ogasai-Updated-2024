@@ -13,6 +13,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then CastSpellByName("Earthbind Totem"); end return true; end end return true; end end
 
 
+
 	-- run combat on good targets
 	if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) or IsInCombat() then
 
@@ -22,6 +23,21 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 			_quest.enemyTarget = GetTarget();
 
 		end
+-- move away from adds script conditions
+		if (IsInCombat()) and (_quest.enemyTarget ~= nil) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (script_grind:isTargetingMe2(_quest.enemyTarget)) and (_quest.enemyTarget:IsInLineOfSight()) and (not _quest.enemyTarget:IsCasting()) and (not _quest.enemyTarget:IsFleeing()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) then
+		
+			-- force reset of closestEnemy
+			if (_quest.enemyTarget ~= nil) then
+			script_om:FORCEOM2();
+			end
+
+			-- check and do move away from adds during combat
+			if (script_checkAdds:checkAdds()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) and (_quest.enemyTarget:GetManaPercentage() <= 5) then
+				script_om:FORCEOM();
+				return true;
+			end
+		end	
+
 
 		-- reset blacklist target timer
 		if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
@@ -77,7 +93,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 		if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) and (_quest.enemyTarget:IsDead()) and not IsInCombat() then
 			local x, y, z = _quest.enemyTarget:GetPosition();
 			if (_quest.enemyTarget:GetDistance() > 5) and ( (GetPet() == nil or GetPet() == 0) or (GetPet() ~= nil and GetPet() ~= 0 and (GetPet():GetUnitsTarget() == nil or GetPet():GetUnitsTarget() == 0)) ) then
-				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+				--script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 				return true;
 			else
 				if not script_grind:isAnyTargetTargetingMe() then
@@ -98,6 +114,9 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 
 		end
 
+		if (IsInCombat()) and (self.enemyTarget == 0 or self.enemyTarget == nil) then
+				self.enemyTarget = script_grind:assignTarget();
+		end
 		if GetPet() ~= 0 and GetPet() ~= nil and GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 and  GetTarget() ~= 0 and GetTarget() ~= nil then
 			if GetPet():GetUnitsTarget():GetGUID() ~= GetTarget():GetGUID() then
 				_quest.enemyTarget = GetPet():GetUnitsTarget();

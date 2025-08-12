@@ -154,6 +154,7 @@ if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_
 -- end quest options
 end
 
+	script_targetMenu:menu();
 	script_miscMenu:menu();
 
 	script_lootMenu:menu();

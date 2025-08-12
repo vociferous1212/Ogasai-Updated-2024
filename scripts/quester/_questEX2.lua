@@ -22,7 +22,7 @@ local localObj = GetLocalPlayer();
 			script_grind.moneyObtainedCount = myMoney - script_grind.currentMoney;
 		end
 	
-	if IsInCombat() then if (script_checkAdds:checkAdds()) then script_om:FORCEOM(); DEFAULT_CHAT_FRAME:AddMessage("test"); return true; end end
+	if IsInCombat() then if (script_checkAdds:checkAdds()) then script_om:FORCEOM(); return true; end end
 	if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
 		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
 			_quest.enemyTarget = GetPet():GetUnitsTarget();
@@ -39,7 +39,7 @@ local localObj = GetLocalPlayer();
 		end
 	end
 
-	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then CheckBagsForBetterGear(); self.checkInvTimer = GetTimeEX() + 180000; end
+	if GetLocalPlayer():GetLevel() < 20 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then CheckBagsForBetterGear(); self.checkInvTimer = GetTimeEX() + 180000; end
 	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
 		 CheckBagsForBetterGear();
 		_questEquipItems:checkInventoryForBags();
@@ -151,6 +151,7 @@ local localObj = GetLocalPlayer();
 		--end
 if not IsInCombat() then
 script_grind:lootAndSkin(); end
+
 	-- loot objects
 	if (not IsInCombat()) and not script_grind.skipLooting then
 		if script_grind.lootObj == nil then
@@ -177,16 +178,17 @@ if script_grind.lootObj ~= nil then
 					return true;
 				end
 				if not IsMoving() and not IsLooting() and not IsInCombat() then
-					_quest:setTimer(150);
+					--_quest:setTimer(150);
 				end
-				if IsLooting() then LootTarget(); _quest:setTimer(350); end
 			end
 
-			--if (script_grind:doLoot(localObj)) then	
-			--	return true;
-			--elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
-			--	ClearTarget();
-			--end
+			if (script_grind:doLoot(localObj)) then
+				if IsLooting() then LootTarget(); _quest:setTimer(350); end
+
+				return true;
+			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
+				ClearTarget();
+			end
 		end
 	end
 
@@ -219,12 +221,4 @@ if script_grind.lootObj ~= nil then
 			end
 		return true;
 		end
-	end
-	if (script_grind.getSpells) and (not IsInCombat()) then
-		if script_getSpells.getSpellsStatus > 0 then
-			return true;
-		end
-	end
-
-return false;
-end
+	end if (script_grind.getSpells) and (not IsInCombat()) then if script_getSpells.getSpellsStatus > 0 then return true; end end return false; end
