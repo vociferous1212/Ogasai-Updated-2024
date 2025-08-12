@@ -1,4 +1,4 @@
-script_hunterEX = {
+script_hunterEX = {quickGrind = false
 
 	
 }
@@ -203,6 +203,10 @@ function script_hunterEX:menu()
 		local wasClicked = false;
 
 	if (CollapsingHeader("Hunter Combat Options")) then
+
+		if GetLocalPlayer():GetLevel() > 10 then
+		wasClicked, self.quickGrind = Checkbox("Disable Some Settings - Quick Grind", self.quickGrind);
+		if self.quickGrind then script_grind.skipLooting = true; script_grind.gather = false; script_hunter.useMark = false; script_hunter.drinkMana = 15; script_hunter.waitAfterCombat = false; script_warlock.waitAfterCombat = false; script_grindMenu.adjustTickRate = true; end end
 
 		if (HasItem("Linen Bandage")) or 
 			(HasItem("Heavy Linen Bandage")) or 

@@ -30,7 +30,7 @@ script_hunter = {
 	hasBandages = false,
 	useFeedPet = true,
 	meleeDistance = 5.5,
-	useCheetah = true,
+	useCheetah = false,
 	useMarkMana = 45,
 	useMark = true,
 	useMultiShot = false,
@@ -144,6 +144,8 @@ function script_hunter:runBackwards(targetObj, range)
  		local moveX, moveY, moveZ = xT + xUV*20, yT + yUV*20, zT + zUV;		
  		if (distance < range and targetObj:IsInLineOfSight()) then
  			if (Move(moveX, moveY, moveZ)) then
+				self.waitTimer = GetTimeEX() + 2000;
+				script_grind.waitTimer = GetTimeEX() + 2500;
  				return true;
 			end
 		return;
@@ -228,6 +230,7 @@ function script_hunter:run(targetGUID)
 				script_grind.tickRate = 100;
 				script_rotation.tickRate = 135;
 				self.waitTimer = GetTimeEX() + 3500;
+				script_gring.waitTimer = GetTimeEX() + 2500;
 				PetAttack();
 				self.message = "Moving away from target for range attacks...";
 				return 4;
@@ -597,7 +600,7 @@ function script_hunter:run(targetGUID)
 						script_grind.waitTimer = GetTimeEX() + 2500;
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
-					return 0;
+					return 4;
 					end
 				end
 			end
@@ -718,9 +721,10 @@ function script_hunter:run(targetGUID)
 						script_grind.tickRate = 100;
 						script_rotation.tickRate = 135;
 						self.waitTimer = GetTimeEX() + 3500;
+						script_grind.waitTimer = GetTimeEX() + 2500;
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
-						return 0;
+						return 4;
 					end
 					
 				end

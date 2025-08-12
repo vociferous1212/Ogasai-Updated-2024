@@ -24,12 +24,12 @@ _questDB:addQuest("no", 0, "Twisted Hatred", "Tallonkai Swiftroot", 9898.5898437
 
 _questDB:addQuest("no", 0, "The Road to Darnassus", "Moon Priestess Amara", 9933.822265625, 1242.5231933594, 1307.8793945313, 141, 6, 10, 9985.8662109375, 1348.5472412109, 1287.7858886719, 1, 10, 0, 0, 0, 0, 9933.822265625, 1242.5231933594, 1307.8793945313, "Moon Priestess Amara", "Gnarlpine Ambusher", 0, 0, 0, 0, 0, "Slay 6 Gnarlpine Ambushers and return to Sentinel Amara Nightwalker outside of Dolanaar.", 0, 1);
 
-_questDB:addQuest("no", 0, "The Emerald Dreamcatcher", "Tallonkai Swiftroot", 9898.58984375, 984.96801757813, 1354.8022460938, 141, 6, 10, 9807.638671875, 352.60781860352, 1308.4591064453, 2, 0, 0, 0, 1, 0, 9898.58984375, 984.96801757813, 1354.8022460938, "Tallonkai Swiftroot", 0, 0, 0, 1568, 0, 0, "Bring the Emerald Dreamcatcher to Tallonkai Swiftroot in Dolanaar.", 0, 1);
+_questDB:addQuest("no", 0, "The Emerald Dreamcatcher", "Tallonkai Swiftroot", 9898.58984375, 984.96801757813, 1354.8022460938, 141, 6, 10, 9807.638671875, 352.60781860352, 1308.4591064453, 2, 0, 0, 0, 1, 0, 9898.58984375, 984.96801757813, 1354.8022460938, "Tallonkai Swiftroot", 0, 0, 0, 1568, 0, 0, "Bring the Emerald Dreamcatcher to Tallonkai Swiftroot in Dolanaar.", 0, 2);
 
 _questDB:addQuest("no", 0, "Gnarlpine Corruption", "Gaerolas Talvethren", 9845.150390625, 440.92999267578, 1317.1828613281, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9887.5302734375, 965.53997802734, 1313.814453125, "Athridas Bearmantle", 0, 0, 0, 0, 0, 0, "Return to Athridas Bearmantle in Dolanaar.", 0, 1);
 
 -- why in the world does this need a new line to read the quest objectives correctly?? time wasted... thanks blizzard!
-_questDB:addQuest("no", 0, "A Troubling Breeze", "Athridas Bearmantle", 9887.5302734375, 965.53997802734, 1313.8148193359, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9845.150390625, 440.92999267578, 1317.1828613281, "Gaerolas Talvethren", 0, 0, 0, 0, 0, 0, "Seek out Gaerolas Talvethren in Starbreeze Village.\n", 0, 1);
+_questDB:addQuest("no", 0, "A Troubling Breeze", "Athridas Bearmantle", 9887.5302734375, 965.53997802734, 1313.8148193359, 141, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9831.54296875, 422.94357299805, 1314.4675292969, "Gaerolas Talvethren", 0, 0, 0, 0, 0, 0, "Seek out Gaerolas Talvethren in Starbreeze Village.\n", 0, 1);
 
 _questDB:addQuest("no", 0, "Seek Redemption!", "Syral Bladeleaf", 9872.259765625, 959.27801513672, 1308.0705566406, 141, 6, 10, 9973.609375, 406.53604125977, 1307.3420410156, 2, 0, 0, 0, 3, 0, 9925.73046875, 737.07000732422, 1315.8264160156, "Zenn Foulhoof", 0, 0, 0, 425, 0, 0, "Collect 3 Fel Cones and give them to Zenn Foulhoof outside of Dolanaar.", 0, 1);
 

@@ -16,6 +16,8 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 		-- duskwood
 		includeDuskwood_20_25 = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Duskwood_20_25.lua"),
 
+		includeSearingGorge = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_SearingGorge.lua"),
+
 		-- tirisfal glades
 		includeTirisfalDeathknell = include("scripts\\db\\questDB\\EasternKingdoms\\_questDB_Tirisfal_Deathknell.lua"),
 	
@@ -74,6 +76,8 @@ function _questDB:setup()
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, desc, rewardNum, useItem, gossipOption)
 
 
+	-- 40-50
+		_questDB_SearingGorge:setup();
 	-- 30-40
 	
 		_questDB_StranglethornVale:setup();

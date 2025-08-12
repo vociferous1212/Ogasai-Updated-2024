@@ -272,7 +272,7 @@ function script_druid:healsAndBuffs()
 		end
 
 	-- shapeshift out of bear form to heal
-	if ( (IsBearForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and (not hasRejuv) and (not hasRegrowth) )
+	if ( (IsBearForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and localMana > 25 and (not hasRejuv) and (not hasRegrowth) )
 	or ( (IsBearForm() ) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
 		if (not script_grind.adjustTickRate) then
@@ -287,7 +287,7 @@ function script_druid:healsAndBuffs()
 	end
 
 	-- shapeshift out of cat form to heal
-	if ( (IsCatForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and (not hasRejuv) and (not hasRegrowth) )
+	if ( (IsCatForm()) and (localHealth <= self.healthToShift) and (localMana >= self.shapeshiftMana) and localMana > 25 and (not hasRejuv) and (not hasRegrowth) )
 	or ( (IsCatForm()) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
 
@@ -304,8 +304,8 @@ function script_druid:healsAndBuffs()
 	-- nature's grasp
 	if IsInCombat() and HasSpell("Nature's Grasp") and not IsSpellOnCD("Nature's Grasp") and not HasForm() and not IsIndoors() and localHealth <= 55 then
 		CastSpellByName("Nature's Grasp", localObj);
-		self.waitTimer = GetTimeEX() + 1650;
-		script_grind:setWaitTimer(1650);
+		self.waitTimer = GetTimeEX() + 2550;
+		script_grind:setWaitTimer(2550);
 		return true;
 		-- may have to set a nature's grasp timer for 1 minute and reset here every cast because isindoors doesn't work all the time
 	end
@@ -351,7 +351,7 @@ function script_druid:healsAndBuffs()
 ------------------------------------
 
 	-- shapeshift if has rejuv and regrowth and mana is high enough and health is low enough
-	if (self.useBear and (IsBearForm() )) and (localHealth <= self.healthToShift - 35) and (localMana >= 65) and (hasRejuv) and (hasRegrowth) and (not IsCasting()) and (not IsChanneling()) then
+	if (self.useBear and (IsBearForm() )) and (localHealth <= self.healthToShift - 20) and (localMana >= 65) and (hasRejuv) and (hasRegrowth) and (not IsCasting()) and (not IsChanneling()) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 335;
 		end
@@ -370,7 +370,7 @@ function script_druid:healsAndBuffs()
 	end
 
 	-- shapeshift out of cat form to heal - already have rejuve and regrowth
-	if (self.useCat and IsCatForm()) and (localHealth <= self.healthToShift - 25) and (localMana >= 65) and (hasRejuv) and (hasRegrowth) then
+	if (self.useCat and IsCatForm()) and (localHealth <= self.healthToShift - 15) and (localMana >= 65) and (hasRejuv) and (hasRegrowth) then
 		if (not script_grind.adjustTickRate) then	
 			script_grind.tickRate = 335;
 		end
@@ -404,8 +404,8 @@ function script_druid:healsAndBuffs()
 	if (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (not IsMounted()) and (not script_checkDebuffs:hasSilence()) then
 
 		-- Innervate
-		if (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana + 10) then
-			CastSpell("Innervate");
+		if not HasForm() and (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana + 10) then
+			CastSpellByName("Innervate");
 			self.waitTimer = GetTimeEX() + 3500;
 			return true;
 		end
@@ -581,15 +581,7 @@ if (not IsInCombat()) then
 		end
 	end
 
-	-- keep auto attack on - turns off when healing - stops casting when low mana can't heal can't shift
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
-			if (not IsAutoCasting("Attack")) and (not IsMoving()) and (IsInCombat()) then
-				script_grind.enemyObj:AutoAttack();
-				return true;
-			end
-		end
-	end
+
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
@@ -654,7 +646,7 @@ function script_druid:run(targetGUID)
 		local tickRandom = math.random(450, 750);
 		if IsCatForm() then tickRandom = 250; self.waitTimer = self.waitTimer - 500; end
 
-		if (IsMoving()) or (not IsInCombat()) then
+		if (IsMoving()) or (not IsInCombat()) or (targetObj:IsFleeing()) then
 			script_grind.tickRate = 135;
 		elseif (not IsInCombat()) and (not IsMoving()) then
 			script_grind.tickRate = tickRandom
@@ -690,6 +682,8 @@ function script_druid:run(targetGUID)
 				SpellStopCasting();
 			end
 		end
+
+if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return 4; end
 
 		-- check heals and buffs
 		if (not IsInCombat()) and (not HasForm()) then
@@ -1670,13 +1664,14 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 				
+				-- dps output is actually lacking keeping this on at all times
 				-- keep tiger's fury up
-				if (HasSpell("Tiger's Fury")) and (not localObj:HasBuff("Tiger's Fury")) and (not IsSpellOnCD("Tiger's Fury")) and (localEnergy >= 30) then
-					if (CastSpellByName("Tiger's Fury")) then
-						self.waitTimer = GetTimeEX() + 1600;
-						return 0;
-					end
-				end
+				--if (HasSpell("Tiger's Fury")) and (not localObj:HasBuff("Tiger's Fury")) and (not IsSpellOnCD("Tiger's Fury")) and (localEnergy >= 30) then
+				--	if (CastSpellByName("Tiger's Fury")) then
+				--		self.waitTimer = GetTimeEX() + 1600;
+				--		return 0;
+				--	end
+				--end
 
 				-- keep rake up
 				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") and (not IsSpellOnCD("Rake")) then
@@ -1835,7 +1830,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	
 			local tickRandom = math.random(450, 750);
 		
-			if (IsMoving()) or (not IsInCombat()) then
+			if (IsMoving()) or (not IsInCombat()) or (targetObj:IsFleeing()) then
 				script_grind.tickRate = 135;
 			elseif (not IsInCombat()) and (not IsMoving()) then
 				script_grind.tickRate = tickRandom;

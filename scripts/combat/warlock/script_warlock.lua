@@ -340,6 +340,7 @@ function script_warlock:run(targetGUID)
 			return true;
 			end
 		end
+
 	-- check for silence and use wand
 	if (PlayerHasTarget()) and (not localObj:IsStunned()) and (script_checkDebuffs:hasSilence()) and (localObj:HasRangedWeapon()) and (IsInCombat()) then
 		if (not IsAutoCasting("Shoot")) then
@@ -631,6 +632,19 @@ function script_warlock:run(targetGUID)
 				end
 			end
 
+	-- force bot to attack pets target
+	if (IsInCombat()) and (GetPet() ~= 0) and (not PlayerHasTarget()) and (GetNumPartyMembers() < 1) and (HasPet()) then
+		if (PetHasTarget()) then
+			if (GetPet():GetDistance() > 10) then
+				AssistUnit("pet");
+				PetFollow();
+			end
+		else
+			AssistUnit("pet");
+			return 4;
+		end
+	end
+
 
 			-- causes crashing after combat phase?
 			-- follow target if single target fear is active and moves out of spell ranged
@@ -763,14 +777,14 @@ function script_warlock:run(targetGUID)
 				end
 			end
 
-			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetCreatureType() ~= "Undead") then
+			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetCreatureType() ~= "Undead") and (targetObj:GetCreatureType() ~= "Mechanical") then
 				script_warlockFunctions:cast("Fear", targetObj);
 				self.waitTimer = GetTimeEX() + 3500;
 				return;
 			end
 
 			-- Fear single Target
-			if (self.alwaysFear) and (HasSpell("Fear")) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetHealthPercentage() > 40) and (targetObj:GetCreatureType() ~= "Undead") then
+			if (self.alwaysFear) and (HasSpell("Fear")) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetHealthPercentage() > 40) and (targetObj:GetCreatureType() ~= "Undead") and (targetObj:GetCreatureType() ~= "Mechanical") then
 				if (not script_grind.adjustTickRate) and (IsInCombat()) then
 					script_grind.tickRate = 135;
 				end

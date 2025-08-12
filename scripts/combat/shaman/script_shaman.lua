@@ -262,7 +262,7 @@ function script_shaman:healsAndBuffs()
 
 		local tickRandom = random(350, 650);
 
-		if (IsMoving()) or (not IsInCombat()) then
+		if (IsMoving()) or (not IsInCombat()) or targetObj:IsFleeing() then
 			script_grind.tickRate = 135;
 		elseif (not IsInCombat()) and (not IsMoving()) then
 			script_grind.tickRate = tickRandom;
@@ -888,7 +888,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 		local tickRandom = random(350, 450);
 
-		if (IsMoving()) or (not IsInCombat()) then
+		if (IsMoving()) or (not IsInCombat()) or targetObj:IsFleeing() then
 			script_grind.tickRate = 135;
 		elseif (not IsInCombat()) and (not IsMoving()) then
 			script_grind.tickRate = tickRandom;

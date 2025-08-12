@@ -227,13 +227,3 @@ function script_warlockFunctions:petAttackTargetAtackingMe()
 	end
 return false;
 end
-
-function script_warlockFunctions:doWeHaveSoulStone()
-
-return false;
-end
-
-function script_warlockFunctions:applySoulStone()
-
-return false;
-end
