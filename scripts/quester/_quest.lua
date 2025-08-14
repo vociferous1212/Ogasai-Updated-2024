@@ -53,13 +53,13 @@ local localObj = GetLocalPlayer();
 
 	_quest:window();
 
-	script_drawStatusEX:drawSetup();
+	script_drawStatusEX:drawSetup(); 
 
 	if (script_grind.showOM) then EndWindow(); GetObjectsAroundMe(); end
 
 	if (script_radar.showRadar) then script_radar:draw() end
 
-	if (script_grind.useExpChecker) and (IsInCombat()) then script_expChecker:menu(); end
+	if (script_grind.useExpChecker) then script_expChecker:menu(); end
 
 	if (script_grind.drawChests) then script_gather:drawChestNodes(); end
 
@@ -69,6 +69,7 @@ local localObj = GetLocalPlayer();
 
 	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
 
+	-- handle vendor
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 0) then
@@ -84,8 +85,10 @@ local localObj = GetLocalPlayer();
 	return true;
 	end
 
+	-- set wait time / tick rate for script
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
 	
+	-- keep facing the targets
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then
 		if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then 
 			GetTarget():FaceTarget();
@@ -96,8 +99,7 @@ local localObj = GetLocalPlayer();
 
 	if (not self.isSetup) then _quest:setup(); end
 
-	if script_grind.pause then
-
+		-- skip looting then turn lootobj nil
 		if not script_grind.skipLooting and not _questEX.bagsFull and not IsLooting() then
 			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
 		end
@@ -132,15 +134,17 @@ local localObj = GetLocalPlayer();
 			end
 
 			_questEX:doChecks();
+
 			_questDoCombat:doCombat();
+
 		return true;
 		end
-	end
 
 			-- kill stuff on way to quest objectives
 			if GetNumQuestLogEntries() ~= nil and self.killStuffOnRoute and not IsSwimming() then _questDBTargets:killStuffAroundUs(); end
 	if IsInCombat() and IsLooting() then LootTarget(); end
 
+	-- completed a quest so reset vars
 	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
 		if (_questDBHandleDB:turnQuestCompleted()) then
 			self.tickRate = .3;
@@ -178,7 +182,12 @@ if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrin
 
 		if _questDBHandleDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
 	
-if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then if script_gatherRun:gather() then _quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder..""; return true; end end
+	if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
+		if script_gatherRun:gather() then
+			_quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder.."";
+		return true;
+		end
+	end
 
 	-- grind spot reached distance
 	if (self.distToGrind <= 40) and not self.grindspotReached then

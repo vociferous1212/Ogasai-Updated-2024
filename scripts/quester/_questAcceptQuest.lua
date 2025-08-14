@@ -3,6 +3,22 @@ _questAcceptQuest = {}
 function _questAcceptQuest:run()
 
 	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) then
+
+		local px, py, pz = GetLocalPlayer():GetPosition();
+			-- set return target name
+			local name = _quest.curQuestGiver;
+
+			if GetTarget() ~= 0 and GetTarget() ~= nil then
+	
+			-- if target is quest return target
+				if GetTarget():GetUnitName() == name then
+	
+					-- chase moving quest targets... get their position again
+				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = GetTarget():GetPosition();
+	
+				end
+			end
+		
 		if _quest.curQuestGiver ~= nil then
 			TargetByName(_quest.curQuestGiver);
 			_quest:setTimer(2000); 

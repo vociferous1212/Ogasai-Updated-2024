@@ -22,7 +22,7 @@ function _questEX:doStartChecks()
 		end
 	end
 
-	if GetTimeEX() > self.standingInFireTimer then
+	if GetTimeEX() > self.standingInFireTimer and not IsInCombat() then
 	script_helper:areWeStandingInFire()
 	self.standingInFireTimer = GetTimeEX() + 5000;
 	end

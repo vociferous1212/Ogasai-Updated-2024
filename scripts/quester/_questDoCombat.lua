@@ -17,12 +17,16 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 	-- run combat on good targets
 	if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) or IsInCombat() then
 
+			script_expChecker:targetLevels();
+
+
 		-- get a target if we have none
 		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 and GetTarget():CanAttack() and not GetTarget():IsDead() then
 
-			_quest.enemyTarget = GetTarget();
+			_quest.enemyTarget = script_grind:assignTarget();
 
 		end
+
 -- move away from adds script conditions
 		if (IsInCombat()) and (_quest.enemyTarget ~= nil) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (script_grind:isTargetingMe2(_quest.enemyTarget)) and (_quest.enemyTarget:IsInLineOfSight()) and (not _quest.enemyTarget:IsCasting()) and (not _quest.enemyTarget:IsFleeing()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) then
 		
@@ -34,7 +38,8 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 			-- check and do move away from adds during combat
 			if (script_checkAdds:checkAdds()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) and (_quest.enemyTarget:GetManaPercentage() <= 5) then
 				script_om:FORCEOM();
-				return true;
+				_quest.waitTimer = GetTimeEX() + 2000;
+				return;
 			end
 		end	
 
@@ -110,7 +115,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 
 			self.enemyTarget = _questDBTargets:getTarget();
 
-			self.targetingTimer = GetTimeEX() + 3500;
+			self.targetingTimer = GetTimeEX() + 2500;
 
 		end
 
@@ -157,10 +162,10 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 				end
 				-- grab some stuff from grinder like check adds conditions that are set to grinder only. we can run the same target
 				script_grind.enemyObj = _quest.enemyTarget;
-				RunCombatScript(_quest.enemyTarget:GetGUID());
+				script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
 
 				-- move to target
-				if (_quest.enemyTarget ~= nil and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange) or (not _quest.enemyTarget:IsInLineOfSight() and _quest.enemyTarget:GetDistance() > 6) and not IsCasting() and not IsChanneling() then
+				if (script_grind.combatError == 3) then
 					local x, y, z = _quest.enemyTarget:GetPosition();
 					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 					if not IsMoving() and not IsInCombat() and _quest.enemyTarget ~= nil and GetTimeEX() > self.blacklistTimer then
@@ -174,7 +179,6 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 				end
 			end
 		end
-	
 	end
 end
 
