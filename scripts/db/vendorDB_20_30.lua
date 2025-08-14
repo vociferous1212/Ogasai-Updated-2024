@@ -27,6 +27,12 @@ function vendorDB_20_30:setup()
 	vendorDB:addVendor("Ott", 1, 0, 267, true, false, false, false, false, -158.53, -867.18, 56.89);
 	vendorDB:addVendor("Innkeeper Shay", 1, 0, 267, false, true, false, false, false, -5.74, -942.02, 57.16);
 	vendorDB:addVendor("Innkeeper Shay", 1, 0, 267, false, false, true, false, false, -5.74, -942.02, 57.16);
+	vendorDB:addVendor("Kayren Soothallow", 1, 0, 267, false, false, false, false, false, -24.79, -935.18, 55.22);
+	vendorDB:addVendor("Kayren Soothallow", 1, 0, 267, false, true, false, false, false, -24.79, -935.18, 55.22);
+	vendorDB:addVendor("Kayren Soothallow", 1, 0, 267, false, false, true, false, false, -24.79, -935.18, 55.22);
+	vendorDB:addVendor("Kayren Soothallow", 1, 0, 267, false, false, false, true, false, -24.79, -935.18, 55.22);
+	vendorDB:addVendor("Kayren Soothallow", 1, 0, 267, false, false, false, false, true, -24.79, -935.18, 55.22);
+
 
 
 end

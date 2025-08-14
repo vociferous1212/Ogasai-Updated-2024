@@ -330,6 +330,14 @@ script_priestEX.waitTimer = self.waitTimer;
 			targetObj:AutoAttack();
 		end
 
+-- desperate prayer
+		if HasSpell("Desperate Prayer") and not IsSpellOnCD("Desperate Prayer") and localHealth <= 20 then
+			if (Buff("Desperate Prayer", localObj)) then
+				script_grind:setWaitTimer(1700);
+				return 0; -- if buffed 
+			end
+		end
+
 		-- use mind blast on CD
 		if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() < 29) then

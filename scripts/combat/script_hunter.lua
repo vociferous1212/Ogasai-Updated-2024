@@ -89,6 +89,9 @@ function script_hunter:setup()
 	if (GetLocalPlayer():GetLevel() < 10) then
 		self.useMarkMana = 60;
 	end
+	if GetLocalPlayer():GetLevel() > 15 then
+		self.eatHealth = 50;
+	end
 
 	self.isSetup = true;
 
@@ -130,6 +133,13 @@ function script_hunter:enemiesAttackingMe() -- returns number of enemies attacki
     end
     return unitsAttackingUs;
 end
+function TargetTooClose()
+    local lastError = GetLastError() -- Assumes oGasai API function for last error
+    if lastError and string.find(lastError:lower(), "target too close") then
+        return true
+    end
+    return false
+end
 
 -- Run backwards if the target is within range
 function script_hunter:runBackwards(targetObj, range) 
@@ -144,11 +154,11 @@ function script_hunter:runBackwards(targetObj, range)
  		local moveX, moveY, moveZ = xT + xUV*20, yT + yUV*20, zT + zUV;		
  		if (distance < range and targetObj:IsInLineOfSight()) then
  			if (Move(moveX, moveY, moveZ)) then
-				self.waitTimer = GetTimeEX() + 2000;
-				script_grind.waitTimer = GetTimeEX() + 2500;
+				self.waitTimer = GetTimeEX() + 3000;
+				script_grind.waitTimer = GetTimeEX() + 3500;
  				return true;
 			end
-		return;
+		return 4;
  		end
 	end
 	return false;
@@ -224,22 +234,19 @@ function script_hunter:run(targetGUID)
 	end
 
 	-- walk away from target if pet target guid is the same guid as target targeting me
-	if (GetPet() ~= 0) and (self.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
+	if (GetPet() ~= 0) and (self.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) and not script_rotation.usingRotation then
 		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
-			if (script_hunter:runBackwards(targetObj, 11)) then
-				script_grind.tickRate = 100;
-				script_rotation.tickRate = 135;
-				self.waitTimer = GetTimeEX() + 3500;
-				script_gring.waitTimer = GetTimeEX() + 2500;
+			if (script_hunter:runBackwards(targetObj, 13)) then
+				
 				PetAttack();
 				self.message = "Moving away from target for range attacks...";
-				return 4;
+			return 4;
 			end	
 		end
 	end
 
 	-- Check: Do nothing if we are channeling, casting or wait timer
-	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX()) then
+	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX()) or GetLocalPlayer():IsStunned() then
 		return 4;
 	end
 
@@ -274,7 +281,7 @@ function script_hunter:run(targetGUID)
 	
 	-- stuck in combat
 	if (self.waitAfterCombat) and (self.hasPet) and (IsInCombat()) and (GetPet() ~= 0) then
-		if (not PlayerHasTarget()) and (not PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) then
+		if (not PlayerHasTarget()) and (not PetHasTarget()) and (GetNumPartyMembers() < 1) and (script_vendor.status == 0) and not script_rotation.usingRotation then
 			AssistUnit("pet");
 			self.message = "No Target - stuck in combat! WAITING!";
 			return 4;
@@ -284,7 +291,7 @@ function script_hunter:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(500, 1000);
+		local tickRandom = random(300, 400);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -450,8 +457,8 @@ function script_hunter:run(targetGUID)
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
 						ClearTarget();
-						self.waitTimer = GetTimeEX() + 1500;
-						script_grind:setWaitTimer(1500);
+						self.waitTimer = GetTimeEX() + 500;
+						script_grind:setWaitTimer(500);
 						targetObj = 0;
 						return 0;
 					end
@@ -504,6 +511,11 @@ function script_hunter:run(targetGUID)
 				end
 			end
 
+			-- pet intimidation
+			if HasSpell("Intimidation") and not IsSpellOnCD("Intimidation") and HasPet() and localMana >= 25 and targetHealth >= 25 then
+				CastSpellByName("Intimidation");
+			end
+
 			-- mend pet
 			if (HasSpell("Mend Pet")) and (GetPet() ~= 0) then
 				-- Check: Mend the pet if it has lower than 70% HP and out of combat
@@ -545,12 +557,12 @@ function script_hunter:run(targetGUID)
 			end
 		
 			-- move backwards if target too close for melee attacks
-			if (targetObj:GetDistance() < 0.50) then
+			if (targetObj:GetDistance() < 0.50) and not script_rotation.usingRotation then
 				script_grind.tickRate = 135;
 				script_rotation.tickRate = 135;
 				if (script_hunter:runBackwards(targetObj, 2)) then
 					self.waitTimer = GetTimeEX() + 1850;
-					return 0;
+				return 0;
 				end
 			end
 
@@ -574,30 +586,24 @@ function script_hunter:run(targetGUID)
 			end	
 
 			-- follower 
-			if (GetNumPartyMembers() > 0) then
+			if (GetNumPartyMembers() > 0) and not script_rotation.usingRotation then
 				if (targetObj:IsInLineOfSight())
 				and (targetObj:GetUnitsTarget() ~= 0)
 				and (targetObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
-						if (script_hunter:runBackwards(targetObj, 11)) then
-						script_grind.tickRate = 100;
-						script_rotation.tickRate = 135;
-						self.waitTimer = GetTimeEX() + 3500;
+						if (script_hunter:runBackwards(targetObj, 13)) then
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
-						return 4;
+					return 4;
 						end
 					
 				end
 			end
 			-- walk away from target if pet target guid is the same guid as target targeting me
-			if (GetPet() ~= 0) and (self.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
+			if (GetPet() ~= 0) and (self.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) and not script_rotation.usingRotation then
 				if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
 
-					if (script_hunter:runBackwards(targetObj, 11)) then
-						script_grind.tickRate = 100;
-						script_rotation.tickRate = 135;
-						self.waitTimer = GetTimeEX() + 3500;
-						script_grind.waitTimer = GetTimeEX() + 2500;
+					if (script_hunter:runBackwards(targetObj, 13)) then
+					
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
 					return 4;
@@ -635,7 +641,7 @@ function script_hunter:run(targetGUID)
 
 				-- use serpent sting
 				if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
-					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana >25) then
+					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana >25) and targetObj:GetCreatureType() ~= "Elemental" then
 						if (not IsMoving()) then
 							targetObj:FaceTarget();
 						end
@@ -711,17 +717,14 @@ function script_hunter:run(targetGUID)
 			end
 
 			-- walk away from target if pet target guid is the same guid as target targeting me
-			if (GetPet() ~= 0) and (self.hasPet)
+			if (GetPet() ~= 0) and (self.hasPet) and not script_rotation.usingRotation
 				and (not script_grind:isTargetingMe(targetObj))
 				and (targetObj:GetUnitsTarget() ~= 0)
 				and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) then
 				if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
 
-					if (script_hunter:runBackwards(targetObj, 11)) then
-						script_grind.tickRate = 100;
-						script_rotation.tickRate = 135;
-						self.waitTimer = GetTimeEX() + 3500;
-						script_grind.waitTimer = GetTimeEX() + 2500;
+					if (script_hunter:runBackwards(targetObj, 13)) then
+						
 						PetAttack();
 						self.message = "Moving away from target for range attacks...";
 						return 4;
@@ -779,9 +782,9 @@ function script_hunter:rest()
 		script_hunter:setup();
 	end
 
-	if (IsInCombat()) and (not targetObj:IsTargetingMe()) then
-		self.waitTimer = GetTimeEX() + 3500;
-	end
+	--if (IsInCombat()) and (not targetObj:IsTargetingMe()) then
+	--	self.waitTimer = GetTimeEX() + 3500;
+	--end
 
 	if (HasItem("Linen Bandage")) or 
 		(HasItem("Heavy Linen Bandage")) or 
@@ -819,7 +822,7 @@ function script_hunter:rest()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(500, 1000);
+		local tickRandom = random(300, 400);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;

@@ -62,11 +62,17 @@ _questDB = { isSetup = false, questList = {}, numQuests = 0, curListQuest = 0, c
 
 		includeBarrens_15_20 = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Barrens_15_20.lua"),
 
+		includeStonetalon = include("scripts\\db\\questDB\\Kalimdor\\_questDB_StonetalonMountains.lua"),
+
+		includeTanaris = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Desolace.lua"),
+
 		includeThousandNeedles = include("scripts\\db\\questDB\\Kalimdor\\_questDB_ThousandNeedles.lua"),
 
+		includeUnGoro = include("scripts\\db\\questDB\\Kalimdor\\_questDB_UnGoro.lua"),
 
+		includeTanaris = include("scripts\\db\\questDB\\Kalimdor\\_questDB_Tanaris.lua"),
 
-		
+_questDB_StonetalonMountains
 }
 
 function _questDB:setup()
@@ -75,18 +81,21 @@ function _questDB:setup()
 
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, desc, rewardNum, useItem, gossipOption)
 
+	-- 50-60
+		_questDB_UnGoro:setup();
 
 	-- 40-50
 		_questDB_SearingGorge:setup();
+		_questDB_Tanaris:setup();
 	-- 30-40
-	
+		_questDB_Desolace:setup();
 		_questDB_StranglethornVale:setup();
 		_questDB_ThousandNeedles:setup();
 
 	-- 25-35
 		_questDB_HillsbradFoothills:setup();
 	-- 20-30
-
+		_questDB_StonetalonMountains:setup();
 		_questDB_Duskwood_20_25:setup();
 
 	-- 10-20

@@ -22,6 +22,7 @@ function _questDBTargets:isItTapped()
 	if i:GetUnitsTarget():GetGUID() ~= GetLocalPlayer():GetGUID() then
 	return true;
 	end end end end i, t = GetNextObject(i); end return false; end
+
 function _questDBTargets:getTarget()
 local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; local i, t = GetFirstObject(); local dist = 0; local bestDist = 1000; local bestTarget = nil;
 	if _questDB.curListQuest ~= nil then 
@@ -45,7 +46,8 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 
 	while i ~= 0 do
 		if t == 3 then
-			if not _questDBTargets:isItTapped() and not i:IsDead() and i:CanAttack() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
+			if not _questDBTargets:isItTapped() and not i:IsDead() and i:CanAttack() then
+	if script_grind:enemyIsValid(i) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and ((i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 
 				dist = i:GetDistance();
 				if bestDist > dist then
@@ -54,7 +56,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 					self.weHaveQuestTarget = true;
 				end
 			end
-		end
+		end end
 	i, t = GetNextObject(i);
 	end
 	if not self.weHaveQuestTarget then
@@ -77,7 +79,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 		while i ~= 0 do
 			-- acceptable targets
 			if t == 3 then
-			if not _questDBTargets:isItTapped() and not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= 30 then
+			if not _questDBTargets:isItTapped() and not i:IsCritter() and not i:IsDead() and i:CanAttack() and i:GetDistance() <= 30 and script_grind:enemyIsValid(i) then
 	
 				local px, py, pz = GetLocalPlayer();
 				local x, y, z = i:GetPosition();
@@ -86,7 +88,12 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 
 				-- save the closest mob or mobs attacking us
 				if dist <= aggro then
-					bestTarget = i;
+					dist2 = i:GetDistance();
+					if bestDist > dist2 then
+						bestDist = dist2;
+						bestTarget = i;
+					end
+
 				end
 			end
 			end
@@ -94,7 +101,7 @@ local target = 0; local target2 = 0; local numKill = 0; local numKill2 = 0; loca
 		end
 	end
 	--_quest.currentType == 2 and
-	if bestTarget == nil then _quest.message = "No quest targets in range!"; self.weHaveQuestTarget = false; if not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); end
+	if bestTarget == nil then _quest.message = "No quest targets in range!"; self.weHaveQuestTarget = false; if not _quest.needRest then script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ); script_grind:assignTarget(); end
 
 --elseif bestTarget ~= nil then bestTarget:AutoAttack();
 end return bestTarget; end

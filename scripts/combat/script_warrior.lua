@@ -5,7 +5,7 @@ script_warrior = {
 	bloodRageHealth = 65, -- health to use bloodrage
 	potionHealth = 6, -- health to use potion
 	isSetup = false, -- setup check
-	meleeDistance = 3.15, -- melee distance
+	meleeDistance = 4, -- melee distance
 	waitTimer = 0, -- set wait time for script
 	stopIfMHBroken = true, -- stop if main hand is broken
 	overpowerActionBarSlot = 73+6, -- Default: Overpower in slot 7 on the default Battle Stance Bar
@@ -396,11 +396,14 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (self.enableCharge and self.battleStance) then
 				if (HasSpell("Charge")) and (not IsSpellOnCD("Charge")) and (targetObj:IsSpellInRange("Charge")) 
 					and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
+
+					if Cast("Charge", targetObj) then 
 					script_nav:resetNavPos();
+					script_nav:resetNavigate();
 					targetObj:FaceTarget();
 					targetObj:AutoAttack();
-					Cast("Charge", targetObj);
-				return 4;
+					return 4;
+					end
 				end
 			end	
 
@@ -461,8 +464,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 	
 			-- Run backwards if we are too close to the target
-			if (targetObj:GetDistance() <= .4) then 
-				if (script_warrior:runBackwards(targetObj,1)) then 
+			if (targetObj:GetDistance() <= .2) then 
+				if (script_warrior:runBackwards(targetObj,2)) then 
 					return 4; 
 				end 
 			end

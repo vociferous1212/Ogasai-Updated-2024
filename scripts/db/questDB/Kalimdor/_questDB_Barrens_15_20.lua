@@ -11,6 +11,8 @@ local questDescription, questObjectives = GetQuestLogQuestText(1);
 --_questDB:addQuest("no", 1, "", "", xyz, 17, 14, 20, xyz, type
 --_questDB:addQuest("no", 1, "", "", xyz, 17, 14, 20, xyz, type
 
+-- crossover to stonetalone - Goblin Invaders (Kill, Quest ID 1062)
+_questDB:addQuest("no", 1, "Goblin Invaders", "Seereth Stonebreak", -265.125, -943.147, 12.546382904053, 17, 15, 35, 1038.2139892578, 136.38049316406, 17.608114242554, 1, 15, 0, 0, 0, 0, -265.125, -943.147, 12.546382904053, "Seereth Stonebreak", "Venture Co. Logger", 0, 0, 0, 0, 1, "Kill 15 Venture Co. Loggers, then return to Seereth Stonebreak on the border of Stonetalon and the Barrens.", 0, 1);
 
 _questDB:addQuest("no", 1, "Stolen Booty", "Gazlowe", -835.56298828125, -3728.6599121094, 26.292079925537, 17, 14, 20, -1758.2136230469, -3784.5041503906, 1.4539045095444, 2, 0, 0, 0, 1, 1, -835.56298828125, -3728.6599121094, 26.292079925537, "Gazlowe", 0, 0, 0, 347, 31, 1, "Retrieve the Shipment of Boots and Telescopic Lens for Gazlowe in Ratchet.", 0, 1);
 

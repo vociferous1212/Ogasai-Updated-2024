@@ -79,7 +79,7 @@ function script_hunterEX:petChecks()
 	-- Check: If pet is dead, then revive pet
 	if GetLocalPlayer():GetLevel() >= 10 and not IsMounted() then
 	if (GetPet() == nil or GetPet() == 0) or (GetPet() ~= 0 and GetPet():IsDead()) then
-	if (script_hunter.hasPet) and (GetPet() ~= nil and GetPet():IsDead()) and (not IsInCombat()) and (HasSpell("Revive Pet")) then	
+	if IsStanding() and (script_hunter.hasPet) and (GetPet() ~= nil and GetPet():IsDead()) and (not IsInCombat()) and (HasSpell("Revive Pet")) then	
 		script_hunter.message = "Pet is dead, reviving pet...";
 		if (IsMoving()) or (not IsStanding()) then 
 			StopMoving(); 
@@ -93,6 +93,7 @@ function script_hunterEX:petChecks()
 			script_hunter.waitTimer = GetTimeEX() + 1850;
 			return true; 
 		else 
+			script_helper:drink();
 			script_hunter.message = "Pet is dead, need more mana to ress it...";
 			return true; 
 		end

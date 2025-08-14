@@ -36,6 +36,7 @@ script_druid = {
 	rakeEnergy = 40,
 	openerUsed = 0,
 	autoAttackActionSlot = 0,
+	naturesGraspTimer = GetTimeEX(),
 }
 
 
@@ -147,6 +148,7 @@ function script_druid:setup()
 	end
 
 	self.thornsTimer = GetTimeEX();
+	self.naturesGraspTimer = GetTimeEX();
 
 	self.waitTimer = GetTimeEX();	
 
@@ -241,7 +243,7 @@ function script_druid:healsAndBuffs()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(350, 550);
+		local tickRandom = math.random(250, 450);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -302,12 +304,12 @@ function script_druid:healsAndBuffs()
 	end
 
 	-- nature's grasp
-	if IsInCombat() and HasSpell("Nature's Grasp") and not IsSpellOnCD("Nature's Grasp") and not HasForm() and not IsIndoors() and localHealth <= 55 then
+	if IsInCombat() and HasSpell("Nature's Grasp") and not IsSpellOnCD("Nature's Grasp") and not HasForm() and not IsIndoors() and localHealth <= 55 and GetTimeEX() > self.naturesGraspTimer then
 		CastSpellByName("Nature's Grasp", localObj);
 		self.waitTimer = GetTimeEX() + 2550;
 		script_grind:setWaitTimer(2550);
+		self.naturesGraspTimer = GetTimeEX() + 60000;
 		return true;
-		-- may have to set a nature's grasp timer for 1 minute and reset here every cast because isindoors doesn't work all the time
 	end
 
 	-- omen of clarity
@@ -586,7 +588,7 @@ if (not IsInCombat()) then
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(650, 950);
+		local tickRandom = math.random(450, 650);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -643,7 +645,7 @@ function script_druid:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(450, 750);
+		local tickRandom = math.random(450, 650);
 		if IsCatForm() then tickRandom = 250; self.waitTimer = self.waitTimer - 500; end
 
 		if (IsMoving()) or (not IsInCombat()) or (targetObj:IsFleeing()) then
@@ -683,7 +685,7 @@ function script_druid:run(targetGUID)
 			end
 		end
 
-if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return 4; end
+if localObj:HasBuff("Nature's Grasp") and IsInCombat() and targetObj:GetManaPercentage() < 1 then return 4; end
 
 		-- check heals and buffs
 		if (not IsInCombat()) and (not HasForm()) then
@@ -768,6 +770,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 		end
 
+-- Innervate
+		if not HasForm() and (IsInCombat()) and (HasSpell("Innervate")) and (not IsSpellOnCD("Innervate")) and (not localObj:HasBuff("Innervate")) and (localMana <= self.shapeshiftMana + 10) then
+			CastSpellByName("Innervate");
+			self.waitTimer = GetTimeEX() + 3500;
+			return true;
+		end
+
 -- use prowl before spamming auto attack and move in range of target!
 		if (not IsInCombat()) and (self.useCat) and (IsCatForm()) and (self.useStealth) and (HasSpell("Prowl")) and (not IsSpellOnCD("Prowl")) and (not IsStealth()) and (script_grind.lootObj == nil or script_grind.lootObj == 0) and (not script_checkDebuffs:hasPoison()) and (not localObj:HasDebuff("Rend")) and (IsStanding()) and (IsMoving()) then
 			CastSpellByName("Prowl");
@@ -780,7 +789,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 	-- run backwards if target is entangled
 				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) and not IsCatForm() and not IsBearForm() then
-					if (script_druid:runBackwards(targetObj, 12)) then
+					if (script_druid:runBackwards(targetObj, 8)) then
 						self.waitTimer = GetTimeEX() + 500;
 					return 4;
 					end
@@ -1728,7 +1737,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end	
 					-- run backwards if target is entangled
 				if (targetObj:HasDebuff("Entangling Roots")) and (localMana > 36) and not IsCatForm() and not IsBearForm() then
-					if (script_druid:runBackwards(targetObj, 12)) then
+					if (script_druid:runBackwards(targetObj, 8)) then
 						self.waitTimer = GetTimeEX() + 500;
 					return 4;
 					end
@@ -1828,7 +1837,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		-- set tick rate for script to run
 		if (not script_grind.adjustTickRate) then
 	
-			local tickRandom = math.random(450, 750);
+			local tickRandom = math.random(350, 550);
 		
 			if (IsMoving()) or (not IsInCombat()) or (targetObj:IsFleeing()) then
 				script_grind.tickRate = 135;

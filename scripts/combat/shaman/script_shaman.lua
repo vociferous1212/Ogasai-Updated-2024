@@ -143,7 +143,7 @@ end
 function script_shaman:checkEnhancement()
 	if (not IsInCombat() and not IsEating() and not IsDrinking()) then
 		hasMainHandEnchant, _, _, _, _, _ = GetWeaponEnchantInfo();
-		if (hasMainHandEnchant == nil) or (GetTimeEX() > self.enhanceWeaponTimer - 45000) then 
+		if (hasMainHandEnchant == nil or hasMainHandEnchant == 0) or (GetTimeEX() > self.enhanceWeaponTimer - 45000) then 
 			-- Apply enhancement
 			if (HasSpell(self.enhanceWeapon)) then
 

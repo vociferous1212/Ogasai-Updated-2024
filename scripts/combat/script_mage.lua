@@ -1,8 +1,8 @@
 script_mage = {
 	message = 'Mage Combat Script',
 	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
-	drinkMana = 70,	-- drink at this mana %
-	eatHealth = 75,	-- eat at this health %
+	drinkMana = 55,	-- drink at this mana %
+	eatHealth = 65,	-- eat at this health %
 	potionHealth = 10,	-- use potion at this health %
 	potionMana = 10,	-- use potioon at this mana %
 	water = {},	-- water table setup
@@ -28,7 +28,7 @@ script_mage = {
 	coneOfColdMana = 35,	-- use cone of cold above this mana %
 	coneOfColdHealth = 15,	-- use cone of cold above this health %
 	useWandMana = 10,	-- use wand below this mana %
-	useWandHealth = 10,	-- use wand below this target health %
+	useWandHealth = 25,	-- use wand below this target health %
 	manaShieldHealth = 80,	-- use mana shield below this health %
 	manaShieldMana = 20,	-- use mana shield above this mana %
 	useFrostWard = false,	-- use frost ward yes/no
@@ -166,7 +166,7 @@ function script_mage:runBackwards(targetObj, range)
  			if (Move(moveX, moveY, moveZ)) then
  				return true;
 			end
-		return;
+		return 4;
 		end
 	end
 
@@ -349,7 +349,7 @@ function script_mage:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(350, 650);
+		local tickRandom = random(350, 550);
 
 		if (IsMoving()) or (not IsInCombat()) and (not localObj:IsCasting()) then
 			script_grind.tickRate = 135;
@@ -524,7 +524,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Fire blast
-			if (self.useFireBlast) and (targetObj:GetDistance() <= 20) and (HasSpell("Fire Blast")) and (not IsSpellOnCD("Fire Blast")) and (localMana > 6) and (not IsMoving()) then
+			if (self.useFireBlast) and (targetObj:GetDistance() <= 20) and (HasSpell("Fire Blast")) and (not IsSpellOnCD("Fire Blast")) and (localMana > 6) and (not IsMoving()) and targetHealth > 5 then
 				if (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) or (targetHealth < 20 and localHealth < 25) then
 	
 					if (not IsSpellOnCD("Fire Blast")) then
@@ -902,7 +902,7 @@ function script_mage:run(targetGUID)
 		-- set tick rate for script to run
 		if (not script_grind.adjustTickRate) then
 
-				local tickRandom = random(350, 650);
+				local tickRandom = random(350, 550);
 
 			if (IsMoving()) or (not IsInCombat()) and (not localObj:IsCasting()) then
 				script_grind.tickRate = 155;
