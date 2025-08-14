@@ -9,7 +9,7 @@ function script_checkAdds:checkAdds()
     local grindEnemy = script_grind and script_grind.enemyObj or nil
     local questEnemy = _quest and _quest.enemyTarget or nil
 
-    if (grindEnemy ~= nil and grindEnemy ~= 0) and (not IsCasting()) and GetNumPartyMembers() < 2 then
+    if (grindEnemy ~= nil and grindEnemy ~= 0) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
         if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy)) then 
             if self:avoidToAggro(self.checkAddsRange) then
                 if not script_unstuck:pathClearAuto(2) then

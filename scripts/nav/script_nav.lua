@@ -128,13 +128,14 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	
 	-- Check: Move to the next location index
 	local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
+	if _lx ~= nil and self.savedLocations ~= nil and self.savedLocations[self.currentGoToLocation] ~= nil and self.savedLocations[self.currentGoToLocation]['x'] ~= nil then
 	local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
 	if (currentDist < 5 
 		or self.savedLocations[self.currentGoToLocation]['level'] < minLevel
 		or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel) then
 		self.currentGoToLocation = self.currentGoToLocation + 1;
 		return "Changing go to location...";
-	end
+	end end
 
 	
 	if (script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z'])) then

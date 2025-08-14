@@ -13,6 +13,7 @@ script_helper = {
 	numBandage = 0,
 	items = {},
 	numItems = 0,
+	gateTimer = GetTimeEX(),
 
 }
 
@@ -429,3 +430,37 @@ function script_helper:areWeStandingInFire()
 return false;
 end
 
+function script_helper:openGates()
+	i, t = GetFirstObject();
+	local localObj = GetLocalPlayer();
+
+	while i ~= 0 do
+		if i:GetDistance() <= 10 then
+			if (i:GetUnitName() == "Quarry Gate") and (not script_checkDebuffs:hasDisabledMovement()) then
+ 				local xT, yT, zT = i:GetPosition();
+ 				local xP, yP, zP = localObj:GetPosition();
+ 				local distance = i:GetDistance();
+ 				local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
+ 				local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
+ 				local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
+ 				local moveX, moveY, moveZ = xT + xUV*4, yT + yUV*4, zT + zUV;		
+ 				if (distance > 5) then 
+					script_navEX:moveToTarget(GetLocalPlayer(), moveX, moveY, moveZ);
+				return;
+				end
+					if HasForm() then RemoveForm(); end
+	
+				if distance <= 5 and (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
+					if i:GameObjectInteract() then
+						script_grind.timer = GetTimeEX() + 1650;
+ 						script_helper.gateTimer  = GetTimeEX() + 10000; 
+					return true;
+					end
+				end
+			return true;
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end

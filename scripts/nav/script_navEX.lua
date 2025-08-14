@@ -154,3 +154,109 @@ function script_navEX:moveToLoot(localObj, _x, _y, _z) -- use when moving to mov
 	end
 
 end
+
+function script_navEX:moveFallback(x, y, z)
+    -- Prevent execution during casting/channeling or if waitTimer is active
+    if self.waitTimer > GetTimeEX() or IsCasting() or IsChanneling() then
+        return false
+    end
+
+    local localObj = GetLocalPlayer()
+    if localObj:IsDead() then
+        StopMoving()
+        return false
+    end
+
+    -- Current player position
+    local px, py, pz = localObj:GetPosition()
+    local dist = GetDistance3D(px, py, pz, x, y, z)
+
+    -- If close enough, move directly
+    if dist < 2 then
+        Move(x, y, z)
+        self.waitTimer = GetTimeEX() + 50
+        return true
+    end
+
+    -- Configuration
+    local clearance = 2.0 -- Width around obstacles (yards)
+    local maxRetries = 5 -- Max attempts to find clear path
+    local stepDistance = 5.0 -- Distance to check ahead
+    local maxAngle = math.rad(45) -- Max angle to try for path deviation
+
+    -- Helper function to check if path is clear
+    local function isPathClear(startX, startY, startZ, endX, endY, endZ)
+        local hit, hitX, hitY, hitZ = Raycast(startX, startY, startZ, endX, endY, endZ)
+        return not hit
+    end
+
+    -- Calculate direction vector to target
+    local dx = x - px
+    local dy = y - py
+    local dz = z - pz
+    local length = math.sqrt(dx^2 + dy^2 + dz^2)
+    if length == 0 then
+        return false
+    end
+    dx, dy, dz = dx/length, dy/length, dz/length
+
+    -- Try direct path first
+    if isPathClear(px, py, pz, x, y, z) then
+        Move(x, y, z)
+        self.waitTimer = GetTimeEX() + 50
+        return true
+    end
+
+    -- Try alternative paths
+    for i = 1, maxRetries do
+        -- Ensure i is an integer
+        i = math.floor(i)
+        -- Calculate angle for this attempt (spreading out in a cone)
+        local angle = maxAngle * (i / maxRetries) * (math.floor(i/2)*2 == i and 1 or -1)
+        
+        -- Rotate direction vector
+        local sinA, cosA = math.sin(angle), math.cos(angle)
+        local newDx = dx * cosA - dy * sinA
+        local newDy = dx * sinA + dy * cosA
+        local newDz = dz
+
+        -- Calculate intermediate point with clearance
+        local midX = px + newDx * stepDistance
+        local midY = py + newDy * stepDistance
+        local midZ = pz + newDz * stepDistance
+
+        -- Check if path to intermediate point is clear
+        if isPathClear(px, py, pz, midX, midY, midZ) then
+            -- Verify path from intermediate to target
+            if isPathClear(midX, midY, midZ, x, y, z) then
+                Move(midX, midY, midZ)
+                self.waitTimer = GetTimeEX() + 50
+                return true
+            else
+                -- Try wider path by increasing clearance
+                local widerX = midX + newDy * clearance
+                local widerY = midY - newDx * clearance
+                local widerZ = midZ
+                if isPathClear(px, py, pz, widerX, widerY, widerZ) and 
+                   isPathClear(widerX, widerY, widerZ, x, y, z) then
+                    Move(widerX, widerY, widerZ)
+                    self.waitTimer = GetTimeEX() + 50
+                    return true
+                end
+                -- Try other side
+                widerX = midX - newDy * clearance
+                widerY = midY + newDx * clearance
+                if isPathClear(px, py, pz, widerX, widerY, widerZ) and 
+                   isPathClear(widerX, widerY, widerZ, x, y, z) then
+                    Move(widerX, widerY, widerZ)
+                    self.waitTimer = GetTimeEX() + 50
+                    return true
+                end
+            end
+        end
+    end
+
+    -- If no clear path found, stop moving and log
+    StopMoving()
+    return false
+end

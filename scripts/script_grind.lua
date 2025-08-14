@@ -20,6 +20,7 @@ script_grind = {
 	--hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"),
 	fpDBLoaded 		= include("scripts\\db\\fpDB.lua"),
 	goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
+	prioritizeTotemsLoaded	= include("scripts\\script_killTotems.lua"),
 
 	helperLoaded = include("scripts\\script_helper.lua"),
 	checkAddsLoaded = include("scripts\\script_checkAdds.lua"),
@@ -126,7 +127,7 @@ script_grind = {
 	gather = true,		-- use gatherer script
 	lastTarget = 0,		-- last target targeted
 	newTargetTime = GetTimeEX(),	-- set new target wait time
-	blacklistTime = 45,	-- time to blacklist mobs
+	blacklistTime = 30,	-- time to blacklist mobs
 	drawEnabled = true,	-- draw on screen menus
 	showClassOptions = true,	-- setup function to show menu
 	pause = true,		-- pause script
@@ -214,6 +215,8 @@ script_grind = {
 	targetHasRangedWeaponTableNum = 0,
 	autoBlacklistTimer = 0,
 	autoBlacklistTimerSet = false,
+	checkTotemKillTimer = GetTimeEX(),
+
 }
 
 -- ogasai target has ranged weapon doesn't work properly to detect when a ranged weapon is in use...
@@ -250,19 +253,19 @@ function GetObjectsAroundMe()
 					for o = 0, 1 -1 do
 						-- show we can attack horde if we are alliance
 						if (i:CanAttack()) and (script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Horde");
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Horde");
 						end
 						-- show we can attack alliance if we are horde
 						if (i:CanAttack()) and (not script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Alliance");
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Alliance");
 						end
 						-- show we can't attack alliance if we are alliance
 						if (not i:CanAttack()) and (script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Alliance");
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Alliance");
 						end
 						-- show we can't attack horde if we are horde
 						if (not i:CanAttack()) and (not script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetLevel().." lvl - Horde");
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Horde");
 						end
 					end
 				end
@@ -274,7 +277,7 @@ function GetObjectsAroundMe()
 			while i ~= 0 do
 				if t == 3 then
 					for oo = 0, 1 -1 do
-						Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetCreatureType());
+						Text("("..i:GetLevel()..") "..i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetCreatureType());
 					end
 				end
 			i, t = GetNextObject(i);
@@ -286,7 +289,7 @@ function GetObjectsAroundMe()
 				if t ~= 3 and t ~= 4 then
 					if (i:GetDistance() <= 300) then
 						for ooo = 0, 1 -1 do
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).." (yd), "..i:GetObjectDisplayID().." ID | "..i:GetGUID());
+							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetObjectDisplayID().." ID | "..i:GetGUID());
 						end
 					end
 				end
@@ -441,6 +444,8 @@ function script_grind:setup()
 	script_navEXCombat.timer = GetTimeEX();
 	script_grindEX.tryTravelFormTimer = GetTimeEX();
 	self.autoBlacklistTimer = GetTimeEX();
+	self.checkTotemKillTimer = GetTimeEX();
+	script_helper.gateTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
@@ -591,7 +596,7 @@ function script_grind:run()
 	end
 
 	-- display exp checker
-	if (self.useExpChecker) and (IsInCombat()) then
+	if (self.useExpChecker) then
 		script_expChecker:menu();
 	end
 	
@@ -803,6 +808,8 @@ function script_grind:run()
 		return;
 	end
 
+	if not IsInCombat() and not IsEating() and not IsDrinking() and IsStanding() and GetTimeEX() > script_helper.gateTimer then script_helper:openGates(); end
+
 	-- Check: Spend talent points
 	if (not IsInCombat() and not GetLocalPlayer():IsDead() and self.autoTalent) then
 		if (script_talent:learnTalents()) then
@@ -997,6 +1004,12 @@ function script_grind:run()
 		end
 	end
 
+	-- prioritize totems
+	if IsInCombat() and GetTimeEX() > self.checkTotemKillTimer then
+	script_killTotems:checkForTotems(10);
+	self.checkTotemKillTimer = GetTimeEX() + 5000;
+	end
+
 	if (not IsInCombat()) and (not IsLooting()) then
 		self.blacklistLootTime = GetTimeEX();
 	end
@@ -1117,7 +1130,7 @@ function script_grind:run()
 
 				self.message = 'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder.."";
 				if (IsLooting()) then
-					script_grind:setWaitTimer(1500);
+					script_grind:setWaitTimer(1000);
 				end
 			return true;
 			
@@ -1229,13 +1242,28 @@ function script_grind:run()
 				script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
 				self.newTargetTime = GetTimeEX();
 				ClearTarget();
-				script_grind:setWaitTimer(2500);
+				script_grind:setWaitTimer(2000);
 			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
 			end
 			
 		end
 
+	-- try to run out of combat
+	if ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65) or GetLocalPlayer():GetHealthPercentage() <= 20 then
+		local x, y z = 0, 0, 0;
+		self.enemyObj = nil;
+		x, y, z = script_nav.currentHotSpotX , script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
+		if x ~= 0 then
+			if script_navEX:moveToTarget(localObj, x, y, z) then self.message = "Running out of combat";
+				if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+					CastSpellByName("Earthbind Totem");
+				end
+			return true;
+			end
+		end
+	return true;
+	end
 
 		-- distance to hotspot
 		if (script_nav:getDistanceToHotspot() <= 80) then
@@ -1290,12 +1318,13 @@ function script_grind:run()
 		if self.skipLooting then self.lootObj = nil; end
 
 -- stuck in combat phase
-		if (GetLocalPlayer():GetManaPercentage() > self.drinkMana and GetLocalPlayer():GetHealthPercentage() > self.eatHealth) and (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) then
+		if (GetLocalPlayer():GetManaPercentage() > self.drinkMana and GetLocalPlayer():GetHealthPercentage() > self.eatHealth) and (script_hunter.waitAfterCombat or script_warlock.waitAfterCombat) and (IsInCombat()) and (not PetHasTarget()) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and not script_rotation.usingRotation and not script_hunterEX.quickGrind then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) and (self.lastTargetKilled:GetPosition() > 3) then
 				ex, ey, ez = self.lastTargetKilled:GetPosition();
 				Move(ex, ey, ez);
+				self.autoBlacklistTimer = GetTimeEX() + 15000;
 				return;
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) and not self.skipLooting and not AreBagsFull() and not self.bagsFull then
@@ -1307,12 +1336,13 @@ function script_grind:run()
 		return 4;
 		end
 -- stuck in combat phase
-		if (GetLocalPlayer():GetManaPercentage() > self.drinkMana and GetLocalPlayer():GetHealthPercentage() > self.eatHealth) and (IsInCombat() or localObj:HasBuff("Bloodrage")) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) then
+		if (GetLocalPlayer():GetManaPercentage() > self.drinkMana and GetLocalPlayer():GetHealthPercentage() > self.eatHealth) and (IsInCombat() or localObj:HasBuff("Bloodrage")) and (not HasPet() or (HasPet() and not PetHasTarget())) and (script_grind.enemiesAttackingUs() == 0 and not script_grind:isAnyTargetTargetingMe()) and (PlayerHasTarget() and self.enemyObj:GetHealthPercentage() >= 99) and (self.enemyObj:GetDistance() >= 20) and not script_rotation.usingRotation and not script_hunterEX.quickGrind then
 			self.message = "Waiting... Server says we are InCombat()";
 			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) and (self.lastTargetKilled ~= 0 and self.lastTargetKilled ~= nil) and (self.lastTargetKilled:GetPosition() > 3) then
 				ex, ey, ez = self.lastTargetKilled:GetPosition();
 				Move(ex, ey, ez);
+				self.autoBlacklistTimer = GetTimeEX() + 15000;
 				return;
 			end
 			if (self.lootObj ~= 0 and self.lootObj ~= nil) and not self.skipLooting and not AreBagsFull() and not self.bagsFull then
@@ -1350,14 +1380,16 @@ function script_grind:run()
 					-- do blacklist avoid
 					if (not IsEating()) and (not IsDrinking()) then
 						if (script_runner:avoidToAggro(8)) then
-							self.waitTimer = GetTimeEX() + 1000;
+							script_nav:resetNavPos(); script_nav:resetNavigate();
+							script_grind.addTargetToBlacklist(self.enemyObj:GetGUID());
 							return true;
 						end
 
 					-- avoid if we are drinking or eating
 					elseif (IsEating() or IsDrinking()) then
 						if (script_runner:avoidToAggro(10)) then
-							self.waitTimer = GetTimeEX() + 1000;
+							script_nav:resetNavPos(); script_nav:resetNavigate();
+							self.waitTimer = GetTimeEX() + 2000;
 							return;
 						end
 					end
@@ -1383,7 +1415,7 @@ function script_grind:run()
 
 			-- pet stays in combat on some server cores while returning to player
 				-- force bot to finish combat...
-			if (UnitClass('player') == "WARLOCK" or GetMyClass() == "WARLOCK") or (UnitClass('player') == "HUNTER" or GetMyClass() == "HUNTER") and (GetNumPartyMembers() == 0) then
+			if (UnitClass('player') == "WARLOCK" or GetMyClass() == "WARLOCK") or (UnitClass('player') == "HUNTER" or GetMyClass() == "HUNTER") and (GetNumPartyMembers() == 0) and not script_rotation.usingRotation then
 
 				-- force bot to attack pets target
 				if (script_warlock.waitAfterCombat or script_hunter.waitAfterCombat)
@@ -1404,9 +1436,10 @@ function script_grind:run()
 						end
 
 					-- if pet doesn't have a target then return until out of combat phase
-					elseif (not PlayerHasTarget() and not PetHasTarget() and script_grind.enemiesAttackingUs() == 0) and (IsInCombat()) then
+					elseif (not PlayerHasTarget() and not PetHasTarget() and script_grind.enemiesAttackingUs() == 0) and (IsInCombat()) and not script_rotation.usingRotation then
 						--AssistUnit("pet");
 						self.message = "Stuck in combat! WAITING!";
+						self.autoBlacklistTimer = GetTimeEX() + 15000;
 						if (IsMoving()) then
 							StopMoving();
 							return;
@@ -1415,6 +1448,7 @@ function script_grind:run()
 					end
 				end
 			end
+
 			--if (HasSpell("Lightning Bolt")) and (IsInCombat()) and (script_grind:enemiesAttackingUs() == 0) and (not PlayerHasTarget()) then
 			--	self.message = "Stuck in combat! WAITING!";
 			--	if (IsMoving()) then
@@ -1547,18 +1581,10 @@ if (not IsAutoCasting("Attack")) then
 				if (_x ~= 0 and x ~= 0) then
 
 					-- move to target
-					--if (IsPathLoaded(5)) then
 						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-					--end
-					--if (not IsMoving()) and (self.enemyObj:GetDistance() > self.combatScriptRange) and (IsPathLoaded(5)) then
-					--	self.message = "Moving To Target Forced -" ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-					--	local px, py, pz = GetLocalPlayer():GetPosition();
-					--	local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-					--	DrawText("Cannot find a path!", _tX+ 50, _tY-150, 0, 255, 0);
-					--	Move(_x, _y, _z);
-					--	return;
-					--end
+						if (not IsMoving()) and (self.enemyObj:GetDistance() > self.combatScriptRange+1) then script_navEX:moveFallback(_x, _y, _z); end
+					
 					if (IsMoving()) or (IsInCombat()) then
 						self.autoBlacklistTimer = GetTimeEX() - GetTimeEX();
 						self.autoBlacklistTimerSet = false;
@@ -1575,11 +1601,6 @@ if (not IsAutoCasting("Attack")) then
 						self.autoBlacklistTimerSet = true;
 						self.autoBlacklistTimer = GetTimeEX() + 15000;
 					end
-					
-					-- set wait timer to move clicks
-					--if (IsMoving()) then
-					--	script_grind:setWaitTimer(100);
-					--end
 					
 				end
 			return;
@@ -1643,7 +1664,7 @@ if (not IsAutoCasting("Attack")) then
 
 		-- Pre checks before navigating
 		if (IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat()) then
-			script_grind:setWaitTimer(750);
+			script_grind:setWaitTimer(350);
 			return;
 		end
 
@@ -2424,7 +2445,7 @@ function script_grind:doLoot(localObj)
 		end
 
 	-- Loot checking/reset target
-	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) then
+	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) and self.lootObj ~= nil then
 		if (GetTimeEX() > self.lootCheck['timer']) then
 			if (self.lootCheck['target'] == self.lootObj:GetGUID()) then
 				self.lootObj = nil; -- reset lootObj
@@ -2478,6 +2499,13 @@ if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 			self.waitTimer = GetTimeEX() + 1050;
 			return;
 		end
+
+lastError = GetLastError();
+		if lastError == 78 then
+			script_grind:addTargetToLootBlacklist(targetGUID);
+			self.lootObj = nil;
+			ClearLastError();
+		end
 	
 		-- if looting and not moving then wait
 		if (not LootTarget()) and (not IsMoving()) then
@@ -2516,6 +2544,8 @@ if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 	
 		
 	end
+
+	handleSwimming();
 
 	-- Blacklist loot target if swimming or we are close to aggro blacklisted targets and not close to loot target
 	if (self.lootObj ~= nil) then

@@ -100,17 +100,11 @@ function script_gatherRun:gather()
 		else
 			if (_x ~= 0) then
 				local nDist = math.floor(script_gather.nodeObj:GetDistance());
-				if (IsPathLoaded(5)) then
 					script_navEX:moveToLoot(GetLocalPlayer(), _x, _y, _z);
-					script_gather.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Move";
-					return true;
-				elseif (IsPathLoaded(5) and not IsMoving()) or (not IsPathLoaded(5)) then
-					local px, py, pz = GetLocalPlayer():GetPosition();
-					local _tX, _tY, onScreen = WorldToScreen(px, py, pz);
-					DrawText("Canont find a path!", _tX+ 50, _tY-50, 0, 255, 0);
-					MoveToTarget(_x, _y, _z);
-					script_gather.messageToGrinder = "" ..nDist.. " (yd) - Nav Script Force Move - no nav path!";
-				end
+					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
+					if (not IsMoving()) and (nDist > 5) then script_navEX:moveFallback(_x, _y, _z); end
+
+				return true;
 			end
 		end
 		return true;

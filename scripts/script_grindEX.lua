@@ -1,6 +1,6 @@
 script_grindEX = {
 	currMapID = GetMapID(), 
-	avoidBlacklisted = true,
+	avoidBlacklisted = false,
 	unstuckTime = GetTimeEX(),
 	deathCounter = 0,
 	logoutOnHearth = false,
@@ -10,6 +10,7 @@ script_grindEX = {
 	blacklistAggroTargets = {},
 	blacklistAggroNum = 0,
 	tryTavelFormTimer = 0,
+	swimTimer = 0,
 }
 
 function script_grindEX:howManyEnemiesTargetingMe()
@@ -258,20 +259,6 @@ function script_grindEX:doChecks()
 			end
 		end
 
-		if (script_grindEX:areWeSwimming()) or (IsSwimming()) and (IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
-			local x, y, z = GetLocalPlayer():GetPosition();
-			if (GetTimeEX() > script_grind.swimJumpTimer) then
-				local x2, y2, z2 = GetLocalPlayer():GetPosition();
-				if (GetDistance3D(x, y, z, x2, y2, z2) > 5) then
-					JumpOrAscendStart();
-					script_grind.swimJumpTimer = GetTimeEX() + 1200;
-					Move(x, y, z+10)
-					return true;
-				end
-				
-			end
-		end
-
 		if (IsInCombat()) and (GetTimeEX() > script_grind.omTimer) and (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			if (script_grind.enemyObj:GetHealthPercentage() >= 20) then
 				script_om:FORCEOM();
@@ -503,4 +490,30 @@ return target;
 	i, t = GetNextObject(i);
 	end
 return nil;
+end
+
+function handleSwimming()
+    local localObj = GetLocalPlayer();
+    if not localObj then return false end
+
+    -- Initialize swim timer if not set
+    if script_grindEX.swimTimer == nil then
+        script_grindEX.swimTimer = 0
+    end
+
+    -- Check if swimming and not casting/channeling
+    if script_grindEX:areWeSwimming() and not IsCasting() and not IsChanneling() then
+        -- Surface every 10 seconds to avoid drowning
+        if GetTimeEX() > script_grindEX.swimTimer then
+            JumpOrAscendStart() -- Swim upward
+            script_grindEX.swimTimer = GetTimeEX() + 3000 -- 3s interval
+            script_grind.waitTimer = GetTimeEX() + 1000 -- Brief pause to reach surface
+            return true
+        end
+        return true -- Stay in swimming state
+    else
+        -- Reset timer when not swimming
+        script_grindEX.swimTimer = GetTimeEX() + 10000
+        return false
+    end
 end

@@ -84,16 +84,14 @@ function script_rotation:run()
 		local target = GetTarget();
 		if (target:CanAttack()) then
 			self.enemyObj = target;
-		elseif (not IsLooting()) then
+		elseif (IsLooting()) then
 			self.enemyObj = nil;
 		end
 	end
-	
+
 	if (not localObj:IsDead()) then
 		
 		self.enemyObj = GetTarget();
-
-	
 
 		if(self.enemyObj ~= 0) and (self.enemyObj:CanAttack()) then
 
@@ -112,7 +110,7 @@ function script_rotation:run()
 				-- Attack the target
 				self.message = "Running the combat script on target...";
 				RunCombatScript(self.enemyObj:GetGUID());
-			return;
+			return true;
 			end
 		else
 			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -123,7 +121,7 @@ function script_rotation:run()
 
 			-- Rest
 			if (script_rotation:runRest()) then
-				return;
+				return true;
 			end
 
 			self.message = "Waiting for a target...";
@@ -223,6 +221,7 @@ end
 
 
 function script_rotation:runRest()
+	if not IsInCombat() and not GetLocalPlayer():IsDead() then
 	if(RunRestScript()) then
 		self.message = "Resting...";
 
@@ -236,6 +235,7 @@ function script_rotation:runRest()
 			self.waitTimer = GetTimeEX() + 2500;
 		end
 	return true;	
+	end
 	end
 return false;
 end

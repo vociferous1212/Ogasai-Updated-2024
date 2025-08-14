@@ -5,51 +5,37 @@ script_drawData = {
 -- draw monster/player/node data on screen
 
 function script_drawData:drawSavedTargetLocations()
+    -- Initialize step size based on number of saved locations
+    local step = 1
+    if script_nav.numSavedLocation > 20 then
+        step = 10 -- Draw every 10th point for >20 locations
+    elseif script_nav.numSavedLocation > 10 then
+        step = 2 -- Draw every other point for 11-20 locations
+    end -- Default step = 1 for ≤10 locations (draw all)
 
-	-- for each location
-	for i = 0,script_nav.numSavedLocation-1 do
+    -- Draw locations on screen
+    for i = 0, script_nav.numSavedLocation - 1, step do
+        if script_nav.savedLocations[i] then -- Check if location exists
+            local tX, tY, onScreen = WorldToScreen(script_nav.savedLocations[i]['x'], script_nav.savedLocations[i]['y'], script_nav.savedLocations[i]['z'])
+            if onScreen then
+                DrawText('Auto Path Node', tX, tY - 20, 0, 255, 255)
+                DrawText('ID: ' .. i + 1, tX, tY - 10, 0, 255, 255)
+                DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0)
+            end
+        end
+    end
 
-		-- draw locations on screen
-		local tX, tY, onScreen = WorldToScreen(script_nav.savedLocations[i]['x'], script_nav.savedLocations[i]['y'], script_nav.savedLocations[i]['z']);
-	
-		-- if locations are on screen then show text
-		if (onScreen) then
-				-- draw 15
-			if (script_nav.numSavedLocation < 15) then
-				DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
-				DrawText('ID: ' .. i+1, tX, tY-10, 0, 255, 255);
-				DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
-
-				-- draw between 5 and 10
-			elseif (script_nav.numSavedLocation > 15) then
-				DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
-				DrawText('ID: ' .. i+3, tX, tY-10, 0, 255, 255);
-				DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
-
-				-- draw 10 + to save your eyes from trying to sort the screen
-			elseif (script_nav.numSavedLocation > 30) then
-				DrawText('Auto Path Node', tX, tY-20, 0, 255, 255);
-				DrawText('ID: ' .. i+3, tX, tY-10, 0, 255, 255);
-				DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0);
-			end
-
-		end
-	end
-
-	-- if we have a hotspot
-	if (script_nav.currentHotSpotName ~= 0) then
-
-		-- draw current hotspot name
-		local tX, tY, onScreen = WorldToScreen(script_nav.currentHotSpotX , script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-
-		-- if locations are on screen then draw text
-		if (onScreen) then
-			local x, y, z = GetLocalPlayer():GetPosition();
-			local hsDist = math.floor(GetDistance3D(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ, x, y, z));
-			DrawText('HOTSPOT: ' .. script_nav.currentHotSpotName.. " | " ..hsDist.. " (yd)", tX, tY, 0, 255, 255);
-		end
-	end
+    -- Draw current hotspot if available
+    if script_nav.currentHotSpotName ~= 0 then
+        local tX, tY, onScreen = WorldToScreen(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ)
+        if onScreen then
+            local x, y, z = GetLocalPlayer():GetPosition()
+            local hsDist = math.floor(GetDistance3D(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ, x, y, z))
+            DrawText('HOTSPOT: ' .. script_nav.currentHotSpotName .. " | " .. hsDist .. " (yd)", tX, tY, 0, 255, 255)
+        end
+    end
 end
+
 
 function script_drawData:drawUnitsDataOnScreen()
 	local i, targetType = GetFirstObject();

@@ -21,6 +21,9 @@ function script_deleteItems:setup()
     script_deleteItems:addDeleteItem("Kolkar Booty Key");
     script_deleteItems:addDeleteItem("Sunscale Feather");
     script_deleteItems:addDeleteItem("A Letter to Yvette");
+    script_deleteItems:addDeleteItem("Grimesilt Outhouse Key");
+    script_deleteItems:addDeleteItem("Dark Iron Scraps");
+    script_deleteItems:addDeleteItem("Black Diamond");
     self.selectionList[self.deleteNum] = name;
     self.selectedListItem = 0;
 end
