@@ -200,11 +200,13 @@ function script_followEX2:isTargetAttackingMember()
    		while currentObj ~= 0 do 
     			if typeObj == 3 then
 				if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:GetDistance() <= 50) then
-					if (currentObj:GetUnitsTarget():GetGUID() == member:GetGUID()) then 
-						if (script_follow.assistInCombat) then
-							script_follow.objectAttackingUs = currentObj;	
+					if currentObj:GetUnitsTarget() ~= 0 and currentObj:GetUnitsTarget() ~= nil then
+						if (currentObj:GetUnitsTarget():GetGUID() == member:GetGUID()) then 
+							if (script_follow.assistInCombat) then
+								script_follow.objectAttackingUs = currentObj;	
+							end
+                					return true; 
 						end
-                				return true; 
 					end 
 				end
 			end

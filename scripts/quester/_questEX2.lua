@@ -54,7 +54,7 @@ function _questEX2:doChecks()
         end
     end
 
-    if GetLocalPlayer():GetLevel() < 20 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then
+    if GetLocalPlayer():GetLevel() < 10 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then
         CheckBagsForBetterGear()
         self.checkInvTimer = GetTimeEX() + 180000
     end
