@@ -36,7 +36,8 @@ script_druid = {
 	rakeEnergy = 40,
 	openerUsed = 0,
 	autoAttackActionSlot = 0,
-	naturesGraspTimer = GetTimeEX(),
+	naturesGraspTimer = 0,
+	omenOfClarityTimer = 0,
 }
 
 
@@ -140,6 +141,11 @@ function script_druid:setup()
 		self.rakeEnergy = 35;
 	end
 
+	if HasSpell("Feral Charge") and IsIdolOfFerocityEquipped() then
+		self.clawEnergy = 37;
+		self.rakeEnergy = 32;
+	end
+
 	if (not HasSpell("Bear Form")) then
 		shiftToDrink = false;
 		useCharge = false;
@@ -147,6 +153,7 @@ function script_druid:setup()
 		self.useBear = false;
 	end
 
+	self.omenOfClarityTimer = GetTimeEX();
 	self.thornsTimer = GetTimeEX();
 	self.naturesGraspTimer = GetTimeEX();
 
@@ -217,7 +224,7 @@ function script_druid:healsAndBuffs()
 	local localObj = GetLocalPlayer();
 
 
-	if GetLocalPlayer():HasBuff("Omen of Clarity") then
+	if GetLocalPlayer():HasBuff("Clearcasting") then
 		localMana = 100;
 		localRage = 100;
 		localEnergy = 100;
@@ -312,11 +319,23 @@ function script_druid:healsAndBuffs()
 		return true;
 	end
 
+	-- remove form and force our buffs when not in combat
+	if not IsInCombat() and IsStanding() and
+		(
+		(HasSpell("Omen of Clarity") and not localObj:HasBuff("Omen of Clarity")) or
+		(HasSpell("Thorns") and not localObj:HasBuff("Thorns"))
+		) and HasForm() then
+
+		RemoveForm();
+		return true;
+	end
+
 	-- omen of clarity
-	if HasSpell("Omen of Clarity") and not localObj:HasBuff("Omen of Clarity") and localMana >= 10 and not HasForm() then
+	if HasSpell("Omen of Clarity") and (not localObj:HasBuff("Omen of Clarity") or GetTimeEX() > self.omenOfClarityTimer) and localMana >= 10 and not HasForm() then
 		CastSpellByName("Omen of Clarity", localObj);
 		self.waitTimer = GetTimeEX() + 1650;
 		script_grind:setWaitTimer(1650);
+		self.omenOfClarityTimer = GetTimeEX() + 600000;
 		return true;
 	end
 
@@ -398,6 +417,14 @@ function script_druid:healsAndBuffs()
 		if (CastSpellByName("Thorns", localObj)) then
 			self.waitTimer = GetTimeEX() + 2550;
 			self.thornsTimer = GetTimeEX() + 600000;
+			return true;
+		end
+	end
+	-- Force omen of clarity in combat
+	if (localMana > 10) and (HasSpell("Omen of Clarity")) and (not localObj:HasBuff("Omen of Clarity")) and (not IsMounted()) and (not IsSpellOnCD("Omen of Clarity")) and not HasForm() then
+		if CastSpellByName("Omen of Clarity", localObj) then
+			self.waitTimer = GetTimeEX() + 2550;
+			self.omenOfClarityTimer = GetTimeEX() + 600000;
 			return true;
 		end
 	end
@@ -620,7 +647,7 @@ function script_druid:run(targetGUID)
 		script_druid:setup();
 	end
 
-	if GetLocalPlayer():HasBuff("Omen of Clarity") then
+	if GetLocalPlayer():HasBuff("Clearcasting") then
 		localMana = 100;
 		localRage = 100;
 		localEnergy = 100;
@@ -641,6 +668,9 @@ function script_druid:run(targetGUID)
 	end
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
+
+	-- Assign the target 
+	targetObj = GetGUIDObject(targetGUID);
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
@@ -712,9 +742,6 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() and targetObj:GetManaPerc
 				end
 			end
 		end
-
-	-- Assign the target 
-	targetObj = GetGUIDObject(targetGUID);
 	
 	-- check for a valid target
 	if(targetObj == 0 or targetObj == nil) then
@@ -1915,7 +1942,7 @@ function script_druid:rest()
 	end	
 
 	-- shift to drink - in bear form
-	if (IsBearForm()) and (not IsInCombat()) and (self.shiftToDrink) then
+	if (IsBearForm()) and (not IsInCombat()) and (self.shiftToDrink or localMana < 15) then
 		if (localMana <= self.drinkMana - 15 and self.shiftToDrink) 
 		or (localMana <= 15)
 		then
@@ -1927,7 +1954,7 @@ function script_druid:rest()
 	end
 
 	-- shift to drink - in cat form
-	if (self.shiftToDrink) and (IsCatForm()) and (not IsInCombat()) then 	
+	if (self.shiftToDrink or localMana < 15) and (IsCatForm()) and (not IsInCombat()) then 	
 		if (localMana <= self.drinkMana - 15 and self.shiftToDrink) 
 		or (localMana < 15)
 		then	

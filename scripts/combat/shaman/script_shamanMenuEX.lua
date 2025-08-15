@@ -45,7 +45,7 @@ function script_shamanMenuEX:alternateTotemMenuEarth()
 			script_shaman.totem = "Stoneskin Totem";
 		end
 		if (b) and (bb) then
-			script_shaman.totem = "Strength of Earth";
+			script_shaman.totem = "Strength of Earth Totem";
 		end
 		if (c) and (cc) then
 			script_shaman.totem = "Stoneclaw Totem";

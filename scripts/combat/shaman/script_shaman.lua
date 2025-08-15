@@ -306,7 +306,7 @@ if (IsCasting()) or (IsChanneling()) then
 
 	-- Check: Healing
 	if (not IsCasting()) and (not IsChanneling()) and (localMana >= self.healMana) and (not IsMoving()) then
-		if (localHealth < self.healHealth) and (not IsSpellOnCD(self.healingSpell)) then
+		if (localHealth < self.healHealth or (not IsInCombat() and localHealth < self.healHealth + 20)) and (not IsSpellOnCD(self.healingSpell)) then
 			if (IsMoving()) then
 				StopMoving();
 			end
@@ -683,7 +683,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			end
 
 			-- stoneclaw totem if we have more than 1 target
-			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanTotems:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) then
+			if (script_grind.enemiesAttackingUs() > 1) and (localMana >= 20) and (HasSpell("Stoneclaw Totem")) and (not script_shamanTotems:isStoneclawTotemAlive()) and (HasItem("Earth Totem")) and (not IsSpellOnCD("Stoneclaw Totem")) and GetNumPartyMembers() < 1 then
 				CastSpellByName("Stoneclaw Totem");
 				return 0;
 			end
@@ -937,8 +937,8 @@ function script_shaman:rest()
 			if (localHealth < 45) and (not isGhostWolf) then
 				if (localMana >= self.healMana) then 
 					script_shaman:castHealingSpell(GetLocalPlayer());
-						self.waitTimer = GetTimeEX() + 2200;
-						script_grind:setWaitTimer(2200);
+						self.waitTimer = GetTimeEX() + 2500;
+						script_grind:setWaitTimer(2500);
 						return true;
 					
 				end

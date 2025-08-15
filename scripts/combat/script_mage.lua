@@ -28,7 +28,7 @@ script_mage = {
 	coneOfColdMana = 35,	-- use cone of cold above this mana %
 	coneOfColdHealth = 15,	-- use cone of cold above this health %
 	useWandMana = 10,	-- use wand below this mana %
-	useWandHealth = 25,	-- use wand below this target health %
+	useWandHealth = 35,	-- use wand below this target health %
 	manaShieldHealth = 80,	-- use mana shield below this health %
 	manaShieldMana = 20,	-- use mana shield above this mana %
 	useFrostWard = false,	-- use frost ward yes/no
@@ -439,6 +439,29 @@ function script_mage:run(targetGUID)
 			targetObj:FaceTarget();
 		end
 		--	START OF COMBAT PHASE
+
+-- frost ward
+		if IsStanding() and (self.useFrostWard) and (HasSpell("Frost Ward")) and (not localObj:HasBuff("Frost Ward")) then
+			if (localMana > 25) and (not localObj:HasBuff("Fire Ward")) then
+				if (not CastSpellByName("Frost Ward", localObj)) then
+					self.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1700);
+					return true;
+				end
+			end
+		end
+	
+		-- fire ward
+		if IsStanding() and (self.useFireWard) and (HasSpell("Fire Ward")) and (not localObj:HasBuff("Fire Ward")) then
+			if (localMana > 50) and (not localObj:HasBuff("Frost Ward")) then
+				if (not CastSpellByName("Fire Ward", localObj)) then
+					self.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1700);
+					return true;
+				end
+			end
+		end
+
 	
 		-- Opener - not in combat pulling target
 		if (not IsInCombat()) then
@@ -575,6 +598,18 @@ function script_mage:run(targetGUID)
 					return 4; 
 				end 
 			end
+
+			--Cone of Cold
+			if (self.useConeOfCold) and (HasSpell('Cone of Cold')) and (localMana >= self.coneOfColdMana) and (targetHealth >= self.coneOfColdHealth) then
+				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9) and (not targetObj:HasDebuff("Frostbite")) and (not targetObj:HasDebuff("Frost Nova")) then
+						targetObj:FaceTarget();
+					if (script_mage:coneOfCold('Cone of Cold')) then
+						targetObj:FaceTarget();
+						self.waitTimer = GetTimeEX() + 1500;
+						return 0;
+					end
+				end
+			end
 			
 			-- Check: Move backwards if the target is affected by Frost Nova or Frost Bite
 			if (GetNumPartyMembers() < 1) and (self.useFrostNova) then
@@ -686,7 +721,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Check: Frostnova when the target is close, but not when we polymorhped one enemy or the target is affected by Frostbite
-			if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova then
+			if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and targetHealth >= 10 then
 				script_grind.tickRate = 100;
 				self.message = "Frost nova the target(s)...";
 				CastSpellByName("Frost Nova");
@@ -705,21 +740,9 @@ function script_mage:run(targetGUID)
 			end
 
 			-- arcane explosion in group 
-			if (GetNumPartyMembers() > 1) then
+			if (GetNumPartyMembers() > 1) or (GetLocalPlayer():GetLevel() - targetObj:GetLevel() >= 4) then
 				if (HasSpell("Arcane Explosion")) and (targetObj:GetDistance() < 6) and (localMana > 25) and (script_grind:enemiesAttackingUs(5) >= 2) then
 					if (CastSpellByName("Arcane Explosion")) then
-						return 0;
-					end
-				end
-			end
-
-			--Cone of Cold
-			if (self.useConeOfCold) and (HasSpell('Cone of Cold')) and (localMana >= self.coneOfColdMana) and (targetHealth >= self.coneOfColdHealth) then
-				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9) and (not targetObj:HasDebuff("Frostbite")) and (not targetObj:HasDebuff("Frost Nova")) then
-						targetObj:FaceTarget();
-					if (script_mage:coneOfCold('Cone of Cold')) then
-						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 1500;
 						return 0;
 					end
 				end
@@ -802,7 +825,7 @@ function script_mage:run(targetGUID)
 				if (localMana >= self.useWandMana and targetHealth >= self.useWandHealth) then
 
 			-- Check: Frostnova when the target is close, but not when we polymorhped one enemy or the target is affected by Frostbite
-				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and localMana >= 10 then
+				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and localMana >= 10 and targetHealth >= 10 then
 				script_grind.tickRate = 0;
 				self.message = "Frost nova the target(s)...";
 				CastSpellByName("Frost Nova");
@@ -838,7 +861,7 @@ function script_mage:run(targetGUID)
 				if (localMana >= self.useWandMana and targetHealth >= self.useWandHealth) then
 
 				-- Check: Frostnova when the target is close, but not when we polymorhped one enemy or the target is affected by Frostbite
-					if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and localMana >= 10 then
+					if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and localMana >= 10 and targetHealth >= 10 then
 						script_grind.tickRate = 100;
 						self.message = "Frost nova the target(s)...";
 						CastSpellByName("Frost Nova");
@@ -1133,8 +1156,8 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		end
 
 		-- frost ward
-		if (self.useFrostWard) and (HasSpell("Frost Ward")) and (not localObj:HasBuff("Frost Ward")) then
-			if (localMana > 50) and (not localObj:HasBuff("Fire Ward")) then
+		if IsStanding() and (self.useFrostWard) and (HasSpell("Frost Ward")) and (not localObj:HasBuff("Frost Ward")) then
+			if (localMana > 25) and (not localObj:HasBuff("Fire Ward")) then
 				if (not CastSpellByName("Frost Ward", localObj)) then
 					self.waitTimer = GetTimeEX() + 1700;
 					script_grind:setWaitTimer(1700);
@@ -1144,7 +1167,7 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		end
 	
 		-- fire ward
-		if (self.useFireWard) and (HasSpell("Fire Ward")) and (not localObj:HasBuff("Fire Ward")) then
+		if IsStanding() and (self.useFireWard) and (HasSpell("Fire Ward")) and (not localObj:HasBuff("Fire Ward")) then
 			if (localMana > 50) and (not localObj:HasBuff("Frost Ward")) then
 				if (not CastSpellByName("Fire Ward", localObj)) then
 					self.waitTimer = GetTimeEX() + 1700;
@@ -1156,7 +1179,7 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 
 		-- remove curse
 		if (HasSpell("Remove Lesser Curse")) and (script_checkDebuffs:hasCurse()) and (localMana > 10) then
-			if (not CastSpellByName("Remove Lesser Curse", localObj)) then
+			if CastSpellByName("Remove Lesser Curse", localObj) then
 				self.waitTimer = GetTimeEX() + 1800;
 				script_grind:setWaitTimer(1800);
 				return true;
