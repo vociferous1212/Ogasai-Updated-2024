@@ -9,7 +9,7 @@ function script_checkAdds:checkAdds()
     local grindEnemy = script_grind and script_grind.enemyObj or nil
     local questEnemy = _quest and _quest.enemyTarget or nil
 
-    if (grindEnemy ~= nil and grindEnemy ~= 0) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
+    if script_grind.skipHardPull and (grindEnemy ~= nil and grindEnemy ~= 0) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
         if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy)) then 
             if self:avoidToAggro(self.checkAddsRange) then
                 if not script_unstuck:pathClearAuto(2) then
@@ -19,7 +19,7 @@ function script_checkAdds:checkAdds()
                 if GetPet() ~= 0 then
                     PetFollow()
                 end
-                return true
+                return true;
             end
         end
     end
@@ -90,7 +90,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
     while theta <= 2 * PI do
         point = point + 1
         points[point] = { x = pointX + radius * cos(theta), y = pointY + radius * sin(theta) }
-        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist) * cos(theta), y = pointY + (self.addsRange + safeDist) * sin(theta) }
+        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 5) * cos(theta), y = pointY + (self.addsRange + safeDist + 5) * sin(theta) }
         theta = theta + 2 * PI / quality
     end
 
@@ -107,7 +107,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
     end
 
     if farthestPoint == 0 then
-        farthestPoint = 1
+        farthestPoint = 3
     end
 
     if farthestPoint ~= 0 and pointsTwo[farthestPoint] and pointZ then
@@ -127,6 +127,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
                 return true
             end
         end
+	return true;
     end
     return false
 end

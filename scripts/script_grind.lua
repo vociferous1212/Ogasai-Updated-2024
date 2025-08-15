@@ -1004,12 +1004,6 @@ function script_grind:run()
 		end
 	end
 
-	-- prioritize totems
-	if IsInCombat() and GetTimeEX() > self.checkTotemKillTimer then
-	script_killTotems:checkForTotems(10);
-	self.checkTotemKillTimer = GetTimeEX() + 5000;
-	end
-
 	if (not IsInCombat()) and (not IsLooting()) then
 		self.blacklistLootTime = GetTimeEX();
 	end
@@ -1184,6 +1178,12 @@ function script_grind:run()
 				self.lastTarget = self.enemyObj:GetGUID();
 			end
 		end
+
+		-- prioritize totems
+		if IsInCombat() and GetTimeEX() > self.checkTotemKillTimer then
+			script_killTotems:checkForTotems(10);
+			self.checkTotemKillTimer = GetTimeEX() + 5000;
+		end
 	
 		-- force enemy obj var
 		if (IsInCombat()) then
@@ -1250,7 +1250,8 @@ function script_grind:run()
 		end
 
 	-- try to run out of combat
-	if ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65) or GetLocalPlayer():GetHealthPercentage() <= 20 then
+	-- need to change this to account for mana users that can heal.. check to make sure we have low low mana
+	if not script_checkDebuffs:hasDisabledMovement() and ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65) or GetLocalPlayer():GetHealthPercentage() <= 20 then
 		local x, y z = 0, 0, 0;
 		self.enemyObj = nil;
 		x, y, z = script_nav.currentHotSpotX , script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
@@ -1799,7 +1800,7 @@ if (not IsAutoCasting("Attack")) then
 
 
 				-- check stealth rogue
-				if (script_rogue.useStealth or script_druid.useStealth) and (HasSpell("Stealth") or HasSpell("Prowl")) and (not IsSpellOnCD("Stealth") and not IsSpellOnCD("Prowl")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
+				if (script_rogue.useStealth and script_druid.useStealth) and (HasSpell("Stealth") or HasSpell("Prowl")) and (not IsSpellOnCD("Stealth") and not IsSpellOnCD("Prowl")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
 					if (HasSpell("Stealth")) then
 						CastSpellByName("Stealth", localObj);
 						self.waitTimer = GetTimeEX() + 1200;
@@ -2586,10 +2587,9 @@ lastError = GetLastError();
 				end
 			elseif (not IsMoving() or not IsPathLoaded(5)) then
 				
-				Move(_x, _y, _z);
 				if (self.lootObj ~= nil and self.lootObj ~= 0) and (self.lootObj:GetDistance() ~= nil and self.lootObj:GetDistance() ~= 0) then
 					self.message = "Cannot find a path to loot target";
-						-- "..self.lootObj:GetDistance()"";
+					script_grind:addTargetToLootBlacklist(self.lootObj:GetGUID());
 				end
 				return true;
 			end

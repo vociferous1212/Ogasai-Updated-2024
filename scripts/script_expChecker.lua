@@ -203,89 +203,92 @@ function script_expChecker:targetLevels()
                     end
                 end
             elseif GetXPExhaustion() == nil or restR == 0 then
+           	 targetObj = script_grind.enemyObj
+		if targetObj ~= nil and targetObj ~= 0 then
                 if GetLocalPlayer():GetLevel() == targetObj:GetLevel() then
                     if GetLocalPlayer():GetLevel() > 1 then
                         self.messageRest = ""..killsNeeded.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 1 then
+		end
+                elseif targetObj ~= nil and targetObj ~= 0 and GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 1 then
                     local XP = math.floor(baseXP * (1 - 1/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 2 then
+                elseif targetObj ~= nil and targetObj ~= 0 and GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 2 then
                     local XP = math.floor(baseXP * (1 - 2/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 3 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 3 then
                     local XP = math.floor(baseXP * (1 - 3/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 4 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 4 then
                     local XP = math.floor(baseXP * (1 - 4/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 5 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 5 then
                     local XP = math.floor(baseXP * (1 - 5/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 6 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 6 then
                     local XP = math.floor(baseXP * (1 - 6/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 7 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == 7 then
                     local XP = math.floor(baseXP * (1 - 7/zeroDiff))
                     if XP > 1 then
                         local lowXP = math.floor(neededXP / XP)
                         self.messageRest = ""..lowXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -1 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -1 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -2 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -2 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -3 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -3 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -4 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -4 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -5 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -5 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -6 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -6 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
-                elseif GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -7 then
+                elseif targetObj ~= nil and targetObj ~= 0 and  GetLocalPlayer():GetLevel() - targetObj:GetLevel() == -7 then
                     local XP = math.floor(baseXP * (1 + 0.05 * (targetObj:GetLevel() - GetLocalPlayer():GetLevel())))
                     if XP > 1 then
                         local highXP = math.floor(neededXP / XP)
