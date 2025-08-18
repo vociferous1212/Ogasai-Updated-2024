@@ -16,7 +16,8 @@ function script_deleteItems:setup()
     script_deleteItems:addDeleteItem("Vulture Gizzard");
     script_deleteItems:addDeleteItem("Blasted Boar Lung");
     script_deleteItems:addDeleteItem("Snickerfang Jowl");
-    script_deleteItems:addDeleteItem("Imperfect Draenethyst Fragment");
+    script_deleteItems:addDeleteItem("Basilisk Brain");
+    script_deleteItems:addDeleteItem("Scorpok Pincer");
     script_deleteItems:addDeleteItem("Wooden Key");
     script_deleteItems:addDeleteItem("Kolkar Booty Key");
     script_deleteItems:addDeleteItem("Sunscale Feather");
@@ -24,6 +25,8 @@ function script_deleteItems:setup()
     script_deleteItems:addDeleteItem("Grimesilt Outhouse Key");
     script_deleteItems:addDeleteItem("Dark Iron Scraps");
     script_deleteItems:addDeleteItem("Black Diamond");
+    script_deleteItems:addDeleteItem("Savage Frond");
+    script_deleteItems:addDeleteItem("Core of Elements");
     self.selectionList[self.deleteNum] = name;
     self.selectedListItem = 0;
 end

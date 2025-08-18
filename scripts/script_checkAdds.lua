@@ -12,6 +12,11 @@ function script_checkAdds:checkAdds()
     if script_grind.skipHardPull and (grindEnemy ~= nil and grindEnemy ~= 0) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
         if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy)) then 
             if self:avoidToAggro(self.checkAddsRange) then
+		script_grind.waitTimer = GetTimeEX() + 500;
+		_quest.waitTimer = GetTimeEX() + 500;
+		if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
+		if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
+
                 if not script_unstuck:pathClearAuto(2) then
                     script_unstuck:unstuck()
                     return true
@@ -90,7 +95,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
     while theta <= 2 * PI do
         point = point + 1
         points[point] = { x = pointX + radius * cos(theta), y = pointY + radius * sin(theta) }
-        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 5) * cos(theta), y = pointY + (self.addsRange + safeDist + 5) * sin(theta) }
+        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 10) * cos(theta), y = pointY + (self.addsRange + safeDist + 10) * sin(theta) }
         theta = theta + 2 * PI / quality
     end
 
@@ -162,4 +167,109 @@ function script_checkAdds:aggroIntersect(target)
         currentObj, typeObj = GetNextObject(currentObj)
     end
     return nil
+end
+
+function script_checkAdds:moveWhileResting(safeMargin)
+    local localObj = GetLocalPlayer()
+    local closestEnemy = 0
+    local closestDist = 999
+    local addsRange = 25 -- Fallback range if level-based calculation is invalid
+    local currentObj, typeObj = GetFirstObject()
+
+    -- Check for enemies within dynamic aggro range
+    while currentObj ~= 0 do
+        if typeObj == 3 then -- NPC type
+            local aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5
+            if aggro > 0 then
+                addsRange = aggro -- Use level-based aggro range
+            end
+            if currentObj:GetDistance() <= addsRange then
+                if currentObj:CanAttack()
+                    and (not currentObj:IsDead())
+                    and (not currentObj:IsCritter())
+                    and (not currentObj:HasDebuff("Polymorph"))
+                    and (not currentObj:HasDebuff("Fear"))
+                then
+                    local dist = currentObj:GetDistance()
+                    if dist <= (addsRange + 10) and dist < closestDist then
+                        closestDist = dist
+                        closestEnemy = currentObj
+                    end
+                end
+            end
+        end
+        currentObj, typeObj = GetNextObject(currentObj)
+    end
+
+    -- If an enemy is found and player isn't movement-disabled
+    if closestEnemy ~= 0 and not script_checkDebuffs:hasDisabledMovement() then
+        local xT, yT, zT = closestEnemy:GetPosition()
+        local xP, yP, zP = localObj:GetPosition()
+        
+        local intersectEnemy = self:aggroIntersect(closestEnemy)
+        local avoidX, avoidY, avoidZ, radius, safeDist
+
+        if intersectEnemy ~= nil then
+            local x, y = closestEnemy:GetPosition()
+            local xx, yy = intersectEnemy:GetPosition()
+            avoidX, avoidY = (x + xx) / 2, (y + yy) / 2
+            avoidZ = zP
+            radius = addsRange / 2
+            safeDist = addsRange * 2
+        else
+            avoidX, avoidY, avoidZ = xT, yT, zP
+            radius = addsRange / 2
+            safeDist = addsRange
+        end
+
+        -- Integrated avoid logic
+        local sqrt, sin, cos, PI, theta, points, pointsTwo, point = math.sqrt, math.sin, math.cos, math.pi, 0, {}, {}, 0
+        local closestDist = 999
+        local farthestDist = 0
+        local farthestPoint = 0
+        local quality = 250
+        local myX, myY, myZ = localObj:GetPosition()
+
+        -- Generate points for avoidance circle
+        while theta <= 2 * PI do
+            point = point + 1
+            points[point] = { x = avoidX + radius * cos(theta), y = avoidY + radius * sin(theta) }
+            pointsTwo[point] = { x = avoidX + (addsRange + safeDist + 5) * cos(theta), y = avoidY + (addsRange + safeDist + 5) * sin(theta) }
+            theta = theta + 2 * PI / quality
+        end
+
+        -- Find the farthest valid point from the player
+        for i = 1, point do
+            local secondPoint = i
+            if pointsTwo[secondPoint] then
+                local dist = sqrt((pointsTwo[secondPoint].x - myX)^2 + (pointsTwo[secondPoint].y - myY)^2)
+                local enemyDist = sqrt((pointsTwo[secondPoint].x - avoidX)^2 + (pointsTwo[secondPoint].y - avoidY)^2)
+                if dist < closestDist and enemyDist >= addsRange then
+                    closestDist = dist
+                    farthestPoint = i
+                end
+            end
+        end
+
+        if farthestPoint == 0 then
+            farthestPoint = 3
+        end
+
+        -- Move to the avoidance point
+        if farthestPoint ~= 0 and pointsTwo[farthestPoint] and avoidZ then
+            if not script_unstuck:pathClearAuto(2) then
+                script_unstuck:unstuck()
+                return true
+            end
+            if Move(pointsTwo[farthestPoint].x, pointsTwo[farthestPoint].y, avoidZ) then
+                closestEnemy = 0
+                intersectEnemy = nil
+                script_om:FORCEOM()
+                PetFollow()
+                return true
+            end
+            return true
+        end
+    end
+    return false
 end

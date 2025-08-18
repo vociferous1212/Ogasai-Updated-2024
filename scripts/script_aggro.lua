@@ -172,7 +172,7 @@ function script_aggro:safePullRecheck(target)
 			-- acceptable targets
 			if (testRange < 30) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) and (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting())  then	
 
-				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 23.5;
+				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
 
 				-- if we are a ranged class we can pull at half the distance!
 

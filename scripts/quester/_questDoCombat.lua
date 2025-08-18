@@ -165,7 +165,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 				script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
 
 				-- move to target
-				if (script_grind.combatError == 3) then
+				if (script_grind.combatError == 3) and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange then
 					local x, y, z = _quest.enemyTarget:GetPosition();
 					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 					if not IsMoving() and not IsInCombat() and _quest.enemyTarget ~= nil and GetTimeEX() > self.blacklistTimer then

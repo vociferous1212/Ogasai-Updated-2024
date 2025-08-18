@@ -171,6 +171,7 @@ if self.currentType == 10 and _quest.currentQuest ~= nil and ((not script_getSpe
 		return true;
 		end
 	end
+
 	-- set our current quest
 	_questSetQuest:setOurCurrentQuest();
 

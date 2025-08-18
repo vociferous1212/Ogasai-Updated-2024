@@ -276,9 +276,16 @@ function GetObjectsAroundMe()
 		if (CollapsingHeader("All NPC In Range")) then
 			while i ~= 0 do
 				if t == 3 then
-					for oo = 0, 1 -1 do
-						Text("("..i:GetLevel()..") "..i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetCreatureType());
+					if (i:GetClassification() == 4) then
+						for oo = 0, 1 -1 do
+							Text("RARE ("..i:GetLevel()..") "..i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetCreatureType());
+						end
+					else
+						for oo = 0, 1 -1 do
+							Text("("..i:GetLevel()..") "..i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetCreatureType());
+						end
 					end
+
 				end
 			i, t = GetNextObject(i);
 			end
@@ -1198,7 +1205,7 @@ function script_grind:run()
 				if t == 3 and not i:IsCritter() and not i:IsDead() and i:GetHealthPercentage() >= 1 and i:CanAttack() and script_grind:isTargetingMe(i) and (script_grind:enemiesAttackingUs() > 1 or HasPet()) and self.enemyObj ~= 0 and self.enemyObj ~= nil and not self.enemyObj:IsDead() then
 					local hp = script_grind.enemyObj:GetHealthPercentage();
 					local ihp = i:GetHealthPercentage();
-					if (ihp < hp) then
+					if (ihp < hp) and PlayerHasTarget() then
 						if (GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID()) then
 							self.enemyObj = i;
 							self.lastTarget = i:GetGUID();
@@ -1210,8 +1217,9 @@ function script_grind:run()
 		end
 
 		-- don't assign targets  until we get to hotspot
-		if (self.hotspotReached) then
+		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime then
 			self.enemyObj = script_grind:assignTarget();
+			self.newTargetTime = GetTimeEX() + 2500;
 		end
 
 		if (IsInCombat()) or (not PlayerHasTarget()) then
@@ -1220,6 +1228,8 @@ function script_grind:run()
 
 		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 			if (not PlayerHasTarget()) and (not script_grind:isTargetHardBlacklisted(self.enemyObj)) and (not IsAutoCasting("Attack")) and (self.enemyObj:GetDistance() <= self.pullDistance) then
+
+				-- this should target the target, turn auto attack on and then auto attack off to allow for stealth opener
 				if (not GetLocalPlayer():HasBuff("Stealth") and not GetLocalPlayer():HasBuff("Prowl")) then
 					self.enemyObj:AutoAttack();
 				end
@@ -1250,21 +1260,61 @@ function script_grind:run()
 		end
 
 	-- try to run out of combat
-	-- need to change this to account for mana users that can heal.. check to make sure we have low low mana
-	if not script_checkDebuffs:hasDisabledMovement() and ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65) or GetLocalPlayer():GetHealthPercentage() <= 20 then
-		local x, y z = 0, 0, 0;
-		self.enemyObj = nil;
-		x, y, z = script_nav.currentHotSpotX , script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
-		if x ~= 0 then
-			if script_navEX:moveToTarget(localObj, x, y, z) then self.message = "Running out of combat";
-				if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
-					CastSpellByName("Earthbind Totem");
-				end
-			return true;
-			end
-		end
-	return true;
-	end
+-- need to change this to account for mana users that can heal.. check to make sure we have low low mana
+	if script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then local targetHealth = script_grind.enemyObj:GetHealthPercentage(); end
+	if not script_checkDebuffs:hasDisabledMovement() and ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65 and targetHealth >= 50) or (GetLocalPlayer():GetHealthPercentage() <= 10 and targetHealth >= 20) then
+ 		   local localObj = GetLocalPlayer();
+ 		   self.enemyObj = nil;
+
+    -- Check: Load/update the hotspot
+    if (script_nav.currentHotSpotName ~= 0) then
+        script_nav:updateHotSpot(localObj:GetLevel(), GetFaction(), false);
+    end
+
+    -- Fallback to hotspot if fewer than 3 saved locations
+    if script_nav.numSavedLocation ~= nil and (script_nav.numSavedLocation < 3) then
+        local x, y, z = script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
+        if x ~= 0 then
+            if script_navEX:moveToTarget(localObj, x, y, z) then
+                self.message = "Running out of combat";
+                if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+                    CastSpellByName("Earthbind Totem");
+                end
+                return true;
+            end
+        end
+        return true;
+    end
+
+    -- Check: If we reached the last location index
+    if (script_nav.currentGoToLocation > script_nav.numSavedLocation) then
+        script_nav.currentGoToLocation = 0;
+    end
+
+    -- Check: Move to the next location index
+    local _lx, _ly, _lz = localObj:GetPosition();
+    if _lx ~= nil and script_nav.savedLocations ~= nil and script_nav.savedLocations[script_nav.currentGoToLocation] ~= nil and script_nav.savedLocations[script_nav.currentGoToLocation]['x'] ~= nil then
+        local currentDist = math.sqrt((_lx - script_nav.savedLocations[script_nav.currentGoToLocation]['x'])^2 + (_ly - script_nav.savedLocations[script_nav.currentGoToLocation]['y'])^2);
+        local minLevel = localObj:GetLevel() - 5; -- Example range, adjust if needed
+        local maxLevel = localObj:GetLevel() + 5;
+        if (currentDist < 5
+            or script_nav.savedLocations[script_nav.currentGoToLocation]['level'] < minLevel
+            or script_nav.savedLocations[script_nav.currentGoToLocation]['level'] > maxLevel) then
+            script_nav.currentGoToLocation = script_nav.currentGoToLocation + 1;
+            self.message = "Running out of combat: Changing go to location...";
+            return true;
+        end
+    end
+
+    if (script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])) then
+        self.message = "Running out of combat: Moving to auto path node " .. (script_nav.currentGoToLocation + 1) .. "...";
+        if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+            CastSpellByName("Earthbind Totem");
+        end
+        return true;
+    end
+    return true;
+end
 
 		-- distance to hotspot
 		if (script_nav:getDistanceToHotspot() <= 80) then
@@ -1465,8 +1515,9 @@ function script_grind:run()
 			script_checkAdds.intersectEnemy = nil;
 			end
 
-			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) then
+			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime then
 				self.enemyObj = script_grind:assignTarget();
+				self.newTargetTime = GetTimeEX() + 2500;
 				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 					self.lastTarget = self.enemyObj:GetGUID();
 				end
@@ -1476,9 +1527,10 @@ function script_grind:run()
 			-- if we have a valid enemy
 			if (self.enemyObj ~= nil) and (not IsInCombat()) then
 				
-			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) then
+			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime then
 				-- else assign a target
 				script_grind:assignTarget();
+				self.newTargetTime = GetTimeEX() + 2500;
 			end
 
 			if (not IsMoving()) then
@@ -1593,6 +1645,8 @@ if (not IsAutoCasting("Attack")) then
 					if IsEating() or IsDrinking() or IsLooting() or (PlayerHasTarget() and IsMoving()) then
 						self.autoBlacklistTimer = GetTimeEX() + 15000;
 					end
+					if IsMoving() then self.autoBlacklistTimer = GetTimeEX() + 15000; end
+
 					if (not IsInCombat()) and (not IsMoving()) and not IsDrinking() and not IsEating() and not IsLooting() and not IsCasting() and not IsChanneling() and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
 						self.autoBlacklistTimerSet = false;
 						script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());

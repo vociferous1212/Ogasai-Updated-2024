@@ -4,6 +4,8 @@ function _questAcceptQuest:run()
 
 	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) then
 
+		if HasForm() then RemoveForm(); return true; end
+
 		local px, py, pz = GetLocalPlayer():GetPosition();
 			-- set return target name
 			local name = _quest.curQuestGiver;
