@@ -181,38 +181,39 @@ function script_grindMenu:menu()
 	script_displayOptionsMenu:menu();
 
 	script_grindPartyMenu:menu();
-
-	if (CollapsingHeader("Trainers and Flight Path Options")) then
-		wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
-		wasClicked, script_grind.useFPS = Checkbox("Use Flight Paths (level 20 areas and under)", script_grind.useFPS);
-		
-		if (CollapsingHeader(">>> |+| Testing Stuff")) then
-			Text("Testing... Go To FP and kill on the way...");
-
-			if (fpDB.goTo) then
-				if (Button("STOP")) then
-					fpDB.goTo = false;
-					fpDB.goToNearestFPBool = false;
-					fpDB.goToAshenvaleBool = false;
+	if GetLocalPlayer():GetLevel() < 20 then
+		if (CollapsingHeader("Trainers and Flight Path Options")) then
+			wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);
+			wasClicked, script_grind.useFPS = Checkbox("Use Flight Paths (level 20 areas and under)", script_grind.useFPS);
+			
+			if (CollapsingHeader(">>> |+| Testing Stuff")) then
+				Text("Testing... Go To FP and kill on the way...");
+	
+				if (fpDB.goTo) then
+					if (Button("STOP")) then
+						fpDB.goTo = false;
+						fpDB.goToNearestFPBool = false;
+						fpDB.goToAshenvaleBool = false;
+					end
 				end
-			end
-			if (fpDB.goTo) then
+				if (fpDB.goTo) then
+					SameLine();
+				end
+				if (Button("Ashenvale")) then
+					fpDB.goTo = true;
+					fpDB.goToAshenvaleBool = true;	
+					end
+					if (Button("Nearest FP")) then
+				fpDB.goTo = true;
+					fpDB.goToNearestFPBool = true;
+				end
 				SameLine();
-			end
-			if (Button("Ashenvale")) then
-				fpDB.goTo = true;
-				fpDB.goToAshenvaleBool = true;	
-			end
-			if (Button("Nearest FP")) then
-				fpDB.goTo = true;
-				fpDB.goToNearestFPBool = true;
-			end
-			SameLine();
-			if (Button("Fly to Nearest City")) then
-				fpDB.goToNearestFPBool = true;
-				fpDB.goTo = true;
+				if (Button("Fly to Nearest City")) then
+					fpDB.goToNearestFPBool = true;
+						fpDB.goTo = true;
 				fpDB.goToCityBool = true;
-			end	
+				end	
+			end
 		end
 	end
 

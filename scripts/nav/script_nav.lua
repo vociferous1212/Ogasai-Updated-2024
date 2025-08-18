@@ -137,10 +137,11 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		return "Changing go to location...";
 	end end
 
-	
+	if self.savedLocations[self.currentGoToLocation]['x'] ~= nil then 
 	if (script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z'])) then
 		return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 		
+	end
 	end
 	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
