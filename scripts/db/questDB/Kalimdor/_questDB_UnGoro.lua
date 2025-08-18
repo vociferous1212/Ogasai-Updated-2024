@@ -72,7 +72,7 @@ _questDB:addQuest("no", 2, "Chasing A-Me 01", "Karna Remtravel", -6172.7890625, 
 _questDB:addQuest("no", 2, "The Scent of Lar'korwi", "Torwa Pathfinder", -7840.33984375, -2117.3200683594, -254.35252380371, 490, 50, 60, -7436.7890625, -3064.7100683594, -254.35252380371, 2, 0, 0, 0, 2, 0, -7840.33984375, -2117.3200683594, -254.35252380371, "Torwa Pathfinder", 0, 0, 0, 11502, 0, 1, "Bring 2 Ravasaur Matriarch's Pelts to Torwa Pathfinder at the entrance of Un'Goro Crater.", 0, 1);
 
 -- 20. The Apes of Un'Goro (Kill)
-_questDB:addQuest("no", 2, "The Apes of Un'Goro", "Torwa Pathfinder", -7840.33984375, -2117.3200683594, -254.35252380371, 490, 50, 60, -6074.4560546875, -3064.7100683594, -254.35252380371, 1, 2, 2, 2, 0, 0, -7840.33984375, -2117.3200683594, -254.35252380371, "Torwa Pathfinder", "Un'Goro Gorilla", "Un'Goro Stomper", "Un'Goro Thunderer", 0, 0, 1, "Bring 2 Un'Goro Gorilla Pelts, 2 Un'Goro Stomper Pelts, and 2 Un'Goro Thunderer Pelts to Torwa Pathfinder at the entrance of Un'Goro Crater.", 0, 1);
+_questDB:addQuest("no", 2, "The Apes of Un'Goro", "Torwa Pathfinder", -7840.33984375, -2117.3200683594, -254.35252380371, 490, 50, 60, -6403.2319335938, -1755.3699951172, -272.34655761719, 1, 10, 10, 10, 0, 0, -7840.33984375, -2117.3200683594, -254.35252380371, "Torwa Pathfinder", "Un'Goro Gorilla", "Un'Goro Stomper", "Un'Goro Thunderer", 0, 0, 1, "Bring 2 Un'Goro Gorilla Pelts, 2 Un'Goro Stomper Pelts, and 2 Un'Goro Thunderer Pelts to Torwa Pathfinder at the entrance of Un'Goro Crater.", 0, 1);
 
 self.isSetup = true;
 

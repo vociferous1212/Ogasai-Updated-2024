@@ -806,9 +806,9 @@ function script_hunter:rest()
 	end
 
 
--- craft bandages
+	-- craft bandages
 	if (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) then
-		if (HasItem("Linen Cloth")) or (HasItem("Wool Cloth")) then
+		if script_firstAid:canCraftBandage() then
 			if (script_firstAid:craftBandages()) then
 				return true;
 			end
@@ -818,6 +818,7 @@ function script_hunter:rest()
 			CloseTradeSkill();
 		end
 	end
+
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then

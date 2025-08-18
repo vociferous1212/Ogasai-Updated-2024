@@ -41,6 +41,7 @@ function script_rogueEX:menu()
 		Separator();
 		if (CollapsingHeader("Rogue Grind Options")) then
 			local wasClicked = false;
+			wasClicked, script_rogue.useThrow = Checkbox("Use Throw", script_rogue.useThrow);
 			if (self.menuBandages) then
 			wasClicked, script_rogue.useBandage = Checkbox("Use Bandages", script_rogue.useBandage);
 			end

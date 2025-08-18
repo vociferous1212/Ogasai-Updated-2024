@@ -45,6 +45,7 @@ script_rogue = {
 	pickpocketMoney = 0,
 	ppMoney = GetMoney(),
 	ppVarUsed = false,
+	useThrow = true,
 }
 
 function script_rogue:setup()
@@ -94,6 +95,7 @@ function script_rogue:setup()
 
 	if (GetLocalPlayer():GetLevel() < 6) then
 		self.eatHealth = 55;
+		self.useThrow = false;
 	end
 	if (GetLocalPlayer():GetLevel() >= 20) and (HasSpell("Poisons")) then
 		self.usePoison = true;
@@ -293,7 +295,24 @@ function script_rogue:run(targetGUID)
 		--Valid Enemy
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
-			
+			if self.useThrow and GetLocalPlayer():HasRangedWeapon() and script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
+				if targetObj:GetDistance() <= 30 and targetObj:GetDistance() > 13 and targetObj:IsInLineOfSight() and targetObj:GetManaPercentage() < 100 then
+					if IsMoving() then
+						StopMoving();
+						return true;
+					end
+				targetObj:FaceTarget();
+				if CastSpellByName("Throw", targetObj) then
+					if IsMoving() then
+						StopMoving();
+						return true;
+					end
+					self.waitTimer = GetTimeEX() + 4000;
+					script_grind.waitTimer = GetTimeEX() + 3500;
+					return;
+				end
+				end
+			end
 
 			if (IsLooting()) then
 				if (not LootTarget()) then
@@ -301,6 +320,15 @@ function script_rogue:run(targetGUID)
 					return true;
 				end
 			end
+
+			local targetHealth = targetObj:GetHealthPercentage();
+
+			-- Check: Use Healing Potion 
+				if IsInCombat() and PlayerHasTarget() and targetHealth <= 99 and (localHealth <= self.potionHealth) then 
+					if (script_helper:useHealthPotion()) then 
+						return 0; 
+					end 
+				end
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (not targetObj:IsCasting()) then
 			if (script_checkAdds:checkAdds()) then
@@ -362,6 +390,7 @@ function script_rogue:run(targetGUID)
 							StopMoving();
 						return true;
 						end
+						if IsAutoCasting("Attack") then CastSpellByName("Attack"); end
 						self.tickRate = 0;
 						self.pickpocketUsed = true;
 						CastSpellByName("Pick Pocket", targetObj);
@@ -416,7 +445,7 @@ function script_rogue:run(targetGUID)
 				self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 
 				-- Auto Attack
-				if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) and (not IsStealth()) then
+				if (targetObj:GetDistance() < 40) and (not IsMoving()) and (not IsAutoCasting("Attack")) then
 					targetObj:AutoAttack();
 				-- stops spamming auto attacking while moving to target
 				elseif (targetObj:GetDistance() <= 8) and (not IsAutoCasting("Attack")) and (not IsStealth()) then
@@ -439,7 +468,8 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Open with stealth opener
-				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and (self.openerUsed < 3) and (not IsLooting()) then
+				if (targetObj:GetDistance() <= 4 and (self.useStealth or IsStealth()) and HasSpell(self.stealthOpener) and IsStealth()) and (self.openerUsed < 3) and (not IsLooting()) then
+					if IsAutoCasting("Attack") then CastSpellByName("Attack"); end
 					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
 						LootTarget();
@@ -565,13 +595,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					return 0;
 				end
 
-				-- Check: Use Healing Potion 
-				if (localHealth <= self.potionHealth) then 
-					if (script_helper:useHealthPotion()) then 
-						return 0; 
-					end 
-				end
-
 				-- Check: Kick if the target is casting
 				if (HasSpell("Kick")) and (targetObj:IsCasting()) and (not IsSpellOnCD("Kick")) and (localEnergy >= 25) then
 					if (CastSpellByName("Kick", targetObj)) then
@@ -581,7 +604,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Gouge if target casting
-				if (HasSpell("Gouge")) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) then
+				if (HasSpell("Gouge") and (not HasSpell("Kick") or IsSpellOnCD("Kick"))) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) then
 					if (CastSpellByName("Gouge", targetObj)) then
 						CastSpellByName("Attack", targetObj);
 						self.waitTimer = GetTimeEX() + 250;
@@ -814,7 +837,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				LootTarget();
 
 				-- Open with stealth opener
-				if (targetObj:GetDistance() <= 4 and self.useStealth and HasSpell(self.stealthOpener) and IsStealth()) and ((self.openerUsed < 3 and self.usePickPocket) or (not self.usePickPocket and self.openerUsed < 2)) and (not IsLooting()) then
+				if (targetObj:GetDistance() <= 4 and (self.useStealth or IsStealth()) and HasSpell(self.stealthOpener) and IsStealth()) and ((self.openerUsed < 3 and self.usePickPocket) or (not self.usePickPocket and self.openerUsed < 2)) and (not IsLooting()) then
 					LootTarget();
 					if (script_rogue:spellAttack(self.stealthOpener, targetObj)) then
 						LootTarget();
@@ -1142,9 +1165,9 @@ function script_rogue:rest()
 	end
 
 
--- craft bandages
+	-- craft bandages
 	if (not GetLocalPlayer():IsDead()) and (not self.hasBandages) and (script_grind.useFirstAid) and (HasSpell("First Aid")) then
-		if (HasItem("Linen Cloth")) or (HasItem("Wool Cloth")) then
+		if script_firstAid:canCraftBandage() then
 			if (script_firstAid:craftBandages()) then
 				return true;
 			end

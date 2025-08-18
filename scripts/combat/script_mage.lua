@@ -46,7 +46,7 @@ script_mage = {
 	followTargetDistance = 100,	-- new follow/face target distance here to debug melee
 	waitTimer = GetTimeEX(),	-- set wait timer variable. probably not needed?
 	rangeDistance = 38,
-	moveAwayRest = false,
+	moveAwayRest = true,
 }
 
 function script_mage:window()
@@ -173,6 +173,67 @@ function script_mage:runBackwards(targetObj, range)
 	return false;
 end
 
+function script_mage:checkFrostNova()
+    local localObj = GetLocalPlayer()
+    local searchRadius = 15 -- 15 yard radius for detection
+    local minSafeDistance = 8 -- Minimum distance to move away
+    local closestFrostTarget = 0
+    local closestDist = 999
+    local currentObj, typeObj = GetFirstObject()
+
+    -- Check for targets with Frostbite or Frost Nova within 15 yards
+    while currentObj ~= 0 do
+        if typeObj == 3 then -- NPC type
+            if currentObj:GetDistance() <= searchRadius then
+                if currentObj:CanAttack()
+                    and (not currentObj:IsDead())
+                    and (not currentObj:IsCritter())
+                    and (currentObj:HasDebuff("Frostbite") or currentObj:HasDebuff("Frost Nova"))
+                then
+                    local dist = currentObj:GetDistance()
+                    if dist < closestDist then
+                        closestDist = dist
+                        closestFrostTarget = currentObj
+                    end
+                end
+            end
+        end
+        currentObj, typeObj = GetNextObject(currentObj)
+    end
+
+    -- If a valid target with frost debuff is found
+    if closestFrostTarget ~= 0 then
+        local xT, yT, zT = closestFrostTarget:GetPosition()
+        local xP, yP, zP = localObj:GetPosition()
+        local distance = closestFrostTarget:GetDistance()
+        local xV, yV, zV = xP - xT, yP - yT, zP - zT
+        local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2)
+        local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV
+
+        -- Stop if already 8 yards or further from the target
+        if distance >= minSafeDistance then
+            return false -- No need to move further
+        end
+
+        -- Calculate movement distance: ensure at least 8 yards
+        local moveDistance = minSafeDistance + 2 -- Move to 8 yards plus a small buffer
+        local moveX, moveY, moveZ = xT + xUV*moveDistance, yT + yUV*moveDistance, zT + zUV
+
+        if (distance <= searchRadius)
+            and (closestFrostTarget:IsInLineOfSight())
+            and (not script_checkDebuffs:hasDisabledMovement())
+        then
+            script_grind.tickRate = 75 -- Set tick rate as in runBackwards
+            if Move(moveX, moveY, moveZ) then
+                return true
+            end
+            return 4
+        end
+    end
+
+    return false
+end
+
 function script_mage:addWater(name) -- water setup
 	self.water[self.numWater] = name;
 	self.numWater = self.numWater + 1;
@@ -271,6 +332,8 @@ function script_mage:setup()
 	if (GetLocalPlayer():GetLevel() < 27) or (self.frostMage) then
 		self.useScorch = false;
 	end
+	
+	if GetLocalPlayer():GetLevel() < 7 then self.moveAwayRest = false; end
 
 	self.isSetup = true;
 end
@@ -507,7 +570,7 @@ function script_mage:run(targetGUID)
 			-- check racial spells
 			CheckRacialSpells();
 
--- Check: Do we have the right target (in UI) ??
+			-- Check: Do we have the right target (in UI) ??
 				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 					if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
 						ClearTarget();
@@ -546,20 +609,6 @@ function script_mage:run(targetGUID)
 				end
 			end
 
-			-- Fire blast
-			if (self.useFireBlast) and (targetObj:GetDistance() <= 20) and (HasSpell("Fire Blast")) and (not IsSpellOnCD("Fire Blast")) and (localMana > 6) and (not IsMoving()) and targetHealth > 5 then
-				if (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) or (targetHealth < 20 and localHealth < 25) then
-	
-					if (not IsSpellOnCD("Fire Blast")) then
-						CastSpellByName("Fire Blast", targetObj);
-						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 1750;
-						script_grind:setWaitTimer(1750);
-						return 0;
-					end
-				end
-			end
-
 			-- Check: Use Healing Potion 
 			if (localHealth < self.potionHealth) then 
 				if (script_helper:useHealthPotion()) then 
@@ -585,6 +634,8 @@ function script_mage:run(targetGUID)
 				CastSpellByName('Cold Snap');
 				return 0;
 			end
+
+			if IsInCombat() then script_mage:checkFrostNova(); self.waitTimer = GetTimeEX() + 500; end
 
 			-- use cold snap to reset frost nova if we don't have ice barrier
 			if (targetObj:IsInLineOfSight()) and (not HasSpell("Ice Barrier")) and (HasSpell("Cold Snap")) and (not IsSpellOnCD("Cold Snap")) and (IsSpellOnCD("Frost Nova")) and (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) and (targetObj:GetDistance() <= 10) and ( (localMana >= 15 and targetHealth >= 20) or (localHealth <= 30 and localMana >= 10) ) then
@@ -630,6 +681,20 @@ function script_mage:run(targetGUID)
 					return 4;
 					end 
 				end	
+			end
+
+-- Fire blast
+			if (self.useFireBlast) and (targetObj:GetDistance() <= 20) and (HasSpell("Fire Blast")) and (not IsSpellOnCD("Fire Blast")) and (localMana > 6) and (not IsMoving()) and targetHealth > 5 then
+				if (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) or (targetHealth < 20 and localHealth < 25) then
+	
+					if (not IsSpellOnCD("Fire Blast")) then
+						CastSpellByName("Fire Blast", targetObj);
+						targetObj:FaceTarget();
+						self.waitTimer = GetTimeEX() + 1750;
+						script_grind:setWaitTimer(1750);
+						return 0;
+					end
+				end
 			end
 
 			-- frost nova if target is running away
@@ -740,7 +805,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- arcane explosion in group 
-			if (GetNumPartyMembers() > 1) or (GetLocalPlayer():GetLevel() - targetObj:GetLevel() >= 4) then
+			if (GetNumPartyMembers() > 1) or (GetLocalPlayer():GetLevel() - targetObj:GetLevel() >= 4) or (targetObj:GetUnitName() == "Flesh Eating Worm") then
 				if (HasSpell("Arcane Explosion")) and (targetObj:GetDistance() < 6) and (localMana > 25) and (script_grind:enemiesAttackingUs(5) >= 2) then
 					if (CastSpellByName("Arcane Explosion")) then
 						return 0;
@@ -948,12 +1013,12 @@ function script_mage:rest()
 	local localMana = localObj:GetManaPercentage();
 	local localHealth = localObj:GetHealthPercentage();
 
-	if (self.moveAwayRest) and (localMana < self.drinkMana or localHealth < self.eatHealth) and (not IsInCombat()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-		if (script_checkAdds:avoidToAggro(script_checkAdds.checkAddsRange+10)) then
-			script_grind:setWaitTimer(1700);
-			self.waitTimer = GetTimeEX() + 5500;
+	if (self.moveAwayRest) and (localHealth < self.eatHealth or localMana < self.drinkMana) then
+		if (script_checkAdds:moveWhileResting(10)) then
+			self.waitTimer = GetTimeEX() + 500;
+			script_grind.waitTimer = GetTimeEX() + 500;
 			self.message = "Moving away from adds to drink/eat.";
-			return;
+			return true;
 		end
 	end
 
@@ -1265,8 +1330,8 @@ function script_mage.frostMagePull(targetObj)
 			targetObj:FaceTarget();
 		end
 		if (CastSpellByName("Frostbolt", targetObj)) then
-			self.waitTimer = GetTimeEX() + 2300;
-			script_grind:setWaitTimer(2300);
+			self.waitTimer = GetTimeEX() + 2550;
+			script_grind:setWaitTimer(2550);
 			if (PlayerHasTarget()) then
 				targetObj:FaceTarget();
 			end

@@ -93,7 +93,7 @@ function script_hunterEX:petChecks()
 			script_hunter.waitTimer = GetTimeEX() + 1850;
 			return true; 
 		else 
-			script_helper:drink();
+			script_helper:drinkWater();
 			script_hunter.message = "Pet is dead, need more mana to ress it...";
 			return true; 
 		end

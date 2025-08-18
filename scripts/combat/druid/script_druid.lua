@@ -310,6 +310,9 @@ function script_druid:healsAndBuffs()
 		end
 	end
 
+if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
+
+
 	-- nature's grasp
 	if IsInCombat() and HasSpell("Nature's Grasp") and not IsSpellOnCD("Nature's Grasp") and not HasForm() and not IsIndoors() and localHealth <= 55 and GetTimeEX() > self.naturesGraspTimer then
 		CastSpellByName("Nature's Grasp", localObj);
@@ -715,7 +718,7 @@ function script_druid:run(targetGUID)
 			end
 		end
 
-if localObj:HasBuff("Nature's Grasp") and IsInCombat() and targetObj:GetManaPercentage() < 1 then return 4; end
+	if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return 4; end
 
 		-- check heals and buffs
 		if (not IsInCombat()) and (not HasForm()) then

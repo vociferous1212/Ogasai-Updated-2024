@@ -118,10 +118,6 @@ function script_paladin:run(targetGUID)
 		return 2;
 	end	
 
-	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
-		TargetHasRangedWeapon(target);
-	end
-
 	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 		if (script_checkAdds:checkAdds()) then
 			script_om:FORCEOM();
