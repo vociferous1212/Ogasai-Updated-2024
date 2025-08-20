@@ -11,6 +11,7 @@ script_grindEX = {
 	blacklistAggroNum = 0,
 	tryTavelFormTimer = 0,
 	swimTimer = 0,
+	deleteItemTimer = GetTimeEX(),
 }
 
 function script_grindEX:howManyEnemiesTargetingMe()
@@ -268,8 +269,9 @@ function script_grindEX:doChecks()
 		end
 
 		-- delete items 
-		if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then
+		if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) and GetTimeEX() > self.deleteItemTimer then
 			script_deleteItems:checkDeleteItems();
+			self.deleteItemTimer = GetTimeEX() + 60000;
 		end
 
 		-- check party members

@@ -76,22 +76,20 @@ return false;
 end
 
 function script_grindParty:isAttackingGroup()
-
-	local members = 0;
-	local i, typeObj = GetFirstObject();
-	local unitsInRange = 0;
-
-	for p = 1, GetNumPartyMembers() do
-		members = GetPartyMember(p);
-	end
-	
-	while i ~= 0 do
-		if (typeObj == 3) and (i:GetDistance() < 60) then
-			if (i:GetUnitsTarget():GetGUID() == members:GetGUID()) then
-				return true;
-			end
-		end
-	i, typeObj = GetNextObject(i);
-	end
-return false;
+    local i, typeObj = GetFirstObject();
+    while i ~= 0 do
+        if (typeObj == 3) and (i:GetDistance() < 60) and (i:CanAttack()) and (not i:IsDead()) then
+            local target = i:GetUnitsTarget();
+            if (target ~= nil) then
+                for p = 1, GetNumPartyMembers() do
+                    local member = GetPartyMember(p);
+                    if (member ~= nil and target:GetGUID() == member:GetGUID()) then
+                        return true, i; -- Return true and the enemy object
+                    end
+                end
+            end
+        end
+        i, typeObj = GetNextObject(i);
+    end
+    return false, nil; -- No enemy found targeting the group
 end

@@ -1,4 +1,5 @@
 script_grind = {
+	grinderSetupIncluded = include("scripts\\script_grindSetup.lua"),
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	grindPartyOptionsLoaded = include("scripts\\script_grindParty.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
@@ -58,8 +59,10 @@ script_grind = {
 	displayOptionsMenuIncluded = include("scripts\\menu\\script_displayOptionsMenu.lua"),
 	vendorMenuIncluded = include("scripts\\menu\\script_vendorMenu.lua"),
 	pathMenuIncluded = include("scripts\\menu\\script_pathMenu.lua"),
+	getObjectsIncluded = include("scripts\\getObjectsAroundMe.lua"),
 
-
+	pathName = 0,
+	pathLoaded = 0,
 	getSpells = false,
 	jump = true,	-- enable jumping out of combat
 	jumpRandomFloat = 99,	-- jump > than 
@@ -105,7 +108,7 @@ script_grind = {
 	skipMechanical = false,	
 	skipElites = true,	-- skip elites (currently disabled)
 	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 3.55, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 3.05, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
@@ -240,238 +243,11 @@ function TargetHasRangedWeapon(target)
 		end
 	end
 return false;
-end
-
-function GetObjectsAroundMe()
-
-	local i, t = GetFirstObject();
-	if NewWindow("Object Manager", 320, 320) then
-		if (CollapsingHeader("All Players In Range")) then
-			while i ~= 0 do
-				if t == 4 then
-					local table = {}
-					for o = 0, 1 -1 do
-						-- show we can attack horde if we are alliance
-						if (i:CanAttack()) and (script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Horde");
-						end
-						-- show we can attack alliance if we are horde
-						if (i:CanAttack()) and (not script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Alliance");
-						end
-						-- show we can't attack alliance if we are alliance
-						if (not i:CanAttack()) and (script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Alliance");
-						end
-						-- show we can't attack horde if we are horde
-						if (not i:CanAttack()) and (not script_getSpells:areWeAlliance()) then
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetLevel().." lvl - Horde");
-						end
-					end
-				end
-			i, t = GetNextObject(i);
-			end
-		end
-		Separator();
-		if (CollapsingHeader("All NPC In Range")) then
-			while i ~= 0 do
-				if t == 3 then
-					if (i:GetClassification() == 4) then
-						for oo = 0, 1 -1 do
-							Text("RARE ("..i:GetLevel()..") "..i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetCreatureType());
-						end
-					else
-						for oo = 0, 1 -1 do
-							Text("("..i:GetLevel()..") "..i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetCreatureType());
-						end
-					end
-
-				end
-			i, t = GetNextObject(i);
-			end
-		end
-		Separator();
-		if (CollapsingHeader("All Items In Range")) then
-			while i ~= 0 do
-				if t ~= 3 and t ~= 4 then
-					if (i:GetDistance() <= 300) then
-						for ooo = 0, 1 -1 do
-							Text(i:GetUnitName()..", "..math.floor(i:GetDistance()).."(yd), "..i:GetObjectDisplayID().." ID | "..i:GetGUID());
-						end
-					end
-				end
-			i, t = GetNextObject(i);
-			end
-		end
-	end
-end
-					
+end				
 
 function script_grind:setup()
 
-	-- used to auto select vendors based on position of last known position
-	myLastX, myLastY, myLastZ = GetLocalPlayer():GetPosition();
-
-	-- Classes that don't use mana
-	local _ , class = UnitClass('player');
-	if (class == "WARRIOR" or GetMyClass() == "WARRIOR") or (class == "ROGUE" or GetMyClass() == "ROGUE") then
-		self.useMana = false;
-		self.restMana = 0;
-	end
-
-	-- grind party or in a group using grind for some other reason?
-	if (GetNumPartyMembers() >= 1) then
-		script_paranoia.paranoidOn = false;
-		self.skipHardPull = false;
-		script_grindEX.avoidBlacklisted = false;
-		script_grindParty.forceTarget = true;
-		script_grindParty.waitForGroup = true;
-		self.drawEnabled = false;
-		self.drawUnits = false;
-		self.useExpChecker = false;
-		
-	end
-
-	if (strfind("HUNTER", class)) or GetMyClass() == "HUNTER" then
-		script_hunter.waitAfterCombat = true;
-	end
-
-	if (strfind("WARLOCK", class)) or GetMyClass() == "WARLOCK" then
-		script_warlock.waitAfterCombat = true;
-	end
-	
-	-- No refill as mage or at level 1
-	if (strfind("MAGE", class)) or GetMyClass() == "MAGE" then
-		self.vendorRefill = false;
-	end
-
-	-- don't refill water or food on start of bot
-	if (GetLocalPlayer():GetLevel() < 3) then
-		self.vendorRefill = false;
-	end
-
-	if ((UnitClass("Player") == "ROGUE" or GetMyClass() == "ROGUE") and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
-		self.blacklistTime = 60;
-	end
-
-	-- don't skip hard pulls when we are at starter zones
-	if (GetLocalPlayer():GetLevel() <= 5) then
-		self.skipHardPull = false;
-		self.blacklistTime = 20;
-	end
-	--if (GetLocalPlayer():GetLevel() <= 22) then
-	--	self.getSpells = true;
-	--	self.useFPS = true;
-	--end
-
-	-- enable drawing unit info on screen
-	self.drawEnabled = true;
-	
-	-- setup helper script
-	script_helper:setup();
-	
-	-- setup talent script
-	script_talent:setup();
-
-	-- setup vendor script
-	script_vendor:setup();
-
-	-- setup gather script
-	script_gather:setup();
-
-	-- vendor database script loaded
-	vendorDB:setup();
-
-	-- hotspot database script loaded
-	hotspotDB:setup();
-
-	-- auto load sell vendors
-	vendorDB:loadDBVendors();
-
-	script_getSpells:setup();
-
-	-- navigation script loaded
-	script_nav:setup();
-
-	-- load check debuffs
-
-	-- safer min level for low level botting
-	if (GetLocalPlayer():GetLevel() < 20) then
-		script_grind.minLevel = GetLocalPlayer():GetLevel() - 3;
-	end
-	
-	-- don't stop bot on next level if level is under 10
-	if (GetLocalPlayer():GetLevel() < 10) then
-		script_paranoia.stopOnLevel = false;
-	end
-
-	-- turn on skinning if have
-	if (HasSpell("Skinning")) then
-		self.skinning = true;
-	end
-	-- turn on herbs
-	if (HasSpell("Find Herbs")) then
-		self.gather = true;
-	end
-	-- turn on mining
-	if (HasSpell("Find Minerals")) then
-		self.gather = true;
-		script_gather.blacklistSetTime = 30;
-	end
-
-	-- change some values to random
-	local randomLogout = math.random(45, 80);
-	self.setParanoidTimer = randomLogout;
-	local randomHotspot = math.random(450, 950);
-	self.distToHotSpot = randomHotspot;
-	local randomSetTimer = math.random(3, 10);
-	self.paranoidSetTimer = randomSetTimer;
-	local randomRange = math.random(45, 100);
-	self.paranoidRange = randomRange;
-
-	-- set timers for script to run based on grind script timer
-	self.nodeTimer = GetTimeEX();
-	self.attackTimer = GetTimeEX();
-	self.blacklistLootTime = GetTimeEX();
-	self.blacklistLootTimeCheck = GetTimeEX();
-	self.deleteCheckTimer = GetTimeEX();
-	script_shamanTotems.waitTimer = GetTimeEX();
-	self.swimJumpTimer = GetTimeEX();
-	self.lootCheck['target'] = 0;
-	self.lootCheck['timer'] = GetTimeEX();
-	self.buffTimer = GetTimeEX();
-	script_getSpells.waitTimer = GetTimeEX();
-	script_navEX.waitTimer = GetTimeEX();
-	self.timeToSit = GetTimeEX();
-	script_grindEX.waitTimer = GetTimeEX();
-	script_aggro.waitTimer = GetTimeEX();
-	self.moveTimer = GetTimeEX();
-	script_goToFP.goToFPTimer = GetTimeEX();
-	script_nav.timer = GetTimeEX();
-	script_navEXCombat.timer = GetTimeEX();
-	script_grindEX.tryTravelFormTimer = GetTimeEX();
-	self.autoBlacklistTimer = GetTimeEX();
-	self.checkTotemKillTimer = GetTimeEX();
-	script_helper.gateTimer = GetTimeEX();
-
-	local level = GetLocalPlayer():GetLevel();
-	if (level < 6) then
-		script_gather.safeGather = false;
-	end
-	if (level < 10) then
-		script_checkAdds.addsRange = 18;
-		self.paranoidRange = 25;
-		self.paranoidSetTimer = 3;
-	end
-	if (level >= 10) and (level < 40) then
-		script_checkAdds.addsRange = 23;
-	end
-	if (level > 40) then
-		script_checkAdds.addsRange = 25;
-	end
-	if (level == 60) then
-		script_checkAdds.addsRange = 28;
-	end
+	script_grindSetup:setup();
 
 	-- we are setup don't reload these items here
 	self.isSetup = true;
@@ -547,24 +323,25 @@ end
 -- run grinder
 function script_grind:run()
 
-	-- draw object manager and end debug window
-	if (self.showOM) then
-		EndWindow();
-
-		GetObjectsAroundMe();
-	end
 	-- show grinder window
 	script_grind:window();
 
 	if (not IsUsingNavmesh()) then UseNavmesh(true);
 		return true;
 	end
-	if (not LoadNavmesh()) then script_grind.message = "Make sure you have mmaps-files...";
+	if (not LoadNavmesh()) and (GetLoadNavmeshProgress() ~= 1) then script_grind.message = "Make sure you have mmaps-files...";
 		return true;
 	end
 	if (GetLoadNavmeshProgress() ~= 1) then
 		script_grind.message = "Loading Nav Mesh! Please Wait!";
 		return;
+	end
+
+	-- draw object manager and end debug window
+	if (self.showOM) then
+		EndWindow();
+
+		getObjectsAroundMe:GetObjectsAroundMe();
 	end
 
 	if (script_warlock2.usingThisScript) then
@@ -823,6 +600,18 @@ function script_grind:run()
 			self.message = "Checking/learning talent: " .. script_talent:getNextTalentName();
 			return;
 		end
+	end
+
+	-- try to stop spell casting so we can use wand if target is really low health.. waste of mana
+	-- or stop spell casting so we can frost nova and run away
+	if not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
+		local target = script_grind.enemyObj;
+		if (script_mage.useWand and GetLocalPlayer():HasRangedWeapon() and (GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth) and IsCasting()) or (IsCasting() and target:GetDistance() <= 6 and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) then
+					-- stop spell casting frostbolt and fireball
+				if GetLocalPlayer():GetCasting() == 8407 or GetLocalPlayer():GetCasting() == 8401 then
+					SpellStopCasting();
+				end
+			end
 	end
 
 -- heroic strike or maul stuck on and target moved away or we stopped casting auto attack
@@ -1261,60 +1050,60 @@ function script_grind:run()
 
 	-- try to run out of combat
 -- need to change this to account for mana users that can heal.. check to make sure we have low low mana
-	if script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then local targetHealth = script_grind.enemyObj:GetHealthPercentage(); end
-	if not script_checkDebuffs:hasDisabledMovement() and ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65 and targetHealth >= 50) or (GetLocalPlayer():GetHealthPercentage() <= 10 and targetHealth >= 20) then
- 		   local localObj = GetLocalPlayer();
- 		   self.enemyObj = nil;
+	--if script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then local targetHealth = script_grind.enemyObj:GetHealthPercentage(); end
+	--if not script_checkDebuffs:hasDisabledMovement() and ((script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 65 and targetHealth >= 50) or (GetLocalPlayer():GetHealthPercentage() <= 10 and targetHealth >= 20) then
+ 		--   local localObj = GetLocalPlayer();
+ 		--   self.enemyObj = nil;
 
     -- Check: Load/update the hotspot
-    if (script_nav.currentHotSpotName ~= 0) then
-        script_nav:updateHotSpot(localObj:GetLevel(), GetFaction(), false);
-    end
+  --  if (script_nav.currentHotSpotName ~= 0) then
+   --     script_nav:updateHotSpot(localObj:GetLevel(), GetFaction(), false);
+  --  end
 
     -- Fallback to hotspot if fewer than 3 saved locations
-    if script_nav.numSavedLocation ~= nil and (script_nav.numSavedLocation < 3) then
-        local x, y, z = script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
-        if x ~= 0 then
-            if script_navEX:moveToTarget(localObj, x, y, z) then
-                self.message = "Running out of combat";
-                if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
-                    CastSpellByName("Earthbind Totem");
-                end
-                return true;
-            end
-        end
-        return true;
-    end
+   -- if script_nav.numSavedLocation ~= nil and (script_nav.numSavedLocation < 3) then
+    --    local x, y, z = script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
+    --    if x ~= 0 then
+    --        if script_navEX:moveToTarget(localObj, x, y, z) then
+    --            self.message = "Running out of combat";
+    --            if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+     --               CastSpellByName("Earthbind Totem");
+    --            end
+    --           return true;
+     --       end
+    --    end
+    --    return true;
+   -- end
 
     -- Check: If we reached the last location index
-    if (script_nav.currentGoToLocation > script_nav.numSavedLocation) then
-        script_nav.currentGoToLocation = 0;
-    end
+    --if (script_nav.currentGoToLocation > script_nav.numSavedLocation) then
+    --    script_nav.currentGoToLocation = 0;
+    --end
 
     -- Check: Move to the next location index
-    local _lx, _ly, _lz = localObj:GetPosition();
-    if _lx ~= nil and script_nav.savedLocations ~= nil and script_nav.savedLocations[script_nav.currentGoToLocation] ~= nil and script_nav.savedLocations[script_nav.currentGoToLocation]['x'] ~= nil then
-        local currentDist = math.sqrt((_lx - script_nav.savedLocations[script_nav.currentGoToLocation]['x'])^2 + (_ly - script_nav.savedLocations[script_nav.currentGoToLocation]['y'])^2);
-        local minLevel = localObj:GetLevel() - 5; -- Example range, adjust if needed
-        local maxLevel = localObj:GetLevel() + 5;
-        if (currentDist < 5
-            or script_nav.savedLocations[script_nav.currentGoToLocation]['level'] < minLevel
-            or script_nav.savedLocations[script_nav.currentGoToLocation]['level'] > maxLevel) then
-            script_nav.currentGoToLocation = script_nav.currentGoToLocation + 1;
-            self.message = "Running out of combat: Changing go to location...";
-            return true;
-        end
-    end
+    --local _lx, _ly, _lz = localObj:GetPosition();
+    --if _lx ~= nil and script_nav.savedLocations ~= nil and script_nav.savedLocations[script_nav.currentGoToLocation] ~= nil and script_nav.savedLocations[script_nav.currentGoToLocation]['x'] ~= nil then
+      --  local currentDist = math.sqrt((_lx - script_nav.savedLocations[script_nav.currentGoToLocation]['x'])^2 + (_ly - script_nav.savedLocations[script_nav.currentGoToLocation]['y'])^2);
+      --  local minLevel = localObj:GetLevel() - 5; -- Example range, adjust if needed
+      --  local maxLevel = localObj:GetLevel() + 5;
+       -- if (currentDist < 5
+       --     or script_nav.savedLocations[script_nav.currentGoToLocation]['level'] < minLevel
+        --    or script_nav.savedLocations[script_nav.currentGoToLocation]['level'] > maxLevel) then
+       --     script_nav.currentGoToLocation = script_nav.currentGoToLocation + 1;
+     --       self.message = "Running out of combat: Changing go to location...";
+     --       return true;
+     --   end
+    --end
 
-    if (script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])) then
-        self.message = "Running out of combat: Moving to auto path node " .. (script_nav.currentGoToLocation + 1) .. "...";
-        if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
-            CastSpellByName("Earthbind Totem");
-        end
-        return true;
-    end
-    return true;
-end
+    --if (script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])) then
+        --self.message = "Running out of combat: Moving to auto path node " .. (script_nav.currentGoToLocation + 1) .. "...";
+       -- if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+      --      CastSpellByName("Earthbind Totem");
+    --    end
+  --      return true;
+--    end
+  --  return true;
+--end
 
 		-- distance to hotspot
 		if (script_nav:getDistanceToHotspot() <= 80) then
@@ -1650,7 +1439,7 @@ if (not IsAutoCasting("Attack")) then
 					if (not IsInCombat()) and (not IsMoving()) and not IsDrinking() and not IsEating() and not IsLooting() and not IsCasting() and not IsChanneling() and (self.autoBlacklistTimerSet) and (GetTimeEX() > self.autoBlacklistTimer) then
 						self.autoBlacklistTimerSet = false;
 						script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
-						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting "..self.enemyObj:GetUnitName()..", "..math.floor(self.enemyObj:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
+						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and we have not moved for 15 seconds... Automatically Blacklisting "..self.enemyObj:GetUnitName()..", "..math.floor(self.enemyObj:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
 					end
 					if (not IsInCombat()) and (not IsMoving()) and (not self.autoBlacklistTimerSet) then
 						self.autoBlacklistTimerSet = true;
@@ -1852,6 +1641,10 @@ if (not IsAutoCasting("Attack")) then
 				-- move to saved locations
 				self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
 
+				if not IsInCombat() and self.hotSpotReached and script_nav:getDistanceToHotspot() < self.distToHotspot then
+					script_grind:assignTarget();
+					self.newTargetTime = GetTimeEX() + 2500;
+				end
 
 				-- check stealth rogue
 				if (script_rogue.useStealth and script_druid.useStealth) and (HasSpell("Stealth") or HasSpell("Prowl")) and (not IsSpellOnCD("Stealth") and not IsSpellOnCD("Prowl")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
@@ -1922,7 +1715,7 @@ function script_grind:getTargetAttackingUs()
 				end	
 
 				-- acceptable target is targeting our group members (limited by distance)
-				if (GetNumPartyMembers() > 1) and (currentObj:GetDistance() < 50) and (currentObj:IsInLineOfSight()) and (script_grindParty.forceTarget) then
+				if (GetNumPartyMembers() > 1) and (currentObj:GetDistance() < 50) and (script_grindParty.forceTarget) then
 
 					-- run another object manager script to get a different target 
                 			if (script_grind:isTargetingGroup(currentObj)) then 
@@ -1998,7 +1791,7 @@ function script_grind:assignTarget()
 	end
 
 	-- get the target with the lowest health attacking us
-	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
+	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) and not GetLocalPlayer():HasBuff("Blade Flurry") then
 		local i, t = GetFirstObject()
 		while i ~= 0 do
 			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
@@ -2007,6 +1800,35 @@ function script_grind:assignTarget()
 				if bestHP < hp then
 					bestHP = hp;
 					return i;
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
+
+	-- get the mana user attacking us and kill it first... go for lowest mana target
+	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
+		local i, t = GetFirstObject()
+		while i ~= 0 do
+			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+				local mana = i:GetManaPercentage();
+				local manaUsers = 0;
+				if mana ~= nil and mana ~= 0 then
+					manaUsers = manaUsers +1
+					local bestMana = 1;
+					if bestMana < mana then
+						bestMana = mana;
+						return i;
+					end
+				end
+				-- if there are more than 1 mana user attacking us go for lowest hp...
+				if manaUsers > 1 then
+					local hp = i:GetHealthPercentage();
+					local bestHP = 1;
+					if bestHP < hp then
+						bestHP = hp;
+						return i;
+					end
 				end
 			end
 		i, t = GetNextObject(i);
@@ -2517,8 +2339,9 @@ function script_grind:doLoot(localObj)
 		end
 	end
 
-	local _x, _y, _z = self.lootObj:GetPosition();
-
+	if self.lootObj ~= nil and self.lootObj ~= 0 then
+		local _x, _y, _z = self.lootObj:GetPosition();
+	end
 	-- close enough to loot range then do these
 	if(dist <= self.lootDistance) then
 		self.message = "Looting...";
@@ -2545,6 +2368,7 @@ function script_grind:doLoot(localObj)
 
 		if (IsLooting()) then
 			self.waitTimer = GetTimeEX() + 950;
+			_quest.waitTimer = GetTimeEX() + 950;
 		end
 
 if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
@@ -2552,6 +2376,7 @@ if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 		-- interact with object if we are not looting
 		if(not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
 			self.waitTimer = GetTimeEX() + 1050;
+			_quest.waitTimer = GetTimeEX() + 1050;
 			return;
 		end
 
@@ -2565,6 +2390,7 @@ lastError = GetLastError();
 		-- if looting and not moving then wait
 		if (not LootTarget()) and (not IsMoving()) then
 			self.waitTimer = GetTimeEX() + 350;
+			_quest.waitTimer = GetTimeEX() + 350;
 			return;
 		else
 
@@ -2577,6 +2403,7 @@ lastError = GetLastError();
 					self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
 
 				script_grind:setWaitTimer(2500);
+				_quest.waitTimer = GetTimeEX() + 2500;
 				if (self.vendorMessageSent) then
 					vendorDB:loadDBVendors();
 					self.vendorMessageSent = false;
@@ -2587,6 +2414,7 @@ lastError = GetLastError();
 			-- we looted so reset variables
 			--self.vendorMessageSent = false;
 			self.waitTimer = GetTimeEX() + 350;
+			_quest.waitTimer = GetTimeEX() + 350;
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
 			return;
@@ -2658,6 +2486,7 @@ lastError = GetLastError();
 			StopMoving();
 		end
 		self.waitTimer = GetTimeEX() + 250;
+		_quest.waitTimer = GetTimeEX() + 250;
 		--script_nav:resetNavigate();
 	end
 	end end
@@ -2704,6 +2533,9 @@ function script_grind:lootAndSkin()
 		-- Tell the grinder we cant loot
 		if (inventoryFull) then
 			script_grind.bagsFull = true;
+		end
+		if (not inventoryFull) then
+			script_grind.bagsFull = false;
 		end
 	end
 

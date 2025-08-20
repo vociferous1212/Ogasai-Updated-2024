@@ -3,13 +3,14 @@ script_expChecker = {
     initialXP = nil,
     startTime = nil,
     lastXPPerHour = 0,
-    lastTimeToLevel = "N/A", -- Store time to level
+    lastTimeToLevel = "N/A",
     lastLevel = nil,
+    lastXP = nil,
 }
 
 -- Calculate XP per hour and time to level
 function script_expChecker:calculateXPPerHour()
-   if (script_grind.pause and _quest.pause) then
+    if (script_grind.pause and _quest.pause) then
         return self.lastXPPerHour, self.lastTimeToLevel
     end
 
@@ -17,6 +18,7 @@ function script_expChecker:calculateXPPerHour()
     local currentTime = GetTimeEX() / 1000
     local currentLevel = GetLocalPlayer():GetLevel()
 
+    -- Initialize on first call or level change (like Titan Panel's session start)
     if self.lastLevel == nil or self.lastLevel ~= currentLevel then
         self.initialXP = currentXP
         self.startTime = currentTime
@@ -29,12 +31,15 @@ function script_expChecker:calculateXPPerHour()
     local xpGained = currentXP - self.initialXP
     local timeElapsed = currentTime - self.startTime
 
-    if timeElapsed < 10 or xpGained <= 0 then
+    -- 1-second delay for stability, similar to Titan Panel's approach
+    if timeElapsed < 1 or xpGained <= 0 then
         return self.lastXPPerHour, self.lastTimeToLevel
     end
 
     local xpPerHour = math.floor((xpGained / timeElapsed) * 3600)
-    self.lastXPPerHour = xpPerHour
+    -- Format XP per hour to nearest thousand (e.g., 5520 -> "5k", 35121 -> "35k")
+    local formattedXPPerHour = math.floor(xpPerHour / 1000) .. "k"
+    self.lastXPPerHour = formattedXPPerHour
 
     -- Calculate time to level
     local remainingXP = UnitXPMax("player") - currentXP
@@ -54,9 +59,8 @@ function script_expChecker:calculateXPPerHour()
     end
     self.lastTimeToLevel = timeToLevel
 
-    return xpPerHour, timeToLevel
+    return formattedXPPerHour, timeToLevel
 end
-
 -- Check exp function
 function script_expChecker:targetLevels()
     if GetXPExhaustion() ~= nil then
@@ -355,12 +359,12 @@ function script_expChecker:menu()
 	end
         if script_grind.useExpChecker and GetXPExhaustion() == nil then
             local xpPerHour, timeToLevel = script_expChecker:calculateXPPerHour()
-            DrawText('XP per hour: '..xpPerHour, x-740, y+60, r+255, g+255, b+255)
+            DrawText('XP per hour: '..xpPerHour.." : ", x-740, y+60, r+255, g+255, b+255)
             DrawText('Time to level: '..timeToLevel, x-600, y+60, r+255, g+255, b+255)
         end
 	if script_grind.useExpChecker and GetXPExhaustion() ~= nil then
             local xpPerHour, timeToLevel = script_expChecker:calculateXPPerHour()
-            DrawText('XP per hour: '..xpPerHour, x-740, y+80, r+255, g+255, b+255)
+            DrawText('XP per hour: '..xpPerHour.." : ", x-740, y+80, r+255, g+255, b+255)
             DrawText('Time to level: '..timeToLevel, x-600, y+80, r+255, g+255, b+255)
         end
     end

@@ -98,7 +98,8 @@ function script_checkDebuffs:hasDisabledMovement()
         ["Entangling Roots"] = true,
         ["Slowing Poison"] = true,
         ["Hamstring"] = true, -- Reduces movement speed (Warrior); dispel with immunities
-        ["Wing Clip"] = true -- Reduces movement speed (Hunter); dispel with immunities
+        ["Wing Clip"] = true, -- Reduces movement speed (Hunter); dispel with immunities
+	["Terrify"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), movement, false);
 end
@@ -159,7 +160,8 @@ function script_checkDebuffs:hasSilence()
         ["Silence"] = true,
         ["Sonic Burst"] = true,
         ["Overwhelming Stench"] = true,
-        ["Counterspell - Silenced"] = true -- Silences after Counterspell; dispel in PvP
+        ["Counterspell - Silenced"] = true, -- Silences after Counterspell; dispel in PvP
+	["Terrify"] = true,
     };
     return checkUnitEffects(GetLocalPlayer(), silences, false);
 end
