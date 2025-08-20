@@ -4,7 +4,7 @@ function _questEX:doStartChecks()
 	if not IsUsingNavmesh() then UseNavmesh(true); return true; end
 	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files..."; return true; end
 	if (GetLoadNavmeshProgress() ~= 1) then self.message = "Loading Nav Mesh! Please Wait!"; return true; end
-		if _quest.enemyTarget ~= nil then if not _quest.enemyTarget:CanAttack() then _quest.enemyTarget = nil; end end
+		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then if not _quest.enemyTarget:CanAttack() then _quest.enemyTarget = nil; end end
 	if PlayerHasTarget() and _quest.currentType == 10 then
 		if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
 			if UnitOnTaxi("player") then
@@ -45,9 +45,6 @@ function _questEX:doChecks()
 	end
 	if (not HasSpell("First Aid")) then
 		script_grind.useFirstAid = false;
-	end
-	if GetNumQuestLogEntries() > 1 then
-		self.message = "Bot only does 1 quest at a time...";
 	end
 	script_grind.nextToNodeDist = 3;
 	NavmeshSmooth(2);

@@ -69,6 +69,16 @@ local localObj = GetLocalPlayer();
 
 	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
 
+	local r, g, b = 0, 0, 0;
+	local y, x, width = 120, 25, 370;
+	local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
+	
+	DrawText("Current Quest - _questDB", x+800, y+485, r+255, g+0, b+0);
+	DrawText("".._questDB.curListQuest, x+800, y+500, r+255, g+0, b+0);
+
+
+
+
 	-- handle vendor
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
 		local vendorStatus = script_vendor:getStatus();

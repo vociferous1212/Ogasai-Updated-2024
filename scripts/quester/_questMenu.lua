@@ -71,12 +71,8 @@ function _questMenu:menu()
 	end
 	
 	if (CollapsingHeader("Quester")) then
-	if (CollapsingHeader(">>> |+| Quest Options")) then
 
-
-		Text("");
-
-	if Button("Add To File...") then
+	if Button("Add Quest Info To File... Must Have Target!") then
 		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1)
 		local questDescription, descr = GetQuestLogQuestText();
 		ToFile(""..title.."");
@@ -88,15 +84,22 @@ function _questMenu:menu()
 		ToFile(" ________________________________________________ ");
 		Text("");
 	end
+	if (CollapsingHeader(">>> |+| Quest Options")) then
 
 local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
 local questDescription, desc = GetQuestLogQuestText(1);
+
+if (Button("Mark Current DB Quest As Complete")) then
+			_questDBHandleDB:turnQuestCompleted();
+		end
+		Text("Mark current DB quest as completed");
+Separator();
 
 		-- quest auto complete button
 		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
 		Text("Until bot reaches current quest in quest log");
 		Text("YOU MUST HAVE A QUEST IN QUEST LOG");
-		Text("");
+Separator();
 
 		if _quest.killStuffOnRoute then
 			Text("Min Level to Grind");
@@ -129,11 +132,7 @@ local questDescription, desc = GetQuestLogQuestText(1);
 	
 		Separator();
 
-		if (Button("Mark Current DB Quest As Complete")) then
-			_questDBHandleDB:turnQuestCompleted();
-		end
-		Text("Mark current DB quest as completed");
-		Text("");	
+		
 
 
 if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_quest.currentQuest - ".._quest.currentQuest); else Text("Current quester quest to run"); Text("_quest.currentQuest - NIL"); end if _quest.currentDesc ~= nil then Text("_quest.currentDesc - ".._quest.currentDesc); else Text("_quest.currentDesc - NIL"); end Text(""); Text("Current questDB quest being checked"); if _questDB.curListQuest ~= nil then Text("_questDB.curListQuest - ".._questDB.curListQuest); if _questDB.curDesc ~= nil then Text("_questDB.curDesc - ".._questDB.curDesc); else Text("_questDB.curDesc - NIL"); end end

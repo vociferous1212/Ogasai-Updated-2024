@@ -38,6 +38,11 @@ function _questEX2:doChecks()
             return true
         end
     end
+
+	if _quest.waitTimer > GetTimeEX() then
+		return;
+	end
+
     if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
         if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
             _quest.enemyTarget = GetPet():GetUnitsTarget()
@@ -204,8 +209,7 @@ function _questEX2:doChecks()
 
             if (script_grind:doLoot(localObj)) then
                 if IsLooting() then
-                    LootTarget()
-                    _quest:setTimer(350)
+                    _quest:setTimer(650)
                     -- New: Reset timer on successful loot start
                     self.lootTimeout = 0
                     self.currentLootGUID = nil
