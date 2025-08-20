@@ -28,7 +28,7 @@ script_mage = {
 	coneOfColdMana = 35,	-- use cone of cold above this mana %
 	coneOfColdHealth = 15,	-- use cone of cold above this health %
 	useWandMana = 10,	-- use wand below this mana %
-	useWandHealth = 35,	-- use wand below this target health %
+	useWandHealth = 20,	-- use wand below this target health %
 	manaShieldHealth = 80,	-- use mana shield below this health %
 	manaShieldMana = 20,	-- use mana shield above this mana %
 	useFrostWard = false,	-- use frost ward yes/no
@@ -164,6 +164,8 @@ function script_mage:runBackwards(targetObj, range)
 			and (not script_checkDebuffs:hasDisabledMovement())
 		then 		
  			if (Move(moveX, moveY, moveZ)) then
+				script_grind:setWaitTimer(750);
+				self.waitTimer = GetTimeEX() + 750;
  				return true;
 			end
 		return 4;
@@ -229,6 +231,7 @@ function script_mage:checkFrostNova()
             end
             return 4
         end
+	return 4;
     end
 
     return false
@@ -455,6 +458,14 @@ function script_mage:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (targetObj ~= nil) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) then
 
+		-- Don't attack if we should rest first
+		-- bot sometimes gets a new target before running rest
+		if (localHealth <= self.eatHealth or localMana <= self.drinkMana) and not script_grind:isTargetingMe(targetObj) and targetHealth > 99 and not targetObj:IsStunned() and not IsInCombat() then
+			targetObj = nil;
+			self.message = "Need rest...";
+			return 4;
+		end
+
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (not PlayerHasTarget()) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
@@ -581,7 +592,6 @@ function script_mage:run(targetGUID)
 					end
 				end
 
-
 			-- blink on movement stop debuffs
 			if (HasSpell("Blink")) and (not IsSpellOnCD("Blink")) then
 				if (script_checkDebuffs:hasDisabledMovement()) then
@@ -635,10 +645,11 @@ function script_mage:run(targetGUID)
 				return 0;
 			end
 
-			if IsInCombat() then script_mage:checkFrostNova(); self.waitTimer = GetTimeEX() + 500; end
+			if IsInCombat() and script_grind:enemiesAttackingUs(10) >= 2 then script_mage:checkFrostNova(); self.waitTimer = GetTimeEX() + 500; end
 
 			-- use cold snap to reset frost nova if we don't have ice barrier
-			if (targetObj:IsInLineOfSight()) and (not HasSpell("Ice Barrier")) and (HasSpell("Cold Snap")) and (not IsSpellOnCD("Cold Snap")) and (IsSpellOnCD("Frost Nova")) and (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) and (targetObj:GetDistance() <= 10) and ( (localMana >= 15 and targetHealth >= 20) or (localHealth <= 30 and localMana >= 10) ) then
+			-- make sure we waste both cone of cold and frost nova cooldown
+			if (targetObj:IsInLineOfSight()) and (not HasSpell("Ice Barrier")) and (HasSpell("Cold Snap")) and (not IsSpellOnCD("Cold Snap")) and (IsSpellOnCD("Frost Nova")) and (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) and (targetObj:GetDistance() <= 10) and ( (localMana >= 15 and targetHealth >= 20) or (localHealth <= 30 and localMana >= 10) ) and (not HasSpell("Cone of Cold") or (HasSpell("Cone of Cold") and IsSpellOnCD("Cone of Cold"))) then
 				CastSpellByName("Cold Snap");
 				self.waitTimer = GetTimeEX() + 1000;
 			end
@@ -651,10 +662,10 @@ function script_mage:run(targetGUID)
 			end
 
 			--Cone of Cold
-			if (self.useConeOfCold) and (HasSpell('Cone of Cold')) and (localMana >= self.coneOfColdMana) and (targetHealth >= self.coneOfColdHealth) then
+			if (self.useConeOfCold) and (HasSpell("Cone of Cold")) and (localMana >= self.coneOfColdMana) and (targetHealth >= self.coneOfColdHealth) then
 				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9) and (not targetObj:HasDebuff("Frostbite")) and (not targetObj:HasDebuff("Frost Nova")) then
 						targetObj:FaceTarget();
-					if (script_mage:coneOfCold('Cone of Cold')) then
+					if (script_mage:coneOfCold("Cone of Cold")) then
 						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1500;
 						return 0;
@@ -684,15 +695,18 @@ function script_mage:run(targetGUID)
 			end
 
 -- Fire blast
+-- we only really want to use it as a last resort once we have better spells... costs a lot of mana
 			if (self.useFireBlast) and (targetObj:GetDistance() <= 20) and (HasSpell("Fire Blast")) and (not IsSpellOnCD("Fire Blast")) and (localMana > 6) and (not IsMoving()) and targetHealth > 5 then
 				if (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) or (targetHealth < 20 and localHealth < 25) then
+					if targetHealth <= 20 and (not HasSpell("Cone of Cold") and IsSpellOnCD("Frost Nova")) or (HasSpell("Cone of Cold") and IsSpellOnCD("Cone of Cold") and IsSpellOnCD("Frost Nova")) then
 	
-					if (not IsSpellOnCD("Fire Blast")) then
-						CastSpellByName("Fire Blast", targetObj);
-						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 1750;
-						script_grind:setWaitTimer(1750);
-						return 0;
+						if (not IsSpellOnCD("Fire Blast")) then
+							CastSpellByName("Fire Blast", targetObj);
+							targetObj:FaceTarget();
+							self.waitTimer = GetTimeEX() + 1750;
+							script_grind:setWaitTimer(1750);
+							return 0;
+						end
 					end
 				end
 			end
@@ -718,7 +732,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Use Mana Gem when low on mana
-			if (localMana < self.manaGemMana and GetTimeEX() > self.gemTimer) then
+			if (localMana < self.manaGemMana and GetTimeEX() > self.gemTimer) and targetObj:GetHealthPercentage() >= 10 then
 				for i=0,self.numGem do
 					if(HasItem(self.manaGem[i])) then
 						UseItem(self.manaGem[i]);
@@ -744,7 +758,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Use Mana Shield if we have more than 35 percent mana and no active Ice Barrier
-			if (not localObj:HasBuff("Ice Barrier")) and (HasSpell("Mana Shield")) and (localMana >= self.manaShieldMana) and (localHealth <= self.manaShieldHealth) and (not localObj:HasBuff("Mana Shield")) and (IsInCombat()) then
+			if (not localObj:HasBuff("Ice Barrier")) and (HasSpell("Mana Shield")) and (localMana >= self.manaShieldMana) and (localHealth <= self.manaShieldHealth) and (not localObj:HasBuff("Mana Shield")) and (IsInCombat()) and (targetHealth >= 10 or script_grind:enemiesAttackingUs() >= 2 or localHealth <= 20) then
 				if (not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite")) then
 					CastSpellByName("Mana Shield");
 					self.waitTimer = GetTimeEX() + 1650;
@@ -869,6 +883,7 @@ function script_mage:run(targetGUID)
 				end
 			end
 
+
 			-- Wand if mana or target health is low
 			if (self.useWand and localObj:HasRangedWeapon()) and (localMana <= self.useWandMana or targetHealth <= self.useWandHealth) and (not IsChanneling()) and (not localObj:IsStunned()) and (not IsMoving()) then
 				self.message = "Using wand...";
@@ -905,7 +920,7 @@ function script_mage:run(targetGUID)
 			end
 			
 					-- check range
-					if (not targetObj:IsSpellInRange("Frostbolt")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) and not (targetObj:HasDebuff("Polymorph")) then
+					if (not targetObj:IsSpellInRange("Frostbolt")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova") or targetObj:GetDistance() > script_grind.combatScriptRange) and not (targetObj:HasDebuff("Polymorph")) then
 						return 3;
 					end
 
@@ -956,7 +971,7 @@ function script_mage:run(targetGUID)
 			if (self.frostMage) and (not HasSpell("Frostbolt")) and (not IsMoving()) then				
 		
 				-- else if not has frostbolt then use fireball as range check
-				if (not targetObj:IsSpellInRange("Fireball")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
+				if (not targetObj:IsSpellInRange("Fireball")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova") or targetObj:GetDistance() > script_grind.combatScriptRange) then
 					return 3;
 				end	
 				FaceTarget();
@@ -1267,7 +1282,8 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		end
 
 		if (script_helper:drinkWater()) then 
-			self.message = "Drinking..."; 
+			self.message = "Drinking...";
+			script_grind.autoBlacklistTimer = GetTimeEX() + 15000; 
 			return true; 
 		else 
 			self.message = "No drinks! (or drink not included in script_helper)";
@@ -1285,6 +1301,7 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		
 		if (script_helper:eat()) then 
 			self.message = "Eating..."; 
+			script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
 			return true; 
 		else 
 			self.message = "No food! (or food not included in script_helper)";
@@ -1306,9 +1323,35 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 			JumpOrAscendStart();
 		end
 	end
+
+	-- eat AND drink....
+	if (IsEating() and not IsDrinking() and localMana <= 85) or (IsDrinking() and not IsEating() and localHealth <= 80) then
+		if not IsEating() then
+			if (script_helper:eat()) then 
+				self.message = "Eating..."; 
+				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
+				return true; 
+			else 
+				self.message = "No food! (or food not included in script_helper)";
+				return true; 
+			end
+		end	
+		if not IsDrinking() then
+			if (script_helper:drinkWater()) then 
+				self.message = "Drinking...";
+				script_grind.autoBlacklistTimer = GetTimeEX() + 15000; 
+				return true; 
+			else 
+				self.message = "No drinks! (or drink not included in script_helper)";
+				return true; 
+			end
+		end
+	end
 	
 	if (IsDrinking() or IsEating()) then
 		self.message = "Resting to full hp/mana...";
+		script_grind:setWaitTimer(2000);
+		self.waitTimer = GetTimeEX() + 2000;
 		return true;
 	end
 

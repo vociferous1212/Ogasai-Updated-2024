@@ -86,12 +86,15 @@ function script_rogue:setup()
 	if (HasSpell("Hemorrhage")) then
 		self.cpGenerator = "Hemorrhage";
 	end
+
+	-- DOES NOT RECOGNIZE TALENT POINTS
+	-- Set the energy cost for the CP builder ability (does not recognize talent e.g. imp. sinister strike)
+	_, _, _, _, self.cpGeneratorCost = GetSpellInfo(self.cpGenerator);
+
+	-- set sinister strike cost to 40 if we have riposte in talent tree.... fall back for getspellinfo
 	if (HasSpell("Riposte")) then
 		self.cpGeneratorCost = 40;
 	end
-
-	-- Set the energy cost for the CP builder ability (does not recognize talent e.g. imp. sinister strike)
-	_, _, _, _, self.cpGeneratorCost = GetSpellInfo(self.cpGenerator);
 
 	if (GetLocalPlayer():GetLevel() < 6) then
 		self.eatHealth = 55;
@@ -160,6 +163,8 @@ function script_rogue:checkPoisons()
 			UseItem(self.offhandPoison); 
 			PickupInventoryItem(17); 
 			self.waitTimer = GetTimeEX() + 6000; 
+			script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
+
 			return true; 
 		end
 	end 
@@ -538,6 +543,8 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsLooting()) then
 					return 3;
 				end
+
+				if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
 
 				if (HasSpell('Kidney Shot')) and (localCP >= 1) and (targetObj:IsCasting()) and (not IsSpellOnCD('Kidney Shot')) and (localEnergy >= 25) then
 					if (Cast('Kidney Shot', targetObj)) then
