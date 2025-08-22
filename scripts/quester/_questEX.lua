@@ -100,7 +100,7 @@ function _questEX:doChecks()
 							script_grind.message = "Finding a safe spot to ress...";
 							return true;
 						end end end RetrieveCorpse(); script_grindEX.useThisVar = true; end return true; end end end
-if GetNumPartyMembers() > 0 then if _quest.enemyTarget == 0 or _quest.enemyTarget == nil and IsInCombat() then _quest.enemyTarget = script_grind:assignTarget(); _quest.message = "Assisting party members";  end end
+if GetNumPartyMembers() > 0 then if _quest.enemyTarget == 0 or _quest.enemyTarget == nil and IsInCombat() then _quest.enemyTarget = script_grindAssignTarget:assignTarget(); _quest.message = "Assisting party members";  end end
 	if _questEX2:doChecks() then
 		return true;
 	end

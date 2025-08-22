@@ -15,6 +15,7 @@ function script_pathMenu:menu()
 			wasClicked, script_grind.autoSelectTargets = Checkbox("(TODO) Auto Select Hotspot Enemies", script_grind.autoSelectTargets);
 
 			wasClicked, script_grind.staticHotSpot = Checkbox("Auto Load Hotspots From - HotspotDB.lua", script_grind.staticHotSpot);
+			if script_grind.staticHotSpot then Text("Change hotspots on level up or no mobs in range"); end
 		end
 			--wasClicked, script_grind.attackTargetsOnRoutes = Checkbox("Attack Unfriendly NPC's Going To Hotspots", script_grind.attackTargetsOnRoutes);
 		
@@ -22,6 +23,7 @@ function script_pathMenu:menu()
 		if (script_grindMenu.useHotSpotArea) then
 			if (Button("Save Current Location As Hotspot")) then
 				script_nav:newHotspot(GetMinimapZoneText() .. ' ' .. GetLocalPlayer():GetLevel() .. ' - ' .. GetLocalPlayer():GetLevel()+2);
+				script_nav.numSavedLocation = 0;
 				if (script_grind.pause) and (IsMoving()) then
 					StopMoving();
 				end

@@ -23,7 +23,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 		-- get a target if we have none
 		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 and GetTarget():CanAttack() and not GetTarget():IsDead() then
 
-			_quest.enemyTarget = script_grind:assignTarget();
+			_quest.enemyTarget = script_grindAssignTarget:assignTarget();
 
 		end
 
@@ -120,7 +120,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 		end
 
 		if (IsInCombat()) and (self.enemyTarget == 0 or self.enemyTarget == nil) then
-				self.enemyTarget = script_grind:assignTarget();
+				self.enemyTarget = script_grindAssignTarget:assignTarget();
 		end
 		if GetPet() ~= 0 and GetPet() ~= nil and GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 and  GetTarget() ~= 0 and GetTarget() ~= nil then
 			if GetPet():GetUnitsTarget():GetGUID() ~= GetTarget():GetGUID() then

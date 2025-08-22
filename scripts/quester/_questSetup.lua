@@ -52,10 +52,6 @@ function _questSetup:run()
 
 	_quest.waitTimer = GetTimeEX();
 
-	if GetLocalPlayer():GetLevel() < 6 then
-		_quest.killStuffOnRoute = false;
-	end
-
 	if GetNumPartyMembers() > 1 then
 		script_gather.safeGather = false;
 	end

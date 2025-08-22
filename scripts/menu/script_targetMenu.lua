@@ -85,6 +85,7 @@ function script_targetMenu:menu()
 		Text('Target Level');
 		script_grind.minLevel = SliderInt("Min lvl", 1, 60, script_grind.minLevel);
 		script_grind.maxLevel = SliderInt("Max lvl", 1, 60, script_grind.maxLevel); 
+		if script_grind.minLevel < 1 then script_grind.minLevel = 1; end
 
 		Separator();
 		Text("Blacklist Targets By Name");
