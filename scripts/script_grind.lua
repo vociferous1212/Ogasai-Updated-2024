@@ -1620,6 +1620,7 @@ if (not IsAutoCasting("Attack")) then
 					end
 				end
 			end
+		return true;
 		else
 			-- Check: Load/Refresh the walk path
 			if (self.pathName ~= self.pathLoaded) then
@@ -1637,6 +1638,7 @@ if (not IsAutoCasting("Attack")) then
 
 			-- Navigate
 			self.message = script_nav:navigate(localObj);
+		return true;
 		end
 end
 
