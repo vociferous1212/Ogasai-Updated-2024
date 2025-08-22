@@ -95,7 +95,7 @@ function script_nav:saveTargetLocation(target, mobLevel)
 	local _tx, _ty, _tz = target:GetPosition();
 	-- Check: Don't save if we are outside the hotspot distance
 	if (script_nav:getDistanceToHotspot() > self.hotSpotDist) then return; end
-	-- Check: Don't save if we already saved a location within 60 yd
+	-- Check: Don't save if we already saved a location within 40 yd
 	local saveLocation = true;
 	if (self.numSavedLocation > 0) and _tx ~= nil then
 		for i = 0, self.numSavedLocation -1 do
@@ -117,32 +117,27 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- Let's get at least 2 path nodes around the hot spot before we navigate through them
-	if (self.numSavedLocation < 3) then
+	if (self.numSavedLocation < 2) then
 		return script_moveToHotspot:moveToHotspot(localObj);
 	end
 
-		-- Check: If we reached the last location index
-	if (self.currentGoToLocation > (self.numSavedLocation)) then
+	-- Check: If we reached the last location index
+	if (self.currentGoToLocation > (self.numSavedLocation - 1)) then
 		self.currentGoToLocation = 0;
 	end
 	
 	-- Check: Move to the next location index
 	local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
-	if script_grindMenu.useHotSpotArea and _lx ~= nil and self.currentGoToLocation ~= nil and self.savedLocations ~= nil and self.savedLocations[self.currentGoToLocation]['x'] ~= nil then
 	local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
-		if (currentDist < 5 
-			or self.savedLocations[self.currentGoToLocation]['level'] < minLevel
-			or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel) then
-			self.currentGoToLocation = self.currentGoToLocation + 1;
-			return "Changing go to location...";
-		end
+	if script_grind.staticHotSpot and (currentDist < 5 
+		or self.savedLocations[self.currentGoToLocation]['level'] < minLevel
+		or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel) then
+		self.currentGoToLocation = self.currentGoToLocation + 1;
+		return "Changing go to location...";
 	end
 
-	if self.savedLocations[self.currentGoToLocation]['x'] ~= nil then 
-		if (script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z'])) then
-			return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";		
-		end
-	end
+	script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+	
 	return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 end
 

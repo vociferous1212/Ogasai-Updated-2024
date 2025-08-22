@@ -1598,7 +1598,7 @@ if (not IsAutoCasting("Attack")) then
 			if (script_nav:getDistanceToHotspot() < 50) and (not self.hotspotReached or script_nav.numSavedLocation < 3) then
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
-				return;
+				--return;
 
 			else
 
@@ -1620,7 +1620,6 @@ if (not IsAutoCasting("Attack")) then
 					end
 				end
 			end
-		return true;
 		else
 			-- Check: Load/Refresh the walk path
 			if (self.pathName ~= self.pathLoaded) then
@@ -1638,7 +1637,6 @@ if (not IsAutoCasting("Attack")) then
 
 			-- Navigate
 			self.message = script_nav:navigate(localObj);
-		return true;
 		end
 end
 
@@ -2315,12 +2313,15 @@ return false;
 end
 
 function script_grind:attackTargetAttackingMe()
-	if (not PlayerHasTarget()) then
+
+	if (not PlayerHasTarget()) and (script_grind.enemyObj == 0 or script_grind.enemyObj == nil) then
+
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then
 				if (script_grind:isTargetingMe(i)) then
 					script_grind.enemyObj = i;
+					return true;
 				end
 			end
 		i, t = GetNextObject(i);
