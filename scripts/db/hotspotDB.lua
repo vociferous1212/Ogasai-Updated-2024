@@ -63,10 +63,10 @@ function hotspotDB:getHotspotID(race, level)
 				self.hotspotList[i]['race'] == UnitFactionGroup("player") ) then
 				local myX, myY, myZ = GetLocalPlayer():GetPosition();
 				local _dist = GetDistance3D(myX, myY, myZ, self.hotspotList[i]['pos']['x'], self.hotspotList[i]['pos']['y'], self.hotspotList[i]['pos']['z']);
-				if(_dist < bestDist) then
-					bestDist = _dist;
+				--if(_dist < bestDist) then
+				--	bestDist = _dist;
 					bestIndex = i;
-				end
+				--end
 			end
 		end
 	end

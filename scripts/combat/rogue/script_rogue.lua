@@ -539,7 +539,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
  
 				-- Check: Adrenaline Rush if more than 2 enemies attacks us or we fight an elite enemy
-				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or UnitIsPlusMob("target"))) then 
+				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) then 
 					if (targetObj:GetDistance() < 6) and (not IsSpellOnCD("Adrenaline Rush")) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
