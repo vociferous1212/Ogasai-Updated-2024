@@ -477,18 +477,15 @@ end
 function script_grindEX:getTargetWithinAggroRange()
 
 	i, t = GetFirstObject();
-	x, y, z = GetLocalPlayer():GetPosition();
-	tx, ty, tz = 0, 0, 0;
-	target = 0;
+	aggro = 0;
 
 	while i ~= 0 do
 		if t == 3 then
-			local aggro = ((i:GetLevel() - GetLocalPlayer():GetLevel()) + 22);
-return target;
-		end
-
-			
-
+			local aggro = (i:GetLevel() - GetLocalPlayer():GetLevel() + 22);
+			if i:GetDistance() <= aggro then
+				return i;
+			end
+		end	
 	i, t = GetNextObject(i);
 	end
 return nil;

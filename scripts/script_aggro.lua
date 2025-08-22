@@ -583,7 +583,7 @@ function script_aggro:closeToAdds()
 		if t == 3 then
 
 			if i:GetDistance() <= 40 and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
-				aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20.5;
+				aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 22.5;
 
 				if i:GetDistance() <= aggro and script_grind:isTargetBlacklisted(i:GetGUID()) then
 					return true;

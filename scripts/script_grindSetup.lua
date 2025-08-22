@@ -44,7 +44,7 @@ function script_grindSetup:setup()
 	end
 
 	if ((UnitClass("Player") == "ROGUE" or GetMyClass() == "ROGUE") and script_rogue.useStealth) or (HasSpell("Prowl") and script_druid.useStealth) then
-		script_grind.blacklistTime = 60;
+		script_grind.blacklistTime = 45;
 	end
 
 	-- don't skip hard pulls or elites when we are at starter zones or in a group

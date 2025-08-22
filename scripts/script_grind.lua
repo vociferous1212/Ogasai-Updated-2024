@@ -1041,6 +1041,7 @@ function script_grind:run()
 				script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
 				self.newTargetTime = GetTimeEX();
 				ClearTarget();
+				script_nav:resetNavigate();
 				script_grind:setWaitTimer(2000);
 			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
@@ -1063,7 +1064,7 @@ function script_grind:run()
 
 		-- Dont pull mobs before we reached our hotspot unless we are in aggro range
 		if (not IsInCombat()) then
-			if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (not IsInCombat()) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+			if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
 				self.enemyObj = nil;
 				if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 					ClearTarget();
@@ -1265,7 +1266,10 @@ function script_grind:run()
 					self.lastTarget = self.enemyObj:GetGUID();
 				end
 			end
-					
+			
+
+			-- need to run a check for last target and current target to see if we have targeted the same target over and over again...
+			-- bot will target, move to target, leave range of target, move to auto path node, gain same target, move to target, leave target range....		
 
 			-- if we have a valid enemy
 			if (self.enemyObj ~= nil) and (not IsInCombat()) then
@@ -1394,6 +1398,7 @@ if (not IsAutoCasting("Attack")) then
 						self.autoBlacklistTimerSet = false;
 						script_grind:addTargetToHardBlacklist(self.enemyObj:GetGUID());
 						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and we have not moved for 15 seconds... Automatically Blacklisting "..self.enemyObj:GetUnitName()..", "..math.floor(self.enemyObj:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
+						script_nav:resetNavigate();
 					end
 					if (not IsInCombat()) and (not IsMoving()) and (not self.autoBlacklistTimerSet) then
 						self.autoBlacklistTimerSet = true;
@@ -1583,70 +1588,30 @@ if (not IsAutoCasting("Attack")) then
 		end
 
 
+	-- Use auto pathing or walk paths
+
+	-- this is our navigation if we can't complete conditions set above
+
+		-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
+			-- doubled up on move to target in combat and navigate....
 		-- Use auto pathing or walk paths
-		if (self.autoPath) and (not IsInCombat()) then
-
-			if (script_grind.enemyObj == nil) and not IsInCombat() and self.hotSpotReached and script_nav:getDistanceToHotspot() < self.distToHotspot then
-				script_grindAssignTarget:assignTarget();
-				self.newTargetTime = GetTimeEX() + 2500;
-				self.message = "Trying to find a target...";
-			end
-
-			-- continue to hotspot until we find a valid enemy...
-			if (script_nav:getDistanceToHotspot() < 50) and (not self.hotspotReached or script_nav.numSavedLocation < 3) then
-				if script_grind.enemyObj == nil or script_grind.enemyObj == 0 then
-					self.message = "Hotspot reached... (No targets around?)";
-					self.hotspotReached = true;
-					--return;
-				end
-
-
-			-- move through auto path saved location nodes if no valid enemy found...
+		if (self.autoPath) then
+			if (script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached) then
+				self.message = "Hotspot reached... (No targets around?)";
+				self.hotspotReached = true;
+				return;
 			else
-
-				-- move to saved locations
-				-- if we are not attacking...
-
-			-- return to auto path node #1 so we make a full circle path, run through nodes until a target is found.
-				-- keep running through nodes until a new node can be made.
-				-- if node is too close to make a new one, return to running saved node paths
-				-- if nodes changed, new mobs probably loaded
-
-				if self.enemyObj == nil or self.enemyObj == 0 then
-					self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, script_grind.staticHotSpot);
-				end
-
-
-
-			-- check stealth rogue
-				if (script_rogue.useStealth and script_druid.useStealth) and (HasSpell("Stealth") or HasSpell("Prowl")) and (not IsSpellOnCD("Stealth") and not IsSpellOnCD("Prowl")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
-					if (HasSpell("Stealth")) then
-						CastSpellByName("Stealth", localObj);
-						self.waitTimer = GetTimeEX() + 1200;
-					end
-					if script_druid.useStealth and (HasSpell("Prowl")) and IsCatForm() then
-						CastSpellByName("Prowl", localObj);
-						self.waitTimer = GetTimeEX() + 1200;
-					end
-				end
+				self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
+				script_grind:setWaitTimer(100);
 			end
 		else
 			-- Check: Load/Refresh the walk path
 			if (self.pathName ~= self.pathLoaded) then
-
-				-- return no path loaded
-				if (not LoadPath(self.pathName, 0)) then
-					self.message = "No walk path has been loaded...";
-					return;
-				end
-
-				-- else pathloaded
+				if (not LoadPath(self.pathName, 0)) then self.message = "No walk path has been loaded..."; return; end
 				self.pathLoaded = self.pathName;
 			end
-
-
-			-- Navigate
-			self.message = script_nav:navigate(GetLocalPlayer());
+		-- Navigate
+		self.message = script_nav:navigate(localObj);
 		end
 end
 
@@ -1911,30 +1876,30 @@ function script_grind:doLoot(localObj)
 	local dist = self.lootObj:GetDistance();
 	local localObj = GetLocalPlayer();
 
-		if (not self.adjustTickRate) then
-			script_grind.tickRate = 50;
-		end
+	if (not self.adjustTickRate) then
+		script_grind.tickRate = 50;
+	end
 
-		if GetLocalPlayer():GetHealthPercentage() < 75 then
-			if not script_grindEX:isLootSafeToLoot() then
-				script_grind:runRest();
-				_quest.message = "Loot is not safe to gather... resting..."
-				script_grind.message = "Loot is not safe to gather... resting..."
-				return true;
-			end
-			
+	if GetLocalPlayer():GetHealthPercentage() < 75 then
+		if not script_grindEX:isLootSafeToLoot() then
+			script_grind:runRest();
+			_quest.message = "Loot is not safe to gather... resting..."
+			script_grind.message = "Loot is not safe to gather... resting..."
+			return true;
 		end
+		
+	end
 
-		if (not self.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
-			self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
-			self.timerSet = true;
-		end
+	if (not self.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
+		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		self.timerSet = true;
+	end
 
-		if (self.lootObj ~= nil) then
-			if (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
-				self.lootObj = nil; -- don't loot blacklisted targets	
-			end
+	if (self.lootObj ~= nil) then
+		if (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
+			self.lootObj = nil; -- don't loot blacklisted targets	
 		end
+	end
 
 	-- Loot checking/reset target
 	if (self.lootCheck['timer'] ~= 0 and self.lootCheck['timer'] ~= nil) and self.lootObj ~= nil then
@@ -1958,7 +1923,7 @@ function script_grind:doLoot(localObj)
 		local _x, _y, _z = self.lootObj:GetPosition();
 	end
 	-- close enough to loot range then do these
-	if(dist <= self.lootDistance) then
+	if (dist <= self.lootDistance) then
 		self.message = "Looting...";
 		
 		-- stop moving
@@ -1986,67 +1951,67 @@ function script_grind:doLoot(localObj)
 			_quest.waitTimer = GetTimeEX() + 950;
 		end
 
-if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
+		if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 
 		-- interact with object if we are not looting
-		if(not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
-			self.waitTimer = GetTimeEX() + 1050;
-			_quest.waitTimer = GetTimeEX() + 1050;
-			return;
-		end
+		if self.lootObj ~= 0 and self.lootObj ~= nil then
+			if (not self.lootObj:UnitInteract() and not IsLooting()) and (not IsMoving()) then
+				self.waitTimer = GetTimeEX() + 1050;
+				_quest.waitTimer = GetTimeEX() + 1050;
+				return;
+			end
 
-		lastError = GetLastError();
-		if lastError == 78 then
-			script_grind:addTargetToLootBlacklist(self.lootObj);
-			self.lootObj = nil;
-			ClearLastError();
-		end
-		--if lastError == 22828 or lastError == 16864 then
-		--	script_grind:addTargetToLootBlacklist(self.lootObj);
-		--	self.lootObj = nil;
-		--	ClearLastError();
-		--end
-
-		-- if looting and not moving then wait
-		if (not LootTarget()) and (not IsMoving()) then
-			self.waitTimer = GetTimeEX() + 350;
-			_quest.waitTimer = GetTimeEX() + 350;
-			return;
-		else
-
-		if (self.autoSelectVendors) and (IsLooting()) then
-			local bX, bY, bZ = GetLocalPlayer():GetPosition();
-		if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
-			if (not self.vendorMessageSent) then
-			DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
-				self.vendorMessageSent = true;
-					self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
-
-				script_grind:setWaitTimer(2500);
-				_quest.waitTimer = GetTimeEX() + 2500;
-				if (self.vendorMessageSent) then
-					vendorDB:loadDBVendors();
-					self.vendorMessageSent = false;
+			lastError = GetLastError();
+			if lastError == 78 then
+				script_grind:addTargetToLootBlacklist(self.lootObj);
+				self.lootObj = nil;
+				ClearLastError();
+			end
+			--if lastError == 22828 or lastError == 16864 then
+			--	script_grind:addTargetToLootBlacklist(self.lootObj);
+			--	self.lootObj = nil;
+			--	ClearLastError();
+			--end
+	
+			-- if looting and not moving then wait
+			if (not LootTarget()) and (not IsMoving()) then
+				self.waitTimer = GetTimeEX() + 350;
+				_quest.waitTimer = GetTimeEX() + 350;
+				return;
+			else
+	
+				if (self.autoSelectVendors) and (IsLooting()) then
+					local bX, bY, bZ = GetLocalPlayer():GetPosition();
+					if (GetDistance3D(self.myLastX, self.myLastY, self.myLastZ, bX, bY, bZ) > 500) then
+						if (not self.vendorMessageSent) then
+							DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
+							self.vendorMessageSent = true;
+							self.myLastX, self.myLastY, self.myLastZ = GetLocalPlayer():GetPosition();
+	
+							script_grind:setWaitTimer(2500);
+							_quest.waitTimer = GetTimeEX() + 2500;
+							if (self.vendorMessageSent) then
+								vendorDB:loadDBVendors();
+								self.vendorMessageSent = false;
+							end
+						end
+					end 
 				end
 			end
-		end
-	end
+
 			-- we looted so reset variables
 			--self.vendorMessageSent = false;
 			self.waitTimer = GetTimeEX() + 350;
 			_quest.waitTimer = GetTimeEX() + 350;
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
-			return;
+		return;
 		end
 
-		-- If we reached the loot object, reset the nav path
-		script_nav:resetNavigate();
-		--self.waitTimer = GetTimeEX() + 550;
+-- If we reached the loot object, reset the nav path
+script_nav:resetNavigate();
+end
 
-	
-		
-	end
 
 	handleSwimming();
 
@@ -2100,16 +2065,18 @@ if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 
 	-- wait momentarily once we reached lootObj / stop moving / etc
 	if (self.lootObj ~= 0 and self.lootObj ~= nil) then
-	if (self.lootObj:GetDistance() ~= nil and self.lootObj:GetDistance() ~= 0) then
-	if (self.lootObj:GetDistance() <= self.lootDistance) then
-		if (IsMoving()) then
-			StopMoving();
+		if (self.lootObj:GetDistance() ~= nil and self.lootObj:GetDistance() ~= 0) then
+			if (self.lootObj:GetDistance() <= self.lootDistance) then
+				if (IsMoving()) then
+					StopMoving();
+				end
+			self.waitTimer = GetTimeEX() + 250;
+			quest.waitTimer = GetTimeEX() + 250;
+			--script_nav:resetNavigate();
+			end
 		end
-		self.waitTimer = GetTimeEX() + 250;
-		_quest.waitTimer = GetTimeEX() + 250;
-		--script_nav:resetNavigate();
 	end
-	end end
+
 end
 
 function script_grind:getSkinTarget(lootRadius)
