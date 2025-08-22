@@ -1592,6 +1592,7 @@ if (not IsAutoCasting("Attack")) then
 
 	-- this is our navigation if we can't complete conditions set above
 
+	if self.enemyObj == nil and self.lootObj == nil then
 		-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
 			-- doubled up on move to target in combat and navigate....
 		-- Use auto pathing or walk paths
@@ -1611,8 +1612,9 @@ if (not IsAutoCasting("Attack")) then
 				self.pathLoaded = self.pathName;
 			end
 		-- Navigate
-		self.message = script_nav:navigate(localObj);
+		self.message = "No acceptable tagets in range - navigating"..script_nav:navigate(GetLocalPlayer());
 		end
+	end
 end
 
 
