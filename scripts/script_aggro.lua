@@ -604,6 +604,9 @@ function script_aggro:returnClosestAddsTarget()
 		if t == 3 then
 			if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 40 and script_aggro:closeToAdds() and script_grind:isTargetBlacklisted(i:GetGUID()) then
 				script_grind.enemyObj = i;
+				if not IsAutoCasting("Attack") then
+					i:AutoAttack();
+				end
 				return i;
 			end
 		end
