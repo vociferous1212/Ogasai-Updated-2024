@@ -338,6 +338,11 @@ function script_mage:setup()
 	
 	if GetLocalPlayer():GetLevel() < 7 then self.moveAwayRest = false; end
 
+	-- if we have cone of cold we can start saving a lot of mana...
+	if HasSpell("Cone of Cold") then
+		self.drinkMana = 35;
+	end
+
 	self.isSetup = true;
 end
 
@@ -660,22 +665,10 @@ function script_mage:run(targetGUID)
 					return 4; 
 				end 
 			end
-
-			--Cone of Cold
-			if (self.useConeOfCold) and (HasSpell("Cone of Cold")) and (localMana >= self.coneOfColdMana) and (targetHealth >= self.coneOfColdHealth) then
-				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9) and (not targetObj:HasDebuff("Frostbite")) and (not targetObj:HasDebuff("Frost Nova")) then
-						targetObj:FaceTarget();
-					if (script_mage:coneOfCold("Cone of Cold")) then
-						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 1500;
-						return 0;
-					end
-				end
-			end
 			
 			-- Check: Move backwards if the target is affected by Frost Nova or Frost Bite
 			if (GetNumPartyMembers() < 1) and (self.useFrostNova) then
-				if (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova")) and (targetHealth > 10 or localHealth < 35) and (not localObj:HasBuff('Evocation')) and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (targetObj:IsInLineOfSight()) then
+				if (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova")) and (targetHealth > self.useWandHealth or localHealth < 35) and (not localObj:HasBuff('Evocation')) and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (targetObj:IsInLineOfSight()) then
 					script_grind.tickRate = 0;
 					self.tickRate = 250;
 
@@ -692,6 +685,33 @@ function script_mage:run(targetGUID)
 					return 4;
 					end 
 				end	
+			end
+
+			-- bot still consuming a lot of mana... force wand if we can forst nova/ cone of cold again
+			-- this seems to turn wand on and off randomly to cast frostbolt.
+			--if not IsCasting() and (self.useWand and localObj:HasRangedWeapon()) and (not IsChanneling()) and (not localObj:IsStunned()) and (not IsMoving()) and (targetObj:HasDebuff("Frost Nova") or targetObj:HasDebuff("Frostbite")) and not IsSpellOnCD("Frost Nova") and not IsSpellOnCD("Cone of Cold") and targetObj:GetDistance() >= 8 then
+			--	self.message = "Using wand...";
+			--	if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) then
+			--		targetObj:FaceTarget();
+			--		targetObj:CastSpell("Shoot");
+			--		self.waitTimer = GetTimeEX() + 250;
+			--		return true;
+			--	end
+			--end
+
+
+			--Cone of Cold
+			-- bot should use frost nova first if available - half the mana costs
+			-- don't waste the mana if frost nova isn't on CD unless 2 or more targets attacking us
+			if (self.useConeOfCold) and (HasSpell("Cone of Cold")) and (localMana >= self.coneOfColdMana) and (targetHealth >= self.coneOfColdHealth) and (IsSpellOnCD("Frost Nova") or script_grind:enemiesAttackingUs(10) >= 2) then
+				if (not self.addPolymorphed) and (targetObj:GetDistance() < 9) and (not targetObj:HasDebuff("Frostbite")) and (not targetObj:HasDebuff("Frost Nova")) then
+						targetObj:FaceTarget();
+					if (script_mage:coneOfCold("Cone of Cold")) then
+						targetObj:FaceTarget();
+						self.waitTimer = GetTimeEX() + 1500;
+						return 0;
+					end
+				end
 			end
 
 -- Fire blast
@@ -1037,7 +1057,7 @@ function script_mage:rest()
 		end
 	end
 
-if (not IsMounted()) then
+	if (not IsMounted()) then
 
 	if (self.waitTimer > GetTimeEX()) then
 		return;

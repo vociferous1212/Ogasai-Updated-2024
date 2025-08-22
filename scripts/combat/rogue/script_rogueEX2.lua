@@ -17,23 +17,16 @@ function script_rogueEX2:menu()
 end
 
 function script_rogueEX2:rotationMenu()
-
-		-- rotation menu
-	if (script_rogue.enableRotation) then
-		Separator();
+	if (script_rogue.enableRotation) then Separator();
 		if(CollapsingHeader("Rogue Talent Rotation Options")) then
-			Separator();
+			Separator(); wasClicked, script_rogue.useStealth = Checkbox("Use Stealth", script_rogue.useStealth);
 			if (HasSpell("Slice and Dice")) then
 				wasClicked, script_rogue.useSliceAndDice = Checkbox("Use Slice & Dice", script_rogue.useSliceAndDice);
 			end
-			if (HasSpell("Kidney Shot")) then
-				SameLine();
-				wasClicked, script_rogue.useKidneyShot = Checkbox("Kidney Shot Interrupts", script_rogue.useKidneyShot);
+			if (HasSpell("Kidney Shot")) then SameLine(); wasClicked, script_rogue.useKidneyShot = Checkbox("Kidney Shot Interrupts", script_rogue.useKidneyShot);
 			end
-			if (HasSpell("Stealth")) then
-				SameLine();
-				wasClicked, script_rogue.useStealth = Checkbox("Use Stealth", script_rogue.useStealth);
-				script_rogueEX3:menuOne();
+			if (HasSpell("Stealth")) then SameLine(); wasClicked, script_rogue.useStealth = Checkbox("Use Stealth", script_rogue.useStealth);
+			script_rogueEX3:menuOne();
 			end
 			wasClicked, script_rogue.enableFaceTarget = Checkbox("Auto Face Target", script_rogue.enableFaceTarget);
 			if (HasSpell("Blade Flurry")) then
@@ -89,14 +82,4 @@ function script_rogueEX2:rotationMenu()
 				script_rogue.stealthRange = SliderInt('SR (yd)', 1, 50, script_rogue.stealthRange);
 			end
 			if (GetLocalPlayer():GetLevel() >= 20) then
-				if (CollapsingHeader("|+|Poison Options")) then
-					Text("Poison on Main Hand");
-					script_rogue.mainhandPoison = InputText("PMH", script_rogue.mainhandPoison);
-					Text("Poison on Off Hand");
-					script_rogue.offhandPoison = InputText("POH", script_rogue.offhandPoison);
-				end
-			end
-			script_rogueEX2:menu();
-		end
-	end
-end
+				if (CollapsingHeader("|+|Poison Options")) then Text("Poison on Main Hand"); script_rogue.mainhandPoison = InputText("PMH", script_rogue.mainhandPoison); Text("Poison on Off Hand"); script_rogue.offhandPoison = InputText("POH", script_rogue.offhandPoison); end end script_rogueEX2:menu(); end end end

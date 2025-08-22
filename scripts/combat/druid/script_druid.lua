@@ -93,6 +93,10 @@ function script_druid:setup()
 	if (localObj:GetLevel() >= 35) then
 		self.shapeshiftMana = 20;
 	end
+	
+	if localObj:GetLevel() >= 45 then
+		self.shapeshiftMana = 18;
+	end
 
 	if (localObj:GetLevel() >= 10) and (not HasSpell("Cat Form")) and (HasSpell("Bear Form")) then
 		self.useBear = true;
@@ -114,7 +118,7 @@ function script_druid:setup()
 		self.meleeDistance = 3.6;
 	end
 	
-	if (GetNumPartyMembers() >= 1) then
+	if (GetNumPartyMembers() ~= 0) then
 		self.useEntanglingRoots = false;
 	end
 
@@ -151,6 +155,9 @@ function script_druid:setup()
 		useCharge = false;
 		useRest = false;
 		self.useBear = false;
+	end
+	if GetLocalPlayer():GetLevel() >= 50 then
+		self.drinkMana = 45;
 	end
 
 	self.omenOfClarityTimer = GetTimeEX();
@@ -650,6 +657,7 @@ function script_druid:run(targetGUID)
 		script_druid:setup();
 	end
 
+	-- check for clearcasting each run of script
 	if GetLocalPlayer():HasBuff("Clearcasting") then
 		localMana = 100;
 		localRage = 100;
@@ -785,6 +793,17 @@ function script_druid:run(targetGUID)
 		return 4;
 	end
 
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
+						ClearTarget();
+						self.waitTimer = GetTimeEX() + 1500;
+						script_grind:setWaitTimer(1500);
+						targetObj = 0;
+						return 0;
+					end
+				end
+
 if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) and (not IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
@@ -853,14 +872,14 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 		-- use charge in bear form
 		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 11) then
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 				script_druidEX:castCharge();
 			end
 
 			-- keep faerie fire up
 			if PlayerHasTarget() and HasForm() and not self.useStealth and not targetObj:IsDead() and targetObj:IsInLineOfSight() and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and (IsBearForm() or IsCatForm()) then
 				CastSpellByName("Faerie Fire (Feral)()");
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 			end
 
 			-- check melee distance
@@ -902,7 +921,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 -- stay in form bear if bear form is selected
 		-- enemies greater than 2 then use bear form
-		if (self.useBear) or ( script_grind.enemiesAttackingUs(12) >= 2 and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) and (not IsDrinking()) and (not IsEating()) )
+		if (self.useBear) or (GetNumPartyMembers() == 0 and script_grind.enemiesAttackingUs(12) >= 2 and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) and (not IsDrinking()) and (not IsEating()) )
 
 		-- enemy level greater than 2 then use bear form
 		or ( (targetObj:GetLevel() > (localObj:GetLevel() + 2)) and (IsInCombat()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) and (not IsDrinking()) and (not IsEating()) and (targetObj:GetHealthPercentage() >= 40) and (IsInCombat()) ) then
@@ -948,20 +967,20 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					return 0;
 				end
 			end
 
 -- use charge in bear form
 		if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) and (targetObj:GetDistance() <= 26) and (targetObj:GetDistance() >= 11) then
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 				script_druidEX:castCharge();
 			end
 
 		-- face target
 		if (not IsMoving() and targetObj:GetDistance() <= self.meleeDistance) then
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 		end
 
 		-- assign target health
@@ -969,7 +988,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 
 	-- shapeshift out of cat form to use bear form 2 or more targets - leave form
-		if (self.useCat) and (IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth <= self.healthToShift) and (GetNumPartyMembers() < 2) then
+		if (self.useCat) and (IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth <= self.healthToShift) and (GetNumPartyMembers() == 0) then
 			if (script_grind:enemiesAttackingUs(12) >= 2 or targetObj:GetLevel() > localObj:GetLevel() + 2) and (IsInCombat()) then
 		
 				if (not script_grind.adjustTickRate) then
@@ -1003,7 +1022,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- not in a party and not if target has entangling roots
 				-- 2 or more enemies only
 		if (not IsBearForm()) and (not IsCatForm()) and (IsInCombat()) then
-			if (targetObj:IsCasting() or script_druid:enemiesAttackingUs(6) >= 2) and (GetNumPartyMembers() < 2) and (not targetObj:HasDebuff("Entangling Roots")) and (targetObj:GetDistance() <= 8) then
+			if (targetObj:IsCasting() or script_druid:enemiesAttackingUs(6) >= 2) and (GetNumPartyMembers() == 0) and (not targetObj:HasDebuff("Entangling Roots")) and (targetObj:GetDistance() <= 8) then
 				CheckRacialSpells();
 				self.waitTimer = GetTimeEX() + 200;
 			end
@@ -1034,17 +1053,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (not IsInCombat()) and (not IsTravelForm()) then
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 
--- Check: Do we have the right target (in UI) ??
-				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
-						ClearTarget();
-						self.waitTimer = GetTimeEX() + 1500;
-						script_grind:setWaitTimer(1500);
-						targetObj = 0;
-						return 0;
-					end
-				end
-
 			-- stealth opener
 			if (IsCatForm()) and (self.useCat) and (self.useStealth) and (IsStealth()) then
 				if (HasSpell(self.stealthOpener)) and (not IsSpellOnCD(self.stealthOpener)) and (localEnergy >= 60) and (targetObj:GetDistance() <= 4) and (HasSpell("Shred") and self.openerUsed < 3) or (not HasSpell("Shred")) then
@@ -1074,7 +1082,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 				if (localEnergy >= self.clawEnergy) and (not IsSpellOnCD("Claw")) then
 					CastSpellByName("Claw", targetObj);
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					self.openerUsed = 0;
 					self.waitTimer = GetTimeEX() + 1600;
 					return 0;
@@ -1091,7 +1099,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					return 0;
 				end
 			end
@@ -1112,7 +1120,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- use charge in bear form
 			if (IsBearForm()) and (self.useCharge) and (HasSpell("Feral Charge")) and (not IsSpellOnCD("Feral Charge")) and (localRage >= 5) then
 				if (self.useBear) and (targetObj:GetDistance() < 26) and (targetObj:GetDistance() <= 11) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					CastSpellByName("Feral Charge", targetObj);
 				end
 			end
@@ -1125,7 +1133,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- keep faerie fire up
 			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				CastSpellByName("Faerie Fire (Feral)()");
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 				return 0;
 			end
 
@@ -1167,7 +1175,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if ( (not IsBearForm()) and (self.useBear) and (not IsCatForm()) and (localHealth > self.healthToShift) and (localMana > self.shapeshiftMana) and (not IsDrinking()) and (not IsEating()) )
 		
 		-- or if enemies attacking us greater than 2 and mana/health set right
-		or ( (script_grind.enemiesAttackingUs(12) >= 2) and (not IsBearForm()) and (not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) ) 
+		or GetNumPartyMembers() == 0 and ( (script_grind.enemiesAttackingUs(12) >= 2) and (not IsBearForm()) and (not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) ) 
 
 		-- or enemy level is greater than 2 and health/mana is set right
 		or ( (targetObj:GetLevel() > (localObj:GetLevel() + 2) and IsInCombat() ) and (not IsBearForm()) and (not IsCatForm()) and (localMana > self.shapeshiftMana) and (localHealth > self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) )
@@ -1204,7 +1212,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			-- keep faerie fire up
 			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
 				CastSpellByName("Faerie Fire (Feral)()");
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 				return 0;
 			end
 
@@ -1240,7 +1248,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- face target
 			if (targetObj:GetDistance() <= self.meleeDistance + 2) and (not IsMoving()) then
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 			end
 
 			-- cast tigers fury if we have time
@@ -1278,13 +1286,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- face target
 			if (targetObj:GetDistance() <= 30) and (not IsMoving()) then
-				targetObj:FaceTarget();
+				if not IsMoving() then targetObj:FaceTarget(); end
 			end
 
 			--pull with starfire
 			if (HasSpell("Starfire")) and (localMana >= self.drinkMana) then
 				if (CastSpellByName("Starfire", targetObj)) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					return 0;
 				end
 			end
@@ -1294,7 +1302,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (CastSpellByName("Wrath", targetObj)) then
 				if IsMoving() then StopMoving(); return true; end
 
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					self.waitTimer = GetTimeEX() + 1950;
 					script_grind:setWaitTimer(1950);
 					self.tickRate = 1200;
@@ -1307,12 +1315,12 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (HasSpell("Moonfire")) and (localMana >= self.drinkMana) and (not targetObj:HasDebuff("Moonfire")) and (not IsMoving()) and (targetObj:IsInLineOfSight()) then
 				if (IsMoving()) then
 					StopMoving();
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 				end
 				if not (CastSpellByName("Moonfire", targetObj)) then
 					self.waitTimer = GetTimeEX() + 1750;
 					script_grind:setWaitTimer(1750);
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 					return 0;
 				end
 			end
@@ -1351,7 +1359,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			-- reset vars
 			self.openerUsed = 0;
-
 
 			-- check heals and buffs
 		if (localHealth <= self.healthToShift) and (not script_checkDebuffs:hasSilence()) then
@@ -1454,7 +1461,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- face target
 				if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 				end
 
 				-- if we are switching froms from cat to bear then speed up script tick rate
@@ -1465,7 +1472,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- face target
 				if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 				end
 
 				-- check line of sight and move to target
@@ -1492,7 +1499,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (not IsAutoCasting("Attack")) and (not IsMoving()) then
 					targetObj:AutoAttack();
 					if (targetObj:GetDistance() < self.meleeDistance) and (not IsMoving()) then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 					end
 					if ((targetObj:GetDistance() > self.meleeDistance) and (IsInCombat()) and (PlayerHasTarget()) and HasForm()) or (not HasForm() and localMana <= 30 and not IsCasting() and not IsChanneling()) then
 						return 3;
@@ -1576,10 +1583,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				and (not localObj:HasBuff("Frenzied Regeneration"))
 				and (localRage >= self.maulRage)				
 				then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 					if (CastSpellByName("Maul", targetObj)) then
 						targetObj:AutoAttack();
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						self.waitTimer = GetTimeEX() + 200;
 						return 0;
 					end
@@ -1592,10 +1599,10 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				and (targetHealth > 30) and (targetObj:GetDistance() <= self.meleeDistance)
 				and (not localObj:HasBuff("Frenzied Regeneration")) and (localRage >= self.maulRage)
 				then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 					if (CastSpellByName("Maul", targetObj)) then
 						targetObj:AutoAttack();
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						self.waitTimer = GetTimeEX() + 200;
 						return 0;
 					end
@@ -1604,7 +1611,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- face target
 				if (targetObj:GetDistance() <= self.meleeDistance) and (IsBearForm()) and (not IsMoving()) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 				end
 
 			end -- end of bear form in combat attacks
@@ -1663,13 +1670,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (not IsAutoCasting("Attack")) and (not IsMoving()) then
 					targetObj:AutoAttack();
 					if (not IsMoving()) then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 					end
 				end
 
 				-- face target
 				if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 				end
 
 				-- keep faerie fire up
@@ -1680,7 +1687,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Rip with 3 CPs
-				if (localCP >= 3) and (localEnergy >= 30) and (not HasSpell("Ferocious Bite")) and (not targetObj:HasDebuff("Rip")) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") then
+				if (localCP >= 3) and (localEnergy >= 30) and (not HasSpell("Ferocious Bite") or (HasSpell("Ferocious Bite") and targetHealth >= 40)) and (not targetObj:HasDebuff("Rip")) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") then
 					if (script_druidEX2:castRip("Rip")) then
 						self.waitTimer = GetTimeEX() + 1000;
 						return 0;
@@ -1723,7 +1730,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				-- Use Claw
 				if (localEnergy >= self.clawEnergy) and (not IsSpellOnCD("Claw")) then
 					if (not CastSpellByName("Claw")) then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						self.waitTimer = GetTimeEX() + 1600;
 						return 0;
 					end
@@ -1739,7 +1746,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if ( (not IsBearForm()) and (not IsCatForm()) and (not self.useBear) and (not self.useCat) ) or (isMoonkin) then
 				-- face target
 				if (targetObj:GetDistance() < 30) and (not IsMoving()) then
-					targetObj:FaceTarget();
+					if not IsMoving() then targetObj:FaceTarget(); end
 				end
 
 				-- Run backwards if we are too close to the target
@@ -1800,7 +1807,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (localMana >= 30) and (targetHealth >= 5) and (not targetObj:HasDebuff("Moonfire")) and (HasSpell("Moonfire")) and (IsInCombat()) and (not HasForm()) and (not IsCasting()) and (not IsChanneling()) then
 					if (CastSpellByName("Moonfire", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1650;
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						return 0;
 					end
 				end
@@ -1809,7 +1816,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (localMana > 30) and (targetHealth < 10) and (not IsSpellOnCD("Moonfire")) and (HasSpell("Moonfire")) then
 					if (CastSpellByName("Moonfire", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1650;
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						return 0;
 					end
 				end
@@ -1817,7 +1824,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				-- starfire
 				if (HasSpell("Starfire")) and (localMana > 60) and (script_grind:enemiesAttackingUs(10) < 2) and (not IsMoving()) then
 					if (CastSpellByName("Starfire", targetObj)) then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						self.waitTimer = GetTimeEX() + 800;
 					end
 				end
@@ -1830,7 +1837,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 						CastSpellByName("Wrath", targetObj);
 						self.waitTimer = GetTimeEX() + 2000;
 						script_grind:setWaitTimer(2000);
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 					end
 				end
 
@@ -1838,7 +1845,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				if (localMana >= 30) and (not HasSpell("Moonfire")) then
 					if (CastSpellByName("Wrath", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1850;
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						return 0;
 					end
 				end
@@ -1850,7 +1857,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 			if (localMana <= 40 or IsBearForm() or IsCatForm()) and (not targetObj:HasDebuff("Entangling Roots")) then
 				if (targetObj:GetDistance() <= self.meleeDistance) then
 					if (not IsMoving()) then
-						targetObj:FaceTarget();
+						if not IsMoving() then targetObj:FaceTarget(); end
 						targetObj:AutoAttack();
 						return 0;
 					end

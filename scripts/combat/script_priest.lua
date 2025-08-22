@@ -102,7 +102,6 @@ function script_priest:runBackwards(targetObj, range)
  		local moveX, moveY, moveZ = xT + xUV*10, yT + yUV*10, zT + zUV;	
 	
  		if (distance <= range and targetObj:IsInLineOfSight()) then -- if in range and line of sight
- 			--\script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
 			Move(moveX, moveY, moveZ); -- move to calculated coords
  			return true; -- return true when done
  		end
@@ -318,6 +317,7 @@ script_priestEX.waitTimer = self.waitTimer;
 
 		-- Don't attack if we should rest first
 		if ((localHealth < self.eatHealth or (localMana < self.drinkMana or localObj:HasBuff("Spirit Tap") and localMana < self.drinkMana/1.5)) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) and not IsInCombat() then
+				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
 				self.message = "Need rest...";
 				return 4;
 		end
@@ -778,15 +778,6 @@ function script_priest:rest()
 			self.waitTimer = GetTimeEX() + 10000;
 			script_grind:setWaitTimer(2500);
 			return true;
-		end
-	end
-
-	if (localObj:HasBuff("Spirit Tap")) and (not IsEating()) and (not IsDrinking()) and (not script_grind:isAnyTargetTargetingMe()) and (localMana >= self.drinkMana/1.5) and (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
-		if (script_grind.lastTargetKilled ~= 0 and script_grind.lastTargetKilled ~= nil) and (script_grind.lastTargetKilled:GetDistance() > 5) then
-			local x, y, z = script_grind.lastTargetKilled:GetPosition();
-			if (Move(x, y, z)) then
-				return;
-			end
 		end
 	end
 
