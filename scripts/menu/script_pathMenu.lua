@@ -8,17 +8,20 @@ function script_pathMenu:menu()
 		-- checkbox use auto hotspots
 		wasClicked, script_grindMenu.useHotSpotArea = Checkbox("Use Auto Hotspots", script_grindMenu.useHotSpotArea);
 		if (script_grindMenu.useHotSpotArea) then
-			-- choose to auto set distance from hotspot areas
-			SameLine();
-			wasClicked, script_grind.useAutoHotspotDist = Checkbox("(TODO) Auto Dist From Hotspot", script_grind.useAutoHotspotDist);
 
-			wasClicked, script_grind.autoSelectTargets = Checkbox("(TODO) Auto Select Hotspot Enemies", script_grind.autoSelectTargets);
+			-- choose to auto set distance from hotspot areas
+			--SameLine();
+			--wasClicked, script_grind.useAutoHotspotDist = Checkbox("(TODO) Auto Dist From Hotspot", script_grind.useAutoHotspotDist);
+			--wasClicked, script_grind.autoSelectTargets = Checkbox("(TODO) Auto Select Hotspot Enemies", script_grind.autoSelectTargets);
 
 			wasClicked, script_grind.staticHotSpot = Checkbox("Auto Load Hotspots From - HotspotDB.lua", script_grind.staticHotSpot);
-			if script_grind.staticHotSpot then Text("Change hotspots on level up or no mobs in range"); end
+			if script_grind.staticHotSpot then Text(" ** Change hotspots on level up or no mobs in range"); end
 		end
-			--wasClicked, script_grind.attackTargetsOnRoutes = Checkbox("Attack Unfriendly NPC's Going To Hotspots", script_grind.attackTargetsOnRoutes);
+
 		
+		Separator();
+		
+
 		-- show auto hotspot button
 		if (script_grindMenu.useHotSpotArea) then
 			if (Button("Save Current Location As Hotspot")) then
@@ -41,12 +44,15 @@ function script_pathMenu:menu()
 			script_grind.distToHotSpot = SliderInt("DHS (yd)", 100, 2500, script_grind.distToHotSpot);
 		end
 
-		-- if not use hotspot then show rest of pathing
+
+		-- if not use hotspot then show rest of pathing functions
 		if (not script_grindMenu.useHotSpotArea) then
 
+			-- replaced with auto hotspots - old select each path
 			-- click auto pathing (nav)
 			--wasClicked, script_grind.autoPath = Checkbox("Auto Pathing)", script_grind.autoPath);
 
+			-- replaced with navmesh and auto hotspots - old make nav point and walk to nav point
 			--click walk path (no nav)
 			--wasClicked, script_grindMenu.selectedWalkPath = Checkbox("Use Walk Paths", script_grindMenu.selectedWalkPath);
 
@@ -84,10 +90,12 @@ function script_pathMenu:menu()
 
 			-- set next to node distance for walk paths
 			Text('Next Node Distance'); script_grind.nextToNodeDist = SliderFloat("ND (yd)", 1, 10, script_grind.nextToNodeDist);
-					Separator();
 				end
 		
 		end
+
+		Separator();
+
 		
 		-- checkbox use unstuck script
 		wasClicked, script_grind.useUnstuck = Checkbox("Use Unstuck Feature (script_unstuck)", script_grind.useUnstuck);

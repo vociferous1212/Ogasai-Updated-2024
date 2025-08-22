@@ -130,8 +130,9 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
 	local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
 	if currentDist < 5 
-		or (script_grind.staticHotSpot and self.savedLocations[self.currentGoToLocation]['level'] < minLevel)
-		or (script_grind.staticHotSpot and self.savedLocations[self.currentGoToLocation]['level'] > maxLevel) then
+		-- change location if max or min level out of range
+		or (script_grind.staticHotSpot and (self.savedLocations[self.currentGoToLocation]['level'] < minLevel
+		or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel)) then
 		self.currentGoToLocation = self.currentGoToLocation + 1;
 		return "Changing go to location...";
 	end
@@ -203,14 +204,16 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		self.lastpathnavIndex = -1; 
 	end	
-	if (not IsPathLoaded(5)) then
-		if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-			local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
-			Move(x, y, z);
-			return "Nav - we are stuck out of navmap boundary";
-		end
-		return "Generating path...";
-	end
+
+		--if (not IsPathLoaded(5)) then
+		--	if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+		--		local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
+		--		Move(x, y, z);
+		--		return "Nav - we are stuck out of navmap boundary";
+		--	end
+		--return "Generating path...";
+		--end
+
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastpathnavIndex);
 	-- When dead use 2D distance

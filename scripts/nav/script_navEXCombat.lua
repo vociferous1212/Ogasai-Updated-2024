@@ -29,14 +29,14 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		--script_grind:setWaitTimer(135);
 	end
 
-	if (not IsPathLoaded(5)) then
-		if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-			local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
-			Move(x, y, z);
-			return "NavEX - we are stuck out of navmap boundary";
-		end
-		return "Generating path...";
-	end
+		--if (not IsPathLoaded(5)) then
+		--	if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+		--		local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
+		--		Move(x, y, z);
+		--		return "NavEX - we are stuck out of navmap boundary";
+		--	end
+		--	return "Generating path...";
+		--end
 
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
