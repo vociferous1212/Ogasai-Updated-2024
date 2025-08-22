@@ -42,6 +42,7 @@ function script_rotation:run()
 		script_rotation:setup(); 
 	end
 
+	-- quick enchanting and disenchanting
 	--if (self.waitTimer > GetTimeEX()) then return; end
 	--if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end ReplaceEnchant();
 
@@ -71,8 +72,9 @@ function script_rotation:run()
 	end
 	self.waitTimer = GetTimeEX() + self.tickRate;
 	if (not self.adjustTickRate) then
-			local tickRotationRandom = random(200, 400);
-		if (not GetLocalPlayer():GetUnitsTarget() == 0) or (IsMoving()) then
+			-- wait for global cooldown
+			local tickRotationRandom = random(700, 1200);
+		if (PlayerHasTarget() and not IsInCombat()) or (IsMoving()) then
 			script_rotation.tickRate = 135;
 
 		elseif (not IsMoving()) and (IsInCombat()) then
@@ -80,16 +82,22 @@ function script_rotation:run()
 		end
 	end
 
-	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (not IsLooting()) then
-		local target = GetTarget();
-		if (target:CanAttack()) then
-			self.enemyObj = target;
-		elseif (IsLooting()) then
-			self.enemyObj = nil;
-		end
-	end
-
 	if (not localObj:IsDead()) then
+
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (not IsLooting()) then
+			local target = GetTarget();
+			if (target:CanAttack()) and not target:IsDead() then
+				self.enemyObj = target;
+				if not IsAutoCasting("Attack") and not IsStealth() then
+					self.enemyObj:AutoAttack();
+				end
+			elseif (IsLooting()) then
+				self.enemyObj = nil;
+			elseif GetTarget():IsDead() then
+				ClearTarget();
+				self.enemyObj = nil;
+			end
+		end
 		
 		self.enemyObj = GetTarget();
 

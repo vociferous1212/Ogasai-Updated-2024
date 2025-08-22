@@ -13,6 +13,10 @@ function script_grindParty:partyOptions()
 	
 	local groupMana = 0;
 	local manaUsers = 0;
+	local memberEnergy = 0;
+	local memberRage = 0;
+	local memberHealth = 0;
+	local memberMana = 0;
 	local member = 0;
 	local memberDistance = 0;
 
@@ -21,7 +25,7 @@ function script_grindParty:partyOptions()
 		if (GetNumPartyMembers() > 0) then
 			member = GetPartyMember(i);
 			memberHealth = member:GetHealthPercentage();
-			SmemberDistance = member:GetDistance();
+			memberDistance = member:GetDistance();
 		end	
 		if (member:GetManaPercentage() > 0) then
 			groupMana = groupMana + member:GetManaPercentage();
@@ -35,6 +39,19 @@ function script_grindParty:partyOptions()
 
 		if (member:GetEnergyPercentage() > 0) then
 			memberEnergy = member:GetEnergyPercentage();
+		end
+
+		if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 and (script_grind.enemyObj == 0 or script_grind.enemyObj == nil) then
+			local i, t = GetFirstObject();
+			while i ~= 0 do
+				if t == 3 then
+					if i:GetDistance() <= 40 and script_grind:isTargetingGroup(i) then
+						script_grind.enemyObj = i;
+						i:AutoAttack();
+					end
+				end
+			i, t = GetNextObject(i);
+			end
 		end
 	
 		if (self.waitForGroup) and (script_grind:getTargetAttackingUs() == nil) and (not IsInCombat()) then

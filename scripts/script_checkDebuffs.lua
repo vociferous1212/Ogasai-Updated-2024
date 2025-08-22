@@ -25,7 +25,8 @@ function script_checkDebuffs:hasCurse()
         ["Curse of Agony"] = true, -- DoT; dispel in PvP, medium raid priority
         ["Curse of Doom"] = true, -- High-damage DoT; dispel in PvP, low raid priority
         ["Curse of the Elements"] = true, -- Increases Fire/Frost damage taken; high raid priority, don’t dispel
-        ["Curse of Shadow"] = true -- Increases Arcane/Shadow damage taken; high raid priority, don’t dispel
+        ["Curse of Shadow"] = true, -- Increases Arcane/Shadow damage taken; high raid priority, don’t dispel
+	["Curse of the Deadwood"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), curses, false);
 end
@@ -63,7 +64,8 @@ function script_checkDebuffs:hasDisease()
         ["Creeping Mold"] = true,
         ["Diseased Slime"] = true,
         ["Infected Wound"] = true, -- Increases cast time, reduces healing; dispel in PvE/PvP
-        ["Plague"] = true -- DoT, spreads; dispel immediately in raids
+        ["Plague"] = true, -- DoT, spreads; dispel immediately in raids
+	["Maggot Slime"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), diseases, false);
 end
@@ -99,7 +101,7 @@ function script_checkDebuffs:hasDisabledMovement()
         ["Slowing Poison"] = true,
         ["Hamstring"] = true, -- Reduces movement speed (Warrior); dispel with immunities
         ["Wing Clip"] = true, -- Reduces movement speed (Hunter); dispel with immunities
-	["Terrify"] = true
+	["Terrify"] = true,
     };
     return checkUnitEffects(GetLocalPlayer(), movement, false);
 end

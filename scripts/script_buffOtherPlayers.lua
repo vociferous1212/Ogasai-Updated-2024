@@ -47,6 +47,8 @@ function script_buffOtherPlayers:doBuffs()
 							-- needed to actually target the player... can be called from a different function though
 							name = i:GetUnitName();
 							TargetByName(name);
+
+							-- we have to target a target to check unit on taxi
 							if (PlayerHasTarget()) and (UnitOnTaxi("target"))  then
 								ClearTarget();
 							end
@@ -57,6 +59,7 @@ function script_buffOtherPlayers:doBuffs()
 							local b = "), myTarget";
 	
 							if (CastSpellByName(buff..r..b)) then
+								script_grind:setWaitTimer(1500);
 							--CastSpellByName("Power Word: Fortitude(Rank ", myTarget);
 	
 							return true;

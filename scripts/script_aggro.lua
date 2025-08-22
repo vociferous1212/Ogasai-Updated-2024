@@ -498,7 +498,7 @@ function script_aggro:avoid(pointX,pointY,pointZ, radius, safeDist)
 		end
 	else
 		-- need to assign blacklisted target only closest target
-		script_grind:assignTarget();
+		script_grindAssignTarget:assignTarget();
 		--moveToPoint = closestPoint + setPoint;
 	end
 	
@@ -506,7 +506,7 @@ function script_aggro:avoid(pointX,pointY,pointZ, radius, safeDist)
 	if (moveToPoint > point or moveToPoint == 0) then
 		moveToPoint =  - setPoint;
 		-- need to assign blacklisted target only closest target
-		--script_grind:assignTarget();
+		--script_grindAssignTarget:assignTarget();
 	end
 
 	-- make sure we have targets around us and acceptable move to points
@@ -571,4 +571,39 @@ function script_aggro:drawAggroCircles(maxRange)
 		-- get next target
  		currentObj, typeObj = GetNextObject(currentObj);
  	end
+end
+
+-- return true or false if we are too close to adds
+function script_aggro:closeToAdds()
+
+	local aggro = 0;
+	local i, t = GetFirstObject();
+
+	while i ~= 0 do
+		if t == 3 then
+
+			aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 20.5;
+
+			if i:GetDistance() <= aggro and script_grind:isTargetBlacklisted(i:GetGUID()) then
+				return true;
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end
+					
+-- get the target with adds we are close to...
+function script_aggro:returnClosestAddsTarget()
+
+	local i, t = GetFirstObject();
+
+	while i ~= 0 do
+		if t == 3 then
+			if script_aggro:closeToAdds() and script_grind:isTargetBlacklisted(i:GetGUID()) then
+				return i;
+			end
+		end
+	end
+return nil;
 end

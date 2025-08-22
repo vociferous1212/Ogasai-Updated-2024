@@ -47,9 +47,10 @@ function script_grindSetup:setup()
 		script_grind.blacklistTime = 60;
 	end
 
-	-- don't skip hard pulls when we are at starter zones
-	if (GetLocalPlayer():GetLevel() <= 5) then
+	-- don't skip hard pulls or elites when we are at starter zones or in a group
+	if GetLocalPlayer():GetLevel() <= 5 or GetNumPartyMembers() ~= 0 then
 		script_grind.skipHardPull = false;
+		script_grind.skipElites = false;
 		script_grind.blacklistTime = 20;
 	end
 	--if (GetLocalPlayer():GetLevel() <= 22) then
@@ -86,7 +87,15 @@ function script_grindSetup:setup()
 	-- navigation script loaded
 	script_nav:setup();
 
-	-- load check debuffs
+	-- load all combat script setups now
+	script_rogue:setup();
+	script_druid:setup();
+	script_mage:setup();
+	script_warlock:setup();
+	script_warrior:setup();
+	script_paladin:setup();
+	script_shaman:setup();
+	script_priest:setup();
 
 	-- safer min level for low level botting
 	if (GetLocalPlayer():GetLevel() < 20) then
