@@ -3,8 +3,14 @@ script_functions = {}
 function HasForm()
 	local player = GetLocalPlayer();
 
-	if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) or (player:HasBuff("Cat Form")) or (player:HasBuff("Aquatic Form")) or (player:HasBuff("Travel Form")) or (player:HasBuff("Moonkin Form")) or (player:HasBuff("Ghost Wolf")) then
-		return true;
+	if (player:HasBuff("Bear Form"))
+		or (player:HasBuff("Dire Bear Form"))
+		or (player:HasBuff("Cat Form"))
+		or (player:HasBuff("Aquatic Form"))
+		or (player:HasBuff("Travel Form"))
+		or (player:HasBuff("Moonkin Form"))
+		or (player:HasBuff("Ghost Wolf")) then
+	return true;
 	end
 return false;
 end
@@ -172,6 +178,7 @@ function RemoveForm()
 	script_shamanEX2:removeGhostWolf();
 return false;
 end
+
 function GetMyFaction()
 	local myFaction = nil;
 	-- faction check - 0 for alliance and 1 for horde
@@ -182,8 +189,101 @@ function GetMyFaction()
 	end
 return myFaction;
 end
+
 function GetMyClass()
 	local class = "";
-	if HasSpell("Heroic Strike") then class = "WARRIOR" elseif HasSpell("Sinister Strike") then class = "ROGUE" elseif HasSpell("Seal of Righteousness") then class = "PALADIN" elseif HasSpell("Lightning Bolt") then class = "SHAMAN" elseif HasSpell("Fireball") then class = "MAGE" elseif HasSpell("Wrath") then class = "DRUID" elseif HasSpell("Shadow Bolt") then class = "WARLOCK" elseif HasSpell("Smite") then class = "PRIEST" elseif HasSpell("Raptor Strike") then class = "HUNTER" end
+	if HasSpell("Heroic Strike") then
+		class = "WARRIOR"
+	elseif HasSpell("Sinister Strike") then
+		class = "ROGUE"
+	elseif HasSpell("Seal of Righteousness") then class = "PALADIN"
+	elseif HasSpell("Lightning Bolt") then
+		class = "SHAMAN"
+	elseif HasSpell("Fireball") then
+		class = "MAGE"
+	elseif HasSpell("Wrath") then
+		class = "DRUID"
+	elseif HasSpell("Shadow Bolt") then
+		class = "WARLOCK"
+	elseif HasSpell("Smite") then
+		class = "PRIEST"
+	elseif HasSpell("Raptor Strike") then
+		class = "HUNTER"
+	end
 return class;
+end
+
+function DoStartChecks()
+	if IsStanding()
+		and not IsMoving()
+		and not IsMounted()
+		and not IsEating()
+		and not IsDrinking()
+		and not IsCasting()
+		and not IsChanneling()
+		and not GetLocalPlayer():IsDead()
+		and not IsGhost()
+		and not GetLocalPlayer():IsConfused()
+		and not GetLocalPlayer():IsFleeing()
+		and not GetLocalPlayer():IsStunned()
+		and not IsLooting()
+	then
+		return true;
+	end
+return false;
+end
+
+-- ogasai target has ranged weapon doesn't work properly to detect when a ranged weapon is in use...
+function TargetHasRangedWeapon(target)
+	local castingTable = {[6660] = true};
+
+	if target ~= nil and target ~= 0 then
+		for i=0, script_grind.targetHasRangedWeaponTableNum do
+			-- check if target is already known to have ranged weapon then return true
+			if (target:GetGUID() == script_grind.targetHasRangedWeaponTable[i]) then
+				return true;
+			end
+			-- if not target is known to have ranged weapon then add to table and return true
+			if (target:GetGUID() ~= script_grind.targetHasRangedWeaponTable[i]) then
+				if castingTable[target:GetCasting()] or (target:IsCasting()) then
+					script_grind.targetHasRangedWeaponTable[script_grind.targetHasRangedWeaponTableNum] = target:GetGUID();
+					script_grind.targetHasRangedWeaponTableNum = script_grind.targetHasRangedWeaponTableNum + 1;
+					return true;
+				end
+			end
+		end
+	end
+return false;
+end
+
+function RunOutOfCombat()
+	if IsInCombat() and (GetLocalPlayer():GetHealthPercentage() < 10 or (script_grind:enemiesAttackingUs() >= 3 and GetLocalPlayer():GetHealthPercentage() <= 55)) then
+		if script_nav.numSavedLocation ~= nil and script_nav.numSavedLocation ~= 0 then
+
+			-- move if saved locations are greater than 3
+			if (script_nav.numSavedLocation > 3) then
+				local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
+
+				if _lx ~= nil then
+					local currentDist = math.sqrt((_lx - script_nav.savedLocations[script_nav.currentGoToLocation]['x'])^2 + (_ly - script_nav.savedLocations[script_nav.currentGoToLocation]['y'])^2);
+
+					-- move from each saved location, count +1 each location each pass
+					if currentDist < 5 then
+						script_nav.currentGoToLocation = script_nav.currentGoToLocation + 1;
+						script_grind.message = "Running out of combat: Changing go to location...";								return true;
+					end
+				end
+
+				-- move to saved location in index
+				if (script_navEX:moveToTarget(GetLocalPlayer(), script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])) then
+					script_grind.message = "Running out of combat: Moving to auto path node " .. (script_nav.currentGoToLocation + 1) .. "...";
+					if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+						CastSpellByName("Earthbind Totem");
+					end
+				return true;
+				end
+			end
+		end
+	end
+return false;
 end
