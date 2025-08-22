@@ -1593,22 +1593,32 @@ if (not IsAutoCasting("Attack")) then
 			end
 
 			-- continue to hotspot until we find a valid enemy...
-				-- move to a diff location if no valid enemies around?
-					-- run autopath nodes?
 			if (script_nav:getDistanceToHotspot() < 50) and (not self.hotspotReached or script_nav.numSavedLocation < 3) then
-				self.message = "Hotspot reached... (No targets around?)";
-				self.hotspotReached = true;
-				--return;
+				if script_grind.enemyObj == nil or script_grind.enemyObj == 0 then
+					self.message = "Hotspot reached... (No targets around?)";
+					self.hotspotReached = true;
+					--return;
+				end
 
+
+			-- move through auto path saved location nodes if no valid enemy found...
 			else
 
-		-- move through auto path saved location nodes...
 				-- move to saved locations
 				-- if we are not attacking...
+
+			-- return to auto path node #1 so we make a full circle path, run through nodes until a target is found.
+				-- keep running through nodes until a new node can be made.
+				-- if node is too close to make a new one, return to running saved node paths
+				-- if nodes changed, new mobs probably loaded
+
 				if self.enemyObj == nil or self.enemyObj == 0 then
 					self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, script_grind.staticHotSpot);
 				end
-				-- check stealth rogue
+
+
+
+			-- check stealth rogue
 				if (script_rogue.useStealth and script_druid.useStealth) and (HasSpell("Stealth") or HasSpell("Prowl")) and (not IsSpellOnCD("Stealth") and not IsSpellOnCD("Prowl")) and (not localObj:IsDead()) and (GetLocalPlayer():GetHealthPercentage() >= 95) and (script_grind.lootObj == nil or script_grind.lootObj == 0) then
 					if (HasSpell("Stealth")) then
 						CastSpellByName("Stealth", localObj);
@@ -1636,7 +1646,7 @@ if (not IsAutoCasting("Attack")) then
 
 
 			-- Navigate
-			self.message = script_nav:navigate(localObj);
+			self.message = script_nav:navigate(GetLocalPlayer());
 		end
 end
 

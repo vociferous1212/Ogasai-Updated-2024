@@ -211,6 +211,7 @@ function script_expChecker:targetLevels()
 			if _quest.enemyTarget ~= nil then
 				targetObj = _quest.enemyTarget;
 			end
+		if targetObj ~= 0 and targetObj ~= nil and targetObj:GetLevel() ~= nil then
 
                 if GetLocalPlayer():GetLevel() == targetObj:GetLevel() then
                     if GetLocalPlayer():GetLevel() > 1 then
@@ -300,6 +301,8 @@ function script_expChecker:targetLevels()
                         local highXP = math.floor(neededXP / XP)
                         self.messageRest = ""..highXP.." needed kills at target level "..targetObj:GetLevel()
                     end
+
+		end
                 end
             end
         end
