@@ -999,7 +999,13 @@ function script_grind:run()
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
-			self.newTargetTime = GetTimeEX() + 2500;
+			if script_grind.enemyObj ~= nil then
+				if script_grind:isTargetBlacklisted(self.enemyObj) then 
+					self.newTargetTime = GetTimeEX() + 5500;
+				else
+					self.newTargetTime = GetTimeEX() + 2500;
+				end
+			end
 		end
 
 		-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
@@ -1261,7 +1267,7 @@ function script_grind:run()
 
 			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime then
 				self.enemyObj = script_grindAssignTarget:assignTarget();
-				self.newTargetTime = GetTimeEX() + 2500;
+				self.newTargetTime = GetTimeEX() + 1000;
 				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 					self.lastTarget = self.enemyObj:GetGUID();
 				end
@@ -1276,8 +1282,14 @@ function script_grind:run()
 				
 			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime then
 				-- else assign a target
-				script_grindAssignTarget:assignTarget();
-				self.newTargetTime = GetTimeEX() + 2500;
+				self.enemyObj = script_grindAssignTarget:assignTarget();
+				if script_grind.enemyObj ~= nil then
+					if script_grind:isTargetBlacklisted(self.enemyObj) then 
+						self.newTargetTime = GetTimeEX() + 5500;
+					else
+						self.newTargetTime = GetTimeEX() + 2500;
+					end
+				end
 			end
 
 			if (not IsMoving()) then
@@ -1466,8 +1478,7 @@ if (not IsAutoCasting("Attack")) then
 		end
 
 		-- Pre checks before navigating
-		if (IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat()) then
-			script_grind:setWaitTimer(350);
+		if IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat() or script_grind.enemyObj ~= nil then
 			return;
 		end
 
@@ -1566,19 +1577,16 @@ if (not IsAutoCasting("Attack")) then
 			--		return;
 			--	
 			--end
-			if (IsLooting()) or (IsCasting()) or (IsChanneling()) or (self.lootObj ~= 0 and self.lootObj ~= nil) then
-				return;
+
+			-- Loot if there is anything lootable and we are not in combat and if our bags aren't full
+			if (not self.skipLooting and not AreBagsFull() and not self.bagsFull) then 
+				if script_nav:getLootTarget(self.findLootDistance) ~= nil then
+					self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+				end
 			end
 
-			if (self.lootObj ~= nil and self.lootObj ~= 0) and not self.skipLooting and not AreBagsFull() and not self.bagsFull then
-				if (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
-					self.lootObj = nil; -- don't loot blacklisted targets	
-				else
-					if (script_grind:doLoot(localObj)) then
-						self.waitTimer = GetTimeEX() + 1000;
-						return true;
-					end
-				end
+			if (IsLooting()) or (IsCasting()) or (IsChanneling()) then
+				return;
 			end
 
 			if (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
@@ -1588,27 +1596,52 @@ if (not IsAutoCasting("Attack")) then
 		end
 
 
+
+
+
+
 	-- Use auto pathing or walk paths
 
 	-- this is our navigation if we can't complete conditions set above
 
-	if self.enemyObj == nil and self.lootObj == nil then
-		-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
-			-- doubled up on move to target in combat and navigate....
+	-- Pre checks before navigating
+	if IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat() or script_grind.enemyObj ~= nil then
+		return;
+	end
 
-		-- Use auto pathing or walk paths
+
+
+
+	-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
+		-- doubled up on move to target in combat and navigate....
+	if self.enemyObj == nil then
+	
+
+		-- Use auto pathing navigation or walk paths
 		if (self.autoPath) then
 
+			-- if we have reached our hotspot then hotspotReached is true
 			if (script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached) then
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
 			end
-			if script_nav.numSavedLocation >= 3 then
-				self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
+
+	-- this becomes our navigation once we have enough saved locations. the bot will move from location to location
+	-- checking for targets in the area, and make a new location. if no acceptable targets are found then
+	-- we navigate through the path nodes until we find a good target
+
+
+			--if we have more than 2 saved locations and cannot find a target or loot then navigate
+				-- this will also double up as moveToHotspot function
+			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() then
+				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot)
+				self.message = "Moving to auto path node: " .. script_nav.currentGoToLocation+1 .. "...";
 				script_grind:setWaitTimer(100);
+
 			end
 
+		-- we are not using auto path and only using walk paths
 		else
 
 			-- Check: Load/Refresh the walk path
@@ -1616,6 +1649,8 @@ if (not IsAutoCasting("Attack")) then
 				if (not LoadPath(self.pathName, 0)) then self.message = "No walk path has been loaded..."; return; end
 				self.pathLoaded = self.pathName;
 			end
+
+		
 		-- Navigate
 		self.message = "No acceptable tagets in range - navigating"..script_nav:navigate(GetLocalPlayer());
 		end
@@ -1887,15 +1922,14 @@ function script_grind:doLoot(localObj)
 		script_grind.tickRate = 50;
 	end
 
-	if GetLocalPlayer():GetHealthPercentage() < 75 then
-		if not script_grindEX:isLootSafeToLoot() then
-			script_grind:runRest();
-			_quest.message = "Loot is not safe to gather... resting..."
-			script_grind.message = "Loot is not safe to gather... resting..."
-			return true;
-		end
-		
-	end
+	--if GetLocalPlayer():GetHealthPercentage() < 75 then
+	--	if not script_grindEX:isLootSafeToLoot() then
+	--		script_grind:runRest();
+	--		_quest.message = "Loot is not safe to gather... resting..."
+	--		script_grind.message = "Loot is not safe to gather... resting..."
+	--		return true;
+	--	end	
+	--end
 
 	if (not self.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
@@ -1916,7 +1950,7 @@ function script_grind:doLoot(localObj)
 				ClearTarget();
 				self.message = 'Reseting loot target...';
 			end
-			self.lootCheck['timer'] = GetTimeEX() + 10000; -- 10 sec
+			self.lootCheck['timer'] = GetTimeEX() + 5000; -- 5 sec
 			if (self.lootObj ~= nil) then 
 				self.lootCheck['target'] = self.lootObj:GetGUID();
 			else

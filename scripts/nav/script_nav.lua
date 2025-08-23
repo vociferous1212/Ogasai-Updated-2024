@@ -128,11 +128,16 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- make sure we check that there are no targets around that are trying to be targeted by grinder....
-	if script_grind.enemyObj == nil then
-		-- Check: Move to the next location index
+	if script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() then
+
+	-- Check: Move to the next location index
 		local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
+
 		local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
+
+		-- distance to autopath node
 		if currentDist < 5 
+
 			-- change location if max or min level out of range
 			or (script_grind.staticHotSpot and (self.savedLocations[self.currentGoToLocation]['level'] < minLevel
 			or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel)) then
@@ -141,8 +146,6 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		end
 
 		script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-	
-		return "Moving to auto path node: " .. self.currentGoToLocation+1 .. "...";
 	end
 end
 

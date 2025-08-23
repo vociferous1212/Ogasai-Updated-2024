@@ -14,6 +14,22 @@ script_grindEX = {
 	deleteItemTimer = GetTimeEX(),
 }
 
+function script_grindEX:isThereAnyValidEnemyNearby()
+	local i, t = GetFirstObject();
+	while i ~= 0 do
+		if t == 3 then
+			if i:GetDistance() <= script_grind.pullDistance and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
+				if script_grindValidEnemy:enemyIsValid(i) then
+					return true;
+				end
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end
+
+script_grindValidEnemy:enemyIsValid(i)
 function script_grindEX:howManyEnemiesTargetingMe()
 	local i, t = GetFirstObject();
 	local numTargetingMe = 0;
