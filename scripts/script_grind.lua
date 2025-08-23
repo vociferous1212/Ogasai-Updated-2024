@@ -443,7 +443,7 @@ function script_grind:run()
 	end
 
 	-- hotspot reached distance
-	if (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
+	if not IsInCombat() and (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
 		self.hotspotReached = false;
 		self.message = "Moving back to hotspot";
 	end	
@@ -1158,7 +1158,7 @@ function script_grind:run()
 	-- Run the combat script and retrieve combat script status if we have a valid target
 			-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
 		-- since avoid is buggy we are just going to try to kill them instead of running into them
-		if not IsInCombat() then
+		if not IsInCombat() and self.hotspotReached then
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
 				self.newTargetTime = GetTimeEX() + 3500;
@@ -1493,7 +1493,7 @@ if (not IsAutoCasting("Attack")) then
 
 
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
-		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) and (self.enemyObj == nil or self.enemyObj == 0) then
+		if (script_vendor:getStatus() == 0) and ((not IsInCombat() or IsMounted()) and (self.autoPath) and (script_nav:getDistanceToHotspot() > self.distToHotSpot or self.hotSpotTimer > GetTimeEX() or not self.hotspotReached)) and (not IsLooting()) then
 			if (not (self.hotSpotTimer > GetTimeEX())) then
 				self.hotSpotTimer = GetTimeEX() + 20000;
 			end
@@ -1566,8 +1566,6 @@ if (not IsAutoCasting("Attack")) then
 	end
 
 
-
-
 	-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
 		-- doubled up on move to target in combat and navigate....
 	if self.enemyObj == nil then
@@ -1576,12 +1574,17 @@ if (not IsAutoCasting("Attack")) then
 		-- Use auto pathing navigation or walk paths
 		if (self.autoPath) then
 
-			-- if we have reached our hotspot then hotspotReached is true
-			if (script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached) then
-				self.message = "Hotspot reached... (No targets around?)";
-				self.hotspotReached = true;
-				return;
+			-- check to see if we need to move back to hotspot area...
+			if script_nav:getDistanceToHotspot() > self.distToHotSpot then
+					self.hotspotReached = false;
 			end
+
+			if script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached then
+				self.hotspotReached = true;
+			end
+			
+
+			
 
 	-- this becomes our navigation once we have enough saved locations. the bot will move from location to location
 	-- checking for targets in the area, and make a new location. if no acceptable targets are found then
@@ -2038,7 +2041,7 @@ function script_grind:doLoot(localObj)
 					self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
 					return true;
 				end
-			else
+			elseif self.lootObj:GetDistance() > self.lootDistance then
 				Move(_x, _y, _z);
 				self.message = "Moving To Target Loot no navmesh path available - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
 

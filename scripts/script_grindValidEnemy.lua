@@ -36,19 +36,32 @@ function script_grindValidEnemy:enemyIsValid(i)
 		end
 
 
-	-- try to skip units below us or above us (in water or structure)
-		-- has bugs
-		--if (script_grind.skipHardPull) and (not script_grind:isTargetBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) then
-		--	local tarPosX, tarPosY, tarPosZ = i:GetPosition();
-		--	local myPosX, myPosY, myPosZ = GetLocalPlayer():GetPosition();
-		--	local posZ = tarPosZ - myPosZ;
-		--	if (posZ > 9) then
-		--		script_grind:addTargetToBlacklist(i:GetGUID());
-		--	end
-		--	if (posZ < -9) then
-		--		script_grind:addTargetToBlacklist(i:GetGUID());
-		--	end
-		--end
+-- do not target targets outside of hotspot range
+	-- Get player position
+	local px, py, pz = GetLocalPlayer():GetPosition();
+
+	-- Get hotspot position
+	local hotspot_x, hotspot_y, hotspot_z = script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
+
+	-- Get target distance and position
+	local _x = i:GetDistance();
+	local tx, ty, tz = i:GetPosition();
+
+	-- Get distance from player to hotspot
+	local _y = script_nav:getDistanceToHotspot();
+
+	-- Calculate actual distance from hotspot to target
+	local dist_to_hotspot = math.sqrt((tx - hotspot_x)^2 + (ty - hotspot_y)^2 + (tz - hotspot_z)^2);
+
+	-- Define ranges
+	local max_move_range = script_grind.distToHotSpot;
+	local max_target_range = script_grind.pullDistance;
+
+	-- Check if target is within hotspot range and targeting range
+	if dist_to_hotspot > max_move_range or _x > max_target_range then
+	return false; -- Target is too far from hotspot or player
+	end
+
 
 	-- Valid Targets: Tapped by us, or is attacking us or our pet
 		if (script_grind:isTargetingMe(i)

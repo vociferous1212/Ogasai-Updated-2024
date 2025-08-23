@@ -607,7 +607,7 @@ function script_aggro:returnClosestAddsTarget()
 				local distance = i:GetDistance();
 
 				if bestDistance > i:GetDistance() then
-					bestDistance = i:GetDistance;
+					bestDistance = i:GetDistance();
 					script_grind.enemyObj = i;
 					return i;
 				end
