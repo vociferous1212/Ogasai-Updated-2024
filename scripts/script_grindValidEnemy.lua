@@ -39,19 +39,33 @@ function script_grindValidEnemy:enemyIsValid(i)
         -- Get hotspot position
         local hotspot_x, hotspot_y, hotspot_z = script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ;
 
+	-- use quester hotspot locations of using quester
+	if _quest.usingQuester then 
+		hotspot_x, hotspot_y, hotspot_z = _questDB:getQuestGrindPos();
+	end
+
         -- Get target distance and position
-        local _x = i:GetDistance(); -- Distance to target (c)
-        local tx, ty, tz = i:GetPosition(); -- Target’s coordinates
+        local _x = i:GetDistance();
+        local tx, ty, tz = i:GetPosition();
 
         -- Get distance from player to hotspot
         local _y = script_nav:getDistanceToHotspot();
+
+	if _quest.usingQuester then
+		_y = _quest.distToGrind;
+	end
 
         -- Calculate actual distance from hotspot to target
         local dist_to_hotspot = math.sqrt((tx - hotspot_x)^2 + (ty - hotspot_y)^2 + (tz - hotspot_z)^2);
 
         -- Define ranges
-        local max_move_range = script_grind.distToHotSpot; -- a (e.g., 100 yards)
-        local max_target_range = script_grind.pullDistance; -- b (e.g., 200 yards)
+        local max_move_range = script_grind.distToHotSpot;
+        local max_target_range = script_grind.pullDistance;
+
+	-- if using quester then set variables
+	if _quest.usingQuester then
+		max_move_range = _quest.distToGrindFromHotspot;
+	end
 
         -- Check if target is within hotspot range and targeting range for ALL conditions
         local function isTargetInRange()

@@ -2,6 +2,12 @@ script_grindAssignTarget = {}
 
 function script_grindAssignTarget:assignTarget()
 
+	if _quest.usingQuester then
+		if _quest.enemyTarget ~= nil then
+			script_grindObj = script_quest.enemyTarget
+		end
+	end
+
 	-- Return a target attacking our group
 	local i, targetType = GetFirstObject();
 

@@ -172,7 +172,11 @@ function script_aggro:safePullRecheck(target)
 			-- acceptable targets
 			if (testRange < 30) and (script_grindEX:howManyEnemiesInRangeOfTarget(currentObj) < 3) and (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) and (currentObj:GetGUID() ~= GetLocalPlayer():GetGUID()) and (not currentObj:IsCasting())  then	
 
-				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
+				local aggroDistToMe = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 20;
+
+					if currentObj:GetCreatureType() == "Humanoid" then
+						aggroDistToMe = currentObj:GetLevel() - localObj:GetLevel() + 23.5;
+					end	
 
 				-- if we are a ranged class we can pull at half the distance!
 
@@ -583,7 +587,7 @@ function script_aggro:closeToAdds()
 	while i ~= 0 do
 		if t == 3 then
 
-			if i:GetDistance() <= 30 and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_grind:isTargetBlacklisted(i:GetGUID()) then
+			if i:GetDistance() <= 30 and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_grind:isTargetBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 				aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 22.5;
 
 				local distance = i:GetDistance();
@@ -604,7 +608,7 @@ function script_aggro:returnClosestAddsTarget()
 
 	while i ~= 0 do
 		if t == 3 then
-			if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 30 and script_grind:isTargetBlacklisted(i:GetGUID()) then
+			if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 30 and script_grind:isTargetBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 
 				local distance = i:GetDistance();
 

@@ -68,7 +68,9 @@ local localObj = GetLocalPlayer();
 
 	if _questEX:doStartChecks() then return; end
 
-	if (self.pause) then script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
+	if (self.pause) then self.usingQuester = false; script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
+
+	self.usingQuester = true;
 
 	local r, g, b = 0, 0, 0;
 	local y, x, width = 120, 25, 370;
