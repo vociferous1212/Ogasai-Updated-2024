@@ -1,4 +1,4 @@
-script_gatherer = {
+script_gatherer = {isSetup = false,
 
 
 	include gatherer
@@ -19,7 +19,7 @@ need to load a path
 need bot to run that path
 need bot to search for gathering nodes
 need bot to move to that gathering node
-need bot to 
+need bot to loot gathering node
 
 
 function script_gatherer:run()
@@ -28,7 +28,7 @@ function script_gatherer:run()
 		run combat script
 	end
 
-	if a target is near my aggro range then
+	if a target is near my aggro range and we choose to attack stuff then
 		attack it first
 	end
 
@@ -42,6 +42,26 @@ function script_gatherer:run()
 end
 
 function script_gatherer:getPath()
+
+	loadscript
+
 end
 
 
+function script_gatherer:menu()
+
+if new window
+	if collapsingheader
+
+end
+
+function script_gatherer:draw()
+end
+
+function script_gatherer:setup()
+
+	run check for current skills
+	add tables from gather
+
+self.isSetup = true;
+end

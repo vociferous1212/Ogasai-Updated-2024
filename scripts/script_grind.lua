@@ -169,7 +169,7 @@ script_grind = {
 	playerPos = 0,	-- paranoid player pos
 	blacklistLootTime = 0,	-- blacklist loot time
 	blacklistLootTimeCheck = 0,
-	blacklistLootTimeVar = 45,
+	blacklistLootTimeVar = 25,
 	timerSet = false,	-- blacklist loot timer set
 	messageOnce = true,	-- message once blacklist loot obj
 	perHasTarget = false,	-- used to check pet target during rest
@@ -828,12 +828,19 @@ function script_grind:run()
 		end
 	end
 
-
-
-		-- Do all checks
-		if (script_grindEX:doChecks()) then
+	-- make sure the grinder cannot run if we are resting...
+	if (not IsInCombat()) and (not petHasTarget) then
+		if (IsEating() and GetLocalPlayer():GetHealthPercentage() < 95)
+			or (IsDrinking() and GetLocalPlayer():GetManaPercentage() < 95)
+		then
 			return;
 		end
+	end
+
+	-- Do all checks
+	if (script_grindEX:doChecks()) then
+		return;
+	end
 
 	--if (script_helper:weAreStandingInFire()) then
 	--	return true;
@@ -999,22 +1006,6 @@ function script_grind:run()
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
-			if script_grind.enemyObj ~= nil then
-				if script_grind:isTargetBlacklisted(self.enemyObj) then 
-					self.newTargetTime = GetTimeEX() + 5500;
-				else
-					self.newTargetTime = GetTimeEX() + 2000;
-				end
-			end
-		end
-
-		-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
-		-- since avoid is buggy we are just going to try to kill them instead of running into them
-		if (self.enemyObj == 0 or self.enemyObj == nil) then
-			if script_aggro:closeToAdds() then
-				self.enemyObj = script_aggro:returnClosestAddsTarget();
-				self.newTargetTime = GetTimeEX() + 1500;
-			end
 		end
 
 		if (IsInCombat()) or (not PlayerHasTarget()) then
@@ -1165,7 +1156,14 @@ function script_grind:run()
 			end
 
 	-- Run the combat script and retrieve combat script status if we have a valid target
-	
+			-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
+		-- since avoid is buggy we are just going to try to kill them instead of running into them
+		if not IsInCombat() then
+			if script_aggro:closeToAdds() then
+				self.enemyObj = script_aggro:returnClosestAddsTarget();
+				self.newTargetTime = GetTimeEX() + 3500;
+			end
+		end
 			if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
 				self.combatError = RunCombatScript(self.enemyObj:GetGUID());
 			end
@@ -1248,13 +1246,7 @@ function script_grind:run()
 			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime then
 				-- else assign a target
 				self.enemyObj = script_grindAssignTarget:assignTarget();
-				if script_grind.enemyObj ~= nil then
-					if script_grind:isTargetBlacklisted(self.enemyObj) then 
-						self.newTargetTime = GetTimeEX() + 5500;
-					else
-						self.newTargetTime = GetTimeEX() + 2000;
-					end
-				end
+				
 			end
 
 			if (not IsMoving()) then
@@ -1595,6 +1587,8 @@ if (not IsAutoCasting("Attack")) then
 	-- checking for targets in the area, and make a new location. if no acceptable targets are found then
 	-- we navigate through the path nodes until we find a good target
 
+	-- if we find a target we drop navigation and kill the target and make a new auto path node
+	-- if no targets found, move to node 1, then 2, etc, until new node can be made
 
 			--if we have more than 2 saved locations and cannot find a target or loot then navigate
 				-- this will also double up as moveToHotspot function
@@ -1965,18 +1959,6 @@ function script_grind:doLoot(localObj)
 				_quest.waitTimer = GetTimeEX() + 1050;
 				return;
 			end
-
-			--lastError = GetLastError();
-			--if lastError == 78 then
-			--	script_grind:addTargetToLootBlacklist(self.lootObj);
-			--	self.lootObj = nil;
-			--	ClearLastError();
-			--end
-			--if lastError == 22828 or lastError == 16864 then
-			--	script_grind:addTargetToLootBlacklist(self.lootObj);
-			--	self.lootObj = nil;
-			--	ClearLastError();
-			--end
 	
 			-- if looting and not moving then wait
 			if (not LootTarget()) and (not IsMoving()) then
@@ -2013,9 +1995,9 @@ function script_grind:doLoot(localObj)
 		return;
 		end
 
--- If we reached the loot object, reset the nav path
-script_nav:resetNavigate();
-end
+		-- If we reached the loot object, reset the nav path
+		script_nav:resetNavigate();
+	end
 
 
 	handleSwimming();
@@ -2024,7 +2006,6 @@ end
 	if (self.lootObj ~= nil) then
 		if (IsSwimming()) and (not script_grindEX.allowSwim) and (script_aggro:closeToBlacklistedTargets() and self.lootObj:GetDistance() > 5) then
 			script_grind:addTargetToLootBlacklist(self.lootObj:GetGUID());
-			return;
 		end
 	end
 
@@ -2057,6 +2038,10 @@ end
 					self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
 					return true;
 				end
+			else
+				Move(_x, _y, _z);
+				self.message = "Moving To Target Loot no navmesh path available - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+
 			end
 		end
 	end
@@ -2219,7 +2204,7 @@ function script_grind:runRest()
 			self.newTargetTime = GetTimeEX();
 			
 			if (IsDrinking() or IsEating()) and (not IsInCombat()) then
-		
+				return true;
 			end
 		end
 

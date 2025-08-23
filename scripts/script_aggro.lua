@@ -582,7 +582,7 @@ function script_aggro:closeToAdds()
 	while i ~= 0 do
 		if t == 3 then
 
-			if i:GetDistance() <= 40 and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
+			if i:GetDistance() <= 30 and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
 				aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 22.5;
 
 				if i:GetDistance() <= aggro and script_grind:isTargetBlacklisted(i:GetGUID()) then
@@ -597,18 +597,25 @@ end
 					
 -- get the target with adds we are close to...
 function script_aggro:returnClosestAddsTarget()
-
+	local bestDistance = 1000
 	local i, t = GetFirstObject();
 
 	while i ~= 0 do
 		if t == 3 then
-			if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 40 and script_aggro:closeToAdds() and script_grind:isTargetBlacklisted(i:GetGUID()) then
-				script_grind.enemyObj = i;
+			if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 30 and script_aggro:closeToAdds() and script_grind:isTargetBlacklisted(i:GetGUID()) then
+
+				local distance = i:GetDistance();
+
+				if bestDistance > i:GetDistance() then
+					bestDistance = i:GetDistance;
+					script_grind.enemyObj = i;
+					return i;
+				end
 				if not IsAutoCasting("Attack") then
 					i:AutoAttack();
 				end
-				return i;
 			end
+
 		end
 	i, t = GetNextObject(i);
 	end

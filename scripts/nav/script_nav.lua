@@ -105,7 +105,7 @@ function script_nav:saveTargetLocation(target, mobLevel)
 			end
 		end
 	end
-	if (saveLocation) then
+	if (saveLocation) and not IsSwimming() then
 		self.savedLocations[self.numSavedLocation] = {}; self.savedLocations[self.numSavedLocation]['x'] = _tx; self.savedLocations[self.numSavedLocation]['y'] = _ty; self.savedLocations[self.numSavedLocation]['z'] = _tz; self.savedLocations[self.numSavedLocation]['level'] = mobLevel; self.numSavedLocation = self.numSavedLocation + 1;
 	end
 end

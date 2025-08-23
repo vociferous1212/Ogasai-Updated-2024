@@ -20,6 +20,7 @@ function script_targetMenu:menu()
 				script_grind:addTargetToHardBlacklist(GetTarget():GetGUID());
 				script_grind.newTargetTime = GetTimeEX();
 				DEFAULT_CHAT_FRAME:AddMessage("" .. GetTarget():GetUnitName() .. " - added to blacklist.");
+				ClearTarget();
 			end
 		end
 		

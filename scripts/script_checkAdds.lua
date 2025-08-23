@@ -12,8 +12,8 @@ function script_checkAdds:checkAdds()
     if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) ) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
         if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy)) and ( (grindEnemy ~= 0 and grindEnemy ~= nil and not grindEnemy:IsStunned()) or (questEnemy ~= nil and questEnemy ~= 0 and not questEnemy:IsStunned()) ) then 
             if self:avoidToAggro(self.checkAddsRange) then
-		script_grind.waitTimer = GetTimeEX() + 500;
-		_quest.waitTimer = GetTimeEX() + 500;
+		script_grind.waitTimer = GetTimeEX() + 750;
+		_quest.waitTimer = GetTimeEX() + 750;
 		if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
 		if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
 
