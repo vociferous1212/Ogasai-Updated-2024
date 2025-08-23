@@ -1595,17 +1595,22 @@ if (not IsAutoCasting("Attack")) then
 	if self.enemyObj == nil and self.lootObj == nil then
 		-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
 			-- doubled up on move to target in combat and navigate....
+
 		-- Use auto pathing or walk paths
 		if (self.autoPath) then
+
 			if (script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached) then
 				self.message = "Hotspot reached... (No targets around?)";
 				self.hotspotReached = true;
 				return;
-			else
+			end
+			if script_nav.numSavedLocation >= 3 then
 				self.message = script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
 				script_grind:setWaitTimer(100);
 			end
+
 		else
+
 			-- Check: Load/Refresh the walk path
 			if (self.pathName ~= self.pathLoaded) then
 				if (not LoadPath(self.pathName, 0)) then self.message = "No walk path has been loaded..."; return; end
