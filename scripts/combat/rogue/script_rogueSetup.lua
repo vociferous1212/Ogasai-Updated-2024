@@ -4,17 +4,19 @@ function script_rogueSetup:setup()
 
 	script_rogue.waitTimer = GetTimeEX();
 
-	script_rogue.useStealth = true; 
+	script_rogue.useStealth = true;
+
+	local localObj = GetLocalPlayer();
 	
 	if GetNumPartyMembers() ~= 0 then
 		script_rogue.useThrow = false;
 	end
 
 	--set backstab as opener
-	if (GetLocalPlayer():GetLevel() < 10) and (HasSpell("Backstab")) then
+	if (localObj:GetLevel() < 10) and (HasSpell("Backstab")) then
 		script_rogue.stealthOpener = "Backstab";
 	end
-	if (not HasSpell("Ambush")) and (HasSpell("Garrote")) and (GetLocalPlayer():GetLevel() >= 10) then
+	if (not HasSpell("Ambush")) and (HasSpell("Garrote")) and (localObj:GetLevel() >= 10) then
 		script_rogue.stealthOpener = "Garrote";
 	end
 	if (HasSpell("Ambush")) and (not HasSpell("Riposte") or HasSpell("Ghostly Strike")) then
@@ -50,11 +52,16 @@ function script_rogueSetup:setup()
 		script_rogue.cpGeneratorCost = 40;
 	end
 
-	if (GetLocalPlayer():GetLevel() < 6) then
+	if (localObj:GetLevel() < 6) then
 		script_rogue.eatHealth = 55;
 		script_rogue.useThrow = false;
 	end
-	if (GetLocalPlayer():GetLevel() >= 20) and (HasSpell("Poisons")) then
+	if localObj:GetLevel() >= 40 then
+		script_rogue.eatHealth = 45;
+		script_rogue.evasionHealth = 35;
+		script_rogue.adrenRushComboHP = 30;
+	end
+	if (localObj:GetLevel() >= 20) and (HasSpell("Poisons")) then
 		script_rogue.usePoison = true;
 	end
 	

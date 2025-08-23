@@ -118,7 +118,7 @@ function script_rogue:run(targetGUID)
 		end	
 	end
 
-	if(targetObj == 0 or targetObj == nil) then
+	if (targetObj == 0 or targetObj == nil) then
 		return 2;
 	end
 
@@ -355,7 +355,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 3) and (not IsLooting()) then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 3) and (not IsLooting()) and not IsDisarmed() then
 					LootTarget();
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					self.openerUsed = 0;
@@ -363,7 +363,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- no stealth  enabled and we need to intiate combat phase
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (not self.useStealth) then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (not self.useStealth) and not IsDisarmed() then
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					return 0;
 				end
@@ -409,7 +409,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
 
-				if (HasSpell('Kidney Shot')) and (localCP >= 1) and (targetObj:IsCasting()) and (not IsSpellOnCD('Kidney Shot')) and (localEnergy >= 25) then
+				if (HasSpell('Kidney Shot')) and (localCP >= 1) and (targetObj:IsCasting()) and (not IsSpellOnCD('Kidney Shot')) and (localEnergy >= 25) and not IsDisarmed() then
 					if (Cast('Kidney Shot', targetObj)) then
 						return 0;
 					end
@@ -460,7 +460,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 
-				if (HasSpell("Ghostly Strike")) and (not IsSpellOnCD("Ghostly Strike")) and (localEnergy >= 40) then
+				if (HasSpell("Ghostly Strike")) and (not IsSpellOnCD("Ghostly Strike")) and (localEnergy >= 40) and not IsDisarmed() then
 					CastSpellByName("Ghostly Strike", targetObj);
 					return 0;
 				end
@@ -474,7 +474,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Gouge if target casting
-				if (HasSpell("Gouge") and (not HasSpell("Kick") or IsSpellOnCD("Kick"))) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) then
+				if (HasSpell("Gouge") and (not HasSpell("Kick") or IsSpellOnCD("Kick"))) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) and not IsDisarmed() then
 					if (CastSpellByName("Gouge", targetObj)) then
 						CastSpellByName("Attack", targetObj);
 						self.waitTimer = GetTimeEX() + 250;
@@ -488,7 +488,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- Gouge then bandage
 				if (self.useBandages) and (not localObj:HasDebuff("Recently Bandaged")) then
-					if (HasSpell("Gouge")) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (localHealth < 35) and (script_grind:enemiesAttackingUs() < 2) then
+					if (HasSpell("Gouge")) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (localHealth < 35) and (script_grind:enemiesAttackingUs() < 2) and not IsDisarmed() then
 						CastSpellByName("Gouge", targetObj);
 						return 0;
 					end
@@ -523,7 +523,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 			
 				-- Check: Blade Flurry when 2 or more targets within 10 yards
-				if (hasFlurry and script_helper:enemiesAttackingUs(10) >= 2 and not IsSpellOnCD('Blade Flurry')) then 
+				if (hasFlurry and script_helper:enemiesAttackingUs(10) >= 2 and not IsSpellOnCD('Blade Flurry')) and not IsDisarmed() then 
 					if (targetObj:GetDistance() < 5 and targetHealth > 15 and localHealth > 20) then
 						CastSpellByName('Blade Flurry');
 						return 0;
@@ -531,7 +531,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 
 				 --Blade Flurry then use Adrenaline Rush on Low HP
-				if (HasSpell('Adrenaline Rush') and not IsSpellOnCD('Adrenaline Rush') and localHealth < self.adrenRushComboHP and (self.adrenRushCombo)) then 
+				if (HasSpell('Adrenaline Rush') and not IsSpellOnCD('Adrenaline Rush') and localHealth < self.adrenRushComboHP and (self.adrenRushCombo)) and not IsDisarmed() then 
 					if (targetObj:GetDistance() < 6) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
@@ -539,7 +539,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
  
 				-- Check: Adrenaline Rush if more than 2 enemies attacks us or we fight an elite enemy
-				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) then 
+				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) and not IsDisarmed() then 
 					if (targetObj:GetDistance() < 6) and (not IsSpellOnCD("Adrenaline Rush")) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
@@ -547,7 +547,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 			
 				-- Check: Blade Flury if more than 2 enemies attacks us or we fight an elite enemy
-				if (hasBladeFlurry and (script_helper:enemiesAttackingUs(10) >= 2 or UnitIsPlusMob("target"))) then 
+				if (hasBladeFlurry and (script_helper:enemiesAttackingUs(10) >= 2 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) and not IsDisarmed() then 
 					if (targetObj:GetDistance() < 6) and (not IsSpellOnCD("Blade Flurry")) then 
 						CastSpellByName('Blade Flurry');
 						return 0;
@@ -555,7 +555,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 
 				-- Eviscerate with 5 CPs
-				if (localCP > 4) and (localEnergy >= 35) then
+				if (localCP > 4) and (localEnergy >= 35) and not IsDisarmed() then
 					CastSpellByName("Eviscerate", targetObj);
 					return 0; -- return until we use Eviscerate
 				end
@@ -569,7 +569,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- expose armor
-				if (self.useExposeArmor) and (HasSpell("Expose Armor")) and (not IsSpellOnCD("Expose Armor")) and (not targetObj:HasDebuff("Expose Armor")) and (not targetObj:HasDebuff("Sunder Armor")) and (targetHealth >= 40) then
+				if (self.useExposeArmor) and (HasSpell("Expose Armor")) and (not IsSpellOnCD("Expose Armor")) and (not targetObj:HasDebuff("Expose Armor")) and (not targetObj:HasDebuff("Sunder Armor")) and (targetHealth >= 40) and not IsDisarmed() then
 					if (localCP >= self.exposeArmorStacks) and (localEnergy >= 25) then
 						if (CastSpellByName("Expose Armor")) then
 							self.waitTimer = GetTimeEX() + 1050;
@@ -579,7 +579,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- rupture
-				if (self.useRupture) and (HasSpell("Rupture")) and (not IsSpellOnCD("Rupture")) and (not targetObj:HasDebuff("Rupture")) then
+				if (self.useRupture) and (HasSpell("Rupture")) and (not IsSpellOnCD("Rupture")) and (not targetObj:HasDebuff("Rupture")) and not IsDisarmed() then
 					if (localCP >= self.ruptureStacks) and (localEnergy >= 25) then
 						if (CastSpellByName("Rupture")) then
 							self.waitTimer = GetTimeEX() + 1050;
@@ -589,7 +589,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Use CP generator attack 
-				if (targetHealth > (10*localCP)) and (localCP < 5) then
+				if (targetHealth > (10*localCP)) and (localCP < 5) and not IsDisarmed() then
 					if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
 						if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
 							return 0;
@@ -598,13 +598,13 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 			
 				-- Dynamic health check when using Eviscerate between 1 and 4 CP
-				if (targetHealth <= (10*localCP)) and (localEnergy >= 35) then
+				if (targetHealth <= (10*localCP)) and (localEnergy >= 35) and not IsDisarmed() then
 					CastSpellByName("Eviscerate", targetObj);
 					return 0; -- return until we use Eviscerate
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and not IsDisarmed() then
 					if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
 						return 0;
 					end
