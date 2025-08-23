@@ -4,7 +4,7 @@ function script_grindAssignTarget:assignTarget()
 
 	if _quest.usingQuester then
 		if _quest.enemyTarget ~= nil then
-			script_grindObj = script_quest.enemyTarget
+			script_grindObj = _quest.enemyTarget;
 		end
 	end
 
@@ -278,3 +278,4 @@ function script_grindAssignTarget:assignTarget()
 -- Return the closest valid target or nil
 return closestTarget;
 end
+
