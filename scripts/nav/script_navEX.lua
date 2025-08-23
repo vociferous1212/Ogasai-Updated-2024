@@ -78,8 +78,10 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
 		script_grind.message = "Moving To Target NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
 	else
-		return "Moving to target... Nav EX";
+		--script_grind.message = "Moving to target... Nav EX";
+		return true 
 	end
+return false;
 
 end
 
