@@ -442,6 +442,12 @@ function script_grind:run()
 		end
 	end
 
+	if not self.pause then
+		if script_unstuck:checkUnstuck() then
+			return true;
+		end
+	end
+
 	-- hotspot reached distance
 	if not IsInCombat() and (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
 		self.hotspotReached = false;
@@ -1164,10 +1170,13 @@ function script_grind:run()
 				self.newTargetTime = GetTimeEX() + 3500;
 			end
 		end
-			if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-				self.combatError = RunCombatScript(self.enemyObj:GetGUID());
-			end
+
+		
+		
+		if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+			self.combatError = RunCombatScript(self.enemyObj:GetGUID());
 		end
+	end
 
 
 
