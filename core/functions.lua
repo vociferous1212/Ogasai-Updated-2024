@@ -1,67 +1,22 @@
 script_functions = {}
 
 function HasForm()
-	local player = GetLocalPlayer();
-
-	if (player:HasBuff("Bear Form"))
-		or (player:HasBuff("Dire Bear Form"))
-		or (player:HasBuff("Cat Form"))
-		or (player:HasBuff("Aquatic Form"))
-		or (player:HasBuff("Travel Form"))
-		or (player:HasBuff("Moonkin Form"))
-		or (player:HasBuff("Ghost Wolf")) then
-	return true;
-	end
-return false;
-end
+	local player = GetLocalPlayer(); if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) or (player:HasBuff("Cat Form")) or (player:HasBuff("Aquatic Form")) or (player:HasBuff("Travel Form")) or (player:HasBuff("Moonkin Form")) or (player:HasBuff("Ghost Wolf")) then return true; end return false; end
 
 function IsMoonkinForm()
-	local player = GetLocalPlayer();
-
-	if (player:HasBuff("Moonkin Form")) then
-		return true;
-	end
-return false;
-end
+	local player = GetLocalPlayer(); if (player:HasBuff("Moonkin Form")) then return true; end return false; end
 
 function IsCatForm()
-	local player = GetLocalPlayer();
+	local player = GetLocalPlayer(); if (player:HasBuff("Cat Form")) then return true; end return false; end
 
-	if (player:HasBuff("Cat Form")) then
-		return true;
-	end
-return false;
-end
-
--- druid has bear form
 function IsBearForm()
-	local player = GetLocalPlayer();
+	local player = GetLocalPlayer(); if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) then return true; end return false; end
 
-	if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) then
-		return true;
-	end
-return false;
-end
-
--- druid has travel form
 function IsTravelForm()
-	local player = GetLocalPlayer();
+	local player = GetLocalPlayer(); if (player:HasBuff("Travel Form")) then return true; end return false; end
 
-	if (player:HasBuff("Travel Form")) then
-		return true;
-	end
-return false;
-end
-
--- druid has aquatic form
 function IsAquaticForm()
-	local player = GetLocalPlayer();
-
-	if (player:HasBuff("Aquatic Form")) then
-		return true;
-	end
-return false;
-end
+	local player = GetLocalPlayer(); if (player:HasBuff("Aquatic Form")) then return true; end return false; end
 
 function CastGhostWolf()
 	local player = GetLocalPlayer();
@@ -192,42 +147,21 @@ end
 
 function GetMyClass()
 	local class = "";
-	if HasSpell("Heroic Strike") then
-		class = "WARRIOR"
-	elseif HasSpell("Sinister Strike") then
-		class = "ROGUE"
+	if HasSpell("Heroic Strike") then class = "WARRIOR"
+	elseif HasSpell("Sinister Strike") then class = "ROGUE"
 	elseif HasSpell("Seal of Righteousness") then class = "PALADIN"
-	elseif HasSpell("Lightning Bolt") then
-		class = "SHAMAN"
-	elseif HasSpell("Fireball") then
-		class = "MAGE"
-	elseif HasSpell("Wrath") then
-		class = "DRUID"
-	elseif HasSpell("Shadow Bolt") then
-		class = "WARLOCK"
-	elseif HasSpell("Smite") then
-		class = "PRIEST"
-	elseif HasSpell("Raptor Strike") then
-		class = "HUNTER"
+	elseif HasSpell("Lightning Bolt") then class = "SHAMAN"
+	elseif HasSpell("Fireball") then class = "MAGE"
+	elseif HasSpell("Wrath") then class = "DRUID"
+	elseif HasSpell("Shadow Bolt") then class = "WARLOCK"
+	elseif HasSpell("Smite") then class = "PRIEST"
+	elseif HasSpell("Raptor Strike") then class = "HUNTER"
 	end
 return class;
 end
 
 function DoStartChecks()
-	if IsStanding()
-		and not IsMoving()
-		and not IsMounted()
-		and not IsEating()
-		and not IsDrinking()
-		and not IsCasting()
-		and not IsChanneling()
-		and not GetLocalPlayer():IsDead()
-		and not IsGhost()
-		and not GetLocalPlayer():IsConfused()
-		and not GetLocalPlayer():IsFleeing()
-		and not GetLocalPlayer():IsStunned()
-		and not IsLooting()
-	then
+	if IsStanding() and not IsMoving() and not IsMounted() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and not GetLocalPlayer():IsDead() and not IsGhost() and not GetLocalPlayer():IsConfused() and not GetLocalPlayer():IsFleeing() and not GetLocalPlayer():IsStunned() and not IsLooting() then
 		return true;
 	end
 return false;
@@ -285,5 +219,10 @@ function RunOutOfCombat()
 			end
 		end
 	end
+
 return false;
 end
+
+function IsDisarmed()
+local INVSLOT_MAINHAND = 16; local mainHandTexture = GetInventoryItemTexture("player", INVSLOT_MAINHAND);
+if mainHandTexture then return false; end return true; end
