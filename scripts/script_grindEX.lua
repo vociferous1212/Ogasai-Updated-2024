@@ -29,7 +29,6 @@ function script_grindEX:isThereAnyValidEnemyNearby()
 return false;
 end
 
-script_grindValidEnemy:enemyIsValid(i)
 function script_grindEX:howManyEnemiesTargetingMe()
 	local i, t = GetFirstObject();
 	local numTargetingMe = 0;
@@ -102,7 +101,7 @@ function script_grindEX:returnTargetNearMyAggroRange()
 	local tx, ty, tz = 0, 0, 0;
 	while i ~= 0 do
 		if t == 3 then
-			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() and not script_grindEX:isTargetAggroBlacklisted(i:GetGUID()) then
+			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() and not script_grindEX:isTargetAggroBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 				tx, ty, tz = i:GetPosition();
 				local range = GetDistance3D(mx, my, mz, tx, ty, tz);
 				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
