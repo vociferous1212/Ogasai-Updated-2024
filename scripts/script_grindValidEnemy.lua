@@ -3,7 +3,7 @@ script_grindValidEnemy = {}
 function script_grindValidEnemy:enemyIsValid(i)
 
 	-- we have a valid enemy in object manager
-	if (i ~= 0) then
+	if (i ~= 0) and i ~= nil then
 
 	-- if target distance is close enough and in line of sight and is targeting group then return target
 		if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) then

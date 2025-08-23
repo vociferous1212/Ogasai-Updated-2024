@@ -224,6 +224,14 @@ function script_grindEX:doChecks()
 			return true;
 		end
 
+		script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
+		if script_grind.lootObj ~= nil then
+			if (script_grind:doLoot(GetLocalPlayer())) then
+				script_grind.waitTimer = GetTimeEX() + 1000;
+			end
+		end
+			
+
 
 		-- run back if has vanish
 		if (localObj:HasBuff("Vanish")) then

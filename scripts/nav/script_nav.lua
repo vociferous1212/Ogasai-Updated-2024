@@ -128,6 +128,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	end
 	
 	-- make sure we check that there are no targets around that are trying to be targeted by grinder....
+		-- hate to run object manager but the bot simply won't stop running path nodes unless there is some condition set
 	if script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() then
 
 	-- Check: Move to the next location index
