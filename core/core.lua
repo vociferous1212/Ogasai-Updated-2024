@@ -1,3 +1,6 @@
+PersistLoadingScreen(true);
+
+
 function Cast(spellName, target)
 	if (HasSpell(spellName)) then
 		if (target:IsSpellInRange(spellName)) then
