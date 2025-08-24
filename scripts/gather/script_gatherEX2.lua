@@ -40,7 +40,7 @@ function script_gatherEX2:isNodeSafeToGather()
 					local dist = GetDistance3D(nx, ny, nz, ix, iy, iz);
 	
 					-- aggro range of mobs around me and node
-					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 27.2;
+					local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
 					
 					if (dist <= aggro) then
 						numberOfEnemiesNearNode = numberOfEnemiesNearNode + 1;

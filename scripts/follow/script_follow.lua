@@ -64,18 +64,12 @@ function script_follow:run() script_follow:window();
 				
 		-- Rest
 		if (not IsInCombat() and script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then if(RunRestScript()) then self.message = "Resting...";
-		-- Stop moving
 		if (IsMoving() and not localObj:IsMovementDisabed()) then StopMoving(); return; end
-		-- Dismount
 		if (IsMounted()) then DisMount(); return; end
-		-- Add 2500 ms timer to the rest script rotations (timer could be set already)
 		if ((self.waitTimer - GetTimeEX()) < 2500) then self.waitTimer = GetTimeEX()+2500; end ClearTarget(); return; end end
-
-		-- If bags are full
 		if (AreBagsFull() and not IsInCombat()) then
 			self.message = 'Warning bags are full...';
 		end
-
 
 		self.isInCombat = true;
 		if (not IsInCombat()) then
@@ -123,9 +117,11 @@ function script_follow:run() script_follow:window();
 		if (self.limitAttackDist) and (enemy ~= 0) and (enemy ~= nil) and (enemy:GetDistance() > self.followLeaderDistance) then
 			self.enemyObj = nil;
 		end
-
+if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not IsSpellOnCD("Stealth") and GetPartyLeaderObject():GetUnitsTarget() ~= nil then CastStealth(); end if self.enemyObj ~= nil then 
+			if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then
+				self.combatError = script_followDoCombat:run();
+			end end
 		-- get enemy to attack
-		-- i want to add a self.stickyTarget to stop the bot from swinging targets by GUID
 		local distance = self.followLeaderDistance;
 		if (GetPartyLeaderObject() ~= 0) and (self.limitAttackDist) and (self.assistInCombat) then
 			if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
@@ -170,12 +166,7 @@ function script_follow:run() script_follow:window();
 				end
 			end
 			end
-	
-			if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then
-				self.combatError = script_followDoCombat:run();
-			end
 		else
-
 			self.enemyObj = nil;
 
 			-- Healer check: heal/buff the party

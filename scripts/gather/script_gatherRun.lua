@@ -100,9 +100,9 @@ function script_gatherRun:gather()
 		else
 			if (_x ~= 0) then
 				local nDist = math.floor(script_gather.nodeObj:GetDistance());
-					script_navEX:moveToLoot(GetLocalPlayer(), _x, _y, _z);
+					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
-					if (not IsMoving()) and (nDist > 5) then script_navEX:moveFallback(_x, _y, _z); end
+					if (not IsMoving()) and (nDist > 5) then Move(_x, _y, _z); end
 
 				return true;
 			end

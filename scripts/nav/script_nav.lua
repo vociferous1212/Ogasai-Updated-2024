@@ -129,7 +129,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	
 	-- make sure we check that there are no targets around that are trying to be targeted by grinder....
 		-- hate to run object manager but the bot simply won't stop running path nodes unless there is some condition set
-	if script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() then
+	if script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() and (script_grind.lootObj == nil or script_grind.bagsFull or AreBagsFull() or script_grind.skipLooting) then
 
 	-- Check: Move to the next location index
 		local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
