@@ -247,9 +247,17 @@ function script_rogue:run(targetGUID)
 					end
 				end
 
+				local loot = script_grind.lootObj
+					local function checkLoot()
+						if loot == nil or script_grind.skipLooting or AreBagsFull() or script_grind.bagsFull then
+						return true;
+						end
+					return false
+					end
+
 
 -- pickpocket
-				if (targetObj:GetDistance() <= 4) then
+				if (targetObj:GetDistance() <= 4) and checkLoot() then
 					if (self.useStealth and HasSpell("Pick Pocket") and IsStealth()) and (targetObj:GetCreatureType()== "Humanoid" or targetObj:GetCreatureType() == "Undead") and (self.usePickPocket) and (not self.pickpocketUsed) and (not IsLooting()) then
 						if (GetTarget() == 0) then
 							TargetNearestEnemy();
@@ -321,7 +329,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Stealth in range if enabled
-				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasMagic()) and (script_grind.lootObj == nil) then
+				if (self.useStealth and targetObj:GetDistance() <= self.stealthRange) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasMagic()) and (script_grind.lootObj == nil) and checkLoot() then
 					if (not IsStealth()) then
 						CastStealth();
 					end
@@ -409,7 +417,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
 
-				if (HasSpell('Kidney Shot')) and (localCP >= 1) and (targetObj:IsCasting()) and (not IsSpellOnCD('Kidney Shot')) and (localEnergy >= 25) and not IsDisarmed() then
+				if (HasSpell('Kidney Shot')) and (localCP >= 1) and (targetObj:IsCasting()) and (not IsSpellOnCD('Kidney Shot')) and (localEnergy >= 25) and not IsDisarmed() and IsSpellOnCD("Kick") and (IsSpellOnCD("Gouge") or localEnergy < 45) then
 					if (Cast('Kidney Shot', targetObj)) then
 						return 0;
 					end

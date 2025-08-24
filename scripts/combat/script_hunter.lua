@@ -291,7 +291,7 @@ function script_hunter:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(300, 400);
+		local tickRandom = random(300, 700);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -308,6 +308,12 @@ function script_hunter:run(targetGUID)
 	end
 	if (not IsMounted()) then
 		script_hunterEX:chooseAspect(targetObj);
+	end
+
+	if not IsInCombat() and script_checkDebuffs:petDebuff() then
+		self.message = "waiting for pet debuffs";
+		self.waitTimer = GetTimeEX() + 1500;
+		return true;
 	end
 
 	--Valid Enemy
@@ -823,7 +829,7 @@ function script_hunter:rest()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(300, 400);
+		local tickRandom = random(300, 700);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
