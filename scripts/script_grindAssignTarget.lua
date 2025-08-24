@@ -99,7 +99,7 @@ function script_grindAssignTarget:assignTarget()
 
 	-- get lowest level target and kill it
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
-
+		local bestTarget = nil;
 		local i, t = GetFirstObject()
 
 		while i ~= 0 do
@@ -121,9 +121,7 @@ function script_grindAssignTarget:assignTarget()
 
 							-- set lowest level as targets current level
 							bestLevel = level;
-
-						return i;
-
+							bestTarget = i;
 						end
 					end
 				end
@@ -132,11 +130,13 @@ function script_grindAssignTarget:assignTarget()
 		i, t = GetNextObject(i);
 
 		end
+	return bestTarget;
 	end
 
 	-- get the target with the lowest health attacking us and not with blade flurry active, rogue, drops combo points
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) and not GetLocalPlayer():HasBuff("Blade Flurry") then
 
+		local bestTarget = nil
 		local i, t = GetFirstObject()
 
 		while i ~= 0 do
@@ -152,8 +152,7 @@ function script_grindAssignTarget:assignTarget()
 					if bestHP < hp then
 
 						bestHP = hp;
-
-					return i;
+						bestTarget = i;
 
 					end
 				end	
@@ -162,11 +161,13 @@ function script_grindAssignTarget:assignTarget()
 		i, t = GetNextObject(i);
 
 		end
+	return bestTarget;
 	end
 
 	-- get the mana user attacking us and kill it first... go for lowest mana target
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
 
+		local bestTarget = nil
 		local i, t = GetFirstObject()
 
 		while i ~= 0 do
@@ -186,8 +187,7 @@ function script_grindAssignTarget:assignTarget()
 					if bestMana < mana then
 
 						bestMana = mana;
-
-					return i;
+						bestTarget = i;
 
 					end
 
@@ -203,9 +203,7 @@ function script_grindAssignTarget:assignTarget()
 					if bestHP < hp then
 
 						bestHP = hp;
-
-					return i;
-
+						bestTarget = i;
 					end
 				end
 			end
@@ -213,6 +211,7 @@ function script_grindAssignTarget:assignTarget()
 		i, t = GetNextObject(i);
 
 		end
+	return bestTarget;
 	end
 
 

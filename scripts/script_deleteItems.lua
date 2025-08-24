@@ -91,6 +91,9 @@ function script_deleteItems:deleteItem(itemName)
                             PickupContainerItem(bag, slot);
                             if (CursorHasItem()) then
                                 DeleteCursorItem();
+				if StaticPopup1:IsVisible() then
+					StaticPopup1Button1:Click()
+				end
                                 return true;
                             end
                         end

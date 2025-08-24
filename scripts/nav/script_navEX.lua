@@ -29,7 +29,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 		script_nav.navPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		script_nav.lastnavIndex = 1; -- start at index 1, index 0 is our position
-		--script_grind:setWaitTimer(135);
+		script_grind:setWaitTimer(135);
 	end
 
 	if (not IsPathLoaded(5)) then
@@ -77,9 +77,6 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
 		script_grind.message = "Moving To Target NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
-	else
-		--script_grind.message = "Moving to target... Nav EX";
-		return true 
 	end
 return false;
 

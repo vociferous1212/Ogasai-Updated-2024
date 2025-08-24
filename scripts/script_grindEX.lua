@@ -223,6 +223,14 @@ function script_grindEX:doChecks()
 			return true;
 		end
 
+		-- make sure the bot actually loots. i don't know why but it will hang and freeze on a loot screen...
+		if IsLooting() and GetTimeEX() > script_grind.waitTimer then 
+			
+			LootTarget();
+			script_grind.waitTimer = GetTimeEX() + 500;
+		end
+
+
 		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull then
 			if not script_grind:isAnyTargetTargetingMe() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
 				script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);

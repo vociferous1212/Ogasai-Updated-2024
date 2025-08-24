@@ -156,6 +156,7 @@ function script_grindSetup:setup()
 	script_grind.checkTotemKillTimer = GetTimeEX();
 	script_helper.gateTimer = GetTimeEX();
 	script_grindEX.deleteItemTimer = GetTimeEX();
+	script_grind.unstuckTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then

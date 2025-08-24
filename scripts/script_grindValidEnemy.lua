@@ -33,6 +33,13 @@ function script_grindValidEnemy:enemyIsValid(i)
             script_grind:addTargetToHardBlacklist(i:GetGUID());
         end
 
+	-- add target to blacklist if we are swimming and it's within range...
+		-- if it's close and we are swimming it mostly likey is a target in water...
+		-- if not directly in water it should just blacklist anything close to water if we are IsSwimming() so we avoid water
+	if not script_grindEX.allowSwim and i:GetDistance() <= 15 and IsSwimming() and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
+            script_grind:addTargetToHardBlacklist(i:GetGUID());
+	end
+
         -- Get player position
         local px, py, pz = GetLocalPlayer():GetPosition();
 

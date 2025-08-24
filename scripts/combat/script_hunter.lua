@@ -200,6 +200,7 @@ function script_hunter:run(targetGUID)
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
 
+
 	if (localObj:IsDead()) then
 		return 0;
 	end
@@ -446,6 +447,20 @@ function script_hunter:run(targetGUID)
 			if (not targetObj:IsInLineOfSight()) then
 				return 3;
 			end
+
+-- set combat script attack distance
+	if GetTarget() ~= 0 and GetTarget() ~= nil then
+		if GetTarget():GetDistance() ~= nil then
+			if GetTarget():GetDistance() < 11 then
+				script_grind.combatScriptRange = self.meleeDistance;
+			else
+				script_grind.combatScriptRange = 30;
+			end
+		end
+	else
+		script_grind.combatScriptRange = 30;
+	end
+	
 
 			if (not HasSpell("War Stomp")) and targetObj:GetHealthPercentage() > 15 then
 				if (CheckRacialSpells()) then

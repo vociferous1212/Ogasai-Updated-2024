@@ -604,6 +604,7 @@ end
 -- get the target with adds we are close to...
 function script_aggro:returnClosestAddsTarget()
 	local bestDistance = 1000
+	local bestTarget = nil
 	local i, t = GetFirstObject();
 
 	if not script_grind:isAnyTargetTargetingMe() then
@@ -615,18 +616,13 @@ function script_aggro:returnClosestAddsTarget()
 
 					if bestDistance > distance then
 						bestDistance = distance;
-						if bestDistance <= distance then
-							if not IsAutoCasting("Attack") then
-								i:AutoAttack();
-							end
-							script_grind.enemyObj = i;
-							return i;
-						end
+						bestTarget = i;
 					end
+				
 				end
 			end
 		i, t = GetNextObject(i);
 		end
 	end
-return nil;
+return bestTarget;
 end

@@ -161,14 +161,16 @@ function script_nav:getLootTarget(lootRadius)
 	local bestTarget = nil;
 	while targetObj ~= 0 do
 		if (targetType == 3) then -- Unit
-			if(targetObj:IsDead()) then
+			if (targetObj:IsDead()) then
 				if (targetObj:IsLootable()) then
-					local dist = targetObj:GetDistance();
-					if (dist < lootRadius and bestDist > dist) then
-					local _x, _y, _z = targetObj:GetPosition();
-						if(not IsNodeBlacklisted(_x, _y, _z, self.nextNavNodeDistance)) then
-							bestDist = dist;
-							bestTarget = targetObj;
+					if not script_grind:isTargetLootBlacklisted(targetObj:GetGUID()) then
+						local dist = targetObj:GetDistance();
+						if (dist < lootRadius and bestDist > dist) then
+						local _x, _y, _z = targetObj:GetPosition();
+							if(not IsNodeBlacklisted(_x, _y, _z, self.nextNavNodeDistance)) then
+								bestDist = dist;
+								bestTarget = targetObj;
+							end
 						end
 					end
 				end

@@ -4,6 +4,8 @@ script_navEXCombat = {	waitTimer = 0,
 
 function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when moving to moving targets
 
+	local ax, ay, az = GetLocalPlayer():GetPosition();
+
 	-- Please load and enable the nav mesh
 	if (not IsUsingNavmesh() and script_nav.useNavMesh) then
 		return "Please load and and enable the nav mesh...";
@@ -15,61 +17,57 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	localObj = GetLocalPlayer();
 	local _lx, _ly, _lz = localObj:GetPosition();
 
-	-- +1 last nav path because we are jumping from normal nav movement to combat nav movement, basically on same path
-	local _ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex+1);	
+	local _ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);	
 
-	-- If the target moves more than 2 yard then make a new path
-	if (GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 2.5
-		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
+	-- If the target moves more than combat script range by yards then make a new path
+		-- the intent of this script is to preserve movement elsewhere while limiting the calls to the nav which can crash the game
+		-- using a separate script with a separate timer was easier on the nav table than an long if then else statement.
+	if (GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > script_grind.combatScriptRange
+
+		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 20) then
 		script_nav.navPosition['x'] = _x;
 		script_nav.navPosition['y'] = _y;
 		script_nav.navPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		script_nav.lastnavIndex = 1; -- start at index 1, index 0 is our position
-		script_grind:setWaitTimer(135);
+		script_grind:setWaitTimer(335);
 	end
 
-		--if (not IsPathLoaded(5)) then
-		--	if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-		--		local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
-		--		Move(x, y, z);
-		--		return "NavEX - we are stuck out of navmap boundary";
-		--	end
-		--	return "Generating path...";
-		--end
+	if (not IsPathLoaded(5)) then
+		return "Generating path...";
+	end
 
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
-	if (GetTimeEX() > self.waitTimer) and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*2.6) then
-			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
-			self.waitTimer = GetTimeEX() + 1050;
-		end
-
-
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= 5) then
-		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;		
+	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
+		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
 		end
 	end
-
-	if (not script_unstuck:pathClearAuto(2)) then
-		script_unstuck:unstuck();
+	if (not IsMoving()) and ((_lx - _ix)^2 < 1) then
+		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
+
+	if (GetTimeEX() > self.waitTimer) then
+		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3) then	
+			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+		end
+	end
+
+	if (self.waitTimer > GetTimeEX()) then
+		return;
+	end
+
+	local mX, mY, mZ = GetLocalPlayer():GetPosition();
 	
-	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
-	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (script_grind.hotspotReached) and (script_vendor:getStatus() == 0) then
-		script_grind.message = "Moving To Target Combat NavEX - " ..math.floor(script_grind.enemyObj:GetDistance()).. " (yd) "..script_grind.enemyObj:GetUnitName().. "";
-	else
-		return "Moving to target... Nav EX";
-	end
+return false;
 
 end
-
 function script_navEXCombat:moveToVendor(localObj, _x, _y, _z) -- use when moving to moving targets
 	script_nav.drawNav = false;
 	-- Fetch our current position
@@ -104,5 +102,4 @@ function script_navEXCombat:moveToVendor(localObj, _x, _y, _z) -- use when movin
 	end
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
-	return "Moving to target...";
 end
