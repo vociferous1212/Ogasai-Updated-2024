@@ -606,26 +606,27 @@ function script_aggro:returnClosestAddsTarget()
 	local bestDistance = 1000
 	local i, t = GetFirstObject();
 
-	while i ~= 0 do
-		if t == 3 then
-			if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 30 and script_grind:isTargetBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
+	if not script_grind:isAnyTargetTargetingMe() then
+		while i ~= 0 do
+			if t == 3 then
+				if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 30 and script_grind:isTargetBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 
-				local distance = i:GetDistance();
+					local distance = i:GetDistance();
 
-				if bestDistance > distance then
-					bestDistance = distance;
-					if bestDistance <= distance then
-						if not IsAutoCasting("Attack") then
-							i:AutoAttack();
+					if bestDistance > distance then
+						bestDistance = distance;
+						if bestDistance <= distance then
+							if not IsAutoCasting("Attack") then
+								i:AutoAttack();
+							end
+							script_grind.enemyObj = i;
+							return i;
 						end
-						script_grind.enemyObj = i;
-						return i;
 					end
 				end
 			end
-
+		i, t = GetNextObject(i);
 		end
-	i, t = GetNextObject(i);
 	end
 return nil;
 end

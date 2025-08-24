@@ -82,7 +82,7 @@ function script_grindValidEnemy:enemyIsValid(i)
             -- Blacklisted target is attacking us
             or ((script_grind:isTargetHardBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)) and (i:IsInLineOfSight()))
             -- Blacklisted target is polymorphed or feared
-            or ((script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) and (script_grind:enemiesAttackingUs() < 2) and (GetNumPartyMembers() <= 1))
+            or ((script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) and (script_grind:enemiesAttackingUs() < 2))
             -- Attacking pet
             or ((script_grind:isTargetingPet(i)) and (i:IsInLineOfSight()))) then
             if isTargetInRange() then

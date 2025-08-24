@@ -64,41 +64,55 @@ script_grind = {
 	pathMenuIncluded = include("scripts\\menu\\script_pathMenu.lua"),
 	getObjectsIncluded = include("scripts\\getObjectsAroundMe.lua"),
 
+	-- pathing
 	pathName = 0,
 	pathLoaded = 0,
-	getSpells = false,
-	jump = true,	-- enable jumping out of combat
-	jumpRandomFloat = 99,	-- jump > than 
-	jumpCheck = false,
-	useVendor = true,	-- use vendor
-	repairWhenYellow = true,	-- repair when yellow
-	stopWhenFull = false,	-- stop when bags are full
-	hsWhenFull = false,	-- hearthstone when bags are full
-	useMount = false,	-- use mount
-	checkBagTimer = GetTimeEX(),
-	mountTimer = GetTimeEX(),	-- defunct setting
-	enemyObj = nil,	-- enemyObj stops a bug
-	lootObj = nil,	-- lootObj stops a bug
-	timer = GetTimeEX(),	-- blacklist timer
-	tickRate = 1550,		-- reaction time / speed of scripts
-	waitTimer = GetTimeEX(),	-- wait timer
-	pullDistance = 225,	-- find target distance
-	avoidElite = true,	-- avoid elites ( currently not working )
-	avoidRange = 40,	-- aboid elites range
-	findLootDistance = 75,
-	lootDistance = 3.05,
-	skipLooting = false,
-	lootCheck = {},
-	minLevel = GetLocalPlayer():GetLevel()-5,
-	maxLevel = GetLocalPlayer():GetLevel()+2,
+	nextToNodeDist = 3.05, -- (Set to about half your nav smoothness)
+	Name = "", -- set to e.g. "paths\1-5 Durator.xml" for auto load at startup
+	pathLoaded = "",	-- path that is loaded
+	autoPath = true,	-- use nav 
+
+	-- display data
+	drawUnits = true,	-- draw unit data on screen
+	drawPath = true,	-- draw path
+	drawAutoPath = true,	-- draw walk path
+
+
+
+	-- grinder settings
+	isSetup = false,	-- is setup function run
 	ressDistance = 29,
 	combatError = 0,
-	autoTalent = false,
 	myX = 0,
 	myY = 0,
 	myZ = 0,
-	myTime = GetTimeEX(),
+	jump = true,	-- enable jumping out of combat
+	jumpRandomFloat = 99,	-- jump > than 
+	jumpCheck = false,
+	useMount = false,	-- use mount
 	message = 'Starting the grinder...',
+	distToHotSpot = 500,	-- distance to target enemies from hotspot
+	staticHotSpot = true,	-- use hotspots
+	hotSpotTimer = GetTimeEX(),	-- timer to hotspot
+	currentLevel = GetLocalPlayer():GetLevel(),	-- current player level
+	skinning = false,	-- use skinning
+	gather = true,		-- use gatherer script
+	lastTarget = 0,		-- last target targeted
+	minLevel = GetLocalPlayer():GetLevel()-5,
+	maxLevel = GetLocalPlayer():GetLevel()+2,
+
+
+	-- other scripts
+	getSpells = false,
+	autoTalent = false,
+
+
+
+	-- targeting
+	enemyObj = nil,
+	pullDistance = 225,	-- find target distance
+	avoidElite = true,	-- avoid elites ( currently not working )
+	avoidRange = 40,	-- aboid elites range
 	skipUnknown = false, -- skip not specified npc - ooze, etc
 	skipHumanoid = false,
 	skipElemental = false,
@@ -110,28 +124,44 @@ script_grind = {
 	skipGiant = false,
 	skipMechanical = false,	
 	skipElites = true,
-	paranoidRange = 75,	-- paranoia range
-	nextToNodeDist = 3.05, -- (Set to about half your nav smoothness)
 	blacklistedTargets = {},	-- GUID table of blacklisted targets
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
 	hardBlacklistedNum = 0,	-- number of blacklisted targets
+
+	-- loot and vendoring
+	lootObj = nil,
+	useVendor = true,	-- use vendor
+	repairWhenYellow = true,	-- repair when yellow
+	stopWhenFull = false,	-- stop when bags are full
+	hsWhenFull = false,	-- hearthstone when bags are full
+	findLootDistance = 75,
+	lootDistance = 3.05,
+	skipLooting = false,
+	lootCheck = {},
 	lootBlacklistedTargets = {},
 	lootBlacklistedNum = 0,
-	isSetup = false,	-- is setup function run
-	drawUnits = true,	-- draw unit data on screen
-	Name = "", -- set to e.g. "paths\1-5 Durator.xml" for auto load at startup
-	pathLoaded = "",	-- path that is loaded
-	drawPath = true,	-- draw path
-	autoPath = true,	-- use nav 
-	drawAutoPath = true,	-- draw walk path
-	distToHotSpot = 500,	-- distance to target enemies from hotspot
-	staticHotSpot = true,	-- use hotspots
-	hotSpotTimer = GetTimeEX(),	-- timer to hotspot
-	currentLevel = GetLocalPlayer():GetLevel(),	-- current player level
-	skinning = false,	-- use skinning
-	gather = true,		-- use gatherer script
-	lastTarget = 0,		-- last target targeted
+
+	-- timers
+	tickRate = 1550,		-- reaction time / speed of scripts
+	waitTimer = GetTimeEX(),	-- wait timer
+	checkBagTimer = GetTimeEX(),
+	mountTimer = GetTimeEX(),	-- defunct setting
+	timer = GetTimeEX(),	-- blacklist timer
+	myTime = GetTimeEX(),
+
+
+	-- paranoia
+	paranoidRange = 75,	-- paranoia range
+	paranoidSetTimer = 22,	-- time to wait after paranoia has needed
+	useString = true,	-- message to send to log players in range run once
+	useOtherString = true,	-- message to send to log players targeting us run once
+	useLogoutTimer = false,	-- use logout timer true/false
+	logoutSetTime = GetTimeEX() / 1000,	-- set the logout time in seconds
+	logoutTime = 2,	-- logout time in hours
+	
+
+	
 	newTargetTime = GetTimeEX(),	-- set new target wait time
 	blacklistTime = 30,	-- time to blacklist mobs
 	drawEnabled = true,	-- draw on screen menus
@@ -151,12 +181,7 @@ script_grind = {
 	hardBlacklistedNameNum = 0,	-- number of blacklisted targets
 	lootBlacklistedNameNum = 0,
 	useExpChecker = true,	-- run exp checker
-	paranoidSetTimer = 22,	-- time to wait after paranoia has needed
-	useString = true,	-- message to send to log players in range run once
-	useOtherString = true,	-- message to send to log players targeting us run once
-	useLogoutTimer = false,	-- use logout timer true/false
-	logoutSetTime = GetTimeEX() / 1000,	-- set the logout time in seconds
-	logoutTime = 2,	-- logout time in hours
+	
 	adjustTickRate = false,	-- adjust script tick rate
 	lootCheckTime = 0,	-- loot check time
 	afkActionSlot = "24",	-- /afk slot for paranoia
@@ -204,7 +229,6 @@ script_grind = {
 	sitTimerSet = false,
 	afkUsed = false,
 	combatScriptRange = 30,
-	--attackTargetsOnRoutes = true,
 	drawAggroAtStart = true,
 	showOM = false,
 	useFirstAid = true,
@@ -582,7 +606,14 @@ function script_grind:run()
 		return;
 	end
 
+	-- set tick rate for scripts
+	if (self.waitTimer > GetTimeEX() + self.tickRate) then
+		return;
+	end
+
 	if not IsInCombat() and not IsEating() and not IsDrinking() and IsStanding() and GetTimeEX() > script_helper.gateTimer then script_helper:openGates(); end
+
+	if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end
 
 	-- Check: Spend talent points
 	if (not IsInCombat() and not GetLocalPlayer():IsDead() and self.autoTalent) then
@@ -777,7 +808,8 @@ function script_grind:run()
 				if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
 					or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
 					or script_grind.enemyObj:IsDead()) then
-						script_grind.waitTimer = GetTimeEX() + 1200;
+						local random = math.random(1750, 2750);
+						script_grind.waitTimer = GetTimeEX() + random;
 						script_grind.enemyObj = nil;
 						ClearTarget();
 				end
@@ -810,13 +842,12 @@ function script_grind:run()
 		script_vendor.message = "idle...";
 	end
 
-
  -- ready to run rest of script - navigation / combat / gathering / vendoring / etc
 
 	-- set tick rate for scripts
-	if (self.waitTimer > GetTimeEX() + self.tickRate) then
-		return;
-	end
+	--if (self.waitTimer > GetTimeEX() + self.tickRate) then
+	--	return;
+	--end
 
 	-- close trade skills...
 	if (script_firstAid.bookOpen) and (not IsChanneling()) and (not IsCasting()) then
@@ -994,7 +1025,7 @@ function script_grind:run()
 
 			-- get the lowest health target in combat with us
 			local i, t = GetFirstObject();
-			while i ~= 0 do
+			while i ~= 0 and i ~= nil do
 				if t == 3 and not i:IsCritter() and not i:IsDead() and i:GetHealthPercentage() >= 1 and i:CanAttack() and script_grind:isTargetingMe(i) and (script_grind:enemiesAttackingUs() > 1 or HasPet()) and self.enemyObj ~= 0 and self.enemyObj ~= nil and not self.enemyObj:IsDead() then
 					local hp = script_grind.enemyObj:GetHealthPercentage();
 					local ihp = i:GetHealthPercentage();
@@ -1009,8 +1040,11 @@ function script_grind:run()
 			end
 		end
 
+				-- find loot before gaining a new target... rogue likes to break stealth
+				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
+
 		-- don't assign targets  until we get to hotspot
-		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime then
+		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
 		end
 
@@ -1063,6 +1097,10 @@ function script_grind:run()
 		-- distance to hotspot
 		if (script_nav:getDistanceToHotspot() <= 80) then
 			self.hotspotReached = true;
+		end
+
+		if IsEating() or IsDrinking() or IsLooting() or (PlayerHasTarget() and IsMoving()) then
+			self.autoBlacklistTimer = GetTimeEX() + 15000;
 		end
 
 		-- Dont pull mobs before we reached our hotspot unless we are in aggro range
@@ -1164,7 +1202,7 @@ function script_grind:run()
 	-- Run the combat script and retrieve combat script status if we have a valid target
 			-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
 		-- since avoid is buggy we are just going to try to kill them instead of running into them
-		if not IsInCombat() and self.hotspotReached then
+		if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached then
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
 				self.newTargetTime = GetTimeEX() + 3500;
@@ -1237,6 +1275,8 @@ function script_grind:run()
 			script_checkAdds.intersectEnemy = nil;
 			end
 
+
+			-- we are in combat so get a target
 			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime then
 				self.enemyObj = script_grindAssignTarget:assignTarget();
 				self.newTargetTime = GetTimeEX() + 1000;
@@ -1251,8 +1291,11 @@ function script_grind:run()
 
 			-- if we have a valid enemy
 			if (self.enemyObj ~= nil) and (not IsInCombat()) then
-				
-			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime then
+
+				-- find loot before gaining a new target... rogue likes to break stealth
+				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
+
+			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) then
 				-- else assign a target
 				self.enemyObj = script_grindAssignTarget:assignTarget();
 				
@@ -1354,6 +1397,9 @@ if (not IsAutoCasting("Attack")) then
 						return true;
 					end
 				end
+
+				-- find loot before moving to a new target...
+				self.lootObj = script_nav:getLootTarget(self.findLootDistance);
 
 				-- if we have a valid position coordinates
 				if (_x ~= 0 and x ~= 0) then
@@ -1591,8 +1637,6 @@ if (not IsAutoCasting("Attack")) then
 			if script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached then
 				self.hotspotReached = true;
 			end
-			
-
 			
 
 	-- this becomes our navigation once we have enough saved locations. the bot will move from location to location
@@ -2044,16 +2088,15 @@ function script_grind:doLoot(localObj)
 
 	if (self.lootObj ~= nil) and not (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
 		local _x, _y, _z = self.lootObj:GetPosition();
-		if (self.lootObj:GetDistance() > (self.lootDistance/2)) then
+		if (self.lootObj:GetDistance() > (self.lootDistance-1)) then
 			if (IsPathLoaded(5)) then
-				if (script_navEX:moveToLoot(localObj, _x, _y, _z)) then
-					self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-					return true;
+				script_navEX:moveToTarget(localObj, _x, _y, _z)
+				self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
+			else
+				if self.lootObj:GetDistance() > self.lootDistance then
+					Move(_x, _y, _z);
+					self.message = "Moving To Target Loot no navmesh path available - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
 				end
-			elseif self.lootObj:GetDistance() > self.lootDistance then
-				Move(_x, _y, _z);
-				self.message = "Moving To Target Loot no navmesh path available - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-
 			end
 		end
 	end

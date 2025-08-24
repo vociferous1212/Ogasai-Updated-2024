@@ -278,4 +278,3 @@ function script_grindAssignTarget:assignTarget()
 -- Return the closest valid target or nil
 return closestTarget;
 end
-

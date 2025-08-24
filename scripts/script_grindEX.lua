@@ -148,7 +148,7 @@ function script_grindEX:doChecks()
 
 	
 		if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then
-			return true;
+			return;
 		end
 		
 		localObj = GetLocalPlayer();
@@ -223,15 +223,16 @@ function script_grindEX:doChecks()
 			return true;
 		end
 
-		if not IsInCombat() then
-			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
-			if script_grind.lootObj ~= nil then
-				if (script_grind:doLoot(GetLocalPlayer())) then
-					script_grind.waitTimer = GetTimeEX() + 1000;
+		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull then
+			if not script_grind:isAnyTargetTargetingMe() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
+				script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
+				if script_grind.lootObj ~= nil then
+					if (script_grind:doLoot(GetLocalPlayer())) then
+						script_grind.waitTimer = GetTimeEX() + 1000;
+					end
 				end
-			end
-		end	
-
+			end	
+		end
 
 		-- run back if has vanish
 		if (localObj:HasBuff("Vanish")) then
@@ -394,12 +395,12 @@ function script_grindEX:doChecks()
 					return true;
 				end
 				if (self.logoutOnHearth) then
-					Exit();
+					Logout();
 				end
 				return;
 			elseif (script_grind.stopWhenFull) then
 				script_grind.message = 'Bags are full, stopping...';
-				Logout(); StopBot(); return true;
+				Exit(); StopBot(); return true;
 			else	
 				script_grind.message = 'Warning bags are full...';
 				if (script_grind.hsWHenFull) then script_grind.message = 'Warning bags are full, pausing...';

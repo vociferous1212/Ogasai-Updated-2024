@@ -140,7 +140,9 @@ function script_checkDebuffs:petDebuff()
         ["Fear"] = true,
         ["Hamstring"] = true,
         ["Wing Clip"] = true,
-        ["Polymorph"] = true
+        ["Polymorph"] = true,
+	["Crystalline Slumber"] = true
+
     };
     return checkUnitEffects(pet, petDebuffs, false);
 end
