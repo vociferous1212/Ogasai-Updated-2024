@@ -190,13 +190,26 @@ function script_grindEX:doChecks()
 			--return
 			--end
 
+			if localObj:IsDead() and not IsGhost() then
+				script_grind.waitTimer = GetTimeEX() + 2000;
+			end
+
 			-- Release body
 			if (not IsGhost()) and (not script_paranoia:checkParanoia(30)) then
+
+				-- try to wait before releasing to ghost
+				script_grind.waitTimer = GetTimeEX() + 4000;
+
+				-- release to ghost
 				if (not RepopMe()) then
+		
+					-- set the death counter +1
 					if (self.useThisVar) then
 						script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
 						self.useThisVar = false;
 					end
+
+					-- wait a moment for the game to load before moving
 					script_grind.waitTimer = GetTimeEX() + 1500;
 					script_grind.message = "Walking to corpse...";
 					return true;
@@ -210,10 +223,12 @@ function script_grindEX:doChecks()
 				-- Ressurrect within the ress distance to our corpse
 				local _lx, _ly, _lz = localObj:GetPosition();
 
+				-- our distance is greater than set ress distance
 				if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
 					script_nav:moveToNav(localObj, GetCorpsePosition());
 					return true;
 				else
+					-- if we are close enough and want to safetly res in the area
 					if (script_grind.safeRess) then
 						local rx, ry, rz = GetCorpsePosition();
 						if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
@@ -337,42 +352,36 @@ function script_grindEX:doChecks()
 
 			if (vendorStatus == 1) then
 
-				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
-					self.message = "Killing stuff in our path.";
-					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
-				else
+				script_grind.message = "Repairing at vendor...";
 
-					script_grind.message = "Repairing at vendor...";
-
-					if (script_vendor:repair()) then script_grind:setWaitTimer(100);
-						return true;
-					end
-
+				if (script_vendor:repair()) then script_grind:setWaitTimer(100);
+					--return;
 				end
+			return true;
 			elseif (vendorStatus == 2) then
-			
-				if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
-					self.message = "Killing stuff in our path.";
-					script_grind.combatError = RunCombatScript(script_grind.enemyObj:GetGUID());	
-				else
 
-					script_grind.message = "Selling to vendor...,";
+				script_grind.message = "Selling to vendor...,";
 
-					if (script_vendor:sell()) then script_grind:setWaitTimer(100);
-						return true;
-					end
+				if (script_vendor:sell()) then script_grind:setWaitTimer(100);
+					--return;
 				end
+			return true;
 			elseif (vendorStatus == 3) then
+
 				script_grind.message = "Buying ammo at vendor...";
-				if (script_vendor:continueBuyAmmo()) then 
-					script_grind:setWaitTimer(100);
-					return true; 
+
+				if (script_vendor:continueBuyAmmo()) then script_grind:setWaitTimer(100);
+					--return;
 				end
+			return true;
 			elseif (vendorStatus == 4) then
+
 				script_grind.message = "Buying food/drink at vendor...";
+
 				if (script_vendor:continueBuy()) then script_grind:setWaitTimer(100);
-					return true;
+					--return;
 				end
+			return true;
 			end
 		end
 

@@ -1051,7 +1051,7 @@ function script_grind:run()
 				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
 
 		-- don't assign targets  until we get to hotspot
-		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) then
+		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0 then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
 		end
 
@@ -1214,7 +1214,7 @@ function script_grind:run()
 	-- Run the combat script and retrieve combat script status if we have a valid target
 			-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
 		-- since avoid is buggy we are just going to try to kill them instead of running into them
-		if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached then
+		if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached and script_vendor.status == 0 then
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
 				if not IsAutoCasting("Attack") then self.enemyObj:AutoAttack(); end
@@ -1306,7 +1306,7 @@ function script_grind:run()
 				-- find loot before gaining a new target... rogue likes to break stealth
 				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
 
-			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) then
+			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0 then
 				-- else assign a target
 				self.enemyObj = script_grindAssignTarget:assignTarget();
 				
@@ -1675,6 +1675,11 @@ if (not IsAutoCasting("Attack")) then
 			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() then
 
 				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot)
+
+				-- reset blacklist/target timer when moving back to hotspot
+				if script_grind.enemyObj == nil and not IsInCombat() then
+					self.newTargetTime = GetTimeEX();
+				end
 
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
