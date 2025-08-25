@@ -1186,13 +1186,13 @@ function script_grind:run()
 		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull then
 			if not script_grind:isAnyTargetTargetingMe() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
 				script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
-				if script_grind.lootObj == nil then script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance); end
+				if script_grind.lootObj == nil and HasSpell("Skinning") then script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance); end
 				if script_grind.lootObj ~= nil then
 					if (script_grind:doLoot(GetLocalPlayer())) then
 						script_grind.waitTimer = GetTimeEX() + 1000;
 						return true;
 					end
-				return;
+				--return;
 				end
 			end	
 		end
