@@ -349,6 +349,8 @@ function script_hunter:run(targetGUID)
 			return 0;
 		end
 
+		targetHealth = targetObj:GetHealthPercentage();
+
 		-- Don't attack if we should rest first
 		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
 			and targetHealth > 99 and not targetObj:IsStunned()) then
@@ -356,7 +358,6 @@ function script_hunter:run(targetGUID)
 			return 4;
 		end
 
-		targetHealth = targetObj:GetHealthPercentage();
 
 		if (not targetObj:IsFleeing()) and (not targetObj:IsInLineOfSight()) then
 			if (not script_checkDebuffs:petDebuff()) then

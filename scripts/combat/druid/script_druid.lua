@@ -868,6 +868,16 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+		-- assign target health
+		targetHealth = targetObj:GetHealthPercentage();
+
+		-- Don't attack if we should rest first
+		if (localHealth < self.eatHealth or localMana < self.drinkMana) and not script_grind:isTargetingMe(targetObj)
+			and targetHealth > 99 and not targetObj:IsStunned() then
+			self.message = "Need rest...";
+			return 4;
+		end
+
 		if targetObj:IsDead() then self.waitTimer = GetTimeEX() + 1500; ClearTarget(); end
 
 		-- use charge in bear form
@@ -982,9 +992,6 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		if (not IsMoving() and targetObj:GetDistance() <= self.meleeDistance) then
 				if not IsMoving() then targetObj:FaceTarget(); end
 		end
-
-		-- assign target health
-		targetHealth = targetObj:GetHealthPercentage();
 
 
 	-- shapeshift out of cat form to use bear form 2 or more targets - leave form

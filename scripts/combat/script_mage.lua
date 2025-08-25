@@ -463,9 +463,12 @@ function script_mage:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (targetObj ~= nil) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) then
 
+-- assign target health
+		targetHealth = targetObj:GetHealthPercentage();
+
 		-- Don't attack if we should rest first
 		-- bot sometimes gets a new target before running rest
-		if (localHealth <= self.eatHealth or localMana <= self.drinkMana) and not script_grind:isTargetingMe(targetObj) and targetHealth > 99 and not targetObj:IsStunned() and not IsInCombat() then
+		if (localHealth <= self.eatHealth or localMana <= self.drinkMana) and not script_grind:isTargetingMe(targetObj) and targetHealth > 99 and not targetObj:IsStunned() then
 			targetObj = nil;
 			self.message = "Need rest...";
 			return 4;
@@ -1099,6 +1102,7 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 			end
 			if (localMana > 10 and not IsDrinking() and not IsEating() and not AreBagsFull()) then
 				if (HasSpell('Conjure Water')) then
+					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Water')
 					self.waitTimer = GetTimeEX() + 1700;
 					return true;
@@ -1133,6 +1137,7 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 			end
 			if (localMana > 10 and not IsDrinking() and not IsEating() and not AreBagsFull()) then
 				if (HasSpell('Conjure Food')) then
+					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Food')
 					self.waitTimer = GetTimeEX() + 1700;
 					return true;
@@ -1176,18 +1181,22 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 
 			if (localMana > 30 and not IsDrinking() and not IsEating() and not AreBagsFull() and not IsInCombat()) then
 				if (HasSpell('Conjure Mana Ruby')) then
+					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Mana Ruby')
 					self.waitTimer = GetTimeEX() + 1800;
 					return true;
 				elseif (HasSpell('Conjure Mana Citrine')) then
+					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Mana Citrine')
 					self.waitTimer = GetTimeEX() + 1800;
 					return true;
 				elseif (HasSpell('Conjure Mana Jade')) then
+					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Mana Jade')
 					self.waitTimer = GetTimeEX() + 1800;
 					return true;
 				elseif (HasSpell('Conjure Mana Agate')) then
+					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Mana Agate')
 					self.waitTimer = GetTimeEX() + 1800;
 					return true;

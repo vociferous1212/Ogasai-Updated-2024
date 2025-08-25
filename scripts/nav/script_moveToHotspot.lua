@@ -61,29 +61,12 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		end
 	
 		if (not script_grind.hotspotReached) and (script_getSpells.getSpellsStatus < 1) then
-			script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-			--if (not IsMoving() and not IsPathLoaded(5)) then
-			--	Move(script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-			--end
-		return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
-
+			script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);		
+			script_grind.message = "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 		end
-
 		
-	--else
-	--	local hsDist = 0;
-	--	if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
-	--		hsDist = math.floor(script_nav:getDistanceToHotspot());
-	--	end
-	--
-	--	script_nav.message = script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-	--	return "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
-	--end
 	elseif (script_nav.numSavedLocation >= 3) then
-		self.message = script_nav:moveToSavedLocation(GetLocalPlayer(), script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
+		script_nav:moveToSavedLocation(GetLocalPlayer(), script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
 	end
-	--else
-	--	return "No hotspot has been loaded...";
-	--end
 return false;
 end

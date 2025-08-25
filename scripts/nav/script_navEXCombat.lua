@@ -47,7 +47,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 			script_nav.lastnavIndex = GetPathSize(5);
 		end
 	end
-	if (not IsMoving()) and ((_lx - _ix)^2 < 0.5) then
+	if (not IsMoving()) and ((_lx - _ix)^2 < 2) then
 		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
 

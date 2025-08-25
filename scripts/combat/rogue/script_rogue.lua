@@ -10,51 +10,52 @@ script_rogue = {
 
 	mainhandPoison = "Instant Poison",
 	offhandPoison = "Instant Poison",
-	cpGenerator = 'Sinister Strike',
-	throwName = "Heavy Throwing Dagger",
+	cpGenerator = 'Sinister Strike',	-- combo point generator
+	throwName = "Heavy Throwing Dagger",	-- throwing weapon name
 	stealthOpener = "Sinister Strike",
 	eatHealth = 60,
 	potionHealth = 10,
-	cpGeneratorCost = 45,
-	meleeDistance = 3.8,
-	stealthRange = 100,
+	cpGeneratorCost = 45,	-- combo point generator cost
+	meleeDistance = 3.8,	-- range to attack target
+	stealthRange = 100,	-- range to target to initiate stealth
 	waitTimer = 0,
 	vanishHealth = 8,
 	evasionHealth = 65,
-	adrenRushComboHP = 40,
-	throwOpener = false,
+	adrenRushComboHP = 40,	-- waste cooldowns on x HP
+	adrenRushCombo = true,	-- use waste cooldowns on low HP - sometimes its better to preserve cooldowns and die, especially if corpse is close
+	throwOpener = false,	-- initiate with throw
 	isSetup = false,
 	useStealth = false,
-	usePoison = false,
+	usePoison = false,	-- use poisons on weapons
 	useSliceAndDice = true,
-	stopIfMHBroken = true,
-	adrenRushCombo = true,
-	enableRotation = false,
-	enableGrind = true,
+	stopIfMHBroken = true,	-- stop if mainhand is broken
+	enableRotation = false,	-- enable use of rotation script
+	enableGrind = true,	-- enable use of grind script
 	useKidneyShot = true,
-	enableFaceTarget = true,
+	enableFaceTarget = true,	-- enable auto facing target in rotation mode
 	enableBladeFlurry = true,
 	enableAdrenRush = true,
-	rotationTwo = false,
-	followTargetDistance = 35,
+	rotationTwo = false,		-- separate rotation script for elites and dungeons
 	useBandage = true,
 	hasBandages = false,
 	riposteActionBarSlot = 8,
-	exposeArmorStacks = 1,
+	exposeArmorStacks = 1,	-- how many stacks of expose armor on target
 	useExposeArmor = false,
 	useRupture = false,
-	ruptureStacks = 2,
-	pickpocketUsed = false,
+	ruptureStacks = 2,	-- how many combo points until rupture is used
+	pickpocketUsed = false,	-- pickpocket variable to check if we have completed an action
 	usePickPocket = true,
-	openerUsed = 0,
-	pickpocketMoney = 0,
-	ppMoney = GetMoney(),
-	ppVarUsed = false,
-	useThrow = true,
+	openerUsed = 0,		-- how many opener attempts used before using a different attack - max 3?
+	pickpocketMoney = 0,	-- pickpocket money obtained
+	ppMoney = GetMoney(),	-- compare pickpocket money to GetMyMoney()
+	ppVarUsed = false,	-- pickpocket variable to check if we have completed an action
+	useThrow = true,	-- use throwing weapons
+	stealthWasEnabled = false,	-- was stealth enabled to reset GetMoney() if we click to enable stealth while botting
 }
 
 function script_rogue:setup()
 
+	-- run the separate rogue setup script
 	script_rogueSetup:setup();
 
 	self.isSetup = true;
@@ -99,6 +100,16 @@ function script_rogue:run(targetGUID)
 	if (localObj:IsDead()) then 
 		return 0; 
 	end
+
+	-- Check if useStealth was just enabled for the first time and reset money variables
+		-- otherwise pickpocket money obtained will show current money obtained
+	if (self.useStealth and not self.stealthWasEnabled) then
+		self.ppMoney = GetMoney(); -- Reset ppMoney to current money
+		self.stealthWasEnabled = true; -- Mark stealth as enabled
+		self.ppVarUsed = false; -- Reset pickpocket flag
+	elseif (not self.useStealth and self.stealthWasEnabled) then
+		self.stealthWasEnabled = false; -- Update flag if stealth is disabled
+	end
 		
 	-- Check: If Mainhand is broken stop bot
 	isMainHandBroken = GetInventoryItemBroken("player", 16);
@@ -111,9 +122,10 @@ function script_rogue:run(targetGUID)
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
 
-	if (IsLooting()) then
+	if (IsLooting()) and GetTimeEX() > self.waitTimer then
 		if (not LootTarget()) then
 			LootTarget();
+			self.waitTimer = GetTimeEX() + 500
 			return true;
 		end	
 	end
@@ -122,11 +134,12 @@ function script_rogue:run(targetGUID)
 		return 2;
 	end
 
-	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
-		TargetHasRangedWeapon(target);
-	end
+	-- attempt to check for if target has a ranged weapon - ogasai api doesn't work correctly
+	--if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():CanAttack()) and (not GetTarget():IsDead()) then
+	--	TargetHasRangedWeapon(target);
+	--end
 	
-	-- Check: Do nothing if we are channeling or casting or wait timer
+	-- Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
 		return 4;
 	end
@@ -158,11 +171,13 @@ function script_rogue:run(targetGUID)
 		DisMount();
 	end
 
+	-- if we have selected the grinder option in menu
 	if (self.enableGrind) then
 
 		--Valid Enemy
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
+			-- primitive throw if target has adds
 			if self.useThrow and GetLocalPlayer():HasRangedWeapon() and script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
 				if targetObj:GetDistance() <= 30 and targetObj:GetDistance() > 13 and targetObj:IsInLineOfSight() and targetObj:GetManaPercentage() < 100 then
 					if IsMoving() then
@@ -182,41 +197,38 @@ function script_rogue:run(targetGUID)
 				end
 			end
 
+			-- if we are looting then loot the target - pickpocket fall back
 			if (IsLooting()) then
 				if (not LootTarget()) then
 					LootTarget();
+					self.waitTimer = GetTimeEX() + 350;
 					return true;
 				end
 			end
 
+			-- set the current targets health
 			local targetHealth = targetObj:GetHealthPercentage();
 
-			-- Check: Use Healing Potion 
-				if IsInCombat() and PlayerHasTarget() and targetHealth <= 99 and (localHealth <= self.potionHealth) then 
-					if (script_helper:useHealthPotion()) then 
-						return 0; 
-					end 
+			--Use Healing Potion 
+			if IsInCombat() and PlayerHasTarget() and targetHealth <= 99 and (localHealth <= self.potionHealth) then 
+				if (script_helper:useHealthPotion()) then 
+					return 0; 
+				end 
+			end
+
+			-- check for adds around us during combat and move to prevent pulling multiple enemies
+			if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (not targetObj:IsCasting()) then
+				if (script_checkAdds:checkAdds()) then
+					script_om:FORCEOM();
+					return true;
 				end
-
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (not targetObj:IsCasting()) then
-			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM();
-				return true;
 			end
-		end
 
-		if (targetObj:GetDistance() <= self.meleeDistance) and (not IsAutoCasting("Attack")) then
-			targetObj:AutoAttack();
-		end
+			-- initiate auto attack on target
+			if (targetObj:GetDistance() <= self.meleeDistance) and (not IsAutoCasting("Attack")) then
+				targetObj:AutoAttack();
+			end
 
-		-- Set Slice and Dice level 10 or greater
-			if not (HasSpell("Slice and Dice")) then
-				self.useSliceAndDice = false;
-			end
-			if (not HasSpell("Stealth")) then
-				self.useStealth = false;
-			end
-		
 			-- Cant Attack dead targets
 			if (targetObj:IsDead() or not targetObj:CanAttack()) then
 				return 0;
@@ -226,8 +238,6 @@ function script_rogue:run(targetGUID)
 				JumpOrAscendStart();
 			end
 	
-			targetHealth = targetObj:GetHealthPercentage();
-
 			-- Don't attack if we should rest first
 			if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
 				and targetHealth > 99 and not targetObj:IsStunned()) then
@@ -363,15 +373,16 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 3) and (not IsLooting()) and not IsDisarmed() then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (self.openerUsed >= 3) and (not IsLooting()) then
 					LootTarget();
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					self.openerUsed = 0;
+					self.waitTimer = GetTimeEX() + 350;
 					return 0;
 				end
 
 				-- no stealth  enabled and we need to intiate combat phase
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (not self.useStealth) and not IsDisarmed() then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and (targetObj:GetDistance() <= 4) and (not self.useStealth) then
 					script_rogue:spellAttack(self.cpGenerator, targetObj);
 					return 0;
 				end
@@ -441,8 +452,8 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() < .2) then 
-					if (script_rogue:runBackwards(targetObj, 1)) then 
+				if (targetObj:GetDistance() < .6) then 
+					if (script_rogue:runBackwards(targetObj, 2)) then 
 						script_grind.tickRate = 80;
 						return 4; 
 					end 
@@ -468,7 +479,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					end
 				end
 
-				if (HasSpell("Ghostly Strike")) and (not IsSpellOnCD("Ghostly Strike")) and (localEnergy >= 40) and not IsDisarmed() then
+				if (HasSpell("Ghostly Strike")) and (not IsSpellOnCD("Ghostly Strike")) and (localEnergy >= 40) then
 					CastSpellByName("Ghostly Strike", targetObj);
 					return 0;
 				end
@@ -482,7 +493,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Gouge if target casting
-				if (HasSpell("Gouge") and (not HasSpell("Kick") or IsSpellOnCD("Kick"))) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) and not IsDisarmed() then
+				if (HasSpell("Gouge") and (not HasSpell("Kick") or IsSpellOnCD("Kick"))) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (targetObj:IsCasting()) then
 					if (CastSpellByName("Gouge", targetObj)) then
 						CastSpellByName("Attack", targetObj);
 						self.waitTimer = GetTimeEX() + 250;
@@ -496,7 +507,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- Gouge then bandage
 				if (self.useBandages) and (not localObj:HasDebuff("Recently Bandaged")) then
-					if (HasSpell("Gouge")) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (localHealth < 35) and (script_grind:enemiesAttackingUs() < 2) and not IsDisarmed() then
+					if (HasSpell("Gouge")) and (not IsSpellOnCD("Gouge")) and (localEnergy >= 45) and (localHealth < 35) and (script_grind:enemiesAttackingUs() < 2) and not script_checkDebuffs:hasMagic() and not script_checkDebuffs:hasPoison() then
 						CastSpellByName("Gouge", targetObj);
 						return 0;
 					end
@@ -531,7 +542,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 			
 				-- Check: Blade Flurry when 2 or more targets within 10 yards
-				if (hasFlurry and script_helper:enemiesAttackingUs(10) >= 2 and not IsSpellOnCD('Blade Flurry')) and not IsDisarmed() then 
+				if (hasFlurry and script_helper:enemiesAttackingUs(10) >= 2 and not IsSpellOnCD('Blade Flurry')) then 
 					if (targetObj:GetDistance() < 5 and targetHealth > 15 and localHealth > 20) then
 						CastSpellByName('Blade Flurry');
 						return 0;
@@ -539,7 +550,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 
 				 --Blade Flurry then use Adrenaline Rush on Low HP
-				if (HasSpell('Adrenaline Rush') and not IsSpellOnCD('Adrenaline Rush') and localHealth < self.adrenRushComboHP and (self.adrenRushCombo)) and not IsDisarmed() then 
+				if (HasSpell('Adrenaline Rush') and not IsSpellOnCD('Adrenaline Rush') and localHealth < self.adrenRushComboHP and (self.adrenRushCombo)) then 
 					if (targetObj:GetDistance() < 6) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
@@ -547,7 +558,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
  
 				-- Check: Adrenaline Rush if more than 2 enemies attacks us or we fight an elite enemy
-				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) and not IsDisarmed() then 
+				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) then 
 					if (targetObj:GetDistance() < 6) and (not IsSpellOnCD("Adrenaline Rush")) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
@@ -555,7 +566,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 			
 				-- Check: Blade Flury if more than 2 enemies attacks us or we fight an elite enemy
-				if (hasBladeFlurry and (script_helper:enemiesAttackingUs(10) >= 2 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) and not IsDisarmed() then 
+				if (hasBladeFlurry and (script_helper:enemiesAttackingUs(10) >= 2 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) then 
 					if (targetObj:GetDistance() < 6) and (not IsSpellOnCD("Blade Flurry")) then 
 						CastSpellByName('Blade Flurry');
 						return 0;
@@ -563,7 +574,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 
 				-- Eviscerate with 5 CPs
-				if (localCP > 4) and (localEnergy >= 35) and not IsDisarmed() then
+				if (localCP > 4) and (localEnergy >= 35) then
 					CastSpellByName("Eviscerate", targetObj);
 					return 0; -- return until we use Eviscerate
 				end
@@ -577,7 +588,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- expose armor
-				if (self.useExposeArmor) and (HasSpell("Expose Armor")) and (not IsSpellOnCD("Expose Armor")) and (not targetObj:HasDebuff("Expose Armor")) and (not targetObj:HasDebuff("Sunder Armor")) and (targetHealth >= 40) and not IsDisarmed() then
+				if (self.useExposeArmor) and (HasSpell("Expose Armor")) and (not IsSpellOnCD("Expose Armor")) and (not targetObj:HasDebuff("Expose Armor")) and (not targetObj:HasDebuff("Sunder Armor")) and (targetHealth >= 40) then
 					if (localCP >= self.exposeArmorStacks) and (localEnergy >= 25) then
 						if (CastSpellByName("Expose Armor")) then
 							self.waitTimer = GetTimeEX() + 1050;
@@ -587,7 +598,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- rupture
-				if (self.useRupture) and (HasSpell("Rupture")) and (not IsSpellOnCD("Rupture")) and (not targetObj:HasDebuff("Rupture")) and not IsDisarmed() then
+				if (self.useRupture) and (HasSpell("Rupture")) and (not IsSpellOnCD("Rupture")) and (not targetObj:HasDebuff("Rupture")) then
 					if (localCP >= self.ruptureStacks) and (localEnergy >= 25) then
 						if (CastSpellByName("Rupture")) then
 							self.waitTimer = GetTimeEX() + 1050;
@@ -597,23 +608,26 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Use CP generator attack 
-				if (targetHealth > (10*localCP)) and (localCP < 5) and not IsDisarmed() then
+				if (targetHealth > (10*localCP)) and (localCP < 5) then
 					if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
 						if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
+							self.waitTimer = GetTimeEX() + 500;
 							return 0;
 						end
 					end
 				end
 			
 				-- Dynamic health check when using Eviscerate between 1 and 4 CP
-				if (targetHealth <= (10*localCP)) and (localEnergy >= 35) and not IsDisarmed() then
+				if (targetHealth <= (10*localCP)) and (localEnergy >= 35) then
 					CastSpellByName("Eviscerate", targetObj);
+					self.waitTimer = GetTimeEX() + 500;
 					return 0; -- return until we use Eviscerate
 				end
 
 				-- Use CP generator attack 
-				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) and not IsDisarmed() then
+				if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
 					if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
+						self.waitTimer = GetTimeEX() + 500;
 						return 0;
 					end
 				end

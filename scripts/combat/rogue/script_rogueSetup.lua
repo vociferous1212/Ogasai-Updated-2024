@@ -64,6 +64,13 @@ function script_rogueSetup:setup()
 	if (localObj:GetLevel() >= 20) and (HasSpell("Poisons")) then
 		script_rogue.usePoison = true;
 	end
+
+	if not (HasSpell("Slice and Dice")) then
+		script_rogue.useSliceAndDice = false;
+	end
+	if (not HasSpell("Stealth")) then
+		script_rogue.useStealth = false;
+	end
 	
 	script_rogue.isSetup = true;
 end

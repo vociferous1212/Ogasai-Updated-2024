@@ -6,8 +6,6 @@ script_navEX = {
 
 function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to moving targets
 
-	local ax, ay, az = GetLocalPlayer():GetPosition();
-
 	-- Please load and enable the nav mesh
 	if (not IsUsingNavmesh() and script_nav.useNavMesh) then
 		return "Please load and and enable the nav mesh...";

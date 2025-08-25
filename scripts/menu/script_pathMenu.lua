@@ -38,6 +38,14 @@ function script_pathMenu:menu()
 				script_grind.hotspotReached = true;
 				script_grind:setWaitTimer(1500);
 			end
+
+			SameLine();
+			
+			-- reset auto path nodes if we move the hotspot slider around and change distance without reloading bot
+			if (Button("Reset Auto Path Nodes")) then
+				script_nav.numSavedLocation = 0;
+				DEFAULT_CHAT_FRAME:AddMessage("Auto Path Nodes reset - Making new path nodes within hotspot distance slider");
+			end
 			
 			-- distance from hotspot slider
 			Text('Distance To Move From Hotspot');

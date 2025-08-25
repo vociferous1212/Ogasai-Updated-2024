@@ -1101,8 +1101,12 @@ function script_grind:run()
 		end
 	end
 
-		-- distance to hotspot
-		if (script_nav:getDistanceToHotspot() <= 80) then
+		-- check to see if we need to move back to hotspot area...
+		if script_nav:getDistanceToHotspot() > self.distToHotSpot then
+			self.hotspotReached = false;
+		end
+
+		if script_nav:getDistanceToHotspot() < self.distToHotSpot and not self.hotspotReached then
 			self.hotspotReached = true;
 		end
 
@@ -1318,7 +1322,7 @@ function script_grind:run()
 			end
 			if (not IsMoving()) and script_grind.enemyObj == nil then
 				-- combat script message
-				self.message = "No valid target in range...";
+				self.message = "No valid target in range or resting...";
 			end
 
 			-- death counter turning variable on and off for 2 or more enemies attacking us

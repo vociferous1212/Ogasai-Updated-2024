@@ -31,11 +31,22 @@ function script_grindMenu:setup()
 end
 
 function script_grindMenu:printHotspot()
+
+	local race, level = 0, 0;
+
 	if (script_grind.autoSelectVendors) then
 		DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB.");
 	end
 	DEFAULT_CHAT_FRAME:AddMessage('Add hotspot to database by copy/paste the following line in hotspotDB. Added line to log files.');
-	local race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
+
+	-- if we are levels 1-25 they are starter areas not good for cross faction grindng...
+	if GetLocalPlayer():GetLevel() < 26 then
+		race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
+	else
+		-- zones 26-60 can be used by all races
+		race, level = ALL, GetLocalPlayer():GetLevel();
+	end
+
 	local x, y, z = GetLocalPlayer():GetPosition();
 	local hx, hy, hz = math.floor(x*100)/100, math.floor(y*100)/100, math.floor(z*100)/100;
 	local addString = 'hotspotDB:addHotspot("' .. GetMinimapZoneText() .. ' ' .. level .. ' - ' .. level+2 .. '", "' .. race
