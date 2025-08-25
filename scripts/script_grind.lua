@@ -1312,9 +1312,13 @@ function script_grind:run()
 				
 			end
 
-			if (not IsMoving()) then
+			if (not IsMoving()) and script_grind.enemyObj ~= nil then
 				-- combat script message
 				self.message = "Running the combat script...";
+			end
+			if (not IsMoving()) and script_grind.enemyObj == nil then
+				-- combat script message
+				self.message = "No valid target in range...";
 			end
 
 			-- death counter turning variable on and off for 2 or more enemies attacking us
@@ -1614,8 +1618,9 @@ if (not IsAutoCasting("Attack")) then
 			end
 
 			if (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
-				self.message = script_moveToHotspot:moveToHotspot(localObj);
-				return true;
+				script_moveToHotspot:moveToHotspot(localObj);
+				script_grind.message = "Moving to hotspot";
+				--return true;
 			end
 		end
 
