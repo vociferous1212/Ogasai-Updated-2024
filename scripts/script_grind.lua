@@ -1183,7 +1183,8 @@ function script_grind:run()
 
 
 
-		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull then
+		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull and not self.needRest then
+			
 			if not script_grind:isAnyTargetTargetingMe() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
 				script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
 				if script_grind.lootObj == nil and HasSpell("Skinning") then script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance); end
