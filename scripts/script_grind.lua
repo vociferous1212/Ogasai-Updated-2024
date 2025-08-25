@@ -1681,7 +1681,7 @@ if (not IsAutoCasting("Attack")) then
 
 			--if we have more than 2 saved locations and cannot find a target or loot then navigate
 				-- this will also double up as moveToHotspot function
-			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() then
+			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached then
 
 				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot)
 
