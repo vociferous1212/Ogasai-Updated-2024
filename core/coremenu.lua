@@ -98,6 +98,7 @@ function coremenu:draw()
 		]]--
 		--DrawPath(true);
 		--NewTheme(false);
+
 	end
 
 	--[[
