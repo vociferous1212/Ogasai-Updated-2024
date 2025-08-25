@@ -275,7 +275,7 @@ function script_unstuck:run()
 		self.timer = GetTimeEX();
 	end
 
-	if (self.timer > GetTimeEX()) then
+	if (self.timer > GetTimeEX()) or script_grind.unstuckTimer > GetTimeEX() then
 		return;
 	end
 
@@ -287,10 +287,10 @@ function script_unstuck:run()
 		self.message = "Slope Z: " .. script_unstuck:getSlope(3) .. ' | Obstacle min-Z: ' .. script_unstuck:getObsMin(2) .. ' | Obstacle max-Z: ' .. script_unstuck:getObsMax(2);
 	end
 
-	if (script_unstuck:pathClearAuto(2)) then
-	else
-		StopMoving();
-	end
+	--if (script_unstuck:pathClearAuto(2)) then
+	--else
+	--	StopMoving();
+	--end
 end
 
 
@@ -300,6 +300,10 @@ function script_unstuck:checkUnstuck()
         --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: No local player object")
         return false
     end
+
+	if script_grind.unstuckTimer > GetTimeEX() then
+		return false;
+	end
 
     -- Initialize on first call or after loading screen
     if (self.timer == 0) then
@@ -371,13 +375,14 @@ function script_unstuck:checkUnstuck()
         -- Move to clear path
         if (_newX ~= nil and _newY ~= nil and _newZ ~= nil) then
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Attempting Move to clear path: " .. _newX .. ", " .. _newY .. ", " .. _newZ)
-            FacePosition(_x + math.cos(_currentAngle + self._turnAngles[1]), _y + math.sin(_currentAngle + self._turnAngles[1]), _z)
+            --FacePosition(_x + math.cos(_currentAngle + self._turnAngles[1]), _y + math.sin(_currentAngle + self._turnAngles[1]), _z)
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Facing position: " .. (_x + math.cos(_currentAngle + self._turnAngles[1])) .. ", " .. (_y + math.sin(_currentAngle + self._turnAngles[1])))
             script_navEX:moveToTarget(GetLocalPlayer(), _newX, _newY, _newZ)
                 --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Move succeeded, IsMoving: " .. tostring(IsMoving()))
                 self._moveAttempts = 0
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Move failed")
             self._moveAttempts = self._moveAttempts + 1
+		self.timer = GetTimeEX() + 750;
         end
 
         -- Fallback: Turn and move 2 yards
@@ -388,7 +393,7 @@ function script_unstuck:checkUnstuck()
             end
             local _angle = _currentAngle + (self._turnAngles[1] * _turnDirection)
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Turning " .. (_turnDirection == 1 and "left" or "right") .. " to angle: " .. math.deg(_angle))
-            FacePosition(_x + math.cos(_angle), _y + math.sin(_angle), _z)
+           -- FacePosition(_x + math.cos(_angle), _y + math.sin(_angle), _z)
             local _moveX, _moveY = _x + 2 * math.cos(_angle), _y + 2 * math.sin(_angle)
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Attempting fallback Move to: " .. _moveX .. ", " .. _moveY .. ", " .. _z)
             script_navEX:moveToTarget(GetLocalPlayer(), _moveX, _moveY, _z)
@@ -396,6 +401,7 @@ function script_unstuck:checkUnstuck()
                 self._moveAttempts = 0
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Fallback Move failed")
             self._moveAttempts = self._moveAttempts + 1
+		self.timer = GetTimeEX() + 750;
         end
 
         -- Reset if max attempts reached
@@ -416,14 +422,15 @@ function script_unstuck:checkUnstuck()
             end
             if (_newX ~= nil and _newY ~= nil and _newZ ~= nil) then
                 --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Attempting Move to clear path: " .. _newX .. ", " .. _newY .. ", " .. _newZ)
-                FacePosition(_x + math.cos(_currentAngle + self._turnAngles[1]), _y + math.sin(_currentAngle + self._turnAngles[1]), _z)
+              --  FacePosition(_x + math.cos(_currentAngle + self._turnAngles[1]), _y + math.sin(_currentAngle + self._turnAngles[1]), _z)
                 --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Facing position: " .. (_x + math.cos(_currentAngle + self._turnAngles[1])) .. ", " .. (_y + math.sin(_currentAngle + self._turnAngles[1])))
                 script_navEX:moveToTarget(GetLocalPlayer(), _newX, _newY, _newZ)
                     --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Move succeeded, IsMoving: " .. tostring(IsMoving()))
                     self._unstuckAttempts = 0
                     self._probeDistance = 5
                     self._moveAttempts = 0
-               
+               		self.timer = GetTimeEX() + 750;
+
                 --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Move failed")
             end
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: No clear path at 20 yards, giving up")
@@ -433,7 +440,6 @@ function script_unstuck:checkUnstuck()
             self._probeDistance = 5
             return false
         end
-        return true
     end
 
     -- Not stuck, reset state

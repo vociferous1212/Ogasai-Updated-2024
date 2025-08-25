@@ -15,16 +15,21 @@ script_grindEX = {
 }
 
 function script_grindEX:isThereAnyValidEnemyNearby()
-	local i, t = GetFirstObject();
-	while i ~= 0 do
-		if t == 3 then
-			if i:GetDistance() <= script_grind.pullDistance and not i:IsDead() and not i:IsCritter() and i:CanAttack() then
-				if script_grindValidEnemy:enemyIsValid(i) then
-					return true;
+
+	-- there are no valid enemies when we are grinding and hotspot isn't reached...
+	if script_grind.hotspotReached then
+
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				if i:GetDistance() <= script_grind.pullDistance and not i:IsDead() and not i:IsCritter() and i:CanAttack() then	
+					if script_grindValidEnemy:enemyIsValid(i) then
+						return true;
+					end
 				end
 			end
+		i, t = GetNextObject(i);
 		end
-	i, t = GetNextObject(i);
 	end
 return false;
 end
@@ -192,38 +197,44 @@ function script_grindEX:doChecks()
 						script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
 						self.useThisVar = false;
 					end
+					script_grind.waitTimer = GetTimeEX() + 1500;
 					script_grind.message = "Walking to corpse...";
 					return true;
 				end
 				return true;
 			end
 
-			-- Ressurrect within the ress distance to our corpse
-			local _lx, _ly, _lz = localObj:GetPosition();
-			if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
-				script_nav:moveToNav(localObj, GetCorpsePosition());
-				return true;
-			else
-				if (script_grind.safeRess) then
-					local rx, ry, rz = GetCorpsePosition();
-					if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
-						script_grind.message = "Finding a safe spot to ress...";
-						return true;
-					else
-						if (script_aggro.rTime > GetTimeEX()) then
-							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
+			-- make sure we are ghost before moving on to finding corpse
+			if IsGhost() then
+
+				-- Ressurrect within the ress distance to our corpse
+				local _lx, _ly, _lz = localObj:GetPosition();
+
+				if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
+					script_nav:moveToNav(localObj, GetCorpsePosition());
+					return true;
+				else
+					if (script_grind.safeRess) then
+						local rx, ry, rz = GetCorpsePosition();
+						if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
 							script_grind.message = "Finding a safe spot to ress...";
 							return true;
+						else
+							if (script_aggro.rTime > GetTimeEX()) then
+								script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);	
+								script_grind.message = "Finding a safe spot to ress...";
+								return true;
+							end
 						end
 					end
-				end
 				RetrieveCorpse();
 				self.useThisVar = true;
+				end
+				return true;
 			end
-			return true;
 		end
-
-		-- make sure the bot actually loots. i don't know why but it will hang and freeze on a loot screen...
+	
+			-- make sure the bot actually loots. i don't know why but it will hang and freeze on a loot screen...
 		if IsLooting() and GetTimeEX() > script_grind.waitTimer then 
 			
 			LootTarget();

@@ -126,6 +126,15 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	if (self.currentGoToLocation > (self.numSavedLocation - 1)) then
 		self.currentGoToLocation = 0;
 	end
+
+	if script_nav:getDistanceToHotspot() < script_grind.distToHotSpot and not script_grind.hotspotReached then
+		script_grind.hotspotReached = true;
+	end
+
+	-- check to see if we need to move back to hotspot area...
+	if script_nav:getDistanceToHotspot() > script_grind.distToHotSpot then
+		script_grind.hotspotReached = false;
+	end
 	
 	-- make sure we check that there are no targets around that are trying to be targeted by grinder....
 		-- hate to run object manager but the bot simply won't stop running path nodes unless there is some condition set
@@ -147,7 +156,9 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		end
 
 		script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+		return true;
 	end
+return false;
 end
 
 function script_nav:setNextToNodeDist(distance)

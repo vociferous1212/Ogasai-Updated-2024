@@ -149,6 +149,7 @@ script_grind = {
 	mountTimer = GetTimeEX(),	-- defunct setting
 	timer = GetTimeEX(),	-- blacklist timer
 	myTime = GetTimeEX(),
+	unstuckTimer = GetTimeEX(),
 
 
 	-- paranoia
@@ -458,23 +459,11 @@ function script_grind:run()
 		return;
 	end
 
-	-- use unstuck feature ----and (not self.pause) 
-	if (self.useUnstuck) and (IsMoving()) and (not self.pause) then
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
-	end
-
-	if not self.pause then
-		if script_unstuck:checkUnstuck() then
-			return true;
-		end
-	end
-
 	-- hotspot reached distance
 	if not IsInCombat() and (script_nav:getDistanceToHotspot() > self.distToHotSpot) and (self.hotspotReached) then
 		self.hotspotReached = false;
+		if PlayerHasTarget() then ClearTarget(); end
+		script_grind.enemyObj = nil;
 		self.message = "Moving back to hotspot";
 	end	
 
@@ -611,9 +600,27 @@ function script_grind:run()
 		return;
 	end
 
+	-- check intial unstuck
+	if not self.pause and self.useUnstuck and GetTimeEX() > self.unstuckTimer then
+		if script_unstuck:checkUnstuck() then
+			self.unstuckTimer = GetTimeEX() + 750;
+		end
+	end
+
+	-- our position must be changing and we must still be stuck so try another unstuck
+	-- use unstuck feature ----and (not self.pause) 
+	if (self.useUnstuck) and (IsMoving()) and (not self.pause) and GetTimeEX() > self.unstuckTimer then
+		if (not script_unstuck:pathClearAuto(2)) then
+			self.unstuckTimer = GetTimeEX() + 750;
+			script_unstuck:unstuck();
+		end
+	end
+
 	if not IsInCombat() and not IsEating() and not IsDrinking() and IsStanding() and GetTimeEX() > script_helper.gateTimer then script_helper:openGates(); end
 
-	if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end
+-- loot BoP items...
+	if GetTimeEX() > self.waitTimer then if IsLooting() and StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
+	if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end end
 
 	-- Check: Spend talent points
 	if (not IsInCombat() and not GetLocalPlayer():IsDead() and self.autoTalent) then
@@ -925,7 +932,7 @@ function script_grind:run()
 		end
 		
 		-- Gather
-		if (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
+		if (script_grind.lootObj == nil or self.skipLooting) and (self.gather and not AreBagsFull() and not self.bagsFull) and (not IsChanneling()) and (not IsCasting()) and (not IsEating()) and (not IsDrinking()) and (not self.needRest) and (not IsInCombat()) then
 
 
 			if (not IsStealth()) and (script_gather.safeGather) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
@@ -1090,7 +1097,7 @@ function script_grind:run()
 -- need to change this to account for mana users that can heal.. check to make sure we have low low mana
 	if IsInCombat() and not script_checkDebuffs:hasDisabledMovement() then
  		if RunOutOfCombat() then
-			return true;
+			return;
 		end
 	end
 
@@ -1104,16 +1111,16 @@ function script_grind:run()
 		end
 
 		-- Dont pull mobs before we reached our hotspot unless we are in aggro range
-		if (not IsInCombat()) then
-			if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
-				self.enemyObj = nil;
-				if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-					ClearTarget();
-				end	
-			elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and (not self.hotspotReached) then
-				self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
-			end
-		end
+		--if (not IsInCombat()) then
+		--	if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+		--		self.enemyObj = nil;
+		--		if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
+		--			ClearTarget();
+		--		end	
+		--	elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
+		--		self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+		--	end
+		--end
 
 		-- Dont pull if more than 1 add will be pulled check SafePull aggro
 		if (self.enemyObj ~= nil and self.enemyObj ~= 0 and self.skipHardPull) and (self.hotspotReached) then
@@ -1150,11 +1157,12 @@ function script_grind:run()
 		
 		if self.skipLooting then self.lootObj = nil; end
 
-		if (self.lootObj ~= nil) then
-			if (script_grind:isTargetLootBlacklisted(self.lootObj:GetGUID())) then
-				self.lootObj = nil; -- don't loot blacklisted targets	
-			end
+		-- we are in combat so get a target sooner based on if anything is attacking us
+		if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime and not script_grind:isAnyTargetTargetingMe() then
+			self.enemyObj = script_grindAssignTarget:assignTarget();
+			self.newTargetTime = GetTimeEX() + 1000;
 		end
+			
 
 		-- Finish loot before we engage new targets or navigate - return
 		if self.lootObj ~= nil and not IsInCombat() and not script_grind:isAnyTargetTargetingMe() then
@@ -1199,21 +1207,24 @@ function script_grind:run()
 	
 			end
 
+	if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+		self.combatError = RunCombatScript(self.enemyObj:GetGUID());
+	end
+
 	-- Run the combat script and retrieve combat script status if we have a valid target
 			-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
 		-- since avoid is buggy we are just going to try to kill them instead of running into them
 		if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached then
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
+				if not IsAutoCasting("Attack") then self.enemyObj:AutoAttack(); end
 				self.newTargetTime = GetTimeEX() + 3500;
 			end
 		end
 
 		
 		
-		if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-			self.combatError = RunCombatScript(self.enemyObj:GetGUID());
-		end
+		
 	end
 
 
@@ -1405,7 +1416,7 @@ if (not IsAutoCasting("Attack")) then
 				if (_x ~= 0 and x ~= 0) then
 
 					-- move to target
-						self.message = script_navEX:moveToTarget(localObj, _x, _y, _z);
+						script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 						self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					
 					if (IsMoving()) or (IsInCombat()) then
@@ -1481,10 +1492,12 @@ if (not IsAutoCasting("Attack")) then
 				end
 
 				-- try unstuck script
+				if GetTimeEX() > self.unstucktimer then
 				if (not script_unstuck:pathClearAuto(2)) then
 					script_unstuck:unstuck();
+					self.unstuckTimer = GetTimeEX() + 750;
 					return true;
-				end
+				end end
 			end
 		end
 
@@ -1620,6 +1633,17 @@ if (not IsAutoCasting("Attack")) then
 		return;
 	end
 
+	
+	-- check to see if we need to move back to hotspot area...
+	if script_nav:getDistanceToHotspot() > self.distToHotSpot then
+		self.hotspotReached = false;
+	end
+
+	if script_nav:getDistanceToHotspot() < self.distToHotSpot and not self.hotspotReached then
+		self.hotspotReached = true;
+	end
+
+
 
 	-- make sure we have don't have an enemy before moving... probably what caused nav crashes over the years of ogasai.....
 		-- doubled up on move to target in combat and navigate....
@@ -1629,14 +1653,14 @@ if (not IsAutoCasting("Attack")) then
 		-- Use auto pathing navigation or walk paths
 		if (self.autoPath) then
 
-			-- check to see if we need to move back to hotspot area...
-			if script_nav:getDistanceToHotspot() > self.distToHotSpot then
-					self.hotspotReached = false;
-			end
+		-- check to see if we need to move back to hotspot area...
+		if script_nav:getDistanceToHotspot() > self.distToHotSpot then
+			self.hotspotReached = false;
+		end
 
-			if script_nav:getDistanceToHotspot() < 50 and not self.hotspotReached then
-				self.hotspotReached = true;
-			end
+		if script_nav:getDistanceToHotspot() < self.distToHotSpot and not self.hotspotReached then
+			self.hotspotReached = true;
+		end
 			
 
 	-- this becomes our navigation once we have enough saved locations. the bot will move from location to location
@@ -1649,8 +1673,11 @@ if (not IsAutoCasting("Attack")) then
 			--if we have more than 2 saved locations and cannot find a target or loot then navigate
 				-- this will also double up as moveToHotspot function
 			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() then
+
 				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot)
-				self.message = "Moving to auto path node: " .. script_nav.currentGoToLocation+1 .. "...";
+
+				local var = script_nav.currentGoToLocation + 1;
+				self.message = "Moving to auto path node: "..var;
 				script_grind:setWaitTimer(100);
 
 			end
@@ -1924,6 +1951,7 @@ function script_grind:drawStatus()
 end
 
 function script_grind:draw()
+	PersistLoadingScreen(true)
 	script_grind:drawStatus();
 end
 
@@ -2006,7 +2034,7 @@ function script_grind:doLoot(localObj)
 			_quest.waitTimer = GetTimeEX() + 950;
 		end
 
-		if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
+		if IsLooting() and StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
 
 		-- interact with object if we are not looting
 		if self.lootObj ~= nil then
@@ -2308,20 +2336,33 @@ function script_grind:isAnyTargetTargetingMe()
 	local i, targetType = GetFirstObject();
 	while i ~= 0 do
 		if (targetType == 3) then
-			if (i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil) then
-				if (i:GetUnitsTarget():GetGUID() == player:GetGUID()) then 
-					return true
-				end
-			end
-			if GetPet() ~= 0 and GetPet() ~= nil then
-				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
-					if (i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then 
+
+			-- limit the check by distance... anything over 40 yards must move closer...
+			if i:GetDistance() <= 40 then
+
+				-- some servers return 0 when unit target has no target so AND ~= nil
+				if (i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil) then
+
+					-- if target is targeting my guid
+					if (i:GetUnitsTarget():GetGUID() == player:GetGUID()) then 
 						return true
+					end
+				end
+				-- if we have a pet active
+				if GetPet() ~= 0 and GetPet() ~= nil then
+
+				-- some servers return 0 when unit target has no target so AND ~= nil
+					if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+
+					-- if target is target my pet guid
+						if (i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then 
+							return true
+						end
 					end
 				end
 			end
 		end
-		i, targetType = GetNextObject(i);
+	i, targetType = GetNextObject(i);
 	end
 
 return false;
@@ -2334,9 +2375,15 @@ function script_grind:attackTargetAttackingMe()
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then
-				if (script_grind:isTargetingMe(i)) then
-					script_grind.enemyObj = i;
-					return true;
+
+				-- limit the check by distance... anything over 40 yards must move closer...
+				if i:GetDistance() <= 40 then
+
+					
+					if (script_grind:isTargetingMe(i)) then
+						script_grind.enemyObj = i;
+						return true;
+					end
 				end
 			end
 		i, t = GetNextObject(i);
