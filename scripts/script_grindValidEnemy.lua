@@ -40,6 +40,10 @@ function script_grindValidEnemy:enemyIsValid(i)
             script_grind:addTargetToHardBlacklist(i:GetGUID());
 	end
 
+
+	-- need to run another check for targets Z position and find the closest xy AND z specifically... will target stuff above and below bot
+
+
         -- Get player position
         local px, py, pz = GetLocalPlayer():GetPosition();
 

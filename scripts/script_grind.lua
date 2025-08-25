@@ -467,6 +467,12 @@ function script_grind:run()
 		self.message = "Moving back to hotspot";
 	end	
 
+	-- clear our target if we are needing to move to vendor. combat script will stick to a target and enemyObj var needs cleared
+	if script_vendor.status ~= 0 and not IsInCombat() and script_grind.enemyObj ~= nil then
+		self.enemyObj = nil;
+		ClearTarget();
+	end
+
 	-- go to FP buttons
 	if (fpDB.goTo) and (not GetLocalPlayer():IsDead()) and (not IsEating()) and (not IsDrinking()) then	
 		if (IsInCombat() and self.pause) then
@@ -810,12 +816,14 @@ function script_grind:run()
 			-- Save location for auto pathing
 			if (script_grind.hotspotReached and script_grind.enemyObj:IsDead() and script_grind.enemyObj:GetLevel() >= script_grind.minLevel and script_grind.enemyObj:GetLevel() <= script_grind.maxLevel) then 
 				script_nav:saveTargetLocation(script_grind.enemyObj, script_grind.enemyObj:GetLevel());
+				script_grind.waitTimer = GetTimeEX() + 1000;
+
 			end
 			if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
 				if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
 					or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
 					or script_grind.enemyObj:IsDead()) then
-						local random = math.random(1750, 2750);
+						local random = math.random(2050, 2750);
 						script_grind.waitTimer = GetTimeEX() + random;
 						script_grind.enemyObj = nil;
 						ClearTarget();
@@ -1158,15 +1166,50 @@ function script_grind:run()
 				return true;
 			end
 		end	
-		
-		if self.skipLooting then self.lootObj = nil; end
 
-		-- we are in combat so get a target sooner based on if anything is attacking us
-		if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime and not script_grind:isAnyTargetTargetingMe() then
-			self.enemyObj = script_grindAssignTarget:assignTarget();
-			self.newTargetTime = GetTimeEX() + 1000;
-		end
+
+
+-- LOOTING
+
+
+
+
+			-- make sure the bot actually loots. i don't know why but it will hang and freeze on a loot screen...
+		if IsLooting() and GetTimeEX() > script_grind.waitTimer then 
 			
+			LootTarget();
+			script_grind.waitTimer = GetTimeEX() + 500;
+		end
+
+
+
+		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull then
+			if not script_grind:isAnyTargetTargetingMe() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
+				script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
+				if script_grind.lootObj == nil then script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance); end
+				if script_grind.lootObj ~= nil then
+					if (script_grind:doLoot(GetLocalPlayer())) then
+						script_grind.waitTimer = GetTimeEX() + 1000;
+						return true;
+					end
+				return;
+				end
+			end	
+		end
+		
+
+		-- if we have a loot target but can't loot then loot object = nil
+		if self.skipLooting or AreBagsFull() or self.bagsFull then self.lootObj = nil; end
+			
+
+
+
+
+-- ENTERING COMBAT PHASE
+
+
+
+
 
 		-- Finish loot before we engage new targets or navigate - return
 		if self.lootObj ~= nil and not IsInCombat() and not script_grind:isAnyTargetTargetingMe() then
@@ -1211,14 +1254,10 @@ function script_grind:run()
 	
 			end
 
-	if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-		self.combatError = RunCombatScript(self.enemyObj:GetGUID());
-	end
 
-	-- Run the combat script and retrieve combat script status if we have a valid target
-			-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
+		-- if we are close to aggro range of targets marked as 'adds' then we need to avoid or attack them first
 		-- since avoid is buggy we are just going to try to kill them instead of running into them
-		if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached and script_vendor.status == 0 then
+		if not script_grindEX.avoidBlacklisted and not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached and script_vendor.status == 0 then
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
 				if not IsAutoCasting("Attack") then self.enemyObj:AutoAttack(); end
@@ -1226,14 +1265,26 @@ function script_grind:run()
 			end
 		end
 
-		
-		
-		
-	end
+
+		-- we are in combat so get a target sooner based on if anything is attacking us
+		if not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime and not script_grind:isAnyTargetTargetingMe() then
+			self.enemyObj = script_grindAssignTarget:assignTarget();
+			self.newTargetTime = GetTimeEX() + 1000;
+		end
+
+
+		-- run the combat script
+		if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+			self.combatError = RunCombatScript(self.enemyObj:GetGUID());
+		end
 
 
 
-	-- in combat phase or we have an enemy
+-- Run the combat script and retrieve combat script status if we have a valid target
+
+
+
+		-- in combat phase or we have an enemy
 		if (self.enemyObj ~= nil or self.enemyObj ~= 0) then
 
 			-- don't avoid our current target check adds script
@@ -1275,14 +1326,6 @@ function script_grind:run()
 				end
 			end
 
-			--if (HasSpell("Lightning Bolt")) and (IsInCombat()) and (script_grind:enemiesAttackingUs() == 0) and (not PlayerHasTarget()) then
-			--	self.message = "Stuck in combat! WAITING!";
-			--	if (IsMoving()) then
-			--		StopMoving();
-			--		return;
-			--	end
-			--	return 4;
-			--end
 
 			if (not IsMoving()) then
 			-- reset object manager and check adds enemies
@@ -1292,7 +1335,7 @@ function script_grind:run()
 
 
 			-- we are in combat so get a target
-			if (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime then
+			if  not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime then
 				self.enemyObj = script_grindAssignTarget:assignTarget();
 				self.newTargetTime = GetTimeEX() + 1000;
 				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -1320,6 +1363,7 @@ function script_grind:run()
 				-- combat script message
 				self.message = "Running the combat script...";
 			end
+			-- if the bot isn't resting it should always be moving or targeting something
 			if (not IsMoving()) and script_grind.enemyObj == nil then
 				-- combat script message
 				self.message = "No valid target in range or resting...";
@@ -1501,13 +1545,16 @@ if (not IsAutoCasting("Attack")) then
 
 				-- try unstuck script
 				if GetTimeEX() > self.unstucktimer then
-				if (not script_unstuck:pathClearAuto(2)) then
-					script_unstuck:unstuck();
-					self.unstuckTimer = GetTimeEX() + 750;
-					return true;
-				end end
+					if (not script_unstuck:pathClearAuto(2)) then
+						script_unstuck:unstuck();
+						self.unstuckTimer = GetTimeEX() + 750;
+						return true;
+					end
+				end
 			end
 		end
+
+	end	-- end finish loot before navigating
 
 		-- Pre checks before navigating
 		if IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat() or script_grind.enemyObj ~= nil then
@@ -1623,7 +1670,7 @@ if (not IsAutoCasting("Attack")) then
 
 			if (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
 				script_moveToHotspot:moveToHotspot(localObj);
-				script_grind.message = "Moving to hotspot";
+				script_grind.message = "Moving to hotspot : "..script_nav.currentHotSpotName.." .. "..math.floor(script_nav:getDistanceToHotspot()).." (yds)";
 				--return true;
 			end
 		end
@@ -2169,7 +2216,7 @@ function script_grind:getSkinTarget(lootRadius)
 					-- if is skinnable and is tapped by me (I killed it)
 				if (targetObj:IsSkinnable() and targetObj:IsTappedByMe() and not targetObj:IsLootable()) then
 					local dist = targetObj:GetDistance();
-					if(dist < lootRadius and bestDist > dist) then
+					if (dist < lootRadius and bestDist > dist) then
 						bestDist = dist;
 						bestTarget = targetObj;
 					end

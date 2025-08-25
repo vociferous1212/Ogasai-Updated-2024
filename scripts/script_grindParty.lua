@@ -41,7 +41,7 @@ function script_grindParty:partyOptions()
 			memberEnergy = member:GetEnergyPercentage();
 		end
 
-		if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 and (script_grind.enemyObj == 0 or script_grind.enemyObj == nil) then
+		if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 then
 			local i, t = GetFirstObject();
 			while i ~= 0 do
 				if t == 3 then
@@ -57,10 +57,10 @@ function script_grindParty:partyOptions()
 		if (self.waitForGroup) and (script_grind:getTargetAttackingUs() == nil) and (not IsInCombat()) then
 			if (member:HasBuff("Drink") and memberMana < 90) or (member:HasBuff("Eat") and memberHealth < 90) then
 				if (member:GetDistance() < 10) then
-					local x, y, z = member:GetDistance();
-					if (script_navEX:moveToTarget(localObj, x, y, z)) then
-						return true;
-					end
+					--local x, y, z = member:GetDistance();
+					--if (script_navEX:moveToTarget(localObj, x, y, z)) then
+					--	return true;
+					--end
 				end
 				
 				script_grind.message = 'Waiting for group to regen mana (25%+)...';

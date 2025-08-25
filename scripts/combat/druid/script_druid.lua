@@ -98,6 +98,10 @@ function script_druid:setup()
 		self.shapeshiftMana = 18;
 	end
 
+	if localObj:GetLevel() >= 58 then
+		self.shapeshiftMana = 15;
+	end
+
 	if (localObj:GetLevel() >= 10) and (not HasSpell("Cat Form")) and (HasSpell("Bear Form")) then
 		self.useBear = true;
 	end
@@ -872,9 +876,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 		targetHealth = targetObj:GetHealthPercentage();
 
 		-- Don't attack if we should rest first
-		if (localHealth < self.eatHealth or localMana < self.drinkMana) and not script_grind:isTargetingMe(targetObj)
+		if (localHealth < self.eatHealth or localMana < self.drinkMana) and not HasForm() and not script_grind:isTargetingMe(targetObj)
 			and targetHealth > 99 and not targetObj:IsStunned() then
-			self.message = "Need rest...";
+			self.message = "Need to rest...";
 			return 4;
 		end
 
@@ -1594,7 +1598,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					if (CastSpellByName("Maul", targetObj)) then
 						targetObj:AutoAttack();
 						if not IsMoving() then targetObj:FaceTarget(); end
-						self.waitTimer = GetTimeEX() + 200;
+						self.waitTimer = GetTimeEX() + 500;
 						return 0;
 					end
 				
@@ -1610,7 +1614,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 					if (CastSpellByName("Maul", targetObj)) then
 						targetObj:AutoAttack();
 						if not IsMoving() then targetObj:FaceTarget(); end
-						self.waitTimer = GetTimeEX() + 200;
+						self.waitTimer = GetTimeEX() + 500;
 						return 0;
 					end
 				

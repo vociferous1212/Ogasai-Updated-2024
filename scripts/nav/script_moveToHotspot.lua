@@ -8,7 +8,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		return false;
 	end
 
-	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3) then
+	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3 or not script_grind.hotspotReached) then
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
@@ -65,7 +65,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 			--script_grind.message = "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
 		end
 		
-	elseif (script_nav.numSavedLocation >= 3) then
+	elseif (script_nav.numSavedLocation >= 3 and self.hotspotReached) then
 		script_nav:moveToSavedLocation(GetLocalPlayer(), script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
 	end
 return false;
