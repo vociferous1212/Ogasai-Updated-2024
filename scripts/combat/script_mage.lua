@@ -43,9 +43,7 @@ script_mage = {
 	frostMage = true,	-- is frost spec yes/no
 	scorchStacks = 2,	-- scorch debuff stacks on target
 	useScorch = true,	-- use  yes/no
-	followTargetDistance = 100,	-- new follow/face target distance here to debug melee
 	waitTimer = GetTimeEX(),	-- set wait timer variable. probably not needed?
-	rangeDistance = 38,
 	moveAwayRest = true,
 }
 
@@ -375,7 +373,7 @@ end
 
 function script_mage:run(targetGUID)
 	
-	-- when you click the start button all of this code runs at the script tick rate
+	script_grind.combatScriptRange = 26
 
 	-- check setup
 	if (not self.isSetup) then

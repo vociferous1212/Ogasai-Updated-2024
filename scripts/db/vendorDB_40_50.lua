@@ -17,4 +17,12 @@ function vendorDB_40_50:setup()
 	vendorDB:addVendor("Faralorn", 0, 1, 357, false, false, false, true, false, -4379.03, 3311.83, 13.55);
 	vendorDB:addVendor("Faralorn", 0, 1, 357, false, false, false, false, true, -4379.03, 3311.83, 13.55);
 
+
+	-- hinterlands alliance
+	vendorDB:addVendor("Truk Wildbeard", 0, 0, 47, false, false, false, false, false, 380.8, -2128.06, 121);
+	vendorDB:addVendor("Truk Wildbeard", 0, 0, 47, false, true, false, false, false, 380.8, -2128.06, 121);
+	vendorDB:addVendor("Truk Wildbeard", 0, 0, 47, false, false, true, false, false, 380.8, -2128.06, 121);
+	vendorDB:addVendor("Harggan", 0, 0, 47, true, false, false, false, false, 333.7, -2091.52, 131.56);
+
+	
 end

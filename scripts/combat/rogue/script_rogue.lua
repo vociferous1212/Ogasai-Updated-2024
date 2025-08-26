@@ -453,7 +453,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() < .6) then 
-					if (script_rogue:runBackwards(targetObj, 2)) then 
+					if (script_rogue:runBackwards(targetObj, 1.5)) then 
 						script_grind.tickRate = 80;
 						return 4; 
 					end 

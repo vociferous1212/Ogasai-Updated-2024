@@ -19,7 +19,7 @@ function hotspotDB_40_50:setup()
 	hotspotDB:addHotspot("High Wilderness 43 - 45", "All", 43, 45, -5076.17, 1391.14, 44.07);
 	hotspotDB:addHotspot("Frayfeather Highlands 45 - 47", "All", 45, 47, -5454.33, 1692.22, 57.43);
 	hotspotDB:addHotspot("Ruins of Isildien 47 - 49", "All", 47, 49, -5851.54, 1514.73, 83.79);
-	hotspotDB:addHotspot("Feathermoon Stronghold 42 - 46", "Night Elf", 43, 45, -4503.68, 3420.45, 24.95);
+	hotspotDB:addHotspot("Feathermoon Stronghold 42 - 46", "ALL", 43, 45, -4503.68, 3420.45, 24.95);
 	hotspotDB:addHotspot("Feralas 41 - 43", "All", 41, 43, -4435.83, 610.59, 61.46);
 	hotspotDB:addHotspot("Lower Wilds 40 - 42", "All", 40, 42, -4482.63, -477.85, 21.37);
 
