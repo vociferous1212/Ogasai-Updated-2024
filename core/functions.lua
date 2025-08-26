@@ -209,15 +209,14 @@ function RunOutOfCombat()
 				end
 
 				-- move to saved location in index
-				if (script_navEX:moveToTarget(GetLocalPlayer(), script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])) then
+				script_navEX:moveToTarget(GetLocalPlayer(), script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])
 					script_grind.message = "Running out of combat: Moving to auto path node " .. (script_nav.currentGoToLocation + 1) .. "...";
 					if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
 						CastSpellByName("Earthbind Totem");
 					end
-				return true;
-				end
 			end
 		end
+	return true;
 	end
 
 return false;
