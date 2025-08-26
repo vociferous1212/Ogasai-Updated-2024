@@ -8,21 +8,22 @@ self.waitTimer = GetTimeEX() + x will stop the combat script and cause a stutter
 -- Create Healthstone (Major)
 -- Faeire Fire (Feral)
 -- UseItem(Scroll of Spirit IV)
-if HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral") then
-	CastSpellByName("Faerie Fire (Feral)()");
-	self.waitTimer = GetTimeEX() + 1600;
-	return 0;				
-end
 
+-- correct syntax for casting faerie fire
+--HasSpell("Faerie Fire (Feral)")
+--IsSpellOnCD("Faerie Fire (Feral)")
+--targetObj:HasDebuff("Faerie Fire (Feral)")
+--CastSpellByName("Faerie Fire (Feral)()")
+
+-- checking bags for items
 for i=0,5 do
 for y=0,GetContainerNumSlots(i) do 
 	if (GetContainerItemLink(i,y) ~= nil) then
 		_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
 		itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
    		itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
-		if (itemName == "Soul Shard") then
+		if (itemName == "item name") then
 			texture, itemCount, locked, quality, readable, lootable, itemLink = GetContainerItemInfo(i, y);
-			if (itemCount < 3) then
 
 
 
@@ -36,8 +37,6 @@ ClearLastError()
 	if (lastError ~= -1) then
 		DEFAULT_CHAT_FRAME:AddMessage(lastError);
 	end	
-
-SendChatMessage(" ");
 
 -- error codes
 spell not ready yet = 60
@@ -86,7 +85,7 @@ IsStealth()	[bool]
 PlayerHasTarget()	[bool]
 PetHasTarget()	[bool]
 
-
+SendChatMessage(" ");
 
 Wow APIs:
 https://wowwiki-archive.fandom.com/wiki/World_of_Warcraft_API?oldid=293138
@@ -182,7 +181,7 @@ FaceAngle([number] angle)
 in rad not degree, if you want to face 90  you need to convert to rad first
 x = math.rad(90)
 FaceAngle(x)
-GetSpellInfoX([string] spellName) [number] CastTime, [number] MaxRange, [number] MinRange,
+GetSpellInfo([string] spellName) [number] CastTime, [number] MaxRange, [number] MinRange,
 [number] PowerType, [number] Cost, [number] SpellId, [CSpellInfo*] SpellObj
 HasSpell([string] spellName) [bool]
 IsSpellOnCD([string] spellName) [bool]

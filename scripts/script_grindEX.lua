@@ -5,7 +5,7 @@ script_grindEX = {
 	deathCounter = 0,
 	logoutOnHearth = false,
 	allowSwim = true,
-	useThisVar = true,
+	useThisVar = true,	-- used to ensure death counter counts only once per mob kill
 	waitTimer = 0,
 	blacklistAggroTargets = {},
 	blacklistAggroNum = 0,
@@ -14,17 +14,23 @@ script_grindEX = {
 	deleteItemTimer = GetTimeEX(),
 }
 
+-- if there is any valid enemy being returned within our set parameters, i.e. skip humanoid or target level 45 - 47 or is elite
 function script_grindEX:isThereAnyValidEnemyNearby()
 
 	-- there are no valid enemies when we are grinding and hotspot isn't reached...
 	if script_grind.hotspotReached then
 
 		local i, t = GetFirstObject();
+
 		while i ~= 0 do
+
 			if t == 3 then
+
 				if i:GetDistance() <= script_grind.pullDistance and not i:IsDead() and not i:IsCritter() and i:CanAttack() then	
+
 					if script_grindValidEnemy:enemyIsValid(i) then
-						return true;
+
+					return true;
 					end
 				end
 			end
@@ -34,16 +40,29 @@ function script_grindEX:isThereAnyValidEnemyNearby()
 return false;
 end
 
+-- count how many enemies are targeting the bot
 function script_grindEX:howManyEnemiesTargetingMe()
+
 	local i, t = GetFirstObject();
+
 	local numTargetingMe = 0;
+
 	while i ~= 0 do
+
 		if t == 3 then
-			if i:GetDistance() <= 50 then
+
+			-- limit the range. anything over 40 yards must move closer so anything over 40 can't attack
+			if i:GetDistance() <= 40 then
+
 				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+
 					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
+
+						-- don't count them if they are about to die or too low level to matter
+						-- another function will take care of the out of bounds here when needed
 						if i:GetHealthPercentage() > 15 and i:GetLevel() >= GetLocalPlayer():GetLevel() -3 then
-							numTargetingMe = numTargetingMe + 1;
+
+						numTargetingMe = numTargetingMe + 1;
 						end
 					end
 				end
@@ -51,28 +70,40 @@ function script_grindEX:howManyEnemiesTargetingMe()
 		end
 	i, t = GetNextObject(i);
 	end
-
 return numTargetingMe;
 end
 
+
+-- check the area to see if it is safe to loot a target or not, and rest if it is not. safety fallback for badly set eat and drink sliders
 function script_grindEX:isLootSafeToLoot()
 
 local numberOfEnemiesInRange = 0;
 local i, t = GetFirstObject();
 
+	-- make sure we even have lootable loot
 	if script_grind.lootObj ~= nil then
+
 		while i ~= 0 do
+
 			if t == 3 then
+
 				if i:CanAttack() and not i:IsCritter() and not i:IsDead() and not i:GetGUID() == script_grind.lootObj:GetGUID() then
+
 					local x, y, z = script_grind.lootObj:GetPosition();
+
 					local tx, ty, tz = i:GetPosition();
+
 					local dist = GetDistance3D(x, y, z, tx, ty, tz);
+
 					if dist > 20 then
+
 						numberOfEnemiesInRange = numberOfEnemiesInRange + 1;
 						
 					end
+
 					if numberOfEnemiesInRange >= 1 then
-						return false;
+
+					return false;
 					end
 				end
 			end
@@ -82,6 +113,8 @@ local i, t = GetFirstObject();
 return true;
 end
 
+
+-- attempt to blacklist nuetral targets and only attack unfriendly targets - currently placeholding for gather checks
 function script_grindEX:addTargetToAggroBlacklist(targetGUID)
 	if (targetGUID ~= nil and targetGUID ~= 0 and targetGUID ~= '') then	
 		self.blacklistAggroTargets[self.blacklistAggroNum] = targetGUID;
@@ -89,7 +122,7 @@ function script_grindEX:addTargetToAggroBlacklist(targetGUID)
 	end
 end
 
--- check if target is blacklisted by table GUID
+-- attempt to blacklist nuetral targets and only attack unfriendly targets - currently placeholding for gather checks
 function script_grindEX:isTargetAggroBlacklisted(targetGUID) 
 	for i=0,self.blacklistAggroNum do
 		if (targetGUID == self.blacklistAggroTargets[i]) then
@@ -99,7 +132,7 @@ function script_grindEX:isTargetAggroBlacklisted(targetGUID)
 	return false;
 end
 
-
+-- attempt to blacklist nuetral targets and only attack unfriendly targets - currently placeholding for gather checks
 function script_grindEX:returnTargetNearMyAggroRange()
 	local i, t = GetFirstObject();
 	local mx, my, mz = GetLocalPlayer():GetPosition();
@@ -131,6 +164,7 @@ function script_grindEX:returnTargetNearMyAggroRange()
 return nil;
 end
 
+-- fall back check to see if we are swimming or not. it works better this way, similar to cone of cold spell requiring its own function to run
 function script_grindEX:areWeSwimming()
 	if (GetLocalPlayer():GetHealthPercentage() >= 1) and (not GetLocalPlayer():IsDead()) then
 		if (IsSwimming()) then
@@ -140,7 +174,12 @@ function script_grindEX:areWeSwimming()
 return false;
 end
 
+
+
+-- main run of this script. doChecks() returns until completed
 function script_grindEX:doChecks() 
+
+		localObj = GetLocalPlayer();
 
 		-- Load vendors if we move into a new map zone
 		if (GetMapID() ~= self.currMapID) then
@@ -149,14 +188,16 @@ function script_grindEX:doChecks()
 		end
 		
 		-- load hotspot stuff
+		-- TODO - auto set specific mobs in certain grind zones for easier botting
 		--hotspotDB_setInfo_1_10_checkMobs();
 
 	
+		-- ensure we wait with the grind script
 		if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then
 			return;
 		end
 		
-		localObj = GetLocalPlayer();
+		-- avoid elite now defunct
 		--if (script_grind.avoidElite and not localObj:IsDead()) then 
 		--	if (script_extraFunctions:avoidElite()) then
 		--		self.message = script_extraFunctions:runBackwards(1, 50);
@@ -165,6 +206,8 @@ function script_grindEX:doChecks()
 		--	end 
 		--end
 
+		
+		-- try to use soulstone if we have one
 		if (localObj:IsDead()) and (localObj:HasBuff("Soulstone Resurrection")) then
 			if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
 			script_grind:addTargetToHardBlacklist(script_grind.enemyObj:GetGUID());
@@ -176,20 +219,19 @@ function script_grindEX:doChecks()
 			end
 		end
 
+		-- return and don't do anything if we are dead and paranoia is active - player in 40 yard range
 		if (localObj:IsDead()) and (script_paranoia:checkParanoia(40)) then
 			return;
 		end
 
+
+
+-- we are dead so retrieve corpse
 		if (localObj:IsDead()) and (not script_paranoia:checkParanoia(40)) then
 
 			script_grind.message = "Waiting to ressurect...";
 
-			-- use soul stone
-			--if (localObj:HasBuff("Soul Stone")) and (localObj:IsDead()) and (not IsGhost()) then
-				--accept text
-			--return
-			--end
-
+			-- wait for a moment before anything
 			if localObj:IsDead() and not IsGhost() then
 				script_grind.waitTimer = GetTimeEX() + 2000;
 			end
@@ -249,12 +291,17 @@ function script_grindEX:doChecks()
 			end
 		end
 
+
+
 		-- run back if has vanish
+-- this does not work properly. bot continues combat
 		if (localObj:HasBuff("Vanish")) then
 			script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z']); 
 			return;
 		end
+
 		
+		--check to see if we need to rest or not
 		local rest = true;
 		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			if (script_grind:enemiesAttackingUs() > 0 or script_grind.enemyObj:IsFleeing() or script_grind.enemyObj:IsStunned()) then
@@ -262,6 +309,21 @@ function script_grindEX:doChecks()
 			end
 		end
 
+		-- Check: If our gear is yellow
+		if not IsInCombat() then
+			for i = 1, 16 do
+			local status = GetInventoryAlertStatus('' .. i);
+				if (status ~= nil) then 
+					if (status >= 3 and script_grind.repairWhenYellow and script_grind.useVendor and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
+						script_vendor:repair(); 
+						script_grind.newTargetTime = GetTimeEX();
+						return true;
+					end
+				end
+			end
+		end
+
+	-- run vendor routine
 		local vendorStatus = script_vendor:getStatus();
 
 		if (vendorStatus >= 1 and not IsInCombat()) then
@@ -329,8 +391,15 @@ function script_grindEX:doChecks()
 			end
 		end
 
+
+
+-- VENDOR LOGIC
+
+
+		-- run vendor if we are mounted and running through mobs to vendor or not in combat
 		if (not IsInCombat() or IsMounted()) then
 
+		-- vendor repair
 			if (vendorStatus == 1) then
 
 				script_grind.message = "Repairing at vendor...";
@@ -339,6 +408,8 @@ function script_grindEX:doChecks()
 					--return;
 				end
 			return true;
+
+		-- vendor sell
 			elseif (vendorStatus == 2) then
 
 				script_grind.message = "Selling to vendor...,";
@@ -347,6 +418,8 @@ function script_grindEX:doChecks()
 					--return;
 				end
 			return true;
+
+		-- vendor buy ammo/bullets
 			elseif (vendorStatus == 3) then
 
 				script_grind.message = "Buying ammo at vendor...";
@@ -355,6 +428,8 @@ function script_grindEX:doChecks()
 					--return;
 				end
 			return true;
+
+		-- vendor buy drink/food
 			elseif (vendorStatus == 4) then
 
 				script_grind.message = "Buying food/drink at vendor...";
@@ -389,6 +464,8 @@ function script_grindEX:doChecks()
 			end
 		end
 
+
+		-- if bags are full and not use vendor but doing something other than skipping loot
 		if ((AreBagsFull() or script_grind.bagsFull) and not IsInCombat()) then
 			if(script_grind.useVendor and script_vendor:sell()) then
 				script_grind.message = "Running the vendor routine: sell..."; 
@@ -418,7 +495,7 @@ function script_grindEX:doChecks()
 			end
 		end
 
-		-- Check: Vendor refill
+		-- Check to see if we are a mana use and need to refill at Vendor
 		if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) then
 			if (script_vendorMenu:checkVendor(script_grind.useMana)) then
 				return true;

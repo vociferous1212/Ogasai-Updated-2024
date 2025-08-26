@@ -2,36 +2,21 @@ script_grindAssignTarget = {}
 
 function script_grindAssignTarget:assignTarget()
 
+
+	local i, targetType = GetFirstObject();
+
 	if _quest.usingQuester then
 		if _quest.enemyTarget ~= nil then
 			script_grindObj = _quest.enemyTarget;
 		end
 	end
 
-	-- Return a target attacking our group
-	local i, targetType = GetFirstObject();
 
-	-- run object manager
-	while i ~= 0 do
-	
-		-- NPC type 3
-		if (targetType == 3) then
-		
-			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
-				
-				-- run another object manager
-				if (script_grind:isTargetingGroup(i)) then
 
-					-- return target
-					return i;
-				end
-			end
-		end
+	-- return target attacking group was here but kept causing the bot to drop target whenever a party member had aggro... only good for tanks
+	-- need to return the check to this position and set it for only defensive stance warrior and bear form druid with other checks
+	-- attack if party member hp is low enough, etc
 
-	-- get next target
-	i, targetType = GetNextObject(i);
-	end
 
 	-- Instantly return the last target if we attacked it and it's still alive and we are in combat
 	if ((script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and not script_grind.enemyObj:IsDead())
@@ -97,10 +82,32 @@ function script_grindAssignTarget:assignTarget()
 	
 	end
 
+	-- run object manager
+	while i ~= 0 do
+	
+		-- NPC type 3
+		if (targetType == 3) then
+		
+			-- acceptable targets limited check by range
+			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+				
+				-- run another object manager
+				if (script_grind:isTargetingGroup(i)) then
+
+					-- return target
+					return i;
+				end
+			end
+		end
+
+	-- get next target
+	i, targetType = GetNextObject(i);
+	end
+
 	-- get lowest level target and kill it
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
 		local bestTarget = nil;
-		local i, t = GetFirstObject()
+		--local i, t = GetFirstObject()
 
 		while i ~= 0 do
 
@@ -137,7 +144,7 @@ function script_grindAssignTarget:assignTarget()
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) and not GetLocalPlayer():HasBuff("Blade Flurry") then
 
 		local bestTarget = nil
-		local i, t = GetFirstObject()
+		--local i, t = GetFirstObject()
 
 		while i ~= 0 do
 
@@ -168,7 +175,7 @@ function script_grindAssignTarget:assignTarget()
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
 
 		local bestTarget = nil
-		local i, t = GetFirstObject()
+		--local i, t = GetFirstObject()
 
 		while i ~= 0 do
 

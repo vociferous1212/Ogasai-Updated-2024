@@ -169,7 +169,7 @@ function _questEX2:doChecks()
             script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance)
             -- New: Reset timer and GUID when selecting a new loot target
             if script_grind.lootObj ~= nil then
-                self.lootTimeout = GetTimeEX() + 10000 -- 10-second timeout
+                self.lootTimeout = GetTimeEX() + 20000 -- 20-second timeout
                 self.currentLootGUID = script_grind.lootObj:GetGUID()
             end
         end

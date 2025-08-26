@@ -893,23 +893,14 @@ function script_grind:run()
 	if (script_grindEX:doChecks()) then
 		return;
 	end
+	if localObj:IsDead() then return; end
 
+	-- attempt to move out of fire. was locking up nav but since nav is fixed it should work properly. can also be used to detect AoE if done right
 	--if (script_helper:weAreStandingInFire()) then
 	--	return true;
 	--end
 
-		-- Check: If our gear is yellow
-		for i = 1, 16 do
-		local status = GetInventoryAlertStatus('' .. i);
-			if (status ~= nil) then 
-				if (status >= 3 and script_grind.repairWhenYellow and script_grind.useVendor and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
-					script_vendor:repair(); 
-					self.newTargetTime = GetTimeEX();
-					return true;
-				end
-			end
-		end
-				
+		
 		--Mount up
 		if (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
@@ -1169,14 +1160,17 @@ function script_grind:run()
 
 
 
--- LOOTING
+-- LOOTING PHASE
 
 
 
 
 			-- make sure the bot actually loots. i don't know why but it will hang and freeze on a loot screen...
-		if IsLooting() and GetTimeEX() > script_grind.waitTimer then 
-			
+		if IsLooting() and GetTimeEX() > script_grind.waitTimer then
+
+			-- pick up BoP items
+			if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
+
 			LootTarget();
 			script_grind.waitTimer = GetTimeEX() + 500;
 		end
@@ -1185,7 +1179,7 @@ function script_grind:run()
 
 		if not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull and not self.needRest then
 			
-			if not script_grind:isAnyTargetTargetingMe() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
+			if not IsInCombat() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and IsStanding() then
 				script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
 				if script_grind.lootObj == nil and HasSpell("Skinning") then script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance); end
 				if script_grind.lootObj ~= nil then
@@ -1368,6 +1362,8 @@ function script_grind:run()
 			if (not IsMoving()) and script_grind.enemyObj == nil then
 				-- combat script message
 				self.message = "No valid target in range or resting...";
+				self.newTargetTime = GetTimeEX()
+				self.autoBlacklistTimer = GetTimeEX() + 15000;
 			end
 
 			-- death counter turning variable on and off for 2 or more enemies attacking us
@@ -1837,16 +1833,23 @@ end
 
 function script_grind:isTargetingGroup(y) 
 	local partyMember = 0;
+	local y, typeObj = GetFirstObject();
+
+	-- seems to want to target every target around that is attacking party members
+	-- need to find a way to dumb this down
+	-- this works for tanking on druid and warrior though pretty well
+	-- maybe if i'm not a warrior with defensive stance active or a druid without bear form active then
+	-- only target them if they are closer than my current target?
+	-- the intent was to keep the bot targeting mobs that are tapped by or targeting other players in the group without choosing a new target
 
 	-- get partymembers
-	for i = 1, GetNumPartyMembers()+1 do
+	for i = 0, GetNumPartyMembers() do
 		local partyMember = GetPartyMember(i);
-	end
 		
 	-- if we have party members and conditions valid (limited object manager by range)
 	if (partyMember ~= nil and partyMember ~= 0 and not partyMember:IsDead() and partyMember:GetDistance() < 50) then
 
-		local y, typeObj = GetFirstObject(); 
+		
 
 		-- run object manager
 		while y ~= 0 do 
@@ -1860,7 +1863,7 @@ function script_grind:isTargetingGroup(y)
 				and (y:IsInLineOfSight())
 			then
 				-- if target has a target then
-				if (y:GetUnitsTarget() ~= nil and y:GetUnitsTarget() ~= 0) then
+				if y:GetUnitsTarget() ~= nil and y:GetUnitsTarget() ~= 0 and partyMember ~= nil then
 
 					-- if target is targeting a party member then
 					if (y:GetUnitsTarget():GetGUID() == partyMember:GetGUID()) then
@@ -1874,6 +1877,7 @@ function script_grind:isTargetingGroup(y)
 		-- get next target
 		y, typeObj = GetNextObject(y); 
 		end
+	end
 	end
 return false;
 end
@@ -2391,7 +2395,10 @@ self.needRest = false;
 return false;
 end
 
+
+-- a lot of times the bot will be stuck in combat phase, even momentarily, after a target has died and it causes the bot to immedietly swtich to a new target. this helps circumvent that problem by checking to make sure nothing is targeting the bot, but when mobs flee they drop their target...
 function script_grind:isAnyTargetTargetingMe()
+
 	local player = GetLocalPlayer();
 
 	-- Return a target targeting us

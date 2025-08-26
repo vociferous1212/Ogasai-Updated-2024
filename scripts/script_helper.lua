@@ -13,11 +13,15 @@ script_helper = {
 	numBandage = 0,
 	items = {},
 	numItems = 0,
-	gateTimer = GetTimeEX(),
+	gateTimer = 0,
+	potionTimer = 0,
 
 }
 
 function script_helper:setup()
+
+	gateTimer = GetTimeEX();
+	potionTimer = GetTimeEX();
 
 	-- Add Bandages
 	script_helper:addBandage("Linen Bandage");
@@ -270,6 +274,10 @@ end
 
 function script_helper:useHealthPotion()
 
+	if self.potionTimer > GetTimeEX() then
+		return false;
+	end
+
 	-- Search for potion
 	local potionIndex = -1;
 	for i=0,self.numHealthPotion do
@@ -280,13 +288,19 @@ function script_helper:useHealthPotion()
 	end
 		
 	if(HasItem(self.healthPotion[potionIndex])) then
-		if (UseItem(self.healthPotion[potionIndex])) then
-			return true;
-		end
+		UseItem(self.healthPotion[potionIndex])
+		self.potionTimer = GetTimeEX() + 120000;
+		return true;
 	end
+
+return false;
 end
 
 function script_helper:useManaPotion()
+
+	if self.potionTimer > GetTimeEX() then
+		return false;
+	end
 
 	-- Search for potion
 	local potionIndex = -1;
@@ -298,10 +312,12 @@ function script_helper:useManaPotion()
 	end
 		
 	if(HasItem(self.manaPotion[potionIndex])) then
-		if (UseItem(self.manaPotion[potionIndex])) then
-			return true;
-		end
+		UseItem(self.manaPotion[potionIndex])
+		self.potionTimer = GetTimeEX() + 120000;
+		return true;
 	end
+
+return false;
 end
 
 function script_helper:addWater(name)

@@ -198,6 +198,7 @@ function script_grindValidEnemy:enemyIsValid(i)
             ) then
                 if isTargetInRange() then
                     script_grind.enemyObj = currentObj; -- Force bot to keep this target
+			script_grind.newTargetTimer = GetTimeEX() + 5000;
                     return true;
                 end
             end
@@ -228,6 +229,7 @@ function script_grindValidEnemy:enemyIsValid(i)
             ) then
                 if isTargetInRange() then
                     script_grind.enemyObj = currentObj; -- Force bot to keep this target
+			script_grind.newTargetTimer = GetTimeEX() + 5000;
                     return true;
                 end
             end

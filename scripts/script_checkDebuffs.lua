@@ -2,19 +2,23 @@ script_checkDebuffs = {}
 
 -- Helper function to check if a unit has any debuffs/buffs from a list
 local function checkUnitEffects(unit, effectList, isBuff)
-    if (unit == nil or not unit:IsValid()) then
+
+    if (unit == nil) then
         return false;
     end
+
     for effect in pairs(effectList) do
         if (isBuff and unit:HasBuff(effect)) or (not isBuff and unit:HasDebuff(effect)) then
             return true;
         end
     end
+
     return false;
 end
 
 -- Curse debuffs (dispellable by Druids/Mages)
 function script_checkDebuffs:hasCurse()
+
     local curses = {
         ["Curse of Mending"] = true,
         ["Curse of the Shadowhorn"] = true,
@@ -33,6 +37,7 @@ end
 
 -- Poison debuffs (dispellable by Druids/Paladins)
 function script_checkDebuffs:hasPoison()
+
     local poisons = {
         ["Weak Poison"] = true,
         ["Corrosive Poison"] = true,
@@ -53,6 +58,7 @@ end
 
 -- Disease debuffs (dispellable by Paladins/Priests)
 function script_checkDebuffs:hasDisease()
+
     local diseases = {
         ["Rabies"] = true,
         ["Fevered Fatigue"] = true, -- Removed duplicate
@@ -72,8 +78,9 @@ end
 
 -- Magic debuffs (dispellable by Priests/Mages/Paladins)
 function script_checkDebuffs:hasMagic()
+
     local magic = {
-        ["Faerie Fire"] = true, -- Reduces armor; high raid priority, don’t dispel
+        ["Faerie Fire"] = true,
         ["Sleep"] = true,
         ["Sap Might"] = true,
         ["Frost Nova"] = true,
@@ -83,16 +90,15 @@ function script_checkDebuffs:hasMagic()
         ["Shadow Word: Pain"] = true, -- DoT; medium raid priority, dispel in PvP
         ["Crystalline Slumber"] = true,
         ["Winter’s Chill"] = true, -- Increases Frost crit; high raid priority, don’t dispel
-        ["Shadow Weaving"] = true, -- Increases Shadow damage; high raid priority, don’t dispel
-        ["Improved Shadow Bolt"] = true, -- Increases Shadow damage; high raid priority, don’t dispel
-        ["Hunter’s Mark"] = true, -- Increases ranged attack power; medium raid priority, dispel in PvP
-        ["Polymorph"] = true -- Incapacitates; dispel in PvP
+        ["Polymorph"] = true, -- Incapacitates; dispel in PvP
+	["Immolate"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), magic, false);
 end
 
 -- Movement-disabling debuffs (mixed types, check for bot navigation)
 function script_checkDebuffs:hasDisabledMovement()
+
     local movement = {
         ["Web"] = true,
         ["Net"] = true,
@@ -108,6 +114,7 @@ end
 
 -- Physical/unclassified debuffs (generally undispellable except by immunities)
 function script_checkDebuffs:hasPhysical()
+
     local physical = {
         ["Sunder Armor"] = true, -- Reduces armor; high raid priority, don’t dispel
         ["Deep Wounds"] = true, -- Bleed DoT; low raid priority, avoid in raids
@@ -118,10 +125,10 @@ function script_checkDebuffs:hasPhysical()
     return checkUnitEffects(GetLocalPlayer(), physical, false);
 end
 
--- Pet debuffs (expanded for movement-disabling and stuns)
+-- Pet debuffs
 function script_checkDebuffs:petDebuff()
-    local _, class = UnitClass("player");
-    if (class ~= "HUNTER" and class ~= "WARLOCK") or GetLocalPlayer():GetLevel() < 10 then
+
+    if (GetMyClass() ~= "HUNTER" or GetMyClass() ~= "WARLOCK") or GetLocalPlayer():GetLevel() < 10 then
         return false;
     end
 
@@ -173,7 +180,7 @@ end
 -- Enemy buffs (raid-relevant buffs to dispel)
 function script_checkDebuffs:enemyBuff()
     local localObj = GetLocalPlayer();
-    if (not PlayerHasTarget() or script_grind.enemyObj == nil or not script_grind.enemyObj:IsValid()) then
+    if (not PlayerHasTarget() or script_grind.enemyObj == nil) then
         return false;
     end
 
@@ -189,4 +196,13 @@ function script_checkDebuffs:enemyBuff()
         ["Blessing of Protection"] = true -- Physical immunity; dispel with Purge/Mass Dispel
     };
     return checkUnitEffects(script_grind.enemyObj, enemyBuffs, true);
+end
+
+function script_checkDebuffs:hasBreakStealthDebuffs()
+	local debuffs = {
+	["Infected Bite"] = true
+	
+	}
+
+return checkUnitEffects(GetLocalPlayer(), debuffs, false);
 end
