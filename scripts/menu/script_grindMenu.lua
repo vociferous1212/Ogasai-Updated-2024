@@ -80,12 +80,12 @@ function script_grindMenu:menu()
 	--	SameLine();
 	--	Text(" - Includes AddOns!");
 	--end
-	wasClicked, script_grindMenu.adjustTickRate = Checkbox("Remove Timers...", script_grindMenu.adjustTickRate);
-		if (script_grindMenu.adjustTickRate) then
-			Text("Quick adjustment of tick rate / script reaction speed");
-			script_grind.adjustTickRate = true;
-			script_grind.tickRate = 150;
-		end
+	--wasClicked, script_grindMenu.adjustTickRate = Checkbox("Remove Timers...", script_grindMenu.adjustTickRate);
+	--	if (script_grindMenu.adjustTickRate) then
+	--		Text("Quick adjustment of tick rate / script reaction speed");
+	--		script_grind.adjustTickRate = true;
+	--		script_grind.tickRate = 150;
+	--	end
 		--show help menu checkbox
 		--SameLine();
 		--Text("  ");

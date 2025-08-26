@@ -99,6 +99,11 @@ function script_firstAid:canCraftBandage()
         end
     end
 
+	-- we cannot craft bandages if bags are full or we are in combat...
+	if script_grind.bagsFull or AreBagsFull() or IsInCombat() then
+		return false;
+	end
+
     -- Check each cloth type and skill requirement
     -- Linen: 1 for Linen Bandage, 20 for Heavy Linen Bandage
     local linenCount = script_firstAid:howMuchLinenDoWeHave();
@@ -153,7 +158,7 @@ function script_firstAid:closeMenu()
 end
 
 function script_firstAid:craftBandages()
-    if (not IsMoving()) and (IsStanding()) then
+    if not IsMoving() and IsStanding() and not IsInCombat() and not script_grind.bagsFull and not AreBagsFull() then
         -- runecloth bandage
         if (HasItem("Runecloth")) then
             script_firstAid:openMenu();
