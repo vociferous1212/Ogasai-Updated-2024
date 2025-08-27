@@ -12,11 +12,30 @@ function script_grindAssignTarget:assignTarget()
 	end
 
 
-
 	-- return target attacking group was here but kept causing the bot to drop target whenever a party member had aggro... only good for tanks
 	-- need to return the check to this position and set it for only defensive stance warrior and bear form druid with other checks
 	-- attack if party member hp is low enough, etc
+	-- run object manager
+	while i ~= 0 do
+	
+		-- NPC type 3
+		if (targetType == 3) then
+		
+			-- acceptable targets limited check by range
+			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+				
+				-- run another object manager
+				if (script_grind:isTargetingGroup(i)) then
 
+					-- return target
+					return i;
+				end
+			end
+		end
+
+	-- get next target
+	i, targetType = GetNextObject(i);
+	end
 
 	-- Instantly return the last target if we attacked it and it's still alive and we are in combat
 	if ((script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and not script_grind.enemyObj:IsDead())
@@ -71,7 +90,7 @@ function script_grindAssignTarget:assignTarget()
 	-- run object manager to find anything targeting me
 	while i ~= 0 do
 
-		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
 
 		return i;
 
@@ -80,28 +99,6 @@ function script_grindAssignTarget:assignTarget()
 	-- get next target
 	i, targetType = GetNextObject(i);
 	
-	end
-
-	-- run object manager
-	while i ~= 0 do
-	
-		-- NPC type 3
-		if (targetType == 3) then
-		
-			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
-				
-				-- run another object manager
-				if (script_grind:isTargetingGroup(i)) then
-
-					-- return target
-					return i;
-				end
-			end
-		end
-
-	-- get next target
-	i, targetType = GetNextObject(i);
 	end
 
 	-- get lowest level target and kill it
@@ -113,7 +110,7 @@ function script_grindAssignTarget:assignTarget()
 
 			if t == 3 then
 
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
 
 					-- get targets level
 					local level = i:GetLevel();
@@ -150,7 +147,7 @@ function script_grindAssignTarget:assignTarget()
 
 			if t == 3 then
 
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
 
 					local hp = i:GetHealthPercentage();
 
@@ -179,7 +176,7 @@ function script_grindAssignTarget:assignTarget()
 
 		while i ~= 0 do
 
-			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and script_grind:isTargetingMe(i) then
+			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
 
 				local mana = i:GetManaPercentage();
 

@@ -6,24 +6,38 @@ script_checkAdds = {
 }
 
 function script_checkAdds:checkAdds()
+
     local grindEnemy = script_grind and script_grind.enemyObj or nil
     local questEnemy = _quest and _quest.enemyTarget or nil
 
+-- if we want to skip hard pulls and we have a valid enemy and we are greater than level 6 then
     if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) ) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
+
+	-- if there aren't too many enemies in range and the target isn't about to die and we aren't stunned, nor is enemy stunned
         if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy)) and ( (grindEnemy ~= 0 and grindEnemy ~= nil and not grindEnemy:IsStunned()) or (questEnemy ~= nil and questEnemy ~= 0 and not questEnemy:IsStunned()) ) then 
+
+	-- move away from adds
             if self:avoidToAggro(self.checkAddsRange) then
-		script_grind.waitTimer = GetTimeEX() + 750;
-		_quest.waitTimer = GetTimeEX() + 750;
+
+		-- set a timer to let this script run. no timers are set anywhere else and if no timers are set then the bot will stutter walk
+		script_grind.waitTimer = GetTimeEX() + 900;
+		_quest.waitTimer = GetTimeEX() + 900;
+
+		-- face the target if we are not moving... turn back around after walking away quicker...
 		if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
 		if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
 
+		-- check unstuck
                 if not script_unstuck:pathClearAuto(2) then
                     script_unstuck:unstuck()
                     return true
                 end
+
+		-- make pet follow too
                 if GetPet() ~= 0 then
                     PetFollow()
                 end
+
                 return true;
             end
         end
@@ -129,7 +143,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
                 self.closestEnemy = 0
                 self.intersectEnemy = nil
                 script_om:FORCEOM()
-                return true
+                return
             end
         end
 	return true;

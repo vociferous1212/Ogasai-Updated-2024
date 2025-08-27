@@ -122,9 +122,9 @@ function script_grindSetup:setup()
 	end
 
 	-- change some values to random
-	local randomLogout = math.random(45, 80);
+	local randomLogout = math.random(25, 40);
 	script_grind.setParanoidTimer = randomLogout;
-	local randomHotspot = math.random(450, 950);
+	local randomHotspot = math.random(200, 375);
 	script_grind.distToHotSpot = randomHotspot;
 	local randomSetTimer = math.random(3, 10);
 	script_grind.paranoidSetTimer = randomSetTimer;

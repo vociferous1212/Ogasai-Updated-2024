@@ -4,24 +4,32 @@ script_moveToHotspot = {}
 -- script character limit... need to continue splitting files...
 function script_moveToHotspot:moveToHotspot(localObj)
 
+	-- return false if we are going to get spells at low level don't return to hotspot until done
 	if (script_getSpells.getSpellsStatus == 1) then
 		return false;
 	end
 
+	-- if we have a hotspot and can move and auto path saved locations < 3 and we have not reached the hotspot or left range of hotspot
 	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3 or not script_grind.hotspotReached) then
+
+		-- make sure the grinder tick rate is set quicker
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 135;
 		end
 		
-		-- move to hotspot coords
+		
+		-- if hotspot is not reached yet then reset blacklist timer
 		if (not script_grind.hotspotReached) then
 
+			-- reset blacklist time when not gathering and not in combat
 			if (not IsInCombat()) and (not script_gather.gathering) then
 				script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime*1000;
 			end
 			
 		end
-			-- mount/stealth/cat form/ travel form/ ghost wolf
+
+
+		-- mount/stealth/cat form/ travel form/ ghost wolf
 		if (not IsMounted() and not script_grind.useMount) and
 			(HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
 			if (not script_checkDebuffs:hasPoison()) and (script_rogue.useStealth or script_druid.useStealth) and
@@ -54,19 +62,30 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		return;
 		end
 	
-		-- display distance to hotspot in message window
+		-- get hotspot distance var
 		local hsDist = 0;
+
+		-- get hotspot distance
 		if (script_nav:getDistanceToHotspot() ~= nil and script_nav:getDistanceToHotspot() ~= 0) then
 			hsDist = math.floor(script_nav:getDistanceToHotspot());
 		end
 	
+		-- if we have not reached the hotspot yet then return to moving to hotspot
 		if (not script_grind.hotspotReached) and (script_getSpells.getSpellsStatus < 1) then
 			script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-			--script_grind.message = "Moving to hotspot " .. script_nav.currentHotSpotName .. " Dist (yds) " ..hsDist.. "";
-		end
+			
+				
+		-- if we cannot find a path to hotspot, try to switch hotspots
+			-- need a way to search table and skip current entry. we can even go to a lower level hotspot closer
 		
+		end
+
+	-- else we have saved auto path nodes and are within range of the hotspot then run auto path nodes
 	elseif (script_nav.numSavedLocation >= 3 and self.hotspotReached) then
+
 		script_nav:moveToSavedLocation(GetLocalPlayer(), script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
+
 	end
+
 return false;
 end

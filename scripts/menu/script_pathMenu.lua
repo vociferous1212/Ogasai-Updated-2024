@@ -62,16 +62,16 @@ function script_pathMenu:menu()
 
 			-- replaced with navmesh and auto hotspots - old make nav point and walk to nav point
 			--click walk path (no nav)
-			--wasClicked, script_grindMenu.selectedWalkPath = Checkbox("Use Walk Paths", script_grindMenu.selectedWalkPath);
+			wasClicked, script_grindMenu.selectedWalkPath = Checkbox("Use Walk Paths", script_grindMenu.selectedWalkPath);
 
 			-- if auto pathing then show hotspot
 			if (script_grind.autoPath) then
 
-			-- draw save current location button
-			if (Button("Save Current Location To Log File")) then script_nav:newHotspot(GetMinimapZoneText() .. ' ' .. GetLocalPlayer():GetLevel() .. ' - ' .. GetLocalPlayer():GetLevel()+2);
-				script_grind.staticHotSpot = false;
-				script_grindMenu:printHotspot(); 
-			end
+				-- draw save current location button
+				if (Button("Save Current Location To Log File")) then script_nav:newHotspot(GetMinimapZoneText() .. ' ' .. GetLocalPlayer():GetLevel() .. ' - ' .. GetLocalPlayer():GetLevel()+2);
+					script_grind.staticHotSpot = false;
+					script_grindMenu:printHotspot(); 
+				end
 
 				-- select hotspot dropdown menu
 				Text("Select A Hotspot From Database:");
@@ -86,15 +86,15 @@ function script_pathMenu:menu()
 				script_grind.distToHotSpot = SliderInt("DHS (yd)", 100, 2500, script_grind.distToHotSpot);
 			end
 
-				-- select walk path input text box
-				if (script_grindMenu.selectedWalkPath) then
-					Separator();
+			-- select walk path input text box
+			if (script_grindMenu.selectedWalkPath) then
+				Separator();
 
-					Text("Current Walk Path");
-					Text("E.g. paths\\1-5 Durotar.xml");
-					script_grind.pathName = InputText(' ', script_grind.pathName);
+				Text("Current Walk Path");
+				Text("E.g. paths\\1-5 Durotar.xml");
+				script_grind.pathName = InputText(' ', script_grind.pathName);
 				
-					Separator();
+				Separator();
 
 			-- set next to node distance for walk paths
 			Text('Next Node Distance'); script_grind.nextToNodeDist = SliderFloat("ND (yd)", 1, 10, script_grind.nextToNodeDist);

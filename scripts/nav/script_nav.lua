@@ -28,31 +28,42 @@ function script_nav:drawPullRange(range)
 end
 
 function script_nav:loadHotspotDB(id)
+
 	local hotspot = hotspotDB:getHotSpotByID(id)
+
 	if (hotspot ~= nil and hotspot ~= -1) then
+
 		if (self.currentHotSpotName ~= hotspot['name']) then
 			script_grind.hotspotReached = false;
 			self.savedLocations = {};
 			self.numSavedLocation = 0;
 			self.currentGoToLocation = 0;
 		end
+
 		self.currentHotSpotX , self.currentHotSpotY, self.currentHotSpotZ, self.currentHotSpotName =
 			hotspot['pos']['x'], hotspot['pos']['y'], hotspot['pos']['z'], hotspot['name'];
 			return true;
 	end
+
 	return false;
 end
 
 function script_nav:updateHotSpot(currentLevel, factionNr, useStaticHotSpot)
-	if (useStaticHotSpot) then 
+
+	-- if we are using auto hotspots
+	if (useStaticHotSpot) and script_grindMenu.useHotSpotArea then 
+
 		local race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
 		local id = hotspotDB:getHotspotID(race, level);
+
 		if (script_nav:loadHotspotDB(id)) then 
 			return true; 
 		end
+
 	end
+
 	-- If there is no static hotspot and no hotspot loaded: Use our current position as a hot spot
-	if (self.currentHotSpotName == 0) then
+	if (self.currentHotSpotName == 0) and script_grindMenu.useHotSpotArea then
 		local localObj = GetLocalPlayer();
 		local x, y, z = localObj:GetPosition();
 		self.currentHotSpotX , self.currentHotSpotY, self.currentHotSpotZ, self.currentHotSpotName =

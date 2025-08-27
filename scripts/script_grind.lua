@@ -507,7 +507,7 @@ function script_grind:run()
 	-- very quick pickpocketing WORKS WHEN GRINDER IS NOT PAUSED
 	--if (not self.pause) and (not IsInCombat()) and (GetLocalPlayer():HasBuff("Stealth")) and (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
 		if (GetLocalPlayer():HasBuff("Stealth")) and (PlayerHasTarget()) and (not IsInCombat()) then
-			if (GetLocalPlayer():GetUnitsTarget():GetDistance() < 3) then
+			if (GetLocalPlayer():GetUnitsTarget():GetDistance() <= self.lootDistance) then
 				if (IsLooting()) then
 					if (not LootTarget()) then
 						return;
@@ -640,7 +640,7 @@ function script_grind:run()
 	-- or stop spell casting so we can frost nova and run away
 	if not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
 		local target = script_grind.enemyObj;
-		if script_mage.useWand and GetLocalPlayer():HasRangedWeapon() and IsCasting() and target:GetDistance() <= 9 and not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite") then
+		if script_grind:enemiesAttackingUs() < 2 and script_mage.useWand and GetLocalPlayer():HasRangedWeapon() and IsCasting() and target:GetDistance() <= 9 and not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite") then
 			if (GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth)
 			or (HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova"))
 			or (HasSpell("Cone of Cold") and not IsSpellOnCD("Cone of Cold")) then
@@ -823,7 +823,7 @@ function script_grind:run()
 				if ((script_grind.enemyObj:IsTapped() and not script_grind.enemyObj:IsTappedByMe()) 
 					or (script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID()) and not IsInCombat())
 					or script_grind.enemyObj:IsDead()) then
-						local random = math.random(2050, 2750);
+						local random = math.random(1050, 1750);
 						script_grind.waitTimer = GetTimeEX() + random;
 						script_grind.enemyObj = nil;
 						ClearTarget();
@@ -1049,6 +1049,7 @@ function script_grind:run()
 				-- find loot before gaining a new target... rogue likes to break stealth
 				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
 
+
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0 then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
@@ -1262,7 +1263,7 @@ function script_grind:run()
 
 
 		-- we are in combat so get a target sooner based on if anything is attacking us
-		if not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime and not script_grind:isAnyTargetTargetingMe() then
+		if not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and GetTimeEX() > self.newTargetTime and not script_grind:isAnyTargetTargetingMe() then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
 			self.newTargetTime = GetTimeEX() + 1000;
 		end
@@ -1270,6 +1271,13 @@ function script_grind:run()
 
 		-- run the combat script
 		if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
+
+			-- keep checking for targets while running combat script since we aren't returning anything anymore to the top
+			if  not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and GetTimeEX() > self.newTargetTime then
+				self.enemyObj = script_grindAssignTarget:assignTarget();
+				self.newTargetTime = GetTimeEX() + 1000;
+			end
+
 			self.combatError = RunCombatScript(self.enemyObj:GetGUID());
 		end
 
@@ -1354,12 +1362,49 @@ function script_grind:run()
 				
 			end
 
+			-- send the combat script messages to the grinder
+			local messageTable={ ["ROGUE"] = true,
+						["PALADIN"] = true,
+						["WARRIOR"] = true,
+						["DRUID"] = true,
+						["SHAMAN"] = true,
+						["HUNTER"] = true,
+						["MAGE"] = true,
+						["PRIEST"] = true,
+						["WARLOCK"] = true
+					}
+
 			if (not IsMoving()) and script_grind.enemyObj ~= nil then
-				-- combat script message
-				self.message = "Running the combat script...";
+				local combatScriptMessage = GetMyClass()
+
+				if messageTable[combatScriptMessage] then
+
+					if combatScriptMessage == "ROGUE" then
+						self.message = script_rogue.message
+					elseif combatScriptMessage == "PALADIN" then
+						self.message = script_paladin.message
+					elseif combatScriptMessage == "WARRIOR" then
+						self.message = script_warrior.message
+					elseif combatScriptMessage == "DRUID" then
+						self.message = script_druid.message
+					elseif combatScriptMessage == "SHAMAN" then
+						self.message = script_shaman.message
+					elseif combatScriptMessage == "HUNTER" then
+						self.message = script_hunter.message
+					elseif combatScriptMessage == "MAGE" then
+						self.message = script_mage.message
+					elseif combatScriptMessage == "PRIEST" then
+						self.message = script_priest.message
+					elseif combatScriptMessage == "WARLOCK" then
+						self.message = script_warlock.message
+					end
+				else
+					self.message = combatScriptMessage.." waiting for combat conditions."
+				end
 			end
+
 			-- if the bot isn't resting it should always be moving or targeting something
-			if (not IsMoving()) and script_grind.enemyObj == nil then
+			if (not IsMoving()) and script_grind.enemyObj == nil and self.hotspotReached then
 				-- combat script message
 				self.message = "No valid target in range or resting...";
 				self.newTargetTime = GetTimeEX()
@@ -1489,7 +1534,7 @@ if (not IsAutoCasting("Attack")) then
 					end
 					
 				end
-			return;
+			--return true;
 			end
 
 			-- Do nothing, return : combat script return 4
@@ -1665,10 +1710,14 @@ if (not IsAutoCasting("Attack")) then
 				return;
 			end
 
-			if (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
+			if self.autoPath and (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
 				script_moveToHotspot:moveToHotspot(localObj);
 				script_grind.message = "Moving to hotspot : "..script_nav.currentHotSpotName.." .. "..math.floor(script_nav:getDistanceToHotspot()).." (yds)";
 				--return true;
+				if not IsPathLoaded(5) then 
+					script_grind.message = "Cannot find path to hotspot : "..script_nav.currentHotSpotName.." .. "..math.floor(script_nav:getDistanceToHotspot()).." (yds)";
+				end
+
 			end
 		end
 
@@ -1749,9 +1798,8 @@ if (not IsAutoCasting("Attack")) then
 				self.pathLoaded = self.pathName;
 			end
 
-		
-		-- Navigate
-		self.message = "No acceptable tagets in range - navigating"..script_nav:navigate(GetLocalPlayer());
+			script_nav:navigate(GetLocalPlayer());
+			return;
 		end
 	end
 end
@@ -2407,7 +2455,7 @@ function script_grind:isAnyTargetTargetingMe()
 		if (targetType == 3) then
 
 			-- limit the check by distance... anything over 40 yards must move closer...
-			if i:GetDistance() <= 40 then
+			if i:GetDistance() <= 50 then
 
 				-- some servers return 0 when unit target has no target so AND ~= nil
 				if (i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil) then

@@ -126,6 +126,7 @@ function script_rogue:run(targetGUID)
 		if (not LootTarget()) then
 			LootTarget();
 			self.waitTimer = GetTimeEX() + 500
+			self.message = "Looting target...";
 			return true;
 		end	
 	end
@@ -550,7 +551,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end 
 
 				 --Blade Flurry then use Adrenaline Rush on Low HP
-				if (HasSpell('Adrenaline Rush') and not IsSpellOnCD('Adrenaline Rush') and localHealth < self.adrenRushComboHP and (self.adrenRushCombo)) then 
+				if (HasSpell('Adrenaline Rush') and not IsSpellOnCD('Adrenaline Rush') and localHealth < self.adrenRushComboHP and (self.adrenRushCombo)) and (targetHealth >= 50 or localHealth <= 15) then 
 					if (targetObj:GetDistance() < 6) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
@@ -558,7 +559,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
  
 				-- Check: Adrenaline Rush if more than 2 enemies attacks us or we fight an elite enemy
-				if (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) then 
+				if targetHealth >= 25 and (hasAdrenalineRush and (script_helper:enemiesAttackingUs(10) >= 3 or targetObj:GetClassification() == 1 or targetObj:GetClassification() == 2)) then 
 					if (targetObj:GetDistance() < 6) and (not IsSpellOnCD("Adrenaline Rush")) then 
 						CastSpellByName('Adrenaline Rush');
 						return 0;
