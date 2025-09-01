@@ -19,7 +19,7 @@ function script_gather:addFish(name, id)
 self.fish[self.numFish] = {}; self.fish[self.numFish][0] = name; self.fish[self.numFish][1] = id; self.numFish = self.numFish + 1; end
 
 function script_gather:addHerb(name, id, use, req)
-self.herbs[self.numHerbs] = {}self.herbs[self.numHerbs][0] = name;self.herbs[self.numHerbs][1] = id;self.herbs[self.numHerbs][2] = use;self.herbs[self.numHerbs][3] = req; self.numHerbs = self.numHerbs + 1; end
+self.herbs[self.numHerbs] = {} self.herbs[self.numHerbs][0] = name; self.herbs[self.numHerbs][1] = id; self.herbs[self.numHerbs][2] = use; self.herbs[self.numHerbs][3] = req; self.numHerbs = self.numHerbs + 1; end
 
 function script_gather:addMineral(name, id, use, req)
 self.minerals[self.numMinerals] = {} self.minerals[self.numMinerals][0] = name; self.minerals[self.numMinerals][1] = id; self.minerals[self.numMinerals][2] = use; self.minerals[self.numMinerals][3] = req; self.numMinerals = self.numMinerals + 1; end

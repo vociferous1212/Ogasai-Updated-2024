@@ -18,9 +18,9 @@ function script_drawData:drawSavedTargetLocations()
         if script_nav.savedLocations[i] then -- Check if location exists
             local tX, tY, onScreen = WorldToScreen(script_nav.savedLocations[i]['x'], script_nav.savedLocations[i]['y'], script_nav.savedLocations[i]['z'])
             if onScreen then
-                DrawText('Auto Path Node', tX, tY - 20, 0, 255, 255)
-                DrawText('ID: ' .. i + 1, tX, tY - 10, 0, 255, 255)
-                DrawText('ML: ' .. script_nav.savedLocations[i]['level'], tX, tY, 255, 255, 0)
+                DrawText('Path Node: '..i+1, tX, tY - 20, 0, 255, 255)
+              --  DrawText('ID: ' .. i + 1, tX, tY - 10, 0, 255, 255)
+               -- DrawText('lvl: ' .. script_nav.savedLocations[i]['level'], tX, tY -10, 255, 255, 0)
             end
         end
     end

@@ -104,9 +104,9 @@ function script_checkDebuffs:hasDisabledMovement()
         ["Net"] = true,
         ["Frost Nova"] = true,
         ["Entangling Roots"] = true,
-        ["Slowing Poison"] = true,
-        ["Hamstring"] = true, -- Reduces movement speed (Warrior); dispel with immunities
-        ["Wing Clip"] = true, -- Reduces movement speed (Hunter); dispel with immunities
+       -- this doesn't disable movement complete... ["Slowing Poison"] = true,
+      --  ["Hamstring"] = true, -- Reduces movement speed (Warrior); dispel with immunities
+       -- ["Wing Clip"] = true, -- Reduces movement speed (Hunter); dispel with immunities
 	["Terrify"] = true,
     };
     return checkUnitEffects(GetLocalPlayer(), movement, false);

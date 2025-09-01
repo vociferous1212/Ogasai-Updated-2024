@@ -215,6 +215,8 @@ function script_fish:run()
 
 		self.message = "Casting Fishing!";
 
+		--script_fish:findPoolAndFish()
+
 		UseItem(self.PoleName);
 
 		if (script_fish:checkLure(self.lureName)) then
@@ -370,4 +372,41 @@ function script_fish:checkLure(lureName)
 		return true;
 	end
 	return false;
+end
+
+function script_fish:findPoolAndFish()
+local targetObj, targetType = GetFirstObject();
+	local poolDist = 0;
+	local bPX, bPY, bPZ = 0, 0, 0;
+	local pPY, pPY, pPZ = 0, 0, 0;
+	local distCalc = 0;
+	local poolTarget = 0;
+
+	while targetObj ~= 0 do
+		if (targetType == 5) then 
+			for i=0, script_gather.numFish - 1 do
+				if (script_gather.fish[i][1] == id) then
+					poolDist = targetObj:GetDistance()
+					-- pool position
+					pPX, pPY, pPZ = i:GetPosition();
+					poolTarget = i;
+				end
+			end
+			if poolDist <= 15 and poolTarget ~= nil and poolTarget ~= 0 then
+				poolTarget:FaceTarget();
+			end
+				
+			-- find bobber distance from pool
+			if (targetObj:GetCreatorsGUID() == GetLocalPlayer():GetGUID() and targetObj:GetObjectDisplayID() == 668) then
+				-- bobber position
+				bPX, bPY, bPZ = targetObj:GetPosition();
+				distCalc = GetDistance3D(pPX, pPY, pPZ, bPX, bPY, bPZ);
+				if distCalc > 3 then
+					UseItem(self.PoleName);
+				end
+				
+			end		
+		end
+	targetObj, targetType = GetNextObject(targetObj);
+	end
 end

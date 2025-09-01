@@ -136,7 +136,7 @@ script_grind = {
 	stopWhenFull = false,	-- stop when bags are full
 	hsWhenFull = false,	-- hearthstone when bags are full
 	findLootDistance = 75,
-	lootDistance = 3.05,
+	lootDistance = 2.15,
 	skipLooting = false,
 	lootCheck = {},
 	lootBlacklistedTargets = {},
@@ -659,7 +659,7 @@ function script_grind:run()
 
 	local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true, [6807] = true, [6808] = true, [6809] = true, [7092] = true, [8972] = true, [9745] = true, [9880] = true, [9881] = true, [12161] = true, [20751] = true};
 
-		if (HasSpell("Heroic Strike") or HasSpell("Maul")) and (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.combatScriptRange) and (not script_checkAdds:checkAdds()) and (not IsMoving()) then
+		if (HasSpell("Heroic Strike") or HasSpell("Maul")) and (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.combatScriptRange+2) and (not script_checkAdds:checkAdds()) and (not IsMoving()) then
 			GetTarget():FaceTarget();
 			if hstable[GetLocalPlayer():GetCasting()] then
 				SpellStopCasting();
@@ -870,14 +870,9 @@ function script_grind:run()
 		CloseTradeSkill();
 	end
 
-	if (IsInCombat()) and (not IsMoving()) and (not HasSpell("Shadow Bolt")) and (not script_checkAdds:checkAdds()) then
-		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (self.enemyObj:GetDistance() <= 30) then
-				--self.enemyObj:FaceTarget();
-				self.blacklistLootTime = GetTimeEX();
-				self.blacklistLootTimeCheck = GetTimeEX();
-			end
-		end
+	if (IsInCombat()) then
+		self.blacklistLootTime = GetTimeEX();
+		self.blacklistLootTimeCheck = GetTimeEX();	
 	end
 
 	-- make sure the grinder cannot run if we are resting...
@@ -1017,10 +1012,10 @@ function script_grind:run()
 		end
 
 		-- prioritize totems
-		if IsInCombat() and GetTimeEX() > self.checkTotemKillTimer then
-			script_killTotems:checkForTotems(10);
-			self.checkTotemKillTimer = GetTimeEX() + 5000;
-		end
+		--if IsInCombat() and GetTimeEX() > self.checkTotemKillTimer then
+		--	script_killTotems:checkForTotems(10);
+		--	self.checkTotemKillTimer = GetTimeEX() + 5000;
+		--end
 	
 		-- force enemy obj var
 		if (IsInCombat()) then
@@ -1051,7 +1046,7 @@ function script_grind:run()
 
 
 		-- don't assign targets  until we get to hotspot
-		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0 then
+		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0  and not IsCasting() and not IsChanneling() then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
 		end
 
@@ -1152,7 +1147,9 @@ function script_grind:run()
 			end
 
 			-- check and do move away from adds during combat
-			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) and (self.enemyObj:GetManaPercentage() <= 5) then
+			-- some servers return -1IND# some return nil some return 0... don't use while target is casting.
+			-- was set to a mana percentage <=5 mana then we can move. don't run back and forth with casters
+			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) and (not self.enemyObj:IsCasting()) then
 				script_om:FORCEOM();
 				script_grind.waitTimer = GetTimeEX() + 1000
 				return true;
@@ -1257,7 +1254,7 @@ function script_grind:run()
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
 				if not IsAutoCasting("Attack") then self.enemyObj:AutoAttack(); end
-				self.newTargetTime = GetTimeEX() + 3500;
+				self.newTargetTime = GetTimeEX() + 1500;
 			end
 		end
 
@@ -1265,18 +1262,12 @@ function script_grind:run()
 		-- we are in combat so get a target sooner based on if anything is attacking us
 		if not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and GetTimeEX() > self.newTargetTime and not script_grind:isAnyTargetTargetingMe() then
 			self.enemyObj = script_grindAssignTarget:assignTarget();
-			self.newTargetTime = GetTimeEX() + 1000;
+			self.newTargetTime = GetTimeEX();
 		end
 
 
 		-- run the combat script
 		if (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-
-			-- keep checking for targets while running combat script since we aren't returning anything anymore to the top
-			if  not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and GetTimeEX() > self.newTargetTime then
-				self.enemyObj = script_grindAssignTarget:assignTarget();
-				self.newTargetTime = GetTimeEX() + 1000;
-			end
 
 			self.combatError = RunCombatScript(self.enemyObj:GetGUID());
 		end
@@ -1340,7 +1331,7 @@ function script_grind:run()
 			-- we are in combat so get a target
 			if  not IsLooting and not IsCasting() and not IsChanneling() and (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > self.newTargetTime then
 				self.enemyObj = script_grindAssignTarget:assignTarget();
-				self.newTargetTime = GetTimeEX() + 1000;
+				self.newTargetTime = GetTimeEX();
 				if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 					self.lastTarget = self.enemyObj:GetGUID();
 				end
@@ -1356,7 +1347,7 @@ function script_grind:run()
 				-- find loot before gaining a new target... rogue likes to break stealth
 				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
 
-			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0 then
+			elseif (self.hotspotReached) and (self.enemyObj == nil or self.enemyObj == 0) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0 then
 				-- else assign a target
 				self.enemyObj = script_grindAssignTarget:assignTarget();
 				
@@ -1407,8 +1398,17 @@ function script_grind:run()
 			if (not IsMoving()) and script_grind.enemyObj == nil and self.hotspotReached then
 				-- combat script message
 				self.message = "No valid target in range or resting...";
-				self.newTargetTime = GetTimeEX()
+				self.newTargetTime = GetTimeEX();
 				self.autoBlacklistTimer = GetTimeEX() + 15000;
+
+				-- if we are in a group get a target... isTargetingGroup function fails on some servers as they return 0s....
+				-- instead of changing the function, this is a fallback targeting method
+				if GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil and not PlayerHasTarget() then
+					TargetNearestEnemy();
+					if GetTarget() ~= nil then
+						self.enemyObj = GetGUIDObject(GetTarget())
+					end
+				end
 			end
 
 			-- death counter turning variable on and off for 2 or more enemies attacking us
@@ -1433,7 +1433,11 @@ function script_grind:run()
 				end
 			end
 
-		-- check return combat errors
+
+
+
+
+-- check return combat errors
 
 			-- clear own player if targeted for some reason
 			if (PlayerHasTarget()) and (IsInCombat()) and (GetLocalPlayer():GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID()) then
@@ -1464,12 +1468,19 @@ function script_grind:run()
 				return;
 			end
 
-			-- Move in range: combat script return 3
+
+
+
+-- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
 				and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
+				if GetTarget() ~= nil and GetTarget() ~= 0 then
+					local _x, _y, _z = GetTarget():GetPosition();
+					if not IsMoving() then Move(_x, _y, _z); end
+				end
 
 -- heroic strike stuck on and target moved away or we stopped casting auto attack
 
@@ -1598,6 +1609,12 @@ if (not IsAutoCasting("Attack")) then
 
 	end	-- end finish loot before navigating
 
+
+
+
+-- END OF COMBAT PHASE
+
+
 		-- Pre checks before navigating
 		if IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or IsInCombat() or script_grind.enemyObj ~= nil then
 			return;
@@ -1647,7 +1664,7 @@ if (not IsAutoCasting("Attack")) then
 				end
 		
 				-- use ghost wolf function
-				if (HasSpell("Ghost Wolf")) then
+				if not HasForm() and (HasSpell("Ghost Wolf")) then
 					if (script_shamanEX2:ghostWolf()) then
 						script_grind:setWaitTimer(4000);
 						script_grindEX.tryTravelFormTimer = GetTimeEX() + 15000;
@@ -1655,6 +1672,13 @@ if (not IsAutoCasting("Attack")) then
 				end
 			end
 		end
+
+
+
+
+-- PATHING AND NAVIGATION
+
+
 
 
 		-- Auto path: keep us inside the distance to the current hotspot, if mounted keep running even if in combat
@@ -2065,8 +2089,7 @@ function script_grind:drawStatus()
 end
 
 function script_grind:draw()
-	PersistLoadingScreen(true)
-	script_grind:drawStatus();
+		script_grind:drawStatus();
 end
 
 function script_grind:doLoot(localObj)

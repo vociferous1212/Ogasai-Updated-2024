@@ -150,7 +150,6 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	-- add check here
 	
 	-- make sure we check that there are no targets around that are trying to be targeted by grinder....
-		-- hate to run object manager but the bot simply won't stop running path nodes unless there is some condition set
 	if script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() and (script_grind.lootObj == nil or script_grind.bagsFull or AreBagsFull() or script_grind.skipLooting) then
 
 	-- Check: Move to the next location index
@@ -158,8 +157,9 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 
 		local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
 
-		-- distance to autopath node
-		if currentDist < 5 
+		-- distance to autopath node in yards
+			local random = math.random(5, 10);
+		if currentDist < random
 
 			-- change location if max or min level out of range
 			or (script_grind.staticHotSpot and (self.savedLocations[self.currentGoToLocation]['level'] < minLevel

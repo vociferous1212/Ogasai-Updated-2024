@@ -82,6 +82,8 @@ function script_gatherEX:setup()
 	script_gather:addFish("Safefish School", 6435);
 	script_gather:addFish("Firefin Snapper School", 6482);
 	script_gather:addFish("Oily Blackmouth School", 6291);
+	script_gather:addFish("Stonescale Eel Swarm", 6742);
+	script_gather:addFish("Tasty Fish", 180248);
 end
 
 function script_gatherEX:drawFishNodes()
