@@ -11,7 +11,7 @@ end
 
 function coremenu:draw()
 
-	if (self.isSetup == false) then
+	if (self.isSetup == false) and coremenu ~= nil then
 		self.isSetup = true;
 		--[[
 			----------------------------
