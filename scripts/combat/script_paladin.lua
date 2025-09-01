@@ -118,14 +118,7 @@ function script_paladin:run(targetGUID)
 		return 2;
 	end	
 
-	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
-		if (script_checkAdds:checkAdds()) then
-			script_om:FORCEOM();
-			return true;
-		end
-	end
-
-	if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
+	if not IsMoving() and (script_paladinEX:healsAndBuffs(localObj, localMana)) then
 		return 4;
 	end
 	-- Check: Do nothing if we are channeling or casting or wait timer
@@ -160,6 +153,8 @@ function script_paladin:run(targetGUID)
 	script_grind.combatScriptRange = self.meleeDistance;
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
+
+	
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
@@ -202,7 +197,7 @@ function script_paladin:run(targetGUID)
 				return 0;
 			 end
 
-			if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
+			if not IsMoving() and (script_paladinEX:healsAndBuffs(localObj, localMana)) then
 				return 4;
 			end
 
@@ -259,14 +254,8 @@ function script_paladin:run(targetGUID)
 				end
 
 
-			if (not targetObj:IsFleeing()) and (targetObj:GetDistance() < self.meleeDistance) then
-				if (IsMoving()) then
-					StopMoving();
-				end
-			end
-
 			if (not targetObj:IsFleeing()) and (localMana > 8) then
-				if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
+				if not IsMoving() and (script_paladinEX:healsAndBuffs(localObj, localMana)) then
 					return 4;
 				end
 			end
@@ -338,7 +327,7 @@ function script_paladin:run(targetGUID)
 
 				
 				if (not targetObj:IsFleeing()) and (localMana > 8) then
-					if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
+					if not IsMoving() and (script_paladinEX:healsAndBuffs(localObj, localMana)) then
 						return 4;
 					end
 				end
@@ -501,7 +490,7 @@ function script_paladin:rest()
 
 	-- heal before eating
 	if (IsStanding()) and (not IsEating()) and (not IsDrinking()) and (not IsMoving()) and (not IsInCombat()) and (localMana > 8) then
-		if (script_paladinEX:healsAndBuffs(localObj, localMana)) then
+		if not IsMoving() and (script_paladinEX:healsAndBuffs(localObj, localMana)) then
 			return true;
 		end
 	end

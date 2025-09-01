@@ -51,6 +51,7 @@ function hotspotDB:getHotSpotByID(id)
 end
 
 function hotspotDB:getHotspotID(race, level)
+
 	local bestDist = 10000;
 	local bestIndex = -1;
 

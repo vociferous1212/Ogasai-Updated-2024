@@ -2,6 +2,10 @@ hotspotDB_50_60 = {}
 
 function hotspotDB_50_60:setup()
 
+-- southern tanaris - great spot to grind from 49-52
+	hotspotDB:addHotspot("Thistleshrub Valley 49 - 52", "All", 50, 52, -8951.79, -2173.61, 8.88);
+
+
 -- Burning Steppes
 	
 	hotspotDB:addHotspot("Ruins of Thaurissan 56 - 58", "All", 56, 58, -7905.86, -2055.05, 133.16);

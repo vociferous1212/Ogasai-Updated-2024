@@ -29,7 +29,7 @@ script_hunter = {
 	useBandage = false,
 	hasBandages = false,
 	useFeedPet = true,
-	meleeDistance = 5.5,
+	meleeDistance = 4,
 	useCheetah = false,
 	useMarkMana = 45,
 	useMark = true,
@@ -246,6 +246,18 @@ function script_hunter:run(targetGUID)
 		end
 	end
 
+-- set combat script attack distance
+	if PlayerHasTarget() then
+		
+		if GetTarget():GetDistance() <= 11 then
+			script_grind.combatScriptRange = self.meleeDistance;
+		else
+			script_grind.combatScriptRange = 32;
+		end
+	else
+		script_grind.combatScriptRange = 32;
+	end
+
 	-- Check: Do nothing if we are channeling, casting or wait timer
 	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX()) or GetLocalPlayer():IsStunned() then
 		return 4;
@@ -417,9 +429,9 @@ function script_hunter:run(targetGUID)
 	-- NOT    in combat ---  do pull stuff
 
 			if (GetLocalPlayer():GetLevel() < 10) then
-				if (targetObj:GetDistance() > 11) and (targetObj:GetDistance() < 35) then
+				if (targetObj:GetDistance() > 11) and (targetObj:GetDistance() < 35) and targetObj:IsInLineOfSight() then
 					script_hunter:hunterPull(targetObj);
-				elseif (targetObj:GetDistance() <= 11) then
+				elseif (targetObj:GetDistance() <= 11) or not targetObj:IsInLineOfSight() then
 					if (targetObj:GetDistance() > self.meleeDistance) then
 						return 3;
 					end
@@ -448,19 +460,6 @@ function script_hunter:run(targetGUID)
 			if (not targetObj:IsInLineOfSight()) then
 				return 3;
 			end
-
--- set combat script attack distance
-	if GetTarget() ~= 0 and GetTarget() ~= nil then
-		if GetTarget():GetDistance() ~= nil then
-			if GetTarget():GetDistance() < 11 then
-				script_grind.combatScriptRange = self.meleeDistance;
-			else
-				script_grind.combatScriptRange = 30;
-			end
-		end
-	else
-		script_grind.combatScriptRange = 30;
-	end
 	
 
 			if (not HasSpell("War Stomp")) and targetObj:GetHealthPercentage() > 15 then
@@ -1071,7 +1070,7 @@ function script_hunter:hunterPull(targetObj)
 				JumpOrAscendStart();
 			end
 
-			if (not targetObj:IsInLineOfSight()) then
+			if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > 30) then
 				return 3;
 			end
 

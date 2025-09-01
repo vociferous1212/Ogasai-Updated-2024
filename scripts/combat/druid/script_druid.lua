@@ -724,7 +724,7 @@ function script_druid:run(targetGUID)
 		if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) and (not script_checkAdds:checkAdds()) and (not IsMoving()) then
 			GetTarget():AutoAttack();
 		end
-		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance) then
+		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance+2) then
 			if mtable[GetLocalPlayer():GetCasting()] then
 				SpellStopCasting();
 			end
@@ -1471,9 +1471,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- face target
-				if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
-					if not IsMoving() then targetObj:FaceTarget(); end
-				end
+				--if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
+				--	if not IsMoving() then targetObj:FaceTarget(); end
+				--end
 
 				-- if we are switching froms from cat to bear then speed up script tick rate
 				if (self.wasInCombat) and (self.runOnce) then
@@ -1482,9 +1482,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- face target
-				if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
-					if not IsMoving() then targetObj:FaceTarget(); end
-				end
+				--if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
+				--	if not IsMoving() then targetObj:FaceTarget(); end
+				--end
 
 				-- check line of sight and move to target
 				if (not targetObj:IsInLineOfSight()) and (IsBearForm()) or (targetObj:GetDistance() > self.meleeDistance) then
@@ -1509,9 +1509,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				-- keep auto attack on
 				if (not IsAutoCasting("Attack")) and (not IsMoving()) then
 					targetObj:AutoAttack();
-					if (targetObj:GetDistance() < self.meleeDistance) and (not IsMoving()) then
-						if not IsMoving() then targetObj:FaceTarget(); end
-					end
+				--	if (targetObj:GetDistance() < self.meleeDistance) and (not IsMoving()) then
+				--		if not IsMoving() then targetObj:FaceTarget(); end
+				--	end
 					if ((targetObj:GetDistance() > self.meleeDistance) and (IsInCombat()) and (PlayerHasTarget()) and HasForm()) or (not HasForm() and localMana <= 30 and not IsCasting() and not IsChanneling()) then
 						return 3;
 					end
@@ -1621,9 +1621,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- face target
-				if (targetObj:GetDistance() <= self.meleeDistance) and (IsBearForm()) and (not IsMoving()) then
-					if not IsMoving() then targetObj:FaceTarget(); end
-				end
+				--if (targetObj:GetDistance() <= self.meleeDistance) and (IsBearForm()) and (not IsMoving()) then
+				--	if not IsMoving() then targetObj:FaceTarget(); end
+				--end
 
 			end -- end of bear form in combat attacks
 
@@ -1680,15 +1680,15 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				-- keep auto attack on
 				if (not IsAutoCasting("Attack")) and (not IsMoving()) then
 					targetObj:AutoAttack();
-					if (not IsMoving()) then
-						if not IsMoving() then targetObj:FaceTarget(); end
-					end
+					--if (not IsMoving()) then
+					--	if not IsMoving() then targetObj:FaceTarget(); end
+					--end
 				end
 
 				-- face target
-				if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
-					if not IsMoving() then targetObj:FaceTarget(); end
-				end
+				--if (targetObj:GetDistance() <= self.meleeDistance) and (not IsMoving()) then
+				--	if not IsMoving() then targetObj:FaceTarget(); end
+				--end
 
 				-- keep faerie fire up
 				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
@@ -1731,7 +1731,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				--end
 
 				-- keep rake up
-				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") and (not IsSpellOnCD("Rake")) then
+				if (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (localEnergy >= self.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and targetObj:GetCreatureType() ~= "Undead" and (targetObj:GetCreatureType() ~= "Mechanical") and (not IsSpellOnCD("Rake")) then
 					if (CastSpellByName("Rake", targetObj)) then
 						self.waitTimer = GetTimeEX() + 2200;
 						return 0;
@@ -1756,9 +1756,9 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 
 			if ( (not IsBearForm()) and (not IsCatForm()) and (not self.useBear) and (not self.useCat) ) or (isMoonkin) then
 				-- face target
-				if (targetObj:GetDistance() < 30) and (not IsMoving()) then
-					if not IsMoving() then targetObj:FaceTarget(); end
-				end
+				--if (targetObj:GetDistance() < 30) and (not IsMoving()) then
+				--	if not IsMoving() then targetObj:FaceTarget(); end
+				--end
 
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() <= .5) then 
