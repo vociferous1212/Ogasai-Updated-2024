@@ -626,7 +626,7 @@ function script_grind:run()
 
 -- loot BoP items...
 	if GetTimeEX() > self.waitTimer then if IsLooting() and StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
-	if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end end
+	if IsLooting() then self.waitTimer = GetTimeEX() + 500; LootTarget(); end end
 
 	-- Check: Spend talent points
 	if (not IsInCombat() and not GetLocalPlayer():IsDead() and self.autoTalent) then
@@ -638,18 +638,19 @@ function script_grind:run()
 
 	-- try to stop spell casting so we can use wand if target is really low health.. waste of mana
 	-- or stop spell casting so we can frost nova and run away
-	if not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
+	if HasSpell("Frostbolt") and not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
 		local target = script_grind.enemyObj;
-		if script_grind:enemiesAttackingUs() < 2 and script_mage.useWand and GetLocalPlayer():HasRangedWeapon() and IsCasting() and target:GetDistance() <= 9 and not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite") then
-			if (GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth)
-			or (HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova"))
-			or (HasSpell("Cone of Cold") and not IsSpellOnCD("Cone of Cold")) then
-					-- stop spell casting frostbolt and fireball
-				if GetLocalPlayer():GetCasting() == 8407 or GetLocalPlayer():GetCasting() == 8401 then
+		if script_grind:enemiesAttackingUs() < 2 and IsCasting() and target:GetDistance() <= 9 and not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite") then
+			if (GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth and script_mage.useWand and GetLocalPlayer():HasRangedWeapon())
+			or (script_mage.useFrostNova and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova") and GetLocalPlayer():GetManaPercentage() >= 10)
+			or (script_mage.useConeOfCold and HasSpell("Cone of Cold") and not IsSpellOnCD("Cone of Cold") and target:GetHealthPercentage() >= script_mage.coneOfColdHealth and GetLocalPlayer():GetManaPercentage() >= script_mage.coneOfColdMana) then
+				-- stop spell casting frostbolt
+				local fbTable = {[116] = true, [205] = true, [837] = true, [7322] = true, [8406] = true, [8407] = true, [8408] = true, [10179] = true, [10180] = true, [10181] = true, [25304] = true}
+				if fbTable[GetLocalPlayer():GetCasting()] then
 					SpellStopCasting();
 					-- timer needed for bot to check everything and not recast frostbolt over and over...
-					script_grind.waitTimer = GetTimeEX() + 500;
-					script_mage.waitTimer = GetTimeEX() + 500;
+					script_grind.waitTimer = GetTimeEX() + 250;
+					script_mage.waitTimer = GetTimeEX() + 750;
 				end
 			end
 		end
@@ -880,6 +881,10 @@ function script_grind:run()
 		if (IsEating() and GetLocalPlayer():GetHealthPercentage() < 95)
 			or (IsDrinking() and GetLocalPlayer():GetManaPercentage() < 95)
 		then
+			self.newTargetTime = GetTimeEX();
+			self.autoBlacklistTimer = 15000;
+			self.blacklistLootTimeCheck = GetTimeEX() * 2;
+			script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 			return;
 		end
 	end
@@ -1082,7 +1087,7 @@ function script_grind:run()
 				ClearTarget();
 				script_nav:resetNavigate();
 				script_grind:setWaitTimer(2000);
-			elseif (IsInCombat()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
+			elseif (IsInCombat() or IsEating() or IsDrinking()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) and (self.enemyObj:IsInLineOfSight()) and (self.lastTarget == self.enemyObj:GetGUID()) then
 				self.newTargetTime = GetTimeEX();
 			end
 			
@@ -1168,9 +1173,8 @@ function script_grind:run()
 
 			-- pick up BoP items
 			if StaticPopup1:IsVisible() then StaticPopup1Button1:Click() end
-
-			LootTarget();
 			script_grind.waitTimer = GetTimeEX() + 500;
+			if not LootTarget() then LootTarget(); end
 		end
 
 
@@ -1408,6 +1412,11 @@ function script_grind:run()
 					if GetTarget() ~= nil then
 						self.enemyObj = GetGUIDObject(GetTarget())
 					end
+				end
+
+				-- try to walk closer to hotspot area... if we cannot find a target... even if distToHotspot is set
+				if self.hotspotReached and not script_grindEX:isThereAnyValidEnemyNearby() and script_nav:getDistanceToHotspot() > 100 then
+					script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 				end
 			end
 
@@ -2183,8 +2192,8 @@ function script_grind:doLoot(localObj)
 	
 			-- if looting and not moving then wait
 			if (not LootTarget()) and (not IsMoving()) then
-				self.waitTimer = GetTimeEX() + 350;
-				_quest.waitTimer = GetTimeEX() + 350;
+				self.waitTimer = GetTimeEX() + 650;
+				_quest.waitTimer = GetTimeEX() + 650;
 				return;
 			else
 	

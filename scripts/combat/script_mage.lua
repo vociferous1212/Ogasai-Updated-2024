@@ -149,7 +149,7 @@ end
 function script_mage:runBackwards(targetObj, range) 
 	local localObj = GetLocalPlayer();
 	script_grind.tickRate = 75;
- 	if targetObj ~= 0 then
+ 	if targetObj ~= 0 and targetObj ~= nil then
  		local xT, yT, zT = targetObj:GetPosition();
  		local xP, yP, zP = localObj:GetPosition();
  		local distance = targetObj:GetDistance();
@@ -779,7 +779,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Use Mana Shield if we have more than 35 percent mana and no active Ice Barrier
-			if (not localObj:HasBuff("Ice Barrier")) and (HasSpell("Mana Shield")) and (localMana >= self.manaShieldMana) and (localHealth <= self.manaShieldHealth) and (not localObj:HasBuff("Mana Shield")) and (IsInCombat()) and (targetHealth >= 10 or script_grind:enemiesAttackingUs() >= 2 or localHealth <= 20) then
+			if (not localObj:HasBuff("Ice Barrier")) and (HasSpell("Mana Shield")) and (localMana >= self.manaShieldMana) and (localHealth <= self.manaShieldHealth) and (not localObj:HasBuff("Mana Shield")) and (IsInCombat()) and (targetHealth >= 10 or script_grind:enemiesAttackingUs() >= 2 or localHealth <= 20) and targetObj:GetDistance() <= 12 then
 				if (not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite")) then
 					CastSpellByName("Mana Shield");
 					self.waitTimer = GetTimeEX() + 1650;
@@ -1295,6 +1295,30 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 	end
 	end	
 
+-- eat AND drink....
+	if (IsEating() and not IsDrinking() and localMana <= 85) or (IsDrinking() and not IsEating() and localHealth <= 80) then
+		if not IsEating() then
+			if (script_helper:eat()) then 
+				self.message = "Eating..."; 
+				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
+				return true; 
+			else 
+				self.message = "No food! (or food not included in script_helper)";
+				return true; 
+			end
+		end	
+		if not IsDrinking() then
+			if (script_helper:drinkWater()) then 
+				self.message = "Drinking...";
+				script_grind.autoBlacklistTimer = GetTimeEX() + 15000; 
+				return true; 
+			else 
+				self.message = "No drinks! (or drink not included in script_helper)";
+				return true; 
+			end
+		end
+	end
+
 -- Eat and Drink
 	if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		self.message = "Need to drink...";
@@ -1348,30 +1372,6 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 	or (IsDrinking() and IsEating() and localHealth >= 95 and localMana >= 95) then
 		if (not IsInCombat()) then
 			JumpOrAscendStart();
-		end
-	end
-
-	-- eat AND drink....
-	if (IsEating() and not IsDrinking() and localMana <= 85) or (IsDrinking() and not IsEating() and localHealth <= 80) then
-		if not IsEating() then
-			if (script_helper:eat()) then 
-				self.message = "Eating..."; 
-				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
-				return true; 
-			else 
-				self.message = "No food! (or food not included in script_helper)";
-				return true; 
-			end
-		end	
-		if not IsDrinking() then
-			if (script_helper:drinkWater()) then 
-				self.message = "Drinking...";
-				script_grind.autoBlacklistTimer = GetTimeEX() + 15000; 
-				return true; 
-			else 
-				self.message = "No drinks! (or drink not included in script_helper)";
-				return true; 
-			end
 		end
 	end
 	
