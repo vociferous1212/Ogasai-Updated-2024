@@ -16,6 +16,7 @@ script_fish = {
 	useFishRandom = false,
 	fishRandomFloat = 2.2,
 	drawFishNodes = true,
+	waitTimer = 0,
 }
 
 function script_fish:GetBobber()
@@ -93,6 +94,10 @@ function script_fish:run()
 
 	self.setup = true;
 	return;
+	end
+
+	if self.waitTimer == 0 or self.waitTimer == nil then
+		self.waitTimer = GetTimeEX();
 	end
 	
 	local localObj = GetLocalPlayer();
@@ -215,14 +220,15 @@ function script_fish:run()
 
 		self.message = "Casting Fishing!";
 
-		--script_fish:findPoolAndFish()
-
 		UseItem(self.PoleName);
 
 		if (script_fish:checkLure(self.lureName)) then
 			self.timer = GetTime() + 6;
 			return;
 		end	
+
+		if GetTimeEX() > self.waitTimer then
+				script_fish:findPoolAndFish() end
 
 		if (not self.useFishRandom) then
 			CastSpellByName("Fishing");
@@ -250,6 +256,7 @@ function script_fish:run()
 				self.bobberInfo.looted = true;
 			end
 		else
+
 			self.message = "Waiting for bobber to move...";
 		end
 	end
@@ -381,18 +388,20 @@ local targetObj, targetType = GetFirstObject();
 	local pPY, pPY, pPZ = 0, 0, 0;
 	local distCalc = 0;
 	local poolTarget = 0;
+	local id = 0;
 
 	while targetObj ~= 0 do
 		if (targetType == 5) then 
+			local id = targetObj:GetObjectDisplayID();
 			for i=0, script_gather.numFish - 1 do
 				if (script_gather.fish[i][1] == id) then
 					poolDist = targetObj:GetDistance()
 					-- pool position
-					pPX, pPY, pPZ = i:GetPosition();
-					poolTarget = i;
+					pPX, pPY, pPZ = targetObj:GetPosition();
+					poolTarget = targetObj;
 				end
 			end
-			if poolDist <= 15 and poolTarget ~= nil and poolTarget ~= 0 then
+			if poolDist <= 18 and poolDist > 8 and poolTarget ~= nil and poolTarget ~= 0 then
 				poolTarget:FaceTarget();
 			end
 				
@@ -400,12 +409,19 @@ local targetObj, targetType = GetFirstObject();
 			if (targetObj:GetCreatorsGUID() == GetLocalPlayer():GetGUID() and targetObj:GetObjectDisplayID() == 668) then
 				-- bobber position
 				bPX, bPY, bPZ = targetObj:GetPosition();
+				_x, _y, _z = GetLocalPlayer():GetPosition();
 				distCalc = GetDistance3D(pPX, pPY, pPZ, bPX, bPY, bPZ);
-				if distCalc > 3 then
-					UseItem(self.PoleName);
+				distToPoolCalc = GetDistance3D(_x, _y, _z, pPX, pPY, pPZ);
+
+				-- there is about a 10 yard distance between player position and pool where it will never land in a pool
+				if distCalc > 3 and distToPoolCalc > 8 and distToPoolCalc <= 18 then
+					CastSpellByName("Fishing");
+					self.waitTimer = GetTimeEX() + 1000;
 				end
 				
-			end		
+			else		
+			--CastSpellByName("Fishing");
+			end
 		end
 	targetObj, targetType = GetNextObject(targetObj);
 	end
