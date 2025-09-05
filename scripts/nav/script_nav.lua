@@ -157,19 +157,19 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 
 		local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
 
-		-- distance to autopath node in yards
-			local random = math.random(5, 10);
-		if currentDist < random
+		if currentDist <= 5
 
 			-- change location if max or min level out of range
 			or (script_grind.staticHotSpot and (self.savedLocations[self.currentGoToLocation]['level'] < minLevel
 			or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel)) then
 			self.currentGoToLocation = self.currentGoToLocation + 1;
-			return "Changing go to location...";
+			-- returning may be causing nav lock ups...
+			--return "Changing go to location...";
 		end
 
 		script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-		return true;
+		-- returning anything at all may be causing nav lock ups... must return in a different script
+		--return true;
 	end
 return false;
 end

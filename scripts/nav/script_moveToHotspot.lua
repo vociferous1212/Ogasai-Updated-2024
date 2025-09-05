@@ -10,7 +10,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 	end
 
 	-- if we have a hotspot and can move and auto path saved locations < 3 and we have not reached the hotspot or left range of hotspot
-	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3 or not script_grind.hotspotReached) then
+	if (script_nav.currentHotSpotName ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (script_nav.numSavedLocation < 3 or not script_grind.hotspotReached or not script_grindEX:isThereAnyValidEnemyNearby()) then
 
 		-- make sure the grinder tick rate is set quicker
 		if (not script_grind.adjustTickRate) then
@@ -71,7 +71,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		end
 	
 		-- if we have not reached the hotspot yet then return to moving to hotspot
-		if (not script_grind.hotspotReached) and (script_getSpells.getSpellsStatus < 1) then
+		if (not script_grind.hotspotReached or not script_grindEX:isThereAnyValidEnemyNearby()) and (script_getSpells.getSpellsStatus < 1) then
 			script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 			
 				

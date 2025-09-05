@@ -1,9 +1,9 @@
 script_warrior = {
 	message = 'Warrior Combat Script',
 	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
-	eatHealth = 65, -- health to use food
+	eatHealth = 50, -- health to use food
 	bloodRageHealth = 65, -- health to use bloodrage
-	potionHealth = 6, -- health to use potion
+	potionHealth = 10, -- health to use potion
 	isSetup = false, -- setup check
 	meleeDistance = 3.65, -- melee distance
 	waitTimer = 0, -- set wait time for script
@@ -251,6 +251,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 -- Don't attack if we should rest first
 		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
 			and targetHealth > 99 and not targetObj:IsStunned()) then
+			if IsMoving() then StopMoving(); return true; end
 			self.message = "Need rest...";
 			return 4;
 		end
@@ -310,6 +311,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
 		if (script_checkAdds:checkAdds()) then
 			self.waitTimer = GetTimeEX() + 1000;
+			script_grind.waitTimer = GetTimeEX() + 1000;
 			return true;
 		end
 	end
@@ -397,8 +399,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 			targetObj:AutoAttack();
 		end
 
-		if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
-
 		-- some servers was causing bot to continue running after charge and attacking.... sometimes heroic strike got stuck too
 		--if (targetObj:GetDistance() <= self.meleeDistance) and (targetObj:IsInLineOfSight()) and (IsAutoCasting("Attack")) and (PlayerHasTarget()) and (script_grind:enemiesAttackingUs() == 0 or not IsInCombat()) then
 		--	StopMoving();
@@ -462,6 +462,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 				return 3;
 			end
 
+		if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
+
+
 			if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (not IsAutoCasting("Attack")) and (targetObj:GetDistance() <= 8) and (not IsMoving()) then
 				targetObj:AutoAttack();
 				--targetObj:FaceTarget();
@@ -518,9 +521,24 @@ function script_warrior:run(targetGUID)	-- main content of script
 				targetObj:AutoAttack();
 			end
 
+			-- use death wish at start of combat phases
+			if HasSpell("Death Wish") and not IsSpellOnCD("Death Wish") and not localObj:HasBuff("Death Wish") and targetHealth >= 50 then
+				if CastSpellByName("Death Wish") then
+					return 0;
+				end
+			end
+
+			-- piercing howl on targets when they are low health
+			if targetObj:GetCreatureType() == 'Humanoid' and HasSpell("Piercing Howl") and not IsSpellOnCD("Piercing Howl") and not targetObj:HasDebuff("Piercing Howl") and not targetObj:HasDebuff("Hamstring") and localRage >= 10 and targetHealth <= 25 then
+				if CastSpellByName("Piercing Howl") then
+					return 0;
+				end
+			end
+			
 			-- Humanoid use to flee, keep Hamstring up on them
-				if (self.battleStance) or (self.berserkerStance) then
-					if (targetObj:GetCreatureType() == 'Humanoid' and localRage >= 10 and not targetObj:HasDebuff('Hamstring')) and (targetHealth <= 45) then 
+				-- don't use if we have piercing howl
+				if not HasSpell("Piercing Howl") and (self.battleStance or self.berserkerStance) then
+					if (targetObj:GetCreatureType() == 'Humanoid' and localRage >= 10 and not targetObj:HasDebuff('Hamstring')) and not targetObj:HasDebuff("Piercing Howl") and (targetHealth <= 45) then 
 						if (Cast('Hamstring', targetObj)) then
 							return 0; 
 						end 
@@ -736,7 +754,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 			-- Check: Use Retaliation if we have three or more mobs on us
 			if (self.battleStance) then
-				if (script_warrior:enemiesAttackingUs(10) >= 3 and HasSpell('Retaliation') and not IsSpellOnCD('Retaliation')) then 
+				if ( (script_warrior:enemiesAttackingUs(10) >= 3 or (script_warrior:enemiesAttackingUs(10) >= 2 and localHealth <= 35)) and HasSpell('Retaliation') and not IsSpellOnCD('Retaliation')) then 
 					CastSpellByName('Retaliation');
 					return 0; 
 				end
@@ -782,6 +800,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 					if (script_checkAdds:checkAdds()) then
 						self.waitTimer = GetTimeEX() + 1000;
+						script_grind.waitTimer = GetTimeEX() + 1000;
 						script_om:FORCEOM()
 						return true;
 					end
@@ -842,6 +861,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 					end
 				end
 
+				-- this needs to be rechecked and changed.... we can return here and skip all other non necessary spells
 				-- melee skill: Bloodthirst, save rage for this attack
 				if (HasSpell("Bloodthirst") and not IsSpellOnCD("Bloodthirst")) then 
 					if (localRage >= 25) then 

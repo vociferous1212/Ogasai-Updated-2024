@@ -1818,7 +1818,7 @@ if (not IsAutoCasting("Attack")) then
 
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
-				script_grind:setWaitTimer(100);
+				--script_grind:setWaitTimer(100);
 
 			end
 
