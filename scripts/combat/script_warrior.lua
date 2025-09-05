@@ -5,7 +5,7 @@ script_warrior = {
 	bloodRageHealth = 65, -- health to use bloodrage
 	potionHealth = 6, -- health to use potion
 	isSetup = false, -- setup check
-	meleeDistance = 4, -- melee distance
+	meleeDistance = 3.65, -- melee distance
 	waitTimer = 0, -- set wait time for script
 	stopIfMHBroken = true, -- stop if main hand is broken
 	overpowerActionBarSlot = 73+6, -- Default: Overpower in slot 7 on the default Battle Stance Bar
@@ -241,14 +241,19 @@ function script_warrior:run(targetGUID)	-- main content of script
 	end
 
 	--stuck in combat
-	if (not PlayerHasTarget()) and (IsInCombat()) and (script_grind.enemiesAttackingUs() == 0) and (GetNumPartyMembers() < 1) then
+		-- don't wait if we have bloodrage, causing us to stick in combat, only if we don't need to eat
+	if (not PlayerHasTarget()) and (IsInCombat() and (not GetLocalPlayer():HasBuff("Bloodrage") or GetLocalPlayer():GetHealthPercentage() < self.eatHealth)) and (script_grind.enemiesAttackingUs() == 0) and (GetNumPartyMembers() < 1) then
 		if IsMoving() then StopMoving(); return true; end
 		self.message = "Stuck in combat... Waiting...";
 		return 4;
 	end
-	if (IsInCombat()) and (IsChanneling() or IsCasting()) and (not IsMoving()) then
-		targetObj:FaceTarget();
-	end
+
+-- Don't attack if we should rest first
+		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
+			and targetHealth > 99 and not targetObj:IsStunned()) then
+			self.message = "Need rest...";
+			return 4;
+		end
 
 	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
 		if (not IsAutoCasting("Attack")) then
@@ -258,6 +263,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling()) or (IsCasting()) or (self.waitTimer >= GetTimeEX()) then
+		if (IsChanneling() or IsCasting()) and IsInCombat() and PlayerHasTarget() then GetTarget():FaceTarget(); end
 
 		local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
 
@@ -303,6 +309,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
 		if (script_checkAdds:checkAdds()) then
+			self.waitTimer = GetTimeEX() + 1000;
 			return true;
 		end
 	end
@@ -336,13 +343,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 		if (not IsStanding()) then
 			JumpOrAscendStart();
-		end
-
-		-- Don't attack if we should rest first
-		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
-			and targetHealth > 99 and not targetObj:IsStunned()) then
-			self.message = "Need rest...";
-			return 4;
 		end
 
 		if (self.useBow) and (not IsInCombat()) and (targetObj:GetDistance() <= 34) and (targetObj:GetDistance() >= 19) and (targetObj:IsInLineOfSight()) and (not IsChanneling()) and (not IsAutoCasting("Shoot Bow")) and (not IsSpellOnCD("Shoot Bow")) and (targetHealth > 99) then
@@ -397,6 +397,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 			targetObj:AutoAttack();
 		end
 
+		if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
+
 		-- some servers was causing bot to continue running after charge and attacking.... sometimes heroic strike got stuck too
 		--if (targetObj:GetDistance() <= self.meleeDistance) and (targetObj:IsInLineOfSight()) and (IsAutoCasting("Attack")) and (PlayerHasTarget()) and (script_grind:enemiesAttackingUs() == 0 or not IsInCombat()) then
 		--	StopMoving();
@@ -409,15 +411,13 @@ function script_warrior:run(targetGUID)	-- main content of script
 		end
 
 			-- Check: Charge if possible in battle stance
-			if (self.enableCharge and self.battleStance) and not IsInCombat() then
+			if (self.enableCharge and self.battleStance) and not IsInCombat() and localHealth >= self.eatHealth then
 				if (HasSpell("Charge")) and (not IsSpellOnCD("Charge")) and (targetObj:IsSpellInRange("Charge")) 
 					and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
 
 					if Cast("Charge", targetObj) then 
-					script_nav:resetNavPos();
-					script_nav:resetNavigate();
-					targetObj:FaceTarget();
-					targetObj:AutoAttack();
+						targetObj:FaceTarget();
+						targetObj:AutoAttack();
 					return 4;
 					end
 				end
@@ -464,7 +464,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 			if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (not IsAutoCasting("Attack")) and (targetObj:GetDistance() <= 8) and (not IsMoving()) then
 				targetObj:AutoAttack();
-				targetObj:FaceTarget();
+				--targetObj:FaceTarget();
 			end
 			
 			-- Dismount
@@ -757,7 +757,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end 
 
 			-- Check: Use Bloodrage when we have more than set HP
-			if (GetNumPartyMembers() <= 1) and (targetObj:GetDistance() <= 10) then
+			if (GetNumPartyMembers() <= 1) and (targetObj:GetDistance() <= 10) and targetHealth >= 20 then
 				if (not IsSpellOnCD('Bloodrage') and HasSpell('Bloodrage') and localHealth >= self.bloodRageHealth) then 
 					CastSpellByName('Bloodrage'); 
 					return;
@@ -781,15 +781,16 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 				if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 					if (script_checkAdds:checkAdds()) then
-						script_om:FORCEOM();
+						self.waitTimer = GetTimeEX() + 1000;
+						script_om:FORCEOM()
 						return true;
 					end
 				end
 
 
-				if (not IsMoving()) then
-					targetObj:FaceTarget();
-				end
+				--if (not IsMoving()) then
+				--	targetObj:FaceTarget();
+				--end
 		
 				if (localObj:IsCasting()) and (not IsAutoCasting("Attack")) then
 					targetObj:AutoAttack();
@@ -852,9 +853,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 					end 
 				end  
 
-				if (targetObj:GetDistance() <= 8) and (not IsMoving()) then
-					targetObj:FaceTarget();
-				end
+				--if (targetObj:GetDistance() <= 8) and (not IsMoving()) then
+				--	targetObj:FaceTarget();
+				--end
 
 				-- melee Skill: Rend if we got more than 10 rage battle or bersker stance
 				if (self.battleStance) and (self.enableRend) then
