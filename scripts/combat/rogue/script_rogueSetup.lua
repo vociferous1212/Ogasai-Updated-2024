@@ -3,6 +3,7 @@ script_rogueSetup = {}
 function script_rogueSetup:setup()
 
 	script_rogue.waitTimer = GetTimeEX();
+	script_rogue.riposteTimer = GetTimeEX();
 
 	script_rogue.useStealth = true;
 

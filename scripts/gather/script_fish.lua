@@ -2,7 +2,7 @@ script_fish = {
 	gatherLoaded = include("scripts\\gather\\script_gather.lua"),
 	gatherEXLoaded = include("scripts\\gather\\script_gatherEX.lua"),
 	PoleName = 'Fishing Pole', 
-	useVendor = true,
+	useVendor = false,
 	wasInCombat = false,
 	weaponMainHand = '',
 	weaponOffHand = '',
@@ -12,7 +12,7 @@ script_fish = {
 	message = 'Fishing...',
 	pause = true,
 	setup = false,
-	displayRadar = true,
+	displayRadar = false,
 	useFishRandom = false,
 	fishRandomFloat = 2.2,
 	drawFishNodes = true,
@@ -227,8 +227,10 @@ function script_fish:run()
 			return;
 		end	
 
+		-- find a fishing pool with 20 yards and fish in that pool... keep casting until bobber is in the pool
 		if GetTimeEX() > self.waitTimer then
-				script_fish:findPoolAndFish() end
+				script_fish:findPoolAndFish()
+		end
 
 		if (not self.useFishRandom) then
 			CastSpellByName("Fishing");
@@ -258,6 +260,11 @@ function script_fish:run()
 		else
 
 			self.message = "Waiting for bobber to move...";
+
+			-- find a fishing pool with 20 yards and fish in that pool... keep casting until bobber is in the pool
+			if GetTimeEX() > self.waitTimer then
+				script_fish:findPoolAndFish()
+			end
 		end
 	end
 end
@@ -382,26 +389,39 @@ function script_fish:checkLure(lureName)
 end
 
 function script_fish:findPoolAndFish()
-local targetObj, targetType = GetFirstObject();
+
+	local targetObj, targetType = GetFirstObject();
+
+	-- distance in yards to pool
 	local poolDist = 0;
+	-- bobber position
 	local bPX, bPY, bPZ = 0, 0, 0;
+	-- pool position
 	local pPY, pPY, pPZ = 0, 0, 0;
+	-- distance in yards bobber to pool
 	local distCalc = 0;
+	-- current pool being fished in
 	local poolTarget = 0;
+	-- id of known fishing pools
 	local id = 0;
 
 	while targetObj ~= 0 do
 		if (targetType == 5) then 
+			-- get the display ID to compare with fishing pool tables
 			local id = targetObj:GetObjectDisplayID();
+			-- search the table for the pool
 			for i=0, script_gather.numFish - 1 do
 				if (script_gather.fish[i][1] == id) then
+					-- set this pool as target and get its distance to player in yards
 					poolDist = targetObj:GetDistance()
 					-- pool position
 					pPX, pPY, pPZ = targetObj:GetPosition();
+					-- set this target as the current fishing pool
 					poolTarget = targetObj;
 				end
 			end
-			if poolDist <= 18 and poolDist > 8 and poolTarget ~= nil and poolTarget ~= 0 then
+			-- face the pool if it's within an acceptable fishing range
+			if poolDist <= 20 and poolDist > 8 and poolTarget ~= nil and poolTarget ~= 0 then
 				poolTarget:FaceTarget();
 			end
 				
@@ -409,18 +429,18 @@ local targetObj, targetType = GetFirstObject();
 			if (targetObj:GetCreatorsGUID() == GetLocalPlayer():GetGUID() and targetObj:GetObjectDisplayID() == 668) then
 				-- bobber position
 				bPX, bPY, bPZ = targetObj:GetPosition();
+				-- players position
 				_x, _y, _z = GetLocalPlayer():GetPosition();
+				-- distance in yards from pool to bobber
 				distCalc = GetDistance3D(pPX, pPY, pPZ, bPX, bPY, bPZ);
+				-- distance in yards of player to pool
 				distToPoolCalc = GetDistance3D(_x, _y, _z, pPX, pPY, pPZ);
 
 				-- there is about a 10 yard distance between player position and pool where it will never land in a pool
-				if distCalc > 3 and distToPoolCalc > 8 and distToPoolCalc <= 18 then
+				if distCalc > 3 and distToPoolCalc > 8 and distToPoolCalc <= 20 then
 					CastSpellByName("Fishing");
 					self.waitTimer = GetTimeEX() + 1000;
 				end
-				
-			else		
-			--CastSpellByName("Fishing");
 			end
 		end
 	targetObj, targetType = GetNextObject(targetObj);

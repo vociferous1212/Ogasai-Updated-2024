@@ -179,7 +179,7 @@ function script_grindValidEnemy:enemyIsValid(i)
         if (script_grind.skipHardPull) and (script_grind.extraSafe)
             and (i:GetDistance() <= 65)
             and (script_grind:isTargetBlacklisted(i:GetGUID()))
-            and (script_aggro:safePullRecheck(i)) then
+            and (script_aggro:safePullRecheck(i)) or script_grind:isTargetingMe(i) then
             if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
                 and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
                 and (i:GetLevel() <= script_grind.maxLevel and i:GetLevel() >= script_grind.minLevel)
@@ -197,7 +197,6 @@ function script_grindValidEnemy:enemyIsValid(i)
                 and not (script_grind.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
             ) then
                 if isTargetInRange() then
-                    script_grind.enemyObj = currentObj; -- Force bot to keep this target
 			script_grind.newTargetTimer = GetTimeEX() + 2000;
                     return true;
                 end
@@ -210,7 +209,7 @@ function script_grindValidEnemy:enemyIsValid(i)
             and (script_grind:isTargetBlacklisted(i:GetGUID()))
             and (script_grind.safePullAvoidTargets)
             and (script_aggro:safePullRecheck(i))
-            and (i:GetDistance() <= 35) then
+            and (i:GetDistance() <= 35) or script_grind:isTargetingMe(i) then
             if (not script_grind:isTargetHardBlacklisted(i:GetGUID()))
                 and (not i:IsDead() and i:CanAttack() and not i:IsCritter()
                 and (i:GetLevel() <= script_grind.maxLevel and i:GetLevel() >= script_grind.minLevel)
@@ -228,7 +227,6 @@ function script_grindValidEnemy:enemyIsValid(i)
                 and not (script_grind.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
             ) then
                 if isTargetInRange() then
-                    script_grind.enemyObj = currentObj; -- Force bot to keep this target
 			script_grind.newTargetTimer = GetTimeEX() + 2000;
                     return true;
                 end

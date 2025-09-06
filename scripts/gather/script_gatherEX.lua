@@ -79,11 +79,15 @@ function script_gatherEX:setup()
 	script_gather:addLock("Battered Footlocker", 5743);
 
 	script_gather:addFish("Floating Wreckage", 6434);
-	script_gather:addFish("Safefish School", 6435);
-	script_gather:addFish("Firefin Snapper School", 6482);
-	script_gather:addFish("Oily Blackmouth School", 6291);
-	script_gather:addFish("Stonescale Eel Swarm", 6742);
-	script_gather:addFish("Tasty Fish", 180248);
+	script_gather:addFish("Sagefish", 6435);
+	script_gather:addFish("Firefin Snapper", 6482);
+	script_gather:addFish("Oily Blackmouth", 6291);
+	script_gather:addFish("Stonescale Eel", 6742);
+	script_gather:addFish("Deviate Fish", 180658);
+	script_gather:addFish("Oil Spill", 180661);
+	script_gather:addFish("Greater Sagefish", 180684);
+	script_gather:addFish("Elemental Water Pool", 180753);
+	--script_gather:addFish("Tasty Fish", 180248);
 end
 
 function script_gatherEX:drawFishNodes()

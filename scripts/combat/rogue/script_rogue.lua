@@ -51,6 +51,7 @@ script_rogue = {
 	ppVarUsed = false,	-- pickpocket variable to check if we have completed an action
 	useThrow = true,	-- use throwing weapons
 	stealthWasEnabled = false,	-- was stealth enabled to reset GetMoney() if we click to enable stealth while botting
+	riposteTimer = 0,	-- some servers are causing riposte to spam on beasts and such...
 }
 
 function script_rogue:setup()
@@ -440,11 +441,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Check: Use Riposte whenever we can
-				if targetObj:GetCreatureType() ~= "Beast" and targetObj:GetCreatureType() ~= "Elemental" and (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
-					if (CastSpellByName("Riposte", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1500;
-						return 0;					
-					end
+				if GetTimeEX() > self.riposteTimer and targetObj:GetCreatureType() ~= "Beast" and targetObj:GetCreatureType() ~= "Elemental" and (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
+					CastSpellByName("Riposte", targetObj)
+					self.waitTimer = GetTimeEX() + 1500;
+					self.riposteTimer = GetTimeEX() + 1500;
+					return 0;					
 				end
 
 				-- Check: Do we have the right target (in UI) ??
@@ -531,11 +532,11 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				hasAdrenalineRush = HasSpell('Adrenaline Rush'); 
 
 				-- Check: Use Riposte whenever we can
-				if targetObj:GetCreatureType()== "Beast" and targetObj:GetCreatureType() ~= "Elemental" and (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
-					if (CastSpellByName("Riposte", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1500;
-						return 0; -- return until we cast Riposte
-					end
+				if GetTimeEX() > self.riposteTimer and targetObj:GetCreatureType()== "Beast" and targetObj:GetCreatureType() ~= "Elemental" and (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
+					CastSpellByName("Riposte", targetObj);
+					self.waitTimer = GetTimeEX() + 1500;
+					self.riposteTimer = GetTimeEX() + 1500;
+					return 0;
 				end
 			
 				-- Check: Use Evasion if low HP or more than one enemy attack us

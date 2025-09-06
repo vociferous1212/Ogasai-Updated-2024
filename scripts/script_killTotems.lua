@@ -57,7 +57,7 @@ function script_killTotems:checkForTotems(range)
 
     -- Set closest totem as script_grind.enemyObj
     if closestTotem then
-        script_grind.enemyObj = closestTotem.obj
+        script_grind.enemyObj = closestTotem
         return true
     end
 

@@ -646,10 +646,13 @@ function script_grind:run()
 			or (script_mage.useConeOfCold and HasSpell("Cone of Cold") and not IsSpellOnCD("Cone of Cold") and target:GetHealthPercentage() >= script_mage.coneOfColdHealth and GetLocalPlayer():GetManaPercentage() >= script_mage.coneOfColdMana) then
 				-- stop spell casting frostbolt
 				local fbTable = {[116] = true, [205] = true, [837] = true, [7322] = true, [8406] = true, [8407] = true, [8408] = true, [10179] = true, [10180] = true, [10181] = true, [25304] = true}
-				if fbTable[GetLocalPlayer():GetCasting()] then
+				if fbTable[GetLocalPlayer():GetCasting()] and script_grind:enemiesAttackingUs() == 1 then
+					
 					SpellStopCasting();
+					CastSpellByName("Frost Nova")
+					CastSpellByName("Cone of Cold");
 					-- timer needed for bot to check everything and not recast frostbolt over and over...
-					script_grind.waitTimer = GetTimeEX() + 250;
+					script_grind.waitTimer = GetTimeEX() + 550;
 					script_mage.waitTimer = GetTimeEX() + 750;
 				end
 			end
@@ -1127,7 +1130,7 @@ function script_grind:run()
 		--end
 
 		-- Dont pull if more than 1 add will be pulled check SafePull aggro
-		if (self.enemyObj ~= nil and self.enemyObj ~= 0 and self.skipHardPull) and (self.hotspotReached) then
+		if (self.enemyObj ~= nil and self.enemyObj ~= 0 and self.skipHardPull) and (self.hotspotReached) and not script_grind:isTargetBlacklisted(self.enemyObj:GetGUID()) then
 			if (not script_aggro:safePull(self.enemyObj)) and (not IsInCombat())
 			and (not script_grind:isTargetingMe2(self.enemyObj)) then
 				script_grind:addTargetToBlacklist(self.enemyObj:GetGUID());
@@ -1257,6 +1260,7 @@ function script_grind:run()
 		if not script_grindEX.avoidBlacklisted and not IsInCombat() and not script_grind:isAnyTargetTargetingMe() and self.hotspotReached and script_vendor.status == 0 then
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
+			
 				if not IsAutoCasting("Attack") then self.enemyObj:AutoAttack(); end
 				self.newTargetTime = GetTimeEX() + 1500;
 			end
