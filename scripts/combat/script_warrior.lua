@@ -243,7 +243,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 	--stuck in combat
 		-- don't wait if we have bloodrage, causing us to stick in combat, only if we don't need to eat
 	if (not PlayerHasTarget()) and (IsInCombat() and (not GetLocalPlayer():HasBuff("Bloodrage") or GetLocalPlayer():GetHealthPercentage() < self.eatHealth)) and (script_grind.enemiesAttackingUs() == 0) and (GetNumPartyMembers() < 1) then
-		if IsMoving() then StopMoving(); return true; end
 		self.message = "Stuck in combat... Waiting...";
 		return 4;
 	end
@@ -418,6 +417,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 					if Cast("Charge", targetObj) then 
 						targetObj:FaceTarget();
 						targetObj:AutoAttack();
+						script_nav:resetNavPos()
 					return 4;
 					end
 				end

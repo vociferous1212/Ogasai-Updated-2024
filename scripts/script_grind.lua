@@ -1413,12 +1413,13 @@ function script_grind:run()
 						self.enemyObj = GetGUIDObject(GetTarget())
 					end
 				end
-
-				-- try to walk closer to hotspot area... if we cannot find a target... even if distToHotspot is set
-				if self.hotspotReached and not script_grindEX:isThereAnyValidEnemyNearby() and script_nav:getDistanceToHotspot() > 100 then
-					script_navEX:moveToTarget(localObj, script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
-				end
 			end
+
+-- try to walk closer to hotspot area... if we cannot find a target... even if distToHotspot is set
+				if script_nav.numSavedLocation < 3 and self.hotspotReached and not script_grindEX:isThereAnyValidEnemyNearby() and script_nav:getDistanceToHotspot() > 50 then
+					script_moveToHotspot:moveToHotspot(localObj);
+					return;
+				end
 
 			-- death counter turning variable on and off for 2 or more enemies attacking us
 			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
@@ -1809,8 +1810,6 @@ if (not IsAutoCasting("Attack")) then
 				-- this will also double up as moveToHotspot function
 			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached then
 
-				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot)
-
 				-- reset blacklist/target timer when moving back to hotspot
 				if script_grind.enemyObj == nil and not IsInCombat() then
 					self.newTargetTime = GetTimeEX();
@@ -1818,8 +1817,8 @@ if (not IsAutoCasting("Attack")) then
 
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
-				--script_grind:setWaitTimer(100);
-
+				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
+			return true;
 			end
 
 		-- we are not using auto path and only using walk paths

@@ -19,32 +19,17 @@ script_nav = {
 	drawNav = true,
 }
 
-function script_nav:setup()
-
-end
-
-function script_nav:drawPullRange(range)
-	local localObj = GetLocalPlayer();
-end
-
+function script_nav:setup() end
+function script_nav:drawPullRange(range) local localObj = GetLocalPlayer(); end
 function script_nav:loadHotspotDB(id)
-
 	local hotspot = hotspotDB:getHotSpotByID(id)
-
 	if (hotspot ~= nil and hotspot ~= -1) then
-
 		if (self.currentHotSpotName ~= hotspot['name']) then
-			script_grind.hotspotReached = false;
-			self.savedLocations = {};
-			self.numSavedLocation = 0;
-			self.currentGoToLocation = 0;
+			script_grind.hotspotReached = false; self.savedLocations = {}; self.numSavedLocation = 0; self.currentGoToLocation = 0;
 		end
-
 		self.currentHotSpotX , self.currentHotSpotY, self.currentHotSpotZ, self.currentHotSpotName =
-			hotspot['pos']['x'], hotspot['pos']['y'], hotspot['pos']['z'], hotspot['name'];
-			return true;
+			hotspot['pos']['x'], hotspot['pos']['y'], hotspot['pos']['z'], hotspot['name']; return true;
 	end
-
 	return false;
 end
 
@@ -122,27 +107,21 @@ function script_nav:saveTargetLocation(target, mobLevel)
 end
 
 function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticHotSpot)
-
+	local localObj = GetLocalPlayer();
 	-- Check: Load/update the hotspot
 	if (self.currentHotSpotName ~= 0) then
 		script_nav:updateHotSpot(localObj:GetLevel(), GetFaction(), useStaticHotSpot); 
 	end
-	
-	-- Let's get at least 2 path nodes around the hot spot before we navigate through them
 	if (self.numSavedLocation < 2) then
 		return script_moveToHotspot:moveToHotspot(localObj);
 	end
-
-	-- Check: If we reached the last location index
 	if (self.currentGoToLocation > (self.numSavedLocation - 1)) then
 		self.currentGoToLocation = 0;
 	end
-
 	if script_nav:getDistanceToHotspot() < script_grind.distToHotSpot and not script_grind.hotspotReached then
 		script_grind.hotspotReached = true;
 	end
 
-	-- check to see if we need to move back to hotspot area...
 	if script_nav:getDistanceToHotspot() > script_grind.distToHotSpot then
 		script_grind.hotspotReached = false;
 	end
@@ -157,27 +136,23 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 
 		local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
 
-		if currentDist <= 5
-
-			-- change location if max or min level out of range
+		if currentDist < 5
 			or (script_grind.staticHotSpot and (self.savedLocations[self.currentGoToLocation]['level'] < minLevel
 			or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel)) then
 			self.currentGoToLocation = self.currentGoToLocation + 1;
-			-- returning may be causing nav lock ups...
-			--return "Changing go to location...";
+			--script_grind:setWaitTimer(200);
 		end
-
+		if self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
 		script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-		-- returning anything at all may be causing nav lock ups... must return in a different script
-		--return true;
+		end
+		if not IsMoving() and self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
+		Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+		end
 	end
 return false;
 end
 
-function script_nav:setNextToNodeDist(distance)
-	self.nextNavNodeDistance = distance;
-	self.nextPathNodeDistance = distance;
-end
+function script_nav:setNextToNodeDist(distance) self.nextNavNodeDistance = distance; self.nextPathNodeDistance = distance; end
 
 function script_nav:getLootTarget(lootRadius)
 	local targetObj, targetType = GetFirstObject();
@@ -270,13 +245,13 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 
 	-- Check: If the move to coords are too far away, something wrong don't use those
 	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 45) then
-		return "Moving to target... Nav";
+		--return "Moving to target... Nav";
 	end
 
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
-	return "Navigating to location...";
+	--return "Navigating to location...";
 end
 
 function script_nav:resetNavPos() -- navPosition used for moveToTarget
@@ -344,7 +319,7 @@ function script_nav:navigate(localObj)
 			
 		script_nav:moveToNav(localObj, _x, _y, _z);
 		
-		return "Navigating to path index: " .. self.lastPathIndex;
+		--return "Navigating to path index: " .. self.lastPathIndex;
 	else
 		-- Please load a path...
 		return "No walk path has been loaded...";

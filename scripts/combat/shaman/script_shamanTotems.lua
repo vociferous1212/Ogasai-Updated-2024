@@ -210,15 +210,4 @@ function script_shamanTotems:isAirTotemAlive()
 	i, t = GetNextObject(i); 
 	end
 return false;
-end				
-
-
-
-
-
-
-
-
-
-
-
+end

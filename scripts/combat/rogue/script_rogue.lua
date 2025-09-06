@@ -220,6 +220,8 @@ function script_rogue:run(targetGUID)
 			-- check for adds around us during combat and move to prevent pulling multiple enemies
 			if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (not targetObj:IsCasting()) then
 				if (script_checkAdds:checkAdds()) then
+					self.waitTimer = GetTimeEX() + 1000;
+					script_grind.waitTimer = GetTimeEX() + 1000;
 					script_om:FORCEOM();
 					return true;
 				end
@@ -413,6 +415,8 @@ function script_rogue:run(targetGUID)
 if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) and (not targetObj:IsCasting()) then
 					if (script_checkAdds:checkAdds()) then
 						script_om:FORCEOM();
+						self.waitTimer = GetTimeEX() + 1000;
+						script_grind.waitTimer = GetTimeEX() + 1000;
 						return true;
 					end
 				end
@@ -436,7 +440,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				end
 
 				-- Check: Use Riposte whenever we can
-				if (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
+				if targetObj:GetCreatureType() ~= "Beast" and targetObj:GetCreatureType() ~= "Elemental" and (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
 					if (CastSpellByName("Riposte", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1500;
 						return 0;					
@@ -527,7 +531,7 @@ if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0
 				hasAdrenalineRush = HasSpell('Adrenaline Rush'); 
 
 				-- Check: Use Riposte whenever we can
-				if (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
+				if targetObj:GetCreatureType()== "Beast" and targetObj:GetCreatureType() ~= "Elemental" and (HasSpell("Riposte")) and (script_rogue:canRiposte() and not IsSpellOnCD("Riposte")) and (localEnergy >= 10) then 
 					if (CastSpellByName("Riposte", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1500;
 						return 0; -- return until we cast Riposte
