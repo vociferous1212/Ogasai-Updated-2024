@@ -194,6 +194,14 @@ function script_grindEX:doChecks()
 	
 		-- ensure we wait with the grind script
 		if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then
+
+			-- force casters to face the targets... useful for mage/warlock especially when pulling
+			if IsCasting() and not IsMoving() and PlayerHasTarget() then
+				if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
+					GetTarget():FaceTarget();
+				end
+			end
+
 			return;
 		end
 		

@@ -640,8 +640,8 @@ function script_grind:run()
 	-- or stop spell casting so we can frost nova and run away
 	if HasSpell("Frostbolt") and not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
 		local target = script_grind.enemyObj;
-		if script_grind:enemiesAttackingUs() < 2 and IsCasting() and target:GetDistance() <= 9 and not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite") then
-			if (GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth and script_mage.useWand and GetLocalPlayer():HasRangedWeapon())
+		if script_grind:enemiesAttackingUs() < 2 and IsCasting() and (target:GetDistance() <= 9 or ((GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth) and script_mage.useWand and GetLocalPlayer():HasRangedWeapon())) and not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite") then
+			if ((GetLocalPlayer():GetManaPercentage() <= script_mage.useWandMana or target:GetHealthPercentage() <= script_mage.useWandHealth) and script_mage.useWand and GetLocalPlayer():HasRangedWeapon())
 			or (script_mage.useFrostNova and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova") and GetLocalPlayer():GetManaPercentage() >= 10)
 			or (script_mage.useConeOfCold and HasSpell("Cone of Cold") and not IsSpellOnCD("Cone of Cold") and target:GetHealthPercentage() >= script_mage.coneOfColdHealth and GetLocalPlayer():GetManaPercentage() >= script_mage.coneOfColdMana) then
 				-- stop spell casting frostbolt

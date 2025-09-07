@@ -412,7 +412,14 @@ function script_mage:run(targetGUID)
 
 	-- Check: Do nothing if we are channeling, casting or Ice Blocked
 	if (IsChanneling()) or (IsCasting()) or (localObj:HasBuff("Ice Block")) or (self.waitTimer > GetTimeEX()) then
-		return 4;
+
+		if IsInCombat() and PlayerHasTarget() and not IsMoving() then
+			if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
+				GetTarget():FaceTarget();
+			end
+		end
+
+	return 4;
 	end
 
 	-- set tick rate for script to run

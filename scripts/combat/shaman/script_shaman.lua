@@ -40,6 +40,7 @@ script_shaman = {
 	enhanceWeaponTimer = 0,
 	healingSpellTimer = 0,
 	healingSpellTimer2 = 0,
+	checkPoisonTimer = 0,
 
 }
 
@@ -129,11 +130,14 @@ function script_shaman:setup()
 		self.drinkMana = 40;
 	end
 
+	if HasSpell("Lesser Healing Wave") then self.healingSpell = "Lesser Healing Wave"; end
+
 	self.waitTimer = GetTimeEX();
 	self.enhanceWeaponTimer = GetTimeEX();
 	script_shamanTotems.waitTimer = GetTimeEX();
 	self.healingSpellTimer = GetTimeEX();
 	self.healingSpellTimer2 = GetTimeEX();
+	self.checkPoisonTimer = GetTimeEX();
 
 	self.isSetup = true;
 
@@ -318,11 +322,12 @@ if (IsCasting()) or (IsChanneling()) then
 	end
 
 	-- check cure poison
-	if (HasSpell("Cure Poison")) and (script_checkDebuffs:hasPoison()) and (IsStanding()) then
+	if  (HasSpell("Cure Poison")) and (script_checkDebuffs:hasPoison()) and (IsStanding()) then
 		if (not IsSpellOnCD("Cure Poison")) and (localMana >= 25) then
 			if (CastSpellByName("Cure Poison", localObj)) then
 				self.waitTimer = GetTimeEX() + 1650;
 				script_grind:setWaitTimer(1650);
+				self.checkPoisonTimer = GetTimeEX() + 3000;
 				return true;
 			end
 		end
@@ -466,6 +471,8 @@ function script_shaman:run(targetGUID)
 
 		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement()) then
 			if (script_checkAdds:checkAdds()) then
+				script_grind:setWaitTimer(1000);
+				self.waitTimer = GetTimeEX() + 1000;
 				script_om:FORCEOM();
 				return true;
 			end
