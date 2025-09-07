@@ -40,6 +40,7 @@ function script_follow:run() script_follow:window();
 		-- Accept group invite
 		if (GetNumPartyMembers() < 1 and self.acceptTimer < GetTimeEX()) then self.acceptTimer = GetTimeEX() + 5000; AcceptGroup(); end
 		local leader = GetPartyLeaderObject(); local isVendoring = false;
+-- VENDORING PHASE IF WE ARE CLOSE TO A VENDOR
 		-- If bags are full
 		if (script_followDoVendor.useVendor) and (not IsInCombat()) and (script_followDoVendor:closeToVendor()) then isVendoring = true;
 			if (script_vendor:sell()) then if (CanMerchantRepair()) then RepairAllItems(); 
@@ -48,7 +49,7 @@ function script_follow:run() script_follow:window();
 			return;
 			end
 		end
-
+-- CORPSE WALK PHASE
 		local localObj = GetLocalPlayer();
 		-- Corpse-walk if we are dead
 		if(localObj:IsDead()) then script_follow.tickRate = 100; self.message = "Walking to corpse...";
@@ -61,7 +62,7 @@ function script_follow:run() script_follow:window();
 
 		-- get target attacking us
 		if (localObj:GetUnitsTarget() ~= 0) then self.enemyObj = localObj:GetUnitsTarget(); end
-				
+-- RESTING PHASE			
 		-- Rest
 		if (not IsInCombat() and script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then if(RunRestScript()) then self.message = "Resting...";
 		if (IsMoving() and not localObj:IsMovementDisabed()) then StopMoving(); return; end
@@ -77,7 +78,7 @@ function script_follow:run() script_follow:window();
 				self.isInCombat = false;
 			end
 		end
-
+-- LOOTING PHASE
 		if (not self.isInCombat) and (not IsInCombat() or self.enemyObj == nil) and (script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
 			-- Loot if there is anything lootable and we are not in combat and if our bags aren't full
 			if (not self.skipLooting and not AreBagsFull()) then 
@@ -102,6 +103,7 @@ function script_follow:run() script_follow:window();
 				ClearTarget();
 			end
 		end
+-- COMBAT PHASE
 		if (GetPet() ~= 0) and (GetPet() ~= nil) and (GetPet():GetUnitsTarget() ~= 0) then
 			self.enemyObj = GetPet():GetUnitsTarget():GetGUID();
 		end
@@ -113,15 +115,23 @@ function script_follow:run() script_follow:window();
 				self.enemyObj = nil;
 			end 
 		end
+		--  if target is further than party leaders distance (don't walk further than distance slider set to follow leader) then enemy = nil
 		local enemy = self.enemyObj
 		if (self.limitAttackDist) and (enemy ~= 0) and (enemy ~= nil) and (enemy:GetDistance() > self.followLeaderDistance) then
 			self.enemyObj = nil;
 		end
-if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not IsSpellOnCD("Stealth") and GetPartyLeaderObject():GetUnitsTarget() ~= nil then CastStealth(); end if self.enemyObj ~= nil then 
+		-- rogue stealth before attacking - forced regardless of distance set in combat script
+		if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not IsSpellOnCD("Stealth") and GetPartyLeaderObject():GetUnitsTarget() ~= nil then
+			CastStealth();
+		end
+-- RUN COMBAT SCRIPT ON A GOOD TARGET
+		if self.enemyObj ~= nil then 
 			if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then
 				self.combatError = script_followDoCombat:run();
-			end end
+			end
+		end
 		-- get enemy to attack
+		-- do combat
 		local distance = self.followLeaderDistance;
 		if (GetPartyLeaderObject() ~= 0) and (self.limitAttackDist) and (self.assistInCombat) then
 			if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
@@ -148,27 +158,27 @@ if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not I
 				ClearTarget();
 			end
 		end
-
-		-- do combat
+-- OUT OF COMBAT PHASE AND IN COMBAT HEALS - it's an ogasai quirk... don't leave open else statements.. use elseif
+		-- heals and buffs 
 		if (not localObj:IsDead()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
-
+			-- heals and buffs out of combat
 			if (script_priestFollowerHeals.enableHeals) or (script_shamanFollowerHeals.enableHeals) or (script_druidFollowerHeals.enableHeals) or (script_paladinFollowerHeals.enableHeals) then
-			-- Healer check: heal/buff the party
-			for i = 1, GetNumPartyMembers() do
-				local member = GetPartyMember(i);
-				if (not member:IsDead()) and (not localObj:IsDead()) and (not IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
-					if (script_followHealsAndBuffs:healAndBuff()) then
-						--self.waitTimer = GetTimeEX() + 1550;
-						self.message = "Healing/buffing the party...";
-						ClearTarget();
-						return true;
+				-- Healer check: heal/buff the party
+				for i = 1, GetNumPartyMembers() do
+					local member = GetPartyMember(i);
+					if (not member:IsDead()) and (not localObj:IsDead()) and (not IsMoving()) and (not IsCasting()) and (not IsChanneling()) then
+						if (script_followHealsAndBuffs:healAndBuff()) then
+							--self.waitTimer = GetTimeEX() + 1550;
+							self.message = "Healing/buffing the party...";
+							ClearTarget();
+							return true;
+						end
 					end
 				end
 			end
-			end
 		else
 			self.enemyObj = nil;
-
+			-- heals and buffs in combat force to run it because of 'else'
 			-- Healer check: heal/buff the party
 			if (script_priestFollowerHeals.enableHeals) or (script_shamanFollowerHeals.enableHeals) or (script_druidFollowerHeals.enableHeals) or (script_paladinFollowerHeals.enableHeals) then
 			for i = 1, GetNumPartyMembers() do
@@ -181,23 +191,24 @@ if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not I
 					end
 				end
 			end
-			end
-			local leader = GetPartyLeaderObject();
-			-- follow leader
-			if (not IsInCombat()) and (leader ~= 0) and (self.lootObj == nil)
-				and (not leader:IsDead()) and (not localObj:IsDead()) then
-				if (not IsCasting()) and (not IsChanneling())
-				and (not IsDrinking()) and (not IsEating()) and (not IsLooting())
-				and (leader:GetDistance() > self.followLeaderDistance-5) then
-					if (script_followMove:followLeader()) then
-						self.isStuck = false;
-						return true;
-					end
-				end	
-			end
 		end
-		if (leader ~= 0 and leader:GetDistance() == 0) or (leader == 0) and (not isVendoring) then
-			self.message = "leader GetDistance == 0... no path";
-			return;
-		end	
+-- END COMBAT PHASE FOLLOW PARTY LEADER
+		local leader = GetPartyLeaderObject();
+		-- follow leader
+		if (not IsInCombat()) and (leader ~= 0) and (self.lootObj == nil)
+			and (not leader:IsDead()) and (not localObj:IsDead()) then
+			if (not IsCasting()) and (not IsChanneling())
+			and (not IsDrinking()) and (not IsEating()) and (not IsLooting())
+			and (leader:GetDistance() > self.followLeaderDistance-5) then
+				if (script_followMove:followLeader()) then
+					self.isStuck = false;
+					return true;
+				end
+			end	
+		end
+	end
+	if (leader ~= 0 and leader:GetDistance() == 0) or (leader == 0) and (not isVendoring) then
+		self.message = "leader GetDistance == 0... no path";
+		return;
+	end	
 end
