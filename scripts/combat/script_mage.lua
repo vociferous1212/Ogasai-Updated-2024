@@ -47,6 +47,7 @@ script_mage = {
 	moveAwayRest = true,
 	useFrostArmor = true,
 	useMageArmor = false,
+	spellRange = 29,	-- spell range of main damage spells fireball/frostbolt (extended with talents)
 }
 
 function script_mage:window()
@@ -375,7 +376,7 @@ end
 
 function script_mage:run(targetGUID)
 	
-	script_grind.combatScriptRange = 26
+	script_grind.combatScriptRange = script_mage.spellRange;
 
 	-- check setup
 	if (not self.isSetup) then
@@ -520,7 +521,7 @@ function script_mage:run(targetGUID)
 			end
 		end 
 		
-		if (targetObj:GetDistance() > 30) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
+		if (targetObj:GetDistance() > script_grind.combatScriptRange) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
 			return 3;
 		end
 
@@ -559,7 +560,7 @@ function script_mage:run(targetGUID)
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 
 			-- frost mage selected
-			if (self.frostMage) and (targetObj:GetDistance() <= 30) and (targetObj:IsInLineOfSight()) then
+			if (self.frostMage) and (targetObj:GetDistance() <= script_mage.spellRange) and (targetObj:IsInLineOfSight()) then
 				if (script_mage.frostMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					self.waitTimer = GetTimeEX() + 2600;
@@ -569,7 +570,7 @@ function script_mage:run(targetGUID)
 				end
 
 				-- fire mage selected use these spells instead
-			elseif (self.fireMage) and (targetObj:GetDistance() <= 30) then
+			elseif (self.fireMage) and (targetObj:GetDistance() <= script_mage.spellRange) then
 				if (script_mage.fireMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					self.waitTimer = GetTimeEX() + 2600;
@@ -803,7 +804,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Check: Polymorph add
-			if (targetObj ~= nil and self.polymorphAdds and script_grind:enemiesAttackingUs(5) > 1 and HasSpell('Polymorph') and not self.addPolymorphed and self.polyTimer < GetTimeEX()) and (targetObj:GetDistance() < 25) then
+			if (targetObj ~= nil and self.polymorphAdds and script_grind:enemiesAttackingUs() > 1 and HasSpell('Polymorph') and not self.addPolymorphed) and (targetObj:GetDistance() < 25) then
 				script_grind.tickRate = 250;
 				self.message = "Polymorphing add...";
 				script_mage:polymorphAdd(targetObj:GetGUID());
@@ -850,7 +851,7 @@ function script_mage:run(targetGUID)
 
 			-- arcane explosion in group 
 			if (GetNumPartyMembers() > 1) or (GetLocalPlayer():GetLevel() - targetObj:GetLevel() >= 4) or (targetObj:GetUnitName() == "Flesh Eating Worm") then
-				if (HasSpell("Arcane Explosion")) and (targetObj:GetDistance() < 6) and (localMana > 25) and (script_grind:enemiesAttackingUs(5) >= 2) then
+				if (HasSpell("Arcane Explosion")) and (targetObj:GetDistance() < 6) and (localMana > 25) and (script_grind:enemiesAttackingUs(10) >= 2) then
 					if (CastSpellByName("Arcane Explosion")) then
 						return 0;
 					end
@@ -916,6 +917,7 @@ function script_mage:run(targetGUID)
 
 			-- Wand if mana or target health is low
 			if (self.useWand and localObj:HasRangedWeapon()) and (localMana <= self.useWandMana or targetHealth <= self.useWandHealth) and (not IsChanneling()) and (not localObj:IsStunned()) and (not IsMoving()) then
+				if targetObj:GetDistance() > 28 or not targetObj:IsInLineOfSight() then script_mage.waitTimer = GetTimeEX() + 1000;  return 3; end
 				self.message = "Using wand...";
 				if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) then
 					targetObj:FaceTarget();
@@ -950,7 +952,7 @@ function script_mage:run(targetGUID)
 			end
 			
 					-- check range
-					if (not targetObj:IsSpellInRange("Frostbolt")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova") or targetObj:GetDistance() > script_grind.combatScriptRange) and not (targetObj:HasDebuff("Polymorph")) then
+					if (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova") or targetObj:GetDistance() > script_grind.combatScriptRange) and not (targetObj:HasDebuff("Polymorph")) then
 						return 3;
 					end
 
@@ -978,7 +980,7 @@ function script_mage:run(targetGUID)
 					end
 
 					-- cast pyroblast
-					if (targetObj:GetDistance() < 30) then
+					if (targetObj:GetDistance() < script_mage.spellRange) then
 
 						if (HasSpell("Pyroblast")) then
 							if (CastSpellByName("Pyroblast", targetObj)) then
@@ -1001,7 +1003,7 @@ function script_mage:run(targetGUID)
 			if (self.frostMage) and (not HasSpell("Frostbolt")) and (not IsMoving()) then				
 		
 				-- else if not has frostbolt then use fireball as range check
-				if (not targetObj:IsSpellInRange("Fireball")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova") or targetObj:GetDistance() > script_grind.combatScriptRange) then
+				if (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova") or targetObj:GetDistance() > script_grind.combatScriptRange) then
 					return 3;
 				end	
 				FaceTarget();
@@ -1017,7 +1019,7 @@ function script_mage:run(targetGUID)
 			-- this is here to check for low level not having a wand yet
 			if (self.frostMage) and (not IsMoving()) and (not localObj:HasRangedWeapon()) and (targetHealth <= self.useWandHealth) and (not IsSpellOnCD("Frostbolt")) then				
 		
-				if (not targetObj:IsSpellInRange("Fireball")) or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
+				if targetObj:GetDistance() > script_grind.combatScriptRange or (not targetObj:IsInLineOfSight()) and (not targetObj:HasDebuff("Frost Nova")) then
 					return 3;
 				end	
 				
@@ -1310,22 +1312,26 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 	end	
 
 -- eat AND drink....
-	if (IsEating() and not IsDrinking() and localMana <= 85) or (IsDrinking() and not IsEating() and localHealth <= 80) then
-		if not IsEating() then
-			if (script_helper:eat()) then 
+	if (localHealth <= self.eatHealth or (IsEating() and not IsDrinking() and localMana <= 85)) or (localMana <= self.drinkMana or (IsDrinking() and not IsEating() and localHealth <= 80)) and not IsSwimming() then
+		if IsMoving() then StopMoving(); return true; end
+
+		if not IsEating() and (localHealth <= self.eatHealth or (IsDrinking() and localHealth <= 80)) then
+			if (script_helper:eat()) then
+				--script_helper:drinkWater();
 				self.message = "Eating..."; 
 				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
-				return true; 
+				--return true; 
 			else 
 				self.message = "No food! (or food not included in script_helper)";
 				return true; 
 			end
 		end	
-		if not IsDrinking() then
+		if not IsDrinking() and (localMana <= self.drinkMana or (IsEating() and localMana <= 85)) then
 			if (script_helper:drinkWater()) then 
+				--script_helper:eat();
 				self.message = "Drinking...";
 				script_grind.autoBlacklistTimer = GetTimeEX() + 15000; 
-				return true; 
+				--return true; 
 			else 
 				self.message = "No drinks! (or drink not included in script_helper)";
 				return true; 
@@ -1346,10 +1352,11 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 			return true;
 		end
 
-		if (script_helper:drinkWater()) then 
+		if (script_helper:drinkWater()) then
+			--script_helper:eat()
 			self.message = "Drinking...";
 			script_grind.autoBlacklistTimer = GetTimeEX() + 15000; 
-			return true; 
+			--return true; 
 		else 
 			self.message = "No drinks! (or drink not included in script_helper)";
 			return true; 
@@ -1365,9 +1372,10 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		end
 		
 		if (script_helper:eat()) then 
+			--script_helper:drinkWater();
 			self.message = "Eating..."; 
 			script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
-			return true; 
+			--return true; 
 		else 
 			self.message = "No food! (or food not included in script_helper)";
 			return true; 
@@ -1391,8 +1399,8 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 	
 	if (IsDrinking() or IsEating()) then
 		self.message = "Resting to full hp/mana...";
-		script_grind:setWaitTimer(2000);
-		self.waitTimer = GetTimeEX() + 2000;
+		--script_grind:setWaitTimer(2000);
+		--self.waitTimer = GetTimeEX() + 2000;
 		return true;
 	end
 
@@ -1403,7 +1411,7 @@ end
 function script_mage.frostMagePull(targetObj)
 
 	-- recheck line of sight on target
-	if (not IsMounted()) and ( (not targetObj:IsInLineOfSight()) or  (targetObj:GetDistance() > 30 and not IsCasting() and not IsChanneling()) or (targetObj:GetDistance() > 30) ) and (PlayerHasTarget()) and (not IsSpellOnCD("Frostbolt")) then
+	if (not IsMounted()) and ( (not targetObj:IsInLineOfSight()) or  (targetObj:GetDistance() > script_mage.spellRange and not IsCasting() and not IsChanneling()) or (targetObj:GetDistance() > script_mage.spellRange) ) and (PlayerHasTarget()) and (not IsSpellOnCD("Frostbolt")) then
 		return 3;
 	else
 		if (IsMoving()) then

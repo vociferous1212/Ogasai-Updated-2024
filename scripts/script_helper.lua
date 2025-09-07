@@ -337,34 +337,34 @@ end
 
 function script_helper:eat()
 	for i=0,self.numFood do
-		if (HasItem(self.food[i])) then
+		if (HasItem(self.food[i])) and not IsEating() and not IsMoving() then
 			if (UseItem(self.food[i])) then
-				self.waitTimer = GetTimeEX() + 1200;
-				script_grind:setWaitTimer(1200);
+				--self.waitTimer = GetTimeEX() + 1200;
+				--script_grind:setWaitTimer(1200);
 				_quest:setTimer(1200);
 				return true;
 			end
 		end
 	end
-	self.waitTimer = GetTimeEX() + 1200;
-	script_grind:setWaitTimer(1200);
+	--self.waitTimer = GetTimeEX() + 1200;
+	--script_grind:setWaitTimer(1200);
 	_quest:setTimer(1200);
 	return false;
 end
 
 function script_helper:drinkWater()
 	for i=0,self.numWater do
-		if (HasItem(self.water[i])) then
+		if (HasItem(self.water[i])) and not IsDrinking() and not IsMoving() then
 			if (UseItem(self.water[i])) then
-				self.waitTimer = GetTimeEX() + 1600;
-				script_grind:setWaitTimer(1600);
+				--self.waitTimer = GetTimeEX() + 1600;
+				--script_grind:setWaitTimer(1600);
 				_quest:setTimer(1600);
 				return true;
 			end
 		end
 	end
-	self.waitTimer = GetTimeEX() + 1200;
-	script_grind:setWaitTimer(1200);
+	--self.waitTimer = GetTimeEX() + 1200;
+	--script_grind:setWaitTimer(1200);
 	_quest:setTimer(1800);
 	return false;
 end

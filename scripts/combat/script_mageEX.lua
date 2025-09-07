@@ -20,6 +20,14 @@ function script_mageEX:menu()
 			SameLine();
 
 		wasClicked, script_mage.fireMage = Checkbox("Fire Spec", script_mage.fireMage);
+		Text("");
+		Text("Frostbolt/Fireball Spell Range");
+		if script_mage.frostMage then
+		script_mage.spellRange = SliderInt("Spell Range", 29, 36, script_mage.spellRange)
+		end
+		if script_mage.fireMage then
+		script_mage.spellRange = SliderInt("Spell Range", 29, 41, script_mage.spellRange)
+		end
 	end
 
 	Separator();

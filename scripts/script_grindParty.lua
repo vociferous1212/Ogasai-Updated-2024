@@ -41,7 +41,7 @@ function script_grindParty:partyOptions()
 			memberEnergy = member:GetEnergyPercentage();
 		end
 
-		if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 then
+		if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil then
 			local i, t = GetFirstObject();
 			while i ~= 0 do
 				if t == 3 then
@@ -101,12 +101,12 @@ function script_grindParty:isAttackingGroup()
                 for p = 1, GetNumPartyMembers() do
                     local member = GetPartyMember(p);
                     if (member ~= nil and target:GetGUID() == member:GetGUID()) then
-                        return true, i; -- Return true and the enemy object
+                        return true;
                     end
                 end
             end
         end
         i, typeObj = GetNextObject(i);
     end
-    return false, nil; -- No enemy found targeting the group
+    return false
 end
