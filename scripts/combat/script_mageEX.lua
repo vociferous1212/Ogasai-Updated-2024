@@ -55,6 +55,12 @@ function script_mageEX:menu()
 				wasClicked, script_mage.useWand = Checkbox("Use Wand", script_mage.useWand);
 
 			end
+
+			if (localObj:HasRangedWeapon()) then
+				SameLine();
+			end
+			if not script_mage.useMageArmor and HasSpell("Frost Armor") then wasClicked, script_mage.useFrostArmor = Checkbox("Use Frost Armor", script_mage.useFrostArmor); end
+			if not script_mage.useFrostArmor and HasSpell("Mage Armor") then SameLine(); wasClicked, script_mage.useMageArmor = Checkbox("Use Mage Armor", script_mage.useMageArmor); end
 			
 			if (HasSpell("Fire Blast")) then
 

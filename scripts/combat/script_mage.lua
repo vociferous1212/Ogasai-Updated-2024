@@ -43,8 +43,10 @@ script_mage = {
 	frostMage = true,	-- is frost spec yes/no
 	scorchStacks = 2,	-- scorch debuff stacks on target
 	useScorch = true,	-- use  yes/no
-	waitTimer = GetTimeEX(),	-- set wait timer variable. probably not needed?
+	waitTimer = GetTimeEX(),
 	moveAwayRest = true,
+	useFrostArmor = true,
+	useMageArmor = false,
 }
 
 function script_mage:window()
@@ -760,7 +762,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Use Mana Gem when low on mana
-			if (localMana < self.manaGemMana and GetTimeEX() > self.gemTimer) and targetObj:GetHealthPercentage() >= 10 then
+			if (localMana < self.manaGemMana and GetTimeEX() > self.gemTimer) and targetObj:GetHealthPercentage() >= 15 then
 				for i=0,self.numGem do
 					if(HasItem(self.manaGem[i])) then
 						UseItem(self.manaGem[i]);
@@ -786,7 +788,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Use Mana Shield if we have more than 35 percent mana and no active Ice Barrier
-			if (not localObj:HasBuff("Ice Barrier")) and (HasSpell("Mana Shield")) and (localMana >= self.manaShieldMana) and (localHealth <= self.manaShieldHealth) and (not localObj:HasBuff("Mana Shield")) and (IsInCombat()) and (targetHealth >= 10 or script_grind:enemiesAttackingUs() >= 2 or localHealth <= 20) and targetObj:GetDistance() <= 12 then
+			if self.useManaShield and (not localObj:HasBuff("Ice Barrier")) and (HasSpell("Mana Shield")) and (localMana >= self.manaShieldMana) and (localHealth <= self.manaShieldHealth) and (not localObj:HasBuff("Mana Shield")) and (IsInCombat()) and (targetHealth >= 10 or script_grind:enemiesAttackingUs() >= 2 or localHealth <= 20) and targetObj:GetDistance() <= 12 then
 				if (not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite")) then
 					CastSpellByName("Mana Shield");
 					self.waitTimer = GetTimeEX() + 1650;
@@ -1235,20 +1237,25 @@ if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		end
 		
 		-- ice armor / frost armor
-		if (HasSpell("Ice Armor")) and (not localObj:HasBuff("Ice Armor")) and (localMana > 20) then
+		if self.useFrostArmor and (HasSpell("Ice Armor")) and (not localObj:HasBuff("Ice Armor")) and (localMana > 20) then
 			if (not CastSpellByName("Ice Armor", localObj)) then
 				self.waitTimer = GetTimeEX() + 1700;
 				script_grind:setWaitTimer(1700);
 				return true;
 			end
-		elseif (not HasSpell("Ice Armor")) and (HasSpell("Frost Armor")) and (not localObj:HasBuff("Frost Armor")) and (localMana > 20) then	
+		elseif self.useFrostArmor and (not HasSpell("Ice Armor")) and (HasSpell("Frost Armor")) and (not localObj:HasBuff("Frost Armor")) and (localMana > 20) then	
 			if (not CastSpellByName("Frost Armor", localObj)) then
 				self.waitTimer = GetTimeEX() + 1700;
 				script_grind:setWaitTimer(1700);
 				return true;
 			end
+		elseif self.useMageArmor and HasSpell("Mage Armor") and not localObj:HasBuff("Mage Armor") and localMana >= 20 then
+			if (not CastSpellByName("Mage Armor", localObj)) then
+				self.waitTimer = GetTimeEX() + 1700;
+				script_grind:setWaitTimer(1700);
+				return true;
+			end
 		end
-	
 		-- dampen magic
 		if (self.useDampenMagic) then
 			if (HasSpell("Dampen Magic")) and (not localObj:HasBuff("Dampen Magic")) and (localMana > 15) then
