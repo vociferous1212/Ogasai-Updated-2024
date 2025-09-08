@@ -22,73 +22,72 @@ function script_grindParty:partyOptions()
 
 	for i = 1, GetNumPartyMembers() do
 
-		if (GetNumPartyMembers() > 0) then
-			member = GetPartyMember(i);
-			memberHealth = member:GetHealthPercentage();
-			memberDistance = member:GetDistance();
-		end	
-		if (member:GetManaPercentage() > 0) then
-			groupMana = groupMana + member:GetManaPercentage();
-			manaUsers = manaUsers + 1;
-			memberMana = member:GetManaPercentage();
-		end
-
-		if (member:GetRagePercentage() > 0) then
-			memberRage = member:GetRagePercentage();
-		end
-
-		if (member:GetEnergyPercentage() > 0) then
-			memberEnergy = member:GetEnergyPercentage();
-		end
-
-		if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil then
-			local i, t = GetFirstObject();
-			while i ~= 0 do
-				if t == 3 then
-					if i:GetDistance() <= 40 and script_grind:isTargetingGroup(i) then
-						script_grind.enemyObj = i;
-						i:AutoAttack();
-					end
-				end
-			i, t = GetNextObject(i);
+			if (GetNumPartyMembers() > 0) then
+				member = GetPartyMember(i);
+				memberHealth = member:GetHealthPercentage();
+				memberDistance = member:GetDistance();
+			end	
+			if (member:GetManaPercentage() > 0) then
+				groupMana = groupMana + member:GetManaPercentage();
+				manaUsers = manaUsers + 1;
+				memberMana = member:GetManaPercentage();
 			end
-		end
 	
-		if (self.waitForGroup) and (script_grind:getTargetAttackingUs() == nil) and (not IsInCombat()) then
-			if (member:HasBuff("Drink") and memberMana < 90) or (member:HasBuff("Eat") and memberHealth < 90) then
-				if (member:GetDistance() < 10) then
-					--local x, y, z = member:GetDistance();
-					--if (script_navEX:moveToTarget(localObj, x, y, z)) then
-					--	return true;
-					--end
+			if (member:GetRagePercentage() > 0) then
+				memberRage = member:GetRagePercentage();
+			end
+	
+			if (member:GetEnergyPercentage() > 0) then
+				memberEnergy = member:GetEnergyPercentage();
+			end
+	end
+
+	if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil then
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				if i:GetDistance() <= 40 and script_grind:isTargetingGroup(i) then
+					script_grind.enemyObj = i;
+					i:AutoAttack();
 				end
-				
-				script_grind.message = 'Waiting for group to regen mana (25%+)...';
-				ClearTarget();
-			return true;
 			end
+		i, t = GetNextObject(i);
 		end
-
-		if (self.waitForMemberDistance) and (memberDistance > 100) and (not IsInCombat()) and (not script_grindParty:isAttackingGroup()) then
-
-			if (IsMoving()) then
-				StopMoving();
+	end
+	
+	if (self.waitForGroup) and (script_grind:getTargetAttackingUs() == nil) and (not IsInCombat()) then
+		if (member:HasBuff("Drink") and memberMana < 90) or (member:HasBuff("Eat") and memberHealth < 90) then
+			if (member:GetDistance() < 10) then
+				--local x, y, z = member:GetDistance();
+				--if (script_navEX:moveToTarget(localObj, x, y, z)) then
+				--	return true;
+				--end
 			end
-
-			script_grind.message = 'Waiting for group members...';
+			
+			script_grind.message = 'Waiting for group to regen mana (25%+)...';
 			ClearTarget();
-			return true;
+		return true;
+		end
+	end
+
+	if (self.waitForMemberDistance) and (memberDistance > 100) and (not IsInCombat()) and (not script_grindParty:isAttackingGroup()) then
+
+		if (IsMoving()) then
+			StopMoving();
 		end
 
-		if (self.healGroup) then
-			if (member:GetDistance() <= 40) then
-				if (script_followHealsAndBuffs:healAndBuff()) then
-					return true;
-				end
+		script_grind.message = 'Waiting for group members...';
+		ClearTarget();
+		return true;
+	end
+
+	if (self.healGroup) then
+		if (member:GetDistance() <= 40) then
+			if (script_followHealsAndBuffs:healAndBuff()) then
+				return true;
 			end
 		end
-	end -- end for loop
-
+	end
 return false;
 end
 

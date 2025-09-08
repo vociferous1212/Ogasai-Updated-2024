@@ -648,7 +648,7 @@ function script_grind:run()
 		TargetHasRangedWeapon(target);
 	end
 		
-	-- check party members
+	-- check party members for their targets/distance/mana/buffs/heals
 	if (GetNumPartyMembers() >= 1) then
 		script_grindParty:partyOptions();
 	end
