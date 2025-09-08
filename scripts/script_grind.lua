@@ -248,6 +248,7 @@ script_grind = {
 	autoBlacklistTimer = 0,
 	autoBlacklistTimerSet = false,
 	checkTotemKillTimer = GetTimeEX(),
+	currentCastingTime = 0,
 
 }			
 
@@ -590,6 +591,9 @@ function script_grind:run()
 		end
 	end
 
+
+-- PAUSE BOT
+
 	-- pause bot
 	if (self.pause) then self.message = "Paused by user...";
 		-- set paranoid used to off to reset paranoia
@@ -808,17 +812,17 @@ function script_grind:run()
 	end
 
 	-- make sure the grinder cannot run if we are resting...
-	if (not IsInCombat()) and (not petHasTarget) then
-		if (IsEating() and GetLocalPlayer():GetHealthPercentage() < 95)
-			or (IsDrinking() and GetLocalPlayer():GetManaPercentage() < 95)
-		then
-			self.newTargetTime = GetTimeEX();
-			self.autoBlacklistTimer = 15000;
-			self.blacklistLootTimeCheck = GetTimeEX() * 2;
-			script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
-			return;
-		end
-	end
+	--if (not IsInCombat()) and (not petHasTarget) then
+	--	if (IsEating() and GetLocalPlayer():GetHealthPercentage() < 95)
+	--		or (IsDrinking() and GetLocalPlayer():GetManaPercentage() < 95)
+	--	then
+	--		self.newTargetTime = GetTimeEX();
+	--		self.autoBlacklistTimer = 15000;
+	--		self.blacklistLootTimeCheck = GetTimeEX() * 2;
+	--		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
+	--		return;
+	--	end
+	--end
 
 	-- Do all checks
 	if (script_grindEX:doChecks()) then

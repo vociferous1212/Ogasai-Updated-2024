@@ -1,54 +1,98 @@
-script_combatHelper = {
-
-}
+script_combatHelper = {castingTimer = 0, castingTimerSet = false}
 
 
 -- override combat script for "clutch" in combat situations...
 function script_combatHelper:run()
 
-	-- get counterspell out ASAP
+	-- don't stop spell casting if we are almost done casting a spell...
+	-- 2/3 of the casting time of frostbolt is 1666.67MS at 2.5 second cast time
+	if GetLocalPlayer():IsCasting() and not self.castingTimerSet then
+		self.castingTimer = GetTimeEX() + 1667;
+		self.castingTimerSet = true;
+	end
+	if not GetLocalPlayer():IsCasting() and self.castingTimerSet then
+		self.castingTimer = 0;
+		self.castingTimerSet = false;
+	end
+
+-- get counterspell out ASAP
 	-- if target is casting and we are casting then stop casting and counterspell
+	if self.castingTimer > GetTimeEX() then
 	if HasSpell("Counterspell") and not IsSpellOnCD("Counterspell") and GetLocalPlayer():GetManaPercentage() >= 10 and not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and IsCasting() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
+
 		local target = script_grind.enemyObj;
+
 		-- counterspell table... bot wants to stop spell casting when trying to cast counterspell...
 		local cSTable = { [2139] = true, [11255] = true, [12598] = true, [12600] = true, [12601] = true, [12602] = true }
+
+		-- if target is within distance and we are not casting counterspell...
 		if target:GetDistance() <= 30 and target:IsCasting() and GetLocalPlayer():IsCasting() and not cSTable[GetLocalPlayer():GetCasting()] then
-				SpellStopCasting();
+			-- stop spellcasting whatever we are casting
+			SpellStopCasting();
+
+			-- cast counterspell
 			if (CastSpellByName("Counterspell", target)) then
 				script_mage.waitTimer = GetTimeEX() + 500;
 			end
 		end
 	end
+	end
 
 
 -- try to stop spell casting so we can use wand if target is really low health.. waste of mana
-	-- or stop spell casting so we can frost nova and run away
+-- or stop spell casting so we can frost nova and run away
+-- or stop casting so we can cone of cold and hope it procs freezing effects so we can run away
+
+	-- make sure there's no polymorph adds that will be hurt with AoE spells
+	if self.castingTimer > GetTimeEX() then
 	if HasSpell("Frostbolt") and not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and not script_mage:isAddPolymorphed() then
+
 		local target = script_grind.enemyObj;
+
+		-- if target is below wand health or my mana is below wand mana (OR) target is not frozen (OR) distance is too close
 		if script_grind:enemiesAttackingUs() < 2 and IsCasting() and (target:GetDistance() <= 9 or ((GetLocalPlayer():GetManaPercentage() < script_mage.useWandMana or target:GetHealthPercentage() < script_mage.useWandHealth) and script_mage.useWand and GetLocalPlayer():HasRangedWeapon())) and ((not target:HasDebuff("Frost Nova") and not target:HasDebuff("Frostbite")) or (GetLocalPlayer():GetManaPercentage() < script_mage.useWandMana or target:GetHealthPercentage() < script_mage.useWandHealth) and script_mage.useWand) then
+
+			-- we need to do a lot of checks to make one big ol' hard to read if statement
 			if ((GetLocalPlayer():GetManaPercentage() < script_mage.useWandMana or target:GetHealthPercentage() < script_mage.useWandHealth) and script_mage.useWand and GetLocalPlayer():HasRangedWeapon())
+
+			-- make sure we have frost nova and is not on cooldown and conditions are acceptable
 			or (script_mage.useFrostNova and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova") and GetLocalPlayer():GetManaPercentage() >= 10)
+
+			-- make sure we have the cone of cold and is not on cooldown and conditions are acceptable
 			or (script_mage.useConeOfCold and HasSpell("Cone of Cold") and not IsSpellOnCD("Cone of Cold") and target:GetHealthPercentage() >= script_mage.coneOfColdHealth and GetLocalPlayer():GetManaPercentage() >= script_mage.coneOfColdMana) then
-				-- stop spell casting frostbolt
+
+				-- frost bolt spell table
 				local fbTable = {[116] = true, [205] = true, [837] = true, [7322] = true, [8406] = true, [8407] = true, [8408] = true, [10179] = true, [10180] = true, [10181] = true, [25304] = true}
+
+				-- if we are casting frostbolt then
 				if fbTable[GetLocalPlayer():GetCasting()] and script_grind:enemiesAttackingUs() == 1 then
 					
+					-- stop it
 					SpellStopCasting();
+
+					-- target is too close!
 					if script_grind.enemyObj:GetDistance() <= 9 then
+
+						-- try to frost nova target
 						if not IsSpellOnCD("Frost Nova") then
 							CastSpellByName("Frost Nova")
 						end
+						-- try to cone of cold target
 						if not IsSpellOnCD("Cone of Cold") then
 							CastSpellByName("Cone of Cold");
 						end
 					end
-					-- timer needed for bot to check everything and not recast frostbolt over and over...
-					script_grind.waitTimer = GetTimeEX() + 550;
-					script_mage.waitTimer = GetTimeEX() + 750;
+
+				-- timer needed for bot to check everything and not recast frostbolt over and over...
+				script_grind.waitTimer = GetTimeEX() + 550;
+				script_mage.waitTimer = GetTimeEX() + 750;
+
 				end
 			end
 		end
 	end
+	end
+
 
 -- heroic strike or maul stuck on and target moved away or we stopped casting auto attack
 
@@ -73,33 +117,33 @@ function script_combatHelper:run()
 			end
 		end
 
-	-- run backwards target has frost nova
+-- run backwards target has frost nova
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and GetNumPartyMembers() < 1 then
 		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Frostbite") or GetLocalPlayer():GetUnitsTarget():HasDebuff("Frost Nova")) and (not GetLocalPlayer():HasBuff('Evocation')) and (not script_checkDebuffs:hasDisabledMovement()) and (not script_grindEX:areWeSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
-		if (script_mage:runBackwards(targetObj, 8)) then -- Moves if the target is closer than 7 yards
-			script_grind.tickRate = 0;
-			script_grind.waitTimer = GetTimeEX();
-			script_grind.message = "Moving away from target...";
-			if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
-				GetLocalPlayer():GetUnitsTarget():FaceTarget();
+			if (script_mage:runBackwards(targetObj, 8)) then -- Moves if the target is closer than 7 yards
+				script_grind.tickRate = 0;
+				script_grind.waitTimer = GetTimeEX();
+				script_grind.message = "Moving away from target...";
+				if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
+					GetLocalPlayer():GetUnitsTarget():FaceTarget();
+				end
+			return;
 			end
-		return;
 		end
-	end
 	end
 	-- run backwards target has entangling roots
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (GetLocalPlayer():GetManaPercentage() >= 25) and not IsBearForm() and not IsCatForm() then
 		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35) and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Entangling Roots")) and (not script_checkDebuffs:hasDisabledMovement()) and (not script_grindEX:areWeSwimming()) and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight()) then
-		if (script_druid:runBackwards(targetObj, 10)) then -- Moves if the target is closer than 7 yards
-			script_grind.tickRate = 0;
-			script_grind.waitTimer = GetTimeEX();
-			script_grind.message = "Moving away from target...";
-			if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
-				GetLocalPlayer():GetUnitsTarget():FaceTarget();
+			if (script_druid:runBackwards(targetObj, 10)) then -- Moves if the target is closer than 7 yards
+				script_grind.tickRate = 0;
+				script_grind.waitTimer = GetTimeEX();
+				script_grind.message = "Moving away from target...";
+				if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
+					GetLocalPlayer():GetUnitsTarget():FaceTarget();
+				end
+			return;
 			end
-		return;
 		end
-	end
 	end
 
 
@@ -122,5 +166,5 @@ if (not IsAutoCasting("Attack")) then
 
 
 
-
+-- end of this mess
 end
