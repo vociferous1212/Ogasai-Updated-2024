@@ -41,18 +41,30 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
+	if not script_grindEX:areWeSwimming() and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
 		end
 	end
-	if (not IsMoving()) and ((_lx - _ix)^2 < 2) then
+	if script_grindEX:areWeSwimming() and (math.sqrt((_lx - _ix)^2 + (_ly - _iy)^2) <= script_grind.nextToNodeDist) then 
+		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
+		if (GetPathSize(5) <= script_nav.lastnavIndex) then
+			script_nav.lastnavIndex = GetPathSize(5);
+		end
+	end
+	if (not IsMoving()) and ((_lx - _ix)^2 < 2) and not script_grindEX:areWeSwimming() then
 		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
 
-	if (GetTimeEX() > self.waitTimer) then
+	if (GetTimeEX() > self.waitTimer) and not script_grindEX:areWeSwimming() then
 		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3) then	
+			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+		end
+	elseif (GetTimeEX() > self.waitTimer) and script_grindEX:areWeSwimming() then
+		-- players Z location is current go to Z
+		_, _, _iz = GetLocalPlayer():GetPosition();
+		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 1) then	
 			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		end
 	end

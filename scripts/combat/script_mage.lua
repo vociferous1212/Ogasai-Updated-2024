@@ -920,7 +920,7 @@ function script_mage:run(targetGUID)
 				if (targetObj:GetDistance() > 28 or not targetObj:IsInLineOfSight()) and not script_checkAdds:checkAdds() and not targetObj:HasDebuff("Frostbite") and not targetObj:HasDebuff("Frost Nova") then script_mage.waitTimer = GetTimeEX() + 1000;  return 3; end
 				self.message = "Using wand...";
 				if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) and not IsMoving() then
-					targetObj:FaceTarget();
+					--targetObj:FaceTarget();
 					targetObj:CastSpell("Shoot");
 					self.waitTimer = GetTimeEX() + 250;
 					return true;
