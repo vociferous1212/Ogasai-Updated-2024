@@ -64,6 +64,12 @@ function script_priestFollowerHeals:HealsAndBuffs()
 		end
 
 		local partyMember = 0;
+
+		local petName = 0;
+		local petHealth = 0;
+
+		if UnitExists("partypet1") then petName = GetUnitName("partypet1"); petHealth = UnitHealth("partypet1"); end
+
 		for i = 1, GetNumPartyMembers() do
 
 			partyMember = GetPartyMember(i);
@@ -75,6 +81,9 @@ function script_priestFollowerHeals:HealsAndBuffs()
 				local leaderObj = GetPartyLeaderObject();
 				local px, py, pz = GetPartyMember(i):GetPosition();
 				local localObj = GetLocalPlayer();
+
+			if getPartyPet() ~= nil and petHealth ~= nil and petHealth ~= 0 and petHealth < 75 then partyMember = getPartyPet(); partyMembersHP = petHealth; end
+
 			
 				if (not leaderObj:IsInLineOfSight()) or (leaderObj:IsInLineOfSight() and not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance) or (leaderObj:GetDistance() > 40 and self.enableHeals) then
 					script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
@@ -131,7 +140,16 @@ function script_priestFollowerHeals:HealsAndBuffs()
 						return true;
 					end
 				end	
-	
+				-- Power word Fortitude pet
+                		if getPartyPet() ~= nil then
+					if (HasSpell("Power Word: Fortitude")) and (localMana > 40)
+					and (not getPartyPet():HasBuff("Power Word: Fortitude")) then
+						if (Cast("Power Word: Fortitude", "party1pet")) then
+							self.timer = GetTimeEX() + 1500;
+							return true;
+						end
+					end
+				end	
 				-- Divine Spirit
 				if (HasSpell("Divine Spirit")) and (localMana > 30) and (not partyMember:HasBuff("Divine Spirit")) then
 					if (Cast("Divine Spirit", partyMember)) then
@@ -265,3 +283,20 @@ function script_priestFollowerHeals:HealsAndBuffs()
 	return false;
 	end
 end
+
+function getPartyPet()
+	if UnitExists("partypet1") then
+		local name = GetUnitName("partypet1");
+		local i, t = GetFirstObject()
+		while i ~= 0 do
+			if t == 3 and i:GetDistance() <= 40 then
+				if name == i:GetUnitName() then
+					return i;
+				end
+			end
+		i, t = GetNextObject(i);
+		end
+	end
+return nil;
+end
+					
