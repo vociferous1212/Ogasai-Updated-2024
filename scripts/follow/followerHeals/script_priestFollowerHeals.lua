@@ -144,7 +144,7 @@ function script_priestFollowerHeals:HealsAndBuffs()
                 		if getPartyPet() ~= nil then
 					if (HasSpell("Power Word: Fortitude")) and (localMana > 40)
 					and (not getPartyPet():HasBuff("Power Word: Fortitude")) then
-						if (Cast("Power Word: Fortitude", "party1pet")) then
+						if (Cast("Power Word: Fortitude", getPartyPet())) then
 							self.timer = GetTimeEX() + 1500;
 							return true;
 						end
