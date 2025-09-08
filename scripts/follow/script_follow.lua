@@ -1,156 +1,221 @@
-script_follow = {enemyObj = nil, lootObj = nil, timer = GetTimeEX(), tickRate = 500, waitTimer = GetTimeEX(), pullDistance = 150, findLootDistance = 60, lootDistance = 2.5, skipLooting = false, lootCheck = {}, ressDistance = 25, combatError = 0, dpsHP = 95, myTime = GetTimeEX(), nextToNodeDist = 3.2, isSetup = false, drawUnits = false, acceptTimer = GetTimeEX(), followLeaderDistance = 18, assistInCombat = false, isChecked = true, pause = true, message = "Starting the follower...", drawNav = true, objectAttackingUs = 0, meleeDistance = 3.5, unstuck = true, followTimer = GetTimeEX(), randomFollow = true, limitAttackDist = false, isStuck = false, adjustTickRate = false, isInCombat = false, helperLoaded = include("scripts\\script_helper.lua"), drawDataLoaded = include("scripts\\script_drawData.lua"), drawStatusLoaded = include("scripts\\script_drawStatus.lua"), checkDebuffsLoaded = include("scripts\\script_checkDebuffs.lua"), unstuckLoaded = include("scripts\\script_unstuck.lua"), grindFunctions = include("scripts\\script_grind.lua"), vendorsLoaded = include("scripts\\script_vendor.lua"), vendormenu = include("scripts\\menu\\script_vendorMenu.lua"), nav1 = include("scripts\\nav\\script_nav.lua"), mav2 = include("scripts\\nav\\script_navEX.lua"),
+script_follow = {enemyObj = nil, lootObj = nil, timer = GetTimeEX(), tickRate = 500, waitTimer = GetTimeEX(), pullDistance = 150, findLootDistance = 60, lootDistance = 2.5, skipLooting = false, lootCheck = {}, ressDistance = 25, combatError = 0, dpsHP = 95, myTime = GetTimeEX(), nextToNodeDist = 3.2, isSetup = false, drawUnits = false, acceptTimer = GetTimeEX(), followLeaderDistance = 18, assistInCombat = false, isChecked = true, pause = true, message = "Starting the follower...", drawNav = true, objectAttackingUs = 0, meleeDistance = 3.5, unstuck = true, followTimer = GetTimeEX(), randomFollow = true, limitAttackDist = false, isStuck = false, adjustTickRate = false, isInCombat = false, helperLoaded = include("scripts\\script_helper.lua"), drawDataLoaded = include("scripts\\script_drawData.lua"), drawStatusLoaded = include("scripts\\script_drawStatus.lua"), checkDebuffsLoaded = include("scripts\\script_checkDebuffs.lua"), unstuckLoaded = include("scripts\\script_unstuck.lua"), grindFunctions = include("scripts\\script_grind.lua"), vendorsLoaded = include("scripts\\script_vendor.lua"), vendormenu = include("scripts\\menu\\script_vendorMenu.lua"), nav1 = include("scripts\\nav\\script_nav.lua"), mav2 = include("scripts\\nav\\script_navEX.lua"), startChecksLoaded = include("scripts\\follow\\script_followStartChecks.lua"),
 
 -- follow folder
 healsLoaded = include("scripts\\follow\\script_followHealsAndBuffs.lua"), moveToMemberLoaded = include("scripts\\follow\\script_followMove.lua"), doCombatLoaded = include("scripts\\follow\\script_followDoCombat.lua"), menuLoaded = include("scripts\\follow\\script_followMenu.lua"), extraFunctions = include("scripts\\follow\\script_followEX.lua"), moveToTargetLoaded = include("scripts\\follow\\script_followMoveToTarget.lua"), moveToLootLoaded = include("scripts\\follow\\script_followMoveToLoot.lua"), moveToEnemyLoaded = include("scripts\\follow\\script_followMoveToEnemy.lua"), doVendorStuff = include("scripts\\follow\\script_followDoVendor.lua")}
 
--- i'm sorry :( file size limitations....
-function script_follow:window() if (self.isChecked) then EndWindow(); if(NewWindow("Follower Options", 320, 360)) then script_followMenu:menu(); end end end
-function script_follow:setup() self.lootCheck['timer'] = 0; self.lootCheck['target'] = 0; script_helper:setup(); script_followEX2:setup(); script_priestFollowerHeals.timer = GetTimeEX(); self.isSetup = true; ClearTarget(); end
+function script_follow:window()
+	if (self.isChecked) then
+		EndWindow();
+		if(NewWindow("Follower Options", 320, 360)) then
+			script_followMenu:menu();
+		end
+	end
+end
+
+function script_follow:setup() self.lootCheck['timer'] = 0; self.lootCheck['target'] = 0; script_helper:setup(); script_followEX2:setup(); script_gather:setup(); script_priestFollowerHeals.timer = GetTimeEX(); self.isSetup = true; ClearTarget(); end
 function script_follow:draw() script_followEX:drawStatus(); end
 function script_follow:setWaitTimer(ms) self.waitTimer = GetTimeEX() + (ms); end
-function GetPartyLeaderObject() if GetNumPartyMembers() > 0 then leaderObj = GetPartyMember(GetPartyLeaderIndex()); if (leaderObj ~= nil) then return leaderObj; end end return 0; end
-function script_follow:run() script_follow:window();	
 
-	if (IsUsingNavmesh()) and (self.drawPath) then script_drawData:drawPath(); end
+function GetPartyLeaderObject()
+local leaderObj = 0;
+	if GetNumPartyMembers() > 0 then
+
+		leaderObj = GetPartyMember(GetPartyLeaderIndex());
+
+		if leaderObj ~= nil and leaderObj ~= 0 then
+	
+		return leaderObj;
+		end
+	end
+return 0;
+end
+
+function script_follow:run() script_follow:window();
+
+if (not self.isSetup) then
+		script_follow:setup();
+	end
+if (IsUsingNavmesh()) and (script_follow.drawPath) then
+		script_drawData:drawPath();
+	end
+
 	-- Set next to node distance and nav-mesh smoothness to double that number
-	if (IsMounted()) then script_nav:setNextToNodeDist(8); NavmeshSmooth(14);
-	else script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist); end
-	if (not self.isSetup) then script_follow:setup(); end
-	if (self.pause) then self.message = "Paused by user..."; return; end
+	if (IsMounted()) then
+		script_nav:setNextToNodeDist(8);
+		NavmeshSmooth(14);
+	else
+		script_nav:setNextToNodeDist(script_follow.nextToNodeDist);
+		NavmeshSmooth(script_follow.nextToNodeDist);
+	end
+
 	-- Automatic loading of the nav mesh
-	if (not IsUsingNavmesh()) then UseNavmesh(true); return; end
-	if (not LoadNavmesh()) then self.message = "Make sure you have mmaps-files..."; return; end
-	if (GetLoadNavmeshProgress() ~= 1) then self.message = "Loading the nav mesh... "; return; end
-	if (GetLoadNavmeshProgress() ~= 1) then return; end
+	if (not IsUsingNavmesh()) then
+		UseNavmesh(true);
+	return;
+	end
+	if (not LoadNavmesh()) then
+		self.message = "Make sure you have mmaps-files...";
+	return;
+	end
 
-	-- auto unstuck feature
-	local thisTime = script_followMoveToTarget.moveTimer - 4000;
-	if (self.unstuck) and (IsMoving()) then
-	script_unstuck.turnSensitivity = 3;
-	if (not script_unstuck:pathClearAuto(2)) then self.isStuck = true; script_unstuck:unstuck();
-	self.message = script_unstuck.message; return true; else self.isStuck = false; end end self.tickRate = 135;
+	if (GetLoadNavmeshProgress() ~= 1) then
+		self.message = "Loading the nav mesh... ";
+	return;
+	end
+	if (GetLoadNavmeshProgress() ~= 1) then
+	return;
+	end
+	
+	if (self.pause) then
+		self.message = "Paused by user...";
+	return;
+	end
 
-		if (IsMoving()) then script_follow.tickRate = 50; end
-		if (IsInCombat()) and (not IsMoving()) then script_follow.tickRate = 500; end
-		if (not IsMoving()) and (not IsInCombat()) then self.message = "Waiting for action"; end
-		if (not IsInCombat()) then script_follow.combatError = nil;  end
-		-- Wait out the wait-timer and/or casting or channeling
-		if (self.waitTimer > GetTimeEX() + self.tickRate or IsCasting() or IsChanneling()) then return; end
-		if (GetTimeEX() > self.followTimer) and (self.randomFollow) then local r = math.random(10, 20); script_follow.followLeaderDistance = r; localObj = GetLocalPlayer(); self.followTimer = GetTimeEX() + 18000; end
-		-- Accept group invite
-		if (GetNumPartyMembers() < 1 and self.acceptTimer < GetTimeEX()) then self.acceptTimer = GetTimeEX() + 5000; AcceptGroup(); end
-		local leader = GetPartyLeaderObject(); local isVendoring = false;
--- VENDORING PHASE IF WE ARE CLOSE TO A VENDOR
-		-- If bags are full
-		if (script_followDoVendor.useVendor) and (not IsInCombat()) and (script_followDoVendor:closeToVendor()) then isVendoring = true;
-			if (script_vendor:sell()) then if (CanMerchantRepair()) then RepairAllItems(); 
-			-- sell
-			script_vendorMenu:sellLogic(); self.waitTimer = GetTimeEX() + 300; return; else script_vendorMenu:sellLogic(); return; end
+	if self.waitTimer > GetTimeEX() then return; end
+
+	-- vendoring and corpse walk + random checks
+	script_followStartChecks:doStartChecks();	
+
+	-- get a target attacking us and set it as enemy object
+	if (localObj:GetUnitsTarget() ~= 0) then
+		self.enemyObj = localObj:GetUnitsTarget();
+	end
+	
+-- RESTING PHASE			
+		-- Rest
+		if (not IsInCombat() and script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
+			if (RunRestScript()) then
+				self.message = "Resting...";
+
+				if (IsMoving() and not localObj:IsMovementDisabed()) then
+					StopMoving();
+				return;
+				end
+
+				if (IsMounted()) then
+					DisMount();
+				return;
+				end
+
+				if self.waitTimer - GetTimeEX() < 2500 then
+					self.waitTimer = GetTimeEX() + 2500;
+				end
+
+			ClearTarget();
 			return;
 			end
 		end
--- CORPSE WALK PHASE
-		local localObj = GetLocalPlayer();
-		-- Corpse-walk if we are dead
-		if(localObj:IsDead()) then script_follow.tickRate = 100; self.message = "Walking to corpse...";
-		-- Release body
-		if(not IsGhost()) then RepopMe(); return; end
-		-- Ressurrect within the ress distance to our corpse
-		local _lx, _ly, _lz = localObj:GetPosition(); if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > self.ressDistance) then
-		script_nav:moveToNav(localObj, GetCorpsePosition()); self.message = "Running to corpse..."; return; else local rx, ry, rz = GetCorpsePosition();
-		if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then script_grind.message = "Finding a safe spot to ress..."; return; end RetrieveCorpse();end return;end
 
-		-- get target attacking us
-		if (localObj:GetUnitsTarget() ~= 0) then self.enemyObj = localObj:GetUnitsTarget(); end
--- RESTING PHASE			
-		-- Rest
-		if (not IsInCombat() and script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then if(RunRestScript()) then self.message = "Resting...";
-		if (IsMoving() and not localObj:IsMovementDisabed()) then StopMoving(); return; end
-		if (IsMounted()) then DisMount(); return; end
-		if ((self.waitTimer - GetTimeEX()) < 2500) then self.waitTimer = GetTimeEX()+2500; end ClearTarget(); return; end end
-		if (AreBagsFull() and not IsInCombat()) then
-			self.message = 'Warning bags are full...';
+	-- double check our combat phase before looting...
+	self.isInCombat = true;
+	if (not IsInCombat()) then
+		if (not script_followEX2:isTargetAttackingMember()) then
+			self.isInCombat = false;
 		end
+	end
 
-		self.isInCombat = true;
-		if (not IsInCombat()) then
-			if (not script_followEX2:isTargetAttackingMember()) then
-				self.isInCombat = false;
-			end
-		end
 -- LOOTING PHASE
-		if (not self.isInCombat) and (not IsInCombat() or self.enemyObj == nil) and (script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
-			-- Loot if there is anything lootable and we are not in combat and if our bags aren't full
-			if (not self.skipLooting and not AreBagsFull()) then 
-				self.lootObj = script_nav:getLootTarget(self.findLootDistance);
-			else
-				self.lootObj = nil;
-			end
-			if (self.lootObj == 0) then self.lootObj = nil; end
-			local isLoot = not IsInCombat() and not (self.lootObj == nil);
-			if (isLoot and not AreBagsFull()) then
-				script_followEX:doLoot(localObj);
-					return true;
-			elseif (AreBagsFull() and not hsWhenFull) then
-				self.lootObj = nil;
-				self.message = "Warning the bags are full...";
-			end	
+	if (not self.isInCombat) and (not IsInCombat() or self.enemyObj == nil) and (script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
+
+		-- Loot if there is anything lootable and we are not in combat and if our bags aren't full
+		if (not self.skipLooting and not AreBagsFull()) then 
+			self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+		else
+			self.lootObj = nil;
 		end
-		-- Clear dead/tapped targets
-		if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-			if (self.enemyObj:IsDead()) then
-				self.enemyObj = nil;
-				ClearTarget();
-			end
+
+		if (self.lootObj == 0) then
+			self.lootObj = nil;
 		end
--- COMBAT PHASE
-		if (GetPet() ~= 0) and (GetPet() ~= nil) and (GetPet():GetUnitsTarget() ~= 0) then
-			self.enemyObj = GetPet():GetUnitsTarget():GetGUID();
-		end
-		if (GetNumPartyMembers() > 0) and (GetTarget() ~= 0 and GetTarget() ~= nil) then
-            			local target = GetTarget();
-			if (target:CanAttack() and self.assistInCombat) then
-				self.enemyObj = target;
-			elseif (script_followEX2:enemiesAttackingUs() == 0) then
-				self.enemyObj = nil;
-			end 
-		end
-		--  if target is further than party leaders distance (don't walk further than distance slider set to follow leader) then enemy = nil
-		local enemy = self.enemyObj
-		if (self.limitAttackDist) and (enemy ~= 0) and (enemy ~= nil) and (enemy:GetDistance() > self.followLeaderDistance) then
+
+		local isLoot = not IsInCombat() and not (self.lootObj == nil);
+
+		if (isLoot and not AreBagsFull()) then
+			script_followEX:doLoot(localObj);
+
+		return true;
+		elseif (AreBagsFull() and not hsWhenFull) then
+			self.lootObj = nil;
+			self.message = "Warning the bags are full...";
+		end	
+	end
+
+	-- Clear dead/tapped targets
+	if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+		if (self.enemyObj:IsDead()) then
 			self.enemyObj = nil;
+			ClearTarget();
 		end
-		-- rogue stealth before attacking - forced regardless of distance set in combat script
-		if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not IsSpellOnCD("Stealth") and GetPartyLeaderObject():GetUnitsTarget() ~= nil then
-			CastStealth();
+	end
+
+	-- gatherer
+	if script_grind.gather and (not self.isInCombat) and (not IsInCombat() or self.enemyObj == nil) and (script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
+		if (script_gatherRun:gather()) then
+			if IsLooting() then
+				self.waitTimer = GetTimeEX() + 1200;
+			end
+			return true;
 		end
+	end
+
+
+-- COMBAT PHASE
+
+	-- if we have a pet then get its target
+	if (GetPet() ~= 0) and (GetPet() ~= nil) and (GetPet():GetUnitsTarget() ~= 0) then
+		self.enemyObj = GetPet():GetUnitsTarget():GetGUID();
+	end
+
+	-- if we dont want to assist in combat or no one is attacking us then
+	if (GetNumPartyMembers() > 0) and (GetTarget() ~= 0 and GetTarget() ~= nil) then
+
+		local target = GetTarget();
+
+		if (target:CanAttack() and self.assistInCombat) then
+			self.enemyObj = target;
+		elseif (script_followEX2:enemiesAttackingUs() == 0) then
+			self.enemyObj = nil;
+		end 
+	end
+
+	--  if target is further than party leaders distance (don't walk further than distance slider set to follow leader) then enemy = nil
+	local enemy = self.enemyObj
+
+	if (self.limitAttackDist) and (enemy ~= 0) and (enemy ~= nil) and (enemy:GetDistance() > self.followLeaderDistance) then
+		self.enemyObj = nil;
+	end
+
+	-- rogue stealth before attacking - forced regardless of distance set in combat script
+	if HasSpell("Stealth") and script_rogue.useStealth and not IsStealth() and not IsSpellOnCD("Stealth") then
+		if GetPartyLeaderObject() ~= nil and GetPartyLeaderObject() ~= 0 then
+			if GetPartyLeaderObject():GetUnitsTarget() ~= nil then
+				CastStealth();
+			end
+		end
+	end
+
 -- RUN COMBAT SCRIPT ON A GOOD TARGET
-		if self.enemyObj ~= nil then 
-			if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then
-				self.combatError = script_followDoCombat:run();
-			end
+
+	if self.enemyObj ~= nil then 
+
+		-- run the do combat script
+		if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then
+			self.combatError = script_followDoCombat:run();
 		end
-		-- get enemy to attack
-		-- do combat
-		local distance = self.followLeaderDistance;
-		if (GetPartyLeaderObject() ~= 0) and (self.limitAttackDist) and (self.assistInCombat) then
-			if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
-						curTarget = GetPartyLeaderObject():GetUnitsTarget();
-				if (curTarget:GetHealthPercentage() <= self.dpsHP) then
-					tarX, tarY, tarZ = curTarget:GetPosition();
-					leaderX, leaderY, leaderZ = leader:GetPosition();
-					if (GetDistance3D(leaderX, leaderY, leaderZ, tarX, tarY, tarZ) <= distance) then
-						self.enemyObj = GetPartyLeaderObject():GetUnitsTarget();
-					end
-				elseif (script_followEX2:enemiesAttackingUs() == 0) then
-					self.enemyObj = nil;
-					ClearTarget();
-				end
-			end
-       		elseif (GetPartyLeaderObject() ~= 0) and (not self.limitAttackDist) and (self.assistInCombat) then
-			if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
+	end
+
+
+	-- get enemy to attack
+	-- do combat
+	local distance = self.followLeaderDistance;
+
+	if (GetPartyLeaderObject() ~= 0) and (self.limitAttackDist) and (self.assistInCombat) then
+		if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
 					curTarget = GetPartyLeaderObject():GetUnitsTarget();
-				if (curTarget:GetHealthPercentage() <= self.dpsHP) then
+			if (curTarget:GetHealthPercentage() <= self.dpsHP) then
+				tarX, tarY, tarZ = curTarget:GetPosition();
+				leaderX, leaderY, leaderZ = leader:GetPosition();
+				if (GetDistance3D(leaderX, leaderY, leaderZ, tarX, tarY, tarZ) <= distance) then
 					self.enemyObj = GetPartyLeaderObject():GetUnitsTarget();
 				end
 			elseif (script_followEX2:enemiesAttackingUs() == 0) then
@@ -158,6 +223,17 @@ function script_follow:run() script_follow:window();
 				ClearTarget();
 			end
 		end
+       	elseif (GetPartyLeaderObject() ~= 0) and (not self.limitAttackDist) and (self.assistInCombat) then
+		if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
+				curTarget = GetPartyLeaderObject():GetUnitsTarget();
+			if (curTarget:GetHealthPercentage() <= self.dpsHP) then
+				self.enemyObj = GetPartyLeaderObject():GetUnitsTarget();
+			end
+		elseif (script_followEX2:enemiesAttackingUs() == 0) then
+			self.enemyObj = nil;
+			ClearTarget();
+		end
+	end
 -- OUT OF COMBAT PHASE AND IN COMBAT HEALS - it's an ogasai quirk... don't leave open else statements.. use elseif
 		-- heals and buffs 
 		if (not localObj:IsDead()) and (self.enemyObj ~= nil and self.enemyObj ~= 0) then
@@ -207,7 +283,7 @@ function script_follow:run() script_follow:window();
 			end	
 		end
 	end
-	if (leader ~= 0 and leader:GetDistance() == 0) or (leader == 0) and (not isVendoring) then
+	if leader ~= nil and (leader ~= 0 and leader:GetDistance() == 0) or (leader == 0) and (not isVendoring) then
 		self.message = "leader GetDistance == 0... no path";
 		return;
 	end	

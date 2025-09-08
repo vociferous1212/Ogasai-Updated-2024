@@ -34,24 +34,18 @@ function script_followMenu:menu()
 			
 			Separator();
 
+			wasClicked, script_follow.randomFollow = Checkbox("Randomly Adjust Follow Distance", script_follow.randomFollow);
 			Text("Distance to follow Party Leader  ");
 			script_follow.followLeaderDistance = SliderInt("Follow Leader Distance (yd)", 5, 45, script_follow.followLeaderDistance);
+			
 
-			SameLine();
 
 			wasClicked, script_follow.followMember = Checkbox("Follow Party Member", script_follow.followMember);
 			wasClicked, script_follow.unstuck = Checkbox("Use UnStuck Script", script_follow.unstuck);
-			wasClicked, script_follow.randomFollow = Checkbox("Randomly Adjust Follow Distance", script_follow.randomFollow);
 
 			local _, class = UnitClass("player")
 			if class == "HUNTER" then
 				script_follow.randomFollow = false
-			end
-
-			if (script_follow.randomFollow) then
-				local followTimer = math.floor( (script_follow.followTimer - GetTimeEX()) / 1000);
-				SameLine();
-				Text(followTimer);
 			end
 			
 			Separator();
@@ -226,6 +220,8 @@ function script_followMenu:menu()
 			script_vendorMenu:menu();
 		end
 	end
+
+	script_gatherMenu:menu();
 
 	if (CollapsingHeader("Display Options")) then
 		
