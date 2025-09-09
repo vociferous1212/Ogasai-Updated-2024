@@ -2186,7 +2186,7 @@ function script_grind:doLoot(localObj)
 			if (IsPathLoaded(5)) or (IsPathLoaded(4)) or (IsPathLoaded(3)) then
 				script_navEX:moveToTarget(localObj, _x, _y, _z)
 				self.message = "Moving To Target Loot - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
-			elseif not IsPathLoaded() then
+			else
 				if self.lootObj:GetDistance() > self.lootDistance then
 					Move(_x, _y, _z);
 					self.message = "Moving To Target Loot no navmesh path available - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
