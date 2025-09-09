@@ -192,17 +192,12 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 				end
 			end
 		end
-		-- Check: Do we have the right target (in UI) ??
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			if (GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
-				ClearTarget();
-				self.waitTimer = GetTimeEX() + 1500;
-			end
-		end
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then if (GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then ClearTarget(); self.waitTimer = GetTimeEX() + 1500; end end
 		if (not IsMoving()) and  (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat() and PlayerHasTarget()) then
 				targetHealth = GetTarget():GetHealthPercentage();
 			if (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (IsInCombat()) then
 				if (targetHealth >= 20) and (localMana >= script_priest.mindBlastMana) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+					if IsAutoCasting("Shoot") then SpellStopCasting(); end
 					targetObj:FaceTarget();
 					CastSpellByName("Mind Blast", targetObj);
 					self.waitTimer = GetTimeEX() + 1550;

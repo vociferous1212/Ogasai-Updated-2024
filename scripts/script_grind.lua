@@ -2160,6 +2160,21 @@ function script_grind:doLoot(localObj)
 
 	handleSwimming();
 
+	-- water doesn't flow uphill... even in this game...
+		-- if we are swimming then we need to check targets Z coords for their difference in our coords
+		-- it may be possible to accurately blacklist targets while swimming based on their Z position...
+		-- the only drawback is if the character is at the top of a river that does flow downhill it may not work...
+		-- we must go up in Z coords to leave water. meaning anything above our Z axis is not in water (assuming we are at the top of water)
+		-- grab my Z position after IsSwimming() returns and then compare to current targets Z position
+		-- blacklist if the Z axis is ~10 yards or greater LOWER than my Z
+		-- limit this to range ~50 yards - allow the bot to swim at the top of water
+		-- this never worked for blacklisting targets higher than me on ground but water is usually flat
+		-- if the water is not flat just compare my last Z before swimming to my Z while swimming
+		-- if Z position changes, assuming we are still at the top of the water, reset ground level Z position
+
+		-- need to make sure it accurately calculates my Z position when not IsSwimming()
+			-- versus IsSwimming() and that it calculates before anything else
+
 	-- Blacklist loot target if swimming or we are close to aggro blacklisted targets and not close to loot target
 	if (self.lootObj ~= nil) then
 		if (IsSwimming()) and (not script_grindEX.allowSwim) and (script_aggro:closeToBlacklistedTargets() and self.lootObj:GetDistance() > 5) then

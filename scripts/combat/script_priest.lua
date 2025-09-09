@@ -221,7 +221,7 @@ function script_priest:run(targetGUID)
 	end
 
 	-- Check: Do nothing if we are channeling, casting or Ice Blocked
-	if (IsChanneling()) or (IsCasting()) or (self.waitTimer >= GetTimeEX() or script_priestEX.waitTimer > GetTimeEX()) then
+	if (IsChanneling() or IsCasting() and not IsAutoCasting("Shoot")) or (self.waitTimer >= GetTimeEX() or script_priestEX.waitTimer > GetTimeEX()) then
 		if GetLocalPlayer():IsCasting() and not IsMoving() and PlayerHasTarget() then
 			targetObj:FaceTarget();
 		end
@@ -329,7 +329,12 @@ function script_priest:run(targetGUID)
 		-- Don't attack if we should rest first
 		if ((localHealth < self.eatHealth or (localMana < self.drinkMana or localObj:HasBuff("Spirit Tap") and localMana < self.drinkMana/1.5)) and not script_grind:isTargetingMe(targetObj) and not targetObj:IsFleeing() and not targetObj:IsStunned()) and not IsInCombat() then
 				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
-				self.message = "Need rest...";
+				if not localObj:HasBuff("Spirit Tap") then
+					self.message = "Need rest...";
+				end
+				if localObj:HasBuff("Spirit Tap") then
+					self.message = "Waiting for Spirit Tap to restore mana...";
+				end
 				return 4;
 		end
 
@@ -337,21 +342,23 @@ function script_priest:run(targetGUID)
 		targetHealth = targetObj:GetHealthPercentage();
 
 		-- Auto Attack
+		-- this actually targets our target
 		if (targetObj:GetDistance() <= 40) then
 			targetObj:AutoAttack();
 		end
 
--- desperate prayer
-		if HasSpell("Desperate Prayer") and not IsSpellOnCD("Desperate Prayer") and localHealth <= 20 then
+		-- desperate prayer
+		if HasSpell("Desperate Prayer") and not IsSpellOnCD("Desperate Prayer") and localHealth <= 30 then
 			if (Buff("Desperate Prayer", localObj)) then
-				script_grind:setWaitTimer(1700);
-				return 0; -- if buffed 
+				self.waitTimer = GetTimeEX() + 500;
+				return true;
 			end
 		end
 
 		-- use mind blast on CD
 		if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() <= self.spellRange) then
+				if IsAutoCasting("Shoot") then SpellStopCasting(); end
 				
 				CastSpellByName("Mind Blast", targetObj);
 				targetObj:FaceTarget();
@@ -406,6 +413,7 @@ function script_priest:run(targetGUID)
 						StopMoving();
 						return true;
 					end
+					if IsAutoCasting("Shoot") then SpellStopCasting(); end
 					CastSpellByName("Mind Blast");
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1850;
@@ -707,6 +715,7 @@ if (IsMoving()) then
 			-- use wand
 			if (not IsMoving()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetGUID() == targetObj:GetGUID()) and (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling()) and (not script_checkAdds:checkAdds())
 				and ( (not self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) or (self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) ) then
+				if (localObj:HasDebuff("Weakened Soul") or localHealth >= self.shieldHP or localMana < 10) or (localObj:HasBuff("Renew") or localMana < 10 or localHealth >= self.renewHP) or (IsSpellOnCD("Mind Blast") or (targetHealth <= self.useWandHealth or localMana <= self.useWandMana)) or (self.useSmite and (localMana <= self.useWandMana or targetHealth <= self.useWandHealth)) then
 				if (localObj:HasRangedWeapon()) then
 					if (targetObj:GetDistance() > 26) or (not targetObj:IsInLineOfSight()) then
 						self.waitTimer = GetTimeEX() + 1000;
@@ -714,10 +723,11 @@ if (IsMoving()) then
 					end
 					if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) and not IsMoving() and not IsCasting() then
 						targetObj:CastSpell("Shoot");
-						self.waitTimer = GetTimeEX() + 1500;
+						self.waitTimer = GetTimeEX() + 500;
 						return true;
 					end
 
+				end
 				end
 			end
 		end
