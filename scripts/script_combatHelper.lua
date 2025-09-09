@@ -1,4 +1,4 @@
-script_combatHelper = {castingTimer = 0, castingTimerSet = false}
+script_combatHelper = {castingTimer = 0, castingTimerSet = false, tempHP = 100}
 
 
 -- override combat script for "clutch" in combat situations...
@@ -13,6 +13,28 @@ function script_combatHelper:run()
 	if not GetLocalPlayer():IsCasting() and self.castingTimerSet then
 		self.castingTimer = 0;
 		self.castingTimerSet = false;
+	end
+
+	local currentHP = GetLocalPlayer():GetHealthPercentage();
+	-- try to add time to spell casting timer due to knockback from attacks
+	-- reset temp health out of combat
+	if not IsInCombat() then
+		self.tempHP = GetLocalPlayer():GetHealthPercentage();
+	end
+	-- if we are casting
+	if IsInCombat() and GetLocalPlayer():IsCasting() then
+		-- assume we recovered health in combat
+		if currentHP > self.tempHP then
+			self.tempHP = currentHP;
+		end
+		-- if our HP is less than temp HP
+		if currentHP < self.tempHP and self.castingTimerSet then
+			--assume we were hit and suffered a knockback to spell casting time of 500ms.
+			self.tempHP = currentHP;
+
+			-- if we are being hit then increase the casting time, instead of reduce, we don't want to stay casting.. 1667ms MAX
+			self.castingTimer = self.castingTimer + 500;
+		end
 	end
 
 -- get counterspell out ASAP

@@ -53,6 +53,7 @@ function script_priestFollowerHeals:HealsAndBuffs()
 
 	-- set tick rate for scripts
 	if (GetTimeEX() > self.timer) then
+
 		self.timer = GetTimeEX() + script_follow.tickRate;
 
 		-- Check if anything is attacking us Priest
@@ -85,6 +86,7 @@ function script_priestFollowerHeals:HealsAndBuffs()
 			if getPartyPet() ~= nil and petHealth ~= nil and petHealth ~= 0 and petHealth < 75 then partyMember = getPartyPet(); partyMembersHP = petHealth; end
 
 			
+				-- follow party leader OR move to party member
 				if (not leaderObj:IsInLineOfSight()) or (leaderObj:IsInLineOfSight() and not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance) or (leaderObj:GetDistance() > 40 and self.enableHeals) then
 					script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
 					if (script_follow.followLeaderDistance >= 10 and leaderObj:GetDistance() < 10 and leaderObj:IsInLineOfSight()) then
@@ -93,8 +95,6 @@ function script_priestFollowerHeals:HealsAndBuffs()
 							return true;
 						end
 					end
-					return true;
-
                        		end
 
 				-- Dispel Magic
@@ -201,6 +201,19 @@ function script_priestFollowerHeals:HealsAndBuffs()
 
 				if (self.enableHeals) and (GetNumPartyMembers() > 0) then
 				local localMana = GetLocalPlayer():GetManaPercentage();
+
+					-- Shield
+	                		if (self.clickShield) then
+	                    			if (localMana > self.shieldMana) and (partyMembersHP < self.partyShieldHealth)
+							and (not partyMember:HasDebuff("Weakened Soul"))
+							and (HasSpell("Power Word: Shield")) then
+	                        			if (CastHeal("Power Word: Shield", partyMember)) then 
+	                        	    			self.timer = GetTimeEX() + 1550;
+	                        	    			return true; 
+	                        			end
+	                    			end
+		   			end
+
 	                		-- flash heal 
 	                		if (self.clickFlashHeal) then
                 				if (localMana > self.flashHealMana) and (partyMembersHP < self.partyFlashHealHealth) then
@@ -264,18 +277,6 @@ function script_priestFollowerHeals:HealsAndBuffs()
         	                			end
         	            			end
         	        		end
-	
-	                		-- Shield
-	                		if (self.clickShield) then
-	                    			if (localMana > self.shieldMana) and (partyMembersHP < self.partyShieldHealth)
-							and (not partyMember:HasDebuff("Weakened Soul"))
-							and (HasSpell("Power Word: Shield")) then
-	                        			if (CastHeal("Power Word: Shield", partyMember)) then 
-	                        	    			self.timer = GetTimeEX() + 1550;
-	                        	    			return true; 
-	                        			end
-	                    			end
-		   			end
 	    			end
 			
 			end

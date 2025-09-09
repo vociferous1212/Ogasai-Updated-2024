@@ -26,9 +26,8 @@ function script_followMove:followLeader()
 
 			local leadX, leadY, leadZ = leaderObj:GetPosition();
 
-			if (Move(leadX, leadY, leadZ)) then
-				script_follow.message = "Following Party Leader...";
-			end
+			Move(leadX, leadY, leadZ);
+			script_follow.message = "Following Party Leader...";
 		end
 	end
 return false;

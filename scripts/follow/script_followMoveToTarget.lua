@@ -52,24 +52,16 @@ function script_followMoveToTarget:moveToTarget(localObj, _x, _y, _z) -- use whe
 	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 50) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		script_follow.message = "cannot find path...";
-		return "Generating a new path...";
 	end
 
 
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
-	if (not IsMoving()) and (GetLoadNavmeshProgress() ~= 0) and (GetTimeEX() > self.moveTimer) then
-		collectgarbage(script_nav.navPosition['z']);
-		collectgarbage(script_nav.navPosition['y']);
-		collectgarbage(script_nav.navPosition['x']);
-		script_followMoveToTarget.used = script_followMoveToTarget.used + 1;
-		self.moveTimer  = GetTimeEX() + 5000;
-	end
+
 	
 	if (not script_follow.isStuck) then
 		script_follow:setWaitTimer((script_follow.followLeaderDistance-2)*100);
 	end
 
 	script_follow.message = "moving to party member...";
-	return "Moving to party member...";
 end

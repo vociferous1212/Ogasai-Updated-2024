@@ -82,9 +82,10 @@ function script_priestMenu:menu()
 			-- hide spell if not obtained yet
 			if (HasSpell("Psychic Scream")) then
 				wasClicked, script_priest.useScream = Checkbox("Use Fear", script_priest.useScream);
+				SameLine();
 			end
 
-			SameLine();
+			
 
 			wasClicked, script_priest.useSmite = Checkbox("Use Smite", script_priest.useSmite);
 			
@@ -114,7 +115,7 @@ function script_priestMenu:menu()
 						
 		end
 
-		if (CollapsingHeader("Priest Heal Options - Self")) then
+		if (CollapsingHeader("Priest Heal Options - Combat Script")) then
 
 			Text('Drink below mana percentage');
 			script_priest.drinkMana = SliderInt("DM%", 10, 99, script_priest.drinkMana);

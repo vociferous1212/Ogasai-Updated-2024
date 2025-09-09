@@ -276,15 +276,12 @@ if (IsUsingNavmesh()) and (script_follow.drawPath) then
 			if (not IsCasting()) and (not IsChanneling())
 			and (not IsDrinking()) and (not IsEating()) and (not IsLooting())
 			and (leader:GetDistance() > self.followLeaderDistance-5) then
-				if (script_followMove:followLeader()) then
+				script_followMove:followLeader();
 					self.isStuck = false;
-					return true;
-				end
 			end	
 		end
 	end
 	if leader ~= nil and (leader ~= 0 and leader:GetDistance() == 0) or (leader == 0) and (not isVendoring) then
 		self.message = "leader GetDistance == 0... no path";
-		return;
 	end	
 end

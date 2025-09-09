@@ -24,8 +24,8 @@ function script_checkAdds:checkAdds()
 		_quest.waitTimer = GetTimeEX() + 900;
 
 		-- face the target if we are not moving... turn back around after walking away quicker...
-		if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
-		if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
+		--if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
+		--if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
 
 		-- check unstuck
                 if not script_unstuck:pathClearAuto(2) then

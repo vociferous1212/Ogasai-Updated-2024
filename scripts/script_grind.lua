@@ -1352,7 +1352,7 @@ function script_grind:run()
 			end
 
 -- try to walk closer to hotspot area... if we cannot find a target... even if distToHotspot is set
-				if script_nav.numSavedLocation < 3 and self.hotspotReached and not script_grindEX:isThereAnyValidEnemyNearby() and script_nav:getDistanceToHotspot() > 50 then
+				if script_nav.numSavedLocation < 3 and self.hotspotReached and not script_grindEX:isThereAnyValidEnemyNearby() and script_nav:getDistanceToHotspot() > 50 and script_vendor.status == 0 then
 					script_moveToHotspot:moveToHotspot(localObj);
 					return;
 				end
@@ -1420,6 +1420,14 @@ function script_grind:run()
 -- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
 				and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+
+-- Check: Do we have the right target (in UI) ??
+				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
+					if (GetTarget():GetGUID() ~= self.enemyObj:GetGUID()) then
+						ClearTarget();
+						self.enemyObj = script_grindAssignTarget:assignTarget();
+					end
+				end
 				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end

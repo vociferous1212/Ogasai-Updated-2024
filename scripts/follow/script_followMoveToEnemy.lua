@@ -44,20 +44,11 @@ function script_followMoveToEnemy:moveToEnemy(localObj, _x, _y, _z) -- use when 
 	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 50) then
 		GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		script_follow.message = "cannot find path...";
-		return "Generating a new path...";
 	end
 
 
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
-	if (not IsMoving()) and (GetLoadNavmeshProgress() ~= 0) and (GetTimeEX() > self.moveTimer) then
-		collectgarbage(script_nav.navPosition['z']);
-		collectgarbage(script_nav.navPosition['y']);
-		collectgarbage(script_nav.navPosition['x']);
-		script_followMoveToTarget.used = script_followMoveToTarget.used + 1;
-		self.moveTimer = GetTimeEX() + 300;
-	end
 	
 	script_follow.message = "moving to enemy...";
-	return "Moving to enemy...";
 end

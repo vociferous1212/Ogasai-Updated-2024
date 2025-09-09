@@ -30,10 +30,10 @@ script_priest = {
 	swpMana = 15, -- Use shadow word: pain above this mana %
 	followTargetDistance = 100,
 	rangeDistance = 28,
-	openerRange = 28,	-- range to return 3 / walk to target to attack
 	useDOTOnAdds = true,
 	useHexOfWeakness = false,
 	useShadowGuard = false,
+	spellRange = 30,
 }
 
 function script_priest:heal(spellName, target)
@@ -73,18 +73,19 @@ end
 
 function script_priest:enemiesAttackingUs(range) -- returns number of enemies attacking us within range
     local unitsAttackingUs = 0; -- set variable
-    local currentObj, typeObj = GetFirstObject();  -- get game target
-    while currentObj ~= 0 do -- start loop
-    	if typeObj == 3 then -- typeObj is NPC
+    local currentObj, typeObj = GetFirstObject();
+
+	while currentObj ~= 0 do
+		if typeObj == 3 then
 			if (currentObj:CanAttack()) and (not currentObj:IsDead()) then -- if can attack and not dead
-         	   if (script_grind:isTargetingMe(currentObj)) and (currentObj:GetDistance() <= range) then -- if being targeted and within range
-                	unitsAttackingUs = unitsAttackingUs + 1; -- count how many units are attacking us
-            	end 
-        	end 
-       	end
-    	currentObj, typeObj = GetNextObject(currentObj); -- get next game target for each typeObj == 3
-    end
-    return unitsAttackingUs; -- return number of units attacking
+				if (script_grind:isTargetingMe(currentObj)) and (currentObj:GetDistance() <= range) then
+					unitsAttackingUs = unitsAttackingUs + 1;
+            			end 
+        		end 
+       		end
+	currentObj, typeObj = GetNextObject(currentObj);
+	end
+    return unitsAttackingUs;
 end
 
 -- Run backwards if the target is within range
@@ -101,23 +102,26 @@ function script_priest:runBackwards(targetObj, range)
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
  		local moveX, moveY, moveZ = xT + xUV*10, yT + yUV*10, zT + zUV;	
 	
- 		if (distance <= range and targetObj:IsInLineOfSight()) then -- if in range and line of sight
-			Move(moveX, moveY, moveZ); -- move to calculated coords
- 			return true; -- return true when done
+ 		if (distance <= range and targetObj:IsInLineOfSight()) then
+			Move(moveX, moveY, moveZ);
+ 			return true;
  		end
 	end
-	return false; -- return false to continue loop if needed
+	return false;
 end
 
 function script_priest:setup()
-	self.waitTimer = GetTimeEX(); -- set timer
+
+	self.waitTimer = GetTimeEX();
+
 	script_priestEX.waitTiemr = GetTimeEX();
+
 	script_priestEX.flashHealTimer = GetTimeEX();
-	self.isSetup = true; -- setup variable run once
-	if (HasSpell("Mind Flay")) then -- if has mind flay
-		self.drinkMana = 35; -- set drinkMana variable
-		self.shieldHP = 90;	-- set shieldHP variable
-		self.renewHP = 80;	-- set renewHP variable
+
+	if (HasSpell("Mind Flay")) then
+		self.drinkMana = 35;
+		self.shieldHP = 90;
+		self.renewHP = 80;
 	end
 	
 	if (GetNumPartyMembers() > 1) then
@@ -132,9 +136,16 @@ function script_priest:setup()
 	if (HasSpell("Hex of Weakness")) then
 		self.useHexOfWeakness = true;
 	end
+
 	if (HasSpell("Shadowguard")) then
 		self.useShadowGuard = true;
 	end
+
+	if HasSpell("Mind Blast") and GetLocalPlayer():HasRangedWeapon() then
+		self.useSmite = false;
+	end
+
+	self.isSetup = true;
 end
 
 function script_priest:draw()
@@ -181,28 +192,26 @@ function script_priest:run(targetGUID)
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
 
+	script_grind.combatScriptRange = self.spellRange;
+
 	
 	-- if no wand equipped then force using smite
 	if (not localObj:HasRangedWeapon()) then
 		self.useWand = false;
 	end
-	if (not localObj:HasRangedWeapon()) and (not HasSpell("Mind Blast")) then
-		self.useWand = false;
+
+	if (not HasSpell("Mind Blast")) then
 		self.useSmite = true;
 	end
+
 	-- if target is dead then don't attack
 	if (localObj:IsDead()) then
 		self.message = "You have died";
 		return 0;
 	end
-
-	if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-		script_priestEX.waitTimer = self.waitTimer;
-		return;
-	end
 	
 	-- Assign the target 
-	targetObj =  GetGUIDObject(targetGUID); -- get guid of target and save it
+	targetObj =  GetGUIDObject(targetGUID);
 	
 
 	-- clear target
@@ -212,16 +221,17 @@ function script_priest:run(targetGUID)
 	end
 
 	-- Check: Do nothing if we are channeling, casting or Ice Blocked
-	if (IsChanneling()) or (IsCasting()) or (self.waitTimer >= GetTimeEX()) then
+	if (IsChanneling()) or (IsCasting()) or (self.waitTimer >= GetTimeEX() or script_priestEX.waitTimer > GetTimeEX()) then
+		if GetLocalPlayer():IsCasting() and not IsMoving() and PlayerHasTarget() then
+			targetObj:FaceTarget();
+		end
 		return 4;
 	end
 
 	-- set shadow form true
 	if (GetLocalPlayer():HasBuff("Shadowform")) then
 		self.shadowForm = true;
-
-	else	-- else false if not buffed with shadowform
-
+	else
 		 self.shadowForm = false;
 	end
 
@@ -273,6 +283,9 @@ function script_priest:run(targetGUID)
 					end
 				end
 
+-- check heals and buffs
+	script_priestEX:healsAndBuffs(localObj, localMana);
+
 	-- wand cast if silenced
 	if (targetObj ~= 0) and (targetObj ~= nil) and (not localObj:IsStunned()) and (script_checkDebuffs:hasSilence()) and (localObj:HasRangedWeapon()) and (IsInCombat()) then
 		if (not IsAutoCasting("Shoot")) and (self.useWand) then
@@ -281,10 +294,6 @@ function script_priest:run(targetGUID)
 			targetObj:CastSpell("Shoot");
 			self.waitTimer = GetTimeEX() + 100;
 			return true; -- return true - if not AutoCasting then false
-		end
-		if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-script_priestEX.waitTimer = self.waitTimer;
-			return;
 		end
 	end
 	
@@ -300,6 +309,8 @@ script_priestEX.waitTimer = self.waitTimer;
 		if (not IsCasting()) and (not IsChanneling()) and (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
+				self.waitTimer = GetTimeEX() + 1000;
+				script_grind:setWaitTimer(1000);
 				return true;
 			end
 		end
@@ -340,7 +351,7 @@ script_priestEX.waitTimer = self.waitTimer;
 
 		-- use mind blast on CD
 		if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
-			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() < 29) then
+			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() <= self.spellRange) then
 				
 				CastSpellByName("Mind Blast", targetObj);
 				targetObj:FaceTarget();
@@ -383,15 +394,14 @@ script_priestEX.waitTimer = self.waitTimer;
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 			
 			-- Opener check range of ALL SPELLS
-			if ( (targetObj:GetDistance() > self.openerRange and not IsCasting() and not IsChanneling()) or (not targetObj:IsInLineOfSight()) ) then
-				self.message = "Walking to spell range!";
+			if ( (targetObj:GetDistance() > self.spellRange and not IsCasting() and not IsChanneling()) or (not targetObj:IsInLineOfSight()) ) then
 				self.waitTimer = GetTimeEX() + 150;
 				return 3;
 			end
 
 			-- casts mind blast quicker
 			if (not IsMoving()) and (HasSpell("Mind Blast")) and (targetObj:IsInLineOfSight()) and (not IsSpellOnCD("Mind Blast")) and (not IsMoving()) then
-				if (not HasSpell("Vampiric Embrace")) or (not HasSpell("Devouring Plague")) and (targetObj:GetDistance() < 29) then
+				if (not HasSpell("Vampiric Embrace")) or (not HasSpell("Devouring Plague")) and (targetObj:GetDistance() < self.spellRange) then
 					if (IsMoving()) then
 						StopMoving();
 						return true;
@@ -405,7 +415,7 @@ script_priestEX.waitTimer = self.waitTimer;
 			
 			-- smite low level wouldn't cast for some reason kept defaulting to auto attack
 			-- also used before we have mind blast
-			if (not HasSpell("Mind Blast")) and (targetObj:GetDistance() <= 30) and (localMana > 10) and (not IsMoving()) then
+			if (not HasSpell("Mind Blast")) and (targetObj:GetDistance() <= self.spellRange) and (localMana > 10) and (not IsMoving()) then
 				if (IsMoving()) then
 					StopMoving();
 				end
@@ -422,7 +432,6 @@ script_priestEX.waitTimer = self.waitTimer;
 				if (Cast("Devouring Plague", targetObj)) then
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 200;
-					self.message = "Casting Devouring Plague!";
 					return 0; -- keep trying until cast
 				end
 			end
@@ -437,7 +446,6 @@ if (IsMoving()) then
 				end
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1850;
-					self.message = "Casting Mind Blast!";
 					return 0; -- keep trying until cast
 				end
 
@@ -446,7 +454,6 @@ if (IsMoving()) then
 				if (Cast("Vampiric Embrace", targetObj)) then	
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 1850;
-					self.message = "Casting Vampiric Embrace!";
 					return 0; -- keep trying until cast
 				end
 				--shadow word pain if mindblast is on CD to pull if no wand
@@ -467,7 +474,6 @@ if (IsMoving()) then
 				if (CastSpellByName("Smite", targetObj)) then
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 2250;
-					self.message = "Smite is checked!";
 					return 0; -- keep trying until cast
 				end
 				if (HasSpell("Holy Fire")) and (not targetObj:HasDebuff("Holy Fire")) and (localMana >= 25) then
@@ -487,7 +493,6 @@ if (IsMoving()) then
 				if (CastSpellByName("Smite", targetObj)) then
 					targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 2250;
-					self.message = "Smite is checked!";
 					return 0; -- keep trying until cast
 				end
 				if (HasSpell("Holy Fire")) and (not targetObj:HasDebuff("Holy Fire")) and (localMana >= 25) then
@@ -521,7 +526,7 @@ if (IsMoving()) then
 				end
 			end
 
-			if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+			if (targetObj:GetDistance() > self.spellRange) or (not targetObj:IsInLineOfSight()) then
 				self.waitTimer = GetTimeEX() + 150;
 				return 3;
 			end
@@ -532,7 +537,7 @@ if (IsMoving()) then
 			if (IsMounted()) then DisMount(); end
 
 			if (targetObj:IsInLineOfSight() and not IsMoving()) then
-				if (targetObj:GetDistance() <= 32) and (targetObj:IsInLineOfSight()) and (script_grind:isTargetingMe(targetObj)) then
+				if (targetObj:GetDistance() <= self.spellRange) and (targetObj:IsInLineOfSight()) and (script_grind:isTargetingMe(targetObj)) then
 					targetObj:FaceTarget();
 				end
 			end
@@ -544,10 +549,7 @@ if (IsMoving()) then
 			end
 
 			-- check heals and buffs
-			if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-script_priestEX.waitTimer = self.waitTimer;
-				return;
-			end
+			script_priestEX:healsAndBuffs(localObj, localMana);
 
 			-- Check: Use Healing Potion 
 			if (localHealth <= self.potionHealth) then 
@@ -577,7 +579,6 @@ script_priestEX.waitTimer = self.waitTimer;
 			if (self.useScream) and (script_priest:enemiesAttackingUs(9) >= 1) and (targetHealth >= 20) and (localMana >= 10) then
 				if (HasSpell("Psychic Scream")) and (not IsSpellOnCD("Psychic Scream")) then
 					CastSpellByName("Psychic Scream");
-					self.message = 'Adds close, use Psychic Scream...';
 					return 0; -- keep trying until cast
 				end
 			end
@@ -606,7 +607,6 @@ script_priestEX.waitTimer = self.waitTimer;
 			if (not targetObj:HasDebuff("Shadow Word: Pain")) and (HasSpell("Shadow Word: Pain")) and (localMana >= self.swpMana) and (targetHealth >= 20) then
 				if (Cast("Shadow Word: Pain", targetObj)) then 
 					self.waitTimer = GetTimeEX() + 1750;
-					self.message = "Keeping DoT up!";
 					return; -- keep trying until cast
 				end
 			end
@@ -621,7 +621,6 @@ script_priestEX.waitTimer = self.waitTimer;
 			if (HasSpell("Vampiric Embrace")) and (not IsSpellOnCD("Vampiric Embrace")) and (not targetObj:HasDebuff("Vampiric Embrace")) and (localMana >= 3) then
 				if (Cast("Vampiric Embrace", targetObj)) then	
 					self.waitTimer = GetTimeEX() + 1550;
-					self.message = "Casting Vampiric Embrace!";
 					return; -- keep trying until cast
 				end
 			end
@@ -662,10 +661,8 @@ script_priestEX.waitTimer = self.waitTimer;
 			end
 
 			-- check heal and buffs
-			if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-script_priestEX.waitTimer = self.waitTimer;
-				return; -- keep trying until cast
-			end
+			script_priestEX:healsAndBuffs(localObj, localMana)
+
 
 			-- Mind flay 
 			if (self.shadowForm or self.useMindFlay) and ((IsSpellOnCD("Mind Blast") or localMana <= self.mindBlastMana)) then
@@ -681,14 +678,11 @@ script_priestEX.waitTimer = self.waitTimer;
 				end
 			end
 
-			if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+			if (targetObj:GetDistance() > self.spellRange) or (not targetObj:IsInLineOfSight()) then
 				return 3;
 			end
 
-			if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-script_priestEX.waitTimer = self.waitTimer;
-				return;
-			end
+			script_priestEX:healsAndBuffs(localObj, localMana)
 
 			-- use mind blast on CD
 			if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) then
@@ -702,16 +696,11 @@ script_priestEX.waitTimer = self.waitTimer;
 		
 			-- No Mind Blast but wand ? fixed!
 			if (not HasSpell("Mind Blast")) and (localObj:HasRangedWeapon()) and (self.useWand) then
-					if (not IsAutoCasting("Shoot")) and (self.useWand) then
-						self.waitTimer = GetTimeEX() + 100;
-						targetObj:FaceTarget();
-						self.message = "Using wand...";
-						targetObj:CastSpell("Shoot");
-						return true; -- return true - if not AutoCasting then false
-					end
-				if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-script_priestEX.waitTimer = self.waitTimer;
-					return;
+				if (not IsAutoCasting("Shoot")) and (self.useWand) then
+					self.waitTimer = GetTimeEX() + 250;
+					self.message = "Using wand...";
+					targetObj:CastSpell("Shoot");
+					return true; -- return true - if not AutoCasting then false
 				end
 			end
 
@@ -719,20 +708,16 @@ script_priestEX.waitTimer = self.waitTimer;
 			if (not IsMoving()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetGUID() == targetObj:GetGUID()) and (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling()) and (not script_checkAdds:checkAdds())
 				and ( (not self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) or (self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) ) then
 				if (localObj:HasRangedWeapon()) then
-					if (targetObj:GetDistance() > self.openerRange) or (not targetObj:IsInLineOfSight()) then
+					if (targetObj:GetDistance() > 26) or (not targetObj:IsInLineOfSight()) then
+						self.waitTimer = GetTimeEX() + 1000;
 						return 3;
 					end
-					if (not IsAutoCasting("Shoot")) and (self.useWand) then
-						self.waitTimer = GetTimeEX() + 100;
-						self.message = "Using wand...";
-						targetObj:FaceTarget();
+					if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) and not IsMoving() and not IsCasting() then
 						targetObj:CastSpell("Shoot");
-						return true; -- return if not AutoCasting then false
+						self.waitTimer = GetTimeEX() + 1500;
+						return true;
 					end
-					if (script_priestEX:healsAndBuffs(localObj, localMana)) then
-script_priestEX.waitTimer = self.waitTimer;
-						return;
-					end
+
 				end
 			end
 		end
@@ -792,10 +777,7 @@ function script_priest:rest()
 
 	-- check heals and buffs
 	if (IsStanding()) and (not IsDrinking() and not IsEating()) then
-		if (script_priestEX:healsAndBuffs(localObj, localMana)) then 
-script_priestEX.waitTimer = self.waitTimer;
-			return true;
-		end
+		script_priestEX:healsAndBuffs(localObj, localMana);
 	end
 
 	-- Eat and Drink

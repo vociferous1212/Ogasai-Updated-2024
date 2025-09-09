@@ -94,9 +94,7 @@ function script_followEX:doLoot(localObj)
 				script_follow.waitTimer = GetTimeEX() + 250;
 			end
 		else
-			if(script_followMoveToTarget:moveToLoot(GetLocalPlayer(), _x, _y, _z)) then
-				return;
-			end
+			script_followMoveToTarget:moveToLoot(GetLocalPlayer(), _x, _y, _z);
 		end
 	end
 end
