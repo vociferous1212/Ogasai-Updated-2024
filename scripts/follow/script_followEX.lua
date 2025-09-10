@@ -1,6 +1,5 @@
 script_followEX = {
 	
-	healsLoaded = include("scripts\\follow\\script_followHealsAndBuffs.lua"),
 	followEX2Loaded = include("scripts\\follow\\script_followEX2.lua"),
 
 

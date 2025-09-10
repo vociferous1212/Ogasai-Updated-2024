@@ -123,6 +123,7 @@ if (IsUsingNavmesh()) and (script_follow.drawPath) then
 		else
 			self.lootObj = nil;
 		end
+		if self.lootObj == nil then self.lootObj = script_grind:getSkinTarget(self.findLootDistance); end
 
 		if (self.lootObj == 0) then
 			self.lootObj = nil;
@@ -166,7 +167,7 @@ if (IsUsingNavmesh()) and (script_follow.drawPath) then
 		self.enemyObj = GetPet():GetUnitsTarget():GetGUID();
 	end
 
-	-- if we dont want to assist in combat or no one is attacking us then
+	-- if we dont want to assist in combat or an npc is attacking us then
 	if (GetNumPartyMembers() > 0) and (GetTarget() ~= 0 and GetTarget() ~= nil) then
 
 		local target = GetTarget();
