@@ -1,9 +1,9 @@
 script_mage = {
 	message = 'Mage Combat Script',
 	mageMenu = include("scripts\\combat\\mage\\script_mageEX.lua"),
-	pullSpellsIncluded = include("scripts\\mage\\combat\\script_magePullSpells.lua"),
+	pullSpellsIncluded = include("scripts\\combat\\mage\\script_magePullSpells.lua"),
 	mageRestIncluded = include("scripts\\combat\\mage\\script_mageRest.lua"),
-	magePolymorphIncluded = include("scripts\\mage\\combat\\script_magePolymorph.lua"),
+	magePolymorphIncluded = include("scripts\\combat\\mage\\script_magePolymorph.lua"),
 	drinkMana = 55,	-- drink at this mana %
 	eatHealth = 65,	-- eat at this health %
 	potionHealth = 10,	-- use potion at this health %
