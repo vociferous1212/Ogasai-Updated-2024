@@ -8,6 +8,7 @@ function script_grindValidEnemy:enemyIsValid(i)
         -- If target distance is close enough and in line of sight and is targeting group then return target
         if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (script_grindParty.forceTarget) then
             if (script_grind:isTargetingGroup(i)) then
+              
             end
         end
 

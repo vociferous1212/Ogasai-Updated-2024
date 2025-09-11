@@ -205,6 +205,11 @@ function script_hunterEX:menu()
 
 	if (CollapsingHeader("Hunter Combat Options")) then
 
+		Text("Ranged Attack Distsance");
+		script_hunter.spellRange = SliderInt("Dist yards", 30, 41, script_hunter.spellRange);
+
+		Separator();
+
 		if GetLocalPlayer():GetLevel() > 10 then
 		wasClicked, self.quickGrind = Checkbox("Disable Some Settings - Quick Grind", self.quickGrind);
 		if self.quickGrind then script_grind.skipLooting = true; script_grind.gather = false; script_hunter.useMark = false; script_hunter.drinkMana = 15; script_hunter.waitAfterCombat = false; script_warlock.waitAfterCombat = false; script_grindMenu.adjustTickRate = true; end end

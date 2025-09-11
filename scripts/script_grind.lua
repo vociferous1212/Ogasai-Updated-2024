@@ -196,7 +196,7 @@ script_grind = {
 	playerPos = 0,	-- paranoid player pos
 	blacklistLootTime = 0,	-- blacklist loot time
 	blacklistLootTimeCheck = 0,
-	blacklistLootTimeVar = 25,
+	blacklistLootTimeVar = 15,
 	timerSet = false,	-- blacklist loot timer set
 	messageOnce = true,	-- message once blacklist loot obj
 	perHasTarget = false,	-- used to check pet target during rest
@@ -780,7 +780,7 @@ function script_grind:run()
 		end
 	end
 
-	if (not IsInCombat()) and (not IsLooting()) then
+	if (not IsInCombat()) and (not IsLooting()) and self.lootObj == nil then
 		self.blacklistLootTime = GetTimeEX();
 	end
 
@@ -1151,9 +1151,10 @@ function script_grind:run()
 			-- blacklist loot message
 			self.messageOnce = true;
 
-			-- blacklist loot timer
-			self.timerSet = false;
-
+			if self.lootObj == nil or self.lootObj == 0 then
+				-- blacklist loot timer
+				self.timerSet = false;
+			end
 			-- reset the combat status
 			self.combatError = nil; 
 
@@ -1343,12 +1344,12 @@ function script_grind:run()
 
 				-- if we are in a group get a target... isTargetingGroup function fails on some servers as they return 0s....
 				-- instead of changing the function, this is a fallback targeting method
-				if GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil and not PlayerHasTarget() then
-					TargetNearestEnemy();
-					if GetTarget() ~= nil then
-						self.enemyObj = GetGUIDObject(GetTarget())
-					end
-				end
+				--if GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil and not PlayerHasTarget() then
+				--	TargetNearestEnemy();
+				--	if GetTarget() ~= nil then
+				--		self.enemyObj = GetGUIDObject(GetTarget())
+				--	end
+				--end
 			end
 
 -- try to walk closer to hotspot area... if we cannot find a target... even if distToHotspot is set
@@ -1376,8 +1377,6 @@ function script_grind:run()
 					self.lastTargetKilled = self.enemyObj;
 					self.monsterKillCount = self.monsterKillCount + 1;
 					self.useAnotherVar = true;
-					-- if we killed a target then pause for a second if nothing else is attacking us
-					self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
 
@@ -1740,7 +1739,7 @@ function script_grind:run()
 
 			--if we have more than 2 saved locations and cannot find a target or loot then navigate
 				-- this will also double up as moveToHotspot function
-			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached then
+			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached and not IsInCombat() then
 
 				-- reset blacklist/target timer when moving back to hotspot
 				if script_grind.enemyObj == nil and not IsInCombat() then
@@ -1750,8 +1749,10 @@ function script_grind:run()
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
 				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
-				if not IsMoving() then Move(self.minLevel, self.maxLevel, self.staticHotSpot); end
-			return;
+				if not IsMoving() and not IsPathLoaded(5) then
+					Move(script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z']);
+				end
+			--return true;
 			end
 
 		-- we are not using auto path and only using walk paths
@@ -1785,38 +1786,38 @@ function script_grind:getTargetAttackingUs()
 	while currentObj ~= 0 do 
 		
 		-- NPC type 3
-    		if typeObj == 3 then
+    	if typeObj == 3 then
 	
-			-- acceptable targets
-			if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:IsInLineOfSight()) and (not currentObj:IsCritter()) then
+		-- acceptable targets
+		if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:IsInLineOfSight()) and (not currentObj:IsCritter()) then
 
 			-- get targets target - target of target
 			local localObj = GetLocalPlayer();
 			local targetTarget = currentObj:GetUnitsTarget();
 
-				-- target has a target and distance less than 50 (limit object manager by distance)
-				if (targetTarget ~= 0 and targetTarget ~= nil) and (currentObj:GetDistance() < 50) then
+			-- target has a target and distance less than 50 (limit object manager by distance)
+			if (targetTarget ~= 0 and targetTarget ~= nil) and (currentObj:GetDistance() < 50) then
 
-					-- if target is targeting me then
-					if (targetTarget:GetGUID() == localObj:GetGUID()) then
+				-- if target is targeting me then
+				if (targetTarget:GetGUID() == localObj:GetGUID()) then
 	
-						-- return target
-						return currentObj:GetGUID();
-					end
-				end	
-
-				-- acceptable target is targeting our group members (limited by distance)
-				if (GetNumPartyMembers() > 1) and (currentObj:GetDistance() < 50) and (script_grindParty.forceTarget) then
-
-					-- run another object manager script to get a different target 
-                			if (script_grind:isTargetingGroup(currentObj)) then 
-					
-						-- return target
-                				return currentObj:GetGUID();
-                			end
+					-- return target
+					return currentObj:GetGUID();
 				end
-            		end 
-       		end
+			end	
+
+			-- acceptable target is targeting our group members (limited by distance)
+			if (GetNumPartyMembers() >= 1) and (currentObj:GetDistance() < 50) and (script_grindParty.forceTarget) then
+
+				-- run another object manager script to get a different target 
+                	if (script_grind:isTargetingGroup(currentObj)) then 
+					
+					-- return target
+                			return currentObj;
+                		end
+				end
+            end 
+       	end
 
 	-- get next target
 	currentObj, typeObj = GetNextObject(currentObj); 
@@ -1856,11 +1857,11 @@ function script_grind:isTargetingGroup(y)
 	-- the intent was to keep the bot targeting mobs that are tapped by or targeting other players in the group without choosing a new target
 
 	-- get partymembers
-	for i = 0, GetNumPartyMembers() do
+	for i = 1, GetNumPartyMembers() do
 		local partyMember = GetPartyMember(i);
 		
-	-- if we have party members and conditions valid (limited object manager by range)
-	if (partyMember ~= nil and partyMember ~= 0 and not partyMember:IsDead() and partyMember:GetDistance() < 50) then
+		-- if we have party members and conditions valid (limited object manager by range)
+		if (partyMember ~= nil and partyMember ~= 0 and not partyMember:IsDead() and partyMember:GetDistance() < 50) then
 
 		
 
@@ -2051,7 +2052,7 @@ function script_grind:doLoot(localObj)
 	--	end	
 	--end
 
-	if (not self.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) then
+	if (not self.timerSet) and (not IsEating()) and (not IsDrinking()) and (IsStanding()) and (not IsInCombat()) or IsLooting() then
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 		self.timerSet = true;
 	end
@@ -2084,7 +2085,7 @@ function script_grind:doLoot(localObj)
 		local _x, _y, _z = self.lootObj:GetPosition();
 	end
 	-- close enough to loot range then do these
-	if (dist <= self.lootDistance) then
+	if (dist <= self.lootDistance) and self.blacklistLootTime <= self.blacklistLootTimeCheck then
 		self.message = "Looting...";
 		
 		-- stop moving
@@ -2364,8 +2365,8 @@ function script_grind:runRest()
  if (script_grind.lootObj == nil or AreBagsFull() or self.skipLooting or self.bagsFull) or not script_grindEX:isLootSafeToLoot() then
 	if(RunRestScript()) then
 		-- reset blacklist looting time
-		script_grind.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
-		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
+	--	script_grind.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
+		--script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 		if not PlayerHasTarget() then
 			script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
 		end

@@ -36,6 +36,7 @@ script_hunter = {
 	useMultiShot = false,
 	--useScorpidSting = false,
 	waitAfterCombat = false,
+	spellRange = 35,
 
 }	
 
@@ -252,10 +253,10 @@ function script_hunter:run(targetGUID)
 		if GetTarget():GetDistance() <= 11 then
 			script_grind.combatScriptRange = self.meleeDistance;
 		else
-			script_grind.combatScriptRange = 32;
+			script_grind.combatScriptRange = self.spellRange;
 		end
 	else
-		script_grind.combatScriptRange = 32;
+		script_grind.combatScriptRange = self.spellRange;
 	end
 
 	-- Check: Do nothing if we are channeling, casting or wait timer
@@ -378,7 +379,7 @@ function script_hunter:run(targetGUID)
 		end
 
 		-- check line of sight
-		if (not targetObj:IsInLineOfSight()) or (targetObj:GetDistance() > 32) then
+		if (not targetObj:IsInLineOfSight()) or (targetObj:GetDistance() > self.spellRange) then
 			return 3;
 		end
 
@@ -415,7 +416,7 @@ function script_hunter:run(targetGUID)
 			if (self.hasPet) and (GetPet() ~= 0) and (GetPet():GetDistance() > 35) and (GetLocalPlayer():GetUnitsTarget() == 0) then 
 				PetFollow();
 			end
-			if (self.hasPet) and (GetPet():GetDistance() <= 32) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then 
+			if (self.hasPet) and (GetPet():GetDistance() <= self.spellRange) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then 
 				PetAttack();
 				targetObj:AutoAttack();
 			end
@@ -429,7 +430,7 @@ function script_hunter:run(targetGUID)
 	-- NOT    in combat ---  do pull stuff
 
 			if (GetLocalPlayer():GetLevel() < 10) then
-				if (targetObj:GetDistance() > 11) and (targetObj:GetDistance() < 35) and targetObj:IsInLineOfSight() then
+				if (targetObj:GetDistance() > 11) and (targetObj:GetDistance() < self.spellRange) and targetObj:IsInLineOfSight() then
 					script_hunter:hunterPull(targetObj);
 				elseif (targetObj:GetDistance() <= 11) or not targetObj:IsInLineOfSight() then
 					if (targetObj:GetDistance() > self.meleeDistance) then
@@ -493,7 +494,7 @@ function script_hunter:run(targetGUID)
 
 			-- force auto shot if in combat
 			if (IsInCombat()) then
-				if (not IsAutoCasting("Auto Shot")) and (targetObj:GetDistance() > 10) and (targetObj:GetDistance() < 30) and (targetObj:IsInLineOfSight()) then
+				if (not IsAutoCasting("Auto Shot")) and (targetObj:GetDistance() > 10) and (targetObj:GetDistance() < self.spellRange) and (targetObj:IsInLineOfSight()) then
 					if not IsMoving() then
 						targetObj:FaceTarget();
 					end
@@ -632,7 +633,7 @@ function script_hunter:run(targetGUID)
 				end
 			end
 
-			if (targetObj:GetDistance() > 14) and (targetObj:GetDistance() < 35) then
+			if (targetObj:GetDistance() > 14) and (targetObj:GetDistance() < self.spellRange) then
 
 				-- use Hunter's Mark first
 				if (self.useMark) then
@@ -1070,7 +1071,7 @@ function script_hunter:hunterPull(targetObj)
 				JumpOrAscendStart();
 			end
 
-			if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > 30) then
+			if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > self.spellRange) then
 				return 3;
 			end
 

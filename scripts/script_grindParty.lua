@@ -42,7 +42,7 @@ function script_grindParty:partyOptions()
 			end
 	end
 
-	if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 and script_grind.enemyObj == nil then
+	if self.forceTarget and IsInCombat() and GetNumPartyMembers() ~= 0 then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then

@@ -124,68 +124,6 @@ function script_mage:runBackwards(targetObj, range)
 	return false;
 end
 
-function script_mage:checkFrostNova()
-    local localObj = GetLocalPlayer()
-    local searchRadius = 15 -- 15 yard radius for detection
-    local minSafeDistance = 8 -- Minimum distance to move away
-    local closestFrostTarget = 0
-    local closestDist = 999
-    local currentObj, typeObj = GetFirstObject()
-
-    -- Check for targets with Frostbite or Frost Nova within 15 yards
-    while currentObj ~= 0 do
-        if typeObj == 3 then -- NPC type
-            if currentObj:GetDistance() <= searchRadius then
-                if currentObj:CanAttack()
-                    and (not currentObj:IsDead())
-                    and (not currentObj:IsCritter())
-                    and (currentObj:HasDebuff("Frostbite") or currentObj:HasDebuff("Frost Nova"))
-                then
-                    local dist = currentObj:GetDistance()
-                    if dist < closestDist then
-                        closestDist = dist
-                        closestFrostTarget = currentObj
-                    end
-                end
-            end
-        end
-        currentObj, typeObj = GetNextObject(currentObj)
-    end
-
-    -- If a valid target with frost debuff is found
-    if closestFrostTarget ~= 0 then
-        local xT, yT, zT = closestFrostTarget:GetPosition()
-        local xP, yP, zP = localObj:GetPosition()
-        local distance = closestFrostTarget:GetDistance()
-        local xV, yV, zV = xP - xT, yP - yT, zP - zT
-        local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2)
-        local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV
-
-        -- Stop if already 8 yards or further from the target
-        if distance >= minSafeDistance then
-            return false -- No need to move further
-        end
-
-        -- Calculate movement distance: ensure at least 8 yards
-        local moveDistance = minSafeDistance + 2 -- Move to 8 yards plus a small buffer
-        local moveX, moveY, moveZ = xT + xUV*moveDistance, yT + yUV*moveDistance, zT + zUV
-
-        if (distance <= searchRadius)
-            and (closestFrostTarget:IsInLineOfSight())
-            and (not script_checkDebuffs:hasDisabledMovement())
-        then
-            script_grind.tickRate = 75 -- Set tick rate as in runBackwards
-            if Move(moveX, moveY, moveZ) then
-                return true
-            end
-            return 4
-        end
-	return 4;
-    end
-
-    return false
-end
-
 function script_mage:addWater(name) -- water setup
 	self.water[self.numWater] = name;
 	self.numWater = self.numWater + 1;
@@ -625,7 +563,8 @@ function script_mage:run(targetGUID)
 				return 0;
 			end
 
-			if IsInCombat() and script_grind:enemiesAttackingUs(10) >= 2 then script_mage:checkFrostNova(); self.waitTimer = GetTimeEX() + 500; end
+			-- if more than 2 enemies are attacking us then check them for frost nova and run backwards
+			if IsInCombat() and script_grind:enemiesAttackingUs(10) >= 2 then script_mageCheckFrostNova:checkFrostNova(); self.waitTimer = GetTimeEX() + 500; end
 
 			-- use cold snap to reset frost nova if we don't have ice barrier
 			-- make sure we waste both cone of cold and frost nova cooldown
