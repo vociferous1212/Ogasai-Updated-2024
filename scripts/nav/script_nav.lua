@@ -148,6 +148,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 		if not IsMoving() and self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
 		Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
 		end
+		
 	end
 return false;
 end

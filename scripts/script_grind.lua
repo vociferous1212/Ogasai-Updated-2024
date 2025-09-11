@@ -42,7 +42,7 @@ script_grind = {
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
-	mageMenu = include("scripts\\combat\\script_mageEX.lua"),
+	mageMenu = include("scripts\\combat\\mage\\script_mageEX.lua"),
 	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
 	priestMenu = include("scripts\\combat\\script_priestMenu.lua"),
 	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
@@ -227,7 +227,7 @@ script_grind = {
 	restMana = 1,
 	restHealth = 1,
 	killStuffAroundGatherNodes = true,
-	timeToSit = GetTimeEX(),
+	timeToSit = 0,
 	sitTimerSet = false,
 	afkUsed = false,
 	combatScriptRange = 30,
@@ -811,24 +811,24 @@ function script_grind:run()
 		self.blacklistLootTimeCheck = GetTimeEX();	
 	end
 
-	-- make sure the grinder cannot run if we are resting...
-	--if (not IsInCombat()) and (not petHasTarget) then
-	--	if (IsEating() and GetLocalPlayer():GetHealthPercentage() < 95)
-	--		or (IsDrinking() and GetLocalPlayer():GetManaPercentage() < 95)
-	--	then
-	--		self.newTargetTime = GetTimeEX();
-	--		self.autoBlacklistTimer = 15000;
-	--		self.blacklistLootTimeCheck = GetTimeEX() * 2;
-	--		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
-	--		return;
-	--	end
-	--end
-
 	-- Do all checks
 	if (script_grindEX:doChecks()) then
 		return;
 	end
 	if localObj:IsDead() then return; end
+
+	-- make sure the grinder cannot run if we are resting...
+	if (not IsInCombat()) and (not petHasTarget) then
+		if (IsEating() and GetLocalPlayer():GetHealthPercentage() < 95)
+			or (IsDrinking() and GetLocalPlayer():GetManaPercentage() < 95)
+		then
+			self.newTargetTime = GetTimeEX();
+			self.autoBlacklistTimer = 15000;
+			self.blacklistLootTimeCheck = GetTimeEX() * 2;
+			script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
+			return;
+		end
+	end
 
 	-- attempt to move out of fire. was locking up nav but since nav is fixed it should work properly. can also be used to detect AoE if done right
 	--if (script_helper:weAreStandingInFire()) then
@@ -1376,6 +1376,8 @@ function script_grind:run()
 					self.lastTargetKilled = self.enemyObj;
 					self.monsterKillCount = self.monsterKillCount + 1;
 					self.useAnotherVar = true;
+					-- if we killed a target then pause for a second if nothing else is attacking us
+					self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
 
@@ -1669,11 +1671,12 @@ function script_grind:run()
 				end
 			end
 
-			if (IsLooting()) or (IsCasting()) or (IsChanneling()) then
+			if (IsLooting()) or (IsCasting()) or (IsChanneling()) or IsEating() or IsDrinking() then
 				return;
 			end
 
-			if self.autoPath and (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) then
+-- for some reason the bot is refusing to stop and rest when moving to hotspot (eat/drink)
+			if self.autoPath and (not self.hotspotReached) and (not IsInCombat()) and (script_vendor.status == 0) and not IsEating() and not IsDrinking() and not self.needRest then
 				script_moveToHotspot:moveToHotspot(localObj);
 				script_grind.message = "Moving to hotspot : "..script_nav.currentHotSpotName.." .. "..math.floor(script_nav:getDistanceToHotspot()).." (yds)";
 				--return true;
@@ -1747,7 +1750,8 @@ function script_grind:run()
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
 				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
-			return true;
+				if not IsMoving() then Move(self.minLevel, self.maxLevel, self.staticHotSpot); end
+			return;
 			end
 
 		-- we are not using auto path and only using walk paths

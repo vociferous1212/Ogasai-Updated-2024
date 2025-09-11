@@ -17,7 +17,8 @@ function script_follow:draw() script_followEX:drawStatus(); end
 function script_follow:setWaitTimer(ms) self.waitTimer = GetTimeEX() + (ms); end
 
 function GetPartyLeaderObject()
-local leaderObj = 0;
+	local leaderObj = 0;
+
 	if GetNumPartyMembers() > 0 then
 
 		leaderObj = GetPartyMember(GetPartyLeaderIndex());
@@ -30,14 +31,15 @@ local leaderObj = 0;
 return 0;
 end
 
-function script_follow:run() script_follow:window();
+function script_follow:run()
+	script_follow:window();
 
-if (not self.isSetup) then
-		script_follow:setup();
-	end
-if (IsUsingNavmesh()) and (script_follow.drawPath) then
-		script_drawData:drawPath();
-	end
+	if (not self.isSetup) then
+			script_follow:setup();
+		end
+	if (IsUsingNavmesh()) and (script_follow.drawPath) then
+			script_drawData:drawPath();
+		end
 
 	-- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
@@ -123,7 +125,8 @@ if (IsUsingNavmesh()) and (script_follow.drawPath) then
 		else
 			self.lootObj = nil;
 		end
-		if self.lootObj == nil then self.lootObj = script_grind:getSkinTarget(self.findLootDistance); end
+		if script_grind:getSkinTarget(self.findLootDistance) ~= nil then
+			if self.lootObj == nil then self.lootObj = script_grind:getSkinTarget(self.findLootDistance); end end
 
 		if (self.lootObj == 0) then
 			self.lootObj = nil;

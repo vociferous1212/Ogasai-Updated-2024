@@ -48,7 +48,9 @@ function script_grindParty:partyOptions()
 			if t == 3 then
 				if i:GetDistance() <= 40 and script_grind:isTargetingGroup(i) then
 					script_grind.enemyObj = i;
-					i:AutoAttack();
+					if not IsAutoCasting("Attack") then
+						i:AutoAttack();
+					end
 				end
 			end
 		i, t = GetNextObject(i);
