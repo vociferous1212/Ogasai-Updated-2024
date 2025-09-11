@@ -2,6 +2,9 @@ script_followEX2 = {
 
 }
 
+-- this script is mainly for functions to be called elsewhere. targeting and such
+
+-- also has setup function
 
 function script_followEX2:setup()
 

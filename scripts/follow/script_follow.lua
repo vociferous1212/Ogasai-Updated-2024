@@ -12,9 +12,23 @@ function script_follow:window()
 	end
 end
 
-function script_follow:setup() self.lootCheck['timer'] = 0; self.lootCheck['target'] = 0; script_helper:setup(); script_followEX2:setup(); script_gather:setup(); script_priestFollowerHeals.timer = GetTimeEX(); self.isSetup = true; ClearTarget(); end
-function script_follow:draw() script_followEX:drawStatus(); end
-function script_follow:setWaitTimer(ms) self.waitTimer = GetTimeEX() + (ms); end
+function script_follow:setup()
+	self.lootCheck['timer'] = 0;
+	self.lootCheck['target'] = 0;
+	script_helper:setup();
+	script_followEX2:setup();
+	script_gather:setup();
+	script_priestFollowerHeals.timer = GetTimeEX();
+	self.isSetup = true; ClearTarget();
+end
+
+function script_follow:draw()
+	script_followEX:drawStatus();
+end
+
+function script_follow:setWaitTimer(ms)
+	self.waitTimer = GetTimeEX() + (ms);
+end
 
 function GetPartyLeaderObject()
 	local leaderObj = 0;
@@ -28,18 +42,20 @@ function GetPartyLeaderObject()
 		return leaderObj;
 		end
 	end
-return 0;
+	return 0;
 end
 
+-- RUN THE FOLLOWER SCRIPT
 function script_follow:run()
 	script_follow:window();
 
 	if (not self.isSetup) then
 			script_follow:setup();
-		end
+	end
+
 	if (IsUsingNavmesh()) and (script_follow.drawPath) then
-			script_drawData:drawPath();
-		end
+		script_drawData:drawPath();
+	end
 
 	-- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
@@ -55,6 +71,7 @@ function script_follow:run()
 		UseNavmesh(true);
 	return;
 	end
+
 	if (not LoadNavmesh()) then
 		self.message = "Make sure you have mmaps-files...";
 	return;
@@ -64,6 +81,7 @@ function script_follow:run()
 		self.message = "Loading the nav mesh... ";
 	return;
 	end
+
 	if (GetLoadNavmeshProgress() ~= 1) then
 	return;
 	end
@@ -73,7 +91,9 @@ function script_follow:run()
 	return;
 	end
 
-	if self.waitTimer > GetTimeEX() then return; end
+	if self.waitTimer > GetTimeEX() then
+	return;
+	end
 
 	-- vendoring and corpse walk + random checks
 	script_followStartChecks:doStartChecks();	
@@ -84,29 +104,29 @@ function script_follow:run()
 	end
 	
 -- RESTING PHASE			
-		-- Rest
-		if (not IsInCombat() and script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
-			if (RunRestScript()) then
-				self.message = "Resting...";
+	-- Rest
+	if (not IsInCombat() and script_followEX2:enemiesAttackingUs() == 0 and not localObj:HasBuff('Feign Death')) then
+		if (RunRestScript()) then
+			self.message = "Resting...";
 
-				if (IsMoving() and not localObj:IsMovementDisabed()) then
-					StopMoving();
-				return;
-				end
-
-				if (IsMounted()) then
-					DisMount();
-				return;
-				end
-
-				if self.waitTimer - GetTimeEX() < 2500 then
-					self.waitTimer = GetTimeEX() + 2500;
-				end
-
-			ClearTarget();
+			if (IsMoving() and not localObj:IsMovementDisabed()) then
+				StopMoving();
 			return;
 			end
+
+			if (IsMounted()) then
+				DisMount();
+			return;
+			end
+
+			if self.waitTimer - GetTimeEX() < 2500 then
+				self.waitTimer = GetTimeEX() + 2500;
+			end
+
+			ClearTarget();
+		return;
 		end
+	end
 
 	-- double check our combat phase before looting...
 	self.isInCombat = true;
@@ -273,13 +293,18 @@ function script_follow:run()
 			end
 		end
 -- END COMBAT PHASE FOLLOW PARTY LEADER
+-- FOLLOW PARTY LEADER
 		local leader = GetPartyLeaderObject();
 		-- follow leader
 		if (not IsInCombat()) and (leader ~= 0) and (self.lootObj == nil)
-			and (not leader:IsDead()) and (not localObj:IsDead()) then
+		and (not leader:IsDead()) and (not localObj:IsDead())
+		then
+
 			if (not IsCasting()) and (not IsChanneling())
 			and (not IsDrinking()) and (not IsEating()) and (not IsLooting())
-			and (leader:GetDistance() > self.followLeaderDistance-5) then
+			and (leader:GetDistance() > self.followLeaderDistance-5)
+			then
+
 				script_followMove:followLeader();
 					self.isStuck = false;
 			end	
