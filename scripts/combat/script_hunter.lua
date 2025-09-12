@@ -120,7 +120,7 @@ end
 -- Run backwards if the target is within range
 function script_hunter:runBackwards(targetObj, range) 
 	local localObj = GetLocalPlayer();
- 	if (targetObj ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) then
+ 	if (targetObj ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and not IsChanneling() then
  		local xT, yT, zT = targetObj:GetPosition();
  		local xP, yP, zP = localObj:GetPosition();
  		local distance = targetObj:GetDistance();
@@ -244,7 +244,8 @@ function script_hunter:run(targetGUID)
 -- set combat script attack distance
 	if PlayerHasTarget() then
 		
-		if GetTarget():GetDistance() < 10 then
+		-- change our attack distance to melee distance if we don't have a pet or target is targeting me'
+		if (GetTarget():GetDistance() < 12 and not script_grind:isTargetingMe(targetObj)) or GetPet() == 0 or GetPet() == nil then
 			script_grind.combatScriptRange = self.meleeDistance;
 		else
 			script_grind.combatScriptRange = self.spellRange;
@@ -261,7 +262,7 @@ function script_hunter:run(targetGUID)
 -- force bot to attack pets target
 	if (IsInCombat()) and (GetPet() ~= 0) and (not PlayerHasTarget()) and (GetNumPartyMembers() < 1) and (self.hasPet) then
 		if (PetHasTarget()) then
-			--if (GetPet():GetDistance() > 10) then
+			--if (GetPet():GetDistance() > 12) then
 				AssistUnit("pet");
 				PetFollow();
 			--end
@@ -278,9 +279,9 @@ function script_hunter:run(targetGUID)
 		end
 	end
 
--- pet not in line of sight then call pet
+-- pet not in line of sight then call pet but not if target is in line of sight
 	if (GetPet() ~= 0) then
-		if (IsInCombat()) and (not GetPet():IsInLineOfSight()) then
+		if (IsInCombat()) and (not GetPet():IsInLineOfSight()) and not targetObj:IsInLineOfSight() then
 			PetFollow();
 		end
 	end
@@ -391,12 +392,12 @@ function script_hunter:run(targetGUID)
 		end
 
 		-- face target
-		if (targetObj:GetDistance() < self.spellRange) and (targetObj:IsInLineOfSight()) and (not IsMoving()) then
+		if (targetObj:GetDistance() < self.spellRange) and script_grind:isTargetingMe(targetObj) and (targetObj:IsInLineOfSight()) and (not IsMoving()) then
 				targetObj:FaceTarget();
 		end
 
 		-- Auto Attack
-		if (targetObj:GetDistance() < self.spellRange) and targetObj:GetDistance() > 10 and (targetObj:IsInLineOfSight()) then
+		if (targetObj:GetDistance() < self.spellRange) and targetObj:GetDistance() > 12 and (targetObj:IsInLineOfSight()) then
 			if (self.hasPet) then
 				PetAttack();
 			end
@@ -459,12 +460,12 @@ function script_hunter:run(targetGUID)
 -- NOT in combat ---  do pull stuff
 
 		-- do pull function if we are far enough away
-		if (GetLocalPlayer():GetLevel() < 10) then
-			if (targetObj:GetDistance() > 10) and (targetObj:GetDistance() < self.spellRange) and targetObj:IsInLineOfSight() then
+		if (GetLocalPlayer():GetLevel() < 12) then
+			if (targetObj:GetDistance() > 12) and (targetObj:GetDistance() < self.spellRange) and targetObj:IsInLineOfSight() then
 				script_hunter:hunterPull(targetObj);
 
 			-- else move to target to melee
-			elseif (targetObj:GetDistance() < 10) or not targetObj:IsInLineOfSight() then
+			elseif (targetObj:GetDistance() < 12) or not targetObj:IsInLineOfSight() then
 				if (targetObj:GetDistance() > self.meleeDistance) then
 					return 3;
 				end
@@ -472,7 +473,7 @@ function script_hunter:run(targetGUID)
 		end
 						
 -- if we are not in combat then do pull ELSE
-		if (not IsInCombat()) and (targetObj:GetDistance() < self.spellRange) and (targetObj:GetDistance() > 10) and (targetObj:IsInLineOfSight()) then
+		if (not IsInCombat()) and (targetObj:GetDistance() < self.spellRange) and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
 			script_hunter:hunterPull(targetObj);
 			script_grind:setWaitTimer(1500);
 			if (not IsMoving()) then
@@ -519,7 +520,7 @@ function script_hunter:run(targetGUID)
 
 			-- force auto shot if in combat
 			if (IsInCombat()) then
-				if (not IsAutoCasting("Auto Shot")) and (targetObj:GetDistance() > 10) and (targetObj:GetDistance() < self.spellRange) and (targetObj:IsInLineOfSight()) then
+				if (not IsAutoCasting("Auto Shot")) and (targetObj:GetDistance() > 12) and (targetObj:GetDistance() < self.spellRange) and (targetObj:IsInLineOfSight()) then
 					if not IsMoving() then
 						targetObj:FaceTarget();
 					end
@@ -663,7 +664,7 @@ function script_hunter:run(targetGUID)
 
 -- target is far enough to use ranged attacks
 
-			if (targetObj:GetDistance() > 10) and (targetObj:GetDistance() < self.spellRange) then
+			if (targetObj:GetDistance() > 12) and (targetObj:GetDistance() < self.spellRange) then
 
 				-- use Hunter's Mark first
 				if (self.useMark) then
@@ -693,7 +694,10 @@ function script_hunter:run(targetGUID)
 
 				-- use serpent sting
 				if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
-					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 8) and targetObj:GetCreatureType() ~= "Elemental" then
+					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 8)
+					and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon"
+					
+					then
 						if (not IsMoving()) then
 							targetObj:FaceTarget();
 						end
@@ -747,13 +751,16 @@ function script_hunter:run(targetGUID)
 -- melee attacks otherwise
 
 			-- Auto Attack
-			if (targetObj:GetDistance() < 10) then
+			if (targetObj:GetDistance() < 12) then
 
-				if targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight() then
-					return 3;
-				end
-				if targetObj:GetDistance() <= self.meleeDistance and not IsMoving() then
-					targetObj:FaceTarget();
+				if GetPet() ~= 0 and GetPet() ~= nil and self.hasPet and script_grind:isTargetingMe(targetObj) then
+					if targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight() then
+						return 3;
+					end
+
+					if targetObj:GetDistance() <= self.meleeDistance and not IsMoving() and script_grind:isTargetingMe(targetObj) then
+						targetObj:FaceTarget();
+					end
 				end
 
 				-- cast raptor strike
@@ -794,7 +801,7 @@ function script_hunter:run(targetGUID)
 				end
 
 				-- auto attack the target
-				if targetObj:GetDistance() < 10 and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+				if targetObj:GetDistance() < 12 and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
 					CastSpellByName("Attack");
 				end
 					
@@ -1134,7 +1141,7 @@ function script_hunter:hunterPull(targetObj)
 	end
 
 	-- auto shot
-	if (not IsAutoCasting("Auto Shot")) and (targetObj:IsInLineOfSight()) and (IsStanding()) and (targetObj:GetDistance() > 10) then
+	if (not IsAutoCasting("Auto Shot")) and (targetObj:IsInLineOfSight()) and (IsStanding()) and (targetObj:GetDistance() > 12) then
 		if (not IsMoving()) then
 			targetObj:FaceTarget();
 		end

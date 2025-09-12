@@ -432,7 +432,7 @@ function script_mage:run(targetGUID)
 			end
 		end 
 		
-		if (targetObj:GetDistance() > script_grind.combatScriptRange or not targetObj:IsInLineOfSight()) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
+		if (targetObj:GetDistance() > script_grind.combatScriptRange -1 or not targetObj:IsInLineOfSight()) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
 			return 3;
 		end
 		if targetObj:GetDistance() <= script_grind.combatScriptRange and not IsMoving() and targetObj:GetHealthPercentage() <= 99 then
@@ -481,7 +481,7 @@ function script_mage:run(targetGUID)
 				if (script_magePullSpells.frostMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					self.waitTimer = GetTimeEX() + 2600;
-					if (PlayerHasTarget()) then
+					if (PlayerHasTarget()) and not IsMoving() then
 						targetObj:FaceTarget();
 					end
 				end
@@ -491,7 +491,7 @@ function script_mage:run(targetGUID)
 				if (script_magePullSpells.fireMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					self.waitTimer = GetTimeEX() + 2600;
-					if (PlayerHasTarget()) then
+					if (PlayerHasTarget()) and not IsMoving() then
 						targetObj:FaceTarget();
 					end
 				end
@@ -840,7 +840,7 @@ function script_mage:run(targetGUID)
 				end
 			
 					-- check range
-					if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > script_grind.combatScriptRange) and not (targetObj:HasDebuff("Polymorph")) and not targetObj:HasDebuff("Frostbite") and not targetObj:HasDebuff("Frost Nova") then
+					if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > script_grind.combatScriptRange -1) and not (targetObj:HasDebuff("Polymorph")) and not targetObj:HasDebuff("Frostbite") and not targetObj:HasDebuff("Frost Nova") then
 						return 3;
 					end
 
@@ -891,31 +891,33 @@ function script_mage:run(targetGUID)
 			if (self.frostMage) and (not HasSpell("Frostbolt")) and (not IsMoving()) then				
 		
 				-- else if not has frostbolt then use fireball as range check
-				if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > script_grind.combatScriptRange) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
+				if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > script_grind.combatScriptRange -1) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
 					return 3;
 				end	
 				-- cast fireball
-				if (CastSpellByName("Fireball", targetObj)) then
-					script_grind:setWaitTimer(2500);
-					self.waitTimer = GetTimeEX() + 2500;
-					return 0;
+				if targetObj:IsInLineOfSight() and not IsMoving() then
+					if (CastSpellByName("Fireball", targetObj)) then
+						script_grind:setWaitTimer(2500);
+						self.waitTimer = GetTimeEX() + 2500;
+						return 0;
+					end
 				end
 			end
 
 			-- this is here to check for low level not having a wand yet
 			if (self.frostMage) and (not IsMoving()) and (not localObj:HasRangedWeapon()) and (targetHealth <= self.useWandHealth) and (not IsSpellOnCD("Frostbolt")) then				
 		
-				if (targetObj:GetDistance() > script_grind.combatScriptRange or not targetObj:IsInLineOfSight()) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
+				if (targetObj:GetDistance() > script_grind.combatScriptRange -1 or not targetObj:IsInLineOfSight()) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
 					return 3;
 				end	
 				
 				-- cast frostbolt
-				if targetObj:IsInLineOfSight() then
-				if (CastSpellByName("Frostbolt", targetObj)) then
-					script_grind:setWaitTimer(1650);
-					self.waitTimer = GetTimeEX() + 1650;
-					return 0;
-				end
+				if targetObj:IsInLineOfSight() and not IsMoving() then
+					if (CastSpellByName("Frostbolt", targetObj)) then
+						script_grind:setWaitTimer(1650);
+						self.waitTimer = GetTimeEX() + 1650;
+						return 0;
+					end
 				end
 			end
 

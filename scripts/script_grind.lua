@@ -196,7 +196,7 @@ script_grind = {
 	playerPos = 0,	-- paranoid player pos
 	blacklistLootTime = 0,	-- blacklist loot time
 	blacklistLootTimeCheck = 0,
-	blacklistLootTimeVar = 15,
+	blacklistLootTimeVar = 25,
 	timerSet = false,	-- blacklist loot timer set
 	messageOnce = true,	-- message once blacklist loot obj
 	perHasTarget = false,	-- used to check pet target during rest
@@ -441,7 +441,9 @@ function script_grind:run()
 	elseif (IsIndoors()) then
 		script_nav:setNextToNodeDist(2.2); NavmeshSmooth(self.nextToNodeDist*1.2);
 	else
-		script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
+		--script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
+		script_grind.nextToNodeDist = 3;
+		NavmeshSmooth(2);
 	end
 	
 	-- run setup function if not ran yet
@@ -981,9 +983,10 @@ function script_grind:run()
 			end
 		end
 
+			if not self.skipLooting and not AreBagsFull() and not self.bagsFull then
 				-- find loot before gaining a new target... rogue likes to break stealth
 				self.lootObj = script_nav:getLootTarget(self.findLootDistance)
-
+			end
 
 		-- don't assign targets  until we get to hotspot
 		if (self.hotspotReached) and GetTimeEX() > self.newTargetTime and not IsLooting() and not IsEating() and not IsDrinking() and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) and script_vendor.status == 0  and not IsCasting() and not IsChanneling() then
@@ -1421,14 +1424,14 @@ function script_grind:run()
 
 -- Move in range: combat script return 3
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
-				and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+				and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) and not self.enemyObj:IsDead() then
 
 				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
 				if GetTarget() ~= nil and GetTarget() ~= 0 then
 					local _x, _y, _z = GetTarget():GetPosition();
-					if not IsMoving() then Move(_x, _y, _z); end
+					if not IsMoving() and not GetTarget():IsDead() then Move(_x, _y, _z); end
 				end
 
 				-- check positions
@@ -1479,7 +1482,7 @@ function script_grind:run()
 					end
 					
 				end
-			--return true;
+			return true;
 			end
 
 			-- Do nothing, return : combat script return 4
@@ -1736,7 +1739,7 @@ function script_grind:run()
 			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached and not IsInCombat() then
 
 				-- reset blacklist/target timer when moving back to hotspot
-				if script_grind.enemyObj == nil and not IsInCombat() then
+				if script_grind.enemyObj == nil and not IsInCombat() and not self.needRest then
 					self.newTargetTime = GetTimeEX();
 				end
 

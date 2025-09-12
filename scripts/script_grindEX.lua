@@ -320,13 +320,14 @@ function script_grindEX:doChecks()
 		end
 
 		-- Check: If our gear is yellow
-		if not IsInCombat() then
+		if not IsInCombat() and script_grind.repairWhenYellow and script_grind.useVendor then
 			for i = 1, 16 do
 			local status = GetInventoryAlertStatus('' .. i);
 				if (status ~= nil) then 
 					if (status >= 3 and script_grind.repairWhenYellow and script_grind.useVendor and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
 						script_vendor:repair(); 
 						script_grind.newTargetTime = GetTimeEX();
+						script_grind.message = "Going to vendor to repair...";
 						return true;
 					end
 				end
@@ -506,8 +507,9 @@ function script_grindEX:doChecks()
 		end
 
 		-- Check to see if we are a mana use and need to refill at Vendor
-		if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) then
+		if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) and self.useVendor then
 			if (script_vendorMenu:checkVendor(script_grind.useMana)) then
+				script_grind.message = "Going to vendor for water/food";
 				return true;
 			end
 		end
