@@ -36,6 +36,7 @@ _quest = {
 	curQuestName = nil,
 	distToGiver = 0,
 	distToGrind = 0,
+	unstuckTimer = 0,
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 }
 
@@ -100,6 +101,23 @@ local localObj = GetLocalPlayer();
 
 	-- set wait time / tick rate for script
 	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
+
+-- check intial unstuck
+	if not self.pause and GetTimeEX() > self.unstuckTimer then
+		if script_unstuck:checkUnstuck() then
+			self.unstuckTimer = GetTimeEX() + 750;
+		end
+	end
+
+	-- our position must be changing and we must still be stuck so try another unstuck
+	-- use unstuck feature ----and (not self.pause) 
+	if (IsMoving()) and (not self.pause) and GetTimeEX() > self.unstuckTimer then
+		if (not script_unstuck:pathClearAuto(2)) then
+			self.unstuckTimer = GetTimeEX() + 750;
+			script_unstuck:unstuck();
+		end
+	end
+
 	
 	-- keep facing the targets
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then
@@ -196,7 +214,7 @@ if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrin
 
 		if _questDBHandleDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
 	
-	if script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
+	if script_grind.lootObj == nil and script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
 		if script_gatherRun:gather() then
 			_quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder.."";
 		return true;

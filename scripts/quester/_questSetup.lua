@@ -52,6 +52,8 @@ function _questSetup:run()
 
 	_quest.waitTimer = GetTimeEX();
 
+	_quest.unstuckTimer = GetTimeEX();
+
 	if GetNumPartyMembers() > 1 then
 		script_gather.safeGather = false;
 	end

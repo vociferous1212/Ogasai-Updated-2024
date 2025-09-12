@@ -164,26 +164,21 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 				script_grind.enemyObj = _quest.enemyTarget;
 				script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
 
-				-- stop moving...
-				if _quest.enemyTarget:GetDistance() <= script_grind.combatScriptRange and not _quest.enemyTarget:IsFleeing() then
-					if IsMoving() then StopMoving() return true; end end
-				-- move to target
-				if (script_grind.combatError == 3) and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange then
+								-- move to target
+				if (script_grind.combatError == 3) and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight() then
 
--- stop moving...
-				if _quest.enemyTarget:GetDistance() <= script_grind.combatScriptRange and not _quest.enemyTarget:IsFleeing() then
-					if IsMoving() then StopMoving() return true; end end
+				
 
 					local x, y, z = _quest.enemyTarget:GetPosition();
-					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+					script_navEXCombat:moveToTarget(GetLocalPlayer(), x, y, z);
 					if not IsMoving() and not IsInCombat() and _quest.enemyTarget ~= nil and GetTimeEX() > self.blacklistTimer then
 						script_grind:addTargetToHardBlacklist(_quest.enemyTarget:GetGUID())
 						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
 						ClearTarget();
 						_quest.enemyTarget = nil;
 						self.blacklistTimer = GetTimeEX() + 10000;
+					return true;
 					end
-				return true;
 				end
 			end
 		end

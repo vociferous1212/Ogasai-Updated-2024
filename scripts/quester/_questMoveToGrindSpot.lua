@@ -29,7 +29,6 @@ function _questMoveToGrindSpot:run()
 
 			_quest.message = "Moving to grind spot";
 			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
-		return true;
 		end
 	end
 end

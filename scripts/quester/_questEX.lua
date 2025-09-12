@@ -76,7 +76,7 @@ function _questEX:doChecks()
 		local _rtx, _rty, _rtz = _questDB:getReturnTargetPos();
 
 		if GetCorpsePosition() ~= nil and GetCorpsePosition() ~= 0 then
-			if _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorsePosition()) > 100 then
+			if _quest.isQuestComplete and GetDistance3D(_lx, _ly, _lz, _rtx, _rty, _rtz) < 300 and GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > 200 and GetDistance3D(_rtx, _rty, _rtz, GetCorpsePosition()) > 100 then
 		
 				_questRessAtGY:ressurect();
 				return true;
