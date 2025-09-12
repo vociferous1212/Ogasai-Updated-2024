@@ -128,11 +128,11 @@ function script_hunter:runBackwards(targetObj, range)
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
  		local moveX, moveY, moveZ = xT + xUV*20, yT + yUV*20, zT + zUV;		
- 		if (distance < range and targetObj:IsInLineOfSight()) then
+ 		if (distance < range and targetObj:IsInLineOfSight()) and script_unstuck:pathClearAuto(8) then
  			if (Move(moveX, moveY, moveZ)) then
-				self.waitTimer = GetTimeEX() + 3000;
-				script_grind.waitTimer = GetTimeEX() + 3500;
- 				return true;
+				self.waitTimer = GetTimeEX() + 1200;
+				script_grind.waitTimer = GetTimeEX() + 1200;
+ 				--return true;
 			end
 		return 4;
  		end
@@ -396,7 +396,7 @@ function script_hunter:run(targetGUID)
 		end
 
 		-- Auto Attack
-		if (targetObj:GetDistance() <= self.spellRange) and targetObj:GetDistance() > 10 and (targetObj:IsInLineOfSight()) then
+		if (targetObj:GetDistance() < self.spellRange) and targetObj:GetDistance() > 10 and (targetObj:IsInLineOfSight()) then
 			if (self.hasPet) then
 				PetAttack();
 			end
@@ -433,7 +433,7 @@ function script_hunter:run(targetGUID)
 
 			-- les than spell range and target is in line of sight then attack target
 			if (self.hasPet)
-			and (GetPet():GetDistance() <= self.spellRange)
+			and (GetPet():GetDistance() < self.spellRange)
 			and (GetLocalPlayer():GetUnitsTarget() ~= 0) 
 			and targetObj:IsInLineOfSight()
 			
@@ -607,12 +607,11 @@ function script_hunter:run(targetGUID)
 			end
 		
 			-- move backwards if target too close for melee attacks
-			if (targetObj:GetDistance() < 0.50) and not script_rotation.usingRotation then
+			if (targetObj:GetDistance() < .3) and not script_rotation.usingRotation then
 				script_grind.tickRate = 135;
 				script_rotation.tickRate = 135;
 				if (script_hunter:runBackwards(targetObj, 2)) then
-					self.waitTimer = GetTimeEX() + 1850;
-				return 0;
+				return 4;
 				end
 			end
 
@@ -694,7 +693,7 @@ function script_hunter:run(targetGUID)
 
 				-- use serpent sting
 				if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
-					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana >25) and targetObj:GetCreatureType() ~= "Elemental" then
+					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 8) and targetObj:GetCreatureType() ~= "Elemental" then
 						if (not IsMoving()) then
 							targetObj:FaceTarget();
 						end
@@ -753,6 +752,9 @@ function script_hunter:run(targetGUID)
 				if targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight() then
 					return 3;
 				end
+				if targetObj:GetDistance() <= self.meleeDistance and not IsMoving() then
+					targetObj:FaceTarget();
+				end
 
 				-- cast raptor strike
 				if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (localMana > 10) and (targetObj:GetDistance() <= self.meleeDistance) and not HasPet() then
@@ -770,7 +772,7 @@ function script_hunter:run(targetGUID)
 				end
 
 				-- call pet if it's too far'
-				if (self.hasPet) and (not GetPet() ~= 0) and GetPet():GetDistance() > self.spellRange then
+				if (self.hasPet) and (GetPet() ~= 0 and GetPet() ~= nil) and GetPet():GetDistance() > self.spellRange then
 					CallPet();
 				end
 
@@ -1035,7 +1037,7 @@ function script_hunter:rest()
 	end
 
 	-- Quiver check : should we go buy ammo?
-	if (self.buyWhenQuiverEmpty and self.ammoName ~= 0 and not IsInCombat()) then
+	if (self.buyWhenQuiverEmpty and self.ammoName ~= 0 and not IsInCombat()) and script_grind.useVendor then
 		local ammoNr = 0;
 		for y=1,GetContainerNumSlots(self.quiverBagNr-1) do
 			local texture, itemCount, locked, quality, readable = GetContainerItemInfo(self.quiverBagNr-1,y);
@@ -1101,9 +1103,7 @@ function script_hunter:hunterPull(targetObj)
 		JumpOrAscendStart();
 	end
 
-	if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > self.spellRange) then
-		return 3;
-	end
+	
 
 	if (GetPet() ~= 0)
 	and (self.hasPet)
@@ -1140,60 +1140,60 @@ function script_hunter:hunterPull(targetObj)
 		end
 
 		CastSpellByName("Auto Shot");
+
 		if (GetPet() ~= 0) and (self.hasPet) then
 			PetAttack();
-			end
-			self.waitTimer = GetTimeEX() + 1500;
-			script_grind:setWaitTimer(1500);
+		end
+		--self.waitTimer = GetTimeEX() + 1500;
+		--script_grind:setWaitTimer(1500);
+		--return 0;
+	end
+
+	-- use concussive shot
+	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
+		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 20) then
+			CastSpellByName("Concussive Shot");
+			PetAttack();
 			return 0;
 		end
+	end
 
-		-- use concussive shot
-		if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
-			if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 20) then
-				CastSpellByName("Concussive Shot");
-				PetAttack();
-				return 0;
-			end
+	-- use serpent sting
+	if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
+		if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 8) then
+			CastSpellByName("Serpent Sting");
+			PetAttack();
+			self.waitTimer = GetTimeEX() + 500;
+			return 0;
 		end
+	end
 
-		-- use serpent sting
-		if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
-			if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 10) then
-				CastSpellByName("Serpent Sting");
-				PetAttack();
-				self.waitTimer = GetTimeEX() + 500;
-				return 0;
-			end
-		end
-
-		-- use Scorpid Sting
-		--if (not targetObj:HasDebuff("Scorpid Sting")) then
-		--	if (HasSpell("Scorpid Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 20) and (targetHealth > 30) then
-		--		CastSpellByName("Scorpid Sting");
-		--		PetAttack();
-		--		return 0;
-		--	end
-		--end
+	-- use Scorpid Sting
+	--if (not targetObj:HasDebuff("Scorpid Sting")) then
+	--	if (HasSpell("Scorpid Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 20) and (targetHealth > 30) then
+	--		CastSpellByName("Scorpid Sting");
+	--		PetAttack();		--		return 0;
+	--	end
+	--end
 					
-		-- use arcane shot
-		if (not IsSpellOnCD("Arcane Shot")) and (IsStanding()) then
-			if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 10) then
-				CastSpellByName("Arcane Shot");
-				PetAttack();
-				self.waitTimer = GetTimeEX() + 500;
-				return 0;
-			end
+	-- use arcane shot
+	if (not IsSpellOnCD("Arcane Shot")) and (IsStanding()) then
+		if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 10) then
+			CastSpellByName("Arcane Shot");
+			PetAttack();
+			self.waitTimer = GetTimeEX() + 500;
+			return 0;
 		end
+	end
 
-		if (not self.hasPet) then
-			if (targetObj:GetDistance() <= 10) then
-				if (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
-					CastSpellByName("Attack");
-				end
-			else
-				return 3;
+	if (not self.hasPet) then
+		if (targetObj:GetDistance() <= 10) then
+			if (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) then
+				CastSpellByName("Attack");
 			end
+		else
+			return 3;
 		end
-	return;
+	end
+return;
 end

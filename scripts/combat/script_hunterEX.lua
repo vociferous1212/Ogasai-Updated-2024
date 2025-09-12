@@ -210,9 +210,19 @@ function script_hunterEX:menu()
 
 		Separator();
 
+		-- if we have a pet we can disable some settings and focus solely on grinding mobs
 		if GetLocalPlayer():GetLevel() > 10 then
-		wasClicked, self.quickGrind = Checkbox("Disable Some Settings - Quick Grind", self.quickGrind);
-		if self.quickGrind then script_grind.skipLooting = true; script_grind.gather = false; script_hunter.useMark = false; script_hunter.drinkMana = 15; script_hunter.waitAfterCombat = false; script_warlock.waitAfterCombat = false; script_grindMenu.adjustTickRate = true; end end
+			wasClicked, self.quickGrind = Checkbox("Disable Some Settings - Quick Grind", self.quickGrind);
+			if self.quickGrind then
+				script_grind.skipLooting = true;
+				script_grind.gather = false;
+				script_hunter.useMark = false;
+				script_hunter.drinkMana = 15;
+				script_hunter.waitAfterCombat = false;
+				script_warlock.waitAfterCombat = false;
+				script_grindMenu.adjustTickRate = true;
+			end
+		end
 
 		if (HasItem("Linen Bandage")) or 
 			(HasItem("Heavy Linen Bandage")) or 
@@ -261,9 +271,17 @@ function script_hunterEX:menu()
 		Separator();
 
 		if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
-			wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat);
+
+			wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat)
+
+				
+
 			if (script_hunter.waitAfterCombat) then
-				Text("*Pet will hang in combat phase - choose to force bot to wait*")
+
+				-- these are tied together elsewhere...
+				 script_warlock.waitAfterCombat = true;
+
+				Text("This will not allow the bot to chain pull targets'")
 			end
 		end
 		Separator();
