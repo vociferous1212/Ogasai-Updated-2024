@@ -257,15 +257,15 @@ function script_hunterEX:menu()
 				Separator();
 			end
 		end
+				
+		Separator();
 
-		--SameLine();
-		--if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
-		--	wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat);
-		--	if (script_grindMenu.helpMenu) then
-		--		Text("*Pet will hang in combat phase - choose to force bot to wait*")
-		--		Separator();
-		--	end
-		--end
+		if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
+			wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat);
+			if (script_hunter.waitAfterCombat) then
+				Text("*Pet will hang in combat phase - choose to force bot to wait*")
+			end
+		end
 		Separator();
 
 		Text('Drink below mana percentage');

@@ -1230,7 +1230,7 @@ function script_grind:run()
 			if (UnitClass('player') == "WARLOCK" or GetMyClass() == "WARLOCK") or (UnitClass('player') == "HUNTER" or GetMyClass() == "HUNTER") and (GetNumPartyMembers() == 0) and not script_rotation.usingRotation then
 
 				-- force bot to attack pets target
-				if (script_warlock.waitAfterCombat or script_hunter.waitAfterCombat)
+				if (script_warlock.waitAfterCombat and script_hunter.waitAfterCombat)
 					and (IsInCombat())
 					and (GetPet() ~= 0
 						and GetPet():GetHealthPercentage() > 1
@@ -1252,6 +1252,7 @@ function script_grind:run()
 						--AssistUnit("pet");
 						self.message = "Stuck in combat! WAITING!";
 						self.autoBlacklistTimer = GetTimeEX() + 15000;
+						self.blacklistLootTime = 0;
 						if (IsMoving()) then
 							StopMoving();
 							return;
@@ -1422,13 +1423,6 @@ function script_grind:run()
 			if (self.combatError == 3) and (not localObj:IsMovementDisabed())
 				and (not script_checkDebuffs:hasDisabledMovement()) and (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
 
--- Check: Do we have the right target (in UI) ??
-				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-					if (GetTarget():GetGUID() ~= self.enemyObj:GetGUID()) then
-						ClearTarget();
-						self.enemyObj = script_grindAssignTarget:assignTarget();
-					end
-				end
 				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
