@@ -64,6 +64,7 @@ if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming(
 					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Water')
 					script_mage.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1500);
 					return true;
 				end
 			end
@@ -99,6 +100,7 @@ if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming(
 					if IsMoving() then StopMoving() return true; end
 					CastSpellByName('Conjure Food')
 					script_mage.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1500);
 					return true;
 				end
 			end

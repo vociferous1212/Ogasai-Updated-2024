@@ -186,6 +186,8 @@ function script_grindEX:doChecks()
 			self.currMapID = GetMapID();
 			vendorDB:loadDBVendors();
 		end
+
+		if not script_grind.useVendor then script_vendor.status = 0; end
 		
 		-- load hotspot stuff
 		-- TODO - auto set specific mobs in certain grind zones for easier botting
@@ -324,7 +326,7 @@ function script_grindEX:doChecks()
 			for i = 1, 16 do
 			local status = GetInventoryAlertStatus('' .. i);
 				if (status ~= nil) then 
-					if (status >= 3 and script_grind.repairWhenYellow and script_grind.useVendor and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
+					if (status >= 3 and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
 						script_vendor:repair(); 
 						script_grind.newTargetTime = GetTimeEX();
 						script_grind.message = "Going to vendor to repair...";
@@ -408,7 +410,11 @@ function script_grindEX:doChecks()
 
 
 		-- run vendor if we are mounted and running through mobs to vendor or not in combat
-		if (not IsInCombat() or IsMounted()) then
+		if (not IsInCombat() or IsMounted())
+		and GetLocalPlayer():GetHealthPercentage() >= script_grind.eatHealth
+		and GetLocalPlayer():GetManaPercentage() >= script_grind.drinkMana
+		
+		then
 
 		-- vendor repair
 			if (vendorStatus == 1) then
@@ -416,7 +422,7 @@ function script_grindEX:doChecks()
 				script_grind.message = "Repairing at vendor...";
 
 				if (script_vendor:repair()) then script_grind:setWaitTimer(100);
-					--return;
+				return;
 				end
 			return true;
 
@@ -426,7 +432,7 @@ function script_grindEX:doChecks()
 				script_grind.message = "Selling to vendor...,";
 
 				if (script_vendor:sell()) then script_grind:setWaitTimer(100);
-					--return;
+					return;
 				end
 			return true;
 
@@ -436,7 +442,7 @@ function script_grindEX:doChecks()
 				script_grind.message = "Buying ammo at vendor...";
 
 				if (script_vendor:continueBuyAmmo()) then script_grind:setWaitTimer(100);
-					--return;
+					return;
 				end
 			return true;
 
@@ -446,7 +452,7 @@ function script_grindEX:doChecks()
 				script_grind.message = "Buying food/drink at vendor...";
 
 				if (script_vendor:continueBuy()) then script_grind:setWaitTimer(100);
-					--return;
+					return;
 				end
 			return true;
 			end

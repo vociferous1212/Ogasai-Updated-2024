@@ -137,7 +137,7 @@ script_grind = {
 	stopWhenFull = false,	-- stop when bags are full
 	hsWhenFull = false,	-- hearthstone when bags are full
 	findLootDistance = 75,
-	lootDistance = 2.15,
+	lootDistance = 1.85,
 	skipLooting = false,
 	lootCheck = {},
 	lootBlacklistedTargets = {},
@@ -442,7 +442,7 @@ function script_grind:run()
 		script_nav:setNextToNodeDist(2.2); NavmeshSmooth(self.nextToNodeDist*1.2);
 	else
 		--script_nav:setNextToNodeDist(self.nextToNodeDist); NavmeshSmooth(self.nextToNodeDist*1.6);
-		script_grind.nextToNodeDist = 3;
+		script_grind.nextToNodeDist = self.nextToNodeDist;
 		NavmeshSmooth(2);
 	end
 	
@@ -918,7 +918,7 @@ function script_grind:run()
 		end
 		
 		-- go to trainer and get spells
-		if (self.getSpells) and (not self.pause) and (not IsInCombat()) then
+		if (self.getSpells) and (not self.pause) and (not IsInCombat()) and (self.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting) then
 			if (script_getSpells:checkForSpellsNeeded()) then
 			script_grind.message = "Moving to class trainer for spells";
 				if (self.useUnstuck) and (IsMoving()) and (not self.pause) then
@@ -1094,7 +1094,7 @@ function script_grind:run()
 			-- was set to a mana percentage <=5 mana then we can move. don't run back and forth with casters
 			if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) and (not self.enemyObj:IsCasting()) then
 				script_om:FORCEOM();
-				script_grind.waitTimer = GetTimeEX() + 1000
+				script_grind.waitTimer = GetTimeEX() + 500
 				return true;
 			end
 		end	
@@ -1245,7 +1245,7 @@ function script_grind:run()
 					-- if pet has a target then assist and do combat
 						-- recall pet for safety
 			 		if (PetHasTarget()) then
-						if (GetPet():GetDistance() > 10) then
+						if (GetPet():GetDistance() > 12) then
 							AssistUnit("pet");
 							PetFollow();
 						end
@@ -1429,10 +1429,10 @@ function script_grind:run()
 				self.message = "Moving to target return 3 trying to find a path...";
 				--if (self.enemyObj:GetDistance() < self.disMountRange) then
 				--end
-				if GetTarget() ~= nil and GetTarget() ~= 0 then
-					local _x, _y, _z = GetTarget():GetPosition();
-					if not IsMoving() and not GetTarget():IsDead() then Move(_x, _y, _z); end
-				end
+				--if GetTarget() ~= nil and GetTarget() ~= 0 then
+					--local _x, _y, _z = GetTarget():GetPosition();
+					--if not IsMoving() and not GetTarget():IsDead() and not IsPathLoaded(5) then Move(_x, _y, _z); end
+				--end
 
 				-- check positions
 				local _x, _y, _z = self.enemyObj:GetPosition();
@@ -1451,8 +1451,10 @@ function script_grind:run()
 					end
 				end
 
-				-- find loot before moving to a new target...
-				self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+				if not self.bagsFull and not AreBagsFull() and not self.skipLooting then
+					-- find loot before moving to a new target...
+					self.lootObj = script_nav:getLootTarget(self.findLootDistance);
+				end
 
 				-- if we have a valid position coordinates
 				if (_x ~= 0 and x ~= 0) then
@@ -1480,7 +1482,7 @@ function script_grind:run()
 						self.autoBlacklistTimerSet = true;
 						self.autoBlacklistTimer = GetTimeEX() + 15000;
 					end
-					
+					return true;
 				end
 			return true;
 			end
@@ -1529,7 +1531,7 @@ function script_grind:run()
 				-- check and avoid adds
 				if (script_checkAdds:checkAdds()) and (self.enemyObj:GetHealthPercentage() >= 20) then
 					script_om:FORCEOM();
-				 	script_grind.waitTimer = GetTimeEX() + 2000;
+				 	script_grind.waitTimer = GetTimeEX() + 500;
 					return true;
 				end
 
@@ -1736,10 +1738,12 @@ function script_grind:run()
 
 			--if we have more than 2 saved locations and cannot find a target or loot then navigate
 				-- this will also double up as moveToHotspot function
-			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached and not IsInCombat() then
+			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached and not IsInCombat()
+				and GetLocalPlayer():GetHealthPercentage() >= self.eatHealth and GetLocalPlayer():GetManaPercentage() >= self.drinkMana
+				and script_vendor.status == 0 then
 
 				-- reset blacklist/target timer when moving back to hotspot
-				if script_grind.enemyObj == nil and not IsInCombat() and not self.needRest then
+				if script_grind.enemyObj == nil and not IsInCombat() then
 					self.newTargetTime = GetTimeEX();
 				end
 
@@ -2039,7 +2043,15 @@ function script_grind:doLoot(localObj)
 	if (not self.adjustTickRate) then
 		script_grind.tickRate = 50;
 	end
+		-- Tell the grinder we cant loot
+		if (inventoryFull) then
+			script_grind.bagsFull = true;
+		end
+		if (not inventoryFull) then
+			script_grind.bagsFull = false;
+		end
 
+	if self.bagsFull or AreBagsFull() then self.lootObj = nil; end
 	--if GetLocalPlayer():GetHealthPercentage() < 75 then
 	--	if not script_grindEX:isLootSafeToLoot() then
 	--		script_grind:runRest();
@@ -2265,6 +2277,26 @@ function script_grind:lootAndSkin()
 	if (not HasSpell("Auto Shot")) then
 		local inventoryFull = true;
 		for i = 1, 5 do 
+			if (i ~= 0) then 
+				for y=1,GetContainerNumSlots(i-1) do 
+					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
+					if (itemCount == 0 or itemCount == nil) then 
+						inventoryFull = false; 
+					end 
+				end
+			end 
+		end 
+	
+		-- Tell the grinder we cant loot
+		if (inventoryFull) then
+			script_grind.bagsFull = true;
+		end
+		if (not inventoryFull) then
+			script_grind.bagsFull = false;
+		end
+	else 
+		local inventoryFull = true;
+		for i = 1, 4 do 
 			if (i ~= 0) then 
 				for y=1,GetContainerNumSlots(i-1) do 
 					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);

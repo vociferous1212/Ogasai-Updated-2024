@@ -477,7 +477,7 @@ function script_mage:run(targetGUID)
 
 
 			-- frost mage selected
-			if (self.frostMage) and (targetObj:GetDistance() <= script_mage.spellRange) and (targetObj:IsInLineOfSight()) then
+			if (self.frostMage) and (targetObj:GetDistance() <= script_mage.spellRange) and (targetObj:IsInLineOfSight()) and not IsMoving() then
 				if (script_magePullSpells.frostMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					self.waitTimer = GetTimeEX() + 2600;
@@ -487,7 +487,7 @@ function script_mage:run(targetGUID)
 				end
 
 				-- fire mage selected use these spells instead
-			elseif (self.fireMage) and (targetObj:GetDistance() <= script_mage.spellRange) and targetObj:IsInLineOfSight() then
+			elseif (self.fireMage) and (targetObj:GetDistance() <= script_mage.spellRange) and targetObj:IsInLineOfSight() and not IsMoving() then
 				if (script_magePullSpells.fireMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					self.waitTimer = GetTimeEX() + 2600;

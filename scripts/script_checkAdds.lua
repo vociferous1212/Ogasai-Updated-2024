@@ -8,7 +8,12 @@ script_checkAdds = {
 function script_checkAdds:checkAdds()
 
     local grindEnemy = script_grind.enemyObj
-    local questEnemy =  _quest.enemyTarget
+    local questEnemy = nil;
+
+    -- if we aren't using the grinder then flip the variable to use quester...'
+    if grindEnemy == 0 or grindEnemy == nil then
+        grindEnemy =  _quest.enemyTarget
+    end
 
 -- if we want to skip hard pulls and we have a valid enemy and we are greater than level 6 then
     if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) ) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
@@ -20,8 +25,8 @@ function script_checkAdds:checkAdds()
             if self:avoidToAggro(self.checkAddsRange) then
 
 		-- set a timer to let this script run. no timers are set anywhere else and if no timers are set then the bot will stutter walk
-		script_grind.waitTimer = GetTimeEX() + 900;
-		_quest.waitTimer = GetTimeEX() + 900;
+		script_grind.waitTimer = GetTimeEX() + 500;
+		_quest.waitTimer = GetTimeEX() + 500;
 
 		-- face the target if we are not moving... turn back around after walking away quicker...
 		--if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
@@ -37,7 +42,7 @@ function script_checkAdds:checkAdds()
                 if GetPet() ~= 0 then
                     PetFollow()
                 end
-
+            script_grind:setWaitTimer(2000)
                 return true;
             end
         end

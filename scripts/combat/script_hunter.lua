@@ -51,7 +51,6 @@ function script_hunter:setup()
 		itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
    		itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
 		self.ammoName = itemName;
-		script_vendorMenu.ammoName = itemName;
 	end
 
 	--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo name is set to: "' .. self.ammoName .. '" ...');
@@ -230,7 +229,7 @@ function script_hunter:run(targetGUID)
 	then
 
 		-- run backwards
-		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
+		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) or targetObj:HasDebuff("Wing Clip") then
 			if (script_hunter:runBackwards(targetObj, 13)) then
 				
 				PetAttack();
@@ -245,7 +244,7 @@ function script_hunter:run(targetGUID)
 	if PlayerHasTarget() then
 		
 		-- change our attack distance to melee distance if we don't have a pet or target is targeting me'
-		if (GetTarget():GetDistance() < 12 and not script_grind:isTargetingMe(targetObj)) or GetPet() == 0 or GetPet() == nil then
+		if (GetTarget():GetDistance() < 12 and script_grind:isTargetingMe(targetObj)) or GetPet() == 0 or GetPet() == nil then
 			script_grind.combatScriptRange = self.meleeDistance;
 		else
 			script_grind.combatScriptRange = self.spellRange;
@@ -261,7 +260,7 @@ function script_hunter:run(targetGUID)
 
 -- force bot to attack pets target
 	if (IsInCombat()) and (GetPet() ~= 0) and (not PlayerHasTarget()) and (GetNumPartyMembers() < 1) and (self.hasPet) then
-		if (PetHasTarget()) then
+		if (PetHasTarget()) and not PlayerHasTarget() then
 			--if (GetPet():GetDistance() > 12) then
 				AssistUnit("pet");
 				PetFollow();
@@ -424,7 +423,7 @@ function script_hunter:run(targetGUID)
 			-- greater than spell range and we don't have a target'
 			if (self.hasPet)
 			and (GetPet() ~= 0)
-			and (GetPet():GetDistance() > self.spellRange)
+			and (GetPet():GetDistance() > self.spellRange and script_grind:isTargetingMe(targetObj))
 			and (GetLocalPlayer():GetUnitsTarget() == 0)
 			
 			then 
@@ -434,7 +433,7 @@ function script_hunter:run(targetGUID)
 
 			-- les than spell range and target is in line of sight then attack target
 			if (self.hasPet)
-			and (GetPet():GetDistance() < self.spellRange)
+			and (GetPet():GetDistance() < self.spellRange and targetObj:GetDistance() <= 12)
 			and (GetLocalPlayer():GetUnitsTarget() ~= 0) 
 			and targetObj:IsInLineOfSight()
 			
@@ -650,7 +649,19 @@ function script_hunter:run(targetGUID)
 			end
 
 			-- walk away from target if pet target guid is the same guid as target targeting me
-			if (GetPet() ~= 0) and (self.hasPet) and (not script_grind:isTargetingMe(targetObj)) and (targetObj:GetUnitsTarget() ~= 0) and (not script_checkDebuffs:hasDisabledMovement()) and (targetObj:IsInLineOfSight()) and not script_rotation.usingRotation then
+			if (
+				(GetPet() ~= 0)
+			and (self.hasPet)
+			and (not script_grind:isTargetingMe(targetObj))
+			and (targetObj:GetUnitsTarget() ~= 0)
+			and (not script_checkDebuffs:hasDisabledMovement())
+			and (targetObj:IsInLineOfSight()
+				)
+			or targetObj:HasDebuff("Wing Clip"))
+			and not script_rotation.usingRotation
+			
+			then
+
 				if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID()) then
 
 					if (script_hunter:runBackwards(targetObj, 13)) then
@@ -1056,7 +1067,8 @@ function script_hunter:rest()
 		-- Go buy ammo if we have just 1 stack of ammo left
 		if (ammoNr <= 1 and self.ammoName ~= 0) then
 			script_vendor:buyAmmo(self.quiverBagNr-1, self.ammoName, self.ammoIsArrow);
-			return false;
+			script_grind.message = "Going to vndor to buy ammo...";
+			return;
 		end 
 	end
 
