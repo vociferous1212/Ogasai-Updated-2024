@@ -99,7 +99,7 @@ function script_follow:run()
 	script_followStartChecks:doStartChecks();	
 
 	-- get a target attacking us and set it as enemy object
-	if (localObj:GetUnitsTarget() ~= 0) then
+	if (localObj:GetUnitsTarget() ~= 0) and localObj:GetUnitsTarget() ~= nil then
 		self.enemyObj = localObj:GetUnitsTarget();
 	end
 	
@@ -145,14 +145,16 @@ function script_follow:run()
 		else
 			self.lootObj = nil;
 		end
-		if script_grind:getSkinTarget(self.findLootDistance) ~= nil then
-			if self.lootObj == nil then self.lootObj = script_grind:getSkinTarget(self.findLootDistance); end end
+		if HasSpell("Skinning") then
+			if script_grind:getSkinTarget(self.findLootDistance) ~= nil then
+				if self.lootObj == nil then self.lootObj = script_grind:getSkinTarget(self.findLootDistance); end end
 
-		if (self.lootObj == 0) then
-			self.lootObj = nil;
+			if (self.lootObj == 0) then
+				self.lootObj = nil;
+			end
 		end
 
-		local isLoot = not IsInCombat() and not (self.lootObj == nil);
+		local isLoot = not IsInCombat() and (self.lootObj ~= nil);
 
 		if (isLoot and not AreBagsFull()) then
 			script_followEX:doLoot(localObj);
@@ -186,8 +188,10 @@ function script_follow:run()
 -- COMBAT PHASE
 
 	-- if we have a pet then get its target
-	if (GetPet() ~= 0) and (GetPet() ~= nil) and (GetPet():GetUnitsTarget() ~= 0) then
-		self.enemyObj = GetPet():GetUnitsTarget():GetGUID();
+	if (GetPet() ~= 0) and (GetPet() ~= nil) then
+		if (GetPet():GetUnitsTarget() ~= 0) and GetPet():GetUnitsTarget() ~= nil then
+			self.enemyObj = GetPet():GetUnitsTarget();
+		end
 	end
 
 	-- if we dont want to assist in combat or an npc is attacking us then
@@ -220,7 +224,7 @@ function script_follow:run()
 
 -- RUN COMBAT SCRIPT ON A GOOD TARGET
 
-	if self.enemyObj ~= nil then 
+	if self.enemyObj ~= nil and self.enemyObj ~= 0 then 
 
 		-- run the do combat script
 		if (not self.enemyObj:IsDead()) and (self.enemyObj:CanAttack()) then

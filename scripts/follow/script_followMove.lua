@@ -32,5 +32,4 @@ function script_followMove:followLeader()
 		end
 	end
 return false;
-
 end

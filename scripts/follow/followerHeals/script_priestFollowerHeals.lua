@@ -37,9 +37,23 @@ function script_priestFollowerHeals:HealsAndBuffs()
 		script_priestFollowerHeals:setup();
 		self.isSetup = true;
 	end
+
+	local localObj = GetLocalPlayer();
+
+	local localMana = localObj:GetManaPercentage();
+	local localHealth = localObj:GetHealthPercentage();
 	
-	local localMana = GetLocalPlayer():GetManaPercentage();
-	local localHealth = GetLocalPlayer():GetHealthPercentage();
+	local partyMember = 0;
+
+	local petName = 0;
+	local petHealth = 0;
+
+	local partyMembersHP = 0;
+	local partyMemberDistance = 0;
+	local px, py, pz = 0, 0, 0;
+	local leaderObj = 0;
+
+
 
 	if (not IsStanding()) then 
 		StopMoving();
@@ -58,35 +72,38 @@ function script_priestFollowerHeals:HealsAndBuffs()
 
 		-- Check if anything is attacking us Priest
 		if (script_followEX2:enemiesAttackingUs() >= 1) then
-				local localMana = GetLocalPlayer():GetManaPercentage();
 			if (localMana > 6 and HasSpell('Fade') and not IsSpellOnCD('Fade')) then
 				CastSpellByName('Fade');
 			end
 		end
 
-		local partyMember = 0;
+		-- get a pet if there is one in party
+		if UnitExists("partypet1") then
+			petName = GetUnitName("partypet1"); petHealth = UnitHealth("partypet1");
+		end
 
-		local petName = 0;
-		local petHealth = 0;
-
-		if UnitExists("partypet1") then petName = GetUnitName("partypet1"); petHealth = UnitHealth("partypet1"); end
-
+		-- iterate ceach member
 		for i = 1, GetNumPartyMembers() do
 
+			-- set partymember each iteration
 			partyMember = GetPartyMember(i);
 	
+			-- make sure we have a party member and it's not ourselves
 			if (GetNumPartyMembers() > 0) and (partyMember:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 
-				local partyMembersHP = partyMember:GetHealthPercentage();
-				local partyMemberDistance = partyMember:GetDistance();
-				local leaderObj = GetPartyLeaderObject();
-				local px, py, pz = GetPartyMember(i):GetPosition();
-				local localObj = GetLocalPlayer();
+				-- set current iteration party member
+				partyMembersHP = partyMember:GetHealthPercentage();
+				partyMemberDistance = partyMember:GetDistance();
+				leaderObj = GetPartyLeaderObject();
+				px, py, pz = GetPartyMember(i):GetPosition();
 
-			if getPartyPet() ~= nil and petHealth ~= nil and petHealth ~= 0 and petHealth < 75 then partyMember = getPartyPet(); partyMembersHP = petHealth; end
+				-- set party member as pet if pet health is low
+				if getPartyPet() ~= nil and petHealth ~= nil and petHealth ~= 0 and petHealth < 75 then
+					partyMember = getPartyPet(); partyMembersHP = petHealth;
+				end
 
 			
-				-- follow party leader OR move to party member
+				-- follow party leader OR move to party member, else stop moving
 				if (not leaderObj:IsInLineOfSight()) or (leaderObj:IsInLineOfSight() and not partyMember:IsInLineOfSight() and partyMemberDistance < script_follow.followLeaderDistance) or (leaderObj:GetDistance() > 40 and self.enableHeals) then
 					script_followMoveToTarget:moveToTarget(GetLocalPlayer(), px, py, pz);
 					if (script_follow.followLeaderDistance >= 10 and leaderObj:GetDistance() < 10 and leaderObj:IsInLineOfSight()) then
@@ -200,7 +217,6 @@ function script_priestFollowerHeals:HealsAndBuffs()
 				end
 
 				if (self.enableHeals) and (GetNumPartyMembers() > 0) then
-				local localMana = GetLocalPlayer():GetManaPercentage();
 
 					-- Shield
 	                		if (self.clickShield) then

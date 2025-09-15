@@ -108,7 +108,7 @@ function script_followEX:doLoot(localObj)
 				script_follow.lootObj = nil;
 				script_follow.waitTimer = GetTimeEX() + 250;
 			end
-		else
+		elseif (script_follow.lootObj ~= nil) and script_follow.lootObj ~= 0 then
 			script_followMoveToTarget:moveToLoot(GetLocalPlayer(), _x, _y, _z);
 		end
 	end
