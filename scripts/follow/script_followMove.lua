@@ -26,10 +26,11 @@ function script_followMove:followLeader()
 
 			local leadX, leadY, leadZ = leaderObj:GetPosition();
 
-			script_navEX:MoveToTarget(GetLocalPlayer(), leadX, leadY, leadZ);
+			script_navEX:moveToTarget(GetLocalPlayer(), leadX, leadY, leadZ);
 			script_follow.message = "Following Party Leader...";
 		return true;
 		end
 	end
 return false;
+
 end
