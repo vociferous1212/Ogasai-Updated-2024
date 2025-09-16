@@ -85,7 +85,7 @@ end
 function CastStealth()
 	local player = GetLocalPlayer();
 
-	if (HasSpell("Stealth")) or (HasSpell("Prowl")) and (not script_checkDebuffs:hasMagic()) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasCurse()) and (not IsStealth()) then
+	if (HasSpell("Stealth") or HasSpell("Prowl") or HasSpell("Shadowmeld")) and (not script_checkDebuffs:hasMagic()) and (not script_checkDebuffs:hasPoison()) and (not script_checkDebuffs:hasCurse()) and (not IsStealth()) then
 		if (HasSpell("Stealth")) and (script_rogue.useStealth) then
 			if (not IsSpellOnCD("Stealth")) then
 				CastSpellByName("Stealth", player);
@@ -103,6 +103,12 @@ function CastStealth()
 				script_grind:setWaitTimer(1500);
 				return true;
 			end
+		elseif HasSpell("Shadowmeld") then
+			if not IsSpellOnCD("Shadowmeld") then
+				CastSpellByName("Shadowmeld", player);
+				script_grind:setWaitTimer(1500);
+				return true;
+			end
 		end
 	end
 return false;
@@ -111,7 +117,7 @@ end
 function IsStealth()
 	local player = GetLocalPlayer();
 
-	if (player:HasBuff("Stealth")) or (player:HasBuff("Prowl")) then
+	if (player:HasBuff("Stealth")) or (player:HasBuff("Prowl")) or player:HasBuff("Shadowmeld") then
 		return true;
 	end
 return false;
@@ -187,38 +193,6 @@ function TargetHasRangedWeapon(target)
 			end
 		end
 	end
-return false;
-end
-
-function RunOutOfCombat()
-	if IsInCombat() and (GetLocalPlayer():GetHealthPercentage() < 10 or (script_grind:enemiesAttackingUs() >= 3 and GetLocalPlayer():GetHealthPercentage() <= 55)) then
-		if script_nav.numSavedLocation ~= nil and script_nav.numSavedLocation ~= 0 then
-
-			-- move if saved locations are greater than 3
-			if (script_nav.numSavedLocation > 3) then
-				local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
-
-				if _lx ~= nil then
-					local currentDist = math.sqrt((_lx - script_nav.savedLocations[script_nav.currentGoToLocation]['x'])^2 + (_ly - script_nav.savedLocations[script_nav.currentGoToLocation]['y'])^2);
-
-					-- move from each saved location, count +1 each location each pass
-					if currentDist < 5 then
-						script_nav.currentGoToLocation = script_nav.currentGoToLocation + 1;
-						script_grind.message = "Running out of combat: Changing go to location...";								return true;
-					end
-				end
-
-				-- move to saved location in index
-				script_navEX:moveToTarget(GetLocalPlayer(), script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])
-					script_grind.message = "Running out of combat: Moving to auto path node " .. (script_nav.currentGoToLocation + 1) .. "...";
-					if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
-						CastSpellByName("Earthbind Totem");
-					end
-			end
-		end
-	return true;
-	end
-
 return false;
 end
 
