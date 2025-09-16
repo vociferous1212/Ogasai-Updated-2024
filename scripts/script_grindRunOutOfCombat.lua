@@ -23,7 +23,7 @@ function script_grindRunOutOfCombat:runOutOfCombat()
 	-- run away from targets too high level
 	or 	(
 		(script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0)
-		and (script_grind.skipHardPull and script_grind.enemyObj:GetLevel() > script_grind.maxLevel)
+		and (script_grind.skipHardPull and script_grind.enemyObj:GetLevel() > script_grind.maxLevel and script_grind:enemiesAttackingUs() > 1)
 		)
 
 	then

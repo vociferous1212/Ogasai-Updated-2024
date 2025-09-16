@@ -42,7 +42,7 @@ function script_grindAssignTarget:assignTarget()
 
 		or (_quest.enemyTarget ~= 0 and _quest.enemyTarget ~= nil and not _quest.enemyTarget:IsDead()))
 
-		and IsInCombat()
+		and IsInCombat() and not script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID())
 
 	then
 
@@ -90,7 +90,9 @@ function script_grindAssignTarget:assignTarget()
 	-- run object manager to find anything targeting me
 	while i ~= 0 do
 
-		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
+		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack()
+			and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i))
+			and (not script_grind:isTargetHardBlacklisted(i:GetGUID()) or i:GetHealthPercentage() <= 92) then
 
 		return i;
 

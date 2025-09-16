@@ -142,15 +142,12 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 			self.currentGoToLocation = self.currentGoToLocation + 1;
 		end
 
-		if self.savedLocations ~= nil and self.currentGoToLocation ~= nil and self.savedLocations ~= 0 and self.currentGoToLocation ~= 0 then
 		script_navEX:moveToTarget(GetLocalPlayer(), self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
-		return true;
-		end
 
 		if not IsMoving() and not IsPathLoaded(5) and self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
 			Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
 		end
-	return true;
+	return;
 	end
 return false;
 end

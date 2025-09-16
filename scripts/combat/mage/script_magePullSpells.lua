@@ -15,13 +15,15 @@ function script_magePullSpells:frostMagePull(targetObj)
 		if (PlayerHasTarget()) then
 			targetObj:FaceTarget();
 		end
-		if (CastSpellByName("Frostbolt", targetObj)) then
-			script_mage.waitTimer = GetTimeEX() + 2750;
-			script_grind:setWaitTimer(2750);
-			if (PlayerHasTarget()) then
-				targetObj:FaceTarget();
+		if targetObj:IsInLineOfSight() then
+			if (CastSpellByName("Frostbolt", targetObj)) then
+				script_mage.waitTimer = GetTimeEX() + 2750;
+				script_grind:setWaitTimer(2750);
+				if (PlayerHasTarget()) then
+					targetObj:FaceTarget();
+				end
+				return true;
 			end
-			return true;
 		end
 	end
 return false;

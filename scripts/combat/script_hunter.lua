@@ -36,6 +36,7 @@ script_hunter = {
 	waitAfterCombat = false,
 	spellRange = 35,
 	bagsFull = false,
+	petAttackTimer = 0,
 
 }	
 
@@ -44,6 +45,7 @@ function script_hunter:setup()
 	-- no more bug first time
 	self.feedTimer = GetTimeEX();
 	self.waitTimer = GetTimeEX();
+	self.petAttackTimer = GetTimeEX();
 	
 	-- Save the name of ammo we use
 	local bagSlots = GetContainerNumSlots(self.quiverBagNr-1);
@@ -134,7 +136,7 @@ function script_hunter:runBackwards(targetObj, range)
  		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
- 		local moveX, moveY, moveZ = xT + xUV*20, yT + yUV*20, zT + zUV;		
+ 		local moveX, moveY, moveZ = xT + xUV*30, yT + yUV*30, zT + zUV;		
  		if (distance <= range)  then
 
 				script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
@@ -144,7 +146,7 @@ function script_hunter:runBackwards(targetObj, range)
  				--return true;
 				--end
 
-				if not IsMoving() and not IsPathLoaded(5) then
+				if not IsMoving()  then
 					Move(moveX, moveY, moveZ)
 					script_nav:resetNavigate();
 				end
@@ -261,12 +263,12 @@ function script_hunter:run(targetGUID)
 		then
 
 			if targetObj:GetDistance() < 13 then
-				if (script_hunter:runBackwards(targetObj, 13)) then
+				if (script_hunter:runBackwards(targetObj, 15)) then
 					
 					self.message = "Moving away from target for range attacks...";
 					
 					if targetObj:IsInLineOfSight() then
-						PetAttack();
+						if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 3000; end;
 					elseif not targetObj:IsInLineOfSight() then
 						PetFollow();
 					end				
@@ -341,14 +343,14 @@ function script_hunter:run(targetGUID)
 
 -- pet not in line of sight then call pet but not if target is in line of sight
 	if (GetPet() ~= 0) then
-		if (IsInCombat()) and (not GetPet():IsInLineOfSight()) and not targetObj:IsInLineOfSight() then
+		if (IsInCombat()) and not targetObj:IsInLineOfSight() then
 			PetFollow();
 		end
 	end
 
 -- pet and target not in line of sight
 	if (GetPet() ~= 0) and (IsInCombat()) and (GetLocalPlayer():GetUnitsTarget() ~= 0 and GetLocalPlayer():GetUnitsTarget() ~= nil) then
-		if (not targetObj:IsInLineOfSight() and not GetPet():IsInLineOfSight()) then
+		if (not targetObj:IsInLineOfSight()) then
 			if (not script_checkDebuffs:petDebuff()) then
 				PetFollow();
 			end
@@ -369,7 +371,7 @@ function script_hunter:run(targetGUID)
 -- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(300, 700);
+		local tickRandom = random(300, 500);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -454,10 +456,11 @@ function script_hunter:run(targetGUID)
 		if (targetObj:GetDistance() < self.spellRange) and targetObj:GetDistance() > 12 and (targetObj:IsInLineOfSight())
 		and not targetObj:IsDead() and targetObj:CanAttack() then
 			if (self.hasPet) then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 3000; end
 			end
 			if (not IsAutoCasting("Auto Shot")) and not targetObj:IsDead() then
 			CastSpellByName("Auto Shot", targetObj);
+			targetObj:FaceTarget();
 			self.waitTimer = GetTimeEX() + 500;
 			end
 		end
@@ -467,8 +470,8 @@ function script_hunter:run(targetGUID)
 		if IsInCombat() and GetPet() ~= 0 and GetPet() ~= nil
 		and script_grind:enemiesAttackingUs() > 1 then
 				
-			-- send pet to attack a target attacking me
-			script_hunter:petAttackTargetAttackingMe();
+		-- send pet to attack a target attacking me
+		script_hunter:petAttackTargetAttackingMe();
 
 		end	
 		-- Check: if we target player pets/totems
@@ -486,10 +489,10 @@ function script_hunter:run(targetGUID)
 		-- check pet range
 		if (GetPet() ~= 0) then
 
-			-- greater than spell range and we don't have a target'
+			-- greater than spell range and we have a target'
 			if (self.hasPet)
 			and (GetPet() ~= 0)
-			and (GetPet():GetDistance() > self.spellRange and script_grind:isTargetingMe(targetObj))
+			and (GetPet():GetDistance() > 35 and script_grind:isTargetingMe(targetObj))
 			and (GetLocalPlayer():GetUnitsTarget() == 0)
 			
 			then 
@@ -507,7 +510,7 @@ function script_hunter:run(targetGUID)
 			
 			then 
 
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 3000; end
 				targetObj:AutoAttack();
 			end
 	
@@ -623,7 +626,7 @@ function script_hunter:run(targetGUID)
 
 					CastSpellByName("Auto Shot", targetObj);
 					self.waitTimer = GetTimeEX() + 500;
-					PetAttack();
+					if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 3000; end
 					return 0;
 
 				end
@@ -748,7 +751,7 @@ function script_hunter:run(targetGUID)
 				and (targetObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
 
 						if (script_hunter:runBackwards(targetObj, 12)) then
-							PetAttack();
+							if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 3000; end
 							self.message = "Moving away from target for range attacks...";
 						return 4;
 						end
@@ -767,7 +770,7 @@ function script_hunter:run(targetGUID)
 
 						CastSpellByName("Hunter's Mark");
 						self.waitTimer = GetTimeEX() + 1650;
-						PetAttack();
+						if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 3000; end
 						if (not IsMoving()) then
 							targetObj:FaceTarget();
 						end
@@ -967,7 +970,7 @@ function script_hunter:rest()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(300, 700);
+		local tickRandom = random(300, 500);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -1314,55 +1317,60 @@ function script_hunter:hunterPull(targetObj)
 return;
 end
 
--- check to see if pet is attacking it and if not then pet attack
+-- check to see if pet is attacking a target attacking me, and if not then pet attack
 function script_hunter:petAttackTargetAttackingMe()
 
 	-- make sure we have a pet
 	if GetPet() ~= 0 and GetPet() ~= nil then
 
-			local i, t = GetFirstObject()
+		-- iterate first object
+		local i, t = GetFirstObject()
 
-			while i ~= 0 do
+		-- valid object
+		while i ~= 0 do
 
-				-- if enemy is valid
-				if t == 3 and i:GetDistance() <= 50 and not i:IsCritter() and not i:IsDead() and i:CanAttack() then
+			-- if enemy type is valid
+			if t == 3 and i:GetDistance() <= 50 and not i:IsCritter() and not i:IsDead() and i:CanAttack() then
 
-					-- if a target is targeting me then attack one of them
-					if script_grind:isTargetingMe(i) then
+				-- if a target is targeting me then attack one of them
+				if script_grind:isTargetingMe(i) then
 
-						-- we need to make sure the pet does have a target before we check for its target... target of target
-						if not PetHasTarget() then
+					-- we need to make sure the pet does have a target before we check for its target... target of target
+					if not PetHasTarget() then
 
-							-- get a target attacking me
-							PetAttack(i);
+						-- get a target attacking me
+						PetAttack(i);
+					end
 
-						end
+					-- pet has a target
+					if PetHasTarget() then
 
-						-- pet has a target
-						if PetHasTarget() then
+						-- check its target to see if it's the same target that is tattacking me'
+						if GetPet():GetUnitsTarget():GetGUID() ~= i:GetGUID() then
 
-							-- check its target to see if it's the same target that is tattacking me'
-							if GetPet():GetUnitsTarget():GetGUID() ~= i:GetGUID() then
+							-- apparently we need to target it first either way... pet attack doesn't work without a target
+							-- make sure we don't keep interacting with it.
+							if PlayerHasTarget() then
 
-								-- apparently we need to target it first either way... pet attack doesn't work without a target
-								-- make sure we don't keep interacting with it.
-								if PlayerHasTarget() then
-									if GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID() then
+								-- if my target isn't the target attacking me then
+								if GetLocalPlayer():GetUnitsTarget():GetGUID() ~= i:GetGUID() then
 
-										-- target the target
-										i:UnitInteract();
+									-- target the target
+									i:UnitInteract();
 
-										-- attack target attacking me
-										PetAttack(i);
-
-									end
+									-- send pet to attack target attacking me
+									PetAttack(i);
 								end
 							end
 						end
 					end
 				end
-			i, t = GetNextObject(i);
 			end
+
+		-- iterate next object
+		i, t = GetNextObject(i);
+		end
 	end
+
 return false;
 end

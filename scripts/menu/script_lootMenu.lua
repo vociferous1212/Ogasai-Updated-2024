@@ -5,6 +5,18 @@ function script_lootMenu:menu()
 	if (CollapsingHeader("Loot Options")) then
 		local wasClicked = false;
 
+if (Button("Add Target To Loot Blacklist")) then
+				if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
+					script_grind:addTargetToLootBlacklist(GetLocalPlayer():GetUnitsTarget():GetGUID());
+				DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. GetLocalPlayer():GetUnitsTarget():GetUnitName() .. "");	
+				elseif (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
+					script_grind:addTargetToLootBlacklist(script_grind.lootObj:GetGUID());
+					DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. script_grind.lootObj:GetUnitName() .. "");
+				elseif (GetLocalPlayer():GetUnitsTarget() == 0) and (script_grind.lootObj == 0 or script_grind.lootObj == nil) then
+					DEFAULT_CHAT_FRAME:AddMessage("No target to blacklist loot!");
+				end
+			end
+
 		if (script_grind.deleteItems) then
 			if (CollapsingHeader(">>> |+| Items To Delete")) then
 				--for i=0, script_deleteItems.deleteNum -1 do
@@ -40,17 +52,6 @@ function script_lootMenu:menu()
 
 			Text("Blacklist Loot Time");
 			script_grind.blacklistLootTimeVar = SliderInt("BL (sec)", 10, 60, script_grind.blacklistLootTimeVar);
-			if (Button("Add Target To Loot Blacklist")) then
-				if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-					script_grind:addTargetToLootBlacklist(GetLocalPlayer():GetUnitsTarget():GetGUID());
-				DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. GetLocalPlayer():GetUnitsTarget():GetUnitName() .. "");	
-				elseif (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
-					script_grind:addTargetToLootBlacklist(script_grind.lootObj:GetGUID());
-					DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. script_grind.lootObj:GetUnitName() .. "");
-				elseif (GetLocalPlayer():GetUnitsTarget() == 0) and (script_grind.lootObj == 0 or script_grind.lootObj == nil) then
-					DEFAULT_CHAT_FRAME:AddMessage("No target to blacklist loot!");
-				end
-			end
 		end
 	end
 end

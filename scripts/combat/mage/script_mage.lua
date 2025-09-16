@@ -56,6 +56,7 @@ script_mage = {
 	useMageArmor = false,
 	spellRange = 29,	-- spell range of main damage spells fireball/frostbolt (extended with talents)
 	startedNewCharacter = true,	-- changed to false in setup if we have frostbolt
+	blinkTimer = 0,
 }
 
 function script_mage:window()
@@ -111,10 +112,22 @@ function script_mage:runBackwards(targetObj, range)
  		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;
- 		local moveX, moveY, moveZ = xT + xUV*20, yT + yUV*20, zT + zUV;		
- 		if (distance < range) then 		
+ 		local moveX, moveY, moveZ = xT + xUV*30, yT + yUV*30, zT + zUV;		
+ 		if (distance < range) then
 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ);
+			if not script_mage.useBlink or (script_mage.useBlink and HasSpell("Blink") and IsSpellOnCD("Blink")) then
+
+				script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ);
+
+				if not IsMoving()  then
+					Move(moveX, moveY, moveZ)
+					script_nav:resetNavigate();
+				end
+
+			elseif script_mage.useBlink and HasSpell("Blink") and not IsSpellOnCD("Blink") then
+			
+				CastSpellByName("Blink")
+			end
 		--	self.waitTimer = GetTimeEX() + 500;
  			--if (Move(moveX, moveY, moveZ)) then
 				--script_grind:setWaitTimer(750);
@@ -253,7 +266,7 @@ function script_mage:run(targetGUID)
 		end
 
 	-- Check: Do nothing if we are channeling, casting or Ice Blocked
-	if (IsChanneling()) or (IsCasting()) or (localObj:HasBuff("Ice Block")) or (self.waitTimer > GetTimeEX()) then
+	if (IsChanneling()) or (IsCasting()) or (localObj:HasBuff("Ice Block")) or (self.waitTimer + script_grind.tickRate > GetTimeEX()) then
 
 		if IsStanding() and IsInCombat() and PlayerHasTarget() and not IsMoving() then
 			if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
@@ -269,7 +282,7 @@ function script_mage:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(350, 550);
+		local tickRandom = random(250, 350);
 
 		if (IsMoving()) or (not IsInCombat()) and (not localObj:IsCasting()) then
 			script_grind.tickRate = 135;
@@ -477,7 +490,7 @@ function script_mage:run(targetGUID)
 					FaceAngle(a);
 					if (CastSpellByName("Blink")) then
 						targetObj:FaceTarget();
-						self.waitTimer = GetTimeEX() + 500;
+						self.waitTimer = GetTimeEX() + 7500;
 						return 0;
 					end
 				end
@@ -491,7 +504,7 @@ function script_mage:run(targetGUID)
 						FaceAngle(a);
 						if (CastSpellByName("Blink")) then
 							targetObj:FaceTarget();
-							self.waitTimer = GetTimeEX() + 500;
+							self.waitTimer = GetTimeEX() + 750;
 						end
 					end
 				end
@@ -655,7 +668,7 @@ function script_mage:run(targetGUID)
 
 			-- Check: Polymorph add
 			if targetObj:IsInLineOfSight() and (targetObj ~= nil and self.polymorphAdds and script_grind:enemiesAttackingUs() > 1 and HasSpell('Polymorph') and not self.addPolymorphed) and (targetObj:GetDistance() < 25) and not script_magePolymorph:isAddPolymorphed() and script_magePolymorph:isPolymorphTargetValid() then
-				script_grind.tickRate = 250;
+				if not script_grind.adjustTickRate then script_grind.tickRate = 250; end
 				self.message = "Polymorphing add...";
 				script_magePolymorph:polymorphAdd(targetObj:GetGUID());
 				self.waitTimer = GetTimeEX() + 1750;
@@ -677,7 +690,7 @@ function script_mage:run(targetGUID)
 
 			-- Check: Frostnova when the target is close, but not when we polymorhped one enemy or the target is affected by Frostbite
 			if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and targetHealth >= 10 then
-				script_grind.tickRate = 100;
+				if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 				self.message = "Frost nova the target(s)...";
 				CastSpellByName("Frost Nova");
 			end			
@@ -706,7 +719,7 @@ function script_mage:run(targetGUID)
 			if (self.fireMage) and (HasSpell("Blast Wave")) then
 				if (localMana > 30) and (targetObj:GetDistance() < 10) and (not IsSpellOnCD("Blast Wave")) and (targetHealth > 10 or localHealth < 35) and (not IsSwimming()) and (targetObj:IsInLineOfSight()) then
 					if (script_mage:runBackwards(targetObj, 12)) then -- Moves if the target is closer than 7 yards
-						script_grind.tickRate = 0;
+						if not script_grind.adjustTickRate then script_grind.tickRate = 0; end
 						self.message = "Moving away from target...";
 						if (not IsSpellOnCD("Blast Wave")) then
 							CastSpellByName("Blast Wave");
@@ -779,7 +792,7 @@ function script_mage:run(targetGUID)
 
 					-- Check: Frostnova when the target is close, but not when we polymorhped one enemy or the target is affected by Frostbite
 					if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not targetObj:HasDebuff("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and localMana >= 10 and targetHealth >= 10 then
-						script_grind.tickRate = 0;
+						if not script_grind.adjustTickRate then script_grind.tickRate = 0; end
 						self.message = "Frost nova the target(s)...";
 						CastSpellByName("Frost Nova");
 					end
@@ -807,7 +820,7 @@ function script_mage:run(targetGUID)
 
 			-- Check: Frostnova when the target is close, but not when we polymorhped one enemy or the target is affected by Frostbite
 					if (not self.addPolymorphed) and (targetObj:GetDistance() < 9 and not targetObj:HasDebuff("Frostbite") and HasSpell("Frost Nova") and not targetObj:HasDebuff("Frost Nova") and not IsSpellOnCD("Frost Nova")) and self.useFrostNova and localMana >= 10 and targetHealth >= 10 then
-						script_grind.tickRate = 100;
+						if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 						self.message = "Frost nova the target(s)...";
 						CastSpellByName("Frost Nova");
 					end
@@ -872,7 +885,7 @@ function script_mage:run(targetGUID)
 		-- set tick rate for script to run
 		if (not script_grind.adjustTickRate) then
 
-				local tickRandom = random(350, 550);
+				local tickRandom = random(250, 350);
 
 			if (IsMoving()) or (not IsInCombat()) and (not localObj:IsCasting()) then
 				script_grind.tickRate = 155;

@@ -150,7 +150,7 @@ script_grind = {
 	lootBlacklistedNum = 0,
 
 	-- timers
-	tickRate = 1550,		-- reaction time / speed of scripts
+	tickRate = 350,		-- reaction time / speed of scripts
 	waitTimer = GetTimeEX(),	-- wait timer
 	checkBagTimer = GetTimeEX(),
 	mountTimer = GetTimeEX(),	-- defunct setting
@@ -356,13 +356,63 @@ function script_grind:shouldWeRest()
 return false;
 end
 
+-- example of object manager iteration
+function script_grind:objectManagerExample()
 
+	-- iterate first object
+	local i, t = GetFirstObject();
 
+	-- placeholder
+	local target = nil;
 
+	-- we have a valid object
+	while i ~= 0 do
 
+		-- NPC
+		if t == 3
+		-- Player
+		or t == 4
+		-- Game object
+		or t == 5
 
+		then
 
+			-- iterate through all objects less than 100 yards
+			if i:GetDistance() < 100 then
 
+				-- iterate all names within 100 yards
+					if i:GetUnitName() == "name" then
+
+						-- iterate all objects within 100 yards by name and now iterate through their health
+						if i:GetHealthPercentage() > 0 then
+
+							-- save this target for the next iteration
+							target = i;
+						end
+					end
+
+			-- iterate through all objects within 100 yards and check their distance to my target
+				if target:GetDistance() > i:GetDistance() then
+					target = i;
+				end
+			end
+
+			-- we still have local target variable set from above
+			if target ~= nil and i:GetDistance() <= target:GetDistance() then
+
+				-- set our new target variable if i distance < target distance
+				target = i;
+			end
+		end
+
+	-- we are done iterating that single object, get the next object to check
+	i, t = GetNextObject(i);
+	end
+
+	-- return the target after all iterations done
+return target;
+end
+						
 -- RUN GRINDER
 function script_grind:run()
 
@@ -660,7 +710,7 @@ function script_grind:run()
 
 
 -- set tick rate for scripts
-	if (self.waitTimer > GetTimeEX() + self.tickRate) then
+	if (self.waitTimer + self.tickRate > GetTimeEX()) then
 		return;
 	end
 
@@ -2092,12 +2142,14 @@ function script_grind:run()
 
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
-				script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot);
+				if script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot) then
 				--if not IsMoving() and not IsPathLoaded(5) then
 					--Move(script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z']);
 					--script_nav.currentGoToLocation = script_nav.currentGoToLocation + 1;
 					--script_nav:resetNavigate();
 				--end
+					return true;
+				end
 			return;
 			end
 
@@ -2578,8 +2630,8 @@ function script_grind:doLoot(localObj)
 	
 			-- if looting and not moving then wait
 			if (not LootTarget()) and (not IsMoving()) then
-				self.waitTimer = GetTimeEX() + 650;
-				_quest.waitTimer = GetTimeEX() + 650;
+				self.waitTimer = GetTimeEX() + 450;
+				_quest.waitTimer = GetTimeEX() + 450;
 				return;
 			else
 	
@@ -2604,8 +2656,8 @@ function script_grind:doLoot(localObj)
 
 			-- we looted so reset variables
 			--self.vendorMessageSent = false;
-			self.waitTimer = GetTimeEX() + 350;
-			_quest.waitTimer = GetTimeEX() + 350;
+			self.waitTimer = GetTimeEX() + 250;
+			_quest.waitTimer = GetTimeEX() + 250;
 			self.lootCheckTime = 0;
 			self.lootObj = nil;
 		return;
@@ -2672,10 +2724,11 @@ function script_grind:doLoot(localObj)
 				if not (IsPathLoaded(5)) and not IsMoving() then
 					if self.lootObj:GetDistance() > self.lootDistance then
 						Move(_x, _y, _z);
+						script_nav:resetNavigate();
 						self.message = "Moving To Target Loot no navmesh path available - " ..math.floor(self.lootObj:GetDistance()).. " (yd) "..self.lootObj:GetUnitName().. "";
 					end
 				end
-		--return true;
+		return true;
 		end
 	end
 

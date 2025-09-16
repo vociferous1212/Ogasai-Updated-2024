@@ -29,17 +29,7 @@ function script_checkAdds:checkAdds()
 	-- move away from adds
             if self:avoidToAggro(self.checkAddsRange) then
 
-        -- won't detect ismoving quick enough and is causing a stutter......
-		    -- face the target if we are not moving... turn back around after walking away quicker...
-		    --if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
-		      --if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
-
-		-- check unstuck
-             --   if not script_unstuck:pathClearAuto(2) then
-               --     script_unstuck:unstuck()
-                 --   return true
-                --end
-            return true;
+              return true;
             end
         end
     end
@@ -67,6 +57,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
                     and (not currentObj:HasDebuff("Polymorph"))
                     and (not currentObj:HasDebuff("Fear"))
                     and currentObj:IsInLineOfSight()
+                    and (not HasPet() or (HasPet() and PetHasTarget() and i:GetGUID() ~= GetPet():GetUnitsTarget():GetGUID()))
                 then
                     local dist = currentObj:GetDistance()
                     if dist <= (self.addsRange + 10) and dist < closestDist then
@@ -171,6 +162,8 @@ function script_checkAdds:aggroIntersect(target)
                     and not currentObj:HasDebuff("Polymorph")
                     and not currentObj:HasDebuff("Fear")
                     and currentObj:IsInLineOfSight()
+                    and ( not HasPet() or (HasPet() and PetHasTarget() and i:GetGUID() ~= GetPet():GetUnitsTarget():GetGUID()) )
+
                 then
                     local xx, yy = currentObj:GetPosition()
                     local dist = sqrt((x - xx)^2 + (y - yy)^2)

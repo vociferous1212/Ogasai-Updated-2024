@@ -23,6 +23,11 @@ function script_grindValidEnemy:enemyIsValid(i)
             script_grind:addTargetToHardBlacklist(i:GetGUID());
         end
 
+        -- blacklist targets around elite
+        if (script_grind.skipElites) then
+          script_grindEX:blacklistAreaWithElite();
+        end
+
         -- Add above maxLevel to blacklist
         if (script_grind.skipHardPull) and (i:GetDistance() <= 65) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > script_grind.maxLevel) then
             script_grind:addTargetToHardBlacklist(i:GetGUID());

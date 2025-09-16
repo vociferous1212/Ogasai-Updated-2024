@@ -4,6 +4,10 @@ script_navEXCombat = {	waitTimer = 0,
 
 function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when moving to moving targets
 
+	if not script_grind.adjustTickRate then
+		script_grind.tickRate = 135;
+	end
+
 	local ax, ay, az = GetLocalPlayer():GetPosition();
 
 	-- Please load and enable the nav mesh

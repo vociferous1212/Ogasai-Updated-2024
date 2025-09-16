@@ -4,6 +4,10 @@ script_moveToHotspot = {}
 -- script character limit... need to continue splitting files...
 function script_moveToHotspot:moveToHotspot(localObj)
 
+	if not script_grind.adjustTickRate then
+		script_grind.tickRate = 135;
+	end
+
 	-- return false if we are going to get spells at low level don't return to hotspot until done
 	if (script_getSpells.getSpellsStatus == 1) then
 		return false;
