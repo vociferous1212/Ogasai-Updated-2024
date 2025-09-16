@@ -53,10 +53,10 @@ function script_grindSetup:setup()
 		script_grind.skipElites = false;
 		script_grind.blacklistTime = 20;
 	end
-	--if (GetLocalPlayer():GetLevel() <= 22) then
-	--	script_grind.getSpells = true;
-	--	script_grind.useFPS = true;
-	--end
+	if (GetLocalPlayer():GetLevel() <= 10) then
+		script_grind.getSpells = true;
+		--script_grind.useFPS = true;
+	end
 
 	-- enable drawing unit info on screen
 	script_grind.drawEnabled = true;
@@ -175,6 +175,51 @@ function script_grindSetup:setup()
 	end
 	if (level == 60) then
 		script_checkAdds.addsRange = 28;
+	end
+
+	-- Check bags if they are full
+	if (not HasSpell("Auto Shot")) then
+		local inventoryFull = true;
+		for i = 1, 5 do 
+			if (i ~= 0) then 
+				for y=1,GetContainerNumSlots(i-1) do 
+					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
+					if (itemCount == 0 or itemCount == nil) then 
+						inventoryFull = false; 
+					end 
+				end
+			end 
+		end 
+	
+		-- Tell the grinder we cant loot
+		if (inventoryFull) then
+			script_grind.bagsFull = true;
+		end
+		if (not inventoryFull) then
+			script_grind.bagsFull = false;
+		end
+	elseif HasSpell("Auto Shot") then 
+		local inventoryFull = true;
+
+		-- skip slot 5, it's a quiver
+		for i = 1, 4 do 
+			if (i ~= 0) then 
+				for y=1,GetContainerNumSlots(i-1) do 
+					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y);
+					if (itemCount == 0 or itemCount == nil) then 
+						inventoryFull = false; 
+					end 
+				end
+			end 
+		end 
+	
+		-- Tell the grinder we cant loot
+		if (inventoryFull) then
+			script_grind.bagsFull = true;
+		end
+		if (not inventoryFull) then
+			script_grind.bagsFull = false;
+		end
 	end
 
 end

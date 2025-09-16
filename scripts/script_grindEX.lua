@@ -181,13 +181,25 @@ function script_grindEX:doChecks()
 
 		localObj = GetLocalPlayer();
 
-		-- Load vendors if we move into a new map zone
+-- Load vendors if we move into a new map zone
 		if (GetMapID() ~= self.currMapID) then
 			self.currMapID = GetMapID();
 			vendorDB:loadDBVendors();
 		end
 
-		if not script_grind.useVendor then script_vendor.status = 0; end
+-- turn vendor status to 0 if we aren't using vendor'
+		if not script_grind.useVendor then
+			script_vendor.status = 0;
+		end
+
+-- skip looting if we aren't using vendor and bags are full, if we are not already skipping looting'
+		if (script_grind.bagsFull or AreBagsFull() or script_hunter.bagsFull) and not script_grind.useVendor and not script_grind.skipLooting then
+			script_grind.skipLooting = true;
+		end
+		if script_grind.skipLooting and script_grind.useVendor then
+			script_grind.useVendor = false;
+			DEFAULT_CHAT_FRAME:AddMessage("Cannot skip looting and use vendoring together");
+		end
 		
 		-- load hotspot stuff
 		-- TODO - auto set specific mobs in certain grind zones for easier botting
@@ -200,7 +212,7 @@ function script_grindEX:doChecks()
 			-- force casters to face the targets... useful for mage/warlock especially when pulling
 			if IsStanding() and IsCasting() and not IsMoving() and PlayerHasTarget() then
 				if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
-					if not IsMoving() then
+					if not IsMoving() and IsCasting() and not script_checkAdds:checkAdds() then
 						GetTarget():FaceTarget();
 					end
 				end
@@ -303,8 +315,6 @@ function script_grindEX:doChecks()
 			end
 		end
 
-
-
 		-- run back if has vanish
 -- this does not work properly. bot continues combat
 		if (localObj:HasBuff("Vanish")) then
@@ -315,63 +325,9 @@ function script_grindEX:doChecks()
 		
 		--check to see if we need to rest or not
 		local rest = true;
-		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
+		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and GetLocalPlayer():GetHealthPercentage() > script_grind.eatHealth and GetLocalPlayer():GetManaPercentage() > script_grind.drinkMana then
 			if (script_grind:enemiesAttackingUs() > 0 or script_grind.enemyObj:IsFleeing() or script_grind.enemyObj:IsStunned()) then
 				rest = false;
-			end
-		end
-
-		-- Check: If our gear is yellow
-		if not IsInCombat() and script_grind.repairWhenYellow and script_grind.useVendor then
-			for i = 1, 16 do
-			local status = GetInventoryAlertStatus('' .. i);
-				if (status ~= nil) then 
-					if (status >= 3 and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
-						script_vendor:repair(); 
-						script_grind.newTargetTime = GetTimeEX();
-						script_grind.message = "Going to vendor to repair...";
-						return true;
-					end
-				end
-			end
-		end
-
-	-- run vendor routine
-		local vendorStatus = script_vendor:getStatus();
-
-		if (vendorStatus >= 1 and not IsInCombat()) then
-			script_grind.currentTime2 = GetTimeEX();
-			if (script_grind:runRest()) then
-				if (IsMoving()) then
-					StopMoving();
-					return;
-				end
-				return true;
-			end
-
-			if (script_grind:lootAndSkin()) then
-				return true;
-			end
-
-			if (script_grind.useMount) and (not IsMounted()) and (GetLocalPlayer():GetLevel() >= 40) then
-				if (script_helper:useMount()) then
-				end
-			end
-			if (GetLocalPlayer():GetLevel() <= 40) and (IsMoving()) and (HasSpell("Bear Form")) and (not script_grindEX:areWeSwimming()) then
-				if (not HasSpell("Travel Form")) and (HasSpell("Cat Form")) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
-					script_druidEX2:catForm();
-				elseif (HasSpell("Travel Form")) and (not localObj:HasBuff("Cat Form")) and (GetTimeEX() > self.tryTravelFormTimer) then
-					script_druidEX:travelForm();
-					self.tryTravelFormTimer = GetTimeEX() + 5000;
-				end
-			end
-			if (script_druid.useStealth) and (IsCatForm()) and (HasSpell("Prowl")) and (not IsSpellOnCD("Prowl")) and (not GetLocalPlayer():HasBuff("Prowl")) then
-				CastSpellByName("Prowl");
-				script_grind:setWaitTimer(1500);
-			end
-			if (script_rogue.useStealth) and (not GetLocalPlayer():HasBuff("Stealth")) and (not IsSpellOnCD("Stealth")) and (HasSpell("Stealth")) then
-				CastSpellByName("Stealth");
-				script_grind:setWaitTimer(1500);
 			end
 		end
 
@@ -397,67 +353,12 @@ function script_grindEX:doChecks()
 		end
 
 		-- Jump
-		if (script_grind.jump) then
+		if (script_grind.jump) and IsMoving() and not IsInCombat() then
 			local jumpRandom = random(1, 100);
-			if (jumpRandom > script_grind.jumpRandomFloat and IsMoving() and not IsInCombat()) then
+			if jumpRandom > script_grind.jumpRandomFloat then
 				JumpOrAscendStart();
 			end
 		end
-
-
-
--- VENDOR LOGIC
-
-
-		-- run vendor if we are mounted and running through mobs to vendor or not in combat
-		if (not IsInCombat() or IsMounted())
-		and GetLocalPlayer():GetHealthPercentage() >= script_grind.eatHealth
-		and GetLocalPlayer():GetManaPercentage() >= script_grind.drinkMana
-		
-		then
-
-		-- vendor repair
-			if (vendorStatus == 1) then
-
-				script_grind.message = "Repairing at vendor...";
-
-				if (script_vendor:repair()) then script_grind:setWaitTimer(100);
-				return;
-				end
-			return true;
-
-		-- vendor sell
-			elseif (vendorStatus == 2) then
-
-				script_grind.message = "Selling to vendor...,";
-
-				if (script_vendor:sell()) then script_grind:setWaitTimer(100);
-					return;
-				end
-			return true;
-
-		-- vendor buy ammo/bullets
-			elseif (vendorStatus == 3) then
-
-				script_grind.message = "Buying ammo at vendor...";
-
-				if (script_vendor:continueBuyAmmo()) then script_grind:setWaitTimer(100);
-					return;
-				end
-			return true;
-
-		-- vendor buy drink/food
-			elseif (vendorStatus == 4) then
-
-				script_grind.message = "Buying food/drink at vendor...";
-
-				if (script_vendor:continueBuy()) then script_grind:setWaitTimer(100);
-					return;
-				end
-			return true;
-			end
-		end
-
 
 		if (not IsInCombat()) and (not localObj:HasBuff('Feign Death')) then
 			-- Move out of water before resting/mounting
@@ -481,39 +382,8 @@ function script_grindEX:doChecks()
 			end
 		end
 
-
-		-- if bags are full and not use vendor but doing something other than skipping loot
-		if ((AreBagsFull() or script_grind.bagsFull) and not IsInCombat()) then
-			if(script_grind.useVendor and script_vendor:sell()) then
-				script_grind.message = "Running the vendor routine: sell..."; 
-				return true;
-			elseif (script_grind.hsWhenFull and HasItem("Hearthstone")) then
-				script_vendor:removeShapeShift();
-				script_grind.message = 'Inventory is full, using Hearthstone...';
-				if (IsMounted()) then DisMount(); script_grind.waitTimer = GetTimeEX()+3000;
-					return true;
-				end
-				if (UseItem("Hearthstone")) then
-					self.waitTimer = GetTimeEX() + 15000;
-					return true;
-				end
-				if (self.logoutOnHearth) then
-					Logout();
-				end
-				return;
-			elseif (script_grind.stopWhenFull) then
-				script_grind.message = 'Bags are full, stopping...';
-				Exit(); StopBot(); return true;
-			else	
-				script_grind.message = 'Warning bags are full...';
-				if (script_grind.hsWHenFull) then script_grind.message = 'Warning bags are full, pausing...';
-					return true;
-				end 
-			end
-		end
-
 		-- Check to see if we are a mana use and need to refill at Vendor
-		if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) and self.useVendor then
+		if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) then
 			if (script_vendorMenu:checkVendor(script_grind.useMana)) then
 				script_grind.message = "Going to vendor for water/food";
 				return true;

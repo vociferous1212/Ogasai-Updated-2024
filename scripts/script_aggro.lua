@@ -281,10 +281,8 @@ function script_aggro:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 
 			-- move to point
 			script_navEX:moveToTarget(GetLocalPlayer(), rX, rY, rZ);			
-
 		return true;
 	end
-
 return false;
 end
 
@@ -525,28 +523,16 @@ function script_aggro:avoid(pointX,pointY,pointZ, radius, safeDist)
 
 		then
 
-		-- use unstuck script
-		if (self.useUnstuck and IsMoving()) then
-			if (not script_unstuck:pathClearAuto(2)) then
-				script_unstuck:unstuck();
-				return true;
-			end
-		end
-
 		-- move to avoid points
-		if (Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)) then
-
-			-- reset navigation for next target
-			script_nav:resetNavPos();
-			script_nav:resetNavigate();
-			script_nav:resetPath();
-		end
+			script_navEX:moveToTarget(GetLocalPlayer(), pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ);
+		return true;
 	else
 			-- reset navigation for next target
-			script_nav:resetNavPos();
-			script_nav:resetNavigate();
-			script_nav:resetPath();
+			--script_nav:resetNavPos();
+			--script_nav:resetNavigate();
+			--script_nav:resetPath();
 	end
+return false;
 end
 
 

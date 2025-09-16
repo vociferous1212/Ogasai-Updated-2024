@@ -8,6 +8,8 @@ script_combatHelper =  { castingTimer = 0,
 function script_combatHelper:run()
 
 
+		if GetLocalPlayer():HasBuff("Evocation") then return; end
+
 		-- check casting timer of frostbolt to see if we need to stop casting a spell or not.
 		-- we don't want to stop casting when almost done casting
 		script_combatHelper:getFrostboltCastingTime();
@@ -17,8 +19,9 @@ function script_combatHelper:run()
 		script_combatHelper:mageStopFrostboltConditions();
 
 
+	-- possible this is causing nav crashes being called from the grinder instead of combat script...
 		-- run backwards during combat under ceratin conditions, entangle root / frost nova
-		script_combatHelper:checkRunBackwards();
+		--script_combatHelper:checkRunBackwards();
 
 
 		-- check warrior for conditions to stop spell casting frostbolt
@@ -145,11 +148,10 @@ function script_combatHelper:getFrostboltCastingTime()
 	end
 end
 
-
 function script_combatHelper:checkRunBackwards()
 
 	-- run backwards target has frost nova
-	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and GetNumPartyMembers() < 1 then
+	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and GetNumPartyMembers() < 1 and not IsCasting() and not IsChanneling() then
 
 		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35)
 		and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Frostbite") or GetLocalPlayer():GetUnitsTarget():HasDebuff("Frost Nova"))
@@ -161,17 +163,16 @@ function script_combatHelper:checkRunBackwards()
 		then
 
 			-- Moves if the target is closer than 8 yards
-			if (script_mage:runBackwards(targetObj, 8)) then
-				script_grind.tickRate = 0;
+			if (script_mage:runBackwards(targetObj, 10)) then
 				script_grind.waitTimer = GetTimeEX();
 				script_grind.message = "Moving away from target...";
 
 				-- face the target
-				if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 9) and (not IsMoving()) then
+				if (GetLocalPlayer():GetUnitsTarget():GetDistance() >= 10) and (not IsMoving()) then
 					GetLocalPlayer():GetUnitsTarget():FaceTarget();
 				end
 
-			return;
+			return true;
 			end
 		end
 	end
@@ -203,7 +204,7 @@ function script_combatHelper:checkRunBackwards()
 					GetLocalPlayer():GetUnitsTarget():FaceTarget();
 				end
 
-			return;
+			return true;
 			end
 		end
 	end

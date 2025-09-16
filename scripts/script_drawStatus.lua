@@ -8,6 +8,27 @@ script_drawStatus = {
 -- draw status text and display boxes on screen
 	-- self.message follow.message grind.message etc
 function script_drawStatus:draw()
+
+-- display radar
+	if (script_radar.showRadar) then
+		script_radar:draw()
+	end
+
+-- display exp checker
+	if (script_grind.useExpChecker) then
+		script_expChecker:menu();
+	end
+	
+-- draw chests
+	if (script_grind.drawChests) then
+		script_gather:drawChestNodes();
+	end
+
+-- draw fishing pools
+	if (script_gatherEX.drawFishingPools) then
+		script_gatherEX:drawFishNodes();
+	end
+
 	-- color
 	local r, g, b = 0, 0, 0;
 	-- position

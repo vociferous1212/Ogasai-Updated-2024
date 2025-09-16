@@ -1,6 +1,6 @@
 script_checkAdds = {
-    addsRange = 30,
-    checkAddsRange = 8,
+    addsRange = 20,
+    checkAddsRange = 3,
     closestEnemy = 0,
     intersectEnemy = nil,
 }
@@ -16,34 +16,30 @@ function script_checkAdds:checkAdds()
     end
 
 -- if we want to skip hard pulls and we have a valid enemy and we are greater than level 6 then
-    if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) ) and (not IsCasting()) and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
+    if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) )
+        and not IsChanneling() and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
 
 	-- if there aren't too many enemies in range and the target isn't about to die and we aren't stunned, nor is enemy stunned
-        if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy)) and ( (grindEnemy ~= 0 and grindEnemy ~= nil and not grindEnemy:IsStunned()) or (questEnemy ~= nil and questEnemy ~= 0 and not questEnemy:IsStunned()) ) then 
+        if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy))
+            and ( (grindEnemy ~= 0 and grindEnemy ~= nil and not grindEnemy:IsStunned())
+            or (questEnemy ~= nil and questEnemy ~= 0 and not questEnemy:IsStunned()) )
+            
+        then 
 
 	-- move away from adds
             if self:avoidToAggro(self.checkAddsRange) then
 
-		-- set a timer to let this script run. no timers are set anywhere else and if no timers are set then the bot will stutter walk
-		script_grind.waitTimer = GetTimeEX() + 500;
-		_quest.waitTimer = GetTimeEX() + 500;
-
-		-- face the target if we are not moving... turn back around after walking away quicker...
-		--if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
-		--if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
+        -- won't detect ismoving quick enough and is causing a stutter......
+		    -- face the target if we are not moving... turn back around after walking away quicker...
+		    --if not IsMoving() and grindEnemy ~= nil and grindEnemy ~= 0 then grindEnemy:FaceTarget(); end
+		      --if not IsMoving() and questEnemy ~= nil and questEnemy ~= 0 then questEnemy:FaceTarget(); end
 
 		-- check unstuck
-                if not script_unstuck:pathClearAuto(2) then
-                    script_unstuck:unstuck()
-                    return true
-                end
-
-		-- make pet follow too
-                if GetPet() ~= 0 then
-                    PetFollow()
-                end
-            script_grind:setWaitTimer(2000)
-                return true;
+             --   if not script_unstuck:pathClearAuto(2) then
+               --     script_unstuck:unstuck()
+                 --   return true
+                --end
+            return true;
             end
         end
     end
@@ -70,6 +66,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
                     and (not currentObj:IsCritter())
                     and (not currentObj:HasDebuff("Polymorph"))
                     and (not currentObj:HasDebuff("Fear"))
+                    and currentObj:IsInLineOfSight()
                 then
                     local dist = currentObj:GetDistance()
                     if dist <= (self.addsRange + 10) and dist < closestDist then
@@ -90,12 +87,12 @@ function script_checkAdds:avoidToAggro(safeMargin)
         if self.intersectEnemy ~= nil then
             local x, y = self.closestEnemy:GetPosition()
             local xx, yy = self.intersectEnemy:GetPosition()
-            local centerX, centerY = (x + xx) / 2, (y + yy) / 2
-            self:avoid(centerX, centerY, zP, self.addsRange / 2, self.checkAddsRange * 2)
+            local centerX, centerY = (x + xx), (y + yy)
+            self:avoid(centerX, centerY, zP, self.addsRange, self.checkAddsRange)
             PetFollow()
             return true
         else
-            self:avoid(xT, yT, zP, self.addsRange / 2, self.checkAddsRange)
+            self:avoid(xT, yT, zP, self.addsRange, self.checkAddsRange)
             PetFollow()
             return true
         end
@@ -141,17 +138,16 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
         end
         local grindEnemy = script_grind.enemyObj
         if grindEnemy and not grindEnemy:IsCasting() then
-            if Move(pointsTwo[farthestPoint].x, pointsTwo[farthestPoint].y, pointZ) then
-                if not script_grind.adjustTickRate and PlayerHasTarget() then
-                    script_grind.tickRate = 135
-                end
+            if not script_grind.adjustTickRate and PlayerHasTarget() then
+                script_grind.tickRate = 135
+            end
+                
+                script_navEXCombat:moveToTarget(GetLocalPlayer(), pointsTwo[farthestPoint].x, pointsTwo[farthestPoint].y, pointZ);
                 self.closestEnemy = 0
                 self.intersectEnemy = nil
                 script_om:FORCEOM()
-                return
-            end
         end
-	return true;
+	--return true;
     end
     return false
 end
@@ -163,7 +159,7 @@ function script_checkAdds:aggroIntersect(target)
 
     while currentObj ~= 0 do
         if typeObj == 3 then
-            local test = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 24
+            local test = currentObj:GetLevel() - GetLocalPlayer():GetLevel() + 19
             if currentObj:GetDistance() <= test then
                 if currentObj:CanAttack()
                     and not currentObj:IsDead()
@@ -174,6 +170,7 @@ function script_checkAdds:aggroIntersect(target)
                     and currentObj:GetGUID() ~= self.closestEnemy:GetGUID()
                     and not currentObj:HasDebuff("Polymorph")
                     and not currentObj:HasDebuff("Fear")
+                    and currentObj:IsInLineOfSight()
                 then
                     local xx, yy = currentObj:GetPosition()
                     local dist = sqrt((x - xx)^2 + (y - yy)^2)
@@ -208,6 +205,7 @@ function script_checkAdds:moveWhileResting(safeMargin)
                     and (not currentObj:IsCritter())
                     and (not currentObj:HasDebuff("Polymorph"))
                     and (not currentObj:HasDebuff("Fear"))
+                    and currentObj:IsInLineOfSight()
                 then
                     local dist = currentObj:GetDistance()
                     if dist <= (addsRange + 10) and dist < closestDist then
@@ -231,13 +229,13 @@ function script_checkAdds:moveWhileResting(safeMargin)
         if intersectEnemy ~= nil then
             local x, y = closestEnemy:GetPosition()
             local xx, yy = intersectEnemy:GetPosition()
-            avoidX, avoidY = (x + xx) / 2, (y + yy) / 2
+            avoidX, avoidY = (x + xx), (y + yy)
             avoidZ = zP
-            radius = addsRange / 2
-            safeDist = addsRange * 2
+            radius = addsRange
+            safeDist = addsRange
         else
             avoidX, avoidY, avoidZ = xT, yT, zP
-            radius = addsRange / 2
+            radius = addsRange
             safeDist = addsRange
         end
 
@@ -280,14 +278,13 @@ function script_checkAdds:moveWhileResting(safeMargin)
                 script_unstuck:unstuck()
                 return true
             end
-            if Move(pointsTwo[farthestPoint].x, pointsTwo[farthestPoint].y, avoidZ) then
+
+                script_navEXCombat:moveToTarget(GetLocalPlayer(), pointsTwo[farthestPoint].x, pointsTwo[farthestPoint].y, pointZ);
                 closestEnemy = 0
                 intersectEnemy = nil
                 script_om:FORCEOM()
                 PetFollow()
-                return true
-            end
-            return true
+       -- return true;
         end
     end
     return false
