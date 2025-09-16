@@ -49,8 +49,12 @@ function vendorDB:GetVendor(faction, continentID, mapID, canRepair, needFood, ne
 			and (canRepair and self.vendorList[i]['canRepair'] or not canRepair)) then
 				local _dist = GetDistance3D(posX, posY, posZ, self.vendorList[i]['pos']['x'], self.vendorList[i]['pos']['y'], self.vendorList[i]['pos']['z']);
 				if(_dist < bestDist) then
+
 					bestDist = _dist;
-					bestIndex = i;
+
+					if _dist <= bestDist then
+						bestIndex = i;
+					end
 				end
 			end
 		end

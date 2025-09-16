@@ -15,7 +15,7 @@ function script_getSpellsShaman:getTrainerTargetShaman()
 				vX, vY, vZ = -623.93902587891, -4203.8798828125, 38.13410949707;
 				script_getSpells.trainerTarget = "Shikrik";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() > 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 307.11401367188, -4839.91015625, 10.524313926697;
 				script_getSpells.trainerTarget = "Swart";
 			end
@@ -31,7 +31,7 @@ function script_getSpellsShaman:getTrainerTargetShaman()
 				vX, vY, vZ = -2873.8798828125, -264.70901489258, 53.916400909424;
 				script_getSpells.trainerTarget = "Meela Dawnstrider";
 			end
-			if (GetLocalPlayer():GetLevel() >= 6 and GetLocalPlayer():GetLevel() <= 10) then
+			if (GetLocalPlayer():GetLevel() > 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = -2298.9599609375, -437.74200439453, -5.4384160041809;
 				script_getSpells.trainerTarget = "Narm Skychaser";
 			end

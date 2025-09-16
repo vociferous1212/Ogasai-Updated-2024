@@ -66,7 +66,7 @@ function hotspotDB:getHotspotID(race, level)
 				local _dist = GetDistance3D(myX, myY, myZ, self.hotspotList[i]['pos']['x'], self.hotspotList[i]['pos']['y'], self.hotspotList[i]['pos']['z']);
 				if(_dist < bestDist) then
 					bestDist = _dist;
-					if _dist <= bestDist then
+					if _dist == bestDist then
 						bestIndex = i;
 					end
 				end

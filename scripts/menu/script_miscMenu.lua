@@ -49,10 +49,15 @@ if (CollapsingHeader("Vendor Options")) then
 		if (script_grind.useVendor) then 
 			script_vendorMenu:menu(); Separator();
 		else
-			Separator(); Text("If Inventory Is Full - ");
-			wasClicked, script_grind.hsWhenFull = Checkbox("Use Hearthstone", script_grind.hsWhenFull); SameLine();
-			wasClicked, script_grind.stopWhenFull = Checkbox("Exit The Bot", script_grind.stopWhenFull); SameLine();
-			wasClicked, script_grindEX.logoutOnHearth = Checkbox("Logout On Hearth", script_grindEX.logoutOnHearth); Separator();
+			Separator(); Text("If Inventory Is Full - "); 
+			wasClicked, script_grind.stopBotWhenInvFull = Checkbox("Stop Bot When Inventory Full", script_grind.stopBotWhenInvFull);
+
+			if not script_grind.stopBotWhenInvFull then
+				wasClicked, script_grind.hsWhenFull = Checkbox("Use Hearthstone", script_grind.hsWhenFull); SameLine();
+				wasClicked, script_grind.stopWhenFull = Checkbox("Exit The Bot", script_grind.stopWhenFull); SameLine();
+				wasClicked, script_grindEX.logoutOnHearth = Checkbox("Logout On Hearth", script_grindEX.logoutOnHearth); Separator();
+			end
+
 		end
 	end
 

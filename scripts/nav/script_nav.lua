@@ -36,12 +36,12 @@ end
 function script_nav:updateHotSpot(currentLevel, factionNr, useStaticHotSpot)
 
 	-- if we are using auto hotspots
-	if (useStaticHotSpot) and script_grindMenu.useHotSpotArea then 
+	if (useStaticHotSpot) and script_grindMenu.useHotSpotArea and (script_grind.hotspotReached or script_nav:getDistanceToHotspot() <= 100) then 
 
 		local race, level = UnitRace("player"), GetLocalPlayer():GetLevel();
 		local id = hotspotDB:getHotspotID(race, level);
 
-		if (script_nav:loadHotspotDB(id)) then 
+		if (script_nav:loadHotspotDB(id)) then
 			return true; 
 		end
 
@@ -140,15 +140,17 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 			or (script_grind.staticHotSpot and (self.savedLocations[self.currentGoToLocation]['level'] < minLevel
 			or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel)) then
 			self.currentGoToLocation = self.currentGoToLocation + 1;
-			--script_grind:setWaitTimer(200);
 		end
-		if self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
-		script_navEX:moveToTarget(localObj, self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+
+		if self.savedLocations ~= nil and self.currentGoToLocation ~= nil and self.savedLocations ~= 0 and self.currentGoToLocation ~= 0 then
+		script_navEX:moveToTarget(GetLocalPlayer(), self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+		return true;
 		end
-		if not IsMoving() and self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
-		Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+
+		if not IsMoving() and not IsPathLoaded(5) and self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
+			Move(self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
 		end
-		
+	return true;
 	end
 return false;
 end

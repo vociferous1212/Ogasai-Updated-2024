@@ -102,7 +102,7 @@ function script_gatherRun:gather()
 				local nDist = math.floor(script_gather.nodeObj:GetDistance());
 					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
-					if (not IsMoving()) and (nDist > 5) then Move(_x, _y, _z); end
+					if (not IsMoving()) and not IsPathLoaded(5) and (nDist > 5) then Move(_x, _y, _z); end
 
 				return true;
 			end

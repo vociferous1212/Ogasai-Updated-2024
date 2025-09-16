@@ -33,35 +33,47 @@ function script_vendorMenu:menu()
 			script_vendor.message = "Idle..."; 
 			script_vendor.status = 0;
 			script_grind.bagsFull = false;
+			script_hunter.bagsFull = false;
 		end 
 	end
 
 	wasClicked, script_grind.repairWhenYellow = Checkbox("Repair When Gear Is Yellow", script_grind.repairWhenYellow);
+	
+	Text("");
 
 	if (CollapsingHeader(">>> |+| Selling Options:")) then
 		local wasClicked = false;
 		local keepBox = false;
-		wasClicked, script_vendor.sellPoor = Checkbox("Sell Poor Items (Grey)", script_vendor.sellPoor);
-		wasClicked, script_vendor.sellCommon = Checkbox("Sell Common Items (White)", script_vendor.sellCommon);
-		wasClicked, script_vendor.sellUncommon = Checkbox("Sell Uncommon Items (Green)", script_vendor.sellUncommon);
-		wasClicked, script_vendor.sellRare = Checkbox("Sell Rare Items (Blue)", script_vendor.sellRare);
-		wasClicked, script_vendor.sellEpic = Checkbox("Sell Epic Items (Purple)", script_vendor.sellEpic);
-		Separator();
-		Text("Unique Keep Items:");
-		wasClicked, script_vendor.selectedKeepItemNr = ComboBox("", script_vendor.selectedKeepItemNr, unpack(script_vendor.keepItems));
-		if Button("Remove") then
-			script_vendor:deleteKeepItem(script_vendor.selectedKeepItemNr+1);
+
+		if CollapsingHeader(" |+| <<<	Keep Items By Quality") then
+			wasClicked, script_vendor.sellPoor = Checkbox("Sell Poor Items (Grey)", script_vendor.sellPoor);
+			wasClicked, script_vendor.sellCommon = Checkbox("Sell Common Items (White)", script_vendor.sellCommon);
+			wasClicked, script_vendor.sellUncommon = Checkbox("Sell Uncommon Items (Green)", script_vendor.sellUncommon);
+			wasClicked, script_vendor.sellRare = Checkbox("Sell Rare Items (Blue)", script_vendor.sellRare);
+			wasClicked, script_vendor.sellEpic = Checkbox("Sell Epic Items (Purple)", script_vendor.sellEpic);
+			Separator();
 		end
-		SameLine();
-		Text(" - Removes Selected Item From The Keep List...");
-		if Button("Add Item") then
-			script_vendor:addSaveItem(script_vendor.addItemName);
+
+		if CollapsingHeader(" |+| <<<	Keep Items By Name") then
+			
+			Text("Unique Keep Items:");
+			wasClicked, script_vendor.selectedKeepItemNr = ComboBox("", script_vendor.selectedKeepItemNr, unpack(script_vendor.keepItems));
+			if Button("Remove") then
+				script_vendor:deleteKeepItem(script_vendor.selectedKeepItemNr+1);
+			end
+			SameLine();
+			Text(" - Removes Selected Item From The Keep List...");
+			if Button("Add Item") then
+				script_vendor:addSaveItem(script_vendor.addItemName);
+			end
+			SameLine();
+			script_vendor.addItemName = InputText("", script_vendor.addItemName);
+			Separator();
+			Text("All items in your inventory will be added to the");
+			Text("keep item list when reloading scripts...");
 		end
-		SameLine();
-		script_vendor.addItemName = InputText("", script_vendor.addItemName);
-		Separator();
-		Text("All items in your inventory will be added to the");
-		Text("keep item list when reloading scripts...");
+
+		Text("")
 	end
 
 	if (CollapsingHeader(">>> |+| Vendor NPC And Buy Options")) then
@@ -213,6 +225,9 @@ function script_vendorMenu:menu()
 				end
 			end
 		end
+
+		Text("")
+
 end
 
 function script_vendorMenu:setRepairVendor()
@@ -374,6 +389,7 @@ function script_vendorMenu:sellLogic()
 			-- At the last slot change status to idle again (sell routine done)
 			if (i == 4 and y == GetContainerNumSlots(i)) then
 				script_grind.bagsFull = false;
+				script_hunter.bagsFull = false;
 				script_vendor.message = 'Finished selling...';
 				script_vendor.status = 0; -- set status back to idle
 				ClearTarget();
