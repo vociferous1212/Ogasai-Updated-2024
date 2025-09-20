@@ -51,6 +51,10 @@ if (Button("Add Target To Loot Blacklist")) then
 			script_grind.lootDistance = SliderFloat("LCD (yd)", 1, 5, script_grind.lootDistance);
 
 			Text("Blacklist Loot Time");
+			if script_grind.blacklistLootTimeVar ~= 20 then 
+			SameLine();
+			Text(" - Will update next loot phase")
+			end
 			script_grind.blacklistLootTimeVar = SliderInt("BL (sec)", 10, 60, script_grind.blacklistLootTimeVar);
 		end
 	end

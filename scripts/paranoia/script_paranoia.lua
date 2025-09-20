@@ -33,17 +33,26 @@ function script_paranoia:checkParanoia()
 
 	-- logout if level reached
 	if (script_paranoia.stopOnLevel) then
+			-- get our current level
 			selfLevel = GetLocalPlayer():GetLevel();
+
+		-- compare to targeted level (wanted to change this to log out on 2 or 3 level instead of levelup once)
 		if (selfLevel >= script_paranoia.targetedLevel) and (not IsInCombat()) then
+
 			StopBot();
+
+			-- reset our level if the bot is started again without reloading. this is set when bot is reloaded/started
 			script_paranoia.targetedLevel = script_paranoia.targetedLevel + 1;
+
 			if (script_paranoia.exitBot) then
 				Exit();
 			end
-			return;
+
+		return;
 		end
 	end
 
+	-- if we are dead and not a ghost then we can't do paranoia
 	if (localObj:IsDead()) then
 		return false;
 	end

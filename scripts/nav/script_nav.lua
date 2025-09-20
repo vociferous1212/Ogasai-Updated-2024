@@ -131,6 +131,11 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 	-- make sure we check that there are no targets around that are trying to be targeted by grinder....
 	if script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() and (script_grind.lootObj == nil or script_grind.bagsFull or AreBagsFull() or script_grind.skipLooting) then
 
+		-- redundancy make sure tick rate is set
+		if not script_grind.adjustTickRate then
+			script_grind.tickRate = 135;
+		end
+
 	-- Check: Move to the next location index
 		local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
 
@@ -141,7 +146,7 @@ function script_nav:moveToSavedLocation(localObj, minLevel, maxLevel, useStaticH
 			or self.savedLocations[self.currentGoToLocation]['level'] > maxLevel)) then
 			self.currentGoToLocation = self.currentGoToLocation + 1;
 		end
-
+		if self.currentGoToLocation == nil or self.currentGoToLocation == 0 then self.currentGoToLocation = 1; end
 		script_navEX:moveToTarget(GetLocalPlayer(), self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
 
 		if not IsMoving() and not IsPathLoaded(5) and self.savedLocations ~= nil and self.currentGoToLocation ~= nil then
@@ -213,15 +218,6 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		self.lastpathnavIndex = -1; 
 	end	
-
-		--if (not IsPathLoaded(5)) then
-		--	if (not IsMoving()) and (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-		--		local x, y, z = GetLocalPlayer():GetUnitsTarget():GetPosition();
-		--		Move(x, y, z);
-		--		return "Nav - we are stuck out of navmap boundary";
-		--	end
-		--return "Generating path...";
-		--end
 
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastpathnavIndex);

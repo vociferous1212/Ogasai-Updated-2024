@@ -15,7 +15,7 @@ script_follow = {
 	myTime = GetTimeEX(),
 	nextToNodeDist = 3.2,
 	isSetup = false, 
-	rawUnits = false,
+	drawUnits = false,
 	acceptTimer = GetTimeEX(),
 	followLeaderDistance = 18,
 	assistInCombat = false,
@@ -267,6 +267,8 @@ function script_follow:run()
 	and script_followNumEnemiesAttackingUs:numEnemiesAttackingUs() == 0
 	and not localObj:HasBuff('Feign Death')
 	and not AreBagsFull()
+	and not script_grind.AreBagsFull
+	and not script_hunter.areBagsFull
 	
 	then
 
@@ -347,7 +349,7 @@ function script_follow:run()
 		end
 	end
 
-	-- get party leader distance - don't attack stuff too far away from party leader'
+	-- get party leader distance - don't attack stuff too far away from party leader
 	local distance = self.followLeaderDistance;
 
 -- get a target

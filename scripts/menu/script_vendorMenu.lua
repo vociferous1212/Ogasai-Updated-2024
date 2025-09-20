@@ -56,7 +56,7 @@ function script_vendorMenu:menu()
 
 		if CollapsingHeader(" |+| <<<	Keep Items By Name") then
 			
-			Text("Unique Keep Items:");
+			Text("Unique Keep Items: "..script_vendor.keepNum-1);
 			wasClicked, script_vendor.selectedKeepItemNr = ComboBox("", script_vendor.selectedKeepItemNr, unpack(script_vendor.keepItems));
 			if Button("Remove") then
 				script_vendor:deleteKeepItem(script_vendor.selectedKeepItemNr+1);
@@ -129,7 +129,7 @@ function script_vendorMenu:menu()
 				end
 			end
 					
-			Text("Input Food Name And Number Of Stacks: 1 stack = 5 drinks");
+			Text("Input Food Name And Number Of Stacks: 1 stack = 5 food");
 			script_vendor.foodName = InputText("Food", script_vendor.foodName); 
 			SameLine();
 			script_vendor.foodNr = InputText("FX", script_vendor.foodNr);
@@ -379,7 +379,6 @@ function script_vendorMenu:sellLogic()
 
 	--reset new target time for blacklisting
 		script_grind.newTargetTime = GetTimeEX();
-		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 
 	for i = script_vendor.currentBag,4 do 
 		for y=script_vendor.currentSlot,GetContainerNumSlots(i) do 
@@ -411,7 +410,8 @@ function script_vendorMenu:sellLogic()
 				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
    				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
 				if (not script_vendor:keepItem(itemName) and itemRarity <= script_vendor.sellQuality
-					and itemName ~= script_vendor.foodName and itemName ~= script_vendor.drinkName) then
+					and itemName ~= script_vendor.foodName and itemName ~= script_vendor.drinkName)
+					and itemName ~= script_vendor.ammoName then
 					UseContainerItem(i,y);
 				end
 			end
