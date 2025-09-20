@@ -94,7 +94,7 @@ function getObjectsAroundMe:GetObjectsAroundMe()
 
 			while i ~= 0 do
 		
-				-- items can vary by type but most are 3 or 4...
+				-- items can vary by type but most are NOT 3 or 4...
 				if t ~= 3 and t ~= 4 then
 
 					-- limit the distance we can find items across the world

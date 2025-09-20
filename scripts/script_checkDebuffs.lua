@@ -108,6 +108,7 @@ function script_checkDebuffs:hasDisabledMovement()
       --  ["Hamstring"] = true, -- Reduces movement speed (Warrior); dispel with immunities
        -- ["Wing Clip"] = true, -- Reduces movement speed (Hunter); dispel with immunities
 	["Terrify"] = true,
+	["Encasing Webs"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), movement, false);
 end

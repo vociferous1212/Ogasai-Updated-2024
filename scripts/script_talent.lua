@@ -92,21 +92,44 @@ function script_talent:setup()
 		-- Priest talent points in order 1-31
 		self.priestTalents = {
 
-			"1;Wand Specialization", "1;Wand Specialization", "1;Wand Specialization", "1;Wand Specialization", "1;Wand Specialization", 
-			
+			-- 10-14
 			"3;Spirit Tap", "3;Spirit Tap", "3;Spirit Tap", "3;Spirit Tap", "3;Spirit Tap",
 
-			"3;Improved Shadow Word: Pain", "3;Improved Shadow Word: Pain", "3;Shadow Focus", "3;Shadow Focus ", "3;Shadow Focus", 
+			-- 15-19
+			"1;Wand Specialization", "1;Wand Specialization", "1;Wand Specialization", "1;Wand Specialization", "1;Wand Specialization", 
+			
+			-- 20-21
+			"3;Improved Shadow Word: Pain", "3;Improved Shadow Word: Pain",
+			
+			-- 22-24
+			"3;Shadow Focus", "3;Shadow Focus ", "3;Shadow Focus", 
 
-			"3;Mind Flay", "3;Improved Mind Blast","3;Improved Mind Blast","3;Improved Mind Blast","3;Improved Mind Blast",
+			-- 25
+			"3;Mind Flay",
 
+			-- 26-29
+			"3;Improved Mind Blast","3;Improved Mind Blast","3;Improved Mind Blast","3;Improved Mind Blast",
+
+			-- 30-34
 			"3;Shadow Weaving", "3;Shadow Weaving", "3;Shadow Weaving", "3;Shadow Weaving", "3;Shadow Weaving", 
 
-			"3;Vampiric Embrace", "3;Improved Vampiric Embrace", "3;Improved Vampiric Embrace", "3;Shadow Focus", "3;Shadow Focus", 
+			-- 35
+			"3;Vampiric Embrace",
+			
+			-- 36-37
+			"3;Improved Vampiric Embrace", "3;Improved Vampiric Embrace",
+			
+			-- 38-49
+			"3;Shadow Focus", "3;Shadow Focus", 
 
+			-- 40-45
 			"3;Darkness", "3;Darkness", "3;Darkness", "3;Darkness", "3;Darkness", 
 
-			"3;Shadowform", "3;Shadow Reach", "3;Shadow Reach", "3;Shadow Reach"
+			-- 46
+			"3;Shadowform",
+			
+			-- 47-49
+			"3;Shadow Reach", "3;Shadow Reach", "3;Shadow Reach"
 
 
 
@@ -130,17 +153,30 @@ function script_talent:setup()
 		
 		-- Hunter beastmaster talent points in order 1-31
 		self.hunterTalents = {
+			-- 10-14
 			"1;Endurance Training", "1;Endurance Training", "1;Endurance Training", "1;Endurance Training", "1;Endurance Training",
+			-- 15-17
 			"1;Thick Hide", "1;Thick Hide", "1;Thick Hide",
+			-- 18-19
 			"1;Improved Revive Pet", "1;Improved Revive Pet",
+			-- 20
 			"1;Bestial Swiftness",
+			-- 21-24
 			"1;Unleashed Fury", "1;Unleashed Fury", "1;Unleashed Fury", "1;Unleashed Fury",
+			-- 25-29
 			"1;Ferocity", "1;Ferocity", "1;Ferocity", "1;Ferocity", "1;Ferocity",
+			-- 30
 			"1;Intimidation",
+			-- 31-32
 			"1;Spirit Bond", "1;Spirit Bond",
+			-- 33-34
 			"1;Bestial Discipline", "1;Bestial Discipline",
+			-- 35-39
 			"1;Frenzy", "1;Frenzy", "1;Frenzy", "1;Frenzy", "1;Frenzy",
-			"1;Bestial Wrath"
+			-- 40
+			"1;Bestial Wrath",
+			--41
+			"1:Unleashed Fury"
 		}
 		
 		-- Warlock talent points 1-21 Affliction, 22-51 Demonology
@@ -224,7 +260,7 @@ function script_talent:learnTalents()
 		-- Spend talent points
 		script_talent:learnClassTalents();
 
-		self.talentTimer = GetTimeEX() + 250;
+		self.talentTimer = GetTimeEX() + 550;
 
 	end
 

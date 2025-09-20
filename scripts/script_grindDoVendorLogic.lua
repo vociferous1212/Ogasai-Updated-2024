@@ -9,30 +9,23 @@ local vendorStatus = script_vendor.status;
 	if (vendorStatus >= 1 and not IsInCombat()) then
 		script_grind.currentTime2 = GetTimeEX();
 
-		-- do loot and skinning if we kill something on way to vendor
+		if PlayerHasTarget() and script_grind.enemyObj == nil and not script_grind:isAnyTargetTargetingMe() then ClearTarget(); end
+
 		if not script_grind.skipLooting
 		and not AreBagsFull()
 		and not script_grind.bagsFull 
 		and not script_hunter.bagsFull
 		
 		then
-			if (script_grind:lootAndSkin()) then
-				return true;
-			end
-		end
+			if (script_grind:lootAndSkin()) then return true; end end
 
 		-- use mount
 		if script_grind.useMount
 		and not IsMounted()
 		and GetLocalPlayer():GetLevel() >= 40
 		
-		then
-			if (script_helper:useMount()) then
+		then if (script_helper:useMount()) then end end
 
-			end
-		end
-
-		-- driud use cat form/travel form to vendor
 		if (GetLocalPlayer():GetLevel() <= 40)
 		and (IsMoving())
 		and (HasSpell("Bear Form"))
@@ -124,6 +117,11 @@ local vendorStatus = script_vendor.status;
 	and not script_grind:shouldWeRest()
 		
 	then
+
+		-- if we are a hunter then go buy ammo and then sell - setup in hunter script
+		if HasSpell("Auto Shot") and vendorStatus == 2 and (AreBagsFull() or script_grind.areBagsFull or script_hunter.areBagsFull) then
+			vendorStatus = 3;
+		end
 
 		-- vendor repair
 		if (vendorStatus == 1) then

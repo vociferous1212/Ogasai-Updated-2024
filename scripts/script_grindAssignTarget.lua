@@ -11,7 +11,6 @@ function script_grindAssignTarget:assignTarget()
 		end
 	end
 
-
 	-- return target attacking group was here but kept causing the bot to drop target whenever a party member had aggro... only good for tanks
 	-- need to return the check to this position and set it for only defensive stance warrior and bear form druid with other checks
 	-- attack if party member hp is low enough, etc

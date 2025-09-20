@@ -207,7 +207,7 @@ function _questEX2:doChecks()
                 end
             end
 
-            if (script_grind:doLoot(localObj)) then
+            if (script_grindDoLoot:doLoot(localObj)) then
                 if IsLooting() then
                     _quest:setTimer(650)
                     -- New: Reset timer on successful loot start

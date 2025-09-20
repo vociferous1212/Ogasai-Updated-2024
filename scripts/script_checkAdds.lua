@@ -20,7 +20,7 @@ function script_checkAdds:checkAdds()
         and not IsChanneling() and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
 
 	-- if there aren't too many enemies in range and the target isn't about to die and we aren't stunned, nor is enemy stunned
-        if script_grind:enemiesWithinRange() <= 3 and (grindEnemy:GetHealthPercentage() >= 25 and not TargetHasRangedWeapon(grindEnemy))
+        if script_grind:enemiesWithinRange() <= 4 and (grindEnemy:GetHealthPercentage() >= 25 and (not TargetHasRangedWeapon(grindEnemy) or (GetMyClass() == "HUNTER" or GetMyClass() == "MAGE" or GetMyClass() == "WARLOCK") ) )
             and ( (grindEnemy ~= 0 and grindEnemy ~= nil and not grindEnemy:IsStunned())
             or (questEnemy ~= nil and questEnemy ~= 0 and not questEnemy:IsStunned()) )
             
@@ -57,7 +57,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
                     and (not currentObj:HasDebuff("Polymorph"))
                     and (not currentObj:HasDebuff("Fear"))
                     and currentObj:IsInLineOfSight()
-                    and (not HasPet() or (HasPet() and PetHasTarget() and i:GetGUID() ~= GetPet():GetUnitsTarget():GetGUID()))
+
                 then
                     local dist = currentObj:GetDistance()
                     if dist <= (self.addsRange + 10) and dist < closestDist then
@@ -162,7 +162,6 @@ function script_checkAdds:aggroIntersect(target)
                     and not currentObj:HasDebuff("Polymorph")
                     and not currentObj:HasDebuff("Fear")
                     and currentObj:IsInLineOfSight()
-                    and ( not HasPet() or (HasPet() and PetHasTarget() and i:GetGUID() ~= GetPet():GetUnitsTarget():GetGUID()) )
 
                 then
                     local xx, yy = currentObj:GetPosition()

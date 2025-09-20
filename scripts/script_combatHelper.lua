@@ -49,7 +49,7 @@ function script_combatHelper:mageStopFrostboltConditions()
 			if script_grind:enemiesAttackingUs() < 2 and IsCasting()
 		
 			-- if target range is 10 or less
-			and (target:GetDistance() <= 10
+			and (target:GetDistance() <= 8
 
 				-- or target is within acceptable wand attack conditions
 				or ((GetLocalPlayer():GetManaPercentage() < script_mage.useWandMana or target:GetHealthPercentage() < script_mage.useWandHealth) and script_mage.useWand and GetLocalPlayer():HasRangedWeapon()))

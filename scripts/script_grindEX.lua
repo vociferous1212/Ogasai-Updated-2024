@@ -113,7 +113,7 @@ local i, t = GetFirstObject();
 
 			if t == 3 then
 
-				if i:CanAttack() and not i:IsCritter() and not i:IsDead() and not i:GetGUID() == script_grind.lootObj:GetGUID() then
+				if i:CanAttack() and not i:IsCritter() and not i:IsDead() and i:GetGUID() ~= script_grind.lootObj:GetGUID() then
 
 					local x, y, z = script_grind.lootObj:GetPosition();
 
@@ -121,7 +121,7 @@ local i, t = GetFirstObject();
 
 					local dist = GetDistance3D(x, y, z, tx, ty, tz);
 
-					if dist > 20 then
+					if dist <= 25 then
 
 						numberOfEnemiesInRange = numberOfEnemiesInRange + 1;
 						
@@ -205,229 +205,231 @@ end
 -- main run of this script. doChecks() returns until completed
 function script_grindEX:doChecks() 
 
-		localObj = GetLocalPlayer();
+	localObj = GetLocalPlayer();
+		
+-- reset blacklist loot table every 7 mintues. it uses GUID... when mobs respawn it won't loot them
+	if GetTimeEX() > script_grind.resetBlacklistLootTableTimer and not IsLooting() and not IsInCombat() then
+		script_grind:resetLootBlacklistTable();
+		script_grind.resetBlacklistLootTableTimer = GetTimeEX() + 420000;
+		--DEFAULT_CHAT_FRAME:AddMessage("Blacklist loot table reset");
+	end
+
 
 -- Load vendors if we move into a new map zone
-		if (GetMapID() ~= self.currMapID) then
-			self.currMapID = GetMapID();
-			vendorDB:loadDBVendors();
-		end
+	if (GetMapID() ~= self.currMapID) then
+		self.currMapID = GetMapID();
+		vendorDB:loadDBVendors();
+	end
 
 -- turn vendor status to 0 if we aren't using vendor'
-		if not script_grind.useVendor then
-			script_vendor.status = 0;
-		end
+	if not script_grind.useVendor then
+		script_vendor.status = 0;
+	end
 
 -- skip looting if we aren't using vendor and bags are full, if we are not already skipping looting'
-		if (script_grind.bagsFull or AreBagsFull() or script_hunter.bagsFull) and not script_grind.useVendor and not script_grind.skipLooting then
-			script_grind.skipLooting = true;
-		end
-		if script_grind.skipLooting and script_grind.useVendor then
-			script_grind.useVendor = false;
-			DEFAULT_CHAT_FRAME:AddMessage("Cannot skip looting and use vendoring together");
-		end
+	if (script_grind.bagsFull or AreBagsFull() or script_hunter.bagsFull) and not script_grind.useVendor and not script_grind.skipLooting then
+		script_grind.skipLooting = true;
+	end
+	if script_grind.skipLooting and script_grind.useVendor then
+		script_grind.useVendor = false;
+		DEFAULT_CHAT_FRAME:AddMessage("Cannot skip looting and use vendoring together");
+	end
 		
-		-- load hotspot stuff
-		-- TODO - auto set specific mobs in certain grind zones for easier botting
-		--hotspotDB_setInfo_1_10_checkMobs();
+	-- load hotspot stuff
+	-- TODO - auto set specific mobs in certain grind zones for easier botting
+		-- set specific targets to kill by name or by creature type
+	--hotspotDB_setInfo_1_10_checkMobs();
 
 	
-		-- ensure we wait with the grind script
-		if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then
+	-- ensure we wait with the grind script
+	if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then
 
-			-- force casters to face the targets... useful for mage/warlock especially when pulling
-			if IsStanding() and IsCasting() and not IsMoving() and PlayerHasTarget() then
-				if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
-					if not IsMoving() and IsCasting() and not script_checkAdds:checkAdds() then
-						GetTarget():FaceTarget();
-					end
+		-- force casters to face the targets... useful for mage/warlock especially when pulling
+		if IsStanding() and IsCasting() and not IsMoving() and PlayerHasTarget() then
+			if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
+				if not IsMoving() and IsCasting() and not script_checkAdds:checkAdds() then
+					GetTarget():FaceTarget();
 				end
 			end
+		end
 
+		return;
+	end
+		
+	-- avoid elite now defunct
+	--if (script_grind.avoidElite and not localObj:IsDead()) then 
+	--	if (script_extraFunctions:avoidElite()) then
+	--		self.message = script_extraFunctions:runBackwards(1, 50);
+	--		script_grind.message = "Elite within " .. script_grind.avoidRange .. " yd. running away...";
+	--		return true; 
+	--	end 
+	--end
+
+		
+-- try to use soulstone if we have one
+	if (localObj:IsDead()) and (localObj:HasBuff("Soulstone Resurrection")) then
+		if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
+		script_grind:addTargetToHardBlacklist(script_grind.enemyObj:GetGUID());
+		end
+		-- wow in-game api
+		if (HasSoulstone()) then
+			UseSoulstone();
 			return;
 		end
-		
-		-- avoid elite now defunct
-		--if (script_grind.avoidElite and not localObj:IsDead()) then 
-		--	if (script_extraFunctions:avoidElite()) then
-		--		self.message = script_extraFunctions:runBackwards(1, 50);
-		--		script_grind.message = "Elite within " .. script_grind.avoidRange .. " yd. running away...";
-		--		return true; 
-		--	end 
-		--end
+	end
 
-		
-		-- try to use soulstone if we have one
-		if (localObj:IsDead()) and (localObj:HasBuff("Soulstone Resurrection")) then
-			if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
-			script_grind:addTargetToHardBlacklist(script_grind.enemyObj:GetGUID());
-			end
-			-- wow in-game api
-			if (HasSoulstone()) then
-				UseSoulstone();
-				return;
-			end
-		end
-
-		-- return and don't do anything if we are dead and paranoia is active - player in 40 yard range
-		if (localObj:IsDead()) and (script_paranoia:checkParanoia(40)) then
-			return;
-		end
+	-- return and don't do anything if we are dead and paranoia is active - player in 40 yard range
+	if (localObj:IsDead()) and (script_paranoia:checkParanoia(40)) then
+		return;
+	end
 
 
 
 -- we are dead so retrieve corpse
-		if (localObj:IsDead()) and (not script_paranoia:checkParanoia(40)) then
+	if (localObj:IsDead()) and (not script_paranoia:checkParanoia(40)) then
 
-			script_grind.message = "Waiting to ressurect...";
+		script_grind.message = "Waiting to ressurect...";
 
-			-- wait for a moment before anything
-			if localObj:IsDead() and not IsGhost() then
-				script_grind.waitTimer = GetTimeEX() + 2000;
-			end
+		-- wait for a moment before anything
+		if localObj:IsDead() and not IsGhost() then
+			script_grind.waitTimer = GetTimeEX() + 2000;
+		end
 
-			-- Release body
-			if (not IsGhost()) and (not script_paranoia:checkParanoia(30)) then
+		-- Release body
+		if (not IsGhost()) and (not script_paranoia:checkParanoia(30)) then
 
-				-- try to wait before releasing to ghost
-				script_grind.waitTimer = GetTimeEX() + 4000;
+			-- try to wait before releasing to ghost
+			script_grind.waitTimer = GetTimeEX() + 4000;
 
-				-- release to ghost
-				if (not RepopMe()) then
+			-- release to ghost
+			if (not RepopMe()) then
 		
-					-- set the death counter +1
-					if (self.useThisVar) then
-						script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
-						self.useThisVar = false;
-					end
-
-					-- wait a moment for the game to load before moving
-					script_grind.waitTimer = GetTimeEX() + 1500;
-					script_grind.message = "Walking to corpse...";
-					return true;
+				-- set the death counter +1
+				if (self.useThisVar) then
+					script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
+					self.useThisVar = false;
 				end
-				return true;
+
+				-- wait a moment for the game to load before moving
+				script_grind.waitTimer = GetTimeEX() + 1500;
+				script_grind.message = "Walking to corpse...";
+			return true;
 			end
+		return true;
+		end
 
-			-- make sure we are ghost before moving on to finding corpse
-			if IsGhost() then
+		-- make sure we are ghost before moving on to finding corpse
+		if IsGhost() then
 
-				-- Ressurrect within the ress distance to our corpse
-				local _lx, _ly, _lz = localObj:GetPosition();
+			-- Ressurrect within the ress distance to our corpse
+			local _lx, _ly, _lz = localObj:GetPosition();
 
-				-- our distance is greater than set ress distance
-				if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
-					script_nav:moveToNav(localObj, GetCorpsePosition());
-					return true;
-				else
-					-- if we are close enough and want to safetly res in the area
-					if (script_grind.safeRess) then
-						local rx, ry, rz = GetCorpsePosition();
-						if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
+			-- our distance is greater than set ress distance
+			if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
+				script_nav:moveToNav(localObj, GetCorpsePosition());
+				return true;
+			else
+				-- if we are close enough and want to safetly res in the area
+				if (script_grind.safeRess) then
+					local rx, ry, rz = GetCorpsePosition();
+					if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
+						script_grind.message = "Finding a safe spot to ress...";
+						return true;
+					else
+						if (script_aggro.rTime > GetTimeEX()) then
+							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);	
 							script_grind.message = "Finding a safe spot to ress...";
 							return true;
-						else
-							if (script_aggro.rTime > GetTimeEX()) then
-								script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);	
-								script_grind.message = "Finding a safe spot to ress...";
-								return true;
-							end
 						end
 					end
-				RetrieveCorpse();
-				self.useThisVar = true;
 				end
-				return true;
+			RetrieveCorpse();
+			self.useThisVar = true;
 			end
+		return true;
 		end
+	end
 
-		-- run back if has vanish
--- this does not work properly. bot continues combat
-		if (localObj:HasBuff("Vanish")) then
-			script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z']); 
-			return;
-		end
+-- run back if has vanish
+	if (localObj:HasBuff("Vanish")) then
+		script_navEX:moveToTarget(localObj, script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z']); 
+		script_grind.enemyObj = nil;
+		ClearTarget()
+	return;
+	end
 
 		
-		--check to see if we need to rest or not
-		local rest = true;
-		if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and GetLocalPlayer():GetHealthPercentage() > script_grind.eatHealth and GetLocalPlayer():GetManaPercentage() > script_grind.drinkMana then
-			if (script_grind:enemiesAttackingUs() > 0 or script_grind.enemyObj:IsFleeing() or script_grind.enemyObj:IsStunned()) then
-				rest = false;
-			end
+	--check to see if we need to rest or not
+	local rest = true;
+	if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) and GetLocalPlayer():GetHealthPercentage() > script_grind.eatHealth and GetLocalPlayer():GetManaPercentage() > script_grind.drinkMana then
+		if (script_grind:enemiesAttackingUs() > 0 or script_grind.enemyObj:IsFleeing() or script_grind.enemyObj:IsStunned()) then
+			rest = false;
 		end
+	end
 
-		if (IsInCombat()) and (GetTimeEX() > script_grind.omTimer) and (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
-			if (script_grind.enemyObj:GetHealthPercentage() >= 20) then
-				script_om:FORCEOM();
-				script_grind.omTimer = GetTimeEX() + 5000;
+	-- Check to see if we are a mana use and need to refill at Vendor
+	if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) then
+		if (script_vendorMenu:checkVendor(script_grind.useMana)) then
+			script_grind.message = "Going to vendor for water/food";
+			return true;
+		end
+	end
+
+	if (IsInCombat()) and (GetTimeEX() > script_grind.omTimer) and (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
+		if (script_grind.enemyObj:GetHealthPercentage() >= 20) then
+			script_om:FORCEOM();
+			script_grind.omTimer = GetTimeEX() + 5000;
+			return true;
+		end
+	end
+
+-- delete inventory items 
+	if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) and GetTimeEX() > self.deleteItemTimer then
+		script_deleteItems:checkDeleteItems();
+		self.deleteItemTimer = GetTimeEX() + 60000;
+	end
+
+-- check party members and run grind party script
+	if (GetNumPartyMembers() >= 1) then
+		if (script_grindParty:partyOptions()) then
+			return true;
+		end
+	end
+
+-- Jump - paranoia menu
+	if (script_grind.jump) and IsMoving() and not IsInCombat() then
+		local jumpRandom = random(1, 100);
+		if jumpRandom > script_grind.jumpRandomFloat then
+			JumpOrAscendStart();
+		end
+	end
+
+-- Move out of water before resting/mounting
+	if (not IsInCombat()) and (not localObj:HasBuff('Feign Death')) then
+		if (script_grindEX:areWeSwimming()) and (not script_grindEX.allowSwim) then 
+			script_grind.message = "Moving out of the water..."; 
+			if (script_grind.autoPath) then
+				script_grind.message = script_nav:moveToSavedLocation(localObj, script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
+			else
+				script_nav:navigate(GetLocalPlayer());
 				return true;
 			end
 		end
-
-		-- delete items 
-		if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) and GetTimeEX() > self.deleteItemTimer then
-			script_deleteItems:checkDeleteItems();
-			self.deleteItemTimer = GetTimeEX() + 60000;
-		end
-
-		-- check party members
-		if (GetNumPartyMembers() >= 1) then
-			if (script_grindParty:partyOptions()) then
+		if (rest) then
+			if (script_grind:runRest()) then
 				return true;
 			end
 		end
+		--if (script_grind:lootAndSkin()) then
+			--return true;
+		--end
+	end
 
-		-- Jump
-		if (script_grind.jump) and IsMoving() and not IsInCombat() then
-			local jumpRandom = random(1, 100);
-			if jumpRandom > script_grind.jumpRandomFloat then
-				JumpOrAscendStart();
-			end
-		end
-
-		if (not IsInCombat()) and (not localObj:HasBuff('Feign Death')) then
-			-- Move out of water before resting/mounting
-			if (script_grindEX:areWeSwimming()) and (not script_grindEX.allowSwim) then 
-				script_grind.message = "Moving out of the water..."; 
-				if (script_grind.autoPath) then
-					script_grind.message = script_nav:moveToSavedLocation(localObj, script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
-				else
-					script_nav:navigate(GetLocalPlayer());
-					return true;
-				end
-			end
-			if (rest) then
-				if (script_grind:runRest()) then
-					return true;
-				end
-			end
-			
-			if (script_grind:lootAndSkin()) then
-				return true;
-			end
-		end
-
-		-- Check to see if we are a mana use and need to refill at Vendor
-		if (script_grind.useVendor and script_grind.vendorRefill and not IsInCombat()) then
-			if (script_vendorMenu:checkVendor(script_grind.useMana)) then
-				script_grind.message = "Going to vendor for water/food";
-				return true;
-			end
-		end
-
-		-- Update pull levels if we leveled up
-		if (script_grind.currentLevel < GetLocalPlayer():GetLevel()) then
-			script_grind.currentLevel = GetLocalPlayer():GetLevel();
-			script_grind.minLevel = script_grind.minLevel + 1;
-			script_grind.maxLevel = script_grind.maxLevel + 1;
-		end
-		
-		-- Update/load hot spot distance and location
-		if (script_grind.autoPath) then 
-			script_nav:updateHotSpot(GetLocalPlayer():GetLevel(), GetFaction(), script_grind.staticHotSpot);
-			script_nav:setHotSpotDistance(script_grind.distToHotSpot); 
-		end
+	-- Update/load hot spot distance and location
+	if (script_grind.autoPath) then 
+		script_nav:updateHotSpot(GetLocalPlayer():GetLevel(), GetFaction(), script_grind.staticHotSpot);
+		script_nav:setHotSpotDistance(script_grind.distToHotSpot); 
+	end
 
 	return false;
 end

@@ -135,12 +135,12 @@ function script_grindSetup:setup()
 	script_grind.nodeTimer = GetTimeEX();
 	script_grind.attackTimer = GetTimeEX();
 	script_grind.blacklistLootTime = GetTimeEX();
-	script_grind.blacklistLootTimeCheck = GetTimeEX();
+	script_grind.blacklistLootTimeCheck = GetTimeEX() + script_grind.blacklistLootTimeVar * 1000;
 	script_grind.deleteCheckTimer = GetTimeEX();
 	script_shamanTotems.waitTimer = GetTimeEX();
 	script_grind.swimJumpTimer = GetTimeEX();
 	script_grind.lootCheck['target'] = 0;
-	script_grind.lootCheck['timer'] = GetTimeEX();
+	script_grind.lootCheck['timer'] = GetTimeEX() + 10000;
 	script_grind.buffTimer = GetTimeEX();
 	script_getSpells.waitTimer = GetTimeEX();
 	script_navEX.waitTimer = GetTimeEX();
@@ -157,6 +157,8 @@ function script_grindSetup:setup()
 	script_helper.gateTimer = GetTimeEX();
 	script_grindEX.deleteItemTimer = GetTimeEX();
 	script_grind.unstuckTimer = GetTimeEX();
+	script_grind.lootCheckTime = 10000;
+	script_grind.resetBlacklistLootTableTimer = GetTimeEX();
 
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then

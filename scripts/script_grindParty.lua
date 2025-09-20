@@ -5,12 +5,37 @@ script_grindParty = {
 	waitForMemberDistance = false,	-- wait for group distance
 	healGroup = true,
 	partyHealsLoaded = include("scripts\\follow\\script_followHealsAndBuffs.lua"),
-
+	usePartybots = false,
+	partybotFollowTimer = 0,
+	partybotAttackTimer = 0,
+	partybotActionTime = 7	-- adjust time to tell partybots to attack and follow
 
 }
 
 function script_grindParty:partyOptions()
-	
+
+	if script_grind.waitTimer > GetTimeEX() then return; end
+	if self.usePartybots then
+
+		local target = script_grind.enemyObj;
+		local setTime = self.partybotActionTime * 1000;
+
+		if GetTimeEX() > self.partybotAttackTimer then
+			if target ~= nil and target ~= nil and PlayerHasTarget() then
+				SendChatMessage(".partybot Attack");
+				self.partybotAttackTimer = GetTimeEX() + setTime;
+			end
+		end
+		if GetTimeEX() > self.partybotFollowTimer then
+			if not IsInCombat() and not PlayerHasTarget() and (target == nil or target == 0) then
+				SendChatMessage(".partybot ComeToMe")
+				self.partybotFollowTimer = GetTimeEX() + setTime;
+			end
+		end
+	end
+
+--
+
 	local groupMana = 0;
 	local manaUsers = 0;
 	local memberEnergy = 0;

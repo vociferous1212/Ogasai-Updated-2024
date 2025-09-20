@@ -221,20 +221,22 @@ function script_vendor:repair()
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
-		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			MoveToTarget(vX, vY, vZ);
-		end
+		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 1; -- moving to a repair vendor
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			if not IsSwimming() then
+				script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			elseif IsSwimming() then
+				Move(vX, vY, vZ);
+			end
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
+			if not IsMoving() and not IsPathLoaded(5) then
+				Move(vX, vY, vZ);
+				script_nav:resetNavigate();
+			end
 			return true;
 		end
 		
@@ -339,24 +341,27 @@ function script_vendor:sell()
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		_questEX2.sellVendorX, _questEX2.sellVendorY, _questEX2.sellVendorZ = vX, vY, vZ;
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
+		
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
-		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			MoveToTarget(vX, vY, vZ);
-		end
+		
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			if not IsSwimming() then
+				script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			elseif IsSwimming() then
+				Move(vX, vY, vZ);
+			end
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;
 			self.currentSlot = 0;
+			if not IsMoving() and not IsPathLoaded(5) then
+				Move(vX, vY, vZ);
+				--script_nav:resetNavigate();
+			end
 			return true;
 		end
 
@@ -377,29 +382,27 @@ function script_vendor:sell()
 			end
 		end
 		if GetTarget() ~= nil and GetTarget() ~= 0 then
-		if (vendorTarget ~= nil) and GetTarget():GetUnitName() == vendor['name'] then
+			if (vendorTarget ~= nil) and GetTarget():GetUnitName() == vendor['name'] then
 			
-			self.message = 'Selling...';
-			if (not IsVendorWindowOpen()) then
-				SkipGossip();
-				if (vendorTarget:UnitInteract()) then
-					return true;
-				end
-			else
-				if (CanMerchantRepair()) then
-					RepairAllItems(); 
-					-- sell
-					script_vendorMenu:sellLogic();
-					return true;
+				self.message = 'Selling...';
+				if (not IsVendorWindowOpen()) then
+					SkipGossip();
+					if (vendorTarget:UnitInteract()) then
+						return true;
+					end
 				else
-					script_vendorMenu:sellLogic();
+					if (CanMerchantRepair()) then
+						RepairAllItems(); 
+						-- sell
+						script_vendorMenu:sellLogic();
+						return true;
+					else
+						script_vendorMenu:sellLogic();
 					return true;
+					end				
 				end
-				
-				
-			end
 			return true;
-		end
+			end
 		end
 	end
 	return false;
@@ -452,21 +455,25 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
+		
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
-		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			MoveToTarget(vX, vY, vZ);
-		end
+	
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			if not IsSwimming() then
+				script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			elseif IsSwimming() then
+				Move(vX, vY, vZ);
+			end	
 			self.status = 3; -- moving to buy ammo at a vendor
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
+			if not IsMoving() and not IsPathLoaded(5) then
+				Move(vX, vY, vZ);
+				script_nav:resetNavigate();
+
+			end
 			return true;
 		end
 
@@ -592,21 +599,25 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		-- Move to vendor
-		if (not script_unstuck:pathClearAuto(2)) then
-			script_unstuck:unstuck();
-			return true;
-		end
+		
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
-		if (not IsMoving()) and (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			MoveToTarget(vX, vY, vZ);
-		end
+		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			if not IsSwimming() then
+				script_navEX:moveToTarget(localObj, vX, vY, vZ);
+			elseif IsSwimming() then
+				Move(vX, vY, vZ);
+			end
 			self.status = 4; 
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
+			if not IsMoving() and not IsPathLoaded(5) then
+				Move(vX, vY, vZ);
+				script_nav:resetNavigate();
+
+			end
 			return true;
 		end
 		
@@ -698,4 +709,73 @@ function script_vendor:removeShapeShift()
 		end
 	end
 return false;
+end
+
+function script_vendor:getDistanceToClosestVendor()
+
+	local bestDistance = 0;
+	
+	local x, y, z = GetLocalPlayer():GetPosition();
+
+
+	--sell vendor
+	local sellX, sellY, sellZ = script_vendor:getSellVendorPosition();
+	local dist1 = GetDistance3D(x, y, z, sellX, sellY, sellZ);
+
+	-- repair vendor
+	local repairX, repairY, repairZ = script_vendor:getRepairVendorPosition();
+	local dist2 = GetDistance3D(x, y, z, repairX, repairY, repairZ);
+
+	-- ammo vendor
+	local dist3 = GetDistance3D(x, y, z, ammoX, ammoY, ammoZ);
+	local ammoX, ammoY, ammoZ = script_vendor:getAmmoVendorPosition();
+
+	-- compare dist1
+	if dist1 < dist2 and dist1 < dist3 then
+		bestDistance = dist1;
+	-- compare dist2
+	elseif dist2 < dist1 and dist2 < dist3 then
+		bestDistance = dist2;
+	-- compare dist3
+	elseif dist3 < dist1 and dist3 < dist2 then
+		bestDistance = dist3;
+	end
+
+return bestDistance;
+end
+
+function script_vendor:getSellVendorPosition()
+
+	local x, y, z = 0, 0, 0;
+
+	if script_vendor.sellVendor ~= nil and script_vendor.sellVendor ~= 0 then
+
+		-- sell vendor pos
+		x, y, z = script_vendor.sellVendor['pos']['x'], script_vendor.sellVendor['pos']['y'], script_vendor.sellVendor['pos']['z'];
+	end
+return x, y, z;
+end
+
+function script_vendor:getRepairVendorPosition()
+
+	local x, y, z = 0, 0, 0;
+
+	if script_vendor.repairVendor ~= nil and script_vendor.repairVendor ~= 0 then
+
+		-- repair vendor pos
+		x, y, z = script_vendor.repairVendor['pos']['x'], script_vendor.repairVendor['pos']['y'], script_vendor.repairVendor['pos']['z'];
+	end
+return x, y, z;
+end
+
+function script_vendor:getAmmoVendorPosition()
+
+	local x, y, z = 0, 0, 0;
+
+	if script_vendor.ammoVendor ~= nil and script_vendor.ammoVendor ~= 0 then
+
+		-- ammo vendor pos
+		x, y, z = script_vendor.ammoVendor['pos']['x'], script_vendor.ammoVendor['pos']['y'], script_vendor.ammoVendor['pos']['z'];
+	end
+return x, y, z;
 end

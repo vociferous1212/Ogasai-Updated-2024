@@ -15,6 +15,8 @@ script_helper = {
 	numItems = 0,
 	gateTimer = 0,
 	potionTimer = 0,
+	drinkTimer = 0,
+	eatTimer = 0,
 
 }
 
@@ -336,36 +338,32 @@ function script_helper:addMount(name)
 end
 
 function script_helper:eat()
+	if self.eatTimer == 0 then self.eatTimer = GetTimeEX(); end
 	for i=0,self.numFood do
-		if (HasItem(self.food[i])) and not IsEating() and not IsMoving() then
+		if (HasItem(self.food[i])) and not IsEating() and not IsMoving() and GetTimeEX() > self.eatTimer then
 			if (UseItem(self.food[i])) then
-				--self.waitTimer = GetTimeEX() + 1200;
-				--script_grind:setWaitTimer(1200);
+				self.eatTimer = GetTimeEX() + 2000;
+				script_grind:setWaitTimer(2000);
 				_quest:setTimer(1200);
 				return true;
 			end
 		end
 	end
-	--self.waitTimer = GetTimeEX() + 1200;
-	--script_grind:setWaitTimer(1200);
-	_quest:setTimer(1200);
 	return false;
 end
 
 function script_helper:drinkWater()
+	if self.drinkTimer == 0 then self.drinkTimer = GetTimeEX(); end
 	for i=0,self.numWater do
-		if (HasItem(self.water[i])) and not IsDrinking() and not IsMoving() then
+		if (HasItem(self.water[i])) and not IsDrinking() and not IsMoving() and GetTimeEX() > self.drinkTimer then
 			if (UseItem(self.water[i])) then
-				--self.waitTimer = GetTimeEX() + 1600;
-				--script_grind:setWaitTimer(1600);
+				self.drinkTimer = GetTimeEX() + 2000;
+				script_grind:setWaitTimer(2000);
 				_quest:setTimer(1600);
 				return true;
 			end
 		end
 	end
-	--self.waitTimer = GetTimeEX() + 1200;
-	--script_grind:setWaitTimer(1200);
-	_quest:setTimer(1800);
 	return false;
 end
 
