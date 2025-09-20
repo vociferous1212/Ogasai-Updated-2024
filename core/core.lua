@@ -1,5 +1,3 @@
-PersistLoadingScreen(true);
-
 -- load the navmesh once we enter the game
 if (not IsUsingNavmesh()) then UseNavmesh(true); end LoadNavmesh();
 
