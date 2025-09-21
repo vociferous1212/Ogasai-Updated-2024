@@ -73,8 +73,12 @@ function script_vendorMenu:menu()
 			Text("keep item list when reloading scripts...");
 		end
 
-		Text("")
+		-- blank space
+		Text("");
 	end
+
+	-- blank space
+	Text("");
 
 	if (CollapsingHeader(">>> |+| Vendor NPC And Buy Options")) then
 		wasClicked, script_grind.autoSelectVendors = Checkbox("Auto Load Closest Vendors", script_grind.autoSelectVendors);

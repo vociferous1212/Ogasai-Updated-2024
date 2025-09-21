@@ -40,7 +40,7 @@ function script_hunterEX:chooseAspect(targetObj)
 				end 
 			end
 		end
-	elseif (script_hunter.useCheetah) and (hasCheetah) and (not IsInCombat()) and (targetObj == nil) and (localMana > script_hunter.drinkMana + 10) then 
+	elseif (script_hunter.useCheetah) and (hasCheetah) and (not IsInCombat()) and (targetObj == nil or target:GetDistance() >= 50) and (localMana > script_hunter.drinkMana + 10) then 
 		if (not localObj:HasBuff('Aspect of the Cheetah')) then 
 			CastSpellByName('Aspect of the Cheetah'); 
 			script_hunter.waitTimer = GetTimeEX() + 1550;
@@ -206,8 +206,12 @@ function script_hunterEX:menu()
 
 	if (CollapsingHeader("Hunter Combat Options")) then
 
-		Text("Ranged Attack Distsance");
-		script_hunter.spellRange = SliderInt("Dist yards", 30, 41, script_hunter.spellRange);
+		-- use ranged attacks or melee attacks
+		wasClicked, script_hunter.useRangedAttacks = Checkbox("Use Ranged Attacks", script_hunter.useRangedAttacks);
+		if script_hunter.useRangedAttacks then
+			Text("Ranged Attack Distsance");
+			script_hunter.spellRange = SliderInt("Dist yards", 30, 41, script_hunter.spellRange);
+		end
 
 		Separator();
 
@@ -315,9 +319,13 @@ function script_hunterEX:menu()
 		Separator();
 
 		if (script_hunter.useMark) then
-			Text("Use Hunter Mark above mana percentage");
+			Text("Use Hunter's' Mark above mana percentage");
 			script_hunter.useMarkMana = SliderInt("MM", 5, 100, script_hunter.useMarkMana);
 		end
+		Text("Serpent Sting Mana")
+		script_hunter.serpentStingMana = SliderInt("SSM", 5, 50, script_hunter.serpentStingMana);
+		Text("Arcane Shot Mana")
+		script_hunter.arcaneShotMana = SliderInt("ASM", 5, 50, script_hunter.arcaneShotMana);
 
 		if (HasSpell("Multi-Shot")) then
 			wasClicked, script_hunter.useMultiShot = Checkbox("Use MultiShot", script_hunter.useMultiShot);

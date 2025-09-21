@@ -30,6 +30,7 @@ local vendorStatus = script_vendor.status;
 		and (IsMoving())
 		and (HasSpell("Bear Form"))
 		and (not script_grindEX:areWeSwimming())
+		and not IsMounted()
 
 		then
 			if not HasSpell("Travel Form")
@@ -71,7 +72,21 @@ local vendorStatus = script_vendor.status;
 			CastSpellByName("Stealth");
 			script_grind:setWaitTimer(1500);
 		end
+
+		if script_hunter.useCheetah then
+			if HasSpell("Aspect of the Cheetah") and not GetLocalPlayer():HasBuff("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") then
+				CastSpellByName("Aspect of the Cheetah");
+				script_grind:setWaitTimer(1500);
+			end
+ 		end
+
+		if HasSpell("Blink") and not IsSpellOnCD("Blink") and GetLocalPlayer():GetManaPercentage() >= script_grind.drinkMana + 20 then
+			CastSpellByName("Blink");
+			script_grind.tickRate = 50;
+		end
+
 	end
+
 
 -- 1 Check: If our gear is yellow and need to repair
 	if not IsInCombat() and script_grind.repairWhenYellow and script_grind.useVendor then
@@ -117,6 +132,19 @@ local vendorStatus = script_vendor.status;
 	and not script_grind:shouldWeRest()
 		
 	then
+
+		-- close to adds - attack them!
+		if script_vendor.status >= 1 then
+			if script_aggro:closeToAdds() then
+				self.enemyObj = script_aggro:returnClosestAddsTarget();
+			
+				if self.enemyObj ~= nil then
+					if not IsAutoCasting("Attack") then
+						self.enemyObj:AutoAttack();
+					end
+				end
+			end
+		end
 
 		-- if we are a hunter then go buy ammo and then sell - setup in hunter script
 		if HasSpell("Auto Shot") and vendorStatus == 2 and (AreBagsFull() or script_grind.areBagsFull or script_hunter.areBagsFull) then

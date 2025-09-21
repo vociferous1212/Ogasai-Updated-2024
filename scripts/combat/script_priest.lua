@@ -349,6 +349,7 @@ function script_priest:run(targetGUID)
 				end
 				if localObj:HasBuff("Spirit Tap") then
 					self.message = "Waiting for Spirit Tap to restore mana...";
+					script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
 				end
 				return 4;
 		end
@@ -899,7 +900,7 @@ function script_priest:rest()
 		return true;
 	end
 
-	if (not IsDrinking()) and (not IsEating()) then
+	if (not IsDrinking() or (IsDrinking() and localMana >= 95)) and (not IsEating() or (IsEating() and localHealth >= 95)) then
 		if (not IsStanding()) then
 			JumpOrAscendStart();
 		end

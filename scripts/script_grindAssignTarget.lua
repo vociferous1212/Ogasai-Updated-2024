@@ -7,7 +7,7 @@ function script_grindAssignTarget:assignTarget()
 
 	if _quest.usingQuester then
 		if _quest.enemyTarget ~= nil then
-			script_grindObj = _quest.enemyTarget;
+			script_grind.enemyObj = _quest.enemyTarget;
 		end
 	end
 

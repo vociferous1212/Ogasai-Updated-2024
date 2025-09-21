@@ -160,6 +160,11 @@ function script_grindSetup:setup()
 	script_grind.lootCheckTime = 10000;
 	script_grind.resetBlacklistLootTableTimer = GetTimeEX();
 
+	-- if we are a melee class we can blacklist loot sooner since we are closer
+	if GetMyClass() == "ROGUE" or GetMyClass() == "WARRIOR" or GetMyClass() == "SHAMAN" or GetMyClass() == "DRUID" or GetMyClass() == "PALADIN" then
+		script_grind.blacklistLootTimeVar = 10;
+	end
+
 	local level = GetLocalPlayer():GetLevel();
 	if (level < 6) then
 		script_gather.safeGather = false;

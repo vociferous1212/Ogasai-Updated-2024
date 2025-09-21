@@ -157,17 +157,17 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 					if (CastHeal("Lesser Heal", localObj)) then
 						self.waitTimer = GetTimeEX() + 1700;
 						script_priest.waitTimer = GetTimeEX() + 500;
-						return true;
+						return;
 					end
 				end
 			end
 	
 			-- ELSE IF player level >= 20
 			if HasSpell("Flash Heal") then
-				if (localMana <= 8) and (localHealth <= script_priest.flashHealHP) then
+				if (localMana <= 10) and (localHealth <= script_priest.flashHealHP) then
 					if (CastHeal("Lesser Heal", localObj)) then
 						self.waitTimer = GetTimeEX() + 1700;
-						return true;	-- if cast return true
+						return;
 					end
 				end
 			end

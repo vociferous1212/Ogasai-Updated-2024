@@ -10,6 +10,7 @@ script_grindMenu = {
 	isSetup = false,
 	useOtherWarlockScript = false,
 	adjustTickRate = false,
+	whoListTimer = GetTimeEX(),
 
 }
 

@@ -127,25 +127,14 @@ function script_mage:runBackwards(targetObj, range)
 					script_nav:resetNavigate();
 				end
 
-			--elseif script_mage.useBlink and HasSpell("Blink") and not IsSpellOnCD("Blink") then
-			
-			--	CastSpellByName("Blink")
-			--end
-		--	script_mage.waitTimer = GetTimeEX() + 500;
- 			--if (Move(moveX, moveY, moveZ)) then
-				--script_grind:setWaitTimer(750);
-				--script_mage.waitTimer = GetTimeEX() + 750;
- 				--return true;
-			--end
-
+			-- check for adds 
 			if script_checkAdds:checkAdds() then
 				return 4;
 			end
-
+			self.waitTimer = GetTimeEX() + 500;
 		return 4;
 		end
 	end
-
 	return false;
 end
 
@@ -203,17 +192,18 @@ function script_mage:run(targetGUID)
 	
 	script_grind.combatScriptRange = script_mage.spellRange;
 
-	-- check setup
+-- check setup
 	if (not script_mage.isSetup) then
 		script_mage:setup();
 	end
 	
+-- set low level stuff
 	if (not HasSpell("Frostbolt")) then
 		script_mage.frostMage = false;
 		script_mage.fireMage = true;
 	end
 
-	-- we have fireball at level 1-3 that has a 35 yard range cast. if we do not reload bot, and obtain frostbolt, we need to change the distance
+-- we have fireball at level 1-3 that has a 35 yard range cast. if we do not reload bot, and obtain frostbolt, we need to change the distance
 	if script_mage.startedNewCharacter then
 		if HasSpell("Frostbolt") and script_mage.fireMage then
 			script_mage.spellRange = 29;
@@ -223,7 +213,7 @@ function script_mage:run(targetGUID)
 		end
 	end
 
-	-- handle low level mana cost of spells...
+-- handle low level mana cost of spells...
 	if GetLocalPlayer():GetLevel() >= 4 then
 		script_mage.frostboltMana = 10
 	elseif GetLocalPlayer():GetLevel() >= 6 then
@@ -234,6 +224,7 @@ function script_mage:run(targetGUID)
 		script_mage.frostboltMana = 4;
 	end
 
+-- set local variables
 	local localObj = GetLocalPlayer();
 
 	local localMana = localObj:GetManaPercentage();
@@ -245,48 +236,52 @@ function script_mage:run(targetGUID)
 	script_grind.eatHealth = script_mage.eatHealth;
 	script_grind.drinkMana = script_mage.drinkMana;
 
-	-- check if we are dead
+-- check if we are dead
 	if (localObj:IsDead()) then
 		return 0;
 	end
 	
-	-- Assign the target 
+-- Assign the target 
 	targetObj =  GetGUIDObject(targetGUID);
 
-	-- clear dead targets
+
+
+
+
+-- clear dead targets
 	if (targetObj == 0) or (targetObj == nil) or (targetObj:IsDead()) then
 		ClearTarget();
 		return 2;
 	end
 
-	-- Check: Move backwards if the target is affected by Frost Nova or Frost Bite
+-- Check: Move backwards if the target is affected by Frost Nova or Frost Bite
 		-- run backwards
-		if (GetNumPartyMembers() < 1) and (script_mage.useFrostNova) and not IsCasting() and not IsChanneling() then
-			if (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova"))
-			and (targetHealth > script_mage.useWandHealth or localHealth < 35)
-			and (not localObj:HasBuff('Evocation'))
-			and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (targetObj:IsInLineOfSight()) then
+	if (GetNumPartyMembers() < 1) and (script_mage.useFrostNova) and not IsCasting() and not IsChanneling() then
+		if (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova"))
+		and (targetHealth > script_mage.useWandHealth or localHealth < 35)
+		and (not localObj:HasBuff('Evocation'))
+		and (not script_checkDebuffs:hasDisabledMovement()) and (not IsSwimming()) and (targetObj:IsInLineOfSight()) then
 
-				if targetObj:GetDistance() < 12 then
-					if (script_mage:runBackwards(targetObj, 12)) then -- Moves if the target is closer than 7 yards
+			if targetObj:GetDistance() < 12 then
+				if (script_mage:runBackwards(targetObj, 12)) then -- Moves if the target is closer than 7 yards
 
-						script_mage.message = "Moving away from target...";
+					script_mage.message = "Moving away from target...";
 
-						if (not IsSpellOnCD("Frost Nova")) and (targetObj:GetDistance() < 9)
-							and (not targetObj:HasDebuff("Frostbite")) and not targetObj:HasDebuff("Frost Nova")
-							and not script_mage.addPolymorphed
-						then
-							CastSpellByName("Frost Nova");
-						end
+					if (not IsSpellOnCD("Frost Nova")) and (targetObj:GetDistance() < 9)
+						and (not targetObj:HasDebuff("Frostbite")) and not targetObj:HasDebuff("Frost Nova")
+						and not script_mage.addPolymorphed
+					then
+						CastSpellByName("Frost Nova");
+					end
 
-					return 4;
-					end 
-				return;
-				end
-			end	
-		end
+				return 4;
+				end 
+			return;
+			end
+		end	
+	end
 
-	-- Check: Do nothing if we are channeling, casting or Ice Blocked
+-- Check: Do nothing if we are channeling, casting or Ice Blocked
 	if (IsChanneling()) or (IsCasting()) or (localObj:HasBuff("Ice Block")) or (script_mage.waitTimer + script_grind.tickRate > GetTimeEX())
 	or localObj:IsStunned() then
 
@@ -297,11 +292,10 @@ function script_mage:run(targetGUID)
 				end
 			end
 		end
-
 	return 4;
 	end
 
-	-- set tick rate for script to run
+-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
 		local tickRandom = random(250, 350);
@@ -315,7 +309,8 @@ function script_mage:run(targetGUID)
 		end
 	end
 
-	-- check silence and use wand
+-- check silence and use wand
+	-- this doesn't work properly...
 	if (IsInCombat())
 		and (localObj:HasRangedWeapon())
 		and (not IsCasting())
@@ -339,7 +334,7 @@ function script_mage:run(targetGUID)
 		end
 	end
 
-	-- dismount before combat
+-- dismount before combat
 	if (IsMounted()) then
 		DisMount();
 	end
@@ -534,7 +529,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- Check: Use Mana Potion 
-			if (localMana < script_mage.potionMana) then 
+			if (localMana < script_mage.potionMana) and (targetHealth >= 25 or localHealth <= 50) then 
 				if (script_helper:useManaPotion()) then 
 					return 0; 
 				end 
@@ -601,8 +596,8 @@ function script_mage:run(targetGUID)
 	
 						if (not IsSpellOnCD("Fire Blast")) then
 							CastSpellByName("Fire Blast", targetObj);
-							script_mage.waitTimer = GetTimeEX() + 1750;
-							script_grind:setWaitTimer(1750);
+							script_mage.waitTimer = GetTimeEX() + 1550;
+							script_grind:setWaitTimer(1550);
 							return 0;
 						end
 					end
@@ -772,7 +767,7 @@ function script_mage:run(targetGUID)
 			-- Wand if mana or target health is low
 			if (script_mage.useWand)
 			and (localObj:HasRangedWeapon())
-			and (localMana <= script_mage.useWandMana or targetHealth <= script_mage.useWandHealth)
+			and (localMana <= script_mage.useWandMana or targetHealth <= script_mage.useWandHealth or localMana <= script_mage.frostboltMana)
 			and (not IsChanneling())
 			and (not localObj:IsStunned())
 			and (not IsMoving())
@@ -820,6 +815,7 @@ function script_mage:run(targetGUID)
 
 					if localMana >= script_mage.frostboltMana and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and targetObj:IsInLineOfSight() then
 						if (CastSpellByName("Frostbolt", targetObj)) then
+							targetObj:FaceTarget();
 							script_mage.waitTimer = GetTimeEX() + 1850;
 							script_grind:setWaitTimer(1850);
 							--return 0;

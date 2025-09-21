@@ -80,11 +80,10 @@ function script_magePolymorph:polymorphAdd(targetObjGUID) -- cast the polymorph 
 								script_navEXCombat:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 							end
 							if currentObj:GetDistance() <= 30 and not IsMoving() then
-								if (script_mage:cast('Polymorph', currentObj)) then 
+									script_mage:cast('Polymorph', currentObj);
 									script_mage.addPolymorphed = true; 
 									polyTimer = GetTimeEX() + 8000;
-									return true; 
-								end
+								return true; 
 							end
 						end
 					end 

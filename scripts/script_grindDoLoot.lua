@@ -6,34 +6,34 @@ script_grindDoLoot = {
 
 function script_grindDoLoot:doLoot(localObj)
 
-	-- set the timer if not already set
+-- set the timer if not already set
 	if self.timerWhileLooting == 0 then
 
 		self.timerWhileLooting = GetTimeEX();
 	end
 
-	-- get loot position
+-- get loot position
 	local _x, _y, _z = script_grind.lootObj:GetPosition();
 
-	-- get distance to loot object from my position
+-- get distance to loot object from my position
 	local dist = script_grind.lootObj:GetDistance();
 
-	-- get player object
+-- get player object
 	local localObj = GetLocalPlayer();
 
-	-- set script speed
+-- set script speed
 	if (not script_grind.adjustTickRate) then
 
 		script_grind.tickRate = 50;
 	end
 
-	-- if our bags are full then set loot object to nil
+-- if our bags are full then set loot object to nil
 	if script_grind.bagsFull or script_hunter.bagsFull or AreBagsFull() or script_grind.skipLooting then
 
 		script_grind.lootObj = nil;
 	end
 
-	-- if we have a loot object and it is blacklisted then turn loot object to nil
+-- if we have a loot object and it is blacklisted then turn loot object to nil
 	if (script_grind.lootObj ~= nil) then
 
 		if (script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID())) then
@@ -42,7 +42,7 @@ function script_grindDoLoot:doLoot(localObj)
 		end
 	end
 
-	-- Loot checking/reset target
+-- Loot checking/reset target
 	if (script_grind.lootCheck['timer'] ~= 0 and script_grind.lootCheck['timer'] ~= nil) and script_grind.lootObj ~= nil then
 
 		-- if timer has ran out
@@ -92,7 +92,7 @@ function script_grindDoLoot:doLoot(localObj)
 		end
 	end
 
-	-- close enough to loot range then do these
+-- close enough to loot range then do these
 	if (dist <= script_grind.lootDistance)
 	and script_grind.lootObj ~= nil
 	and script_grind.lootObj ~= 0
@@ -126,7 +126,7 @@ function script_grindDoLoot:doLoot(localObj)
 			end
 		end
 	
-		-- stop moving
+	-- stop moving
 		if (IsMoving() and not localObj:IsMovementDisabed()) then
 
 			StopMoving();
@@ -134,7 +134,7 @@ function script_grindDoLoot:doLoot(localObj)
 			return;
 		end
 
-		-- stand if we are sitting
+	-- stand if we are sitting
 		if (not IsStanding()) then
 
 			StopMoving();
@@ -144,13 +144,14 @@ function script_grindDoLoot:doLoot(localObj)
 			return;
 		end
 
-		-- Dismount
+	-- Dismount
 		if (IsMounted()) then
 			DisMount();
 			script_grind.waitTimer = GetTimeEX() + 350;
 			return;
 		end
 
+	-- loot attempt #1
 		if (IsLooting()) then
 			if self.timerWhileLooting < GetTimeEX() then 
 				LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000; script_grind:setWaitTimer(500);
@@ -160,74 +161,84 @@ function script_grindDoLoot:doLoot(localObj)
 			end
 		end
 
-		-- interact with object if we are not looting
+	-- interact with object if we are not looting
+			-- backup line 2 (and not IsLooting())
 		if script_grind.lootObj ~= nil then
-			if (not script_grind.lootObj:UnitInteract() and not IsLooting()) then	
+			if (not script_grind.lootObj:UnitInteract()) then	
 				if self.timerWhileLooting < GetTimeEX() then 
 					LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000; script_grind:setWaitTimer(500);
 				end
+				script_grind:setWaitTimer(500);
 			end
 		end
-			-- if looting and not moving then wait
-			if (not IsLooting()) then
-				script_grind.waitTimer = GetTimeEX() + 450;
-				_quest.waitTimer = GetTimeEX() + 450;
-				self.timerWhileLooting = GetTimeEX() + 1000;
-				LootTarget();
-			else
+			
+-- if looting and not moving then wait
+		if (not IsLooting()) then
+			script_grind.waitTimer = GetTimeEX() + 450;
+			_quest.waitTimer = GetTimeEX() + 450;
+			self.timerWhileLooting = GetTimeEX() + 1000;
+			LootTarget();
+		else
 	
-				if (script_grind.autoSelectVendors) and (IsLooting()) then
-					if self.timerWhileLooting < GetTimeEX() then 
-						LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000; end
-
-					local bX, bY, bZ = GetLocalPlayer():GetPosition();
-					if (GetDistance3D(script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ, bX, bY, bZ) > 500) then
-						if (not script_grind.vendorMessageSent) then
-							DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
-							script_grind.vendorMessageSent = true;
-							script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ = GetLocalPlayer():GetPosition();
-	
-							script_grind:setWaitTimer(2500);
-							_quest.waitTimer = GetTimeEX() + 2500;
-							if (script_grind.vendorMessageSent) then
-								vendorDB:loadDBVendors();
-								script_grind.vendorMessageSent = false;
-							end
-						end
-					end 
+-- else we are done looting - load cloest vendors
+			if (script_grind.autoSelectVendors) and (IsLooting()) then
+				if self.timerWhileLooting < GetTimeEX() then 
+					LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000;
 				end
-			end
 
-			-- we looted so reset variables
-			--script_grind.vendorMessageSent = false;
-			--script_grind.waitTimer = GetTimeEX() + 250;
-			--_quest.waitTimer = GetTimeEX() + 250;
-			--if not IsLooting() then
-			--	script_grind.lootCheckTime = 0;
+				local bX, bY, bZ = GetLocalPlayer():GetPosition();
+				if (GetDistance3D(script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ, bX, bY, bZ) > 500) then
+					if (not script_grind.vendorMessageSent) then
+						DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
+						script_grind.vendorMessageSent = true;
+						script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ = GetLocalPlayer():GetPosition();
+
+						script_grind:setWaitTimer(2500);
+						_quest.waitTimer = GetTimeEX() + 2500;
+						if (script_grind.vendorMessageSent) then
+							vendorDB:loadDBVendors();
+							script_grind.vendorMessageSent = false;
+						end
+					end
+				end 
+			end
+		end
+
+		-- we looted so reset variables
+		--script_grind.vendorMessageSent = false;
+		--script_grind.waitTimer = GetTimeEX() + 250;
+		--_quest.waitTimer = GetTimeEX() + 250;
+		--if not IsLooting() then
+		--	script_grind.lootCheckTime = 0;
 		--	end
-			script_grind.lootObj = nil;
+		
+		script_grind.lootObj = nil;
 			
 	
-
-		-- If we reached the loot object, reset the nav path
+-- If we reached the loot object, reset the nav path
 		script_nav:resetNavigate();
-		return true;
+
+	return true;
 	end
 
 
+-- jump while swimming
 	handleSwimming();
 
-	-- Blacklist loot target if swimming or we are close to aggro blacklisted targets and not close to loot target
+-- Blacklist loot target if swimming or we are close to aggro blacklisted targets and not close to loot target
 	if (script_grind.lootObj ~= nil) then
 		if (IsSwimming()) and (not script_grindEX.allowSwim) and (script_aggro:closeToBlacklistedTargets() and script_grind.lootObj:GetDistance() > 5) then
 			script_grind:addTargetToLootBlacklist(script_grind.lootObj:GetGUID());
 		end
 	end
 
-	-- blacklisting loot after x time
+-- blacklisting loot after x time
 	if (not IsInCombat()) then
 
-			if IsEating() or IsDrinking() or IsInCombat() then script_grind.lootCheckTime = 10000; script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000); end
+		if IsEating() or IsDrinking() or IsInCombat() then
+			script_grind.lootCheckTime = 10000;
+			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
+		end
 
 		if (GetTimeEX() >= script_grind.blacklistLootTimeCheck) then
 
@@ -242,7 +253,7 @@ function script_grindDoLoot:doLoot(localObj)
 		end
 	end
 
-	-- move to loot object
+-- move to loot object
 
 	if (script_grind.lootObj ~= nil) then
 		script_grind.message = "Moving to loot...";
@@ -267,7 +278,16 @@ function script_grindDoLoot:doLoot(localObj)
 				script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 			
 		end
-		return true;
+
+		if not IsMoving() then
+			Move(_x, _y, _z);
+			script_nav:resetNavigate();
+			script_nav:resetNavPos();
+		end
+	return true;
+
 	end
+		script_grind:setWaitTimer(150)
+
 return false;
 end

@@ -54,7 +54,7 @@ function script_grindBotPausedChecks:botPausedChecks()
 		end
 	end
 
--- check inventory for bag every 3 minutes... if we have none in slot 4 already, only level 10 or lower
+-- check inventory for bags every 3 minutes... if we have none in slot 4 already, only level 10 or lower
 	if not IsInCombat()
 	and not IsMoving()
 	and GetTimeEX() > script_grind.checkBagTimer
