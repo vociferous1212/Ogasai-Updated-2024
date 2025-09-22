@@ -166,6 +166,12 @@ local localObj = GetLocalPlayer();
 
 			_questEX:doChecks();
 
+			if IsInCombat() or IsMoving() then
+			script_grind.lootCheckTime = 10000;
+			script_grind.lootCheck['timer'] = 0;
+			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000); end
+
+			if self.enemyTarget ~= nil and not IsAutoCasting("Attack") then self.enemyTarget:AutoAttack(); end
 			_questDoCombat:doCombat();
 
 		return true;

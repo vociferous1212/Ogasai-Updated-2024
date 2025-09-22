@@ -161,7 +161,12 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 					end
 				end
 				-- grab some stuff from grinder like check adds conditions that are set to grinder only. we can run the same target
-				script_grind.enemyObj = _quest.enemyTarget;
+				if script_grind.enemyObj ~= nil then
+					script_grind.enemyObj = _quest.enemyTarget;
+					if not IsAutoCasting("Attack") then
+					_quest.enemyTarget:AutoAttack();
+					end
+				end
 				script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
 
 								-- move to target
