@@ -814,10 +814,11 @@ function script_mage:run(targetGUID)
 					end
 
 					if localMana >= script_mage.frostboltMana and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and targetObj:IsInLineOfSight() then
+							targetObj:FaceTarget();
 						if (CastSpellByName("Frostbolt", targetObj)) then
 							targetObj:FaceTarget();
-							script_mage.waitTimer = GetTimeEX() + 1850;
-							script_grind:setWaitTimer(1850);
+							script_mage.waitTimer = GetTimeEX() + 500;
+							script_grind:setWaitTimer(300);
 							--return 0;
 						end
 					end

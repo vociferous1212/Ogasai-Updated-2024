@@ -55,7 +55,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
 	-- If we are not swimming and are close to the next path node, increase our nav node index
-	if not script_grindEX:areWeSwimming() and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
+	if not script_grindAreWeSwimming:areWeSwimming() and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
@@ -63,7 +63,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- If we are swimming then our new path node is always changing
-	if script_grindEX:areWeSwimming() and (math.sqrt((_lx - _ix)^2 + (_ly - _iy)^2) <= script_grind.nextToNodeDist) then 
+	if script_grindAreWeSwimming:areWeSwimming() and (math.sqrt((_lx - _ix)^2 + (_ly - _iy)^2) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
@@ -71,12 +71,12 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- if we are not moving, and not swimming, try to generate a new path
-	if (not IsMoving()) and ((_lx - _ix)^2 < 1) and not script_grindEX:areWeSwimming() then
+	if (not IsMoving()) and ((_lx - _ix)^2 < 1) and not script_grindAreWeSwimming:areWeSwimming() then
 		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
 
 	-- time based distance to node check if we are not swimming
-	if (GetTimeEX() > self.waitTimer) and not script_grindEX:areWeSwimming() then
+	if (GetTimeEX() > self.waitTimer) and not script_grindAreWeSwimming:areWeSwimming() then
 
 		-- if we are moving and a new path can be made, uphill or downhill, then generate a new path
 		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3) then	
@@ -84,7 +84,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		end
 
 	-- if we are swimming then
-	elseif (GetTimeEX() > self.waitTimer) and script_grindEX:areWeSwimming() then
+	elseif (GetTimeEX() > self.waitTimer) and script_grindAreWeSwimming:areWeSwimming() then
 	
 		-- udpate players position
 		_, _, _iz = GetLocalPlayer():GetPosition();

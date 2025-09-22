@@ -4,6 +4,9 @@ script_grindCheckSpentTalentPoints = {}
 -- call during setup of combat scripts
 function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
+	-- tried to do this in tables and by simply adding + 2 (or 3) to each spell range but the bot didn't like it
+	-- old fashioned if else then all the way
+
 	local player = GetLocalPlayer();
 	local level = player:GetLevel();
 	local class = GetMyClass();
@@ -31,14 +34,15 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 				-- hawk eye talent in marksmanship tree
 				if nameTalent == "Hawk Eye" then
 					if currRank == 1 then
-
-						-- each rank provides 2 yards... at rank 3 that's 6 yards
-						script_hunter.spellRange = script_hunter.spellRange + (currRank * 2);
+						script_hunter.spellRange = 37;
+					elseif currRank == 2 then
+						script_hunter.spellRange = 39;
+					elseif currRank == 3 then
+						script_hunter.spellRange = 41;
 					end
 				end
 			end
 			
-
 -- mage
 			-- set mage combat script attack range
 			if level >= 20 and class == "MAGE" then
@@ -57,16 +61,26 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 					if currRank == 1 then
 
-						script_mage.spellRange = script_mage.spellRange + (currRank * 2);
+						script_mage.spellRange = 33;
+					elseif currRank == 2 then
+						script_mage.spellRange = 35;
+
 					end
 				end
 			end
 		
 -- rogue
 			-- set rogue sinister strike energy cost
-	
-			
-
+			if level >= 10 and class == "ROGUE" then
+				if nameTalent == "Improved Sinister Strike" then
+					if currRank == 1 then
+						script_rogue.cpGeneratorCost = 43;
+					elseif currRank == 2 then
+						script_rogue.cpGeneratorCost = 40;
+					end
+				end
+			end
+		
 -- druid
 			-- set druid maul/claw/rake
 			if level >= 10 and class == "DRUID" then
@@ -93,6 +107,14 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 				end
 			end
+
+-- shaman
+
+-- paladin
+
+-- warlock
+
+-- warrior
 			
 		end
 	end

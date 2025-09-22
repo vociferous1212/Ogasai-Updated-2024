@@ -75,7 +75,11 @@ script_grind = {
 	grindFindLootTargetIncluded = include("scripts\\grindFunctions\\script_grindFindLootTarget.lua"),
 	grindAttackTargetAttackingMeIncluded = include("scripts\\grindFunctions\\script_grindAttackTargetAttackingMe.lua"),
 	grindIsAnyTargetTargetingPetIncluded = include("scripts\\grindFunctions\\script_grindIsAnyTargetTargetingPet.lua"),
-
+	grindAddTargetToAggroBlacklistLoaded = include("scripts\\grindFunctions\\script_grindAddTargetToAggroBlacklist.lua"),
+	grindAreWeSwimmingLoaded = include("scripts\\grindFunctions\\script_grindAreWeSwimming.lua"),
+	grindReturnTargetNearMyAggroRangeLoaded = include("scripts\\grindFunctions\\script_grindReturnTargetNearMyAggroRange.lua"),
+	grindIsTargetAggroBlacklistedLoaded = include("scripts\\grindFunctions\\script_grindIsTargetAggroBlacklisted.lua"),
+	grindBlacklistAreaWithEliteLoaded = include("scripts\\grindFunctions\\script_grindBlacklistAreaWithElite.lua"),
 
 
 	
@@ -477,9 +481,9 @@ function script_grind:run()
 		self.lootCheckTimer = 10000;
 		script_grind.lootCheck['timer'] = 0;
 	end
-	if IsEating() or IsDrinking() then
+	if IsEating() or IsDrinking() or IsChanneling() or IsCasting() and not IsInCombat()then
 		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
-		if PlayerHasTarget() then ClearTarget(); script_grind.enemyObj = nil; end
+		if PlayerHasTarget() and script_grind.enemyObj ~= nil then if GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID() then ClearTarget(); script_grind.enemyObj = nil; end end
 	end
 
 -- Check: Spend talent points
@@ -838,12 +842,12 @@ function script_grind:run()
 		
 	then
 
-		if (not IsStealth()) and (script_gather.safeGather) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) and not IsInCombat() then
+		if (not IsStealth()) and (script_gather.safeGather) and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil) and not IsInCombat() then
 			if (not IsStealth()) and (self.enemyObj == nil or self.enemyObj == 0 and not IsInCombat()) then
-				self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+				self.enemyObj = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
 			end
 			
-		elseif not IsInCombat() and self.lootObj == nil and (script_grindEX:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) or (IsStealth())  or (not script_gather.safeGather) then
+		elseif not IsInCombat() and self.lootObj == nil and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) or (IsStealth())  or (not script_gather.safeGather) then
 			
 			if (script_gatherRun:gather()) then
 
@@ -1076,13 +1080,13 @@ function script_grind:run()
 
 -- Dont pull mobs before we reached our hotspot unless we are in aggro range
 		--if (not IsInCombat()) then
-		--	if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() == nil) then
+		--	if (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() == nil) then
 		--		self.enemyObj = nil;
 		--		if (PlayerHasTarget()) and (script_grind.enemyObj == nil or script_grind.enemyObj == 0) then
 		--			ClearTarget();
 		--		end	
-		--	elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindEX:returnTargetNearMyAggroRange() ~= nil) then
-		--		self.enemyObj = script_grindEX:returnTargetNearMyAggroRange();
+		--	elseif (not IsInCombat()) and (not IsStealth()) and (GetLocalPlayer():GetLevel() > 5) and (not self.hotspotReached or script_vendor.status > 0 or script_getSpells.getSpellsStatus > 0) and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil) then
+		--		self.enemyObj = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
 		--	end
 		--end
 
@@ -1163,7 +1167,7 @@ function script_grind:run()
 						
 				end
 
-				if script_grind.lootObj ~= nil 
+				if (script_grind.lootObj ~= nil or not script_grind:isAnyTargetTargetingMe())
 				and not IsEating()
 				and not IsDrinking()
 				and not IsCasting()
@@ -1173,7 +1177,7 @@ function script_grind:run()
 
 					if script_grindDoLoot:doLoot(GetLocalPlayer()) then
 
-						if IsEating() or IsDrinking() then
+						if IsEating() or IsDrinking() or IsChanneling() or IsCasting() then
 							script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 						end
 						return true;
@@ -1247,11 +1251,16 @@ function script_grind:run()
 		and not script_grind:isAnyTargetTargetingMe()
 		and not script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet()
 		and self.hotspotReached and script_vendor.status == 0
+		and GetMyClass() ~= "ROGUE"
 			
 		then
 	
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
+
+				if self.enemyObj:GetDistance() > self.combatScriptRange then
+					self.combatError = 3;
+				end
 				
 				if not IsAutoCasting("Attack") then
 					self.enemyObj:AutoAttack();
@@ -1262,10 +1271,10 @@ function script_grind:run()
 		end
 	
 		-- we are in combat so get a target sooner based on if anything is attacking us
-		if not IsLooting
+		if not IsLooting()
 		and not IsCasting()
 		and not IsChanneling()
-		and (IsInCombat())
+		and IsInCombat()
 		and GetTimeEX() > self.newTargetTime
 		and not script_grind:isAnyTargetTargetingMe()
 		and not script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet()
@@ -1283,6 +1292,7 @@ function script_grind:run()
 					and (self.enemyObj == nil or self.enemyObj == 0)
 				)
 			)	
+			or self.enemyObj ~= nil and IsInCombat() and not script_grind:isTargetingMe(self.enemyObj)
 				
 		then
 				self.enemyObj = script_grindAssignTarget:assignTarget();
@@ -1550,13 +1560,10 @@ function script_grind:run()
 	if (self.combatError == 0) then
 
 		-- we stopped moving so reset navigate
-		script_nav:resetNavigate();
+		--script_nav:resetNavigate();
 
 		-- return 0 stops movement
-		if IsMoving() then
-			StopMoving();
-		return;
-		end
+		self.waitTimer = GetTimeEX() + 250;
 	end
 
 -- return 2 Invalid target: combat script return 2
@@ -1609,7 +1616,7 @@ function script_grind:run()
 		script_grindFindLootTarget:findLootTarget();
 
 -- if we have a valid target position coordinates
-		if (_x ~= 0 and x ~= 0) then
+		if (_x ~= 0 and x ~= 0) and self.enemyObj:GetDistance() > 2.5 then
 
 			-- move to target
 			script_navEXCombat:moveToTarget(localObj, _x, _y, _z);

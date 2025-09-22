@@ -157,7 +157,7 @@ function script_combatHelper:checkRunBackwards()
 		and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Frostbite") or GetLocalPlayer():GetUnitsTarget():HasDebuff("Frost Nova"))
 		and (not GetLocalPlayer():HasBuff('Evocation'))
 		and (not script_checkDebuffs:hasDisabledMovement())
-		and (not script_grindEX:areWeSwimming())
+		and (not script_grindAreWeSwimming:areWeSwimming())
 		and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight())
 
 		then
@@ -188,7 +188,7 @@ function script_combatHelper:checkRunBackwards()
 		if (GetLocalPlayer():GetUnitsTarget():GetHealthPercentage() > 10 or GetLocalPlayer():GetHealthPercentage() < 35)
 		and (GetLocalPlayer():GetUnitsTarget():HasDebuff("Entangling Roots"))
 		and (not script_checkDebuffs:hasDisabledMovement())
-		and (not script_grindEX:areWeSwimming())
+		and (not script_grindAreWeSwimming:areWeSwimming())
 		and (GetLocalPlayer():GetUnitsTarget():IsInLineOfSight())
 		
 		then

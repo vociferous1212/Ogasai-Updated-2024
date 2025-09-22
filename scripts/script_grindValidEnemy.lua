@@ -25,7 +25,7 @@ function script_grindValidEnemy:enemyIsValid(i)
 
         -- blacklist targets around elite
         if (script_grind.skipElites) then
-          script_grindEX:blacklistAreaWithElite();
+          script_grindBlacklistAreaWithElite:blacklistAreaWithElite();
         end
 
         -- Add above maxLevel to blacklist

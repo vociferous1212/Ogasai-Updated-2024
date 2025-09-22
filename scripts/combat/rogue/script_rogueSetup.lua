@@ -13,19 +13,23 @@ function script_rogueSetup:setup()
 		script_rogue.useThrow = false;
 	end
 
-	--set backstab as opener
+	-- set backstab as opener
 	if (localObj:GetLevel() < 10) and (HasSpell("Backstab")) then
 		script_rogue.stealthOpener = "Backstab";
 	end
+	-- set garrote as opener
 	if (not HasSpell("Ambush")) and (HasSpell("Garrote")) and (localObj:GetLevel() >= 10) then
 		script_rogue.stealthOpener = "Garrote";
 	end
+	-- set ambush as opener
 	if (HasSpell("Ambush")) and (not HasSpell("Riposte") or HasSpell("Ghostly Strike")) then
 		script_rogue.stealthOpener = "Ambush";
 	end
+	-- use garrote if we do not have cheapshot and have riposte, instead of ambush
 	if (HasSpell("Riposte")) and (not HasSpell("Cheap Shot")) then
 		script_rogue.stealthOpener = "Garrote";
 	end
+	-- set cheapshot as opener
 	if (HasSpell("Cheap Shot")) and (not HasSpell("Ghostly Strike")) then
 		script_rogue.stealthOpener = "Cheap Shot";
 	end
@@ -47,11 +51,6 @@ function script_rogueSetup:setup()
 	-- DOES NOT RECOGNIZE TALENT POINTS
 	-- Set the energy cost for the CP builder ability (does not recognize talent e.g. imp. sinister strike)
 	_, _, _, _, script_rogue.cpGeneratorCost = GetSpellInfo(script_rogue.cpGenerator);
-
-	-- set sinister strike cost to 40 if we have riposte in talent tree.... fall back for getspellinfo
-	if (HasSpell("Riposte")) then
-		script_rogue.cpGeneratorCost = 40;
-	end
 
 	if (localObj:GetLevel() < 6) then
 		script_rogue.eatHealth = 55;

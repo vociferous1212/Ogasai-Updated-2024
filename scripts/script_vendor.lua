@@ -186,8 +186,14 @@ function script_vendor:repair()
 
 	local localObj = GetLocalPlayer();
 	local x, y, z = localObj:GetPosition();
-	local factionID = 1; -- horde
+
+	-- faction 1 is horde
+	local factionID = 1;
+
+	-- get our current faction
 	local factionNr = GetFaction();
+
+	-- our faction is human, gnome, night elf or dwawrf
 	if (factionNr == 1 or factionNr == 3 or factionNr == 4 or factionNr == 115) then
 		factionID = 0; -- alliance
 	end
@@ -221,8 +227,11 @@ function script_vendor:repair()
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
-			vX, vY, vZ = GetTarget():GetPosition();
+		-- chase down moving targets. get their name and position if close enough to target
+		if GetTarget() ~= 0 and GetTarget() ~= nil then
+			if GetTarget() == vendor['name'] and not GetTarget():CanAttack() then
+				vX, vY, vZ = GetTarget():GetPosition();
+			end
 		end
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then

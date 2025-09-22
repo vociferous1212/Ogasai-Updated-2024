@@ -9,6 +9,10 @@ function script_warlockEX2:summonPet()
 
 	script_warlock.message = "Summoning Pet";
 
+	if script_warlock.waitTimer > GetTimeEX() then
+		return false;
+	end
+
 	if (not script_grind.adjustTickRate) then
 		script_grind.tickRate = 1500;
 		script_rotation.tickRate = 1500;

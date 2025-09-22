@@ -29,7 +29,7 @@ local vendorStatus = script_vendor.status;
 		if (GetLocalPlayer():GetLevel() <= 40)
 		and (IsMoving())
 		and (HasSpell("Bear Form"))
-		and (not script_grindEX:areWeSwimming())
+		and (not script_grindAreWeSwimming:areWeSwimming())
 		and not IsMounted()
 
 		then

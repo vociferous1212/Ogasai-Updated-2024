@@ -730,20 +730,11 @@ function script_hunter:run(targetGUID)
 			end
 	
 			-- Check: If pet is stunned, feared etc use Bestial Wrath
-			if (self.hasPet) and (HasPet()) then
-				if HasSpell('Bestial Wrath') 
-				and localMana >= 10
-				and (pet:IsStunned()
-					or pet:IsConfused() 
-					or pet:IsFleeing()
-					or petHP <= 75
-					or localMana >= 80)
-					
-				then 
+			if (self.hasPet) and (HasPet()) and HasSpell("Bestial Wrath") and not IsSpellOnCD("Bestial Wrath") and localMana >= 6 then
+				if (targetHealth >= 30 and targetHealth <= 95) or petHP <= 50 or pet:IsStunned() or pet:IsConfused() or pet:IsFleeing() then 
 
-					if (script_hunter:cast('Beastial Wrath', targetObj)) then 
-						return true; 
-					end
+					CastSpellByName("Bestial Wrath");
+				return true; 
 				end
 			end
 

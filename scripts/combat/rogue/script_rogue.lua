@@ -49,7 +49,7 @@ script_rogue = {
 	pickpocketMoney = 0,	-- pickpocket money obtained
 	ppMoney = GetMoney(),	-- compare pickpocket money to GetMyMoney()
 	ppVarUsed = false,	-- pickpocket variable to check if we have completed an action
-	useThrow = true,	-- use throwing weapons
+	useThrow = false,	-- use throwing weapons
 	stealthWasEnabled = false,	-- was stealth enabled to reset GetMoney() if we click to enable stealth while botting
 	riposteTimer = 0,	-- some servers are causing riposte to spam on beasts and such...
 }
@@ -123,6 +123,9 @@ function script_rogue:run(targetGUID)
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
 
+	if IsInCombat() and not IsMoving() and targetObj:GetDistance() <= self.meleeDistance + 2 then targetObj:FaceTarget(); end
+
+
 	if (IsLooting()) and GetTimeEX() > self.waitTimer then
 		if (not LootTarget()) then
 			LootTarget();
@@ -142,7 +145,8 @@ function script_rogue:run(targetGUID)
 	--end
 	
 	-- Do nothing if we are channeling or casting or wait timer
-	if (IsChanneling() or IsCasting() or (self.waitTimer > GetTimeEX())) then
+	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX())
+		or ( not HasSpell("Will of the Forsaken") and (localObj:IsFleeing() or localObj:IsConfused() or localObj:IsStunned()) ) then
 		return 4;
 	end
 
@@ -424,11 +428,9 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Check if we are in melee range
-				if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsLooting()) then
+				if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) and (PlayerHasTarget()) and (not IsLooting()) then
 					return 3;
 				end
-
-				if IsInCombat() and not IsMoving() and targetObj:GetDistance() <= self.meleeDistance then targetObj:FaceTarget(); end
 
 				if (HasSpell('Kidney Shot')) and (localCP >= 1) and (targetObj:IsCasting()) and (not IsSpellOnCD('Kidney Shot')) and (localEnergy >= 25) and not IsDisarmed() and IsSpellOnCD("Kick") and (IsSpellOnCD("Gouge") or localEnergy < 45) then
 					if (Cast('Kidney Shot', targetObj)) then
@@ -454,8 +456,8 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() < .6) then 
-					if (script_rogue:runBackwards(targetObj, 1.5)) then 
+				if (targetObj:GetDistance() < .4) then 
+					if (script_rogue:runBackwards(targetObj, 2)) then 
 						script_grind.tickRate = 80;
 						return 4; 
 					end 
@@ -612,7 +614,10 @@ function script_rogue:run(targetGUID)
 				-- Use CP generator attack 
 				if (targetHealth > (10*localCP)) and (localCP < 5) then
 					if (localEnergy >= self.cpGeneratorCost) and (HasSpell(self.cpGenerator)) then
+						if not IsMoving() then targetObj:FaceTarget(); end
 						if (script_rogue:spellAttack(self.cpGenerator, targetObj)) then
+							if not IsMoving() then 
+							targetObj:FaceTarget(); end
 							self.waitTimer = GetTimeEX() + 500;
 							return 0;
 						end
@@ -721,16 +726,23 @@ function script_rogue:runBackwards(targetObj, range)
  		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
-		local moveX, moveY, moveZ = xT + xUV*5, yT + yUV*5, zT + zUV;		
+		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
  		if (distance < range) then 		
 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ);
-		--	self.waitTimer = GetTimeEX() + 500;
- 			--if (Move(moveX, moveY, moveZ)) then
-				--script_grind:setWaitTimer(750);
-				--self.waitTimer = GetTimeEX() + 750;
- 				--return true;
-			--end
+			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
+
+				-- move fall-back
+				if not IsMoving() then
+					Move(moveX, moveY, moveZ)
+					script_nav:resetNavigate();
+				end
+				
+			if script_checkAdds:checkAdds() then
+				return 4;
+			end
+
+			self.waitTimer = GetTimeEX() + 500;
+
 		return 4;
 		end
 	end

@@ -3,6 +3,9 @@ script_magePullSpells = {}
 function script_magePullSpells:frostMagePull(targetObj)
 
 	local targetObj = script_grind.enemyObj;
+	if targetObj == nil or targetObj == 0 then
+		targetObj = _quest.enemyTarget;
+	end
 
 	-- recheck line of sight on target
 	if (not IsMounted()) and ( (not targetObj:IsInLineOfSight()) or  (targetObj:GetDistance() > script_mage.spellRange and not IsCasting() and not IsChanneling()) or (targetObj:GetDistance() > script_mage.spellRange) ) and (PlayerHasTarget()) and (not IsSpellOnCD("Frostbolt")) then
@@ -32,6 +35,10 @@ end
 function script_magePullSpells:fireMagePull(targetObj)
 
 	local targetObj = script_grind.enemyObj;
+
+	if targetObj == nil or targetObj == 0 then
+		targetObj = _quest.enemyTarget;
+	end
 
 	-- recheck line of sight on target
 	if (not IsMounted()) and (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > script_mage.spellRange) and (PlayerHasTarget()) then

@@ -121,7 +121,7 @@ function script_rogueRest:rest()
 			return true;
 		end
 	end
-	
+
 	-- Continue eating until we are full
 	if(localHealth < 98 and IsEating()) then
 		script_rogue.message = "Resting up to full health...";
@@ -129,10 +129,9 @@ function script_rogueRest:rest()
 		return true;
 	end
 		
-	if (not IsDrinking()) and (not IsEating()) then
-		if (not IsStanding()) then
-			JumpOrAscendStart();
-		end
+	if (not IsStanding()) and (not IsEating()
+								or (IsEating() and localHealth >= 95) ) then
+		JumpOrAscendStart();
 	end
 
 	local vendorStatus = script_vendor:getStatus();

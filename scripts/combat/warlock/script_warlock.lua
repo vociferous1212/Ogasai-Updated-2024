@@ -29,7 +29,7 @@ script_warlock = {
 	enableCurseOfAgony = true,
 	enableImmolate = true,
 	enableCorruption = true,
-	drainLifeHealth = 55,
+	drainLifeHealth = 75,
 	healPetHealth = 40,
 	sacrificeVoid = true,
 	sacrificeVoidHealth = 20,
@@ -195,7 +195,7 @@ function script_warlock:run(targetGUID)
 	if (self.enableGatherShards) then
 		self.alwaysFear = false;
 	end
-	if (script_grindEX:areWeSwimming()) then
+	if (script_grindAreWeSwimming:areWeSwimming()) then
 		self.useUnendingBreath = true;
 	end
 	
@@ -344,7 +344,6 @@ function script_warlock:run(targetGUID)
 
 	if (HasPet()) and (IsInCombat()) and (not targetObj:IsInLineOfSight() or not GetPet():IsInLineOfSight()) then
 		PetFollow();
-		return 3;
 	end
 
 
@@ -460,13 +459,13 @@ function script_warlock:run(targetGUID)
 		end
 
 		-- use shadowbolt on more than 1 target for increased survivability
-		if (IsInCombat()) and (script_grind:enemiesAttackingUs(10) > 1) and (self.useWand) and (not self.useShadowBolt) and (localMana >= 15) then
+		if (IsInCombat()) and (script_grind:enemiesAttackingUs() >= 2) and (self.useWand) and (not self.useShadowBolt) and (localMana >= 15) then
 			self.useWand = false;
 			self.useShadowBolt = true;
 			self.varUsed = true;
 		end
 		-- turn wand use back on when done
-		if (self.varUsed and not IsInCombat() or script_grind:enemiesAttackingUs() < 2) or (localMana < 15 and self.varUsed) then
+		if (self.varUsed and (not IsInCombat() or script_grind:enemiesAttackingUs() < 2)) or (localMana < 15 and self.varUsed) then
 			self.useWand = true;
 			self.useShadowBolt = true;
 			self.varUsed = false;
@@ -1242,6 +1241,10 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 		self.message = "Resting to full hp/mana...";
 		self.waitTimer = GetTimeEX() + 2000;
 		return true;
+	end
+
+	if not IsStanding() and (not IsEating() or (IsEating() and localHealth >= 95)) and (not IsDrinking() or (IsDrinking() and localMana >= 95)) then
+		JumpOrAscendStart()
 	end
 
 	-- force bot to stop when using consume shadows

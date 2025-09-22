@@ -7,38 +7,11 @@ script_grindEX = {
 	allowSwim = true,
 	useThisVar = true,	-- used to ensure death counter counts only once per mob kill
 	waitTimer = 0,
-	blacklistAggroTargets = {},
-	blacklistAggroNum = 0,
 	tryTavelFormTimer = 0,
 	swimTimer = 0,
 	deleteItemTimer = GetTimeEX(),
 }
 
--- if there is an elite then blacklist all targets around it
-function script_grindEX:blacklistAreaWithElite()
-
-	local eliteTarget = nil;
-	local eliteX, eliteY, eliteZ = 0, 0, 0;
-	local tarX, tarY, tarZ = 0, 0, 0;
-	local i, t = GetFirstObject();
-
-	while i ~= 0 do
-		if t == 3 then
-			tarX, tarY, tarZ = i:GetPosition();
-			if script_grind:isTargetHardBlacklisted(i:GetGUID()) and (i:GetClassification() == 1 or i:GetClassification() == 2) then
-				eliteTarget = i;
-				eliteX, eliteY, eliteZ = eliteTarget:GetPosition();
-			end
-			if GetDistance3D(tarX, tarY, tarZ, eliteX, eliteY, eliteZ) <= 40 then
-				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
-					script_grind:addTargetToHardBlacklist(i:GetGUID());
-				end
-			end
-		end
-	i, t = GetNextObject(i);
-	end
-	return false;
-end
 
 -- if there is any valid enemy being returned within our set parameters, i.e. skip humanoid or target level 45 - 47 or is elite
 function script_grindEX:isThereAnyValidEnemyNearby()
@@ -140,66 +113,6 @@ return true;
 end
 
 
--- attempt to blacklist nuetral targets and only attack unfriendly targets - currently placeholding for gather checks
-function script_grindEX:addTargetToAggroBlacklist(targetGUID)
-	if (targetGUID ~= nil and targetGUID ~= 0 and targetGUID ~= '') then	
-		self.blacklistAggroTargets[self.blacklistAggroNum] = targetGUID;
-		self.blacklistAggroNum = self.blacklistAggroNum + 1;
-	end
-end
-
--- attempt to blacklist nuetral targets and only attack unfriendly targets - currently placeholding for gather checks
-function script_grindEX:isTargetAggroBlacklisted(targetGUID) 
-	for i=0,self.blacklistAggroNum do
-		if (targetGUID == self.blacklistAggroTargets[i]) then
-			return true;
-		end
-	end
-	return false;
-end
-
--- attempt to blacklist nuetral targets and only attack unfriendly targets - currently placeholding for gather checks
-function script_grindEX:returnTargetNearMyAggroRange()
-	local i, t = GetFirstObject();
-	local mx, my, mz = GetLocalPlayer():GetPosition();
-	local tx, ty, tz = 0, 0, 0;
-	while i ~= 0 do
-		if t == 3 then
-			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight() and not script_grindEX:isTargetAggroBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
-				tx, ty, tz = i:GetPosition();
-				local range = GetDistance3D(mx, my, mz, tx, ty, tz);
-				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
-				if range <= aggro and (not PlayerHasTarget()) then
-					name = i:GetUnitName();
-					TargetByName(name);
-					if (UnitIsEnemy("target","player")) then
-						i:AutoAttack();
-						return i;
-					end
-				elseif (not script_grind.hotspotReached or _quest.usingQuester) and (not IsInCombat()) then	
-					script_grindEX:addTargetToAggroBlacklist(i:GetGUID());
-					if (PlayerHasTarget()) then
-						ClearTarget();
-					end
-				return nil;
-				end
-			end
-		end
-	i, t = GetNextObject(i);
-	end
-return nil;
-end
-
--- fall back check to see if we are swimming or not. it works better this way, similar to cone of cold spell requiring its own function to run
-function script_grindEX:areWeSwimming()
-	if (GetLocalPlayer():GetHealthPercentage() >= 1) and (not GetLocalPlayer():IsDead()) then
-		if (IsSwimming()) then
-			return true;
-		end
-	end
-return false;
-end
-
 
 
 -- main run of this script. doChecks() returns until completed
@@ -232,7 +145,7 @@ function script_grindEX:doChecks()
 	end
 	if script_grind.skipLooting and script_grind.useVendor then
 		script_grind.useVendor = false;
-		DEFAULT_CHAT_FRAME:AddMessage("Cannot skip looting and use vendoring together");
+		DEFAULT_CHAT_FRAME:AddMessage("Cannot skip looting and use vendoring together - disabling vendoring");
 	end
 		
 	-- load hotspot stuff
@@ -406,7 +319,7 @@ function script_grindEX:doChecks()
 
 -- Move out of water before resting/mounting
 	if (not IsInCombat()) and (not localObj:HasBuff('Feign Death')) then
-		if (script_grindEX:areWeSwimming()) and (not script_grindEX.allowSwim) then 
+		if (script_grindAreWeSwimming:areWeSwimming()) and (not script_grindEX.allowSwim) then 
 			script_grind.message = "Moving out of the water..."; 
 			if (script_grind.autoPath) then
 				script_grind.message = script_nav:moveToSavedLocation(localObj, script_grind.minLevel, script_grind.maxLevel, script_grind.staticHotSpot);
@@ -528,7 +441,7 @@ function handleSwimming()
     end
 
     -- Check if swimming and not casting/channeling
-    if script_grindEX:areWeSwimming() and not IsCasting() and not IsChanneling() then
+    if script_grindAreWeSwimming:areWeSwimming() and not IsCasting() and not IsChanneling() then
         -- Surface every 10 seconds to avoid drowning
         if GetTimeEX() > script_grindEX.swimTimer then
             JumpOrAscendStart() -- Swim upward

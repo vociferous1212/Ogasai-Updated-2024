@@ -165,7 +165,7 @@ if (GetPet() == 0 or GetPet() == nil) and (not IsCasting()) and (not IsChannelin
 		PetDismiss();
 	end
 
-	if (script_grindEX:areWeSwimming()) then
+	if (script_grindAreWeSwimming:areWeSwimming()) then
 		if (not localObj:HasBuff("Unending Breath")) and (myMana >= 20) then
 			CastSpellByName("Unending Breath", localObj);
 		end

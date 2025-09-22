@@ -12,6 +12,9 @@ function script_grindDoLoot:doLoot(localObj)
 		self.timerWhileLooting = GetTimeEX();
 	end
 
+	if script_grind.lootObj == nil then
+		return false; end
+
 -- get loot position
 	local _x, _y, _z = script_grind.lootObj:GetPosition();
 
@@ -101,7 +104,7 @@ function script_grindDoLoot:doLoot(localObj)
 
 		script_grind.message = "Looting...";
 
-		if IsEating() or IsDrinking() then
+		if IsEating() or IsDrinking() or IsChanneling() or IsCasting() then
 
 			script_grind.lootCheckTime = 10000;
 
