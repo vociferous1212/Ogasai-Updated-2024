@@ -48,16 +48,16 @@ function coremenu:draw()
 		LoadScript("Rogue", "scripts\\combat\\rogue\\script_rogue.lua");
 		AddScriptToCombat("Rogue", "script_rogue");
 
-		LoadScript("Hunter", "scripts\\combat\\script_hunter.lua");
+		LoadScript("Hunter", "scripts\\combat\\hunter\\script_hunter.lua");
 		AddScriptToCombat("Hunter", "script_hunter");
 
-		LoadScript("Paladin", "scripts\\combat\\script_paladin.lua");
+		LoadScript("Paladin", "scripts\\combat\\paladin\\script_paladin.lua");
 		AddScriptToCombat("Paladin", "script_paladin");
 
-		LoadScript("Priest", "scripts\\combat\\script_priest.lua");
+		LoadScript("Priest", "scripts\\combat\\priest\\script_priest.lua");
 		AddScriptToCombat("Priest", "script_priest");
 
-		LoadScript("Warrior", "scripts\\combat\\script_warrior.lua");
+		LoadScript("Warrior", "scripts\\combat\\warrior\\script_warrior.lua");
 		AddScriptToCombat("Warrior", "script_warrior");
 		--[[
 			----------------------------
