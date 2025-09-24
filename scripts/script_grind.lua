@@ -1,4 +1,5 @@
 script_grind = {
+
 	grinderSetupIncluded = include("scripts\\script_grindSetup.lua"),
 	aggroLoaded = include("scripts\\script_aggro.lua"),
 	grindPartyOptionsLoaded = include("scripts\\script_grindParty.lua"),
@@ -12,15 +13,22 @@ script_grind = {
 	omLoaded = include("scripts\\script_om.lua"),
 	navFunctionsLoaded 	= include("scripts\\nav\\script_nav.lua"),
 	runnerLoaded 	= include("scripts\\script_runner.lua"),
+
+	-- nav folder
 	includeNavEX 		= include("scripts\\nav\\script_navEX.lua"),
 	includeNavEXCombat 	= include("scripts\\nav\\script_navEXCombat.lua"),
 	hotspotMoveLoaded 	= include("scripts\\nav\\script_moveToHotspot.lua"),
+	--hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"), -- auto set specific valid targets for each hotspot
+
+	-- professions folder
 	enchantingLoaded 	= include("scripts\\professions\\script_enchanting.lua"),
 	tailoringLoaded 	= include("scripts\\professions\\script_tailoring.lua"),
 	firstAidLoaded 		= include("scripts\\professions\\script_firstAid.lua"),
-	--hotspotInfoLoaded 	= include("scripts\\db\\hotspotDB_setInfo_1_10.lua"), -- auto set specific valid targets for each hotspot
+
+	-- get trainer spells folder
 	fpDBLoaded 		= include("scripts\\db\\fpDB.lua"),
 	goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
+
 	prioritizeTotemsLoaded	= include("scripts\\script_killTotems.lua"),
 	combatHelperLoaded	= include("scripts\\script_combatHelper.lua"),
 
@@ -43,14 +51,16 @@ script_grind = {
 	deleteItemsLoaded = include("scripts\\script_deleteItems.lua"),
 	buffOtherPlayersLoaded = include("scripts\\script_buffOtherPlayers.lua");
 
-	mageMenu = include("scripts\\combat\\mage\\script_mageEX.lua"),
+	-- combat script menus
+	   mageMenu = include("scripts\\combat\\mage\\script_mageEX.lua"),
 	warlockMenu = include("scripts\\combat\\warlock\\script_warlockEX.lua"),
-	priestMenu = include("scripts\\combat\\script_priestMenu.lua"),
-	warriorMenu = include("scripts\\combat\\script_warriorEX.lua"),
-	rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
-	paladinMenu = include("scripts\\combat\\script_paladinEX.lua"),
-	shamanMenu = include("scripts\\combat\\shaman\\script_shamanEX.lua"),
-	druidMenu = include("scripts\\combat\\druid\\script_druidEX.lua"),
+	 priestMenu = include("scripts\\combat\\priest\\script_priestMenu.lua"),
+	warriorMenu = include("scripts\\combat\\warrior\\script_warriorEX.lua"),
+	  rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
+	paladinMenu = include("scripts\\combat\\paladin\\script_paladinMenu.lua"),
+	 shamanMenu = include("scripts\\combat\\shaman\\script_shamanEX.lua"),
+	  druidMenu = include("scripts\\combat\\druid\\script_druidEX.lua"),
+	 hunterMenu = include("scripts\\combat\\hunter\\script_hunterMenu.lua"),
 
 	paranoiaMenuLoaded = include("scripts\\menu\\script_paranoiaMenu.lua"),
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
@@ -86,7 +96,7 @@ script_grind = {
 	-- pathing
 	pathName = 0,
 	pathLoaded = 0,
-	nextToNodeDist = 3.5, -- (Set to about half your nav smoothness)
+	nextToNodeDist = 3, -- (Set to about half your nav smoothness)
 	Name = "", -- set to e.g. "paths\1-5 Durator.xml" for auto load at startup
 	pathLoaded = "",	-- path that is loaded
 	autoPath = true,	-- use nav 
@@ -671,6 +681,52 @@ function script_grind:run()
 		return true;
 	end
 
+		-- send the combat script messages to the grinder
+	if (not IsMoving()) then
+	
+		local messageTable = {
+			["ROGUE"] = true,
+			["PALADIN"] = true,
+			["WARRIOR"] = true,
+			["DRUID"] = true,
+			["SHAMAN"] = true,
+			["HUNTER"] = true,
+			["MAGE"] = true,
+			["PRIEST"] = true,
+			["WARLOCK"] = true
+								}
+
+		local combatScriptMessage = GetMyClass()
+	
+		if messageTable[combatScriptMessage] then
+	
+			if combatScriptMessage == "ROGUE" then
+				self.message = script_rogue.message
+			elseif combatScriptMessage == "PALADIN" then
+				self.message = script_paladin.message
+			elseif combatScriptMessage == "WARRIOR" then
+				self.message = script_warrior.message
+			elseif combatScriptMessage == "DRUID" then
+				self.message = script_druid.message
+			elseif combatScriptMessage == "SHAMAN" then
+				self.message = script_shaman.message
+			elseif combatScriptMessage == "HUNTER" then
+				self.message = script_hunter.message
+			elseif combatScriptMessage == "MAGE" then
+				self.message = script_mage.message
+			elseif combatScriptMessage == "PRIEST" then
+				self.message = script_priest.message
+			elseif combatScriptMessage == "WARLOCK" then
+				self.message = script_warlock.message
+			end
+
+		else
+	
+			self.message = combatScriptMessage.." waiting for combat conditions."
+
+		end
+	end
+
 -- Clear dead/blacklisted/tapped targets
 	if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
 		-- Save location for auto pathing
@@ -851,6 +907,8 @@ function script_grind:run()
 			
 			if (script_gatherRun:gather()) then
 
+					self.lootObj = nil;
+
 					if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() then
 						if PlayerHasTarget() then
 							ClearTarget();
@@ -866,9 +924,12 @@ function script_grind:run()
 					self.jumpCheck = true;
 					self.jump = false;
 				end
+
 				-- bot was blacklisting targets after gathering
 				self.newTargetTime = GetTimeEX();
-				if (script_gather.dist ~= 0 and script_gather.dist ~= nil and script_gather.dist > 20) and (not script_druid.useBear) then
+
+				if (script_gather.dist ~= 0 and script_gather.dist ~= nil and script_gather.dist > 20) and (not script_druid.useBear)
+				and (HasSpell("Prowl") or HasSpell("Stealth")) then
 					CastStealth();
 				end
 
@@ -1062,8 +1123,10 @@ function script_grind:run()
 -- try to run out of combat
 	-- need to change this to account for mana users that can heal.. check to make sure we have low low mana
 	if IsInCombat() and not script_checkDebuffs:hasDisabledMovement() then
- 		if script_grindRunOutOfCombat:runOutOfCombat() then
-			return;
+		if  script_nav.numSavedLocation ~= nil and script_nav.numSavedLocation ~= 0 and script_nav.numSavedLocation >= 3 then
+ 			if script_grindRunOutOfCombat:runOutOfCombat() then
+				return;
+			end
 		end
 	end
 
@@ -1326,51 +1389,7 @@ function script_grind:run()
 		end	
 	end
 
-		-- send the combat script messages to the grinder
-	if (not IsMoving()) then
 	
-		local messageTable = {
-			["ROGUE"] = true,
-			["PALADIN"] = true,
-			["WARRIOR"] = true,
-			["DRUID"] = true,
-			["SHAMAN"] = true,
-			["HUNTER"] = true,
-			["MAGE"] = true,
-			["PRIEST"] = true,
-			["WARLOCK"] = true
-								}
-
-		local combatScriptMessage = GetMyClass()
-	
-		if messageTable[combatScriptMessage] then
-	
-			if combatScriptMessage == "ROGUE" then
-				self.message = script_rogue.message
-			elseif combatScriptMessage == "PALADIN" then
-				self.message = script_paladin.message
-			elseif combatScriptMessage == "WARRIOR" then
-				self.message = script_warrior.message
-			elseif combatScriptMessage == "DRUID" then
-				self.message = script_druid.message
-			elseif combatScriptMessage == "SHAMAN" then
-				self.message = script_shaman.message
-			elseif combatScriptMessage == "HUNTER" then
-				self.message = script_hunter.message
-			elseif combatScriptMessage == "MAGE" then
-				self.message = script_mage.message
-			elseif combatScriptMessage == "PRIEST" then
-				self.message = script_priest.message
-			elseif combatScriptMessage == "WARLOCK" then
-				self.message = script_warlock.message
-			end
-
-		else
-	
-			self.message = combatScriptMessage.." waiting for combat conditions."
-
-		end
-	end
 
 -- RUN COMBAT SCRIPT ON TARGET
 	--	 run the combat script
@@ -1515,6 +1534,9 @@ function script_grind:run()
 	and script_vendor.status == 0
 	and not script_grind:shouldWeRest()
 	and not IsInCombat()
+	and not IsCasting()
+	and not IsChanneling()
+	and not script_grind:shouldWeRest()
 				
 	then
 			script_moveToHotspot:moveToHotspot(localObj);
@@ -1560,7 +1582,7 @@ function script_grind:run()
 	if (self.combatError == 0) then
 
 		-- we stopped moving so reset navigate
-		--script_nav:resetNavigate();
+		script_nav:resetNavigate();
 
 		-- return 0 stops movement
 		self.waitTimer = GetTimeEX() + 250;
@@ -1586,7 +1608,14 @@ function script_grind:run()
 	and not script_checkDebuffs:hasDisabledMovement()
 	and self.enemyObj ~= 0
 	and self.enemyObj ~= nil
-	and not self.enemyObj:IsDead()	
+	and not self.enemyObj:IsDead()
+		-- we only want to move to a target if we are done looting or we are being attacked
+	and (self.lootObj == nil
+		or AreBagsFull()
+		or self.bagsFull
+		or self.skipLooting
+		or script_grind:isAnyTargetTargetingMe()
+		or script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet())
 				
 	then
 
@@ -1605,21 +1634,15 @@ function script_grind:run()
 			script_grind.tickRate = 150;
 		end
 	
-		-- if we are already close to the target and they are stuck behind a wall then return false
-		if (not self.enemyObj:IsInLineOfSight() and self.enemyObj:GetDistance() <= 3) then
-			if (script_mage:runBackwards(targetObj, 8)) then
-				return true;
-			end
-		end
-
 -- find a loot target
 		script_grindFindLootTarget:findLootTarget();
 
 -- if we have a valid target position coordinates
-		if (_x ~= 0 and x ~= 0) and self.enemyObj:GetDistance() > 2.5 then
+		if (_x ~= 0 and mX ~= 0) and (self.enemyObj:GetDistance() > script_grind.combatScriptRange or not self.enemyObj:IsInLineOfSight()) then
 
 			-- move to target
 			script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
+
 			self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
 					
 			if (IsMoving()) or (IsInCombat()) then
@@ -1651,6 +1674,7 @@ function script_grind:run()
 			end
 		end
 	--return true;
+	return false;
 	end
 
 -- return 4 Do nothing, return : combat script return 4
@@ -1925,9 +1949,18 @@ function script_grind:run()
 
 				local var = script_nav.currentGoToLocation + 1;
 				self.message = "Moving to auto path node: "..var;
+
 				if script_nav:moveToSavedLocation(localObj, self.minLevel, self.maxLevel, self.staticHotSpot) then
 					return true;
 				end
+
+				if not IsMoving() then
+
+					Move(script_nav.savedLocations[script_nav.currentGoToLocation]['x'], script_nav.savedLocations[script_nav.currentGoToLocation]['y'], script_nav.savedLocations[script_nav.currentGoToLocation]['z'])
+					script_nav:resetNavPos();
+					script_nav:resetNavigate();
+				end
+
 			return;
 			end
 
@@ -1958,10 +1991,6 @@ function script_grind:runRest()
 		local localHealth = localObj:GetHealthPercentage();
 		local localMana = localObj:GetManaPercentage();
 
-		local myMoney = GetMoney();
-		if (myMoney ~= self.currentMoney) then
-			self.moneyObtainedCount = myMoney - self.currentMoney;
-		end
 
 		self.needRest = true;
 

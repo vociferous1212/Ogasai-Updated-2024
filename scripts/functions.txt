@@ -15,6 +15,11 @@ self.waitTimer = GetTimeEX() + x will stop the combat script and cause a stutter
 --targetObj:HasDebuff("Faerie Fire (Feral)")
 --CastSpellByName("Faerie Fire (Feral)()")
 
+name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange 
+-- isfunnel = cost
+= GetSpellInfo("spell id or name")
+https://vanilla-wow-archive.fandom.com/wiki/API_GetSpellInfo
+
 -- checking bags for items
 for i=0,5 do
 for y=0,GetContainerNumSlots(i) do 
@@ -85,6 +90,7 @@ IsStealth()	[bool]
 PlayerHasTarget()	[bool]
 PetHasTarget()	[bool]
 
+-- send message to chat window
 SendChatMessage(" ");
 
 Wow APIs:
@@ -92,13 +98,32 @@ https://wowwiki-archive.fandom.com/wiki/World_of_Warcraft_API?oldid=293138
 http://darkenedlinux.com/ogasai/showthread.php?tid=196
 oGasai APIs:
 [WoWUnits]
+
+-- face a position in degrees
 FacePosition( ??? check unstuck script) -- presumably works like FaceAngle()
+
+-- get targets facing angle
+WoWUnits:GetAngle() [number]
+
+-- face the targets position
 WoWUnits:FaceTarget([bool] skipCheck = false)
+
+-- get distance to target
 WoWUnits:GetDistance() [number] distance
+
+-- unit has a debuff
 WoWUnits:HasDebuff([string] spellName) [bool]
+
+-- unit has a buff
 WoWUnits:HasBuff([string] spellName) [bool]
+
+-- target specific enemy
 WoWUnits:TargetEnemy() [bool]
+
+-- is unit targeting player
 WoWUnits:IsTargetingMe() [bool]
+
+-- number of debuff stacks on target
 WoWUnits:GetDebuffStacks([string] spellName) [number] debuffStacks
 WoWUnits:GetBuffStacks([string] spellName) [number] buffStacks
 WoWUnits:IsSpellInRange([string] spellName) [bool]
@@ -122,14 +147,21 @@ WoWUnits:IsMovementDisabed() [bool]
 WoWUnits:IsFleeing() [bool]
 WoWUnits:IsConfused() [bool]
 WoWUnits:IsStunned() [bool]
+
+-- get type of creature - humanoids / beast / dragonkin etc
 WoWUnits:GetCreatureType() [string]
+
+-- creature type index number instead of string
 WoWUnits:GetCreatureTypeIndex() [number]
+
 WoWUnits:IsInLineOfSight() [bool]
 WoWUnits:IsTapped() [bool]
 WoWUnits:IsTappedByMe() [bool]
 WoWUnits:IsSkinnable() [bool]
 WoWUnits:IsCritter() [bool]
 WoWUnits:GetUnitsTarget() [WoWUnits*] pObject
+
+-- interact and/or target a unit
 WoWUnits:UnitInteract() [bool]
 WoWUnits:CastSpell([string] spellName) [bool])
 WoWUnits:GetFieldFlags() [number]

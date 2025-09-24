@@ -153,6 +153,9 @@ function script_grindEX:doChecks()
 		-- set specific targets to kill by name or by creature type
 	--hotspotDB_setInfo_1_10_checkMobs();
 
+	if script_vendor.status > 0 and script_grind.enemyObj ~= nil and not IsInCombat() then
+		script_gring.enemyObj = nil
+	end
 	
 	-- ensure we wait with the grind script
 	if (script_grind.waitTimer > GetTimeEX() or IsCasting() or IsChanneling()) then

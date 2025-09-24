@@ -35,73 +35,6 @@ function script_grindAssignTarget:assignTarget()
 	-- get next target
 	i, targetType = GetNextObject(i);
 	end
-
-	-- Instantly return the last target if we attacked it and it's still alive and we are in combat
-	if ((script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and not script_grind.enemyObj:IsDead())
-
-		or (_quest.enemyTarget ~= 0 and _quest.enemyTarget ~= nil and not _quest.enemyTarget:IsDead()))
-
-		and IsInCombat() and not script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID())
-
-	then
-
-		-- if we have a good grinder target
-		if script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0 then
-
-			-- check if enemyObj is targeting me
-			if script_grind:isTargetingMe2(script_grind.enemyObj)
-
-				-- is targeting pet
-				or script_grind:isTargetingPet(script_grind.enemyObj)
-
-				-- already tapped by me
-				or script_grind.enemyObj:IsTappedByMe()
-
-			then
-	
-		-- return the enemy target
-		return script_grind.enemyObj;
-
-			end
-		end
-		
-		-- if we have a good quester target
-		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
-
-			-- check if enemyObj is targeting me
-			if script_grind:isTargetingMe2(_quest.enemyTarget)
-
-				-- is targeting pet
-				or script_grind:isTargetingPet(_quest.enemyTarget)
-
-				-- already tapped by me
-				or _quest.enemyTarget:IsTappedByMe()
-
-			then
-
-		-- return the enemy target
-		return _quest.enemyTarget;
-
-			end
-		end
-	end
-
-	-- run object manager to find anything targeting me
-	while i ~= 0 do
-
-		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack()
-			and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i))
-			and (not script_grind:isTargetHardBlacklisted(i:GetGUID()) or i:GetHealthPercentage() <= 92) then
-
-		return i;
-
-		end
-
-	-- get next target
-	i, targetType = GetNextObject(i);
-	
-	end
-
 	-- get lowest level target and kill it
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
 		local bestTarget = nil;
@@ -263,6 +196,73 @@ function script_grindAssignTarget:assignTarget()
 
 	-- get next target
 	i, targetType = GetNextObject(i);
+	end
+
+	
+	-- Instantly return the last target if we attacked it and it's still alive and we are in combat
+	if ((script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and not script_grind.enemyObj:IsDead())
+
+		or (_quest.enemyTarget ~= 0 and _quest.enemyTarget ~= nil and not _quest.enemyTarget:IsDead()))
+
+		and IsInCombat() and not script_grind:isTargetHardBlacklisted(script_grind.enemyObj:GetGUID())
+
+	then
+
+		-- if we have a good grinder target
+		if script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0 then
+
+			-- check if enemyObj is targeting me
+			if script_grind:isTargetingMe2(script_grind.enemyObj)
+
+				-- is targeting pet
+				or script_grind:isTargetingPet(script_grind.enemyObj)
+
+				-- already tapped by me
+				or script_grind.enemyObj:IsTappedByMe()
+
+			then
+	
+		-- return the enemy target
+		return script_grind.enemyObj;
+
+			end
+		end
+		
+		-- if we have a good quester target
+		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
+
+			-- check if enemyObj is targeting me
+			if script_grind:isTargetingMe2(_quest.enemyTarget)
+
+				-- is targeting pet
+				or script_grind:isTargetingPet(_quest.enemyTarget)
+
+				-- already tapped by me
+				or _quest.enemyTarget:IsTappedByMe()
+
+			then
+
+		-- return the enemy target
+		return _quest.enemyTarget;
+
+			end
+		end
+	end
+
+	-- run object manager to find anything targeting me
+	while i ~= 0 do
+
+		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack()
+			and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i))
+			and (not script_grind:isTargetHardBlacklisted(i:GetGUID()) or i:GetHealthPercentage() <= 92) then
+
+		return i;
+
+		end
+
+	-- get next target
+	i, targetType = GetNextObject(i);
+	
 	end
 	
 	-- Check: If we are in combat but no valid target, kill the "unvalid" target attacking us

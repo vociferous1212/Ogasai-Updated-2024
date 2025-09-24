@@ -11,6 +11,7 @@ function script_grindRunOutOfCombat:runOutOfCombat()
 		script_grind.combatError = 4;
 	end
 
+	-- check if in combat if we should run away
 	if IsInCombat()
 	and (
 		-- we have low health and a warrior or rogue
@@ -26,6 +27,7 @@ function script_grindRunOutOfCombat:runOutOfCombat()
 	or (script_grind:enemiesAttackingUs() >= 3 and GetLocalPlayer():GetHealthPercentage() <= 55)
 
 	-- run away from targets too high level
+	-- only if there's more than 1 target attacking us
 	or 	(
 		(script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0)
 		and (script_grind.skipHardPull and script_grind.enemyObj:GetLevel() > script_grind.maxLevel and script_grind:enemiesAttackingUs() > 1)

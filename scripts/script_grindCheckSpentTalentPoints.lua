@@ -87,12 +87,31 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 				if nameTalent == "Ferocity" then
 
-					script_druid.maulRage = script_druid.maulRage - currRank;
-
-					script_druid.clawEnergy = script_druid.clawEnergy - currRank;
-
-					script_druid.rakeEnergy = script_druid.rakeEnergy - currRank;
-
+					if currRank == 1 then
+						script_druid.maulRage = 14;
+						script_druid.clawEnergy = 44;
+						script_druid.rakeEnergy = 39;
+					elseif currRank == 2 then
+						script_druid.maulRage = 13;
+						script_druid.clawEnergy = 43;
+						script_druid.rakeEnergy = 38;
+					elseif currRank == 3 then
+						script_druid.maulRage = 12;
+						script_druid.clawEnergy = 42;
+						script_druid.rakeEnergy = 37;
+					elseif currRank == 4 then
+						script_druid.maulRage = 11;
+						script_druid.clawEnergy = 41;
+						script_druid.rakeEnergy = 36;
+					elseif currRank == 5 then
+						script_druid.maulRage = 10;
+						script_druid.clawEnergy = 40;
+						script_druid.rakeEnergy = 35;
+						if IsIdolOfFerocityEquipped() then
+							script_druid.clawEnergy = 37;
+							script_druid.rakeEnergy = 32;
+						end
+					end
 				end
 			end
 

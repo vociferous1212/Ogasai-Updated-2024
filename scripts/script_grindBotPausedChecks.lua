@@ -9,6 +9,13 @@ function script_grindBotPausedChecks:botPausedChecks()
 		getObjectsAroundMe:GetObjectsAroundMe();
 	end
 
+	
+-- count yer money
+	local myMoney = GetMoney();
+	if (myMoney ~= script_grind.currentMoney) then
+		script_grind.moneyObtainedCount = myMoney - script_grind.currentMoney;
+	end
+
 -- temporary 2nd warlock script
 	if (script_warlock2.usingThisScript) then
 			EndWindow();
@@ -92,7 +99,7 @@ function script_grindBotPausedChecks:botPausedChecks()
 	else
 		--script_nav:setNextToNodeDist(script_grind.nextToNodeDist); NavmeshSmooth(script_grind.nextToNodeDist*1.6);
 		script_grind.nextToNodeDist = script_grind.nextToNodeDist;
-		NavmeshSmooth(2);
+		NavmeshSmooth(3);
 	end
 	
 -- run setup function if not ran yet

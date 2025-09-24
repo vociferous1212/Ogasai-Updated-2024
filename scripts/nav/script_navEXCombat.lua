@@ -28,10 +28,10 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 
 	-- If the target moves more than combat script range by yards then make a new path
 		-- the intent of this script is to preserve movement elsewhere while limiting the calls to the nav which can crash the game
-		-- using a separate script with a separate timer was easier on the nav table than an long if then else statement.
-	if GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > script_grind.combatScriptRange
+		-- using a separate script with a separate timer was easier on the nav table than a long if then else statement.
+	if GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 3
 	or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 20
-	
+	or IsNodeBlacklisted(_ix, _iy, _iz, script_grind.nextToNodeDist)
 	then
 
 		script_nav.navPosition['x'] = _x;
@@ -76,7 +76,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- time based distance to node check if we are not swimming
-	if (GetTimeEX() > self.waitTimer) and not script_grindAreWeSwimming:areWeSwimming() then
+	if not script_grindAreWeSwimming:areWeSwimming() and (GetTimeEX() > self.waitTimer or IsNodeBlacklisted(_ix, _iy, _iz, script_grind.nextToNodeDist)) then
 
 		-- if we are moving and a new path can be made, uphill or downhill, then generate a new path
 		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3) then	
@@ -97,11 +97,13 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	if (self.waitTimer > GetTimeEX()) then
-		return;
+		return false;
 	end
 	
 	-- move to next path node
 	Move(_ix, _iy, _iz);
+	script_grind:setWaitTimer(100);
 
-return false;
+
+--return false;
 end

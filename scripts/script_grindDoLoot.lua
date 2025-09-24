@@ -128,24 +128,6 @@ function script_grindDoLoot:doLoot(localObj)
 
 			end
 		end
-	
-	-- stop moving
-		if (IsMoving() and not localObj:IsMovementDisabed()) then
-
-			StopMoving();
-
-			return;
-		end
-
-	-- stand if we are sitting
-		if (not IsStanding()) then
-
-			StopMoving();
-
-			script_grind.waitTimer = GetTimeEX() + 350;
-
-			return;
-		end
 
 	-- Dismount
 		if (IsMounted()) then
@@ -157,7 +139,8 @@ function script_grindDoLoot:doLoot(localObj)
 	-- loot attempt #1
 		if (IsLooting()) then
 			if self.timerWhileLooting < GetTimeEX() then 
-				LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000; script_grind:setWaitTimer(500);
+				LootTarget(); self.timerWhileLooting = GetTimeEX() + 500;
+				--script_grind:setWaitTimer(500);
 			end
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
@@ -167,11 +150,9 @@ function script_grindDoLoot:doLoot(localObj)
 	-- interact with object if we are not looting
 			-- backup line 2 (and not IsLooting())
 		if script_grind.lootObj ~= nil then
-			if (not script_grind.lootObj:UnitInteract()) then	
-				if self.timerWhileLooting < GetTimeEX() then 
-					LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000; script_grind:setWaitTimer(500);
-				end
-				script_grind:setWaitTimer(500);
+			if (script_grind.lootObj:UnitInteract()) then	
+					LootTarget();
+					script_grind:setWaitTimer(500);
 			end
 		end
 			
@@ -179,14 +160,14 @@ function script_grindDoLoot:doLoot(localObj)
 		if (not IsLooting()) then
 			script_grind.waitTimer = GetTimeEX() + 450;
 			_quest.waitTimer = GetTimeEX() + 450;
-			self.timerWhileLooting = GetTimeEX() + 1000;
+			self.timerWhileLooting = GetTimeEX() + 500;
 			LootTarget();
 		else
 	
 -- else we are done looting - load cloest vendors
 			if (script_grind.autoSelectVendors) and (IsLooting()) then
 				if self.timerWhileLooting < GetTimeEX() then 
-					LootTarget(); self.timerWhileLooting = GetTimeEX() + 1000;
+					LootTarget(); self.timerWhileLooting = GetTimeEX() + 500;
 				end
 
 				local bX, bY, bZ = GetLocalPlayer():GetPosition();
@@ -196,7 +177,7 @@ function script_grindDoLoot:doLoot(localObj)
 						script_grind.vendorMessageSent = true;
 						script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ = GetLocalPlayer():GetPosition();
 
-						script_grind:setWaitTimer(2500);
+						script_grind:setWaitTimer(500);
 						_quest.waitTimer = GetTimeEX() + 2500;
 						if (script_grind.vendorMessageSent) then
 							vendorDB:loadDBVendors();
@@ -286,8 +267,9 @@ function script_grindDoLoot:doLoot(localObj)
 			Move(_x, _y, _z);
 			script_nav:resetNavigate();
 			script_nav:resetNavPos();
+			script_grind:setWaitTimer(500);
 		end
-	return true;
+	--return true;
 
 	end
 		script_grind:setWaitTimer(150)
