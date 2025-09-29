@@ -6,9 +6,9 @@ function script_lootMenu:menu()
 		local wasClicked = false;
 
 if (Button("Add Target To Loot Blacklist")) then
-				if (GetLocalPlayer():GetUnitsTarget() ~= 0) then
-					script_grind:addTargetToLootBlacklist(GetLocalPlayer():GetUnitsTarget():GetGUID());
-				DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. GetLocalPlayer():GetUnitsTarget():GetUnitName() .. "");	
+				if (script_grind.lootObj ~= nil) then
+					script_grind:addTargetToLootBlacklist(script_grind.lootObj:GetGUID());
+				DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. script_grind.lootObj:GetUnitName() .. "");	
 				elseif (script_grind.lootObj ~= 0 and script_grind.lootObj ~= nil) then
 					script_grind:addTargetToLootBlacklist(script_grind.lootObj:GetGUID());
 					DEFAULT_CHAT_FRAME:AddMessage("Blacklisting Loot Target " .. script_grind.lootObj:GetUnitName() .. "");

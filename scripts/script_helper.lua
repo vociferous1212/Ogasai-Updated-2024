@@ -126,6 +126,9 @@ function script_helper:setup()
 	script_helper:addFood("Slitherskin Mackerel");
 	script_helper:addFood("Longjaw Mud Snapper");
 
+	-- fishable fish
+	script_helper:addFood("Raw Brilliant Smallfish");
+
 	-- Night elf vendor food
 	script_helper:addFood("Bean Soup");
 	script_helper:addFood("Versicolor Treat");
@@ -402,6 +405,14 @@ function script_helper:useMount()
 return false;
 end
 
+function script_helper:doWeHaveAMount()
+	for i=0,self.numMounts do
+		if (HasItem(self.myMounts[i])) then
+			return true;
+		end
+	end
+return false;
+end
 function script_helper:mountUp()
 
 	if (GetLocalPlayer():GetLevel() >= 40) and (not IsMounted()) and (not IsInCombat()) and (not HasForm()) then

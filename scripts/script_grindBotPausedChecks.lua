@@ -85,7 +85,7 @@ function script_grindBotPausedChecks:botPausedChecks()
 
 -- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
-		script_nav:setNextToNodeDist(11); NavmeshSmooth(script_grind.nextToNodeDist*1.8);
+		script_nav:setNextToNodeDist(5); NavmeshSmooth(script_grind.nextToNodeDist*3);
 	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
 		script_nav:setNextToNodeDist(6.5); NavmeshSmooth(script_grind.nextToNodeDist*1.8);
 	elseif (race == 'Night Elf') and (localObj:IsDead()) then
@@ -106,14 +106,6 @@ function script_grindBotPausedChecks:botPausedChecks()
 	if (not script_grind.isSetup) then
 		script_grind:setup();
 	end
-
--- hotspot reached distance
-	if not IsInCombat() and (script_nav:getDistanceToHotspot() > script_grind.distToHotSpot) and (script_grind.hotspotReached) then
-		script_grind.hotspotReached = false;
-		if PlayerHasTarget() then ClearTarget(); end
-		script_grind.enemyObj = nil;
-		script_grind.message = "Moving back to hotspot";
-	end	
 
 -- clear our target if we are needing to move to vendor. combat script will stick to a target and enemyObj var needs cleared
 	if script_vendor.status ~= 0 and not IsInCombat() and script_grind.enemyObj ~= nil then

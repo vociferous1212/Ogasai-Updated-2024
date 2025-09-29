@@ -119,7 +119,7 @@ end
 function script_grindEX:doChecks() 
 
 	localObj = GetLocalPlayer();
-		
+	
 -- reset blacklist loot table every 7 mintues. it uses GUID... when mobs respawn it won't loot them
 	if GetTimeEX() > script_grind.resetBlacklistLootTableTimer and not IsLooting() and not IsInCombat() then
 		script_grind:resetLootBlacklistTable();
@@ -204,8 +204,6 @@ function script_grindEX:doChecks()
 -- we are dead so retrieve corpse
 	if (localObj:IsDead()) and (not script_paranoia:checkParanoia(40)) then
 
-		script_grind.message = "Waiting to ressurect...";
-
 		-- wait for a moment before anything
 		if localObj:IsDead() and not IsGhost() then
 			script_grind.waitTimer = GetTimeEX() + 2000;
@@ -228,7 +226,6 @@ function script_grindEX:doChecks()
 
 				-- wait a moment for the game to load before moving
 				script_grind.waitTimer = GetTimeEX() + 1500;
-				script_grind.message = "Walking to corpse...";
 			return true;
 			end
 		return true;
@@ -236,6 +233,8 @@ function script_grindEX:doChecks()
 
 		-- make sure we are ghost before moving on to finding corpse
 		if IsGhost() then
+
+						script_grind.message = "Walking to corpse...";
 
 			-- Ressurrect within the ress distance to our corpse
 			local _lx, _ly, _lz = localObj:GetPosition();
@@ -265,6 +264,26 @@ function script_grindEX:doChecks()
 		return true;
 		end
 	end
+
+	
+-- clear targets that left range
+if script_grind.lastTargetTargeted ~= 0 and script_grind.lastTargetTargeted ~= nil and script_grind.lastTarget ~= 0 and script_grind.lastTarget ~= nil and script_grind.hotspotReached then
+	if not script_grind.lastTargetTargeted:IsDead() and script_grind.enemyObj == nil and not script_grindEX:isThereAnyValidEnemyNearby() then
+		if not script_grind:isTargetHardBlacklisted(script_grind.lastTarget) then
+			script_grind:addTargetToHardBlacklist(script_grind.lastTarget);
+			script_grind.lastTarget = nil;
+			DEFAULT_CHAT_FRAME:AddMessage("Grinder target left visual range, blacklisting...");
+		end
+	end
+end
+
+	-- hotspot reached distance
+	if not IsInCombat() and (script_nav:getDistanceToHotspot() > script_grind.distToHotSpot) and (script_grind.hotspotReached) then
+		script_grind.hotspotReached = false;
+		if PlayerHasTarget() then ClearTarget(); end
+		script_grind.enemyObj = nil;
+		script_grind.message = "Moving back to hotspot";
+	end	
 
 -- run back if has vanish
 	if (localObj:HasBuff("Vanish")) then

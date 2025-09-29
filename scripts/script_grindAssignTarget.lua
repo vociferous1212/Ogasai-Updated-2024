@@ -24,7 +24,7 @@ function script_grindAssignTarget:assignTarget()
 			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
 				
 				-- run another object manager
-				if (script_grind:isTargetingGroup(i)) then
+				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i)) then
 
 					-- return target
 					return i;
@@ -35,6 +35,7 @@ function script_grindAssignTarget:assignTarget()
 	-- get next target
 	i, targetType = GetNextObject(i);
 	end
+
 	-- get lowest level target and kill it
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
 		local bestTarget = nil;
@@ -44,7 +45,7 @@ function script_grindAssignTarget:assignTarget()
 
 			if t == 3 then
 
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
 
 					-- get targets level
 					local level = i:GetLevel();
@@ -81,7 +82,7 @@ function script_grindAssignTarget:assignTarget()
 
 			if t == 3 then
 
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
 
 					local hp = i:GetHealthPercentage();
 
@@ -110,7 +111,7 @@ function script_grindAssignTarget:assignTarget()
 
 		while i ~= 0 do
 
-			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i)) then
+			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
 
 				local mana = i:GetManaPercentage();
 
@@ -212,7 +213,7 @@ function script_grindAssignTarget:assignTarget()
 		if script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0 then
 
 			-- check if enemyObj is targeting me
-			if script_grind:isTargetingMe2(script_grind.enemyObj)
+			if script_grind:isTargetingMe2(script_grind.enemyObj) 
 
 				-- is targeting pet
 				or script_grind:isTargetingPet(script_grind.enemyObj)
@@ -253,7 +254,7 @@ function script_grindAssignTarget:assignTarget()
 	while i ~= 0 do
 
 		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack()
-			and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i))
+			and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i))
 			and (not script_grind:isTargetHardBlacklisted(i:GetGUID()) or i:GetHealthPercentage() <= 92) then
 
 		return i;

@@ -51,7 +51,8 @@ function script_checkDebuffs:hasPoison()
         ["Webwood Lurker's Poison"] = true,
         ["Deadly Poison"] = true,
         ["Serpent Sting"] = true, -- DoT; dispel in PvP, avoid in raids (low priority)
-        ["Viper Sting"] = true -- Drains mana; dispel in PvP for mana classes, low raid priority
+        ["Viper Sting"] = true, -- Drains mana; dispel in PvP for mana classes, low raid priority
+        ["Leech Poison"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), poisons, false);
 end
@@ -173,6 +174,7 @@ function script_checkDebuffs:hasSilence()
         ["Sonic Burst"] = true,
         ["Overwhelming Stench"] = true,
         ["Counterspell - Silenced"] = true, -- Silences after Counterspell; dispel in PvP
+        ["Deafening Screech"] = true,
 	["Terrify"] = true,
     };
     return checkUnitEffects(GetLocalPlayer(), silences, false);

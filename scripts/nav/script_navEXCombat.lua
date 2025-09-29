@@ -1,4 +1,5 @@
 script_navEXCombat = {	waitTimer = 0,
+						moveTimer = 0,
 
 }
 
@@ -57,7 +58,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	-- If we are not swimming and are close to the next path node, increase our nav node index
 	if not script_grindAreWeSwimming:areWeSwimming() and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
-		if (GetPathSize(5) <= script_nav.lastnavIndex) then
+		if (GetPathSize(5) <= script_nav.lastnavIndex + 1) then
 			script_nav.lastnavIndex = GetPathSize(5);
 		end
 	end
@@ -71,7 +72,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- if we are not moving, and not swimming, try to generate a new path
-	if (not IsMoving()) and ((_lx - _ix)^2 < 1) and not script_grindAreWeSwimming:areWeSwimming() then
+	if (not IsMoving()) and ((_lx - _ix)^2 < 2) and not script_grindAreWeSwimming:areWeSwimming() then
 		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
 
@@ -96,14 +97,13 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		end
 	end
 
-	if (self.waitTimer > GetTimeEX()) then
-		return false;
+	if (self.waitTimer > GetTimeEX() or self.moveTimer > GetTimeEX()) then
+		return;
 	end
 	
 	-- move to next path node
 	Move(_ix, _iy, _iz);
-	script_grind:setWaitTimer(100);
-
+	self.moveTimer = GetTimeEX() + 100;
 
 --return false;
 end

@@ -11,6 +11,13 @@ function script_grindRunOutOfCombat:runOutOfCombat()
 		script_grind.combatError = 4;
 	end
 
+	if HasSpell("Feign Death") and not IsSpellOnCD("Feign Death") and IsInCombat() and HasPet() and script_hunter.usePet then
+		if GetPet():IsDead() and GetLocalPlayer():GetHealthPercentage() <= 50 then
+			CastSpellByName("Feign Death");
+			script_grind:setWaitTimer(3000);
+		end
+	end
+
 	-- check if in combat if we should run away
 	if IsInCombat()
 	and (

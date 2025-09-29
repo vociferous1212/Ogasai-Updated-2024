@@ -596,7 +596,7 @@ function script_aggro:returnClosestAddsTarget()
 	if not script_grind:isAnyTargetTargetingMe() and not script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet() then
 		while i ~= 0 do
 			if t == 3 then
-				if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 30 and script_grind:isTargetBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
+				if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= 22.5 and script_grind:isTargetBlacklisted(i:GetGUID()) and not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 
 					local distance = i:GetDistance();
 

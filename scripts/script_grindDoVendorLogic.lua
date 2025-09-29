@@ -9,6 +9,8 @@ local vendorStatus = script_vendor.status;
 	if (vendorStatus >= 1 and not IsInCombat()) then
 		script_grind.currentTime2 = GetTimeEX();
 
+		script_grind.tickRate = 50;
+
 		if PlayerHasTarget() and script_grind.enemyObj == nil and not script_grind:isAnyTargetTargetingMe() then ClearTarget(); end
 
 		if not script_grind.skipLooting
@@ -146,38 +148,42 @@ local vendorStatus = script_vendor.status;
 			end
 		end
 
-		-- if we are a hunter then go buy ammo and then sell - setup in hunter script
-		if HasSpell("Auto Shot") and vendorStatus == 2 and (AreBagsFull() or script_grind.areBagsFull or script_hunter.areBagsFull) then
-			vendorStatus = 3;
-		end
-
+		-- if not is mounted... mounting and wait timer causes issues but need the wait timer to stop selling so quick or some servers will D/C you
 		-- vendor repair
 		if (vendorStatus == 1) then
 			script_grind.message = "Repairing at vendor...";
 			script_vendor:repair();
-			script_grind:setWaitTimer(100);
-		return true;
+			if not IsMounted() then
+				script_grind:setWaitTimer(100);
+			end
+			return true;
 
 		-- vendor sell
 		elseif (vendorStatus == 2) then
 			script_grind.message = "Selling to vendor...";
 			script_vendor:sell();
-			script_grind:setWaitTimer(100);
-		return true;
+			if not IsMounted() then
+				script_grind:setWaitTimer(100);
+			end
+			return true;
 
 		-- vendor buy ammo/bullets
 		elseif (vendorStatus == 3) then
 			script_grind.message = "Buying ammo at vendor...";
 			script_vendor:continueBuyAmmo();
-			script_grind:setWaitTimer(100);
-		return true;
+			if not IsMounted() then
+				script_grind:setWaitTimer(100);
+			end
+			return true;
 
 		-- vendor buy drink/food
 		elseif (vendorStatus == 4) then
 			script_grind.message = "Buying food/drink at vendor...";
 			script_vendor:continueBuy();
-			script_grind:setWaitTimer(100);
-		return true;
+			if not IsMounted() then
+				script_grind:setWaitTimer(100);
+			end
+			return true;
 		end
 	end
 return false;

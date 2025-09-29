@@ -215,7 +215,7 @@ function script_vendor:repair()
 	end
 
 	if (script_vendor:getStatus() >= 1) and (not IsInCombat())
-		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
+		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) and script_grind.hasAMount
 	then
 		if (IsMoving()) then
 			StopMoving();
@@ -313,7 +313,7 @@ function script_vendor:sell()
 	end
 
 	if (script_vendor:getStatus() >= 1) and (not IsInCombat())
-		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
+		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) and script_grind.hasAMount
 	then
 		if (IsMoving()) then
 			StopMoving();
@@ -351,7 +351,7 @@ function script_vendor:sell()
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		_questEX2.sellVendorX, _questEX2.sellVendorY, _questEX2.sellVendorZ = vX, vY, vZ;
 		
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
 		
@@ -385,13 +385,8 @@ function script_vendor:sell()
 		if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 			vendorTarget = GetTarget();
 		end
-		if GetTarget() ~= 0 and GetTarget() ~= nil then
-			if GetTarget():GetUnitName() ~= vendor['name'] then
-				ClearTarget();
-			end
-		end
+		
 		if GetTarget() ~= nil and GetTarget() ~= 0 then
-			if (vendorTarget ~= nil) and GetTarget():GetUnitName() == vendor['name'] then
 			
 				self.message = 'Selling...';
 				if (not IsVendorWindowOpen()) then
@@ -411,7 +406,6 @@ function script_vendor:sell()
 					end				
 				end
 			return true;
-			end
 		end
 	end
 	return false;

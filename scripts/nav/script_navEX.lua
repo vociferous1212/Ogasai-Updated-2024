@@ -63,12 +63,6 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	if (not script_unstuck:pathClearAuto(2)) then
 		script_unstuck:unstuck();
 	end
-
-	if (IsMoving()) then
-		if (script_grind.nextToNodeDist < 6) then
-			self.waitTimer = GetTimeEX() + ((script_grind.nextToNodeDist) + (GetDistance3D(mX, mY, mZ ,_lx, _ly, _lz))*1000);
-		end	-- Move to the next destination in the path
-	end
 	
 	Move(_ix, _iy, _iz);
 

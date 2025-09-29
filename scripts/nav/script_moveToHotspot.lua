@@ -34,7 +34,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 
 
 		-- mount/stealth/cat form/ travel form/ ghost wolf
-		if (not IsMounted() and not script_grind.useMount) and
+		if (not IsMounted() and not script_grind.useMount or not script_grind.hasAMount) and
 			(HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
 			if (not script_checkDebuffs:hasPoison()) and (script_rogue.useStealth or script_druid.useStealth) and
 				(not IsSpellOnCD("Stealth")) and (not IsSpellOnCD("Prowl")) then
@@ -58,7 +58,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 		end
 		
 		-- stop moving so we can mount
-		if (not IsInCombat()) and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) then
+		if (not IsInCombat()) and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount and script_grind.hasAMount) then
 			if (IsMoving()) then
 				StopMoving();
 				return;

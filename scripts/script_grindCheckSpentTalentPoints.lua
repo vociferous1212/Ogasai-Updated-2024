@@ -49,7 +49,6 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 				-- frost mage 
 				if nameTalent == "Arctic Reach" then
-
 					if currRank == 1 then
 						script_mage.spellRange = 33;
 					elseif currRank == 2 then 
@@ -58,9 +57,7 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 				-- fire mage
 				elseif nameTalent == "Flame Throwing" then
-
 					if currRank == 1 then
-
 						script_mage.spellRange = 33;
 					elseif currRank == 2 then
 						script_mage.spellRange = 35;
@@ -72,6 +69,7 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 -- rogue
 			-- set rogue sinister strike energy cost
 			if level >= 10 and class == "ROGUE" then
+
 				if nameTalent == "Improved Sinister Strike" then
 					if currRank == 1 then
 						script_rogue.cpGeneratorCost = 43;
@@ -86,7 +84,6 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 			if level >= 10 and class == "DRUID" then
 
 				if nameTalent == "Ferocity" then
-
 					if currRank == 1 then
 						script_druid.maulRage = 14;
 						script_druid.clawEnergy = 44;
@@ -120,21 +117,77 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 			if level >= 20 and class == "PRIEST" then
 			
-				if nameTalen == "Shadow Reach" then
-					
-					script_priest.spellRange = script_priest.spellRange + (currRank * 2);
-
+				if nameTalent == "Shadow Reach" then
+					script_priest.spellRange = script_priest.spellRange;
 				end
 			end
 
 -- shaman
 
+			if level >= 10 and class == "SHAMAN" then
+				if nameTalent == "" then
+					if currRank == 1 then
+					end
+				end
+			end
+
 -- paladin
+
+			if level >= 10 and class == "PALADIN" then
+				if nameTalent == "" then
+					if currRank == 1 then
+					end
+				end
+			end
 
 -- warlock
 
+			if level >= 10 and class == "WARLOCK" then
+				if nameTalent == "Destrucive Reach" then
+					if currRank == 1 then
+					end
+				end
+			end
+
 -- warrior
-			
+
+			if level >= 10 and class == "WARRIOR" then
+
+				if nameTalent == "Improved Heroic Strike" then
+					if currRank == 1 then
+						script_warrior.heroicStrikeRage = 14;
+					elseif currRank == 2 then
+						script_warrior.heroicStrikeRage = 13;
+					elseif currRank == 3 then
+						script_warrior.heroicStrikeRage = 12;
+					end
+				end
+				if nameTalent == "Improved Thunderclap" then
+					if currRank == 1 then
+						script_warrior.thundeclapRage = 19;
+					elseif currRank == 2 then
+						script_warrior.thundeclapRage = 18;
+					elseif currRank == 3 then
+						script_warrior.thundeclapRage = 17;
+					end
+				end
+				if nameTalent == "Improved Execute" then
+					if currRank == 1 then
+						script_warrior.executeRage = 13;
+					elseif currRank == 2 then
+						script_warrior.executeRage = 11;
+					end
+				end
+				if nameTalent == "Improved Sunder Armor" then
+					if currRank == 1 then
+						script_warrior.sunderArmorRage = 14;
+					elseif currRank == 2 then
+						script_warrior.sunderArmorRage = 13;
+					elseif currRank == 3 then
+						script_warrior.sunderArmorRage = 12;
+					end
+				end
+			end
 		end
 	end
 end

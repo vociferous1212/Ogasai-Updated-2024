@@ -90,9 +90,16 @@ function script_grindValidEnemy:enemyIsValid(i)
         end
 
         -- Valid Targets: Tapped by us, or is attacking us or our pet
-        if (script_grind:isTargetingMe(i)
+            -- not if target is hard blacklsited - unless target has less than 92 health unless it is targeting me and 5 yards or less
+        if (not script_grind:isTargetHardBlacklisted(i:GetGUID()) or (script_grind:isTargetHardBlacklisted(i:GetGUID()) and i:GetHealthPercentage() <= 92) or (script_grind:isTargetingMe(i) and i:GetDistance() <= 5))
+            and (
+            -- and the target is targeting me or is targeting my pet
+                (script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i))
+            -- or is targeting pet and is tapped
             or (script_grind:isTargetingPet(i) and (i:IsTappedByMe() or not i:IsTapped()))
+            -- or we are in a group and target is tapped
             or (script_grindParty.forceTarget and script_grind:isTargetingGroup(i) and (i:IsTappedByMe() or not i:IsTapped()))
+            -- is tapped and not is dead
             or (i:IsTappedByMe() and not i:IsDead())
             -- Avoided target is attacking us
             or ((script_grind:isTargetBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)))
@@ -100,8 +107,8 @@ function script_grindValidEnemy:enemyIsValid(i)
             or ((script_grind:isTargetHardBlacklisted(i:GetGUID())) and (script_grind:isTargetingMe(i)) and (i:IsInLineOfSight()) and i:GetHealthPercentage() <= 92) 
             -- Blacklisted target is polymorphed or feared
             or ((script_grind:isTargetBlacklisted(i:GetGUID())) and (i:HasDebuff("Polymorph") or i:HasDebuff("Fear")) and (script_grind:enemiesAttackingUs() < 2))
-            -- Attacking pet
-            or ((script_grind:isTargetingPet(i)) and (i:IsInLineOfSight()))) then
+            )
+        then
             if isTargetInRange() then
                 return true;
             end

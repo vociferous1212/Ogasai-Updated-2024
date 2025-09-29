@@ -1,6 +1,7 @@
 script_grindDoLoot = {
 
-		timerWhileLooting = 0 -- set a time while looting a target to give the game/bot time to update looting
+		timerWhileLooting = 0, -- set a time while looting a target to give the game/bot time to update looting
+		movingToLootTimer = 0,
 }
 
 
@@ -14,6 +15,12 @@ function script_grindDoLoot:doLoot(localObj)
 
 	if script_grind.lootObj == nil then
 		return false; end
+
+	-- return if we are skinning or casting
+	if IsCasting() or IsChanneling() then return true; end
+
+	-- reset targeting while we loot
+	if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() then script_grind.enemyObj = nil; end
 
 -- get loot position
 	local _x, _y, _z = script_grind.lootObj:GetPosition();
@@ -48,7 +55,7 @@ function script_grindDoLoot:doLoot(localObj)
 -- Loot checking/reset target
 	if (script_grind.lootCheck['timer'] ~= 0 and script_grind.lootCheck['timer'] ~= nil) and script_grind.lootObj ~= nil then
 
-		-- if timer has ran out
+		-- if timer has ran out / we had the loot target for too long
 		if (GetTimeEX() > script_grind.lootCheck['timer']) then
 
 			-- if out target is the right target to check
@@ -83,15 +90,7 @@ function script_grindDoLoot:doLoot(localObj)
 
 			end
 
-			-- set loot target to check in table
-			if (script_grind.lootObj ~= nil) then 
-
-				script_grind.lootCheck['target'] = script_grind.lootObj:GetGUID();
-			else
-
-				-- reset loot target table
-				script_grind.lootCheck['target'] = 0;
-			end	
+			
 		end
 	end
 
@@ -138,10 +137,8 @@ function script_grindDoLoot:doLoot(localObj)
 
 	-- loot attempt #1
 		if (IsLooting()) then
-			if self.timerWhileLooting < GetTimeEX() then 
-				LootTarget(); self.timerWhileLooting = GetTimeEX() + 500;
-				--script_grind:setWaitTimer(500);
-			end
+				if self.timerWhileLooting < GetTimeEX() then
+				LootTarget(); self.timerWhileLooting = GetTimeEX() + 500; end
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
 			end
@@ -150,9 +147,13 @@ function script_grindDoLoot:doLoot(localObj)
 	-- interact with object if we are not looting
 			-- backup line 2 (and not IsLooting())
 		if script_grind.lootObj ~= nil then
-			if (script_grind.lootObj:UnitInteract()) then	
-					LootTarget();
-					script_grind:setWaitTimer(500);
+			if (not script_grind.lootObj:UnitInteract()) and not IsLooting() then	
+					if not LootTarget() then
+						script_grind:setWaitTimer(500);
+					end
+			elseif script_grind.lootObj:UnitInteract() or IsLooting() and self.timerWhileLooting < GetTimeEX() then 
+				LootTarget();
+				self.timerWhileLooting = GetTimeEX() + 500;
 			end
 		end
 			
@@ -173,7 +174,7 @@ function script_grindDoLoot:doLoot(localObj)
 				local bX, bY, bZ = GetLocalPlayer():GetPosition();
 				if (GetDistance3D(script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ, bX, bY, bZ) > 500) then
 					if (not script_grind.vendorMessageSent) then
-						DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
+						--DEFAULT_CHAT_FRAME:AddMessage("Closest vendors loaded from vendorDB. - " ..GetTimeStamp());
 						script_grind.vendorMessageSent = true;
 						script_grind.myLastX, script_grind.myLastY, script_grind.myLastZ = GetLocalPlayer():GetPosition();
 
@@ -196,11 +197,14 @@ function script_grindDoLoot:doLoot(localObj)
 		--	script_grind.lootCheckTime = 0;
 		--	end
 		
-		script_grind.lootObj = nil;
 			
 	
 -- If we reached the loot object, reset the nav path
-		script_nav:resetNavigate();
+		if script_grind.lootObj ~= nil then
+			if script_grind.lootObj:GetDistance() <= script_grind.lootDistance then
+				script_nav:resetNavigate();
+			end
+		end
 
 	return true;
 	end
@@ -247,13 +251,23 @@ function script_grindDoLoot:doLoot(localObj)
 	and not (script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()))
 	and not IsEating()
 	and not IsDrinking()
-	and script_grind.lootObj:GetDistance() > script_grind.lootDistance
 	then
-
-		script_navEXCombat:moveToTarget(localObj, _x, _y, _z)
-		script_grind.message = "Moving To Target Loot - " ..math.floor(script_grind.lootObj:GetDistance()).. " (yd) "..script_grind.lootObj:GetUnitName().. "";
-	
 		
+		script_grind.message = "Moving To Target Loot - " ..math.floor(script_grind.lootObj:GetDistance()).. " (yd) "..script_grind.lootObj:GetUnitName().. "";
+		
+		-- move to loot object
+		if GetTimeEX() > self.movingToLootTimer then
+			if script_navEXCombat:moveToTarget(GetLocalPlayer(), _x, _y, _z) then
+				self.movingToLootTimer = GetTimeEX() + 150;
+				-- clear our target to loot
+				if not script_grind:isAnyTargetTargetingMe() and not script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet() then
+					script_grind.enemyObj = nil;
+				end
+				return true;
+			end
+			if not IsMoving() then Move(_x, _y, _z); self.moveTimer = GetTimeEX() + 150; end
+		end
+
 		if (GetTimeEX() >= script_grind.blacklistLootTimeCheck) then
 
 				DEFAULT_CHAT_FRAME:AddMessage("asdf Blacklisting loot - " ..script_grind.lootObj:GetUnitName().. " " ..math.floor(script_grind.lootObj:GetDistance()).. " (yd)");
@@ -263,16 +277,8 @@ function script_grindDoLoot:doLoot(localObj)
 			
 		end
 
-		if not IsMoving() then
-			Move(_x, _y, _z);
-			script_nav:resetNavigate();
-			script_nav:resetNavPos();
-			script_grind:setWaitTimer(500);
-		end
-	--return true;
+	return true;
 
 	end
-		script_grind:setWaitTimer(150)
-
 return false;
 end

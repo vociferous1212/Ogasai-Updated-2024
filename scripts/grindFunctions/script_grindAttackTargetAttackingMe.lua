@@ -5,7 +5,7 @@ script_grindAttackTargetAttackingMe = {}
 
 function script_grindAttackTargetAttackingMe:attackTargetAttackingMe()
 
-	if (not PlayerHasTarget()) and (script_grind.enemyObj == 0 or script_grind.enemyObj == nil) then
+	if (script_grind.enemyObj == 0 or script_grind.enemyObj == nil) then
 
 		local i, t = GetFirstObject();
 
@@ -13,13 +13,11 @@ function script_grindAttackTargetAttackingMe:attackTargetAttackingMe()
 
 			if t == 3 then
 
-				-- limit the check by distance... anything over 40 yards must move closer...
-				if i:GetDistance() <= 40 then
+				if i:GetDistance() <= 50 then
 					
-					if (script_grind:isTargetingMe(i)) then
+					if (script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
 
 						script_grind.enemyObj = i;
-						return true;
 					end
 				end
 			end

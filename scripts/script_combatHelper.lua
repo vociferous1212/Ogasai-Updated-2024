@@ -8,24 +8,33 @@ script_combatHelper =  { castingTimer = 0,
 function script_combatHelper:run()
 
 
-		if GetLocalPlayer():HasBuff("Evocation") then return; end
+		if GetMyClass() == "MAGE" then
 
-		-- check casting timer of frostbolt to see if we need to stop casting a spell or not.
-		-- we don't want to stop casting when almost done casting
-		script_combatHelper:getFrostboltCastingTime();
+			if GetLocalPlayer():HasBuff("Evocation") then return; end
 
+			-- check casting timer of frostbolt to see if we need to stop casting a spell or not.
+			-- we don't want to stop casting when almost done casting
+			script_combatHelper:getFrostboltCastingTime();
 
-		-- check mage for conditions to stop spell casting frostbolt
-		script_combatHelper:mageStopFrostboltConditions();
+			-- check mage for conditions to stop spell casting frostbolt
+			script_combatHelper:mageStopFrostboltConditions();
 
+			
 
-	-- possible this is causing nav crashes being called from the grinder instead of combat script...
-		-- run backwards during combat under ceratin conditions, entangle root / frost nova
-		--script_combatHelper:checkRunBackwards();
+			-- possible this is causing nav crashes being called from the grinder instead of combat script...
+			-- run backwards during combat under ceratin conditions, entangle root / frost nova
+			--script_combatHelper:checkRunBackwards();
+		end
 
+		if GetMyClass() == "WARRIOR" or GetMyClass() == "DRUID" then
+			-- check warrior for conditions to stop spell casting frostbolt
+			script_combatHelper:checkStopHeroicStrikeConditions();
+		end
 
-		-- check warrior for conditions to stop spell casting frostbolt
-		script_combatHelper:checkStopHeroicStrikeConditions();
+		if GetMyClass() == "HUNTER" then
+			script_combatHelper:checkStopRaptorStrikeConditions()
+
+		end
 
 end
 
@@ -258,4 +267,36 @@ function script_combatHelper:checkStopHeroicStrikeConditions()
 			script_grind.enemyObj:AutoAttack();
 		end
 	end
+end
+
+function script_combatHelper:checkStopRaptorStrikeConditions()
+
+	-- raptor strike spell table
+	local rstable = {
+	[2973] = true,  -- Raptor Strike (Rank 1)
+    [14260] = true, -- Raptor Strike (Rank 2)
+    [14261] = true, -- Raptor Strike (Rank 3)
+    [14262] = true, -- Raptor Strike (Rank 4)
+    [14263] = true, -- Raptor Strike (Rank 5)
+    [14264] = true, -- Raptor Strike (Rank 6)
+    [14265] = true, -- Raptor Strike (Rank 7)
+    [14266] = true, -- Raptor Strike (Rank 8)
+    [27014] = true, -- Raptor Strike (Rank 9)
+    [48995] = true, -- Raptor Strike (Rank 10)
+    [48996] = true  -- Raptor Strike (Rank 11)
+};
+
+-- check casting table and stop spell casting if target moves
+if (HasSpell("Raptor Strike"))
+and (IsInCombat())
+and (PlayerHasTarget())
+and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_grind.combatScriptRange+2)
+and (not script_checkAdds:checkAdds())
+and (not IsMoving())
+then
+    -- stop spell casting
+    if rstable[GetLocalPlayer():GetCasting()] then
+        SpellStopCasting();
+    end
+end
 end

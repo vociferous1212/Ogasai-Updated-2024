@@ -159,6 +159,7 @@ function script_grindSetup:setup()
 	script_grind.unstuckTimer = GetTimeEX();
 	script_grind.lootCheckTime = 10000;
 	script_grind.resetBlacklistLootTableTimer = GetTimeEX();
+	script_grind.useItemsTimer = GetTimeEX();
 
 	-- if we are a melee class we can blacklist loot sooner since we are closer
 	if GetMyClass() == "ROGUE" or GetMyClass() == "WARRIOR" or GetMyClass() == "SHAMAN" or GetMyClass() == "DRUID" or GetMyClass() == "PALADIN" then
@@ -227,6 +228,13 @@ function script_grindSetup:setup()
 		if (not inventoryFull) then
 			script_grind.bagsFull = false;
 		end
+	end
+
+	if not script_helper:doWeHaveAMount() then
+		script_grind.hasAMount = false;
+	end
+	if not script_grind.hasAMount then
+		script_grind.useMount = false;
 	end
 
 end
