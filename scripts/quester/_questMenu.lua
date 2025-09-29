@@ -48,7 +48,7 @@ function _questMenu:menu()
 	if (class == 'MAGE') then
 		script_mageEX:menu();
 	elseif (class == 'HUNTER') then
-		script_hunterEX:menu();
+		script_hunterMenu:menu();
 	elseif (class == 'ROGUE') then
 		script_rogueEX:menu();
 	elseif (class == 'DRUID') then
@@ -65,7 +65,7 @@ function _questMenu:menu()
 	elseif (class == 'WARRIOR') then
 		script_warriorEX:menu();
 	elseif (class == 'PALADIN') then
-		script_paladinEX:menu();
+		script_paladinMenu:menu();
 	elseif (class == 'SHAMAN') then
 		script_shamanEX:menu();
 	end
