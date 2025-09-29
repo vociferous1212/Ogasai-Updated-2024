@@ -103,12 +103,6 @@ function CastStealth()
 				script_grind:setWaitTimer(1500);
 				return true;
 			end
-		elseif HasSpell("Shadowmeld") then
-			if not IsSpellOnCD("Shadowmeld") then
-				CastSpellByName("Shadowmeld", player);
-				script_grind:setWaitTimer(1500);
-				return true;
-			end
 		end
 	end
 return false;
