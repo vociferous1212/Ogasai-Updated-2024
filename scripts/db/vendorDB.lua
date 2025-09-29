@@ -43,11 +43,16 @@ function vendorDB:GetVendor(faction, continentID, mapID, canRepair, needFood, ne
 	local bestIndex = -1;
 	
 	for i=0,self.numVendors - 1 do
-		if (self.vendorList[i]['faction'] == faction and self.vendorList[i]['continentID'] == continentID) then	
+		
+		-- faction 2 is both allowed to use the same nuetral vendor
+		if ((self.vendorList[i]['faction'] == faction or self.vendorList[i]['faction'] == 2) and self.vendorList[i]['continentID'] == continentID) then	
+		
 			if((needFood and self.vendorList[i]['hasFood'] or not needFood) and (needWater and self.vendorList[i]['hasWater'] or not needWater)
 			and (needArrow and self.vendorList[i]['hasArrow'] or not needArrow) and (needBullet and self.vendorList[i]['hasBullet'] or not needBullet)
 			and (canRepair and self.vendorList[i]['canRepair'] or not canRepair)) then
+				
 				local _dist = GetDistance3D(posX, posY, posZ, self.vendorList[i]['pos']['x'], self.vendorList[i]['pos']['y'], self.vendorList[i]['pos']['z']);
+				
 				if(_dist < bestDist) then
 
 					bestDist = _dist;
@@ -173,9 +178,9 @@ function vendorDB:setup()
 	vendorDB:addVendor('Vikki Lonsav', 0, 0, 45, false, false, true, true, true, -1274.51, -2537.41, 21.43); -- General Trade for Ammo & Drinks
 
 	-- Winterspring - Ally + Horde
-	vendorDB:addVendor('Wixxrak', 0, 1, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37);
-	vendorDB:addVendor('Wixxrak', 1, 1, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37);
-	vendorDB:addVendor('Himmik', 0, 1, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71);
-	vendorDB:addVendor('Himmik', 1, 1, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71);
+	vendorDB:addVendor('Wixxrak', 0, 0, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37);
+	vendorDB:addVendor('Wixxrak', 1, 0, 618, true, false, false, false, false, 6733.39, -4699.04, 721.37);
+	vendorDB:addVendor('Himmik', 0, 0, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71);
+	vendorDB:addVendor('Himmik', 1, 0, 618, false, true, true, false, false, 6679.62, -4670.89, 721.71);
 
 end

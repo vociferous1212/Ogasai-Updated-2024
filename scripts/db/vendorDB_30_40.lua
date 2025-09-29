@@ -40,4 +40,11 @@ function vendorDB_30_40:setup()
 	vendorDB:addVendor("Jazzrik", 0, 0, 3, false, false, false, false, false, -6760.19, -3135.56, 241.16);
 	vendorDB:addVendor("Jazzrik", 0, 0, 3, true, false, false, false, false, -6760.19, -3135.56, 241.16);
 
+-- dustwallow marsh horde
+vendorDB:addVendor("Zulrg", 1, 1, 15, true, false, false, false, false, -3146.34, -2873.79, 34.27);
+vendorDB:addVendor("Zulrg", 1, 1, 15, false, false, false, false, false, -3146.34, -2873.79, 34.27);
+vendorDB:addVendor("Zanara", 1, 1, 15, false, false, false, true, false, -3086.61, -2838.95, 34.42);
+vendorDB:addVendor("Ogg'marr", 1, 1, 15, false, true, false, false, false, -3117.45, -2902, 33.99);
+vendorDB:addVendor("Ogg'marr", 1, 1, 15, false, false, true, false, false, -3117.45, -2902, 33.99);
+
 end

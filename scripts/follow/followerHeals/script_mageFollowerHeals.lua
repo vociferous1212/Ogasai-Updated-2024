@@ -35,7 +35,7 @@ function script_mageFollowerHeals:HealsAndBuffs()
 
 				-- Move in line of sight and in range of the party member
 				if (partyMember:GetDistance() > 40) or (not partyMember:IsInLineOfSight()) then
-					script_followMoveToTarget:moveToTarget(localObj, px, py, pz);
+					Move(px, py, pz);
 					return true;
 				end
 

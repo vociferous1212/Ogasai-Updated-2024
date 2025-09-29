@@ -24,5 +24,13 @@ function vendorDB_40_50:setup()
 	vendorDB:addVendor("Truk Wildbeard", 0, 0, 47, false, false, true, false, false, 380.8, -2128.06, 121);
 	vendorDB:addVendor("Harggan", 0, 0, 47, true, false, false, false, false, 333.7, -2091.52, 131.56);
 
+	-- tanaris both
+
+vendorDB:addVendor("Jabbey", 0, 1, 440, false, false, false, false, false, -6886.48, -4842.28, 8.53);
+vendorDB:addVendor("Jabbey", 0, 1, 440, false, false, true, false, false, -6886.48, -4842.28, 8.53);
+vendorDB:addVendor("Jabbey", 0, 1, 440, false, false, false, true, false, -6886.48, -4842.28, 8.53);
+vendorDB:addVendor("Jabbey", 0, 1, 440, false, false, false, false, true, -6886.48, -4842.28, 8.53);
+
+
 	
 end

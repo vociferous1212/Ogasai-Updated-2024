@@ -31,6 +31,10 @@ function hotspotDB_50_60:setup()
 	hotspotDB:addHotspot("Plaguewood West 58 - 60", "All", 58, 60, 2796.4, -3338.75, 96.86);
 	hotspotDB:addHotspot("Frostsaber Rock 58 - 61", "All", 58, 61, 8088, -3899.37, 697.41);
 
+-- western Plaguelands
+hotspotDB:addHotspot("The Bulwark 51 - 53", "All", 51, 53, 1725.94, -1025.78, 70.13);
+
+
 -- Un'Goro Crater
 	
 	hotspotDB:addHotspot("The Marshlands 50 - 52", "All", 50, 52, -7805.23, -2000.97, -269.87);
