@@ -23,7 +23,7 @@ function script_grindEX:isThereAnyValidEnemyNearby()
 
 		while i ~= 0 do
 
-			if t == 3 then
+			if t == 3 or t == 4 then
 
 				if i:GetDistance() <= script_grind.pullDistance and not i:IsDead() and not i:IsCritter() and i:CanAttack() then	
 
@@ -48,7 +48,7 @@ function script_grindEX:howManyEnemiesTargetingMe()
 
 	while i ~= 0 do
 
-		if t == 3 then
+		if t == 3 or t == 4 then
 
 			-- limit the range. anything over 40 yards must move closer so anything over 40 can't attack
 			if i:GetDistance() <= 40 then
@@ -163,7 +163,7 @@ function script_grindEX:doChecks()
 		-- force casters to face the targets... useful for mage/warlock especially when pulling
 		if IsStanding() and IsCasting() and not IsMoving() and PlayerHasTarget() then
 			if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
-				if not IsMoving() and IsCasting() and not script_checkAdds:checkAdds() then
+				if not IsMoving() and IsCasting() and not script_checkAdds:checkAdds() and IsStanding() then
 					GetTarget():FaceTarget();
 				end
 			end
@@ -373,7 +373,7 @@ function script_grindEX:howManyEnemiesInRange(range)
 	local i, t = GetFirstObject();
 	local numberNearby = 0;
 	while i ~= 0 do
-		if t == 3 then
+		if t == 3 or t == 4 then
 			if (i:GetDistance() <= range) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
 				numberNearby = numberNearby + 1;
 			end
@@ -394,7 +394,7 @@ function script_grindEX:howManyEnemiesInRangeOfTarget(target)
 	local distToOtherTarget = 0;
 
 	while i ~= 0 do
-		if t == 3 then
+		if t == 3 or t == 4 then
 			if (i:GetDistance() <= 40) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
 
 				-- get other targets pos
@@ -415,7 +415,7 @@ function script_grindEX:howManyEnemiesInRangeOfTarget(target)
 	end
 
 	while i ~= 0 do
-		if t == 3 then
+		if t == 3 or t == 4 then
 			if (i:GetGUID() ~= targetToCheck:GetGUID()) and (distToOtherTarget <= 30) and (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) then
 				if (targetToCheck ~= 0) then
 					local cx, cy, cz = targetToCheck:GetPosition();
@@ -442,7 +442,7 @@ function script_grindEX:getTargetWithinAggroRange()
 	aggro = 0;
 
 	while i ~= 0 do
-		if t == 3 then
+		if t == 3 or t == 4 then
 			local aggro = (i:GetLevel() - GetLocalPlayer():GetLevel() + 22);
 			if i:GetDistance() <= aggro then
 				return i;

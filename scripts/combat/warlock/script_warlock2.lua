@@ -76,7 +76,7 @@ function script_warlock2:fearAdd(myTarget)
 	local i, t = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	while i ~= 0 do 
-		if t == 3 then
+		if t == 3 or t == 4 then
 			if i:CanAttack() and not i:IsCritter() and not i:IsDead() and i:GetCreatureType() ~= "Undead" and not i:GetCreatureType() ~= 'Elemental' then
 				if i:GetGUID() ~= myTarget and script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i) and not i:HasDebuff("Fear") then
 					if (i:IsInLineOfSight()) then
@@ -305,7 +305,7 @@ if (GetPet() == 0 or GetPet() == nil) and (not IsCasting()) and (not IsChannelin
 			local thisTarget = 0;
 			local i, t = GetFirstObject();
 			while i ~= 0 do
-				if t == 3 and i:GetDistance() <= 20 and i:GetUnitsTarget() ~= 0 then
+				if (t == 3  or t == 4) and i:GetDistance() <= 20 and i:GetUnitsTarget() ~= 0 then
 					if i:GetUnitsTarget():GetGUID() == localObj:GetGUID() then
 						thisTarget = i;
 					end

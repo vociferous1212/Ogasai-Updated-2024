@@ -54,7 +54,7 @@ function script_warlockFunctions:petAssistMe()
 	local i, t = GetFirstObject();
 	if (HasPet() and not GetPet():IsDead()) and (script_grind.enemiesAttackingUs() <= 3) then
 		while i ~= 0 do
-			if t == 3 then
+			if t == 3 or t == 4 then
 				if (script_grind:isTargetingMe(i)) and (not script_grind:isTargetingPet(i))
 				and (GetPet():GetUnitsTarget():GetGUID() ~=  i:GetGUID()) then
 					PetAttack(i);
@@ -132,7 +132,7 @@ function script_warlockFunctions:getTargetNotFeared()
    	local unitsAttackingUs = 0; 
    	local currentObj, typeObj = GetFirstObject(); 
    	while currentObj ~= 0 do 
-   		if typeObj == 3 then
+   		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
                			if ((script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) and not currentObj:HasDebuff('Fear')) then 
            		return currentObj;
@@ -148,7 +148,7 @@ function script_warlockFunctions:isAddFeared()
 	local currentObj, typeObj = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	while currentObj ~= 0 do 
-		if typeObj == 3 then
+		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:HasDebuff("Fear")) then
 				script_warlock.addFeared = true; 
 				return true;
@@ -165,7 +165,7 @@ function script_warlockFunctions:fearAdd(targetObjGUID)
 	local currentObj, typeObj = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	while currentObj ~= 0 do 
-		if typeObj == 3 then
+		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:GetCreatureType() ~= "Undead") then
 				if (currentObj:GetGUID() ~= targetObjGUID) and (script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) then
 					if (not currentObj:HasDebuff("Fear") and currentObj:GetCreatureType() ~= 'Elemental' and not currentObj:IsCritter()) then
@@ -224,7 +224,7 @@ function script_warlockFunctions:petAttackTargetAtackingMe()
 	if (not PlayerHasTarget()) or (not PetHasTarget()) then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
-			if t == 3 then
+			if t == 3 or t == 4 then
 				if (script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
 					script_grind.enemyObj = i;
 				end

@@ -11,7 +11,7 @@ function script_mageCheckFrostNova:checkFrostNova()
 
     -- Check for targets with Frostbite or Frost Nova within 15 yards
     while currentObj ~= 0 do
-        if typeObj == 3 then -- NPC type
+        if typeObj == 3 or typeObj == 4 then -- NPC type
             if currentObj:GetDistance() <= searchRadius then
                 if currentObj:CanAttack()
                     and (not currentObj:IsDead())

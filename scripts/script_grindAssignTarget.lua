@@ -5,26 +5,24 @@ function script_grindAssignTarget:assignTarget()
 
 	local i, targetType = GetFirstObject();
 
+	-- set quester target if using quester
 	if _quest.usingQuester then
 		if _quest.enemyTarget ~= nil then
 			script_grind.enemyObj = _quest.enemyTarget;
 		end
 	end
 
-	-- return target attacking group was here but kept causing the bot to drop target whenever a party member had aggro... only good for tanks
-	-- need to return the check to this position and set it for only defensive stance warrior and bear form druid with other checks
-	-- attack if party member hp is low enough, etc
-	-- run object manager
+-- return a target attacking player or players pet
 	while i ~= 0 do
 	
 		-- NPC type 3
-		if (targetType == 3) then
+		if (targetType == 3) or targetType == 4 then
 		
 			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and (i:IsInLineOfSight()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) then
+			if (i:GetDistance() < 50) then
 				
 				-- run another object manager
-				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i)) then
+				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
 
 					-- return target
 					return i;
@@ -36,14 +34,15 @@ function script_grindAssignTarget:assignTarget()
 	i, targetType = GetNextObject(i);
 	end
 
-	-- get lowest level target and kill it
+-- get lowest level target and kill it
 	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
 		local bestTarget = nil;
+		local bestLevel = 0;
 		--local i, t = GetFirstObject()
 
 		while i ~= 0 do
 
-			if t == 3 then
+			if t == 3 or t == 4 then
 
 				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
 
@@ -52,15 +51,14 @@ function script_grindAssignTarget:assignTarget()
 
 					if level ~= nil and level ~= 0 then
 
-						-- set lowest level to check as 1
-						local bestLevel = 1;
-
 						-- if lowest level is less than targets level
 						if bestLevel < level then
 
 							-- set lowest level as targets current level
 							bestLevel = level;
-							bestTarget = i;
+						end
+						if bestLevel < level then
+							bestIndex = i;
 						end
 					end
 				end
@@ -80,7 +78,7 @@ function script_grindAssignTarget:assignTarget()
 
 		while i ~= 0 do
 
-			if t == 3 then
+			if t == 3 or t == 4 then
 
 				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
 
@@ -111,7 +109,7 @@ function script_grindAssignTarget:assignTarget()
 
 		while i ~= 0 do
 
-			if t == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
+			if (t == 3 or t == 4) and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
 
 				local mana = i:GetManaPercentage();
 
@@ -164,7 +162,7 @@ function script_grindAssignTarget:assignTarget()
 	while i ~= 0 do
 
 		-- acceptable targets
-		if (targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack()) then
+		if ((targetType == 3 or targetType == 4) and not i:IsCritter() and not i:IsDead() and i:CanAttack()) then
 
 			-- if that enemy is valid
 			if (script_grindValidEnemy:enemyIsValid(i)) then
@@ -253,7 +251,7 @@ function script_grindAssignTarget:assignTarget()
 	-- run object manager to find anything targeting me
 	while i ~= 0 do
 
-		if targetType == 3 and not i:IsCritter() and not i:IsDead() and i:CanAttack()
+		if (targetType == 3 or targetType == 4) and not i:IsCritter() and not i:IsDead() and i:CanAttack()
 			and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i))
 			and (not script_grind:isTargetHardBlacklisted(i:GetGUID()) or i:GetHealthPercentage() <= 92) then
 

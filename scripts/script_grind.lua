@@ -120,6 +120,7 @@ script_grind = {
 	jumpRandomFloat = 99,	-- jump > than 
 	jumpCheck = false,
 	useMount = true,	-- use mount
+	tryMountTimer = 0,
 	message = 'Starting the grinder...',
 	distToHotSpot = 500,	-- distance to target enemies from hotspot
 	staticHotSpot = true,	-- use hotspots
@@ -177,7 +178,6 @@ script_grind = {
 	tickRate = 1550,		-- reaction time / speed of scripts
 	waitTimer = GetTimeEX(),	-- wait timer
 	checkBagTimer = GetTimeEX(),
-	mountTimer = GetTimeEX(),	-- defunct setting
 	timer = GetTimeEX(),	-- blacklist timer
 	myTime = GetTimeEX(),
 	unstuckTimer = GetTimeEX(),
@@ -757,33 +757,9 @@ function script_grind:run()
 		end
 	end
 
--- we are being attacked by something so attack it - we have a pet
-	if not IsMounted() and (IsInCombat()) and HasPet() and (self.enemyObj == 0 or self.enemyObj == nil) and GetTimeEX() > script_hunter.petAttackTimer then		
-			script_hunter:petAttackTargetAttackingMe();
-			script_hunter.petAttackTimer = GetTimeEX() + 2000;
-	end
-	if IsInCombat() and HasPet() and self.enemyObj ~= nil and self.enemyObj ~= 0 then
-		if PetHasTarget() and PlayerHasTarget() then
-			if not script_grind:isTargetingMe(script_grind.enemyObj) and self.enemyObj:GetHealthPercentage() >= 99 then
-				ClearTarget();
-				GetPet():GetUnitsTarget():AutoAttack();
-				if not script_grind:isTargetHardBlacklisted(GetPet():GetUnitsTarget():GetGUID()) then
-					script_grind.enemyObj = GetPet():GetUnitsTarget();
-					self.message = "Assisting Pet";
-				end
-			end
-		end
-	end
 
--- we are being attacked by something so attack it - we have NO pet
-	if not IsMounted() and (IsInCombat()) and (self.enemyObj == 0 or self.enemyObj == nil) and (script_grind:isAnyTargetTargetingMe() or script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet()) then
-		if (not PlayerHasTarget()) or (not HasPet()) then
-			script_grindAttackTargetAttackingMe:attackTargetAttackingMe();
-			if HasPet() then self.enemyObj = GetPet():GetUnitsTarget(); end
-			if HasPet() then AssistUnit("pet"); end
-			self.message = "Getting nearest target";
-		end
-	end
+
+
 
 -- reset loot blacklist timer
 	if (not IsInCombat()) and (not IsLooting()) and self.lootObj == nil then
@@ -853,6 +829,12 @@ function script_grind:run()
 		return;
 	end
 
+-- run out of Combat
+if IsInCombat() and script_grind:enemiesAttackingUs() >= 2 then
+	if script_grindRunOutOfCombat:runOutOfCombat() then
+		return true;
+	end
+end
 
 -- VENDOR LOGIC
 
@@ -870,7 +852,7 @@ function script_grind:run()
 	--end
 
 -- Mount up
-	if  self.hasAMount and not IsSwimming() and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
+	if GetTimeEX() > self.tryMountTimer and self.hasAMount and not IsSwimming() and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 	and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
 	and (self.lootObj == nil or self.skipLooting or AreBagsFull() or self.bagsFull or script_hunter.bagsFull)
 	and not IsCasting() and not IsChanneling()
@@ -889,7 +871,7 @@ function script_grind:run()
 	end
 
 -- make sure we mount
-	if self.hasAMount and not IsSwimming() and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
+	if GetTimeEX() > self.tryMountTimer and self.hasAMount and not IsSwimming() and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
 		and (self.lootObj == nil or self.skipLooting or AreBagsFull() or self.bagsFull or script_hunter.bagsFull)
 		and not IsCasting() and not IsChanneling()
@@ -1038,15 +1020,7 @@ function script_grind:run()
 	--	self.checkTotemKillTimer = GetTimeEX() + 5000;
 	--end
 	
--- force enemy obj var
-	if (IsInCombat()) then
-		if (PlayerHasTarget()) then
-			if not script_grind:isTargetHardBlacklisted(GetTarget():GetGUID()) then
-			self.enemyObj = GetLocalPlayer():GetUnitsTarget();
-			self.lastTarget = self.enemyObj:GetGUID();
-			end
-		end
-	end
+
 
 -- find loot before gaining a new target... rogue likes to break stealth
 	script_grindFindLootTarget:findLootTarget();
@@ -1709,7 +1683,7 @@ function script_grind:run()
 	end
 
 -- Mount before we navigate through the path, error check to get around indoors
-	if self.hasAMount and (script_grind.useMount) and (not IsMounted()) then
+	if GetTimeEX() >self.tryMountTimer and self.hasAMount and (script_grind.useMount) and (not IsMounted()) then
 		if (script_druidEX:removeCatForm()) or (script_druidEX:removeBearForm())
 		or (script_druidEX:removeTravelForm()) or (script_druidEX:removeMoonkinForm()) then
 			return;
@@ -1717,7 +1691,7 @@ function script_grind:run()
 	end
 
 -- Mount up
-	if self.hasAMount and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
+	if GetTimeEX() > self.tryMountTimer and self.hasAMount and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 	and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (self.useMount) then
 		if (IsMoving()) then
 			StopMoving();
@@ -1783,7 +1757,7 @@ function script_grind:run()
 		end
 
 	--Mount up
-		if self.hasAMount and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
+		if GetTimeEX() > self.tryMountTimer and self.hasAMount and (not self.hotspotReached or script_vendor:getStatus() >= 1) and (not IsInCombat())
 		and (not IsMounted()) and (not IsIndoors()) and (not HasForm())
 		and (script_grind.useMount)
 		then
@@ -2045,7 +2019,7 @@ function script_grind:getTargetAttackingUs()
 	while currentObj ~= 0 do 
 		
 		-- NPC type 3
-    	if typeObj == 3 then
+    	if typeObj == 3 or typeObj == 4 then
 	
 		-- acceptable targets
 		if (currentObj:CanAttack() and not currentObj:IsDead()) and (currentObj:IsInLineOfSight()) and (not currentObj:IsCritter()) then
@@ -2126,7 +2100,7 @@ function script_grind:isTargetingGroup(y)
 		while y ~= 0 do 
 
 			-- acceptable targets
-    			if (typeObj == 3)
+    			if (typeObj == 3 or typeObj == 4)
 				and (y:GetDistance() < 50)
 				and (not y:IsCritter())
 				and (not y:IsDead())
@@ -2174,7 +2148,7 @@ function script_grind:isTargetingGroupBool()
 		while currentObj ~= 0 do 
 
 			-- NPC type 3
-    			if typeObj == 3 then
+    			if typeObj == 3 or typeObj == 4 then
 				
 				-- acceptable targets
 				if (currentObj:CanAttack() and not currentObj:IsDead()) then
@@ -2233,7 +2207,7 @@ function script_grind:enemiesAttackingUs() -- returns number of enemies attackin
 	local unitsAttackingUs = 0; 
 	local currentObj, typeObj = GetFirstObject(); 
 	while currentObj ~= 0 do 
-    	if typeObj == 3 then
+    	if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
 				if (script_grind:isTargetingMe(currentObj) or script_grind:isTargetingPet(currentObj)) then 
 					unitsAttackingUs = unitsAttackingUs + 1; 
@@ -2249,7 +2223,7 @@ function script_grind:enemiesWithinRange() -- returns number of enemies within r
 	local unitsInRange = 0; 
 	local currentObj, typeObj = GetFirstObject(); 
 	while currentObj ~= 0 do 
-    	if (typeObj == 3) and (PlayerHasTarget()) then
+    	if (typeObj == 3 or typeObj == 4) and (PlayerHasTarget()) then
 		if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
                 	if (currentObj:GetDistance() < GetLocalPlayer():GetUnitsTarget():GetDistance() + script_checkAdds.addsRange - 20) then 
                 		unitsInRange = unitsInRange + 1; 
@@ -2449,7 +2423,7 @@ function script_grind:isAnyTargetTargetingMe()
 	-- Return a target targeting us
 	local i, targetType = GetFirstObject();
 	while i ~= 0 do
-		if (targetType == 3) then
+		if (targetType == 3) or targetType == 4 then
 
 			-- limit the check by distance... anything over 40 yards must move closer...
 			if i:GetDistance() <= 50 then

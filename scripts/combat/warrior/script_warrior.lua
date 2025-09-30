@@ -99,7 +99,7 @@ function script_warrior:enemiesAttackingUs(range) -- returns number of enemies a
     local unitsAttackingUs = 0; 
     local currentObj, typeObj = GetFirstObject(); 
     while currentObj ~= 0 do 
-    	if typeObj == 3 then
+    	if typeObj == 3 or t == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
 				if (script_grind:isTargetingMe(currentObj) and currentObj:GetDistance() <= range) then 
 					unitsAttackingUs = unitsAttackingUs + 1; 
@@ -561,7 +561,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				CastSpellByName("Cleave");
 			end
 			-- melee Skill: Heroic Strike if we got 15 rage battle stance
-			if (self.battleStance) and (not IsMoving()) and not targetObj:IsFleeing() then
+			if (self.battleStance or self.berserkerStance) and (not IsMoving()) and not targetObj:IsFleeing() then
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
 					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
@@ -892,7 +892,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				end
 
 				-- melee Skill: Heroic Strike if we got 15 rage battle stance
-				if (self.battleStance) and not IsMoving() then
+				if (self.battleStance or self.berserkerStance) and not IsMoving() then
 					if (localRage >= self.heroicStrikeRage) and not targetObj:IsFleeing() then 
 						targetObj:FaceTarget();
 						if (targetObj:GetDistance() <= self.meleeDistance) then
@@ -905,7 +905,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				end
 
 				-- wait to heroic strike in defensive stance for sunder armor >= 1
-				if (self.defensiveStance) and not IsMoving() then
+				if (self.defensiveStance or self.berserkerStance) and not IsMoving() then
 					if (not targetObj:GetCreatureType() ~= 'Mechanical') and (not targetObj:GetCreatureType() ~= 'Elemental') and not targetObj:IsFleeing() then
 						if (localRage >= 45) and (targetObj:GetDebuffStacks("Sunder Armor") >= self.sunderStacks) then 
 							if (targetObj:GetDistance() <= 6) then

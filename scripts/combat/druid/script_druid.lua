@@ -157,7 +157,7 @@ function script_druid:enemiesAttackingUs(range) -- returns number of enemies att
     local unitsAttackingUs = 0; 
     local currentObj, typeObj = GetFirstObject(); 
     while currentObj ~= 0 do 
-    	if typeObj == 3 then
+    	if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
 				if (script_grind:isTargetingMe(currentObj) and currentObj:GetDistance() <= range) then 
 					unitsAttackingUs = unitsAttackingUs + 1; 

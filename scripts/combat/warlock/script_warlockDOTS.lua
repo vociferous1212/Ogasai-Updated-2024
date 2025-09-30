@@ -14,7 +14,7 @@ function script_warlockDOTS:getTargetNotDOT()
 
 if (IsInCombat()) then 
    	while currentObj ~= 0 do 
-   		if typeObj == 3 then
+   		if typeObj == 3 or t == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and (not currentObj:IsCritter()) then
                			if (script_grind:isTargetingMe(currentObj)) or (script_grind:isTargetingPet(currentObj))
 					or (currentObj:HasDebuff("Fear") and HasPet())
@@ -41,7 +41,7 @@ function script_warlockDOTS:getTargetDOT()
 	local unitsAttackingUs = 0; 
    	local currentObj, typeObj = GetFirstObject(); 
    	while currentObj ~= 0 do 
-   		if typeObj == 3 then
+   		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and (not currentObj:IsCritter()) then
                			if (script_grind:isTargetingMe(currentObj))
 					or (script_grind:isTargetingPet(currentObj))
@@ -66,7 +66,7 @@ function script_warlockDOTS:corruption()
 	local mana = localObj:GetManaPercentage();
 	if (mana >= 15) and (HasSpell("Corruption")) then
 		while currentObj ~= 0 do 
-			if typeObj == 3 then
+			if typeObj == 3 or typeObj == 4 then
 				if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
 					if (currentObj:GetDistance() <= 28) then
 						if (not currentObj:HasDebuff("Corruption") and not script_warlockFunctions:targetHasCorruption(currentObj)) and (currentObj:IsInLineOfSight()) then
@@ -96,7 +96,7 @@ function script_warlockDOTS:immolate()
 	local mana = localObj:GetManaPercentage();
 	if (mana >= 40) and (HasSpell("Immolate")) then
 		while currentObj ~= 0 do 
-			if typeObj == 3 then
+			if typeObj == 3 or typeObj == 4 then
 				if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
 					if (currentObj:GetDistance() <= 28) then
 						if (not currentObj:HasDebuff("Immolate") and not script_warlockFunctions:targetHasImmolate(currentObj)) and (currentObj:IsInLineOfSight()) then
@@ -126,7 +126,7 @@ function script_warlockDOTS:curseOfAgony()
 	local mana = localObj:GetManaPercentage();
 	if (mana >= 15) and (HasSpell("Curse of Agony")) then
 		while currentObj ~= 0 do 
-			if typeObj == 3 then
+			if typeObj == 3 or typeObj == 4 then
 				if (currentObj:CanAttack()) and (not currentObj:IsDead()) and (not currentObj:IsCritter()) then
 					if (currentObj:GetDistance() <= 28) then
 						if (not currentObj:HasDebuff("Curse of Agony") and not script_warlockFunctions:targetHasCurseOfAgony(currentObj)) and (currentObj:IsInLineOfSight()) then
@@ -162,7 +162,7 @@ function script_warlockDOTS:DOTAdds()
 
 		local i, t = GetFirstObject();
 		while i ~= 0 do
-			if t == 3 then
+			if t == 3 or t == 4 then
 				if script_grind:isTargetingMe(i) then
 					if (not script_warlockFunctions:targetHasImmolate(i)) or (not script_warlockFunctions:targetHasCurseOfAgony(i)) or (not script_warlockFunctions:targetHasCorruption(i)) then
 						if (targetObj:GetDistance() > 28) or (not targetObj:IsInLineOfSight()) then

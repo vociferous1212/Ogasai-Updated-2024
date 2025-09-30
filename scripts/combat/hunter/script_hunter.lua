@@ -266,7 +266,7 @@ function script_hunter:run(targetGUID)
 -- cast disengage if target is too close
 	if self.hasPet and HasPet() and IsInCombat() and HasSpell("Disengage") and not IsSpellOnCD("Disengage") then
 		if targetObj ~= nil and targetObj ~= 0 and GetLocalPlayer():GetManaPercentage() >= 5 then
-			if script_grind:isTargetingMe(targetObj) and targetObj:GetDistance() <= 5 then
+			if (script_grind:isTargetingMe(targetObj) and targetObj:GetDistance() <= self.meleeDistance) or (targetObj:GetDistance() <= self.meleeDistance and not GetPet():IsDead() and self.useRangedAttacks) then
 				targetObj:FaceTarget();
 				CastSpellByName("Disengage", targetObj);
 				self.waitTimer = GetTimeEX() + 250;
@@ -310,7 +310,7 @@ function script_hunter:run(targetGUID)
 	then
 
 		-- run backwards
-		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID())
+		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID() or targetObj:IsFleeing())
 
 		then
 
@@ -522,10 +522,14 @@ function script_hunter:run(targetGUID)
 		--send pet to attack something attacking me even if not main target - if we have 2 or more attacking us
 		-- set a timer to give the pet time to gain aggro on a Target
 		if IsInCombat() and HasPet()
-		and script_grind:enemiesAttackingUs() > 1 then
+		and script_grind:enemiesAttackingUs() > 1 
+		and script_grind:isAnyTargetTargetingMe()
+		and GetTimeEX() > self.petAttackTimer - 500
+		then
 				
 			-- send pet to attack a target attacking me
 			script_hunter:petAttackTargetAttackingMe();
+			self.petAttackTimer = GetTimeEX() + 1000;
 
 		end	
 		-- Check: if we target player pets/totems
@@ -1174,10 +1178,10 @@ function script_hunter:rest()
 	end
 	
 	-- continue resting if eating or drinking
-	if((localMana < 98 and IsDrinking()) or (localHealth < 98 and IsEating())) then
+	if((localMana < 95 and IsDrinking()) or (localHealth < 95 and IsEating())) then
 		self.message = "Resting, eating and/or drinking...";
 		return true;
-	elseif not IsEating() and not IsDrinking() then
+	elseif (not IsEating() or (IsEating() and localHealth >= 95)) and (not IsDrinking() or (IsDrinking() and localMana >= 95)) then
 		if not IsStanding() then
 			JumpOrAscendStart()
 		end
@@ -1447,7 +1451,7 @@ function script_hunter:petAttackTargetAttackingMe()
 		while i ~= 0 do
 
 			-- if enemy type is valid
-			if t == 3 and i:GetDistance() <= 50 and not i:IsCritter() and not i:IsDead() and i:CanAttack() then
+			if (t == 3 or typeObj == 4) and i:GetDistance() <= 50 and not i:IsCritter() and not i:IsDead() and i:CanAttack() then
 
 				-- if a target is targeting me then attack one of them
 				if script_grind:isTargetingMe(i) then
@@ -1510,7 +1514,7 @@ local target = nil;
 			local i, t = GetFirstObject();
 
 			while i ~= 0 do
-				if t == 3 then
+				if t == 3 or t == 4 then
 					if GetPet():GetUnitsTarget():GetGUID() == i:GetGUID() then
 						target = i;
 					end

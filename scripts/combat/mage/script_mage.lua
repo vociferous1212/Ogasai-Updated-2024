@@ -399,16 +399,6 @@ function script_mage:run(targetGUID)
 		elseif (targetObj:GetDistance() < 5) then
 			targetObj:AutoAttack();
 		end
-
-		-- Check: if we target player pets/totems
-		if (GetTarget() ~= 0) then
-			if (GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID()) then
-				if (UnitPlayerControlled("target")) then 
-					script_grind:addTargetToBlacklist(targetObj:GetGUID());
-					return 5; 
-				end
-			end
-		end 
 		
 		if (targetObj:GetDistance() > script_grind.combatScriptRange -1 or not targetObj:IsInLineOfSight()) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
 			return 3;

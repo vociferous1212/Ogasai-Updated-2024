@@ -4,7 +4,7 @@ function script_magePolymorph:getTargetNotPolymorphed() -- check polymorph
    	local unitsAttackingUs = 0; 
    	local currentObj, typeObj = GetFirstObject(); 
    	while currentObj ~= 0 do 
-   		if typeObj == 3 then
+   		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
                	if (script_grind:isTargetingMe(currentObj) and not currentObj:HasDebuff('Polymorphed')) and currentObj:IsInLineOfSight() then 
                 	return currentObj;
@@ -20,7 +20,7 @@ function script_magePolymorph:isAddPolymorphed() -- check polymorph
 	local currentObj, typeObj = GetFirstObject(); 
 	local localObj = GetLocalPlayer();
 	while currentObj ~= 0 do 
-		if typeObj == 3 then
+		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:HasDebuff("Polymorph")) then 
 				return true; 
 			end
@@ -34,7 +34,7 @@ function script_magePolymorph:isPolymorphTargetValid()
 	local currentObj, typeObj = GetFirstObject(); 
 
 	while currentObj ~= 0 do 
-    		if typeObj == 3 then
+    		if typeObj == 3 or typeObj == 4 then
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= 50 then
 				if script_grind:isTargetingMe(currentObj) and currentObj:IsInLineOfSight()
 					and currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID() then
@@ -65,7 +65,7 @@ function script_magePolymorph:polymorphAdd(targetObjGUID) -- cast the polymorph 
     local currentObj, typeObj = GetFirstObject(); 
     local localObj = GetLocalPlayer();
     while currentObj ~= 0 do 
-    	if typeObj == 3 then
+    	if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and currentObj:IsInLineOfSight() then
 				if (currentObj:GetGUID() ~= targetObjGUID and script_grind:isTargetingMe(currentObj)) then
 					if script_magePolymorph:isPolymorphTargetValid() then
