@@ -79,6 +79,9 @@ function coremenu:draw()
 		LoadScript("Fishing", "scripts\\gather\\script_fish.lua");
 		AddScriptToMode("Fishing", "script_fish");
 
+		LoadScript("Gatherer", "scripts\\gather\\script_gatherer.lua");
+		AddScriptToMode("Gatherer", "script_gatherer");
+
 		LoadScript("Test Enviornment", "scripts\\testEnviornment.lua");
 		AddScriptToMode("Test Enviornment", "testEnviornment");
 
