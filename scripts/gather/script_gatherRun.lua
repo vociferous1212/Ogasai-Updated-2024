@@ -29,6 +29,7 @@ function script_gatherRun:gather()
 	if (script_gather.nodeObj == 0 or script_gather.nodeObj == nil) and (not script_gather:isNodeBlacklisted(script_gather.nodeGUID)) then
 		if (script_gather.lastNode ~= 0 and script_gather.lastNode ~= nil) then
 			script_gather:addNodeToBlacklist(script_gather.lastNode:GetGUID());
+			script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime*1000;
 			script_gather.nodeObj = 0;
 		end
 		if (not script_gather.messageSent) and (script_gather.lastNode ~= 0) then
@@ -55,6 +56,8 @@ function script_gatherRun:gather()
 			script_gather.timerSet = false;
 		end
 		if (dist < script_gather.lootDistance) then
+
+		script_gather.lastNode = 0;
 			if (script_gather.isChest) and (HasForm()) and (script_gather.collectChests) then
 				if (IsCatForm()) then
 					script_druidEX:removeCatForm();
@@ -65,7 +68,10 @@ function script_gatherRun:gather()
 				if (IsTravelForm) then
 					script_druidEX:removeTravelForm();
 				end
-			end		
+			end	
+			if IsMounted() then
+				DisMount();
+			end
 			if (IsMoving()) then
 				StopMoving();
 				script_gather.timer = GetTimeEX() + 950;
@@ -83,6 +89,7 @@ function script_gatherRun:gather()
 			end
 			if (IsLooting()) then
 			script_gather.lastNode = 0;
+
 				script_gather.waitTimer = GetTimeEX() + 2500;
 				if (LootTarget()) or (IsLooting()) then
 					if (script_gather.collectHerbs) then
@@ -99,15 +106,37 @@ function script_gatherRun:gather()
 			script_gather.waitTimer = GetTimeEX() + 450;
 		else
 			if (_x ~= 0) then
-				local nDist = math.floor(script_gather.nodeObj:GetDistance());
+
+			local nDist = math.floor(script_gather.nodeObj:GetDistance());
+
+
+			-- mount up
+			if nDist > 20 and not IsSwimming() and GetTimeEX() > script_grind.tryMountTimer and script_grind.hasAMount and (not IsInCombat())
+			and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
+			and not IsCasting() and not IsChanneling() and not IsLooting()
+			then
+				if (IsMoving()) then
+					StopMoving();
+				return true;
+				end
+				if (not IsIndoors()) and (not IsMoving()) then
+					if (script_helper:mountUp()) then
+						script_grind:setWaitTimer(4500);
+						script_gather.timer = GetTimeEX() + 4500;
+						script_gatherer.waitTimer = GetTimeEX() + 4500;
+						return;
+					end
+				end
+			return;
+			end
 					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
 					if (not IsMoving()) and not IsPathLoaded(5) and (nDist > 5) then Move(_x, _y, _z); end
 
-				return true;
+				--return true;
 			end
 		end
-		return true;
+		return;
 	end
 	script_gather.gathering = false;
 	return false;

@@ -13,11 +13,17 @@ script_fish = {
 	pause = true,
 	isSetup = false,
 	displayRadar = false,
-	useFishRandom = false,
+	useFishRandom = true,
 	fishRandomFloat = 0.25,
 	drawFishNodes = true,
 	waitTimer = 0,
 	fishCaught = 0,
+	timeSpentFishing = 0,	-- started when bot is not paused
+	timeSpent = 0,	-- GetTimeEX() start timer
+	currentFishingTimeInSeconds = 0,
+	savedLocations = {},
+	numSavedLocation = 0,
+	currentGoToLocation = 0,
 }
 
 function script_fish:GetBobber()
@@ -116,6 +122,8 @@ function script_fish:setup()
 		self.poleName = "Blump Family Fishing Pole";
 	end
 
+	self.timeSpent = GetTimeEX();
+
 	script_grind.paranoidOn = true;
 
 	self.isSetup = true;
@@ -140,7 +148,36 @@ function script_fish:run()
 		self.message = "Paused by user...";
 		return;
 	end
-	
+
+	-- set time in seconds when we start the bot
+	self.currentFishingTimeInSeconds = math.floor((GetTimeEX() - self.timeSpent) / 1000)
+	-- seconds in time spent fishing
+	self.timeSpentFishing = self.currentFishingTimeInSeconds;
+	-- minutes in time spent fishing
+	if self.currentFishingTimeInSeconds > 60 and self.currentFishingTimeInSeconds < 3600 then
+		self.timeSpentFishing = math.floor(self.currentFishingTimeInSeconds / 60);
+	-- hours in time spent fishing
+	elseif self.currentFishingTimeInSeconds > 3600 then
+		self.timeSpentFishing = math.floor(self.currentFishingTimeInSeconds / 3600);
+	end
+
+	if not IsInCombat() then
+		if HasForm() then
+			RemoveForm();
+			return;
+		end
+	end
+
+	-- use items in inventory
+	if not IsInCombat() and GetTimeEX() > script_grind.useItemsTimer then
+		if IsLooting() then LootTarget(); end
+		if script_useItemsInInventory:useItems() then
+			return;
+		end
+		-- 5 mins, bot should return until done
+	script_grind.useItemsTimer = GetTimeEX() + 300000;
+	end
+
 	--[[Spawn Weapon]]--
 	if (isInCombat and not self.wasInCombat) then
 	
@@ -307,6 +344,19 @@ function script_fish:menu()
 
 	Text("Fish Caught : "..self.fishCaught);
 
+	-- time in hours
+	if self.currentFishingTimeInSeconds > 3600 then
+		Text("Time Spent Fishing : "..self.timeSpentFishing.." Hours");
+	end
+	-- time in minues
+	if self.currentFishingTimeInSeconds > 60 then
+		Text("Time Spent Fishing : "..self.timeSpentFishing.." Minutes");
+	-- time in seconds
+	end
+	if self.currentFishingTimeInSeconds < 60 then
+		Text("Time Spent Fishing : "..self.timeSpentFishing.." Seconds");
+	end
+
 		if (not self.pause) then 
 			if (Button("Pause Bot")) then 
 				self.pause = true; 
@@ -446,6 +496,9 @@ function script_fish:findPoolAndFish()
 	local poolTarget = 0;
 	-- id of known fishing pools
 	local id = 0;
+	
+	-- get closest pool target...
+	local bestDist = 1000;
 
 	while targetObj ~= 0 do
 		if (targetType == 5) then 
@@ -458,8 +511,14 @@ function script_fish:findPoolAndFish()
 					poolDist = targetObj:GetDistance()
 					-- pool position
 					pPX, pPY, pPZ = targetObj:GetPosition();
-					-- set this target as the current fishing pool
-					poolTarget = targetObj;
+
+					if bestDist > poolDist then
+						bestDist = poolDist;
+						if poolDist >= bestDist then
+							-- set this target as the current fishing pool
+							poolTarget = targetObj;
+						end
+					end
 				end
 			end
 			-- face the pool if it's within an acceptable fishing range
@@ -487,4 +546,33 @@ function script_fish:findPoolAndFish()
 		end
 	targetObj, targetType = GetNextObject(targetObj);
 	end
+end
+
+-- save a location to fish from
+function script_fish:saveLocation()
+
+	local x, y, z = GetLocalPlayer():GetPosition();
+
+	self.savedLocations[self.numSavedLocation] = {};
+	self.savedLocations[self.numSavedLocation]['x'] = x;
+	self.savedLocations[self.numSavedLocation]['y'] = y;
+	self.savedLocations[self.numSavedLocation]['z'] = z;
+	self.numSavedLocation = self.numSavedLocation + 1;
+
+return false;
+end
+
+function script_fish:moveToLocation()
+		local _lx, _ly, _lz = GetLocalPlayer():GetPosition();
+
+	local currentDist = math.sqrt((_lx-self.savedLocations[self.currentGoToLocation]['x'])^2+(_ly-self.savedLocations[self.currentGoToLocation]['y'])^2);
+
+		if currentDist < 5 then
+			self.currentGoToLocation = self.currentGoToLocation + 1;
+		end
+		if self.currentGoToLocation == nil or self.currentGoToLocation == 0 then
+			self.currentGoToLocation = 1;
+		end
+		script_navEX:moveToTarget(GetLocalPlayer(), self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+return false;
 end
