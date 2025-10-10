@@ -5,24 +5,42 @@ script_gatherer = {
 	waitTimer = 0,
 	message = "Starting the gatherer...",
 	lootTimer = GetTimeEX(),
+	usingGatherer = false,
 
 	gathererPathsLoaded = include("scripts\\gather\\script_gathererPaths.lua"),
-
+	tempWindowLoaded = include("scripts\\gather\\tempSetupWindow.lua"),
 }
 
 
 function script_gatherer:setup()
 
 	script_gather.gatherDistance = 250;
+	script_grind.drawGather = true;
 	script_grind:setup();
 
-	darkshoreGatherPaths:setupDarkshorePaths();
+	arathiGatherPaths:setupArathiPaths();
 	ashenvaleGatherPaths:setupAshenvalePaths();
+	barrensGatherPaths:setupBarrensPaths();
+	darkshoreGatherPaths:setupDarkshorePaths();
+
+	durotarGatherPaths:setupDurotarPaths();
+	duskwoodGatherPaths:setupDuskwoodPaths();
+	elwynnGatherPaths:setupElwynnPaths();
+	felwoodGatherPaths:setupFelwoodPaths();
+	mulgoreGatherPaths:setupMulgorePaths();
+
+	teldrassilGatherPaths:setupTeldrassilPaths();
+	tirisfalGatherPaths:setupTirisfalPaths();
+	westfallGatherPaths:setupWestfallPaths();
+	wetlandsGatherPaths:setupWetlandsPaths();
+
 
 	self.isSetup = true;
 end
 
 function script_gatherer:run()
+
+	self.usingGatherer = true;
 
 	script_grind.message = self.message;
 
@@ -30,6 +48,25 @@ function script_gatherer:run()
 
 	if not self.isSetup then
 		script_gatherer:setup();
+	end
+
+	-- Set next to node distance and nav-mesh smoothness to double that number
+	if (IsMounted()) then
+		script_nav:setNextToNodeDist(4); NavmeshSmooth(script_grind.nextToNodeDist*2.5);
+	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
+		script_nav:setNextToNodeDist(6.5); NavmeshSmooth(script_grind.nextToNodeDist*1.8);
+	elseif (race == 'Night Elf') and (localObj:IsDead()) then
+		script_nav:setNextToNodeDist(8);
+		NavmeshSmooth(script_grind.nextToNodeDist*1.6);
+	elseif (localObj:IsDead() or IsGhost()) then
+		script_nav:setNextToNodeDist(5);
+		NavmeshSmooth(script_grind.nextToNodeDist*1.6);
+	elseif (IsIndoors()) then
+		script_nav:setNextToNodeDist(2.2); NavmeshSmooth(script_grind.nextToNodeDist*1.2);
+	else
+		--script_nav:setNextToNodeDist(script_grind.nextToNodeDist); NavmeshSmooth(script_grind.nextToNodeDist*1.6);
+		script_grind.nextToNodeDist = script_grind.nextToNodeDist;
+		NavmeshSmooth(3);
 	end
 
 -- pause bot
@@ -127,7 +164,7 @@ function script_gatherer:run()
 	--end
 
 -- if we are in combat then kill stuff
-	if IsInCombat() and not IsMounted() then
+	if (IsInCombat() and (script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet() or script_grind:isAnyTargetTargetingMe())) and not IsMounted() then
 
 		-- well, if we are in combat we need to dismount but don't dismount if we are in combat!
 		if IsMounted() then
@@ -155,24 +192,28 @@ function script_gatherer:run()
 			end
 		end
 
+		if HasPet() and PetHasTarget() then
+			if self.enemyTarget == nil or self.enemyTarget == 0 then
+				AssistUnit("pet");
+				if GetTarget() ~= nil and GetTarget() ~= 0 then
+					self.enemyTarget = GetTarget();
+				end
+			end
+		end
+
 		-- run combat script
 		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
 			if self.enemyTarget:IsDead() then ClearTarget(); return; end
 			RunCombatScript(self.enemyTarget:GetGUID());
 			self.message = "Running combat script || "..self.enemyTarget:GetUnitName().." - "..math.floor(self.enemyTarget:GetDistance()).." (yd)";
-
-			if self.enemyTarget:GetDistance() > script_grind.combatScriptRange then
-				local x, y, z = self.enemyTarget:GetPosition();
-				script_navEXCombat:moveToTarget(GetLocalPlayer(), x, y, z)
-				self.waitTimer = GetTimeEX() + 150;
-			end
 		end
+
 	-- return until done
 	return;
 	end
 
 	-- mount up
-	if ((script_gather.nodeObj == nil or script_gather.nodeObj == 0) or (script_gather.nodeObj ~= nil and script_gather.nodeObj ~= 0 and script_gather.nodeObj:GetDistance() > 20)) and
+	if ((script_gather.nodeObj == nil or script_gather.nodeObj == 0) or (script_gather.nodeObj ~= nil and script_gather.nodeObj ~= 0 and script_gather.nodeObj:GetDistance() > 40)) and
 	not script_gather.gathering and not IsSwimming() and GetTimeEX() > script_grind.tryMountTimer and script_grind.hasAMount and (not IsInCombat())
 	and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
 	and not IsCasting() and not IsChanneling() and not IsLooting()
@@ -185,7 +226,11 @@ function script_gatherer:run()
 
 		if (not IsIndoors()) and (not IsMoving()) then
 			if (script_helper:mountUp()) then
-				script_grind:setWaitTimer(4500);
+				if not IsSwimming() then
+					if not IsSwimming() then
+						script_grind:setWaitTimer(4500);
+					end
+				end
 				return;
 			end
 			return;
@@ -200,6 +245,9 @@ function script_gatherer:run()
 
 -- run the gatherer
 	if (script_gatherRun:gather()) then
+
+		-- find the closest path node after gathering
+		script_gathererPaths.currentLocationInPath = script_gathererPaths:findClosestPathNode()
 
 		return;
 
@@ -227,7 +275,7 @@ function script_gatherer:window()
 	-- temp setup window to add paths to file
 	EndWindow();
 	if NewWindow("Temp Gatherer Setup", 100, 100) then
-		script_gatherer:tempSetupWindow();
+		tempSetupWindow:tempSetupWindow()
 	end
 
 end
@@ -237,7 +285,7 @@ function script_gatherer:draw()
 	script_grind:drawStatus();
 
 	-- Draw locations on screen
-	if script_gathererPaths.numPaths ~= nil and script_gathererPaths.paths ~= nil then
+	if script_gathererPaths.numPaths ~= nil and script_gathererPaths.paths ~= nil and script_grind.drawAutoPath then
 
     for i = 1, script_gathererPaths.numPaths -1 do
             local tX, tY, onScreen = WorldToScreen(script_gathererPaths.paths[i]['pos']['x'], script_gathererPaths.paths[i]['pos']['y'], script_gathererPaths.paths[i]['pos']['z'])
@@ -248,26 +296,34 @@ function script_gatherer:draw()
     end
 end
 
-function script_gatherer:tempSetupWindow()
+function script_gatherer:getCurrentArea()
 
--- add current position to file as a path node
-	if Button("Add to file") then
+	local path = nil;
+	local numPath = nil;
 
-		if GetMapID() == 148 then
-			local a = "darkshoreGatherPaths:addDarkshorePath(darkshoreGatherPaths.numDarkshorePaths, "
-			local b, c, d = GetLocalPlayer():GetPosition();
-			local e = ");"
+   -- sort our current area
+   if GetMapID() == 331 then path = ashenvaleGatherPaths.ashenvalePaths; numPath = ashenvaleGatherPaths.numAshenvalePaths;
+   elseif GetMapID() == 17 then path = barrensGatherPaths.barrensPaths; numPath = barrensGatherPaths.numBarrensPaths;
+   elseif GetMapID() == 148 then path = darkshoreGatherPaths.darkshorePaths; numPath = darkshoreGatherPaths.numDarkshorePaths;
 
-			ToFile(a..b..", "..c..", "..d..e);
-			DEFAULT_CHAT_FRAME:AddMessage("added to log file...");
-		end
-		if GetMapID() == 331 then
-			local a = "darkshoreGatherPaths:addDarkshorePath(darkshoreGatherPaths.numDarkshorePaths, "
-			local b, c, d = GetLocalPlayer():GetPosition();
-			local e = ");"
+   elseif GetMapID() == 14 then path = durotarGatherPaths.durotarPaths; numPath = durotarGatherPaths.numDurotarPaths;
+   elseif GetMapID() == 10 then path = duskwoodGatherPaths.duskwoodPaths; numPath = duskwoodGatherPaths.numDuskwoodPaths;
+   elseif GetMapID() == 12 then path = elwynnGatherPaths.elwynnPaths; numPath = elwynnGatherPaths.numElwynnPaths;
+   elseif GetMapID() == 361 then path = felwoodGatherPaths.felwoodPaths; numPath = felwoodGatherPaths.numFelwoodPaths;
+   elseif GetMapID() == 215 then path = mulgoreGatherPaths.mulgorePaths; numPath = mulgoreGatherPaths.numMulgorePaths;
 
-			ToFile(a..b..", "..c..", "..d..e);
-			DEFAULT_CHAT_FRAME:AddMessage("added to log file...");
-		end
+   elseif GetMapID() == 141 then path = teldrassilGatherPaths.teldrassilPaths; numPath = teldrassilGatherPaths.numTeldrassilPaths;
+   elseif GetMapID() == 85 then path = tirisfalGatherPaths.tirisfalPaths; numPath = tirisfalGatherPaths.numTirisfalPaths;
+   elseif GetMapID() == 40 then path = westfallGatherPaths.westfallPaths; numPath = westfallGatherPaths.numWestfallPaths;
+	elseif GetMapID() == 11 then path = wetlandsGatherPaths.wetlandsPaths; numPath = wetlandsGatherPaths.numWetlandsPaths;
+	elseif GetMapID() == 45 then path = arathiGatherPaths.arathiPaths; numPath = arathiGatherPaths.numArathiPaths;
+
+
+
 	end
+
+	
+	script_gathererPaths.paths = path;
+	script_gathererPaths.numPaths = numPath;
 end
+

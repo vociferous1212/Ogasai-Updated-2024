@@ -80,6 +80,7 @@ function script_gatherRun:gather()
 			if (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
 				script_gather.nodeObj:GameObjectInteract();
 				script_gather.timer = GetTimeEX() + 1650;
+				script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 				return true;
 			end
 			if (not LootTarget()) and (script_gather.nodeObj:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
@@ -129,9 +130,11 @@ function script_gatherRun:gather()
 				end
 			return;
 			end
+					if not IsSwimming() then
 					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
+					end
 					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
-					if (not IsMoving()) and not IsPathLoaded(5) and (nDist > 5) then Move(_x, _y, _z); end
+					if IsSwimming() or  ((not IsMoving()) and not IsPathLoaded(5) and (nDist > 5)) then Move(_x, _y, _z); end
 
 				--return true;
 			end

@@ -10,16 +10,29 @@ script_gathererPaths = {
 
     firstStart = true,  -- find closest path node on first start
 
-
-    darkshoreGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\darkshoreGatherPaths.lua"),
+    arathiGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\arathiGatherPaths.lua"),
     ashenvaleGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\ashenvaleGatherPaths.lua"),
+    barrensGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\barrensGatherPaths.lua"),
+    darkshoreGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\darkshoreGatherPaths.lua"),
+    
+    durotarGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\durotarGatherPaths.lua"),
+    duskwoodGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\duskwoodGatherPaths.lua"),
+    elwynnGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\elwynnGatherPaths.lua"),
+    felwoodGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\felwoodGatherPaths.lua"),
+    mulgoreGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\mulgoreGatherPaths.lua"),
+
+    teldrassilGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\teldrassilGatherPaths.lua"),
+    tirisfalGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\tirisfalGatherPaths.lua"),
+    westfallGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\westfallGatherPaths.lua"),
+    wetlandsGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\wetlandsGatherPaths.lua"),
+
+
+
+
+
 
 
 }
-
-
-
-
 
 function script_gathererPaths:moveThroughPaths()
 
@@ -28,13 +41,8 @@ function script_gathererPaths:moveThroughPaths()
 
 	script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime*1000;
 
-    -- sort our current area
-    if GetMapID() == 148 then self.paths = darkshoreGatherPaths.darkshorePaths;
-    elseif GetMapID() == 331 then self.paths = ashenvaleGatherPaths.ashenvalePaths;
-    end
-    if GetMapID() == 148 then self.numPaths = darkshoreGatherPaths.numDarkshorePaths;
-    elseif GetMapID() == 331 then self.numPaths = ashenvaleGatherPaths.numAshenvalePaths;
-    end
+     script_gatherer:getCurrentArea();
+ 
 
     -- Reset to first node if out of bounds
     if self.currentLocationInPath < 1 or self.currentLocationInPath >= self.numPaths then
@@ -72,11 +80,15 @@ function script_gathererPaths:moveThroughPaths()
     end
 
     -- Move to the current path node
-    script_navEX:moveToTarget(GetLocalPlayer(), xx, yy, zz);
+    script_navEXCombat:moveToTarget(GetLocalPlayer(), xx, yy, zz);
+
+    script_gather.waitTimer = GetTimeEX() + 150;
 
     if not IsMoving() and not IsCasting() and not IsChanneling() and ((script_grind.useMount and IsMounted()) or (not script_grind.useMount))then 
       Move(xx, yy, zz); 
     end
+
+    return false;
 end
 
 function script_gathererPaths:findClosestPathNode()
@@ -85,7 +97,7 @@ function script_gathererPaths:findClosestPathNode()
     local closestPathNum = 1;
     local x, y, z = GetLocalPlayer():GetPosition();
 
-    script_gathererPaths:getCurrentArea()
+    script_gatherer:getCurrentArea()
 
     -- Find the closest path node to player
     for i = 1, self.numPaths -1 do
@@ -104,18 +116,3 @@ function script_gathererPaths:findClosestPathNode()
     return closestPathNum;
 end
 
-function script_gathererPaths:getCurrentArea()
-    if GetMapID() == 141 then
-    end
-
-    if GetMapID() == 148 then
-        self.paths = darkshoreGatherPaths.darkshorePaths; self.numPaths = darkshoreGatherPaths.numDarkshorePaths;
-    elseif GetMapID() == 331 then
-        self.paths = ashenvaleGatherPaths.ashenvalePaths; self.numPaths = ashenvaleGatherPaths.numAshenvalePaths;
-    end
-
-    if GetMapID() == 148 then
-    elseif GetMapID() == 331 then
-    end
-
-end
