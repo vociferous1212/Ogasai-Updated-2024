@@ -12,23 +12,23 @@ script_gathererPaths = {
 
     arathiGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\arathiGatherPaths.lua"),
     ashenvaleGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\ashenvaleGatherPaths.lua"),
+    azsharaGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\azsharaGatherPaths.lua"),
     barrensGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\barrensGatherPaths.lua"),
     darkshoreGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\darkshoreGatherPaths.lua"),
-    
+    desolaceGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\desolaceGatherPaths.lua"),
     durotarGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\durotarGatherPaths.lua"),
     duskwoodGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\duskwoodGatherPaths.lua"),
     elwynnGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\elwynnGatherPaths.lua"),
     felwoodGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\felwoodGatherPaths.lua"),
+    feralasGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\feralasGatherPaths.lua"),
     mulgoreGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\mulgoreGatherPaths.lua"),
-
+    stonetalonGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\stonetalonGatherPaths.lua"),
+    tanarisGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\tanarisGatherPaths.lua"),
     teldrassilGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\teldrassilGatherPaths.lua"),
     tirisfalGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\tirisfalGatherPaths.lua"),
     westfallGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\westfallGatherPaths.lua"),
     wetlandsGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\wetlandsGatherPaths.lua"),
-
-
-
-
+    winterspringGatherPathsLoaded = include("scripts\\gather\\gatherPaths\\winterspringGatherPaths.lua"),
 
 
 
@@ -68,7 +68,7 @@ function script_gathererPaths:moveThroughPaths()
     local distance = GetDistance3D(x, y, z, xx, yy, zz);
 
     -- If within 10 yards of the node, move to the next one
-    if distance <= 10 or math.sqrt((x-xx)^2+(y-yy)^2) <= 10 then
+    if distance <= 20 or math.sqrt((x-xx)^2+(y-yy)^2) <= 25 then
         self.currentLocationInPath = self.currentLocationInPath + 1;
         if self.currentLocationInPath >= self.numPaths then
             self.currentLocationInPath = 1;
@@ -82,11 +82,11 @@ function script_gathererPaths:moveThroughPaths()
     -- Move to the current path node
     script_navEXCombat:moveToTarget(GetLocalPlayer(), xx, yy, zz);
 
-    script_gather.waitTimer = GetTimeEX() + 150;
-
-    if not IsMoving() and not IsCasting() and not IsChanneling() and ((script_grind.useMount and IsMounted()) or (not script_grind.useMount))then 
+    if not IsMoving() and not IsCasting() and not IsChanneling() then 
       Move(xx, yy, zz); 
     end
+
+    script_gather.waitTimer = GetTimeEX() + 150;
 
     return false;
 end

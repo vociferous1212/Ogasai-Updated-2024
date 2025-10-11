@@ -134,7 +134,7 @@ function script_gatherRun:gather()
 					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					end
 					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
-					if IsSwimming() or  ((not IsMoving()) and not IsPathLoaded(5) and (nDist > 5)) then Move(_x, _y, _z); end
+					if IsSwimming() or  ((not IsMoving()) and (nDist > 5)) then Move(_x, _y, _z); end
 
 				--return true;
 			end

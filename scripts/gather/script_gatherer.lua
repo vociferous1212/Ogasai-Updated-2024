@@ -15,25 +15,35 @@ script_gatherer = {
 function script_gatherer:setup()
 
 	script_gather.gatherDistance = 250;
+	if GetMapID() == 331 then script_gather.gatherDistance = 100; end
 	script_grind.drawGather = true;
+	script_gather.collectChests = false;
+	script_grind.useVendor = false;
+	script_grind.drawUnits = false;
+	script_grind.stopBotWhenInvFull = true;
+
+
 	script_grind:setup();
 
 	arathiGatherPaths:setupArathiPaths();
 	ashenvaleGatherPaths:setupAshenvalePaths();
+	azsharaGatherPaths:setupAzsharaPaths();
 	barrensGatherPaths:setupBarrensPaths();
 	darkshoreGatherPaths:setupDarkshorePaths();
-
+	desolaceGatherPaths:setupDesolacePaths();
 	durotarGatherPaths:setupDurotarPaths();
 	duskwoodGatherPaths:setupDuskwoodPaths();
 	elwynnGatherPaths:setupElwynnPaths();
 	felwoodGatherPaths:setupFelwoodPaths();
+	feralasGatherPaths:setupFeralasPaths();
 	mulgoreGatherPaths:setupMulgorePaths();
-
+	stonetalonGatherPaths:setupStonetalonPaths();
+	tanarisGatherPaths:setupTanarisPaths();
 	teldrassilGatherPaths:setupTeldrassilPaths();
 	tirisfalGatherPaths:setupTirisfalPaths();
 	westfallGatherPaths:setupWestfallPaths();
 	wetlandsGatherPaths:setupWetlandsPaths();
-
+	winterspringGatherPaths:setupWinterspringPaths();
 
 	self.isSetup = true;
 end
@@ -52,7 +62,7 @@ function script_gatherer:run()
 
 	-- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
-		script_nav:setNextToNodeDist(4); NavmeshSmooth(script_grind.nextToNodeDist*2.5);
+		script_nav:setNextToNodeDist(5); NavmeshSmooth(script_grind.nextToNodeDist*2.5);
 	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
 		script_nav:setNextToNodeDist(6.5); NavmeshSmooth(script_grind.nextToNodeDist*1.8);
 	elseif (race == 'Night Elf') and (localObj:IsDead()) then
@@ -81,21 +91,17 @@ function script_gatherer:run()
 	return;
 	end
 
-	if script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil and not IsInCombat() and not IsCasting() and not IsChanneling() then
-			self.message = "Gathering - "..script_gather.nodeObj:GetUnitName().. " - "..math.floor(script_gather.nodeObj:GetDistance()).." (yd)";
-		end
-
-
 -- if timer isn't done then return
 	if self.waitTimer > GetTimeEX() or script_grind.waitTimer > GetTimeEX() then
 		return;
 	end
 
+	if IsLooting() and GetTimeEX() > self.lootTimer then LootTarget(); self.lootTimer = GetTimeEX() + 500; return; end
+
 	-- check intial unstuck
 	if not script_grind.pause and script_grind.useUnstuck and GetTimeEX() > script_grind.unstuckTimer then
 		if script_unstuck:checkUnstuck() then
 			script_grind.unstuckTimer = GetTimeEX() + 350;
-			self.message = "Checking unstuck #1";
 		end
 	end
 
@@ -104,17 +110,102 @@ function script_gatherer:run()
 	if (script_grind.useUnstuck) and (IsMoving()) and (not script_grind.pause) and GetTimeEX() > script_grind.unstuckTimer then
 		if (not script_unstuck:pathClearAuto(2)) then
 			script_grind.unstuckTimer = GetTimeEX() + 750;
-			self.message = "Checking unstuck #2";
 			script_unstuck:unstuck();
 		end
 	end
 
--- if we are dead do corpse walk
-	if script_grindEX:doChecks() then
-		return;
+-- we are dead so retrieve corpse
+	if (localObj:IsDead()) then
+
+		-- wait for a moment before anything
+		if localObj:IsDead() and not IsGhost() then
+			script_grind.waitTimer = GetTimeEX() + 2000;
+		end
+
+		-- Release body
+		if (not IsGhost()) then
+
+			-- try to wait before releasing to ghost
+			script_grind.waitTimer = GetTimeEX() + 4000;
+
+			-- release to ghost
+			if (not RepopMe()) then
+		
+				-- set the death counter +1
+				if (script_grind.useThisVar) then
+					script_grindEX.deathCounter = script_grindEX.deathCounter + 1;
+					script_grind.useThisVar = false;
+				end
+
+				-- wait a moment for the game to load before moving
+				script_grind.waitTimer = GetTimeEX() + 1500;
+			return true;
+			end
+		return true;
+		end
+
+		-- make sure we are ghost before moving on to finding corpse
+		if IsGhost() then
+
+						script_grind.message = "Walking to corpse...";
+
+			-- Ressurrect within the ress distance to our corpse
+			local _lx, _ly, _lz = localObj:GetPosition();
+
+			-- our distance is greater than set ress distance
+			if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
+				script_nav:moveToNav(localObj, GetCorpsePosition());
+				return true;
+			else
+				-- if we are close enough and want to safetly res in the area
+				if (script_grind.safeRess) then
+					local rx, ry, rz = GetCorpsePosition();
+					if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
+						script_grind.message = "Finding a safe spot to ress...";
+						return true;
+					else
+						if (script_aggro.rTime > GetTimeEX()) then
+							script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);	
+							script_grind.message = "Finding a safe spot to ress...";
+							return true;
+						end
+					end
+				end
+			RetrieveCorpse();
+			script_grind.useThisVar = true;
+			end
+		return true;
+		end
 	end
-	if GetLocalPlayer():IsDead() then
+
+	-- early check to see if bags are full
+	script_grindIfBagsFull:checkBagsIfTheyAreFull()
+
+-- if bags are full and we are not using vendor
+	if script_grind.useVendor and script_grind.stopBotWhenInvFull then
+		script_grind.stopBotWhenInvFull = false;
+	end
+	if not IsInCombat() and script_grind.stopBotWhenInvFull and (AreBagsFull() or script_grind.bagsFull or script_hunter.bagsFull) then
+		script_grind.message = "Bags are full... Stopping bot..."
 		return;
+	end	
+
+-- if our bags are full and we aren't skipping looting and not using vendor
+	if (AreBagsFull() or script_grind.bagsFull or script_hunter.bagsFull)
+	and not script_grind.useVendor
+	and not script_grind.stopBotWhenInvFull
+	and not IsInCombat()
+	and not script_grind:shouldWeRest()
+	
+	then
+
+		if script_grind.hsWhenFull or script_grind.stopWhenFull then
+
+	-- run script for when our bags are full
+			script_grindIfBagsFull:ifBagsFull();
+
+			return true;
+		end
 	end
 
 -- do loot
@@ -158,13 +249,15 @@ function script_gatherer:run()
 			end	
 		end
 	end
-	
-	--if a target is near my aggro range and we choose to attack stuff then
-	--	attack it first
-	--end
 
+	if not IsInCombat() and not IsCasting() and not IsChanneling() and not IsMounted() then
+		if (RunRestScript()) then
+			return;
+		end
+	end
+	
 -- if we are in combat then kill stuff
-	if (IsInCombat() and (script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet() or script_grind:isAnyTargetTargetingMe())) and not IsMounted() then
+	if not IsLooting() and (IsInCombat() and (script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet() or script_grind:isAnyTargetTargetingMe())) and not IsMounted() then
 
 		-- well, if we are in combat we need to dismount but don't dismount if we are in combat!
 		if IsMounted() then
@@ -186,12 +279,7 @@ function script_gatherer:run()
 				ClearTarget();
 			end
 		end
-		if HasPet() then
-			if PetHasTarget() and not GetPet():GetUnitsTarget():IsDead() then
-				self.enemyTarget = GetPet():GetUnitsTarget();
-			end
-		end
-
+	
 		if HasPet() and PetHasTarget() then
 			if self.enemyTarget == nil or self.enemyTarget == 0 then
 				AssistUnit("pet");
@@ -201,15 +289,22 @@ function script_gatherer:run()
 			end
 		end
 
+			local _x, _y, _z = self.enemyTarget:GetPosition();
+		if self.enemyTarget:GetDistance() > script_grind.combatScriptRange then
+			script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
+			self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyTarget:GetDistance()).. " (yd) "..self.enemyTarget:GetUnitName().. "";
+			return false;
+		end
+
 		-- run combat script
-		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
+		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 and not IsLooting() and not IsCasting() and not IsChanneling() then
 			if self.enemyTarget:IsDead() then ClearTarget(); return; end
 			RunCombatScript(self.enemyTarget:GetGUID());
 			self.message = "Running combat script || "..self.enemyTarget:GetUnitName().." - "..math.floor(self.enemyTarget:GetDistance()).." (yd)";
 		end
 
 	-- return until done
-	return;
+	return true;
 	end
 
 	-- mount up
@@ -237,9 +332,12 @@ function script_gatherer:run()
 		end
 	return;
 	end
+	
+	if script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil and (not IsInCombat() or IsMounted()) then
+		script_grind.message = "Gathering - "..script_gather.nodeObj:GetUnitName().. " - "..math.floor(script_gather.nodeObj:GetDistance()).." (yd)";
+	end
 
-	if IsLooting() and GetTimeEX() > self.lootTimer then LootTarget(); self.lootTimer = GetTimeEX() + 500; return; end
-	if script_grind.lootObj ~= nil and not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull and not script_hunter.bagsFull then
+	if (script_grind.lootObj ~= nil and not script_grind.skipLooting and not AreBagsFull() and not script_grind.bagsFull and not script_hunter.bagsFull) then
 		return;
 	end
 
@@ -252,7 +350,7 @@ function script_gatherer:run()
 		return;
 
 -- else move to new path node
-	elseif not script_gather.gathering then
+	elseif not script_gather.gathering and not IsCasting() and not IsChanneling() and not IsLooting() then
 
 
 		script_gathererPaths:moveThroughPaths();
@@ -302,27 +400,27 @@ function script_gatherer:getCurrentArea()
 	local numPath = nil;
 
    -- sort our current area
-   if GetMapID() == 331 then path = ashenvaleGatherPaths.ashenvalePaths; numPath = ashenvaleGatherPaths.numAshenvalePaths;
+   if GetMapID() == 45 then path = arathiGatherPaths.arathiPaths; numPath = arathiGatherPaths.numArathiPaths;
+   elseif GetMapID() == 331 then path = ashenvaleGatherPaths.ashenvalePaths; numPath = ashenvaleGatherPaths.numAshenvalePaths;
+   elseif GetMapID() == 16 then path = azsharaGatherPaths.azsharaPaths; numPath = azsharaGatherPaths.numAzsharaPaths;
    elseif GetMapID() == 17 then path = barrensGatherPaths.barrensPaths; numPath = barrensGatherPaths.numBarrensPaths;
    elseif GetMapID() == 148 then path = darkshoreGatherPaths.darkshorePaths; numPath = darkshoreGatherPaths.numDarkshorePaths;
-
+   elseif GetMapID() == 405 then path = desolaceGatherPaths.desolacePaths; numPath = desolaceGatherPaths.numDesolacePaths;
    elseif GetMapID() == 14 then path = durotarGatherPaths.durotarPaths; numPath = durotarGatherPaths.numDurotarPaths;
    elseif GetMapID() == 10 then path = duskwoodGatherPaths.duskwoodPaths; numPath = duskwoodGatherPaths.numDuskwoodPaths;
    elseif GetMapID() == 12 then path = elwynnGatherPaths.elwynnPaths; numPath = elwynnGatherPaths.numElwynnPaths;
    elseif GetMapID() == 361 then path = felwoodGatherPaths.felwoodPaths; numPath = felwoodGatherPaths.numFelwoodPaths;
+   elseif GetMapID() == 357 then path = feralasGatherPaths.feralasPaths; numPath = feralasGatherPaths.numFeralasPaths;
    elseif GetMapID() == 215 then path = mulgoreGatherPaths.mulgorePaths; numPath = mulgoreGatherPaths.numMulgorePaths;
-
+   elseif GetMapID() == 406 then path = stonetalonGatherPaths.stonetalonPaths; numPath = stonetalonGatherPaths.numStonetalonPaths;
+   elseif GetMapID() == 440 then path = tanarisGatherPaths.tanarisPaths; numPath = tanarisGatherPaths.numTanarisPaths;
    elseif GetMapID() == 141 then path = teldrassilGatherPaths.teldrassilPaths; numPath = teldrassilGatherPaths.numTeldrassilPaths;
    elseif GetMapID() == 85 then path = tirisfalGatherPaths.tirisfalPaths; numPath = tirisfalGatherPaths.numTirisfalPaths;
    elseif GetMapID() == 40 then path = westfallGatherPaths.westfallPaths; numPath = westfallGatherPaths.numWestfallPaths;
-	elseif GetMapID() == 11 then path = wetlandsGatherPaths.wetlandsPaths; numPath = wetlandsGatherPaths.numWetlandsPaths;
-	elseif GetMapID() == 45 then path = arathiGatherPaths.arathiPaths; numPath = arathiGatherPaths.numArathiPaths;
-
-
+   elseif GetMapID() == 11 then path = wetlandsGatherPaths.wetlandsPaths; numPath = wetlandsGatherPaths.numWetlandsPaths;
+   elseif GetMapID() == 618 then path = winterspringGatherPaths.winterspringPaths; numPath = winterspringGatherPaths.numWinterspringPaths;
 
 	end
-
-	
 	script_gathererPaths.paths = path;
 	script_gathererPaths.numPaths = numPath;
 end
