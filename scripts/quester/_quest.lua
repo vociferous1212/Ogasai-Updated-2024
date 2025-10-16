@@ -38,6 +38,7 @@ _quest = {
 	distToGrind = 0,
 	unstuckTimer = 0,
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
+	lootTimer = GetTimeEX(),
 }
 
 function _quest:draw() end
@@ -80,7 +81,8 @@ local localObj = GetLocalPlayer();
 	DrawText("Current Quest - _questDB", x+800, y+485, r+255, g+0, b+0);
 	DrawText("".._questDB.curListQuest, x+800, y+500, r+255, g+0, b+0);
 
-
+	-- quester is getting stuck not looting... force it to loot
+	if IsLooting() and GetTimeEX() > self.lootTimer then LootTarget(); self.lootTimer = GetTimeEX() + 500; end
 
 
 	-- handle vendor
@@ -105,26 +107,21 @@ local localObj = GetLocalPlayer();
 -- check intial unstuck
 	if not self.pause and GetTimeEX() > self.unstuckTimer then
 		if script_unstuck:checkUnstuck() then
-			self.unstuckTimer = GetTimeEX() + 750;
+			self.unstuckTimer = GetTimeEX() + 350;
 		end
 	end
 
-	-- our position must be changing and we must still be stuck so try another unstuck
-	-- use unstuck feature ----and (not self.pause) 
 	if (IsMoving()) and (not self.pause) and GetTimeEX() > self.unstuckTimer then
 		if (not script_unstuck:pathClearAuto(2)) then
-			self.unstuckTimer = GetTimeEX() + 750;
+			self.unstuckTimer = GetTimeEX() + 450;
 			script_unstuck:unstuck();
 		end
 	end
 
-	
-	-- keep facing the targets
 	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then
 		if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then 
 			GetTarget():FaceTarget();
 		end
-		_quest:setTimer(500);
 	return;
 	end
 
@@ -133,6 +130,9 @@ local localObj = GetLocalPlayer();
 		-- skip looting then turn lootobj nil
 		if not script_grind.skipLooting and not _questEX.bagsFull and not IsLooting() then
 			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance);
+			if script_grind.lootObj == nil and HasSpell("Skinning") and script_grind.skinning and HasItem("Skinning Knife") then
+				script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance);
+			end
 		end
 
 		if _questEX:doChecks() then
@@ -181,16 +181,20 @@ local localObj = GetLocalPlayer();
 			if GetNumQuestLogEntries() ~= nil and self.killStuffOnRoute and not IsSwimming() then _questDBTargets:killStuffAroundUs(); end
 	if IsInCombat() and IsLooting() then LootTarget(); end
 
-	-- completed a quest so reset vars
-	if _quest.weCompletedQuest and _quest.isQuestComplete and GetNumQuestLogEntries() < 1 then
+	if _quest.weCompletedQuest and _quest.isQuestComplete then
+		for i=0, GetNumQuestLogEntries() do
+			local questDescription, questObjectives = GetQuestLogQuestText(i);
+			if questObjectives ~= _questDB.curDesc or GetNumQuestLogEntries() == 0 then
+
 		if (_questDBHandleDB:turnQuestCompleted()) then
 			self.tickRate = .3;
-			-- reset variables
 			_quest.weCompletedQuest = false;
 			_quest.isQuestComplete = false;
 			_quest.currentDesc = nil;
 			_questDB.curDesc = nil;
 			_questEX2.flipVendor = true;
+		end
+		end
 		end
 	end
 	
@@ -208,13 +212,10 @@ if self.currentType == 10 and _quest.currentQuest ~= nil and ((not script_getSpe
 		return true;
 		end
 	end
-
-	-- set our current quest
 	_questSetQuest:setOurCurrentQuest();
-
 	_questGetQuestGiver:run()
 
-if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos(); end
+	if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos(); end
 
 	if GetNumQuestLogEntries() > 0 and _questDB.curDesc ~= _quest.currentDesc then
 
@@ -227,7 +228,6 @@ if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrin
 		end
 	end
 
-	-- grind spot reached distance
 	if (self.distToGrind <= 40) and not self.grindspotReached then
 		self.grindSpotReached = true;
 	end
@@ -235,11 +235,8 @@ if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrin
 	if (self.distToGrind >= self.distToGrindFromHotspot) and self.grindSpotReached then
 		self.grindSpotReached = false;
 	end
-
 	_questAcceptQuest:run()
-
 	_questRetrieveQuest:run()
-
 	_questMoveToGrindSpot:run()
  end
 function _quest:runRest() if _questRunRest:runRest() then return true; end end

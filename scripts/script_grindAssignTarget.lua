@@ -12,6 +12,9 @@ function script_grindAssignTarget:assignTarget()
 		end
 	end
 
+		local bestTarget = nil
+		local bestHP = 100
+
 -- return a target attacking player or players pet
 	while i ~= 0 do
 	
@@ -25,7 +28,7 @@ function script_grindAssignTarget:assignTarget()
 				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
 
 					-- return target
-					return i;
+					bestTarget = i;
 				end
 			end
 		end
@@ -34,47 +37,9 @@ function script_grindAssignTarget:assignTarget()
 	i, targetType = GetNextObject(i);
 	end
 
--- get lowest level target and kill it
-	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
-		local bestTarget = nil;
-		local bestLevel = 62;
-		local i, t = GetFirstObject()
-
-		while i ~= 0 do
-
-			if t == 3 or t == 4 then
-
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
-
-					-- get targets level
-					local level = i:GetLevel();
-
-					if level ~= nil and level ~= 0 then
-
-						-- if lowest level is less than targets level
-						if bestLevel > level then
-
-							-- set lowest level as targets current level
-							bestLevel = level;
-						end
-						if bestLevel < level then
-							bestIndex = i;
-						end
-					end
-				end
-			end
-
-		i, t = GetNextObject(i);
-
-		end
-	return bestTarget;
-	end
-
 	-- get the target with the lowest health attacking us and not with blade flurry active, rogue, drops combo points
-	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) and not GetLocalPlayer():HasBuff("Blade Flurry") then
+	if script_grind:enemiesAttackingUs() > 1 and not GetLocalPlayer():HasBuff("Blade Flurry") then
 
-		local bestTarget = nil
-		local bestHP = 100
 		local i, t = GetFirstObject()
 
 		while i ~= 0 do
@@ -92,40 +57,8 @@ function script_grindAssignTarget:assignTarget()
 					if bestHP < hp then
 						bestTarget = i;
 					end
-
-				end	
-			end
-
-		i, t = GetNextObject(i);
-
-		end
-	return bestTarget;
-	end
-
-	-- get the mana user attacking us and kill it first... go for lowest mana target
-	if (IsInCombat()) and (script_grind:enemiesAttackingUs() > 1) then
-
-		local bestTarget = nil;
-		local bestMana = 100;
-		local i, t = GetFirstObject()
-
-		while i ~= 0 do
-
-			if (t == 3 or t == 4) and not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
-
-				local mana = i:GetManaPercentage();
-
-				if mana ~= nil and mana ~= 0 then
-
-					local bestMana = 1;
-
-					if bestMana > mana then
-						bestMana = mana;
-					end
-					if bestMana < mana then
-						bestTarget = i;
-					end
 				end
+
 			end
 
 		i, t = GetNextObject(i);
@@ -133,7 +66,6 @@ function script_grindAssignTarget:assignTarget()
 		end
 	return bestTarget;
 	end
-
 
 	-- Find the closest valid target if we have no target or we are not in combat
 	local mobDistance = script_grind.pullDistance;

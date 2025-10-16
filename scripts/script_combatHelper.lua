@@ -242,7 +242,7 @@ function script_combatHelper:checkStopHeroicStrikeConditions()
 	if (HasSpell("Heroic Strike") or HasSpell("Maul"))
 	and (IsInCombat())
 	and (PlayerHasTarget())
-	and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_grind.combatScriptRange+2)
+	and (GetTarget():GetDistance() > script_grind.combatScriptRange+3)
 	and (not script_checkAdds:checkAdds())
 	and (not IsMoving())
 	
@@ -256,24 +256,7 @@ function script_combatHelper:checkStopHeroicStrikeConditions()
 			SpellStopCasting();
 		end
 
-		-- check for auto attack slot
-
-						--- this needs changed to be 0 and run once per reload of bot
-		if (IsAttackAction(script_grind.autoAttackActionSlot) ~= 1) and (not IsMoving()) then
-
-			-- this is going to just check all the action slots for your auto attack and use it
-			for i=0, 100 do
-				if IsAttackAction(i) then
-
-					-- needs to be changed to not check again. self action slot needs to be 0, run once per reload of bot
-					script_grind.autoAttackActionSlot = i;
-				end
-			end
-		end
-	
-		-- if we can't find the action slot then try to stop through the failing auto attack function
-					-- this needs changed to be == 0
-		if (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (not script_checkAdds:checkAdds()) then
+		if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (not script_checkAdds:checkAdds()) and not IsAutoCasting("Attack") then
 			script_grind.enemyObj:AutoAttack();
 		end
 	end

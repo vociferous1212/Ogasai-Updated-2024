@@ -234,15 +234,14 @@ function script_grindEX:doChecks()
 		-- make sure we are ghost before moving on to finding corpse
 		if IsGhost() then
 
-						script_grind.message = "Walking to corpse...";
+			script_grind.message = "Walking to corpse...";
 
 			-- Ressurrect within the ress distance to our corpse
 			local _lx, _ly, _lz = localObj:GetPosition();
 
 			-- our distance is greater than set ress distance
-			if(GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
+			if (GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
 				script_nav:moveToNav(localObj, GetCorpsePosition());
-				return true;
 			else
 				-- if we are close enough and want to safetly res in the area
 				if (script_grind.safeRess) then
@@ -331,7 +330,7 @@ end
 	end
 
 -- Jump - paranoia menu
-	if (script_grind.jump) and IsMoving() and not IsInCombat() then
+	if (script_grind.jump) and IsMoving() and not IsInCombat() and not IsMounted() then
 		local jumpRandom = random(1, 100);
 		if jumpRandom > script_grind.jumpRandomFloat then
 			JumpOrAscendStart();

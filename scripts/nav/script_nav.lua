@@ -201,11 +201,14 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 			
 	-- If we have a new destination, generate a new path to it
 	if (not script_grind.gather) or (localObj:IsDead()) then
-		if(self.navPathPosition['x'] ~= _x or self.navPathPosition['y'] ~= _y or self.navPathPosition['z'] ~= _z
-		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
+
+		-- if we are dead then ignore z axis
+		if(self.navPathPosition['x'] ~= _x or self.navPathPosition['y'] ~= _y
+		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 50) then
+		local x, y, z = GetLocalPlayer():GetPosition();
 		self.navPathPosition['x'] = _x;
 		self.navPathPosition['y'] = _y;
-		self.navPathPosition['z'] = _z;
+		self.navPathPosition['z'] = z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 		self.lastpathnavIndex = 1; 
 		end
@@ -216,7 +219,7 @@ function script_nav:moveToNav(localObj, _x, _y, _z)
 		self.navPathPosition['y'] = _y;
 		self.navPathPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		self.lastpathnavIndex = -1; 
+		self.lastpathnavIndex = 0; 
 	end	
 
 	-- Get the current path node's coordinates

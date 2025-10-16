@@ -20,7 +20,7 @@ function script_checkAdds:checkAdds()
         and not IsChanneling() and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
 
 	-- if there aren't too many enemies in range and the target isn't about to die and we aren't stunned, nor is enemy stunned
-        if script_grind:enemiesWithinRange() <= 4 and (grindEnemy:GetHealthPercentage() >= 25 and (not TargetHasRangedWeapon(grindEnemy) or (GetMyClass() == "HUNTER" or GetMyClass() == "MAGE" or GetMyClass() == "WARLOCK") ) )
+        if (grindEnemy:GetHealthPercentage() >= 25 and (not TargetHasRangedWeapon(grindEnemy) or (GetMyClass() == "HUNTER" or GetMyClass() == "MAGE" or GetMyClass() == "WARLOCK") ) )
             and ( (grindEnemy ~= 0 and grindEnemy ~= nil and not grindEnemy:IsStunned())
             or (questEnemy ~= nil and questEnemy ~= 0 and not questEnemy:IsStunned()) )
             

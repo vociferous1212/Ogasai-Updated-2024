@@ -70,7 +70,7 @@ function script_drawStatus:draw()
 			DrawText('Blacklist Target Timer: ' .. script_grind.enemyObj:GetUnitName() .. ': ' .. time .. ' s.', x, y+3, 0, 255, 120); 
 			DrawText('Blacklisting Target After ' .. script_grind.blacklistTime .. " s. (If above 92% HP.)", x, y+18, 0, 255, 120); 
 		end
-		if (script_gather.gathering) then
+		if (script_gather.gathering) and script_gather.nodeObj ~= 0 then
 			local nodeTimer = ((GetTimeEX() - script_gather.blacklistTime) / 1000);
 			DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': ' ..nodeTimer..' Sec', x, y+50, 0, 255, 120);
 			if (script_grindMenu.debugMenu) then

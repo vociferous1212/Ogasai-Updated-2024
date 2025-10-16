@@ -6,7 +6,7 @@ function _questSetQuest:setOurCurrentQuest()
 	for y=0, _questDB.numQuests -1 do
 
 		-- get our quest log entry number to check (bot currently only does 1 at a time)
-		for i=0, GetNumQuestLogEntries()  do
+		for i=0, GetNumQuestLogEntries() do
 
 			-- get the objectives for the quest to match in DB
 			local questDescription, questObjectives = GetQuestLogQuestText(1);

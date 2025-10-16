@@ -135,7 +135,6 @@ script_grind = {
 	minLevel = GetLocalPlayer():GetLevel()-5,
 	maxLevel = GetLocalPlayer():GetLevel()+2,
 
-
 	-- other scripts
 	getSpells = false,
 	autoTalent = false,
@@ -160,6 +159,8 @@ script_grind = {
 	blacklistedNum = 0,	-- number of blacklisted targets
 	hardBlacklistedTargets = {},	-- GUID table of blacklisted targets
 	hardBlacklistedNum = 0,	-- number of blacklisted targets
+	collectGarbageTimer = 0,
+
 
 	-- loot and vendoring
 	lootObj = nil,
@@ -368,7 +369,7 @@ end
 -- should we rest and eat/drink
 function script_grind:shouldWeRest()
 
-	if not IsDrinking() and not IsEating() and not IsCasting() and not IsChanneling() and not IsLooting() then
+	if not IsDrinking() and not IsEating() and not IsCasting() and not IsChanneling() and not IsLooting() and not HasForm() then
 	
 		-- some servers are returning ''undefined'' for mana percentage
 
@@ -484,9 +485,14 @@ function script_grind:run()
 		self.blacklistLootTimeCheck = GetTimeEX() + (self.blacklistLootTimeVar * 1000);
 		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 		self.autoBlacklistTimer = GetTimeEX() + 15000;
+		CollectAllGarbage();
 		return;
 	end
 
+-- reset memory every so often
+	if not IsMoving() then
+		CollectAllGarbage();
+	end
 	-- reset timers if eating/drinking
 	if IsEating() or IsDrinking() or IsLooting() or IsMoving() then
 		self.autoBlacklistTimer = GetTimeEX() + 15000;
@@ -515,14 +521,15 @@ function script_grind:run()
 		if HasSpell("Feign Death") and not IsSpellOnCD("Feign Death") then
 			if script_grindIsEliteTargetingMe:isEliteTargetingMe() then
 				CastSpellByName("Feign Death");
+				script_grind:setWaitTimer(3000);
 				return true;
 			end
 		end
 	end
 	-- avoid elites...
-	if not localObj:IsDead() and script_grind.skipElites then 
-		if (script_aggro:avoidElite(40)) then
-			script_grind.message = "Elite within 40 yd... running away...";
+	if not localObj:IsDead() and script_grind.skipElites and script_vendor.status == 0 and not IsMounted() then 
+		if (script_aggro:avoidElite()) then
+			script_grind.message = "Elite within range... running away...";
 			return; 
 		end
 	end
@@ -540,9 +547,8 @@ function script_grind:run()
 
 	-- redundancy - bot will get stuck looting nothing or stuck in loot window...
 	if IsLooting() and GetTimeEX() > script_grindDoLoot.timerWhileLooting then
-		LootTarget();
+		if not LootTarget() then LootTarget(); CloseLoot(); end
 		script_grindDoLoot.timerWhileLooting = GetTimeEX() + 1000; 
-		self.waitTimer = GetTimeEX() + 500;
 	end
 
 	-- use items in inventory
@@ -551,8 +557,8 @@ function script_grind:run()
 			self.waitTimer = GetTimeEX() + 500;
 			return true;
 		end
-	-- 5 mins, bot should return until done
-	self.useItemsTimer = GetTimeEX() + 300000;
+	-- 2 mins, bot should return until done
+	self.useItemsTimer = GetTimeEX() + 120000;
 	end
 
 -- check intial unstuck
@@ -760,7 +766,7 @@ function script_grind:run()
 		-- Save location for auto pathing
 		if (script_grind.hotspotReached and script_grind.enemyObj:IsDead() and script_grind.enemyObj:GetLevel() >= script_grind.minLevel and script_grind.enemyObj:GetLevel() <= script_grind.maxLevel) then 
 			script_nav:saveTargetLocation(script_grind.enemyObj, script_grind.enemyObj:GetLevel());
-			script_grind.waitTimer = GetTimeEX() + 1000;
+			script_grind.waitTimer = GetTimeEX() + 1200;
 			script_nav:resetNavigate();
 			script_nav:resetNavPos();
 		end
@@ -771,6 +777,7 @@ function script_grind:run()
 				script_nav:resetNavigate();
 				script_nav:resetNavPos();
 				script_grind.enemyObj = nil;
+				script_grind.waitTimer = GetTimeEX() + 1200;
 				ClearTarget();
 			end
 		end
@@ -880,7 +887,7 @@ end
 			StopMoving();
 			return;
 		end
-		if (not IsIndoors()) and (not IsMoving()) then
+		if IsStanding() and (not IsIndoors()) and (not IsMoving()) then
 			if (script_helper:mountUp()) then
 				script_grind:setWaitTimer(4500);
 				return;
@@ -923,17 +930,9 @@ end
 				self.enemyObj = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
 			end
 			
-		elseif not IsInCombat() and self.lootObj == nil and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0 or self.enemyObj:GetDistance() > 25) or (IsStealth())  or (not script_gather.safeGather) then
-			
+		elseif not IsInCombat() and self.lootObj == nil and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0) then
+		
 			if (script_gatherRun:gather()) then
-
-					
-
-					if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() then
-						if PlayerHasTarget() then
-							ClearTarget();
-						end
-					end
 
 				if not script_grind.adjustTickRate then
 					script_grind.tickRate = 135;
@@ -961,7 +960,7 @@ end
 				if (IsLooting()) then
 					script_grind:setWaitTimer(1000);
 				end
-			return;
+			return true;
 			end
 		end
 	end
@@ -1107,6 +1106,10 @@ end
 	if self.skipLooting or AreBagsFull() or self.bagsFull or script_hunter.bagsFull then
 		self.lootObj = nil;
 	end
+-- if we skip gathering then gather object = nil
+	if not script_grind.gather then
+		script_gather.nodeObj = nil;
+	end
 
 -- don't assign targets  until we get to hotspot
 	if script_vendor.status == 0
@@ -1115,7 +1118,7 @@ end
 	and not IsLooting()
 	and not IsEating()
 	and not IsDrinking()
-	and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting)
+	and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting or IsInCombat())
 	and not IsCasting()
 	and not IsChanneling()
 	and not script_grind:shouldWeRest()
@@ -1145,7 +1148,9 @@ end
 			and not GetLocalPlayer():HasBuff("Prowl"))
 			
 			then
-				self.enemyObj:AutoAttack();
+				if not IsAutoCasting("Attack") then
+					self.enemyObj:AutoAttack();
+				end
 			end
 
 			if (GetLocalPlayer():HasBuff("Stealth") or GetLocalPlayer():HasBuff("Prowl"))
@@ -1315,15 +1320,32 @@ end
 	
 			if script_aggro:closeToAdds() then
 				self.enemyObj = script_aggro:returnClosestAddsTarget();
-
+	
 				self.message = "Trying to attack target with adds...";
-				
-				if self.enemyObj ~= nil and self.enemyObj ~= 0 then
-					if not IsAutoCasting("Attack") then
+				if not IsAutoCasting("Attack") and self.enemyObj ~= nil and self.enemyObj ~= 0 then
 						self.enemyObj:AutoAttack();
+					end
+				if self.enemyObj ~= nil and self.enemyObj ~= 0 and GetMyClass() ~= "DRUID" then
+					local xx, yy, zz = self.enemyObj:GetPosition();
+					if self.enemyObj:GetDistance() > self.combatScriptRange then
+						script_navEXCombat:moveToTarget(GetLocalPlayer(), xx, yy, zz);
+						return true;
 					end
 					if HasPet() and PlayerHasTarget() then
 						PetAttack();
+					end
+				end
+				if GetMyClass() == "DRUID" then
+					if self.enemyObj ~= 0 and self.enemyObj ~= nil then
+						if IsMoving() then StopMoving(); return true; end
+						if HasForm() and not IsInCombat() then RemoveForm(); return true; end
+						if not IsInCombat() and not self.enemyObj:HasDebuff("Moonfire") and not script_grind:isAnyTargetTargetingMe() then
+							if IsMoving() then StopMoving(); return true; end
+							self.enemyObj:FaceTarget();
+							CastSpellByName("Moonfire", self.enemyObj)
+							self.waitTimer = GetTimeEX() + 1500;
+						return;
+						end
 					end
 				end
 
@@ -1336,7 +1358,7 @@ end
 		and not IsCasting()
 		and not IsChanneling()
 		and IsInCombat()
-		and (not IsMounted() or self.hotspotReached)
+		and (not IsMounted() or self.hotspotReached or IsInCombat())
 		and GetTimeEX() > self.newTargetTime
 		and not script_grind:isAnyTargetTargetingMe()
 		and not script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet()
@@ -1435,7 +1457,7 @@ end
 		and not IsCasting()
 		and not IsChanneling()
 		and IsInCombat()
-		and (not IsMounted() or self.hotspotReached)
+		and (not IsMounted() or self.hotspotReached or IsInCombat())
 		and (self.enemyObj == 0 or self.enemyObj == nil)
 		and GetTimeEX() > self.newTargetTime
 				
@@ -1469,6 +1491,7 @@ end
 		and not IsChanneling()
 		and (script_grind.lootObj == nil or AreBagsFull() or self.bagsFull or self.skipLooting)
 		and script_vendor.status == 0
+		or IsInCombat()
 		
 		then
 
@@ -1560,6 +1583,11 @@ end
 	and self.enemyObj ~= 0
 	and self.enemyObj ~= nil
 	and not self.enemyObj:IsDead()
+	and not IsCasting()
+	and not IsChanneling()
+	and not IsEating()
+	and not IsDrinking()
+	and not IsLooting()
 		-- we only want to move to a target if we are done looting or we are being attacked
 	and (self.lootObj == nil
 		or AreBagsFull()
@@ -1581,26 +1609,19 @@ end
 		if not script_grind.adjustTickRate and PlayerHasTarget()
 		and (script_grind:isTargetingMe(self.enemyObj) or self.enemyObj:GetHealthPercentage() < 20) then
 			script_grind.tickRate = 50;
-		else
+		elseif not script_grind.adjustTickRate then
 			script_grind.tickRate = 150;
 		end
 	
--- find a loot target
-		--script_grindFindLootTarget:findLootTarget();
-
 -- if we have a valid target position coordinates
 		if (_x ~= 0 and x ~= 0) then
 
-			-- turn the target to face the opposite direction it was pulled...
-			local test = 0;
-			if not IsStealth() then
-				test = math.random(-1, 1);
-			end
 			-- move to target
-			script_navEXCombat:moveToTarget(localObj, _x+(test/2), _y-(test/2), _z);
+			script_navEXCombat:moveToTarget(localObj, _x, _y, _z);
 
 			self.message = "Moving To Target Combat NavEX - " ..math.floor(self.enemyObj:GetDistance()).. " (yd) "..self.enemyObj:GetUnitName().. "";
-					
+			--stop moving if we get close enough...
+			if self.combatScriptRange >= 2.5 and GetDistance3D(mX, mY, mZ, _x, _y, _Z) <= 2.5 and IsMoving() then StopMoving(); return true; end
 			if (IsMoving()) or (IsInCombat()) then
 				self.autoBlacklistTimer = GetTimeEX() + 15000;
 				self.autoBlacklistTimerSet = false;
@@ -1628,10 +1649,19 @@ end
 				self.autoBlacklistTimerSet = true;
 				self.autoBlacklistTimer = GetTimeEX() + 15000;
 			end
+
 		end
-		script_grind:setWaitTimer(100);
+		script_grind:setWaitTimer(50);
+		--return true;
+		if not IsMoving() and not IsPathLoaded(5) and not IsCasting() and not IsChanneling() and IsStanding() then
+			self.combatError = nil;
+			local x, y, z = GetLocalPlayer():GetPosition();
+			local var = math.random(-2, 2);
+			Move(x+var, y-var, z);
+			script_nav:resetNavigate();
+			script_nav:resetNavPos();
+		end
 	--return true;
-	return false;
 	end
 
 -- return 4 Do nothing, return : combat script return 4
@@ -1724,7 +1754,7 @@ end
 		end
 
 		-- use helper mount function
-		if (not IsIndoors()) and (not IsMoving()) then
+		if IsStanding() and (not IsIndoors()) and (not IsMoving()) then
 			if (script_helper:mountUp()) then
 				script_grind:setWaitTimer(4500);
 				return;
@@ -1792,7 +1822,7 @@ end
 			return;
 			end
 		
-			if (not IsIndoors()) and (not IsMoving()) then
+			if IsStanding() and (not IsIndoors()) and (not IsMoving()) then
 				if (script_helper:mountUp()) then
 					script_grind:setWaitTimer(4500);
 					self.waitTimer = GetTimeEX() + 4500;
@@ -1840,6 +1870,8 @@ end
 		if self.autoPath and (not self.hotspotReached) and (not IsInCombat() or IsMounted())
 		and (script_vendor.status == 0) and not IsEating() and not IsDrinking()
 		and not script_grind:shouldWeRest() and not IsCasting() and not IsChanneling()
+		and ( (self.lootObj == nil or self.lootObj == 0) or self.skipLooting or AreBagsFull() or self.bagsFull or script_hunter.bagsFulls)
+		and ( (script_gather.nodeObj == 0 and script_gather.nodeObj == nil and self.hotspotReached) or not script_grind.gather or not script_gather.gathering)
 				
 		then
 	
@@ -1858,7 +1890,8 @@ end
 	-- this is our navigation if we can't complete conditions set above
 
 -- Pre checks before navigating
-	if IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or (IsInCombat() and not IsMounted()) or script_grind.enemyObj ~= nil then
+	if IsLooting() or IsCasting() or IsChanneling() or IsDrinking() or IsEating() or (IsInCombat() and not IsMounted()) or script_grind.enemyObj ~= nil or ( (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) and not script_grind.gather)
+	or (script_grind.lootObj ~= nil and script_grind.lootObj ~= 0 and not self.skipLooting and not AreBagsFull() and not self.bagsFull and not script_hunter.bagsFull) then
 		return;
 	end
 
@@ -1901,7 +1934,7 @@ end
 			if script_nav.numSavedLocation >= 3 and not script_grindEX:isThereAnyValidEnemyNearby() and self.hotspotReached and (not IsInCombat() or IsMounted())
 				and not script_grind:shouldWeRest()
 				and script_vendor.status == 0
-				and (script_grind.lootObj == nil or self.skipLooting or self.bagsFull or AreBagsFull() or script_hunter.bagsFull) then
+				and (script_grind.lootObj == nil or self.skipLooting or self.bagsFull or AreBagsFull() or script_hunter.bagsFull) and not IsLooting() then
 					
 				-- reset blacklist/target timer when moving back to hotspot
 				if script_grind.enemyObj == nil and not IsInCombat() then
@@ -1958,7 +1991,7 @@ function script_grind:runRest()
 			script_grind.petHasTarget = false;
 		end
 
- if (script_grind.lootObj == nil or AreBagsFull() or self.skipLooting or self.bagsFull) or not script_grindEX:isLootSafeToLoot() then
+ if (script_grind.lootObj == nil or AreBagsFull() or self.skipLooting or self.bagsFull) or not script_grindEX:isLootSafeToLoot() and not HasForm() then
 	if(RunRestScript()) then
 
 		if not PlayerHasTarget() then
@@ -2327,11 +2360,11 @@ function script_grind:getSkinTarget(lootRadius)
 		end
 
 	local targetObj, targetType = GetFirstObject();
-	local bestDist = lootRadius;
+	local bestDist = 1000;
 	local bestTarget = nil;
 	while targetObj ~= 0 do
 		if (targetType == 3) then -- Unit type NPC
-			if(targetObj:IsDead()) and not script_grind:isTargetLootBlacklisted(targetObj:GetGUID()) then
+			if(targetObj:IsDead()) and not script_grind:isTargetLootBlacklisted(targetObj:GetGUID()) and not targetObj:IsCritter() then
 					-- if is skinnable and is tapped by me (I killed it)
 				if (targetObj:IsSkinnable() and targetObj:IsTappedByMe() and not targetObj:IsLootable()) then
 						checkSkinTarget = targetObj;
@@ -2414,6 +2447,7 @@ function script_grind:lootAndSkin()
 	local isLoot = (not IsInCombat()) and not (self.lootObj == nil);
 	if (isLoot and not AreBagsFull() and not self.bagsFull) and (not IsEating() or not IsDrinking()) and (not self.needRest) and not self.skipLooting then
 		script_grindDoLoot:doLoot(localObj);
+		script_grind:setWaitTimer(500);
 		
 		return true;
 	elseif ((self.bagsFull or AreBagsFull()) and not hsWhenFull) then
@@ -2465,5 +2499,23 @@ function script_grind:isAnyTargetTargetingMe()
 		end
 	i, targetType = GetNextObject(i);
 	end
+return false;
+end
+
+function CollectAllGarbage()
+
+	if GetTimeEX() > script_grind.collectGarbageTimer then
+		script_nav.navPathPosition['x'] = 0;
+		script_nav.navPathPosition['y'] = 0;
+		script_nav.navPathPosition['z'] = 0;
+		script_nav.navPosition = {};
+		script_nav.navPathPosition = {};
+		script_grind.enemyObj = nil;
+		script_grind.lootObj = nil;
+
+		collectgarbage();
+		script_grind.collectGarbageTimer = GetTimeEX() + 60000;
+	end
+
 return false;
 end

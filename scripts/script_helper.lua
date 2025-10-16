@@ -158,6 +158,7 @@ function script_helper:setup()
 	script_helper:addFood("Conjured Muffin");
 
 	-- Epic mounts
+	script_helper:addMount("Reins of the Swift Mistsaber");
 	script_helper:addMount("Deathcharger's Reins");
 	script_helper:addMount("Black War Kodo");
 	script_helper:addMount("Black War Ram");
@@ -498,10 +499,12 @@ return false;
 end
 
 function DisMount()
-	for i=0,script_helper.numMounts do
-		if (HasItem(script_helper.myMounts[i])) then
-			if (UseItem(script_helper.myMounts[i])) then
-				return true;
+	if IsMounted() then
+		for i=0,script_helper.numMounts do
+			if (HasItem(script_helper.myMounts[i])) then
+				if (UseItem(script_helper.myMounts[i])) then
+					return true;
+				end
 			end
 		end
 	end

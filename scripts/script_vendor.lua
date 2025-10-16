@@ -137,9 +137,10 @@ function script_vendor:findDrink()
 				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
    				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
 				for u=0,script_helper.numWater-1 do
+					if strfind(itemName, script_helper.water[u]) ~= nil then
 					if (strfind(itemName, script_helper.water[u])) then
 						return script_helper.water[u];
-					end	
+					end	end
 				end	
 			end	
 		end
@@ -229,7 +230,7 @@ function script_vendor:repair()
 
 		-- chase down moving targets. get their name and position if close enough to target
 		if GetTarget() ~= 0 and GetTarget() ~= nil then
-			if GetTarget() == vendor['name'] and not GetTarget():CanAttack() then
+			if GetTarget():GetUnitName() == vendor['name'] and not GetTarget():CanAttack() then
 				vX, vY, vZ = GetTarget():GetPosition();
 			end
 		end
@@ -351,10 +352,13 @@ function script_vendor:sell()
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		_questEX2.sellVendorX, _questEX2.sellVendorY, _questEX2.sellVendorZ = vX, vY, vZ;
 		
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) and not GetTarget():CanAttack() then
-			vX, vY, vZ = GetTarget():GetPosition();
-		end
 		
+		-- chase down moving targets. get their name and position if close enough to target
+		if GetTarget() ~= 0 and GetTarget() ~= nil then
+			if GetTarget():GetUnitName() == vendor['name'] and not GetTarget():CanAttack() then
+				vX, vY, vZ = GetTarget():GetPosition();
+			end
+		end
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
@@ -459,7 +463,7 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 	if (vendor ~= nil) then
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (GetTarget():GetUnitName() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
 	
@@ -603,7 +607,7 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 		local vX, vY, vZ = vendor['pos']['x'], vendor['pos']['y'], vendor['pos']['z'];
 		-- Move to vendor
 		
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget() == vendor['name'] and not GetTarget():CanAttack()) then
+		if (GetTarget() ~= 0 and GetTarget() ~= nil) or (GetTarget():GetUnitName() == vendor['name'] and not GetTarget():CanAttack()) then
 			vX, vY, vZ = GetTarget():GetPosition();
 		end
 		

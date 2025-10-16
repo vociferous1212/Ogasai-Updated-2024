@@ -24,14 +24,6 @@ function script_grindSetup:setup()
 		script_grind.useExpChecker = false;
 		
 	end
-
-	if (strfind("HUNTER", class)) or GetMyClass() == "HUNTER" then
-		script_hunter.waitAfterCombat = true;
-	end
-
-	if (strfind("WARLOCK", class)) or GetMyClass() == "WARLOCK" then
-		script_warlock.waitAfterCombat = true;
-	end
 	
 	-- No refill as mage or at level 1
 	if (strfind("MAGE", class)) or GetMyClass() == "MAGE" then

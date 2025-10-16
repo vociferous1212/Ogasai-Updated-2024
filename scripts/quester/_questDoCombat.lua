@@ -167,10 +167,8 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 					_quest.enemyTarget:AutoAttack();
 					end
 				end
-				script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
-
 								-- move to target
-				if (script_grind.combatError == 3) and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight() then
+				if (script_grind.combatError == 3) and (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight()) then
 
 				
 
@@ -184,7 +182,13 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 						self.blacklistTimer = GetTimeEX() + 10000;
 					return true;
 					end
+					return false;
 				end
+				
+			script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
+			_quest.waitTimer = GetTimeEX() + 50;
+			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
+
 			end
 		end
 	end

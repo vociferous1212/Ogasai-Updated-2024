@@ -24,6 +24,9 @@ function _questRunRest:runRest()
 
 		_quest.message = "Resting...";
 
+		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
+		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
+
 		-- stop moving if we are moving
 		if (IsMoving()) and (not localObj:IsMovementDisabed()) then
 

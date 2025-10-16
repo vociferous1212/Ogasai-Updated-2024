@@ -15,7 +15,6 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		return "Please load and and enable the nav mesh...";
 	end
 
-	-- not sure why this is turned off here... is this not draw nav path??
 	script_nav.drawNav = false;
 
 	-- set local player variable
@@ -28,10 +27,8 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);	
 
 	-- If the target moves more than combat script range by yards then make a new path
-		-- the intent of this script is to preserve movement elsewhere while limiting the calls to the nav which can crash the game
-		-- using a separate script with a separate timer was easier on the nav table than a long if then else statement.
-	if GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 3
-	or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 20
+	if GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 2
+	or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3
 	or IsNodeBlacklisted(_ix, _iy, _iz, script_grind.nextToNodeDist)
 	then
 
@@ -52,14 +49,13 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 		return "Generating path...";
 	end
 
-	-- Get the current path node's coordinates
-	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
+
 
 	-- If we are not swimming and are close to the next path node, increase our nav node index
 	if not script_grindAreWeSwimming:areWeSwimming() and (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
-		if (GetPathSize(5) <= script_nav.lastnavIndex + 1) then
-			script_nav.lastnavIndex = GetPathSize(5);
+		if (GetPathSize(5) <= script_nav.lastnavIndex + 2) then
+			script_nav.lastnavIndex = GetPathSize(5) + 2;
 		end
 	end
 
@@ -72,16 +68,23 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	end
 
 	-- if we are not moving, and not swimming, try to generate a new path
-	if (not IsMoving()) and ((_lx - _ix)^2 < 2) and not script_grindAreWeSwimming:areWeSwimming() then
+	if (not IsMoving()) and not script_grindAreWeSwimming:areWeSwimming() then
 		GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 	end
 
 	-- time based distance to node check if we are not swimming
-	if not script_grindAreWeSwimming:areWeSwimming() and (GetTimeEX() > self.waitTimer or IsNodeBlacklisted(_ix, _iy, _iz, script_grind.nextToNodeDist)) then
+	if not script_grindAreWeSwimming:areWeSwimming() and (GetTimeEX() > self.waitTimer) then
+
+		-- normal speed is about 7. cat form/wolf form with increased speed is between 9 and 9.5
+		local var = 2;
+		local currentSpeed, maxSpeed = GetLocalPlayer():GetSpeed();
+		if maxSpeed == 7 or maxSpeed < 9 then var = 2;
+		elseif (maxSpeed > 9 and maxSpeed < 9.5) or IsMounted() then var = 3; end
 
 		-- if we are moving and a new path can be made, uphill or downhill, then generate a new path
-		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3) then	
+		if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*var) then	
 			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+			script_nav.lastnavIndex = script_nav.lastnavIndex + 1
 		end
 
 	-- if we are swimming then
@@ -96,14 +99,11 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		end
 	end
-
-	if (self.waitTimer > GetTimeEX() or self.moveTimer > GetTimeEX()) then
+	if self.waitTimer > GetTimeEX() or self.moveTimer > GetTimeEX() then
 		return;
 	end
-	
 	-- move to next path node
 	Move(_ix, _iy, _iz);
 	self.moveTimer = GetTimeEX() + 100;
-
---return false;
+	self.waitTimer = GetTimeEX() + 50;
 end

@@ -83,11 +83,13 @@ function script_grindBotPausedChecks:botPausedChecks()
 		script_grind.bagsFull = true;
 	end
 
+	-- local a, b = GetLocalPlayer():GetMaxSpeed(); if b == 1234 then 
 -- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
 		script_nav:setNextToNodeDist(5); NavmeshSmooth(script_grind.nextToNodeDist*3);
 	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
-		script_nav:setNextToNodeDist(6.5); NavmeshSmooth(script_grind.nextToNodeDist*1.8);
+		-- if GetLocalPlayer():GetSpeed() > 9 and GetLocalPlayer():GetSpeed() <= 9.2	
+		script_nav:setNextToNodeDist(3.8); NavmeshSmooth(script_grind.nextToNodeDist*2);
 	elseif (race == 'Night Elf') and (localObj:IsDead()) then
 		script_nav:setNextToNodeDist(8);
 		NavmeshSmooth(script_grind.nextToNodeDist*1.6);
@@ -97,6 +99,7 @@ function script_grindBotPausedChecks:botPausedChecks()
 	elseif (IsIndoors()) then
 		script_nav:setNextToNodeDist(2.2); NavmeshSmooth(script_grind.nextToNodeDist*1.2);
 	else
+		-- if GetLocalPlayer():GetSpeed() == 7
 		--script_nav:setNextToNodeDist(script_grind.nextToNodeDist); NavmeshSmooth(script_grind.nextToNodeDist*1.6);
 		script_grind.nextToNodeDist = script_grind.nextToNodeDist;
 		NavmeshSmooth(3);

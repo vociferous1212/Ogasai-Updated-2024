@@ -11,7 +11,21 @@ local vendorStatus = script_vendor.status;
 
 		script_grind.tickRate = 50;
 
-		if PlayerHasTarget() and script_grind.enemyObj == nil and not script_grind:isAnyTargetTargetingMe() then ClearTarget(); end
+		-- clear our target to chase down moving vendor targets but not if it is our vendor target
+		if PlayerHasTarget() then
+			if script_grind.enemyObj == nil and not script_grind:isAnyTargetTargetingMe()
+			and GetTarget():GetUnitName() ~= script_vendor.repairVendor['name']
+			and GetTarget():GetUnitName() ~= script_vendor.sellVendor['name']
+			and GetTarget():GetUnitName() ~= script_vendor.foodVendor['name']
+			and GetTarget():GetUnitName() ~= script_vendor.drinkVendor['name']
+			and GetTarget():GetUnitName() ~= script_vendor.arrowVendor['name']
+			and GetTarget():GetUnitName() ~= script_vendor.bulletVendor['name']
+
+			then
+
+				ClearTarget();
+			end
+		end
 
 		if not script_grind.skipLooting
 		and not AreBagsFull()
