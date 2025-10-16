@@ -78,7 +78,7 @@ function script_warriorEX:menu()
 					if (CollapsingHeader("|+| Overpower Options")) then	-- overpower
 						Text("Overpower action bar slot");
 						script_warrior.overpowerActionBarSlot = InputText("OPS", script_warrior.overpowerActionBarSlot);
-						Text("72 is Battle Stance Action Slot 1");
+						Text("73 is Battle Stance Action Slot 1");
 					end
 				end
 
@@ -87,7 +87,7 @@ function script_warriorEX:menu()
 						Text("Mocking Blow action bar slot");
 						wasClicked, script_warrior.useMockingBlow = Checkbox("Use Mocking Blow", script_warrior.useMockingBlow);
 						script_warrior.mockingBlowActionBarSlot = InputText("MBS", script_warrior.mockingBlowActionBarSlot);
-						Text("71 is your action bar number.. slot 1 would be 72");
+						Text("72 is your action bar number.. slot 1 would be 73");
 					end
 				end
 			end

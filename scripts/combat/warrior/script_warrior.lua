@@ -7,7 +7,7 @@ script_warrior = {
 	bloodRageHealth = 65, -- health to use bloodrage
 	potionHealth = 10, -- health to use potion
 	isSetup = false, -- setup check
-	meleeDistance = 3.65, -- melee distance
+	meleeDistance = 4.25, -- melee distance
 	waitTimer = 0, -- set wait time for script
 	stopIfMHBroken = true, -- stop if main hand is broken
 	overpowerActionBarSlot = 73+6, -- Default: Overpower in slot 7 on the default Battle Stance Bar
@@ -277,6 +277,10 @@ function script_warrior:run(targetGUID)	-- main content of script
 		return 4;
 	end
 
+	if localObj:HasDebuff("Dropped Weapon") or localObj:HasDebuff("Disasrmed") or localObj:HasDebuff("Disarm") then
+		return 4;
+	end
+
 -- Don't attack if we should rest first
 		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
 			and targetHealth > 99 and not targetObj:IsStunned()) then
@@ -294,13 +298,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling()) or (IsCasting()) or (self.waitTimer >= GetTimeEX()) then
 
-		-- face the target
-		if (IsChanneling() or IsCasting()) and IsInCombat() and PlayerHasTarget() then
-			if not IsMoving() then
-				GetTarget():FaceTarget();
-			end
+		if IsInCombat() and GetTarget() ~= nil and GetTarget() ~= 0 then
+			GetTarget():FaceTarget();
 		end
-
 		-- heroic strike spell ID table
 		local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
 
@@ -315,8 +315,22 @@ function script_warrior:run(targetGUID)	-- main content of script
 	return;
 	end
 
+	
+	if (IsInCombat() and script_grind:isAnyTargetTargetingMe()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
+		if (script_checkAdds:checkAdds()) then
+			
+			return 4;
+		end
+	end
 
-	if GetLocalPlayer():HasRangedWeapon() and script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
+	-- face the target
+	if IsInCombat() and PlayerHasTarget() then
+		if not IsMoving() and targetObj:GetDistance() <= self.meleeDistance + 2 then
+			GetTarget():FaceTarget();
+		end
+	end
+
+	if self.useBow and GetLocalPlayer():HasRangedWeapon() and script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
 		if targetObj:GetDistance() <= 30 and targetObj:GetDistance() > 13 and targetObj:IsInLineOfSight() then
 			if IsMoving() then
 				StopMoving();
@@ -350,13 +364,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 --Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not localObj:IsMovementDisabed()) and (not localObj:HasDebuff("Disarm")) then
-
-	
-	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
-		if (script_checkAdds:checkAdds()) then
-			return 4;
-		end
-	end
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
@@ -437,10 +444,13 @@ function script_warrior:run(targetGUID)	-- main content of script
 					and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
 
 					if Cast("Charge", targetObj) then 
-						targetObj:FaceTarget();
+						--targetObj:FaceTarget();
 						targetObj:AutoAttack();
+						self.waitTimer = GetTimeEX() + 1000;
+						script_grind:setWaitTimer(1000);
 						script_nav:resetNavPos();
-					return 3;
+						script_nav:resetNavigate();
+					return 0;
 					end
 				end
 			end	
@@ -473,12 +483,19 @@ function script_warrior:run(targetGUID)	-- main content of script
 				return 3;
 			end
 
-			--if IsInCombat() and not IsMoving() then targetObj:FaceTarget(); end
+			if IsInCombat() and not IsMoving() and targetObj:GetDistance() <= self.meleeDistance + 2 then targetObj:FaceTarget(); end
+
 
 
 			if (not IsAutoCasting("Attack")) and (targetObj:GetDistance() <= 8) and (not IsMoving()) then
 				targetObj:AutoAttack();
 				--targetObj:FaceTarget();
+			end
+
+			-- beserker rage
+			if self.berserkerStance and HasSpell("Berserker Rage") and not IsSpellOnCD("Berserker Rage") and targetHealth >= 20 then
+				CastSpellByName("Berserker Rage");
+				self.waitTimer = GetTimeEX() + 1500;
 			end
 			
 			-- Dismount
@@ -488,7 +505,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	
 			-- Run backwards if we are too close to the target
 			if (targetObj:GetDistance() <= .2) then 
-				if (script_warrior:runBackwards(targetObj,2)) then 
+				if (script_warrior:runBackwards(targetObj,3)) then 
 					return 4; 
 				end 
 			end
@@ -545,6 +562,15 @@ function script_warrior:run(targetGUID)	-- main content of script
 					
 				end
 			end
+
+			-- pummel if target is  casting
+			if self.berserkerStance and HasSpell("Pummel") and not IsSpellOnCD("Pummel") then
+				local localRage = GetLocalPlayer():GetRagePercentage();
+				if targetObj:IsCasting() and localRage >= 10 then
+					CastSpellByName("Pummel");
+					self.waitTimer = GetTimeEX() + 500;
+				end
+			end
 			
 			-- Humanoid use to flee, keep Hamstring up on them
 				-- don't use if we have piercing howl
@@ -557,11 +583,34 @@ function script_warrior:run(targetGUID)	-- main content of script
 				end
 
 			-- cleave 2 or more enemies
-			if self.useCleave and localRage >= 20 and script_grind:enemiesAttackingUs() >= 2 then
+			if self.useCleave and localRage >= 20 and script_grind:enemiesAttackingUs() >= 2 and not self.berserkerStance then
 				CastSpellByName("Cleave");
 			end
+
+			-- whirlwind 2 or more enemies
+			if self.berserkerStance and HasSpell("Whirlwind") and not IsSpellOnCD("Whirlwind") and script_grind.enemiesAttackingUs() >= 2 then
+				if localRage >= 25 then
+					CastSpellByName("Whirlwind");
+					self.waitTimer = GetTimeEX() + 1500;
+				else
+					return;
+				end
+			end
+
 			-- melee Skill: Heroic Strike if we got 15 rage battle stance
-			if (self.battleStance or self.berserkerStance) and (not IsMoving()) and not targetObj:IsFleeing() then
+			if (self.battleStance
+			or (self.berserkerStance
+				and (
+					(
+					(
+					HasSpell("Bloodthirst") and IsSpellOnCD("Bloodthirst")
+					)
+					or localRage >= 50)
+					or not HasSpell("Bloodthirst")
+					)
+					)
+					)
+				and (not IsMoving()) and not targetObj:IsFleeing() then
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
 					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
@@ -825,6 +874,19 @@ function script_warrior:run(targetGUID)	-- main content of script
 					return 3;
 				end
 
+				
+				-- this needs to be rechecked and changed.... we can return here and skip all other non necessary spells
+				-- melee skill: Bloodthirst, save rage for this attack
+				if (HasSpell("Bloodthirst") and not IsSpellOnCD("Bloodthirst")) then 
+					if (localRage >= 25) then 
+						if (Cast('Bloodthirst', targetObj)) then 
+						end
+					else 
+						return;
+						 -- save rage for bloodthirst
+					end 
+				end 
+
 				-- shield block
 				-- main rage user use only if target has at least 1 sunder for threat gain
 				if (self.defensiveStance) and (self.enableShieldBlock) and (targetObj:IsTargetingMe()) then
@@ -850,8 +912,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 				-- melee Skill: Overpower if possible battle stance
 				if (self.battleStance) and (GetTimeEX() > self.overpowerTimer) then
 					if (script_warrior:canOverpower() and localRage >= 5 and not IsSpellOnCD('Overpower')) then 
-						self.overpowerTimer = GetTimeEX() + 1000;
 						if (Cast("Overpower", targetObj)) then
+							self.overpowerTimer = GetTimeEX() + 1000;
 							return true;
 						end
 					end  
@@ -864,19 +926,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 							
 						end
 					end
-				end
-
-				-- this needs to be rechecked and changed.... we can return here and skip all other non necessary spells
-				-- melee skill: Bloodthirst, save rage for this attack
-				if (HasSpell("Bloodthirst") and not IsSpellOnCD("Bloodthirst")) then 
-					if (localRage >= 25) then 
-						if (Cast('Bloodthirst', targetObj)) then 
-							
-						end
-					else 
-						 -- save rage for bloodthirst
-					end 
-				end  
+				end 
 
 				--if (targetObj:GetDistance() <= 8) and (not IsMoving()) then
 				--	targetObj:FaceTarget();
@@ -892,7 +942,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				end
 
 				-- melee Skill: Heroic Strike if we got 15 rage battle stance
-				if (self.battleStance or self.berserkerStance) and not IsMoving() then
+			if (self.battleStance or (self.berserkerStance and (( (HasSpell("Bloodthirst") and IsSpellOnCD("Bloodthirst")) or localRage >= 50) or not HasSpell("Bloodthirst")))) and (not IsMoving()) and not targetObj:IsFleeing() then
 					if (localRage >= self.heroicStrikeRage) and not targetObj:IsFleeing() then 
 						targetObj:FaceTarget();
 						if (targetObj:GetDistance() <= self.meleeDistance) then
@@ -905,7 +955,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				end
 
 				-- wait to heroic strike in defensive stance for sunder armor >= 1
-				if (self.defensiveStance or self.berserkerStance) and not IsMoving() then
+				if (self.defensiveStance) and not IsMoving() then
 					if (not targetObj:GetCreatureType() ~= 'Mechanical') and (not targetObj:GetCreatureType() ~= 'Elemental') and not targetObj:IsFleeing() then
 						if (localRage >= 45) and (targetObj:GetDebuffStacks("Sunder Armor") >= self.sunderStacks) then 
 							if (targetObj:GetDistance() <= 6) then
@@ -1067,7 +1117,7 @@ function script_warrior:rest()
 	if localHealth < 95 and IsEating() then
 		self.message = "Resting, eating and/or drinking...";
 		return true;
-	elseif not IsEating() then
+	elseif not IsEating() or (IsEating() and localHealth >= 95) then
 		if not IsStanding() then
 			JumpOrAscendStart()
 		end

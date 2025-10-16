@@ -85,8 +85,8 @@ if IsMounted() then script_helper:mountUp() return true end
 
 
 -- aspect of the cheetah
-	if (script_hunter.useCheetah) and (hasCheetah) and (not IsInCombat())
-	and (targetObj == nil or target:GetDistance() >= 50) and (localMana > script_hunter.drinkMana + 10) then 
+	if (script_hunter.useCheetah) and (hasCheetah) and (not IsInCombat() and not IsMounted())
+	and (targetObj == nil or (targetObj ~= nil and targetObj ~= 0 and target:GetDistance() >= 50)) and (localMana > script_hunter.drinkMana + 10) then 
 
 		if (not localObj:HasBuff('Aspect of the Cheetah')) then 
 

@@ -37,7 +37,7 @@ function script_hunterScareBeast:isScareTargetValid()
 	local currentObj, typeObj = GetFirstObject(); 
 
 	while currentObj ~= 0 do 
-    		if typeObj == 3 then
+    		if typeObj == 3 and script_grind.enemyObj ~= nil then
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= 50 then
 				if script_grind:isTargetingMe(currentObj) and currentObj:IsInLineOfSight()
 					and currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID() then
@@ -68,7 +68,7 @@ function script_hunterScareBeast:scareAdd(targetObjGUID)
     	if typeObj == 3 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and currentObj:IsInLineOfSight() then
 				if (currentObj:GetGUID() ~= targetObjGUID and script_grind:isTargetingMe(currentObj)) then
-					if script_hunterScareBeast:isScareTargetValid() then
+					if script_hunterScareBeast:isScareTargetValid() and currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID() then
 						if (currentObj:IsInLineOfSight()) then
 							if (not script_grind.adjustTickRate) then
 								script_grind.tickRate = 100;

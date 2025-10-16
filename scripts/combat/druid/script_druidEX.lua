@@ -7,6 +7,7 @@ function script_druidEX:castCharge()
 		CastSpellByName("Feral Charge");
 		return true;
 	end
+return false;
 end
 function script_druidEX:removeTravelForm()
 
@@ -65,18 +66,19 @@ function script_druidEX:travelForm()
 			if (localObj:HasBuff("Bear Form")) then
 				if (CastSpellByName("Bear Form")) then
 					self.waitTimer = GetTimeEX() + 1500;
-					return 0;
+					return true;
 				end
 			end
 			if (localObj:HasBuff("Dire Bear Form")) then
 				if (CastSpellByName("Dire Bear Form")) then
 					self.waitTimer = GetTimeEX() + 1500;
+					return true;
 				end
 			end
 			if (localObj:HasBuff("Cat Form")) then
 				if (CastSpellByName("Cat Form")) then
 					self.waitTimer = GetTimeEX() + 1500;
-					return 0;
+					return true;
 				end
 			end
 		end
@@ -86,12 +88,12 @@ function script_druidEX:travelForm()
 		if (HasSpell("Travel Form")) and (not localObj:HasBuff("Travel Form")) and (not IsIndoors()) then
 			if (CastSpellByName("Travel Form")) then
 				self.waitTimer = GetTimeEX() + 1500;
-				return 0;
+				return true;
 			end
 		end
 	end
 
-return true;
+return false;
 end
 
 
@@ -104,19 +106,17 @@ function script_druidEX:bearForm()
 		if (not HasSpell("Dire Bear Form")) then
 			if (HasSpell("Bear Form")) then
 				if (CastSpellByName("Bear Form")) then
-					self.waitTimer = GetTimeEX() + 1500;
-					return 0;
+					return true;
 				end
 			end
 		elseif (HasSpell("Dire Bear Form")) then
 			if (CastSpellByName("Dire Bear Form")) then
-				self.waitTimer = GetTimeEX() + 1500;
-				return 0;
+				return true;
 			end
 		end
 	end
 
-return true;
+return false;
 end	
 
 function script_druidEX:moonkinForm()
