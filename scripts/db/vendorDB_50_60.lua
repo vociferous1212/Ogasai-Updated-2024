@@ -41,4 +41,10 @@ vendorDB:addVendor("Calandrath", 2, 1, 1377, false, false, true, false, false, -
 vendorDB:addVendor("Calandrath", 2, 1, 1377, false, false, false, true, false, -6868.05, 729.91, 45.66);
 vendorDB:addVendor("Calandrath", 2, 1, 1377, false, false, false, false, true, -6868.05, 729.91, 45.66);
 
+-- winterspring
+vendorDB:addVendor("Natheril Raincaller", 0, 1, 618, false, false, false, false, false, 7073.93, -3969.67, 745.63);
+vendorDB:addVendor("Natheril Raincaller", 0, 1, 618, false, false, true, false, false, 7073.93, -3969.67, 745.63);
+vendorDB:addVendor("Natheril Raincaller", 0, 1, 618, false, false, false, true, false, 7073.93, -3969.67, 745.63);
+vendorDB:addVendor("Natheril Raincaller", 0, 1, 618, false, false, false, false, true, 7073.93, -3969.67, 745.63);
+
 end

@@ -180,6 +180,9 @@ function _questDB:addQuest(completed, faction, questName, giverName, posX, posY,
 
 end
 
+-- this starts the quester
+-- everything is checked from the quest start
+-- need to run a for loop to check for current quest name in quest log and compare to curlistquest var
 function _questDB:getQuestStartPos()
 
 	local x, y, z = 0, 0, 0;

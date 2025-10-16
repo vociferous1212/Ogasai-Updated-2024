@@ -17,6 +17,13 @@ function vendorDB_40_50:setup()
 	vendorDB:addVendor("Faralorn", 0, 1, 357, false, false, false, true, false, -4379.03, 3311.83, 13.55);
 	vendorDB:addVendor("Faralorn", 0, 1, 357, false, false, false, false, true, -4379.03, 3311.83, 13.55);
 
+	-- ferelas horde camp mojache
+	vendorDB:addVendor("Worb Strongstitch", 1, 1, 357, true, false, false, false, false, -4339.65, 249.37, 26.31);
+	vendorDB:addVendor("Worb Strongstitch", 1, 1, 357, false, false, false, false, false, -4339.65, 249.37, 26.31);
+	vendorDB:addVendor("Innkeeper Greul", 1, 1, 357, false, true, false, false, false, -4460.11, 242.72, 39.1);
+	vendorDB:addVendor("Innkeeper Greul", 1, 1, 357, false, false, true, false, false, -4460.11, 242.72, 39.1);
+	vendorDB:addVendor("Loorana", 1, 1, 357, false, true, false, false, false, -4400.11, 194.32, 26.42);
+	vendorDB:addVendor("Loorana", 1, 1, 357, false, false, true, false, false, -4400.11, 194.32, 26.42);
 
 	-- hinterlands alliance
 	vendorDB:addVendor("Truk Wildbeard", 0, 0, 47, false, false, false, false, false, 380.8, -2128.06, 121);

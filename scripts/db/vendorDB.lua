@@ -157,6 +157,7 @@ function vendorDB:setup()
 	-- Ally: Wetlands
 	vendorDB:addVendor('Gruham Rumbnul', 0, 0, 11, false, false, false, true, true, -3746.03, 888.59, 11.01); -- Ammo, Bullets, General
 	vendorDB:addVendor('Murndan Derth', 0, 0, 11, true, false, false, false, false, -3790.13, -858.47, 11.60); -- Repair
+	vendorDB:addVendor("Fradd Swiftgear", 0, 0, 11, false, false, false, false, false, -2856.48, -1481.88, 10.15);
 
 	-- Ally + Horde Wetlands
 	vendorDB:addVendor("Kixxle", 0, 0, 11, false, false, false, false, false, -3188.04, -2465.58, 9.56);
