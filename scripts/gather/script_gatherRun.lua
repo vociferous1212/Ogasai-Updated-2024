@@ -110,9 +110,15 @@ function script_gatherRun:gather()
 
 			local nDist = math.floor(script_gather.nodeObj:GetDistance());
 
+			-- dismount to kill anything attacking us
+			if nDist <= 20 and IsInCombat() and script_grind.enemiesAttackingUs() <= 2 then
+				if IsMounted() then
+					DisMount();
+				end
+			end
 
 			-- mount up
-			if nDist > 20 and not IsSwimming() and GetTimeEX() > script_grind.tryMountTimer and script_grind.hasAMount and (not IsInCombat())
+			if nDist >= 60 and not IsSwimming() and GetTimeEX() > script_grind.tryMountTimer and script_grind.hasAMount and (not IsInCombat())
 			and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
 			and not IsCasting() and not IsChanneling() and not IsLooting()
 			then
@@ -134,6 +140,7 @@ function script_gatherRun:gather()
 					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
 					end
 					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
+					script_grind.message = "Gathering - "..script_gather.nodeObj:GetUnitName().. " - "..math.floor(script_gather.nodeObj:GetDistance()).." (yd)";
 					if IsSwimming() or  ((not IsMoving()) and (nDist > 5)) then Move(_x, _y, _z); end
 
 				--return true;

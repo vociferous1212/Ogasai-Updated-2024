@@ -31,7 +31,6 @@ ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3621.0573730469, -
 ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3516.4919433594, -108.33492279053, 1.8849503993988);
 ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3459.2082519531, -30.171146392822, 5.9125742912292);
 ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3374.1604003906, 113.60749053955, 0.86109519004822);
-
 ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3360.4306640625, 219.38861083984, 12.802869796753);
 ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3306.1794433594, 351.63711547852, 5.2041721343994);
 ashenvaleGatherPaths:addAshenvalePath(self.numAshenvalePaths, 3512.1567382813, 393.83197021484, 1.6547569036484);

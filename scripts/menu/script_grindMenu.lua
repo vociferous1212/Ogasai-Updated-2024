@@ -140,8 +140,13 @@ function script_grindMenu:menu()
 		StopBot();
 	end
 
+	--SameLine();
+	--Text(""..GetTimeStamp());
+
 	SameLine();
-	Text(""..GetTimeStamp());
+	if Button("Reset") then
+		script_grind.collectGarbageTimer = 0;
+	end
 
 	if (script_grindMenu.helpMenu) then
 		Text("HELP *press tab key to change settings on this screen");

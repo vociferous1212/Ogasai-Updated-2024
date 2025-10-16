@@ -32,8 +32,10 @@ function script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange()
 					TargetByName(name);
 
 					if (UnitIsEnemy("target","player")) then
-
-						i:AutoAttack();
+					
+						if not IsAutoCasting("Attack") then
+							i:AutoAttack();
+						end
 
 						return i;
 					end

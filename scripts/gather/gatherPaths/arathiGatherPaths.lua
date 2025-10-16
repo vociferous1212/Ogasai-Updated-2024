@@ -8,7 +8,7 @@ arathiGatherPaths = {
 
 function arathiGatherPaths:addArathiPath(id, x, y, z)
 
-    local randomOffset = math.random(-6.24552, 5.12525);
+    local randomOffset = math.random(-10.24552, 10.12525);
 
     self.arathiPaths[self.numArathiPaths] = {};
     self.arathiPaths[self.numArathiPaths]['id'] = id;

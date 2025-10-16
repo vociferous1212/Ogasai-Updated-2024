@@ -9,8 +9,9 @@ script_gatherer = {
 
 	gathererPathsLoaded = include("scripts\\gather\\script_gathererPaths.lua"),
 	tempWindowLoaded = include("scripts\\gather\\tempSetupWindow.lua"),
-}
+	getCurrentAreaAndPathLoaded = include("scripts\\gather\\getCurrentAreaAndPath.lua"),
 
+}
 
 function script_gatherer:setup()
 
@@ -22,27 +23,22 @@ function script_gatherer:setup()
 	script_grind.drawUnits = false;
 	script_grind.stopBotWhenInvFull = true;
 
-
 	script_grind:setup();
 
-	arathiGatherPaths:setupArathiPaths();
-	ashenvaleGatherPaths:setupAshenvalePaths();
-	azsharaGatherPaths:setupAzsharaPaths();
-	barrensGatherPaths:setupBarrensPaths();
-	darkshoreGatherPaths:setupDarkshorePaths();
-	desolaceGatherPaths:setupDesolacePaths();
-	durotarGatherPaths:setupDurotarPaths();
-	duskwoodGatherPaths:setupDuskwoodPaths();
-	elwynnGatherPaths:setupElwynnPaths();
-	felwoodGatherPaths:setupFelwoodPaths();
-	feralasGatherPaths:setupFeralasPaths();
-	mulgoreGatherPaths:setupMulgorePaths();
-	stonetalonGatherPaths:setupStonetalonPaths();
-	tanarisGatherPaths:setupTanarisPaths();
-	teldrassilGatherPaths:setupTeldrassilPaths();
-	tirisfalGatherPaths:setupTirisfalPaths();
-	westfallGatherPaths:setupWestfallPaths();
-	wetlandsGatherPaths:setupWetlandsPaths();
+	-- setup gather paths folder
+	alteracGatherPaths:setupAlteracPaths(); arathiGatherPaths:setupArathiPaths(); ashenvaleGatherPaths:setupAshenvalePaths();
+	azsharaGatherPaths:setupAzsharaPaths(); badlandsGatherPaths:setupBadlandsPaths(); barrensGatherPaths:setupBarrensPaths();
+	blastedlandsGatherPaths:setupBlastedlandsPaths(); burningsteppesGatherPaths:setupBurningsteppesPaths(); darkshoreGatherPaths:setupDarkshorePaths();
+	deadwindGatherPaths:setupDeadwindPaths(); desolaceGatherPaths:setupDesolacePaths(); dunmoroghGatherPaths:setupDunmoroghPaths();
+	durotarGatherPaths:setupDurotarPaths(); duskwoodGatherPaths:setupDuskwoodPaths(); dustwallowGatherPaths:setupDustwallowPaths();
+	easternplaguelandsGatherPaths:setupEasternplaguelandsPaths(); elwynnGatherPaths:setupElwynnPaths(); felwoodGatherPaths:setupFelwoodPaths();
+	feralasGatherPaths:setupFeralasPaths(); hillsbradGatherPaths:setupHillsbradPaths(); hinterlandsGatherPaths:setupHinterlandsPaths();
+	lochmodanGatherPaths:setupLochmodanPaths(); moongladeGatherPaths:setupMoongladePaths(); mulgoreGatherPaths:setupMulgorePaths();
+	redridgeGatherPaths:setupRedridgePaths(); searinggorgeGatherPaths:setupSearinggorgePaths(); silithusGatherPaths:setupSilithusPaths();
+	silverpineGatherPaths:setupSilverpinePaths(); stonetalonGatherPaths:setupStonetalonPaths(); stranglethornGatherPaths:setupStranglethornPaths();
+	swampofsorrowsGatherPaths:setupSwampofsorrowsPaths(); tanarisGatherPaths:setupTanarisPaths(); teldrassilGatherPaths:setupTeldrassilPaths();
+	thousandneedlesGatherPaths:setupThousandneedlesPaths(); tirisfalGatherPaths:setupTirisfalPaths(); ungoroGatherPaths:setupUngoroPaths();
+	westernplaguelandsGatherPaths:setupWesternplaguelandsPaths(); westfallGatherPaths:setupWestfallPaths(); wetlandsGatherPaths:setupWetlandsPaths();
 	winterspringGatherPaths:setupWinterspringPaths();
 
 	self.isSetup = true;
@@ -251,8 +247,9 @@ function script_gatherer:run()
 	end
 
 	if not IsInCombat() and not IsCasting() and not IsChanneling() and not IsMounted() then
-		if (RunRestScript()) then
-			return;
+		if (script_grind:runRest()) then
+				RunRestScript();
+			return true;
 		end
 	end
 	
@@ -270,6 +267,9 @@ function script_gatherer:run()
 		script_gather.blacklistTime = GetTimeEX() + (script_gather.blacklistSetTime * 1000);
 		script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
 
+		if self.enemtTarget ~= nil and self.enemtTarget ~= 0 then
+			self.enemyTarget:AutoAttack();
+		end
 		-- get a target
 		if GetTarget() ~= nil and GetTarget() ~= 0 then
 			if GetTarget():CanAttack() and not GetTarget():IsDead() then
@@ -281,11 +281,9 @@ function script_gatherer:run()
 		end
 	
 		if HasPet() and PetHasTarget() then
-			if self.enemyTarget == nil or self.enemyTarget == 0 then
-				AssistUnit("pet");
-				if GetTarget() ~= nil and GetTarget() ~= 0 then
-					self.enemyTarget = GetTarget();
-				end
+			AssistUnit("pet");
+			if GetTarget() ~= nil and GetTarget() ~= 0 then
+				self.enemyTarget = GetTarget();
 			end
 		end
 
@@ -392,36 +390,5 @@ function script_gatherer:draw()
             end
        end
     end
-end
-
-function script_gatherer:getCurrentArea()
-
-	local path = nil;
-	local numPath = nil;
-
-   -- sort our current area
-   if GetMapID() == 45 then path = arathiGatherPaths.arathiPaths; numPath = arathiGatherPaths.numArathiPaths;
-   elseif GetMapID() == 331 then path = ashenvaleGatherPaths.ashenvalePaths; numPath = ashenvaleGatherPaths.numAshenvalePaths;
-   elseif GetMapID() == 16 then path = azsharaGatherPaths.azsharaPaths; numPath = azsharaGatherPaths.numAzsharaPaths;
-   elseif GetMapID() == 17 then path = barrensGatherPaths.barrensPaths; numPath = barrensGatherPaths.numBarrensPaths;
-   elseif GetMapID() == 148 then path = darkshoreGatherPaths.darkshorePaths; numPath = darkshoreGatherPaths.numDarkshorePaths;
-   elseif GetMapID() == 405 then path = desolaceGatherPaths.desolacePaths; numPath = desolaceGatherPaths.numDesolacePaths;
-   elseif GetMapID() == 14 then path = durotarGatherPaths.durotarPaths; numPath = durotarGatherPaths.numDurotarPaths;
-   elseif GetMapID() == 10 then path = duskwoodGatherPaths.duskwoodPaths; numPath = duskwoodGatherPaths.numDuskwoodPaths;
-   elseif GetMapID() == 12 then path = elwynnGatherPaths.elwynnPaths; numPath = elwynnGatherPaths.numElwynnPaths;
-   elseif GetMapID() == 361 then path = felwoodGatherPaths.felwoodPaths; numPath = felwoodGatherPaths.numFelwoodPaths;
-   elseif GetMapID() == 357 then path = feralasGatherPaths.feralasPaths; numPath = feralasGatherPaths.numFeralasPaths;
-   elseif GetMapID() == 215 then path = mulgoreGatherPaths.mulgorePaths; numPath = mulgoreGatherPaths.numMulgorePaths;
-   elseif GetMapID() == 406 then path = stonetalonGatherPaths.stonetalonPaths; numPath = stonetalonGatherPaths.numStonetalonPaths;
-   elseif GetMapID() == 440 then path = tanarisGatherPaths.tanarisPaths; numPath = tanarisGatherPaths.numTanarisPaths;
-   elseif GetMapID() == 141 then path = teldrassilGatherPaths.teldrassilPaths; numPath = teldrassilGatherPaths.numTeldrassilPaths;
-   elseif GetMapID() == 85 then path = tirisfalGatherPaths.tirisfalPaths; numPath = tirisfalGatherPaths.numTirisfalPaths;
-   elseif GetMapID() == 40 then path = westfallGatherPaths.westfallPaths; numPath = westfallGatherPaths.numWestfallPaths;
-   elseif GetMapID() == 11 then path = wetlandsGatherPaths.wetlandsPaths; numPath = wetlandsGatherPaths.numWetlandsPaths;
-   elseif GetMapID() == 618 then path = winterspringGatherPaths.winterspringPaths; numPath = winterspringGatherPaths.numWinterspringPaths;
-
-	end
-	script_gathererPaths.paths = path;
-	script_gathererPaths.numPaths = numPath;
 end
 
