@@ -2,9 +2,6 @@ script_grindAssignTarget = {}
 
 function script_grindAssignTarget:assignTarget()
 
-
-	local i, targetType = GetFirstObject();
-
 	-- set quester target if using quester
 	if _quest.usingQuester then
 		if _quest.enemyTarget ~= nil then
@@ -15,30 +12,8 @@ function script_grindAssignTarget:assignTarget()
 		local bestTarget = nil
 		local bestHP = 100
 
--- return a target attacking player or players pet
-	while i ~= 0 do
-	
-		-- NPC type 3
-		if (targetType == 3) or targetType == 4 then
-		
-			-- acceptable targets limited check by range
-			if (i:GetDistance() < 50) and i:CanAttack() then
-				
-				-- run another object manager
-				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
-
-					-- return target
-					bestTarget = i;
-				end
-			end
-		end
-
-	-- get next target
-	i, targetType = GetNextObject(i);
-	end
-
 	-- get the target with the lowest health attacking us and not with blade flurry active, rogue, drops combo points
-	if script_grind:enemiesAttackingUs() > 1 and not GetLocalPlayer():HasBuff("Blade Flurry") then
+	if GetLocalPlayer():HasBuff("Blade Flurry") and IsInCombat() then
 
 		local i, t = GetFirstObject()
 
@@ -53,18 +28,42 @@ function script_grindAssignTarget:assignTarget()
 
 					if bestHP > hp then
 						bestHP = hp;
-					end
-					if bestHP < hp then
-						bestTarget = i;
+						if bestHP < hp then
+							bestTarget = i;
+						end
 					end
 				end
-
 			end
 
 		i, t = GetNextObject(i);
 
 		end
 	return bestTarget;
+	end
+	
+-- return a target attacking player or players pet
+	local i, targetType = GetFirstObject();
+
+	while i ~= 0 do
+	
+		-- NPC type 3
+		if (targetType == 3) or targetType == 4 then
+		
+			-- acceptable targets limited check by range
+			if (i:GetDistance() < 50) and i:CanAttack() then
+				
+				-- run another object manager
+				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
+
+					-- return target
+					bestTarget = i;
+					return i;
+				end
+			end
+		end
+
+	-- get next target
+	i, targetType = GetNextObject(i);
 	end
 
 	-- Find the closest valid target if we have no target or we are not in combat

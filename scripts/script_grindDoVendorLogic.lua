@@ -46,7 +46,7 @@ local vendorStatus = script_vendor.status;
 				StopMoving();
 				return;
 			end
-			if (not IsIndoors()) and (not IsMoving()) then
+			if (not IsIndoors()) and (not IsMoving()) and IsStanding() then
 				if (script_helper:mountUp()) then
 					script_grind:setWaitTimer(4500);
 					return true;

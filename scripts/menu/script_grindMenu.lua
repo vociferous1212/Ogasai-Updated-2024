@@ -146,6 +146,8 @@ function script_grindMenu:menu()
 	SameLine();
 	if Button("Reset") then
 		script_grind.collectGarbageTimer = 0;
+		script_nav:resetNavPos();
+		lastnavIndex = 1;
 	end
 
 	if (script_grindMenu.helpMenu) then

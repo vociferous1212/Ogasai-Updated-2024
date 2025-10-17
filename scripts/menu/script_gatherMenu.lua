@@ -30,7 +30,6 @@ function script_gatherMenu:menu()
 					Separator();
 					Text('Herbs');
 
-					-- -29 for some reason double counts each herb from above
 					for i=0,script_gather.numHerbs - 29 do
 						wasClicked, script_gather.herbs[i][2] = Checkbox(script_gather.herbs[i][0], script_gather.herbs[i][2]);
 						SameLine(); Text('(' .. script_gather.herbs[i][3] .. ') Req Level');
@@ -74,8 +73,18 @@ function script_gatherMenu:menu()
 				end
 			end
 			wasClicked, script_gather.safeGather = Checkbox("Safe Gathering", script_gather.safeGather);
-			--SameLine(); 
-			--wasClicked, script_grind.killStuffAroundGatherNodes = Checkbox("Kill Stuff Around Nodes", script_grind.killStuffAroundGatherNodes);
+			SameLine() Text(""); SameLine(); 
+			if GetMapID() == 400 then
+				if Button("Collect Rocket Car Parts") then	
+					script_gather.collectChests = true;
+					script_gather:addChest("rocket car", 449, 1, true);
+					script_gather:addChest("rocket car", 450, 1, true);
+					script_gather:addChest("rocket car", 451, 1, true);
+					script_gather:addChest("rocket car", 452, 1, true);
+					script_gather:addChest("rocket car", 453, 1, true);
+					script_gather:addChest("rocket car", 454, 1, true);
+				end
+			end
 
 			if (script_gather.safeGather) then
 				Text("Blacklisting gather nodes with 3 or more enemies in range");

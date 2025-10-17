@@ -28,6 +28,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 
 	-- If the target moves more than combat script range by yards then make a new path
 	if GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 2
+	or GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) >= script_grind.combatScriptRange
 	or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3
 	or IsNodeBlacklisted(_ix, _iy, _iz, script_grind.nextToNodeDist)
 	then
@@ -40,7 +41,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
 
-		script_nav.lastnavIndex = 1; -- start at index 1, index 0 is our position
+		script_nav.lastnavIndex = 1.5; -- start at index 1, index 0 is our position
 
 	end
 

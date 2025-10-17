@@ -160,7 +160,7 @@ function script_drawData:drawPath()
 			firstIndex = script_nav.lastnavIndex;
 		end
 		if (script_nav.lastnavIndex <= GetPathSize(5)) then
-			for index = firstIndex, GetPathSize(5) - 4 do
+			for index = firstIndex, GetPathSize(5) -5 do
 				local _x, _y, _z = GetPathPositionAtIndex(5, index);
 				local _xx, _yy, _zz = GetPathPositionAtIndex(5, index+1);
 				local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);

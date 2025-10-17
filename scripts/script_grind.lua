@@ -930,7 +930,7 @@ end
 				self.enemyObj = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
 			end
 			
-		elseif not IsInCombat() and self.lootObj == nil and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() == nil) and (self.enemyObj == nil or self.enemyObj == 0) then
+		elseif not IsInCombat() and self.lootObj == nil and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() == nil) then
 		
 			if (script_gatherRun:gather()) then
 
@@ -1336,6 +1336,7 @@ end
 					end
 				end
 				if GetMyClass() == "DRUID" then
+					if IsMoving() then StopMoving(); return true; end
 					if self.enemyObj ~= 0 and self.enemyObj ~= nil then
 						if IsMoving() then StopMoving(); return true; end
 						if HasForm() and not IsInCombat() then RemoveForm(); return true; end
@@ -1346,6 +1347,7 @@ end
 							self.waitTimer = GetTimeEX() + 1500;
 						return;
 						end
+					return;
 					end
 				end
 
@@ -1395,6 +1397,7 @@ end
 			if not self.lastTargetTargeted:IsDead() and not script_grind:isTargetingMe(self.lastTargetTargeted)
 			and not script_grind:isTargetingPet(self.lastTargetTargeted)
 			and not script_grind:isTargetHardBlacklisted(self.lastTargetTargeted:GetGUID())
+			and self.lastTarget:GetHealthPercentage() <= 99
 				
 			then
 				
@@ -1653,13 +1656,18 @@ end
 		end
 		script_grind:setWaitTimer(50);
 		--return true;
-		if not IsMoving() and not IsPathLoaded(5) and not IsCasting() and not IsChanneling() and IsStanding() then
+
+		-- fall back if we cannot find a path and are already in combat
+		if not IsMoving() and IsInCombat() and not IsPathLoaded(5) and not IsCasting() and not IsChanneling() and IsStanding() and self.enemyObj:GetDistance() > script_grind.combatScriptRange + 1 then
 			self.combatError = nil;
 			local x, y, z = GetLocalPlayer():GetPosition();
-			local var = math.random(-2, 2);
-			Move(x+var, y-var, z);
-			script_nav:resetNavigate();
+			if self.enemyObj:GetDistance() <= 15 then
+				x, y, z = self.enemyObj:GetPosition();
+			end
+			local var = math.random(-1, 1);
+			Move(x-(var), y+(var), z);
 			script_nav:resetNavPos();
+			lastnavIndex = 1;
 		end
 	--return true;
 	end
@@ -2449,7 +2457,6 @@ function script_grind:lootAndSkin()
 		script_grindDoLoot:doLoot(localObj);
 		script_grind:setWaitTimer(500);
 		
-		return true;
 	elseif ((self.bagsFull or AreBagsFull()) and not hsWhenFull) then
 		self.lootObj = nil;
 		self.message = "Warning the bags are full...";

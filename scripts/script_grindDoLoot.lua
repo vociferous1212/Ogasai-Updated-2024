@@ -137,8 +137,7 @@ function script_grindDoLoot:doLoot(localObj)
 
 	-- loot attempt #1
 		if (IsLooting()) then
-				if self.timerWhileLooting < GetTimeEX() then
-				LootTarget(); CloseLoot(); self.timerWhileLooting = GetTimeEX() + 500; end
+				LootTarget(); CloseLoot(); self.timerWhileLooting = GetTimeEX() + 500;
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
 			end
@@ -147,14 +146,12 @@ function script_grindDoLoot:doLoot(localObj)
 	-- interact with object if we are not looting
 			-- backup line 2 (and not IsLooting())
 		if script_grind.lootObj ~= nil and not IsMoving() then
-			if (not script_grind.lootObj:UnitInteract() or script_grind.lootObj:UnitInteract()) or IsLooting() then
-				script_grind:setWaitTimer(500);
+			if (not script_grind.lootObj:UnitInteract() or script_grind.lootObj:UnitInteract()) and not IsLooting() then
 				if GetTimeEX() > self.timerWhileLooting then
 					LootTarget(); CloseLoot();
-					script_grind:setWaitTimer(500);
 					self.timerWhileLooting = GetTimeEX() + 500;
 				end
-			elseif script_grind.lootObj:UnitInteract() or (IsLooting() and self.timerWhileLooting < GetTimeEX()) then 
+			elseif script_grind.lootObj:UnitInteract() or (not IsLooting() and self.timerWhileLooting < GetTimeEX()) then 
 				LootTarget(); CloseLoot();
 				self.timerWhileLooting = GetTimeEX() + 500;
 				script_grind:setWaitTimer(500);
@@ -168,6 +165,7 @@ function script_grindDoLoot:doLoot(localObj)
 -- if looting and not moving then wait
 		if (not IsLooting()) then
 			self.timerWhileLooting = GetTimeEX() + 500;
+			script_grind:setWaitTimer(500);
 			LootTarget(); CloseLoot();
 		else
 	

@@ -1,7 +1,4 @@
 script_moveToHotspot = {}
-
-
--- script character limit... need to continue splitting files...
 function script_moveToHotspot:moveToHotspot(localObj)
 
 	if not script_grind.adjustTickRate then
@@ -34,7 +31,7 @@ function script_moveToHotspot:moveToHotspot(localObj)
 
 
 		-- mount/stealth/cat form/ travel form/ ghost wolf
-		if (not IsMounted() and (not script_grind.useMount or not script_grind.hasAMount)) and GetTimeEX() > script_grind.tryMountTimer and
+		if (not IsMounted() and (not script_grind.useMount or not script_grind.hasAMount)) and
 			(HasSpell("Stealth") or HasSpell("Cat Form") or HasSpell("Travel Form") or HasSpell("Ghost Wolf")) and (not IsIndoors()) then
 			if (not script_checkDebuffs:hasPoison()) and (script_rogue.useStealth or script_druid.useStealth) and
 				(not IsSpellOnCD("Stealth")) and (not IsSpellOnCD("Prowl")) then
@@ -44,12 +41,15 @@ function script_moveToHotspot:moveToHotspot(localObj)
 				if script_druid.useStealth and (not script_druid.useBear) and (GetLocalPlayer():HasBuff("Cat Form")) then
 					CastStealth();
 				end
-				if (not script_druid.useBear) and (not HasForm()) then
-					if (GetTimeEX() > script_grindEX.tryTravelFormTimer) then
-						script_druidEX:travelForm();
-						script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
-					end
+			end
+			if (not script_druid.useBear) and (not HasForm()) then
+				if (GetTimeEX() > script_grindEX.tryTravelFormTimer) then
+					script_druidEX:travelForm();
+					script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
 				end
+			end
+			if not script_druid.useBear and not HasSpell("Travel Form") and HasSpell("Cat Form") and not HasForm() then
+				CastSpellByName("Cat Form");
 			end
 			--CastGhostWolf();
 			if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) then
