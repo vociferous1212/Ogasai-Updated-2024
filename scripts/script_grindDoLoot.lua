@@ -166,7 +166,11 @@ function script_grindDoLoot:doLoot(localObj)
 		if (not IsLooting()) then
 			self.timerWhileLooting = GetTimeEX() + 500;
 			script_grind:setWaitTimer(500);
-			LootTarget(); CloseLoot();
+			LootTarget();
+			if StaticPopup1:IsVisible() then
+				StaticPopup1Button1:Click()
+			end
+			CloseLoot();
 		else
 	
 -- else we are done looting - load cloest vendors

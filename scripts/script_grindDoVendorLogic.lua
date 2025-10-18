@@ -71,11 +71,11 @@ local vendorStatus = script_vendor.status;
 
 			elseif HasSpell("Travel Form")
 			and not localObj:HasBuff("Cat Form")
-			and GetTimeEX() > script_grind.tryTravelFormTimer
+			and GetTimeEX() > script_grindEX.tryTravelFormTimer
 			
 			then
 				script_druidEX:travelForm();
-				script_grind.tryTravelFormTimer = GetTimeEX() + 5000;
+				script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
 			end
 		end
 

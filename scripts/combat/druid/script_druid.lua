@@ -518,7 +518,7 @@ function script_druid:run(targetGUID)
 		end
 
 -- keep faerie fire up
-			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and targetObj:IsInLineOfSight() then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					if not IsMoving() then targetObj:FaceTarget(); end
@@ -656,7 +656,7 @@ function script_druid:run(targetGUID)
 			end
 
 			-- keep faerie fire up
-			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and targetObj:IsInLineOfSight() then
 				if HasSpell("Faerie Fire (Feral)") then
 					CastSpellByName("Faerie Fire (Feral)()");
 					if not IsMoving() then targetObj:FaceTarget(); end
@@ -686,7 +686,7 @@ function script_druid:run(targetGUID)
 			end
 
 			-- keep faerie fire up
-			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and targetObj:IsInLineOfSight() then
 				CastSpellByName("Faerie Fire (Feral)()");
 				if not IsMoving() then targetObj:FaceTarget(); end
 				return 0;
@@ -749,7 +749,7 @@ function script_druid:run(targetGUID)
 			end
 
 			-- keep faerie fire up
-			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+			if PlayerHasTarget() and HasForm() and not self.useStealth and targetObj:GetDistance() <= 30 and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and targetObj:IsInLineOfSight() then
 				CastSpellByName("Faerie Fire (Feral)()");
 				if not IsMoving() then targetObj:FaceTarget(); end
 				return 0;
@@ -1049,7 +1049,7 @@ function script_druid:run(targetGUID)
 				end
 
 				-- keep faerie fire up
-				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and targetObj:IsInLineOfSight() then
 					CastSpellByName("Faerie Fire (Feral)()");
 					return 0;
 				end
@@ -1169,7 +1169,7 @@ function script_druid:run(targetGUID)
 				--end
 
 				-- keep faerie fire up
-				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") then
+				if PlayerHasTarget() and HasForm() and HasSpell("Faerie Fire (Feral)") and not IsSpellOnCD("Faerie Fire (Feral)") and not targetObj:HasDebuff("Faerie Fire (Feral)") and targetObj:IsInLineOfSight() then
 					CastSpellByName("Faerie Fire (Feral)()");
 					self.waitTimer = GetTimeEX() + 1600;
 					return 0;
