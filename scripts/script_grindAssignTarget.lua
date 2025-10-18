@@ -25,10 +25,9 @@ function script_grindAssignTarget:assignTarget()
 
 					local hp = i:GetHealthPercentage();
 
-
 					if bestHP > hp then
 						bestHP = hp;
-						if bestHP < hp then
+						if bestHP <= hp then
 							bestTarget = i;
 						end
 					end

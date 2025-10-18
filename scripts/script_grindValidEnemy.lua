@@ -29,10 +29,10 @@ function script_grindValidEnemy:enemyIsValid(i)
        -- end
 
         -- Add above maxLevel to blacklist
-        if (script_grind.skipHardPull) and (i:GetDistance() <= 65) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > script_grind.maxLevel) then
-            script_grind:addTargetToHardBlacklist(i:GetGUID());
-            DEFAULT_CHAT_FRAME:AddMessage("Blacklisting " .. i:GetUnitName() .. ", too high level...");
-        end
+       --if (script_grind.skipHardPull) and (i:GetDistance() <= 65) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) and (not script_grind:isTargetingMe(i)) and (i:GetLevel() > script_grind.maxLevel) then
+        --    script_grind:addTargetToHardBlacklist(i:GetGUID());
+         --   DEFAULT_CHAT_FRAME:AddMessage("Blacklisting " .. i:GetUnitName() .. ", too high level...");
+        --end
 
         -- Add selected target name to blacklist
         if (i:GetUnitName() == script_grind.blacklistTargetName or i:GetUnitName() == script_grind.blacklistTargetName2) and (not script_grind:isTargetHardBlacklisted(i:GetGUID())) then

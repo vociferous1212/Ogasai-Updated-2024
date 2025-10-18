@@ -583,9 +583,9 @@ function script_druid:run(targetGUID)
 
 		-- check heals and buffs
 		if (localHealth <= self.healthToShift) and (not script_checkDebuffs:hasSilence()) and localMana >= self.shapeshiftMana then
-			if (targetHealth >= 25 and script_grind.enemiesAttackingUs(10) == 1)
-			or (targetHealth >= 10 and script_grind.enemiesAttackingUs(10) > 1)
-			or (localHealth < self.healthToShift - 25)
+			if (targetHealth >= 25 and script_grind.enemiesAttackingUs() == 1)
+			or (targetHealth >= 10 and script_grind.enemiesAttackingUs() > 1)
+			or (localHealth < self.healthToShift - 25 and targetHealth >= 10)
 			or (not IsBearForm() and not IsCatForm())
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
@@ -714,10 +714,10 @@ function script_druid:run(targetGUID)
 		if ( (not IsBearForm()) and (self.useBear) and (not IsCatForm()) and (localHealth > self.healthToShift) and (localMana > self.shapeshiftMana) and (not IsDrinking()) and (not IsEating()) )
 		
 		-- or if enemies attacking us greater than 2 and mana/health set right
-		or GetNumPartyMembers() == 0 and ( (script_grind.enemiesAttackingUs(12) >= 2) and (not IsBearForm()) and (not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) ) 
+		or GetNumPartyMembers() == 0 and ( (script_grind.enemiesAttackingUs() >= 2) and (not IsBearForm()) and (not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth >= self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) ) 
 
 		-- or enemy level is greater than 2 and health/mana is set right
-		or ( (targetObj:GetLevel() > (localObj:GetLevel() + 2) and IsInCombat() ) and (not IsBearForm()) and (not IsCatForm()) and (localMana > self.shapeshiftMana) and (localHealth > self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) )
+		or ( (targetObj:GetLevel() > (localObj:GetLevel() + 2) ) and (not IsBearForm()) and (not IsCatForm()) and (localMana > self.shapeshiftMana) and (localHealth > self.healthToShift) and (IsStanding()) and (HasSpell("Bear Form") or HasSpell("Dire Bear Form")) )
 		
 		-- or hasregrowth and has rejuv and is in combat
 		or ( (self.useBear or script_grind.enemiesAttackingUs(10) >= 2) and (hasRegrowth or hasRejuv) and (IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (localMana >= self.shapeshiftMana) and (localHealth > self.healthToShift) )
@@ -895,9 +895,9 @@ function script_druid:run(targetGUID)
 
 			-- check heals and buffs
 		if (localHealth <= self.healthToShift) and (not script_checkDebuffs:hasSilence()) and localMana >= self.shapeshiftMana then
-			if (targetHealth >= 25 and script_grind.enemiesAttackingUs(10) == 1) 
-			or (targetHealth >= 10 and script_grind.enemiesAttackingUs(10) > 1)
-			or (localHealth <self.healthToShift - 25)
+			if (targetHealth >= 25 and script_grind.enemiesAttackingUs() == 1) 
+			or (targetHealth >= 10 and script_grind.enemiesAttackingUs() > 1)
+			or (localHealth <self.healthToShift - 25 and targetHealth >= 10)
 			or (not IsBearForm() and not IsCatForm())
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
@@ -1271,7 +1271,7 @@ function script_druid:run(targetGUID)
 		if (localHealth <= self.healthToShift) and (not script_checkDebuffs:hasSilence()) and localMana >= self.shapeshiftMana then
 			if (targetHealth >= 25 and script_grind.enemiesAttackingUs(10) == 1) 
 			or (targetHealth >= 10 and script_grind.enemiesAttackingUs(10) > 1)
-			or (localHealth <self.healthToShift - 25)
+			or (localHealth <self.healthToShift - 25 and targetHealth >= 10)
 			or (not IsBearForm() and not IsCatForm())
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then

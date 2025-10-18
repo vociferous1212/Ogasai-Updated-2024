@@ -1335,7 +1335,7 @@ end
 						PetAttack();
 					end
 				end
-				if GetMyClass() == "DRUID" then
+				if GetMyClass() == "DRUID" and not HasSpell("Faerie Fire (Feral)") then
 					if IsMoving() then StopMoving(); return true; end
 					if self.enemyObj ~= 0 and self.enemyObj ~= nil then
 						if IsMoving() then StopMoving(); return true; end
@@ -1658,16 +1658,16 @@ end
 		--return true;
 
 		-- fall back if we cannot find a path and are already in combat
-		if not IsMoving() and IsInCombat() and not IsPathLoaded(5) and not IsCasting() and not IsChanneling() and IsStanding() and self.enemyObj:GetDistance() > script_grind.combatScriptRange + 1 then
+		if (not IsMoving() and not IsPathLoaded(5)) and not IsCasting() and not IsChanneling() and IsStanding() and self.enemyObj:GetDistance() > script_grind.combatScriptRange then
 			self.combatError = nil;
 			local x, y, z = GetLocalPlayer():GetPosition();
-			if self.enemyObj:GetDistance() <= 15 then
+			if self.enemyObj:GetDistance() <= 15 or IsInCombat() then
 				x, y, z = self.enemyObj:GetPosition();
 			end
 			local var = math.random(-1, 1);
 			Move(x-(var), y+(var), z);
-			script_nav:resetNavPos();
-			lastnavIndex = 1;
+				script_nav.lastnavIndex = 1;
+				script_nav:resetNavPos();
 		end
 	--return true;
 	end

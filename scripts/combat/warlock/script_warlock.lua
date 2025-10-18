@@ -1342,7 +1342,7 @@ function script_warlock:window()
 		EndWindow();
 
 		if(NewWindow("Class Combat Options", 200, 200)) then
-			script_warlock:menuEX();
+			script_warlockEX:menu();
 		end
 	end
 end
