@@ -61,5 +61,5 @@ Required to use the bot:
 Edited mmaps
 https://drive.google.com/file/d/1kPlDG9XKgTygfWX4T7b47RKpKTmT06CZ/view?usp=sharing
 
-Edit NavMesh by clicked "edit tiles". Click a tile holder until you see it 'light up' (the circle will become larger) - zoom in camera if needed... Hold 'ctrl' and left click where you want to place the new tile holder marker. Press the 'alt' key to undo last tile holder marker movement. Anything INSIDE the white tiles is an acceptable move path. Anything inside blue tiles is not an acceptable move path. Change as needed. 
+Edit NavMesh by clicked "edit tiles". Click a tile holder until you see it 'light up' (the circle will become larger) - zoom in camera if needed... Hold 'ctrl' and left click where you want to place the new tile holder marker. Press the 'alt' key to undo last tile holder marker movement. Anything INSIDE the white tiles is an acceptable move path. Anything inside blue tiles is not an acceptable move path. Change as needed. Make sure Click - To - Move is enabled!
 ![oGasai](https://github.com/vociferous1212/Ogasai-pic/blob/main/mmaps.png?raw=true)
