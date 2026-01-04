@@ -16,7 +16,7 @@ _questDB:addQuest("no", 0, "Report to Goldshire", "Marshal McBride", -8902.58984
 _questDB:addQuest("no", 0, "Bounty on Garrick Padfoot", "Deputy Willem", -8933.5400390625, -136.52299499512, 83.262741088867, 12, 4, 6, -9056.48046875, -460.90301513672, 72.64868927002,  1, 1, 0, 0, 0, 0, -8933.5400390625, -136.52299499512, 83.262741088867, "Deputy Willem", "Garrick Padfoot", 0, 0, 0, 0, 3, "Kill Garrick Padfoot and bring his head to Deputy Willem at Northshire Abbey.", 0, 1);
 
 --cannot find a nav path
-_questDB:addQuest("no", 0, "Grape Manifest", "Milly Osworth", -8850.2900390625, -224.0299987793, 81.696151733398, 12, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8902.1298828125, -181.64599609375, 113.15718841553, "Brother Neals", 0, 0, 0, 0, 0, 2, "Bring the Grape Manifest to Brother Neals in Northshire Abbey.", 0, 1);
+--_questDB:addQuest("no", 0, "Grape Manifest", "Milly Osworth", -8850.2900390625, -224.0299987793, 81.696151733398, 12, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8902.1298828125, -181.64599609375, 113.15718841553, "Brother Neals", 0, 0, 0, 0, 0, 2, "Bring the Grape Manifest to Brother Neals in Northshire Abbey.", 0, 1);
 
 _questDB:addQuest("no", 0, "Milly's Harvest", "Milly Osworth", -8850.2900390625, -224.0299987793, 81.696632385254, 12, 4, 6, -9052.9287109375, -344.13021850586, 73.452621459961, 2, 0, 0, 0, 8, 0, -8850.2900390625, -224.0299987793, 81.696632385254, "Milly Osworth", 0, 0, 0, 3012, 0, 0, "Bring 8 crates of Milly's Harvest to Milly Osworth at Northshire Abbey.", 0, 1);
 

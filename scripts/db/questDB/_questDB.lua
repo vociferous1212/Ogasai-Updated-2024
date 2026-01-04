@@ -206,9 +206,9 @@ function _questDB:getQuestStartPos()
 
 					if (self.questList[i]['mapID'] == myMapID) then
 
-					if GetLocalPlayer():GetLevel() >= self.questList[i]['minLevel'] or not _questDB.minMaxLevel then
+					if GetLocalPlayer():GetLevel() >= self.questList[i]['minLevel'] or _questDB.minMaxLevel then
 
-						if GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] then
+						if GetLocalPlayer():GetLevel() <= self.questList[i]['maxLevel'] or _questDB.minMaxLevel then
 
 							x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 

@@ -263,10 +263,11 @@ end
 			end
 		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and ((script_grind.lootObj == nil or script_grind.skipLooting) or (script_grind.lootObj ~= nil and script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()))) then
 			local name = _questDB:getReturnTargetName();
+			local dist = math.floor(GetDistance3D(px, py, pz, x, y, z));
 			if (not IsInCombat()) and PlayerHasTarget() and GetTarget():GetUnitName() ~= name then
 				ClearTarget();
 			end
-			_quest.message = "Moving to quest return target";
+			_quest.message = "Moving to quest return target - "..name.." : "..dist.." (yd)";
 			--if (GetDistance3D(px, py, pz, x, y, z) < 25) then
 				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 			--else

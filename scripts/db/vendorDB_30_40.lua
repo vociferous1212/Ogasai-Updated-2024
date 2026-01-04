@@ -29,6 +29,15 @@ function vendorDB_30_40:setup()
 -- Stranglethorn Vale - Horde
 	vendorDB:addVendor("Jaquilina Dramet", 1, 0, 33, true, false, false, false, false, -11622.1, -60.62, 10.95);
 	vendorDB:addVendor("Jaquilina Dramet", 1, 0, 33, false, false, false, false, false, -11622.1, -60.62, 10.95);
+	vendorDB:addVendor("Vharr", 1, 0, 33, true, false, false, false, false, -12357.8, 155.55, 4.24);
+	vendorDB:addVendor("Vharr", 1, 0, 33, false, false, false, false, false, -12357.8, 155.55, 4.24);
+	vendorDB:addVendor("Krakk", 1, 0, 33, false, false, false, false, false, -12357.71, 142.37, 4.47);
+	vendorDB:addVendor("Krakk", 1, 0, 33, true, false, false, false, false, -12357.71, 142.37, 4.47);
+	vendorDB:addVendor("Uthok", 1, 0, 33, false, false, false, false, true, -12358, 207.35, 4.14);
+	vendorDB:addVendor("Uthok", 1, 0, 33, false, false, false, true, false, -12358, 207.35, 4.14);
+	vendorDB:addVendor("Uthok", 1, 0, 33, false, false, true, false, false, -12358, 207.35, 4.14);
+	vendorDB:addVendor("Innkeeper Thulbek", 1, 0, 33, false, false, true, false, false, -12434.41, 211.55, 2.36);
+	vendorDB:addVendor("Innkeeper Thulbek", 1, 0, 33, false, true, false, false, false, -12434.41, 211.55, 2.36);
 
 -- Desolace - Alliance
 	vendorDB:addVendor("Christi Galvanis", 0, 1, 405, false, false, false, false, false, 243.01, 1238.58, 192.15);
@@ -41,10 +50,10 @@ function vendorDB_30_40:setup()
 	vendorDB:addVendor("Jazzrik", 0, 0, 3, true, false, false, false, false, -6760.19, -3135.56, 241.16);
 
 -- dustwallow marsh horde
-vendorDB:addVendor("Zulrg", 1, 1, 15, true, false, false, false, false, -3146.34, -2873.79, 34.27);
-vendorDB:addVendor("Zulrg", 1, 1, 15, false, false, false, false, false, -3146.34, -2873.79, 34.27);
-vendorDB:addVendor("Zanara", 1, 1, 15, false, false, false, true, false, -3086.61, -2838.95, 34.42);
-vendorDB:addVendor("Ogg'marr", 1, 1, 15, false, true, false, false, false, -3117.45, -2902, 33.99);
-vendorDB:addVendor("Ogg'marr", 1, 1, 15, false, false, true, false, false, -3117.45, -2902, 33.99);
+	vendorDB:addVendor("Zulrg", 1, 1, 15, true, false, false, false, false, -3146.34, -2873.79, 34.27);
+	vendorDB:addVendor("Zulrg", 1, 1, 15, false, false, false, false, false, -3146.34, -2873.79, 34.27);
+	vendorDB:addVendor("Zanara", 1, 1, 15, false, false, false, true, false, -3086.61, -2838.95, 34.42);
+	vendorDB:addVendor("Ogg'marr", 1, 1, 15, false, true, false, false, false, -3117.45, -2902, 33.99);
+	vendorDB:addVendor("Ogg'marr", 1, 1, 15, false, false, true, false, false, -3117.45, -2902, 33.99);
 
 end

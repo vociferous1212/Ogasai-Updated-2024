@@ -12,7 +12,6 @@ function vendorDB_1_10:setup()
 	vendorDB:addVendor("Adlin Pridedrift", 0, 0, 1, false, false, false, false, true, -6226.67, 320.05, 383.11);
 	vendorDB:addVendor("Grundel Harkin", 0, 0, 1, true, false, false, false, false, -6104.5, 384.02, 395.54);
 	vendorDB:addVendor("Grundel Harkin", 0, 0, 1, false, false, false, false, false, -6104.5, 384.02, 395.54);
-	vendorDB:addVendor("Peria Lamenur", 0, 0, 1, false, false, false, false, false, -5649.98, -497.15, 396.66);
 	vendorDB:addVendor("Boran Ironclink", 0, 0, 1, true, false, false, false, false, -5576.21, -422.04, 397.32);
 	vendorDB:addVendor("Boran Ironclink", 0, 0, 1, false, false, false, false, false, -5576.21, -422.04, 397.32);
 	vendorDB:addVendor("Kreg Bilmn", 0, 0, 1, false, false, false, false, false, -5597.67, -521.86, 399.65);

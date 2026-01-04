@@ -17,7 +17,10 @@ _questDB:addQuest("no", 0, "Find the Lost Guards", "Guard Thomas", -9610.2304687
 
 _questDB:addQuest("no", 0, "Further Concerns", "Marshal Dughan", -9465.51953125, 74.006896972656, 56.595565795898, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9610.23046875, -1032.0500488281, 41.124004364014, "Guard Thomas", 0, 0, 0, 0, 0, 0, "Marshal Dughan wants you to speak with Guard Thomas.", 0, 1);
 
-_questDB:addQuest("no", 0, "Princess Must Die!", "Ma Stonefield", -9895, 332.42401123047, 36.368209838867, 12, 6, 12, -9794.0595703125, -873.56805419922, 39.607879638672, 1, 1, 0, 0, 0, 0, -9895, 332.42401123047, 36.368209838867, "Ma Stonefield", "Princess", 0, 0, 0, 0, 3, "Kill Princess, grab her collar, then bring it back to Ma Stonefield at the Stonefield Farm.", 0, 1);
+_questDB:addQuest("no", 0, "The Escape", "William Pestle", -9460.2998046875, 31.938899993896, 56.966903686523, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10014, 37.604999542236, 35.172149658203, "Maybell Maclure", 0, 0, 0, 0, 0, 0, "Take the Invisibility Liquor to Maybell Maclure.", 0, 1);
+_questDB:addQuest("no", 0, "Collecting Kelp", "William Pestle", -9460.2998046875, 31.938899993896, 56.966430664063, 12, 6, 12, -9426.6181640625, -227.93446350098, 61.137317657471, 1, 10, 10, 0, 0, 0, -9460.2998046875, 31.938899993896, 56.966430664063, "William Pestle", "Murloc Streamrunner", "Murloc", 0, 0, 0, 0, "Bring 4 Crystal Kelp Fronds to William Pestle in Goldshire.", 0, 1);
+
+--_questDB:addQuest("no", 0, "Princess Must Die!", "Ma Stonefield", -9895, 332.42401123047, 36.368209838867, 12, 6, 12, -9794.0595703125, -873.56805419922, 39.607879638672, 1, 1, 0, 0, 0, 0, -9895, 332.42401123047, 36.368209838867, "Ma Stonefield", "Princess", 0, 0, 0, 0, 3, "Kill Princess, grab her collar, then bring it back to Ma Stonefield at the Stonefield Farm.", 0, 1);
 
 _questDB:addQuest("no", 0, "A Fishy Peril", 'Remy "Two Times"', -9496.3203125, 72.826400756836, 56.415245056152, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9465.51953125, 74.006896972656, 56.595565795898, "Marshal Dughan", 0, 0, 0, 0, 0, 0, 'Remy "Two Times" wants you to speak with Marshal Dughan in Goldshire.', 0, 1);
 _questDB:addQuest("no", 0, "Note to William", "Gramma Stonefield", -9880.6298828125, 322.61898803711, 37.741588592529, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9460.2998046875, 31.938899993896, 56.966567993164, "William Pestle", 0, 0, 0, 0, 0, 0, "Take Gramma Stonefield's Note to William Pestle.", 0, 1);
@@ -39,9 +42,6 @@ _questDB:addQuest("no", 0, "Harlan Needs a Resupply", "Harlan Bagley", -8782.900
 _questDB:addQuest("no", 0, "Wine Shop Advert", "Renato Gallina", -8848.259765625, 614.98101806641, 95.186813354492, 1519, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8884.8798828125, 675.54699707031, 100.08033752441, "Suzetta Gallina", 0, 0, 0, 0, 0, 0, "Go to the Gallina Winery, and bring Suzetta Gallina the Wine Ticket for a free bottle of wine.", 0, 1);
 _questDB:addQuest("no", 0, "Shipment to Stormwind", "William Pestle", -9460.2998046875, 31.938899993896, 56.966484069824, 12, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8857.6904296875, 625.49798583984, 95.990425109863, "Morgan Pestle", 0, 0, 0, 0, 0, 2, "Bring William's Shipment to Morgan Pestle in the Stormwind Trade District.", 0, 1);
 _questDB:addQuest("no", 0, "Kobold Candles", "William Pestle", -9460.2998046875, 31.938899993896, 56.966484069824, 12, 6, 10, -9879.4296875, 191.52745056152, 16.459886550903, 1, 10, 10, 0, 0, 0, -9460.2998046875, 31.938899993896, 56.966484069824, "William Pestle", "Kobold Tunneler", "Kobold Miner", 0, 0, 0, 0, "Bring 8 Large Candles to William Pestle in Goldshire.", 0, 1);
-
---leaving northshire abbey
-_questDB:addQuest("no", 0, "Rest and Relaxation", "Falkhaan Isenstrider", -9044.5595703125, -45.981700897217, 88.336166381836, 12, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9462.66015625, 16.191499710083, 56.963390350342, "Innkeeper Farley", 0, 0, 0, 0, 0, 2, "Speak with Innkeeper Farley at the Lion's Pride Inn.", 0, 1);
 
 self.isSetup = true;
 end
