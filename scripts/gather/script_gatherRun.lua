@@ -77,6 +77,7 @@ function script_gatherRun:gather()
 				script_gather.timer = GetTimeEX() + 950;
 				return true;
 			end
+			if IsCasting() or IsChanneling() then script_grind:setWaitTimer(500); return; end
 			if (not IsLooting() and not IsChanneling()) and (not IsMoving()) and (not IsCasting()) and (IsStanding()) then
 				script_gather.nodeObj:GameObjectInteract();
 				script_gather.timer = GetTimeEX() + 1650;
@@ -90,7 +91,7 @@ function script_gatherRun:gather()
 			end
 			if (IsLooting()) then
 			script_gather.lastNode = 0;
-
+				if not script_grind.adjustTickRate then script_grind.tickRate = 500; end
 				script_gather.waitTimer = GetTimeEX() + 2500;
 				if (LootTarget()) or (IsLooting()) then
 					if (script_gather.collectHerbs) then
@@ -146,7 +147,7 @@ function script_gatherRun:gather()
 				--return true;
 			end
 		end
-		return;
+		return true;
 	end
 	script_gather.gathering = false;
 	return false;
