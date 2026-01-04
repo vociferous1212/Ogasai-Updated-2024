@@ -69,7 +69,7 @@ end
 
 function script_drawData:drawMonsterDataOnScreen(target)
 	local player = GetLocalPlayer();
-	local distance = target:GetDistance();
+	local distance = target:GetDistance() - 1;
 	local tX, tY, onScreen = WorldToScreen(target:GetPosition());
 
 	-- if targets on screen
@@ -118,7 +118,11 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		DrawText('HP: ' .. math.floor(target:GetHealthPercentage()) .. '%', tX, tY, 255, 0, 0);
 
 		-- draw unit distance
-		DrawText('' .. math.floor(distance) .. ' yd.', tX, tY+10, 255, 255, 255);
+		if distance > 3 then
+			DrawText('' .. math.floor(distance) .. ' yd.', tX, tY+10, 255, 255, 255);
+		elseif distance <= 3 then
+			DrawText('' .. distance .. ' yd.', tX, tY+10, 255, 255, 255);
+		end
 	end
 end
 
@@ -153,14 +157,14 @@ end
 function script_drawData:drawPath()
 	local firstIndex = 0;
 	local mx, my, mz = GetLocalPlayer():GetPosition();
-	if (IsPathLoaded(5)) then
+	if (IsPathLoaded(5) or IsPathLoaded(4) or IsPathLoaded(3) or IsPathLoaded(2) or IsPathLoaded(1)) then
 		if (script_nav.drawNav) then
 			firstIndex = script_nav.lastpathnavIndex;
 		elseif (not script_nav.drawNav) then
 			firstIndex = script_nav.lastnavIndex;
 		end
-		if (script_nav.lastnavIndex <= GetPathSize(5)) then
-			for index = firstIndex, GetPathSize(5) -5 do
+		if (script_nav.lastnavIndex - 1 <= GetPathSize(5) - 1) then
+			for index = firstIndex, GetPathSize(5) -2 do
 				local _x, _y, _z = GetPathPositionAtIndex(5, index);
 				local _xx, _yy, _zz = GetPathPositionAtIndex(5, index+1);
 				local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);

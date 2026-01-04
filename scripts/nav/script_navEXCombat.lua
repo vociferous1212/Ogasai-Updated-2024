@@ -28,7 +28,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 
 	-- If the target moves more than combat script range by yards then make a new path
 	if GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 2
-	or GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) >= script_grind.combatScriptRange
+	or GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > script_grind.combatScriptRange
 	or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3
 	or IsNodeBlacklisted(_ix, _iy, _iz, script_grind.nextToNodeDist)
 	then
@@ -77,7 +77,7 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 	if not script_grindAreWeSwimming:areWeSwimming() and (GetTimeEX() > self.waitTimer) then
 
 		-- normal speed is about 7. cat form/wolf form with increased speed is between 9 and 9.5
-		local var = 2;
+		local var = 1.8;
 		local currentSpeed, maxSpeed = GetLocalPlayer():GetSpeed();
 		if maxSpeed == 7 or maxSpeed < 9 then var = 2;
 		elseif (maxSpeed > 9 and maxSpeed < 9.5) or IsMounted() then var = 3; end
@@ -100,11 +100,8 @@ function script_navEXCombat:moveToTarget(localObj, _x, _y, _z) -- use when movin
 			GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
 		end
 	end
-	if self.waitTimer > GetTimeEX() or self.moveTimer > GetTimeEX() then
-		return;
-	end
 	-- move to next path node
 	Move(_ix, _iy, _iz);
-	self.moveTimer = GetTimeEX() + 100;
-	self.waitTimer = GetTimeEX() + 50;
+	self.waitTimer = GetTimeEX() + 75;
+	self.moveTimer = GetTimeEX() + 300;
 end

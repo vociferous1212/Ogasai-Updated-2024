@@ -51,18 +51,21 @@ function _questEX2:doChecks()
             end
         end
     end
-    if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor then
+    if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor and script_vendor.sellVendor ~= 0 and script_vendor.sellVendor ~= nil then
+        self.sellVendorX, self.sellVendorY, self.sellVendorZ = script_vendor.sellVendor['pos']['x'],  script_vendor.sellVendor['pos']['y'],  script_vendor.sellVendor['pos']['z'];
         local x, y, z = GetLocalPlayer():GetPosition()
-        if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
-            script_vendor.status = 2
-            _questEX2.flipVendor = false
+        if self.sellVendorX ~= 0 then
+            if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
+                script_vendor.status = 2
+                _questEX2.flipVendor = false
+            end
         end
     end
 
-    if GetLocalPlayer():GetLevel() < 10 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then
-        CheckBagsForBetterGear()
-        self.checkInvTimer = GetTimeEX() + 180000
-    end
+   -- if GetLocalPlayer():GetLevel() < 10 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then
+     --   CheckBagsForBetterGear()
+      --  self.checkInvTimer = GetTimeEX() + 180000
+    --end
     if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
         CheckBagsForBetterGear()
         _questEquipItems:checkInventoryForBags()
@@ -190,7 +193,7 @@ function _questEX2:doChecks()
                 script_grind.lootObj = nil
                 self.lootTimeout = 0
                 self.currentLootGUID = nil
-                _quest:setTimer(500) -- Minimal delay to reset state
+                _quest:setTimer(200) -- Minimal delay to reset state
                 return true
             end
 
@@ -209,7 +212,10 @@ function _questEX2:doChecks()
 
             if (script_grindDoLoot:doLoot(localObj)) then
                 if IsLooting() then
-                    _quest:setTimer(650)
+                    if StaticPopup1:IsVisible() then
+				        StaticPopup1Button1:Click()
+			        end
+                    _quest:setTimer(450)
                     -- New: Reset timer on successful loot start
                     self.lootTimeout = 0
                     self.currentLootGUID = nil

@@ -69,16 +69,15 @@ local vendorStatus = script_vendor.status;
 			then
 				script_druidEX2:catForm();
 
-			elseif HasSpell("Travel Form")
-			and not localObj:HasBuff("Cat Form")
-			and GetTimeEX() > script_grindEX.tryTravelFormTimer
-			
-			then
-				script_druidEX:travelForm();
-				script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
+			elseif HasSpell("Travel Form") and GetTimeEX() > script_grindEX.tryTravelFormTimer then
+				if HasForm() and not GetLocalPlayer():HasBuff("Travel Form") then
+					RemoveForm();
+				else
+					script_druidEX:travelForm();
+					script_grindEX.tryTravelFormTimer = GetTimeEX() + 5000;
+				end
 			end
 		end
-
 
 		if not IsMounted() then
 			-- use stealth if we are cat form

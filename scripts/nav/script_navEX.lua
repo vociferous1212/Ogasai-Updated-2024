@@ -25,7 +25,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 		script_nav.navPosition['x'] = _x;
 		script_nav.navPosition['y'] = _y;
 		script_nav.navPosition['z'] = _z;
-		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
+		GeneratePath(_lx, _ly, _lz+1, _x, _y, _z+1);
 		script_nav.lastnavIndex = 1; -- start at index 1, index 0 is our position
 	end
 
@@ -37,7 +37,7 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);
 
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= script_grind.nextToNodeDist) then 
+	if(GetDistance3D(_lx, _ly, _lz+1, _ix, _iy, _iz+1) <= script_grind.nextToNodeDist) then 
 		script_nav.lastnavIndex = script_nav.lastnavIndex + 1;
 		if (GetPathSize(5) <= script_nav.lastnavIndex) then
 			script_nav.lastnavIndex = GetPathSize(5);
@@ -48,8 +48,8 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 	end
 
 	if (GetTimeEX() > self.waitTimer) then
-			if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > script_grind.nextToNodeDist*3.5) then	
-				GeneratePath(_lx, _ly, _lz, _lx, _ly, _lz);
+			if (GetDistance3D(_lx, _ly, _lz+1, _ix, _iy, _iz+1) > script_grind.nextToNodeDist*3.5) then	
+				GeneratePath(_lx, _ly, _lz+1, _lx, _ly, _lz+1);
 			--return "Generating a new path...";
 		end
 	end

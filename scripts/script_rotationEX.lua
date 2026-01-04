@@ -1,10 +1,13 @@
 script_rotationEX = {
 
-drawEnabled = false,
-	drawAggro = false,
+	drawEnabled = false,
+	drawAggro = true,
+
 	drawGather = false,
-	drawUnits = false,
+
+	drawUnits = true,
 	drawChests = true,
+
 	aggroRangeTank = 50,
 
 

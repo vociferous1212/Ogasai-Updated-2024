@@ -1,44 +1,16 @@
 _quest = {
 	message = "Quester",
-	usingQuester = false,
-	pause = true,
-	isSetup = false,
-	waitTimer = 0,
-	tickRate = 1,
-	currentQuest = nil,
-	enemyTarget = nil,
-	targetKilledNum = 0,
-	targetKilledNum2 = 0,
-	targetKilledNum3 = 0,
-	gatheredNum = 0,
-	gatheredNum2 = 0,
-	isQuestComplete = false,
-	needRest = false,
-	grindSpotReached = false,
-	curGrindX = 0,
-	curGrindY = 0,
-	curGrindz = 0,
-	curQuestX = 0,
-	curQuestY = 0,
-	curQuestZ = 0,
-	weHaveQuest = fasle, 
-	autoComplete = true,
-	currentDesc = nil,
-	returningQuest = false,
-	xp = 0,
-	currentType = nil,
-	usingItem = nil,
-	gossipOption = nil,
-	distToGrindFromHotspot = 200,
-	currentMapID = 0,
-	killStuffOnRoute = true,
-	curQuestGiver = nil,
-	curQuestName = nil,
-	distToGiver = 0,
-	distToGrind = 0,
-	unstuckTimer = 0,
+	usingQuester = false, pause = true, isSetup = false, waitTimer = GetTimeEX(),
+	tickRate = 1, currentQuest = nil, enemyTarget = nil, targetKilledNum = 0,
+	targetKilledNum2 = 0, targetKilledNum3 = 0, gatheredNum = 0, gatheredNum2 = 0,
+	isQuestComplete = false, needRest = false, grindSpotReached = false, curGrindX = 0,
+	curGrindY = 0,curGrindz = 0, curQuestX = 0,curQuestY = 0,curQuestZ = 0, weHaveQuest = fasle, 
+	autoComplete = true, currentDesc = nil, returningQuest = false, xp = 0, currentType = nil,
+	usingItem = nil, gossipOption = nil, distToGrindFromHotspot = 200, currentMapID = 0,
+	killStuffOnRoute = true, curQuestGiver = nil, curQuestName = nil,
+	distToGiver = 0, distToGrind = 0, unstuckTimer = 0, lootTimer = GetTimeEX(),
+
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
-	lootTimer = GetTimeEX(),
 }
 
 function _quest:draw() end
@@ -102,24 +74,25 @@ local localObj = GetLocalPlayer();
 	end
 
 	-- set wait time / tick rate for script
-	if (self.waitTimer + (self.tickRate * 1000) > GetTimeEX()) and script_grind.pause then return; end
+	if ((self.waitTimer + self.tickRate * 1000) > GetTimeEX()) or self.pause then return; end
 
 -- check intial unstuck
 	if not self.pause and GetTimeEX() > self.unstuckTimer then
 		if script_unstuck:checkUnstuck() then
-			self.unstuckTimer = GetTimeEX() + 350;
+			self.unstuckTimer = GetTimeEX() + 150;
 		end
 	end
 
 	if (IsMoving()) and (not self.pause) and GetTimeEX() > self.unstuckTimer then
 		if (not script_unstuck:pathClearAuto(2)) then
-			self.unstuckTimer = GetTimeEX() + 450;
+			self.unstuckTimer = GetTimeEX() + 250;
 			script_unstuck:unstuck();
 		end
 	end
 
-	if IsChanneling() or IsCasting() or GetLocalPlayer():IsStunned() then
-		if PlayerHasTarget() and not GetLocalPlayer():IsStunned() then 
+	local player = GetLocalPlayer();
+	if IsChanneling() or IsCasting() or player:IsStunned() or player:IsConfused() or player:IsFleeing() then
+		if PlayerHasTarget() and not player:IsStunned() and not player:IsFleeing() and not player:IsConfused() then 
 			GetTarget():FaceTarget();
 		end
 	return;
@@ -159,7 +132,7 @@ local localObj = GetLocalPlayer();
 			end
 
 			if IsInCombat() then
-				self.tickRate = 1.5;
+				self.tickRate = 1;
 			elseif not IsInCombat() then
 				self.tickRate = .3;
 			end
@@ -171,7 +144,7 @@ local localObj = GetLocalPlayer();
 			script_grind.lootCheck['timer'] = 0;
 			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000); end
 
-			if self.enemyTarget ~= nil and not IsAutoCasting("Attack") then self.enemyTarget:AutoAttack(); end
+			if self.enemyTarget ~= nil and self.enemyTarget ~= 0 and not IsAutoCasting("Attack") then self.enemyTarget:AutoAttack(); end
 			_questDoCombat:doCombat();
 
 		return true;
@@ -205,7 +178,7 @@ if self.currentType == 10 and _quest.currentQuest ~= nil and ((not script_getSpe
 	_questCheckQuestCompletion:checkQuestForCompletion(); self.tickRate = .3;
 
 	-- return a completed quest to quest return target
-	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil then
+	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil and not IsInCombat() then
 		if _questDBReturnQuest:returnAQuest() then
 			self.enemyTarget = nil;
 			self.message = "Returning quest!";
@@ -217,9 +190,9 @@ if self.currentType == 10 and _quest.currentQuest ~= nil and ((not script_getSpe
 
 	if (not self.grindSpotReached) then self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos(); end
 
-	if GetNumQuestLogEntries() > 0 and _questDB.curDesc ~= _quest.currentDesc then
+	if _questDB.curDesc ~= _quest.currentDesc then
 
-		if _questDBHandleDB:turnOldQuestCompleted() then self.tickRate = .2; _quest:setTimer(150); return true; end end
+		if _questDBHandleDB:turnOldQuestCompleted() then self.tickRate = .1; _quest:setTimer(100); return true; end end
 	
 	if script_grind.lootObj == nil and script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
 		if script_gatherRun:gather() then

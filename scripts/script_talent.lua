@@ -1,17 +1,16 @@
 script_talent = {
-	talentTimer = 0;
-	currentTalentPoint = 0;
-	palaTalents = {},
-	warTalents = {},
-	rogueTalents = {},
-	druidTalents = {},		
-	priestTalents = {},
-	mageTalents = {},
-	hunterTalents = {},
-	lockTalents = {},
-	shamTalents = {},
+
+	talentTimer = 0,
+
+	currentTalentPoint = 0,
+
+	palaTalents = {},		warTalents = {},		rogueTalents = {},
+	druidTalents = {},		priestTalents = {},		mageTalents = {},
+	hunterTalents = {},		lockTalents = {},		shamTalents = {},
+	
 	currentTalentTable = {},
-	isSetup = falsem
+
+	isSetup = false,
 }
 
 function script_talent:setup()

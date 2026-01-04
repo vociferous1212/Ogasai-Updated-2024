@@ -7,6 +7,8 @@ script_grindRunOutOfCombat = {}
 
 function script_grindRunOutOfCombat:runOutOfCombat()
 
+	if script_grind.enemyObj == nil then script_grind.enemyObj = grind2.enemyTarget; end
+
 	if (IsInCombat() or script_grindIsAnyTargetTargetingPet:isAnyTargetTargetingPet()) and GetLocalPlayer():HasBuff("Feign Death") then
 		script_grind.combatError = 4;
 	end
@@ -22,16 +24,16 @@ function script_grindRunOutOfCombat:runOutOfCombat()
 	if IsInCombat()
 	and (
 		-- we have low health and a warrior or rogue
-		(GetLocalPlayer():GetHealthPercentage() <= 15 and (GetMyClass() == "ROGUE" or GetMyClass() == "WARRIOR"))
+		(GetLocalPlayer():GetHealthPercentage() <= 25 and (GetMyClass() == "ROGUE" or GetMyClass() == "WARRIOR" or GetMyClass() == "MAGE"))
 
 		-- we have low health and mana and not a warrior or rogue
-		or (GetLocalPlayer():GetHealthPercentage() <= 15
-			and (GetMyClass() ~= "ROGUE" and GetMyClass() ~= "WARRIOR")
-			and GetLocalPlayer():GetManaPercentage() <= 20)
+		or (GetLocalPlayer():GetHealthPercentage() <= 25
+			and (GetMyClass() ~= "ROGUE" and GetMyClass() ~= "WARRIOR" and GetMyClass() ~= "MAGE")
+			and GetLocalPlayer():GetManaPercentage() <= 30)
 	)
 
 	-- or there's 3 more or more targets attacking us and we have low health
-	or (script_grind:enemiesAttackingUs() >= 3 and GetLocalPlayer():GetHealthPercentage() <= 55)
+	or (script_grind:enemiesAttackingUs() >= 3 and GetLocalPlayer():GetHealthPercentage() <= 85)
 
 	-- run away from targets too high level
 	-- only if there's more than 1 target attacking us

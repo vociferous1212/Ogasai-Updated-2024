@@ -624,7 +624,7 @@ function script_aggro:avoidElite() -- Runs away if there is atleast one elite wi
 	while currentObj ~= 0 do
  		if typeObj == 3 and (currentObj:GetClassification() == 1 or currentObj:GetClassification() == 2) then
 			local tX, tY, tZ = GetDistance3D(x, y, z, tX, tY, tZ);
-			range = currentObj:GetLevel() - localObj:GetLevel() + 25;
+			range = currentObj:GetLevel() - localObj:GetLevel() + 27.5;
 			if currentObj:CanAttack() and currentObj:GetDistance() <= range and not currentObj:IsDead() then	
 				local xT, yT, zT = currentObj:GetPosition();
  				local xP, yP, zP = localObj:GetPosition();

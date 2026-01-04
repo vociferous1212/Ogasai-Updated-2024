@@ -7,6 +7,8 @@ script_combatHelper =  { castingTimer = 0,
 -- override combat script for "clutch" in combat situations...
 function script_combatHelper:run()
 
+		if script_grind.enemyObj == nil then script_grind.enemyObj = grind2.enemyTarget; end
+
 
 		if GetMyClass() == "MAGE" then
 

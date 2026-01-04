@@ -70,9 +70,10 @@ function script_checkDebuffs:hasDisease()
         ["Tetanus"] = true,
         ["Creeping Mold"] = true,
         ["Diseased Slime"] = true,
-        ["Infected Wound"] = true, -- Increases cast time, reduces healing; dispel in PvE/PvP
-        ["Plague"] = true, -- DoT, spreads; dispel immediately in raids
-	["Maggot Slime"] = true
+        ["Infected Wound"] = true,
+        ["Plague"] = true,
+	["Maggot Slime"] = true,
+	["Decayed Strength"] = true
     };
     return checkUnitEffects(GetLocalPlayer(), diseases, false);
 end

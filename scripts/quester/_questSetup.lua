@@ -2,6 +2,8 @@ _questSetup = {isSetup = false}
 
 function _questSetup:run()
 
+	script_grind.drawPath = false;
+
 	if (not _questDB.isSetup) then
 		_questDB:setup();
 	end

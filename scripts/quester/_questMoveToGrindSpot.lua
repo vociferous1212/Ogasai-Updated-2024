@@ -23,7 +23,7 @@ function _questMoveToGrindSpot:run()
 
 	-- we have a quest so go to grind spot
 	if _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not _quest.isQuestComplete and not IsLooting() and (script_grind.lootObj == nil or script_grind.skipLooting) and not IsCasting() and not IsChanneling() then
-		if (_quest.distToGrind > 40 and _quest.currentType ~= 3 and _quest.currentType ~= 4 and not _quest.grindSpotReached) or (_quest.currentType == 3 or _quest.currentType == 4 or _quest.curentType == 5 and _quest.distToGrind > 5) then
+		if (_quest.distToGrind > 40 and _quest.currentType ~= 3 and _quest.currentType ~= 4 and not _quest.grindSpotReached) or (_quest.currentType == 3 or _quest.currentType == 4 or _quest.curentType == 5 or _quest.currentType == 11 and _quest.distToGrind > 5) then
 			if _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5 and not _quest.isQuestComplete and _quest.enemyTarget == nil then
 			end
 

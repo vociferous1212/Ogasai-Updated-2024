@@ -8,8 +8,8 @@ function _questDoCombat:doCombat()
 	
 	return;
 	end
-if _quest.currentQuest ~= "Princess Must Die!" then
-if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 50 then local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
+if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() then
+if GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() and (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 50 then local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
 		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then CastSpellByName("Earthbind Totem"); end return true; end end return true; end end
 
 
@@ -21,7 +21,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 
 
 		-- get a target if we have none
-		if (PlayerHasTarget()) and _quest.enemyTarget == nil or _quest.enemyTarget == 0 and GetTarget():CanAttack() and not GetTarget():IsDead() then
+		if (PlayerHasTarget()) and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) and GetTarget():CanAttack() and not GetTarget():IsDead() then
 
 			_quest.enemyTarget = script_grindAssignTarget:assignTarget();
 
@@ -135,7 +135,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 		_questDoCombat:getLowestHealthTargetAttackingUs();
 
 		-- do something
-		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
+		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 and GetTarget() ~= nil and GetTarget() ~= 0 then
 
 			if not _quest.enemyTarget:IsDead() and _quest.enemyTarget:CanAttack() then
 
@@ -173,7 +173,7 @@ if (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTarget
 				
 
 					local x, y, z = _quest.enemyTarget:GetPosition();
-					script_navEXCombat:moveToTarget(GetLocalPlayer(), x, y, z);
+					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 					if not IsMoving() and not IsInCombat() and _quest.enemyTarget ~= nil and GetTimeEX() > self.blacklistTimer then
 						script_grind:addTargetToHardBlacklist(_quest.enemyTarget:GetGUID())
 						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd), Time: "..GetTimeStamp().."");

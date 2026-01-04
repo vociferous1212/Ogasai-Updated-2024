@@ -25,6 +25,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:IsCasting())
 			and (not currentObj:HasDebuff("Polymorph"))
 			and (not currentObj:HasDebuff("Fear"))
+			and currentObj:GetHealthPercentage() >= 99
 
 
 		then
@@ -45,6 +46,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 				and (not currentObj:IsCasting())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
+				and currentObj:GetHealthPercentage() >= 99
 			then
 	
 				local dist = currentObj:GetDistance();
@@ -74,6 +76,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:IsCasting())
 			and (not currentObj:HasDebuff("Polymorph"))
 			and (not currentObj:HasDebuff("Fear"))
+			and currentObj:GetHealthPercentage() >= 99
 		then
 				script_checkAdds.closestEnemy = currentObj;
 		else
@@ -93,6 +96,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 				and (not currentObj:IsCasting())
 				and (not currentObj:HasDebuff("Polymorph"))
 				and (not currentObj:HasDebuff("Fear"))
+				and currentObj:GetHealthPercentage() >= 99
 			then
 
 				local dist = currentObj:GetDistance();
@@ -130,6 +134,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:IsCasting())
 			and (not currentObj:HasDebuff("Polymorph"))
 			and (not currentObj:HasDebuff("Fear"))
+			and currentObj:GetHealthPercentage() >= 99
 		then		
 				script_checkAdds.closestEnemy = currentObj;
 		typeObj = GetNextObject(currentObj);

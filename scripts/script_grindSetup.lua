@@ -229,4 +229,5 @@ function script_grindSetup:setup()
 		script_grind.useMount = false;
 	end
 
+	if GetMyClass() == "MAGE" then script_grind.adjustTickRate = true; script_grind.tickRate = 50; end
 end

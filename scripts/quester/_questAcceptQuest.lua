@@ -2,7 +2,7 @@ _questAcceptQuest = {}
 
 function _questAcceptQuest:run()
 
-	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) then
+	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) and not IsMoving() then
 
 		if HasForm() then RemoveForm(); return true; end
 
@@ -13,7 +13,7 @@ function _questAcceptQuest:run()
 			if GetTarget() ~= 0 and GetTarget() ~= nil then
 	
 			-- if target is quest return target
-				if GetTarget():GetUnitName() == name then
+				if GetTarget():GetUnitName() == name and GetTarget():IsInLineOfSight() then
 	
 					-- chase moving quest targets... get their position again
 				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = GetTarget():GetPosition();
@@ -23,12 +23,12 @@ function _questAcceptQuest:run()
 		
 		if _quest.curQuestGiver ~= nil then
 			TargetByName(_quest.curQuestGiver);
-			_quest:setTimer(2000); 
+			_quest:setTimer(1200); 
 			_quest.curQuestGiver = GetTarget();
 
 			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
 				if (GetTarget():UnitInteract()) then
-					_quest:setTimer(2000);
+					_quest:setTimer(1200);
 
 					if GetTarget() == nil then
 						StopMoving();
@@ -50,7 +50,7 @@ function _questAcceptQuest:run()
 	return;
 	end
 
-	if GetTarget() == _questDB:getQuestGiverName() then
+	if GetTarget() == _questDB:getQuestGiverName() and GetTarget():IsInLineOfSight() then
 		_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = GetTarget():GetPosition();
 	end
 

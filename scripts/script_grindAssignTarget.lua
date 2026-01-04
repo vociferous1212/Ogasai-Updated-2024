@@ -9,36 +9,8 @@ function script_grindAssignTarget:assignTarget()
 		end
 	end
 
-		local bestTarget = nil
-		local bestHP = 100
-
-	-- get the target with the lowest health attacking us and not with blade flurry active, rogue, drops combo points
-	if GetLocalPlayer():HasBuff("Blade Flurry") and IsInCombat() then
-
-		local i, t = GetFirstObject()
-
-		while i ~= 0 do
-
-			if t == 3 or t == 4 then
-
-				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
-
-					local hp = i:GetHealthPercentage();
-
-					if bestHP > hp then
-						bestHP = hp;
-						if bestHP <= hp then
-							bestTarget = i;
-						end
-					end
-				end
-			end
-
-		i, t = GetNextObject(i);
-
-		end
-	return bestTarget;
-	end
+	local bestTarget = nil;
+	local bestHP = 100;
 	
 -- return a target attacking player or players pet
 	local i, targetType = GetFirstObject();
@@ -55,7 +27,6 @@ function script_grindAssignTarget:assignTarget()
 				if (script_grind:isTargetingGroup(i) or script_grind:isTargetingMe(i) or script_grind:isTargetingPet(i)) then
 
 					-- return target
-					bestTarget = i;
 					return i;
 				end
 			end
@@ -63,6 +34,34 @@ function script_grindAssignTarget:assignTarget()
 
 	-- get next target
 	i, targetType = GetNextObject(i);
+	end
+
+		-- get the target with the lowest health attacking us and not with blade flurry active, rogue, drops combo points
+	if GetLocalPlayer():HasBuff("Blade Flurry") and IsInCombat() then
+
+		local i, t = GetFirstObject()
+
+		while i ~= 0 do
+
+			if t == 3 or t == 4 then
+
+				if not i:IsCritter() and not i:IsDead() and i:CanAttack() and (script_grind:isTargetingMe(i) or script_grind:isTargetingGroup(i) or script_grind:isTargetingPet(i)) then
+
+					local hp = i:GetHealthPercentage();
+
+					if bestHP > hp then
+						bestHP = hp;
+						if bestHP < hp then
+							bestTarget = i;
+						end
+					end
+				end
+			end
+
+		i, t = GetNextObject(i);
+
+		end
+	return bestTarget;
 	end
 
 	-- Find the closest valid target if we have no target or we are not in combat
@@ -182,9 +181,9 @@ function script_grindAssignTarget:assignTarget()
 
 		-- make sure we have a target
 		if (GetTarget() ~= 0) then
-
+		
 			-- need to check for loot first...
-			script_grind.tickRate = 100;
+		if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 
 			-- return target
 			return GetTarget();

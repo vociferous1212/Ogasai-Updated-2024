@@ -1,7 +1,5 @@
 script_rotationMenu = {
 
-	drawUnits = true,
-	drawAggro = true,
 	pause = true,
 	adjustTickRate = false,
 
@@ -9,6 +7,7 @@ script_rotationMenu = {
 }
 
 function script_rotationMenu:menu()
+
 	if (not self.pause) then 
 		if (Button("Pause")) then 
 			self.pause = true; 
@@ -27,14 +26,13 @@ function script_rotationMenu:menu()
 
 	SameLine(); 
 	
-	if (Button("Turn Off")) then 
+	if (Button("Exit")) then 
 		StopBot(); 
 	end
 
-	if (HasSpell("Corruption")) then
-		SameLine();
-		wasClicked, script_rotation.warlockDots = Checkbox("DoT's", script_rotation.warlockDots);
-	end
+	SameLine();
+	
+	wasClicked, script_rotation.lootTargets = Checkbox("Auto-Loot", script_rotation.lootTargets);
 
 	Separator();
 
@@ -81,7 +79,12 @@ function script_rotationMenu:menu()
 		
 		Separator();
 
+		if (script_rotationEX.drawAggro) then
+			Text("Aggro Circle Range");
+			script_rotationEX.aggroRangeTank = SliderInt("AR", 36, 300, script_rotationEX.aggroRangeTank);
+		end
 	end
+
 	if (CollapsingHeader("Script Tick Rate")) then
 		wasClicked, script_rotation.adjustTickRate = Checkbox("Adjust Tick Rate !! Caution !!", script_rotation.adjustTickRate);
 		if (script_rotation.adjustTickRate) then
@@ -89,11 +92,11 @@ function script_rotationMenu:menu()
 			script_rotation.tickRate = SliderInt("TR", 50, 2000, script_rotation.tickRate);
 		end
 	end
-	if (script_rotationEX.drawAggro) then
-		Text("Aggro Circle Range");
-		script_rotationEX.aggroRangeTank = SliderInt("AR", 36, 300, script_rotationEX.aggroRangeTank);
-	end
+	
 
 	--wasClicked, script_rotationEX.drawChests = Checkbox("Draw Chests", script_rotationEX.drawChests);
-		
+
+	if script_rotation.lootTargets then
+		script_lootMenu:menu();
+	end	
 end

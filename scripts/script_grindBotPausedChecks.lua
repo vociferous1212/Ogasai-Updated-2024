@@ -87,7 +87,7 @@ function script_grindBotPausedChecks:botPausedChecks()
 -- Set next to node distance and nav-mesh smoothness to double that number
 	if (IsMounted()) then
 		script_nav:setNextToNodeDist(5); NavmeshSmooth(script_grind.nextToNodeDist*3);
-	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) then
+	elseif (localObj:HasBuff("Sprint")) or (localObj:HasBuff("Aspect of the Cheetah")) or (localObj:HasBuff("Dash")) or (localObj:HasBuff("Cat Form")) or localObj:HasBuff("Travel Form") then
 		-- if GetLocalPlayer():GetSpeed() > 9 and GetLocalPlayer():GetSpeed() <= 9.2	
 		script_nav:setNextToNodeDist(3.8); NavmeshSmooth(script_grind.nextToNodeDist*2);
 	elseif (race == 'Night Elf') and (localObj:IsDead()) then

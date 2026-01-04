@@ -1,6 +1,6 @@
 script_checkAdds = {
-    addsRange = 20,
-    checkAddsRange = 3,
+    addsRange = 22,
+    checkAddsRange = 5,
     closestEnemy = 0,
     intersectEnemy = nil,
 }
@@ -17,7 +17,7 @@ function script_checkAdds:checkAdds()
 
 -- if we want to skip hard pulls and we have a valid enemy and we are greater than level 6 then
     if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) )
-        and not IsChanneling() and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 then
+        and not IsChanneling() and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 and not script_rotation.usingRotation and IsInCombat() then
 
 	-- if there aren't too many enemies in range and the target isn't about to die and we aren't stunned, nor is enemy stunned
         if (grindEnemy:GetHealthPercentage() >= 25 and (not TargetHasRangedWeapon(grindEnemy) or (GetMyClass() == "HUNTER" or GetMyClass() == "MAGE" or GetMyClass() == "WARLOCK") ) )
@@ -57,6 +57,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
                     and (not currentObj:HasDebuff("Polymorph"))
                     and (not currentObj:HasDebuff("Fear"))
                     and currentObj:IsInLineOfSight()
+                    and currentObj:GetHealthPercentage() >= 99
 
                 then
                     local dist = currentObj:GetDistance()
@@ -102,7 +103,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
     while theta <= 2 * PI do
         point = point + 1
         points[point] = { x = pointX + radius * cos(theta), y = pointY + radius * sin(theta) }
-        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 10) * cos(theta), y = pointY + (self.addsRange + safeDist + 10) * sin(theta) }
+        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 12) * cos(theta), y = pointY + (self.addsRange + safeDist + 12) * sin(theta) }
         theta = theta + 2 * PI / quality
     end
 
@@ -162,6 +163,8 @@ function script_checkAdds:aggroIntersect(target)
                     and not currentObj:HasDebuff("Polymorph")
                     and not currentObj:HasDebuff("Fear")
                     and currentObj:IsInLineOfSight()
+                    and currentObj:GetHealthPercentage() >= 99
+
 
                 then
                     local xx, yy = currentObj:GetPosition()

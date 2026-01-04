@@ -18,6 +18,8 @@ function script_grindDoLoot:doLoot(localObj)
 
 	-- return if we are skinning or casting
 	if IsCasting() or IsChanneling() then return true; end
+	
+	if not IsStanding() then local x, y, z = GetLocalPlayer():GetPosition(); Move(x+.1, y, z); end
 
 	-- reset targeting while we loot
 	if not IsInCombat() and not script_grind:isAnyTargetTargetingMe() then script_grind.enemyObj = nil; end
@@ -33,8 +35,7 @@ function script_grindDoLoot:doLoot(localObj)
 
 -- set script speed
 	if (not script_grind.adjustTickRate) then
-
-		script_grind.tickRate = 50;
+		script_grind.tickRate = 250;
 	end
 
 -- if our bags are full then set loot object to nil
@@ -146,18 +147,21 @@ function script_grindDoLoot:doLoot(localObj)
 	-- interact with object if we are not looting
 			-- backup line 2 (and not IsLooting())
 		if script_grind.lootObj ~= nil and not IsMoving() then
-			if (not script_grind.lootObj:UnitInteract() or script_grind.lootObj:UnitInteract()) and not IsLooting() then
+			if (not script_grind.lootObj:UnitInteract()) and not IsLooting() then
 				if GetTimeEX() > self.timerWhileLooting then
-					LootTarget(); CloseLoot();
-					self.timerWhileLooting = GetTimeEX() + 500;
+					LootTarget();
+					CloseLoot();
+					self.timerWhileLooting = GetTimeEX() + 750;
 				end
-			elseif script_grind.lootObj:UnitInteract() or (not IsLooting() and self.timerWhileLooting < GetTimeEX()) then 
-				LootTarget(); CloseLoot();
-				self.timerWhileLooting = GetTimeEX() + 500;
+			elseif script_grind.lootObj:UnitInteract() or (IsLooting() and self.timerWhileLooting < GetTimeEX()) then 
+				LootTarget();
+				CloseLoot();
+				self.timerWhileLooting = GetTimeEX() + 750;
 				script_grind:setWaitTimer(500);
 			elseif self.timerWhileLooting < GetTimeEX() then
-				LootTarget(); CloseLoot();
-				self.timerWhileLooting = GetTimeEX() + 500;
+				LootTarget();
+				CloseLoot();
+				self.timerWhileLooting = GetTimeEX() + 750;
 			end
 
 		end
@@ -165,12 +169,13 @@ function script_grindDoLoot:doLoot(localObj)
 -- if looting and not moving then wait
 		if (not IsLooting()) then
 			self.timerWhileLooting = GetTimeEX() + 500;
-			script_grind:setWaitTimer(500);
 			LootTarget();
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
 			end
 			CloseLoot();
+			script_grind:setWaitTimer(1500);
+
 		else
 	
 -- else we are done looting - load cloest vendors
@@ -264,6 +269,8 @@ function script_grindDoLoot:doLoot(localObj)
 	and not IsEating()
 	and not IsDrinking()
 	then
+
+		if not IsStanding() then JumpOrAscendStart(); local x, y, z = GetLocalPlayer():GetPosition(); Move(x+1, y, z); end
 		
 		script_grind.message = "Moving To Target Loot - " ..math.floor(script_grind.lootObj:GetDistance()).. " (yd) "..script_grind.lootObj:GetUnitName().. "";
 		

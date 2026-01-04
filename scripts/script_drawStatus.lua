@@ -46,7 +46,8 @@ function script_drawStatus:draw()
 	if (script_grind.drawEnabled) then
 		--DrawRect(x - 10, y - 7, x + width, y + 140, 255, 255, 0, 10, 77, 0);
 		--DrawRectFilled(x - 10, y - 7, x + width, y + 140, 0, 0, 0, 80, 10, 77);
-		DrawText('Grinder : Pull range : ' .. math.floor(script_grind.pullDistance) .. ' yd. ' .. 
+		DrawText(
+			--'Grinder : Pull range : ' .. math.floor(script_grind.pullDistance) .. ' yd. ' .. 
 			 	'Level range : ' .. script_grind.minLevel .. ' - ' .. script_grind.maxLevel, x, y-4, r+255, g+255, b+0) y = y + 15;
 		DrawText('Grinder Status:', x, y, r+255, g+255, b+0);
 		DrawText(script_grind.message or "error", x + 115, y, 255, 255, 255);
@@ -55,8 +56,9 @@ function script_drawStatus:draw()
 		if (script_grind.showClassOptions) then RunCombatDraw(); end
 		DrawText("_____________________", x, y-12, r+255, g+255, b);
 		if (script_grind.useVendor) then
-			DrawText('Vendor - ' .. script_vendorMenu:getInfo(), x, y, r+255, g+255, b+0); y = y + 15;
-			DrawText('Vendor Status: ', x, y, r+255, g+255, b+0);
+		--	DrawText('Vendor - ' .. script_vendorMenu:getInfo(), x, y, r+255, g+255, b+0); y = y + 15;
+			y = y + 5;
+		DrawText('Vendor Status: ', x, y, r+255, g+255, b+0);
 			DrawText(script_vendor:getMessage(), x+105, y, 0, 255, 255);
 		end
 		local time = math.floor(((GetTimeEX()-script_grind.newTargetTime)/1000)); 
@@ -67,17 +69,17 @@ function script_drawStatus:draw()
 	
 			--DrawRect(x - 10, y + 19, x + width, y + 45, 255, 255, 0,  1, 1, 1);
 			--DrawRectFilled(x-10, y+20, x + width, y + 45, 0, 0, 0, 100, 0, 0);
-			DrawText('Blacklist Target Timer: ' .. script_grind.enemyObj:GetUnitName() .. ': ' .. time .. ' s.', x, y+3, 0, 255, 120); 
-			DrawText('Blacklisting Target After ' .. script_grind.blacklistTime .. " s. (If above 92% HP.)", x, y+18, 0, 255, 120); 
+			--DrawText('Blacklist Target Timer: ' .. script_grind.enemyObj:GetUnitName() .. ': ' .. time .. ' s.', x, y+3, 0, 255, 120); 
+			--DrawText('Blacklisting Target After ' .. script_grind.blacklistTime .. " s. (If above 92% HP.)", x, y+18, 0, 255, 120); 
 		end
-		if (script_gather.gathering) and script_gather.nodeObj ~= 0 then
-			local nodeTimer = ((GetTimeEX() - script_gather.blacklistTime) / 1000);
-			DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': ' ..nodeTimer..' Sec', x, y+50, 0, 255, 120);
-			if (script_grindMenu.debugMenu) then
-				local nGUID = script_gather.nodeGUID;
-				DrawText("Node GUID - " ..nGUID..  "", x, y+65, 0, 255, 120);
-			end
-		end
+	--	if (script_gather.gathering) and script_gather.nodeObj ~= 0 then
+		--	local nodeTimer = ((GetTimeEX() - script_gather.blacklistTime) / 1000);
+		--	DrawText('Blacklist Gather Node Timer: ' .. script_gather.nodeObj:GetUnitName() .. ': ' ..nodeTimer..' Sec', x, y+50, 0, 255, 120);
+		--	if (script_grindMenu.debugMenu) then
+		--		local nGUID = script_gather.nodeGUID;
+		--		DrawText("Node GUID - " ..nGUID..  "", x, y+65, 0, 255, 120);
+		--	end
+		--end
 		end
 	end
 		if (script_grind.pause) then
