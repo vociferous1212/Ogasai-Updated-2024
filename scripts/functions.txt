@@ -100,6 +100,7 @@ PetHasTarget()	[bool]
 SendChatMessage(" ");
 
 Wow APIs:
+https://vanilla-wow-archive.fandom.com/wiki/World_of_Warcraft_API
 https://wowwiki-archive.fandom.com/wiki/World_of_Warcraft_API?oldid=293138
 http://darkenedlinux.com/ogasai/showthread.php?tid=196
 oGasai APIs:

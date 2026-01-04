@@ -99,10 +99,12 @@ function script_vendor:deleteKeepItem(itemNr)
 end
 
 function script_vendor:keepItem(name)
+	if strfind ~= nil then
 	for i = 0,self.keepNum-1 do
 		if (strfind(self.keepItems[i], name)) then
 			return true;
 		end
+	end
 	end
 	
 	return false; 
