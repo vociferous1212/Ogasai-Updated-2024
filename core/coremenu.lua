@@ -59,16 +59,21 @@ function coremenu:draw()
 
 		LoadScript("Warrior", "scripts\\combat\\warrior\\script_warrior.lua");
 		AddScriptToCombat("Warrior", "script_warrior");
+
 		--[[
 			----------------------------
 			Bot Types
 			----------------------------
 		]]--
+
 		LoadScript("Grinder", "scripts\\script_grind.lua");
 		AddScriptToMode("Grinder", "script_grind");
 
+		LoadScript("Grinder2", "scripts\\grind2\\grind2.lua");
+		AddScriptToMode("Grinder2", "grind2");
+		
 		LoadScript("Quester", "scripts\\quester\\_quest.lua");
-		AddScriptToMode("Quester", "_quest");
+		AddScriptToMode("Quester 1 - 20", "_quest");
 
 		LoadScript("Follower", "scripts\\follow\\script_follow.lua");
 		AddScriptToMode("Follower", "script_follow");

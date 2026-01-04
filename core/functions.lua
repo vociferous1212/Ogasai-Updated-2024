@@ -193,3 +193,47 @@ end
 function IsDisarmed()
 local INVSLOT_MAINHAND = 16; local mainHandTexture = GetInventoryItemTexture("player", INVSLOT_MAINHAND);
 if mainHandTexture then return false; end return true; end
+
+function IsAnyTargetTargetingPlayer()
+	local i, t = GetFirstObject()
+	while i ~= 0 do
+		if t == 3 and i:GetDistance() <= 75 and not i:IsDead() and not i:IsCritter() then
+			if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+				if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
+					return true;
+				end
+				if GetPet() ~= 0 and GetPet() ~= nil then
+					if i:GetUnitsTarget():GetGUID() == GetPet():GetGUID() then
+						return true;
+					end
+				end	
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end
+
+function NumberTargetsAttackingPlayer()
+	local numTargets = 0;
+	local tempTarget = nil;
+	local i, t = GetFirstObject();
+	while i ~= 0 do
+		if t == 3 and i:GetDistance() <= 75 and not i:IsDead() and not i:IsCritter() then
+			if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+				if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
+					numTargets = numTargets + 1;
+					tempTarget = i:GetGUID();
+				end
+				if GetPet() ~= 0 and GetPet() ~= nil and i:GetGUID() ~= tempTarget then
+					if i:GetUnitsTarget():GetGUID() == GetPet():GetGUID() then
+						numTargets = numTargets + 1;
+					end
+				end	
+
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return numTargets;
+end
