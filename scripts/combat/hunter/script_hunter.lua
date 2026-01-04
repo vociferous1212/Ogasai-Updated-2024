@@ -573,7 +573,9 @@ function script_hunter:run(targetGUID)
 		-- do pull function if we are far enough away
 		if (GetLocalPlayer():GetLevel() < self.minSpellRange) then
 			if (targetObj:GetDistance() > self.minSpellRange) and (targetObj:GetDistance() < self.spellRange) and targetObj:IsInLineOfSight() and self.useRangedAttacks then
-				script_hunter:hunterPull(targetObj);
+				if script_hunter:hunterPull(targetObj) then
+					self.waitTimer = GetTimeEX() + 250;
+				end
 				if HasPet() then PetAttack(); end
 				-- else move to target to melee
 			elseif (targetObj:GetDistance() < self.minSpellRange) or not targetObj:IsInLineOfSight() or not self.useRangedAttacks then
@@ -596,7 +598,9 @@ function script_hunter:run(targetGUID)
 -- if we are not in combat then do pull ELSE
 		if (not IsInCombat()) and (targetObj:GetDistance() < self.spellRange) and (targetObj:GetDistance() > self.minSpellRange) and self.useRangedAttacks
 		and (targetObj:IsInLineOfSight()) then
-			script_hunter:hunterPull(targetObj);
+			if script_hunter:hunterPull(targetObj) then 
+				self.waitTimer = GetTimeEX() + 250;
+			end
 			if HasPet() then PetAttack(); end
 			script_grind:setWaitTimer(1500);
 			if (not IsMoving()) then
@@ -858,7 +862,7 @@ function script_hunter:run(targetGUID)
 				end
 
 				-- use serpent sting
-				if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
+				if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
 					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana)
 					and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon"
 					and targetObj:GetCreatureType() ~= "Mechanical"
@@ -1304,20 +1308,22 @@ function script_hunter:hunterPull(targetObj)
 	end
 	if IsMounted() then script_helper:mountUp() end
 
+	if self.waitTimer > GetTimeEX() or IsCasting() or IsChanneling() then return; end
+
 	if self.hasPet and HasPet() and not IsMoving() and not targetObj:IsDead() and targetObj:CanAttack() then
 		PetAttack();
 	end
 
 	-- use Hunter's Mark
-	if (not IsInCombat()) and (self.useMark) and (localMana >= self.useMarkMana) and (not targetObj:HasDebuff("Hunter's Mark")) and (IsStanding()) then
+	if not IsSpellOnCD("Hunter's Mark") and (not IsInCombat()) and (self.useMark) and (localMana >= self.useMarkMana) and (not targetObj:HasDebuff("Hunter's Mark")) and (IsStanding()) then
 		if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (targetObj:CanAttack()) and (not targetObj:IsDead()) and (HasSpell("Hunter's Mark")) then
-			CastSpellByName("Hunter's Mark");
-			PetAttack();
-			if (not IsMoving()) then
-				targetObj:FaceTarget();
+			if CastSpellByName("Hunter's Mark") then
+				PetAttack();
+				if (not IsMoving()) then
+					targetObj:FaceTarget();
+				end
+				self.waitTimer = GetTimeEX() + 1500;
 			end
-			self.waitTimer = GetTimeEX() + 1500;
-		
 		end
 	end
 
@@ -1359,19 +1365,20 @@ function script_hunter:hunterPull(targetObj)
 	-- only use this to pull if we don't have an active pet'
 	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
 		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 7) then
-			CastSpellByName("Concussive Shot");
-			PetAttack();
-			
+			if CastSpellByName("Concussive Shot") then
+				PetAttack();
+				self.waitTimer = GetTimeEX() + 500;
+			end		
 		end
 	end
 
 	-- use serpent sting
-	if (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
+	if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
 		if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana) then
-			CastSpellByName("Serpent Sting");
-			PetAttack();
-			self.waitTimer = GetTimeEX() + 500;
-			
+			if CastSpellByName("Serpent Sting") then
+				PetAttack();
+				self.waitTimer = GetTimeEX() + 500;
+			end
 		end
 	end
 
@@ -1386,10 +1393,10 @@ function script_hunter:hunterPull(targetObj)
 	-- use arcane shot
 	if (not IsSpellOnCD("Arcane Shot")) and (IsStanding()) and not HasSpell("Aimed Shot") then
 		if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) and (localMana > self.arcaneShotMana) then
-			CastSpellByName("Arcane Shot");
-			PetAttack();
-			self.waitTimer = GetTimeEX() + 500;
-			
+			if CastSpellByName("Arcane Shot") then
+				PetAttack();
+				self.waitTimer = GetTimeEX() + 500;
+			end	
 		end
 	end
 
@@ -1400,8 +1407,6 @@ function script_hunter:hunterPull(targetObj)
 	elseif targetObj:GetDistance() > self.meleeDistance then 
 		return 3;
 	end
-
-return;
 end
 
 -- check to see if pet is attacking a target attacking me, and if not then pet attack

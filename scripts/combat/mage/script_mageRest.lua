@@ -32,7 +32,12 @@ function script_mageRest:rest()
 		end
 	end
 
-if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming()) then if IsMoving() then StopMoving(); return true; end end
+	--if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming()) then
+	--	if IsMoving() then
+	--		StopMoving(); 
+	--	return true;
+	--	end
+	--end
 
 	--Create Water
 	local waterIndex = -1;
@@ -165,7 +170,7 @@ if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming(
 	end
 
 	-- Stop moving before we can rest
-	if(localHealth < script_mage.eatHealth or localMana < script_mage.drinkMana) then
+	if(localHealth < script_mage.eatHealth or localMana < script_mage.drinkMana) and not script_rotation.usingRotation then
 		if (IsMoving()) then
 			StopMoving();
 			return true;
@@ -177,6 +182,8 @@ if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming(
 
 		if (not IsStanding()) then
 			JumpOrAscendStart();
+			local x, y, z = GetLocalPlayer():GetPosition();
+			Move(x+1, y, z);
 		end
 	
 		-- arcane intellect
@@ -267,7 +274,7 @@ if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming(
 	or (IsEating() and not IsDrinking() and localMana <= 85))
 	or (localMana <= script_mage.drinkMana or (IsDrinking() and not IsEating() and localHealth <= 80))
 	and not IsSwimming() then
-		if IsMoving() then StopMoving(); return true; end
+		if IsMoving() and not script_rotation.usingRotation then StopMoving(); return true; end
 
 		-- if we need to eat
 		if (not IsEating() and localHealth <= script_mage.eatHealth)
@@ -335,6 +342,8 @@ if (not IsDrinking() and localMana < script_mage.drinkMana) and (not IsSwimming(
 	or (IsDrinking() and IsEating() and localHealth >= 95 and localMana >= 95) then
 		if (not IsInCombat()) then
 			JumpOrAscendStart();
+			local x, y, z = GetLocalPlayer():GetPosition();
+			Move(x+1, y, z);
 		end
 	end
 	

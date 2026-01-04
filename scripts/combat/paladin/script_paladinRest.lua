@@ -47,7 +47,7 @@ function script_paladinRest:rest()
 	end
 
 	-- Stop moving before we can rest
-	if (localHealth <= script_paladin.eatHealth or localMana <= script_paladin.drinkMana) and (not IsEating()) and (not IsDrinking()) then
+	if (localHealth <= script_paladin.eatHealth or localMana <= script_paladin.drinkMana) and (not IsEating()) and (not IsDrinking()) and not IsSwimming() then
 		if (IsMoving()) then
 			StopMoving();
 			return true;
@@ -55,7 +55,7 @@ function script_paladinRest:rest()
 	end
 
 	-- Eat and Drink
-	if (not IsDrinking() and localMana < script_paladin.drinkMana) then
+	if (not IsDrinking() and localMana < script_paladin.drinkMana) and not IsSwimming() then
 		script_paladin.message = "Need to drink...";
 		script_paladin.waitTimer = GetTimeEX() + 2000;
 		-- Dismount
@@ -79,7 +79,7 @@ function script_paladinRest:rest()
 		end
 	end
 
-	if (not IsEating() and localHealth < script_paladin.eatHealth) then
+	if (not IsEating() and localHealth < script_paladin.eatHealth) and not IsSwimming() then
 		-- Dismount
 		if(IsMounted()) then DisMount(); end
 		script_paladin.message = "Need to eat...";

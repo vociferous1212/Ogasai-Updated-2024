@@ -4,13 +4,14 @@ function script_paladinSetup:setup()
 
 	local localObj = GetLocalPlayer();
 
-	if (not HasSpell("Retribution Aura")) and (not HasSpell("Sanctity Aura")) and (not localObj:HasBuff("Stoneskin")) then
+	if (not HasSpell("Retribution Aura")) then
 
 		script_paladin.devoAura = true;
 
-	--elseif (not HasSpell("Sanctity Aura")) and (HasSpell("Retribution Aura")) then
+	elseif (HasSpell("Retribution Aura")) then
 
-	--	script_paladin.retAura = true;
+		script_paladin.devoAura = false;
+		script_paladin.retAura = true;
 	end
 
 	-- Blessing of wisdom

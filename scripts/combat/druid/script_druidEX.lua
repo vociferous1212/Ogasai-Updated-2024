@@ -104,18 +104,21 @@ function script_druidEX:bearForm()
 	
 	if (not IsMounted()) then
 		if (not HasSpell("Dire Bear Form")) then
-			if (HasSpell("Bear Form")) then
+			if (HasSpell("Bear Form")) and not IsSpellOnCD("Bear Form") then
 				if (CastSpellByName("Bear Form")) then
+					script_druid.waitTimer = GetTimeEX();
+					script_druid.tickRate = 135;
 					return true;
 				end
 			end
-		elseif (HasSpell("Dire Bear Form")) then
+		elseif (HasSpell("Dire Bear Form")) and not IsSpellOnCD("Dire Bear Form") then
 			if (CastSpellByName("Dire Bear Form")) then
+				script_druid.waitTimer = GetTimeEX();
+				script_druid.tickRate = 135;
 				return true;
 			end
 		end
 	end
-
 return false;
 end	
 
@@ -214,6 +217,9 @@ Separator();
 		local wasClicked = false;
 		Text('Combat options:');
 		
+		if HasSpell("Moonfire") and not script_druid.useCat and not script_druid.useBear then
+			wasClicked, script_druid.pullWithMoonfire = Checkbox("Pull with Moonfire", script_druid.pullWithMoonfire);
+		end
 		if (HasSpell("Entangling Roots")) and (not script_druid.useCat) and (not script_druid.useBear) then
 			wasClicked, script_druid.useEntanglingRoots = Checkbox("Attempt to root after pull", script_druid.useEntanglingRoots);
 			if (script_grindMenu.helpMenu) then

@@ -5,16 +5,17 @@ script_paladinCastHolyLight = {
 
 function script_paladinCastHolyLight:castHolyLight(localObj)
 	if (self.holyLightTimer > GetTimeEX()) then
-		return false;
+		return;
 	end
 	if (HasSpell("Holy Light")) then
 		if (not IsSpellOnCD("Holy Light")) then
 			if (not IsMoving()) and (IsStanding()) then
 				if (not IsCasting()) and (not IsChanneling()) then
 					if (CastSpellByName("Holy Light", localObj)) then
-						self.holyLightTimer = GetTimeEX() + 3500;
+						self.holyLightTimer = GetTimeEX() + 4500;
 						script_paladin.waitTimer = GetTimeEX() + 2500;
-						return true;
+						script_grind:setWaitTimer(2500);
+						return false;
 					end
 				end
 			end

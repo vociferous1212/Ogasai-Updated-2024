@@ -157,7 +157,7 @@ function script_warlockEX2:numberSoulShard()
 				for t = 0, GetContainerNumSlots(i,y) do
 					if (itemName == "Soul Shard") then
 						shardCount = shardCount + 1;
-						self.shardCount = self.shardCount + 1;
+						self.shardCount = shardCount;
 						return shardCount;
 					end
 				end

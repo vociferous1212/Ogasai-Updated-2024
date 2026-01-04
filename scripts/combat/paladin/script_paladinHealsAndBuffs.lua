@@ -1,17 +1,23 @@
 script_paladinHealsAndBuffs = {
 
+	waitTimer = 0
+
 }
 
 
 function script_paladinHealsAndBuffs:healsAndBuffs()
 	
-	if script_paladin.waitTimer > GetTimeEX() or (IsCasting()) or (IsChanneling()) then
-		return false;
-	end
+	if IsCasting() or IsChanneling() then self.waitTimer = GetTimeEX() + 1000; end
 
+	if (IsCasting()) or (IsChanneling()) then
+		return;
+	end
+	
 	local localMana = GetLocalPlayer():GetManaPercentage();
 	local localHealth = GetLocalPlayer():GetHealthPercentage();
 	local localObj = GetLocalPlayer();
+
+	if localObj:IsDead() then return false; end
 
 	if (not IsMounted()) then
 		if (not IsDrinking()) and (not IsEating()) then
@@ -125,19 +131,14 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 		end
 	end
 
-	-- remove disease with purify
 	if (script_checkDebuffs:hasDisease()) or (script_checkDebuffs:hasPoison()) then
 		if (HasSpell("Purify")) and (localMana > 60) then
 			if (Buff("Purify", localObj)) then 
-				script_paladin.message = "Cleansing..."; 
-				script_grind:setWaitTimer(1750); 
-				script_paladin.waitTimer = GetTimeEX() + 1750;
-				return true; 
+				script_paladin.message = "Cleansing..."; script_grind:setWaitTimer(1750); script_paladin.waitTimer = GetTimeEX() + 1750; return true; 
 			end
 		end
 	end
 
-	-- Check: Remove movement disables with Freedom
 	if (localObj:IsMovementDisabed() or script_checkDebuffs:hasDisabledMovement()) and (HasSpell("Blessing of Freedom")) then
 		Buff("Blessing of Freedom", localObj);
 		script_paladin.waitTimer = GetTimeEX() + 1750;
@@ -146,51 +147,54 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 
 	-- flash of light not in combat
 	if not IsInCombat() and localMana > 10 and HasSpell("Flash of Light") and localHealth <= 80  then
-			script_grind.tickRate = 100;
+		if not script_grind.adjustTickRate then	script_grind.tickRate = 100; end
 			if (IsMoving()) then
 				StopMoving();
 			end
 			CastSpellByName("Flash of Light(Rank 1", localObj);
-			script_grind:setWaitTimer(1500);
+			script_grind:setWaitTimer(1950);
 			script_paladin.waitTimer = GetTimeEX() + 2050;
 			return true;
 	end
 
-	-- holy light
-	if script_paladinCastHolyLight.holyLightTimer < GetTimeEX() and (localMana > 18) and (script_paladinCheckHealthPercentage:doubleCheckHealthPercentage() < script_paladin.holyLightHealth) and (not IsMoving()) then
-		if (not IsCasting()) and (not IsChanneling()) then
-			if (IsMoving()) then
-				StopMoving();
-			end
-			script_paladinCastHolyLight:castHolyLight(localObj);
-			script_grind:setWaitTimer(2250);
-			script_paladin.waitTimer = GetTimeEX() + 2250;
-		return 4;
+		-- Flash of Light in combat
+	if (script_paladin.useFlashOfLightInCombat) and localMana >= 7 and localHealth <= script_paladin.flashOfLightHealth then
+		script_paladinCastFlashOfLight.healthFull = false;
+		if GetLocalPlayer():GetHealthPercentage() >= 85 then
+			self.healthFull = true;
 		end
-		
-	end
-	-- Flash of Light in combat
-	if (script_paladin.useFlashOfLightCombat) then
-		if (IsInCombat()) and (HasSpell("Flash of Light")) and (script_paladinCheckHealthPercentage:doubleCheckHealthPercentage() <= script_paladin.flashOfLightHealth) and (localMana >= 10) then
-			if (not IsCasting()) and (not IsChanneling()) and (GetLocalPlayer():GetHealthPercentage() <= script_paladin.flashOfLightHealth) then
-				if (IsMoving()) then
-					StopMoving();
-				end
-				if (not CastSpellByName("Flash of Light", localObj)) then
-					script_grind:setWaitTimer(2750);
-					script_paladin.waitTimer = GetTimeEX() + 2750;
-					script_paladin.waitTimer = GetTimeEX() + 2750
-					script_paladin.message = "Flash of Light enabled - Healing!";
-				return 4;
-				end
-			return 4;			
-			end
+		if script_paladinCastFlashOfLight:castFlashOfLight() then
+			script_paladin.tickRate = 0;
+			return true;
 		end
 	end	
 
+
+	-- holy light
+	if script_paladinCastHolyLight.holyLightTimer < GetTimeEX() and (localMana > 18) then
+		if (script_paladinCheckHealthPercentage:doubleCheckHealthPercentage() < script_paladin.holyLightHealth) and localHealth < script_paladin.holyLightHealth then
+			if (not IsMoving()) and not IsCasting() and not IsChanneling() then
+				script_paladin.tickRate = 1500
+				if (not IsCasting()) and (not IsChanneling()) then
+					if (IsMoving()) then
+						StopMoving();
+						return;
+					end
+					script_paladinCastHolyLight:castHolyLight(localObj)
+					script_paladinCastHolyLight.holyLightTimer = GetTimeEX() + 4550;
+					script_grind:setWaitTimer(1550);
+					script_paladin.waitTimer = GetTimeEX() + 1550;
+				return 4;
+				end
+			return 4;
+			end
+		return 4;
+		end
+	end
+
 	--flash of light in combat very low health and mana
 	if (HasSpell("Flash of Light")) and (IsInCombat()) and (localMana < 15) and (localMana > 5) and (localHealth < script_paladin.holyLightHealth) then
-		script_grind.tickRate = 100;
+		if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 		if (IsMoving()) then
 			StopMoving();
 		end
@@ -204,13 +208,16 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	end
 
 	-- holy light out of combat
-	if (not IsInCombat() or not script_grind:isAnyTargetTargetingMe()) and not HasSpell("Flash of Light")
-	and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99)) and localHealth <= 75 then
- 		if CastSpellByName("Holy Light(Rank 1", localObj) then
-			script_paladin.waitTimer = GetTimeEX() + 500;
-			return true;
+	if not IsCasting() and not IsChanneling() and (not IsInCombat() or not script_grind:isAnyTargetTargetingMe()) and not HasSpell("Flash of Light")
+	and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99)) then
+		if localHealth <= 70 then
+ 			if not CastSpellByName("Holy Light(Rank 1", localObj) then
+				script_paladin.waitTimer = GetTimeEX() + 500;
+				script_grind:setWaitTimer(500);
+				return false;
+			end
+		return 4;
 		end
-	return true;
 	end
 return false;
 end

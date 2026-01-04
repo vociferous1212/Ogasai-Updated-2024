@@ -37,7 +37,7 @@ script_shaman = {
 	useFlameShock = false,
 	useLightningBolt = false,
 	healMana = 20,
-	enhanceWeaponTimer = 0,
+	enhanceWeaponTimer = GetTimeEX(),
 	healingSpellTimer = 0,
 	healingSpellTimer2 = 0,
 	checkPoisonTimer = 0,
@@ -297,6 +297,7 @@ function script_shaman:healsAndBuffs()
 	if (not IsStanding()) then
 		JumpOrAscendStart();
 	end
+if not IsStanding() then local x, y, z = GetLocalPlayer():GetPosition(); Move(x+.1, y, z); end
 
 	if (IsCasting()) or (IsChanneling()) then
 		return false;
@@ -503,7 +504,8 @@ function script_shaman:run(targetGUID)
 		if (not IsStanding()) then
 			JumpOrAscendStart();
 		end
-	
+	if not IsStanding() then local x, y, z = GetLocalPlayer():GetPosition(); Move(x+.1, y, z); end
+
 		targetHealth = targetObj:GetHealthPercentage();
 
 		-- Check: if we target player pets/totems
@@ -561,7 +563,9 @@ function script_shaman:run(targetGUID)
 				end
 			end
 
-
+			if targetObj:GetDistance() <= 20 and self.useEarthShock and not IsSpellOnCD("Earth Shock") and localMana >= self.earthShockMana and targetObj:IsInLineOfSight() then
+				CastSpellByName("Earth Shock");
+			end
 				
 			-- Auto Attack
 			if (targetObj:GetDistance() <= 35) and (not IsAutoCasting("Attack"))
@@ -580,7 +584,7 @@ function script_shaman:run(targetGUID)
 
 			-- run backwards can't see target but close enough to attack
 			if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance) and (not targetObj:IsInLineOfSight()) then
-				if (targetObj:GetDistance() <= .3) then 
+				if (targetObj:GetDistance() <= .2) then 
 					if (script_shaman:runBackwards(targetObj,2)) then 
 						return 4; 
 					end 
@@ -942,8 +946,8 @@ function script_shaman:rest()
 	end
 
 	-- heal with rank 1 healHealth
-	if not IsInCombat() and localMana > 10 and HasSpell("Healing Wave") and localHealth <= 80  then
-			script_grind.tickRate = 100;
+	if not IsInCombat() and localMana > 10 and HasSpell("Healing Wave") and localHealth <= 80 and GetLocalPlayer():GetLevel() >= 7 then
+			if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 			if (IsMoving()) then
 				StopMoving();
 			end
@@ -1015,6 +1019,8 @@ function script_shaman:rest()
 		JumpOrAscendStart();
 		return false;
 	end
+if not IsStanding() then local x, y, z = GetLocalPlayer():GetPosition(); Move(x+.1, y, z); end
+
 
 	if (not script_grind.adjustTickRate) then
 

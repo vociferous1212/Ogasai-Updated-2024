@@ -79,7 +79,7 @@ function script_paladinMenu:menu()
 
 			if (HasSpell("Flash of Light")) then
 				Text("Otherwise the bot will use Holy Light only");
-				wasClicked, script_paladin.useFlashOfLightCombat = Checkbox("Flash of Light in Combat On/Off", script_paladin.useFlashOfLightCombat);
+				wasClicked, script_paladin.useFlashOfLightInCombat = Checkbox("Flash of Light in Combat On/Off", script_paladin.useFlashOfLightInCombat);
 			end
 
 			Separator();

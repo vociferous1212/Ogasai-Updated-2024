@@ -12,7 +12,7 @@ function script_shamanMenuEX:alternateEnhanceMenu()
 	-- show checkboxes
 	if not (b) and not (c) and not (d) and (e) then
 		wasClicked, script_shaman.useRock = Checkbox("Rockbiter", script_shaman.useRock);
-		script_shaman.enhanceWeapon = "Rocbiter Weapon";
+		script_shaman.enhanceWeapon = "Rockbiter Weapon";
 	end
 	if not (a) and not (c) and not (d) and (f) then
 			SameLine();

@@ -14,11 +14,11 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 		return false;
 	end
 
-	if ((self.waitTimer > GetTimeEX() or script_priest.waitTimer > GetTimeEX()) or IsCasting() or IsChanneling()) then
+	if IsCasting() or IsChanneling() then
 		return false;
 	end
 
-	if GetLocalPlayer():IsCasting() and IsAutoCasting("Shoot") then SpellStopCasting(); self.waitTimer = GetTimeEX() + 500; end
+	if self.waitTimer > GetTimeEX() then return false; end
 
 	-- get target health percentage
 	if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (IsInCombat()) then
@@ -99,11 +99,14 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	
 		-- Cast Shield Power Word: Shield
 		if (localMana >= 10) and (localHealth <= script_priest.shieldHP) and (not localObj:HasDebuff("Weakened Soul")) and (IsInCombat()) and (HasSpell("Power Word: Shield")) then
-			if ( (not PlayerHasTarget()) or (PlayerHasTarget() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetHealthPercentage() >= 20) )  then
-					Buff("Power Word: Shield", localObj);
-					self.waitTimer = GetTimeEX() + 500;
-					script_priest.waitTimer = GetTimeEX() + 500;
-					return true;
+			if ( (not PlayerHasTarget()) or (PlayerHasTarget() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetHealthPercentage() >= 20) ) then
+				if not CastSpellByName("Power Word: Shield", localObj) then 
+					self.waitTimer = GetTimeEX() + 750;
+					script_priest.waitTimer = GetTimeEX() + 750;
+					script_grind:setWaitTimer(750);
+					script_rotation.waitTimer = GetTimeEX() + 750;
+					return;
+				end
 			end
 		end
 

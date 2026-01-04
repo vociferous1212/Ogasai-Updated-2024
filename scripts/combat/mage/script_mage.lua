@@ -368,7 +368,7 @@ function script_mage:run(targetGUID)
 	and (not targetObj:IsCasting()) then
 		if (script_checkAdds:checkAdds()) then
 			script_om:FORCEOM();
-		return 4;
+			--return true;
 		end
 	end
 
@@ -448,6 +448,7 @@ function script_mage:run(targetGUID)
 			if (script_mage.frostMage) and (targetObj:GetDistance() <= script_mage.spellRange) and (targetObj:IsInLineOfSight()) and not IsMoving() then
 				if (script_magePullSpells.frostMagePull(targetObj)) then
 
+				if IsMoving() then StopMoving(); return true; end
 				-- set some timers to make the bot wait before pulling a target that may have walked closer during casting - pulls 2 at once
 					-- spell casting time is greater the greater the frostbolt rank
 					if GetLocalPlayer():GetLevel() < 28 then
@@ -590,8 +591,8 @@ function script_mage:run(targetGUID)
 -- Fire blast
 -- we only really want to use it as a last resort once we have better spells... costs a lot of mana
 			if (script_mage.useFireBlast) and (targetObj:GetDistance() <= 20) and (HasSpell("Fire Blast")) and (not IsSpellOnCD("Fire Blast")) and (localMana > 6) and (not IsMoving()) and targetHealth > 5 then
-				if (not targetObj:HasDebuff("Frost Nova")) and (not targetObj:HasDebuff("Frostbite")) or (targetHealth < 20 and localHealth < 25) then
-					if targetHealth <= 20 and (not HasSpell("Cone of Cold") and IsSpellOnCD("Frost Nova")) or (HasSpell("Cone of Cold") and IsSpellOnCD("Cone of Cold") and IsSpellOnCD("Frost Nova")) then
+				if (not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite")) or (targetHealth <= 20 or localHealth <= 25) then
+					if (not HasSpell("Cone of Cold") and (IsSpellOnCD("Frost Nova") or not HasSpell("Frost Nova"))) or (HasSpell("Cone of Cold") and IsSpellOnCD("Cone of Cold") and IsSpellOnCD("Frost Nova")) then
 	
 						if (not IsSpellOnCD("Fire Blast")) then
 							CastSpellByName("Fire Blast", targetObj);

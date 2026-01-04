@@ -9,20 +9,22 @@ script_paladin = {
 	paladinCastHolyLightLoaded = include("scripts\\combat\\paladin\\script_paladinCastHolyLight.lua"),
 	paladinCheckAuraLoaded = include("scripts\\combat\\paladin\\script_paladinCheckAura.lua"),
 	paladinCheckBlessingLoaded = include("scripts\\combat\\paladin\\script_paladinCheckBlessing.lua"),
-	isSetup = false, stopIfMHBroken = true, useFlashOfLightInCombat = false,
+	paladinFlashOfLightLoaded = include("scripts\\combat\\paladin\\script_paladinCastFlashOfLight.lua"),
+	isSetup = false, stopIfMHBroken = true, useFlashOfLightInCombat = true,
 	waitTimer = 0,
 	eatHealth = 30, drinkMana = 25,
-	shieldHealth = 16, lohHealth = 12, holyLightHealth = 45, flashOfLightHealth = 70,
+	shieldHealth = 16, lohHealth = 12, holyLightHealth = 45, flashOfLightHealth = 30,
 	potionHealth = 15, potionMana = 20,
 	consecrationMana = 50,
 	meleeDistance = 3.5,
-	useSealOfCrusader = false, useJudgement = true, useFlashOfLightInCombat = false, useBubbleHearth = false,
+	useSealOfCrusader = false, useJudgement = true, useBubbleHearth = false,
 	onlyUseSealOfCrusader = false,
 	-- auras
 	devoAura = true, retAura = false, sancAura = false,
 	-- blessings
 	might = false, wisdom = false,
 	startedNewCharacter = false,
+	tempTimer = 0,
 
 }
 
@@ -54,7 +56,7 @@ function script_paladin:runBackwards(targetObj, range)
  		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
-		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
+		local moveX, moveY, moveZ = xT + xUV*2, yT + yUV*2, zT + zUV;		
  		if (distance < range) then 		
 
 			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
@@ -68,9 +70,6 @@ function script_paladin:runBackwards(targetObj, range)
 			if script_checkAdds:checkAdds() then
 				return 4;
 			end
-
-			self.waitTimer = GetTimeEX() + 200
-			script_grind:setWaitTimer(100);
 
 		return 4;
 		end
@@ -150,9 +149,9 @@ function script_paladin:run(targetGUID)
 
 	local targetHealth = targetObj:GetHealthPercentage();
 
-	local targetplayerHasCrusader = targetObj:HasDebuff("Judgement of the Crusader");
-	local targetplayerHasWisdom = targetObj:HasDebuff("Judgement of Wisdom");
-	local targetplayerHasLight = targetObj:HasDebuff("Judgement of Light");
+	local targetHasCrusader = targetObj:HasDebuff("Judgement of the Crusader");
+	local targetHasWisdom = targetObj:HasDebuff("Judgement of Wisdom");
+	local targetHasLight = targetObj:HasDebuff("Judgement of Light");
 
 
 
@@ -160,24 +159,38 @@ function script_paladin:run(targetGUID)
 		return 2;
 	end	
 
+	
+	if IsInCombat() and targetObj:GetDistance() <= self.meleeDistance and not IsMoving() and self.tempTimer < GetTimeEX() then
+		targetObj:FaceTarget();
+		self.tempTimer = GetTimeEX() + 50;
+	end
+
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling()) or (IsCasting()) or (self.waitTimer > GetTimeEX()) then
 		return 4;
 	end
 
-	-- face the target
-	if IsInCombat() and targetObj:GetDistance() <= self.meleeDistance + 2 and not IsMoving() then
-		targetObj:FaceTarget();
-	end
 
-	-- intial heal check
-	if script_paladinHealsAndBuffs:healsAndBuffs() then
-		if IsMoving() then StopMoving(); return; end
+-- check for adds around us during combat and move to prevent pulling multiple enemies
+		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and not IsCasting()
+		and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement())
+		and (not targetObj:IsCasting()) then
+			if (script_checkAdds:checkAdds()) then
+				script_om:FORCEOM(); script_paladin.tickRate = 50; script_grind.tickRate = 50;
+				self.waitTimer = GetTimeEX() + 750; return true;
+			end
+		end
+
+	-- heal check
+	if not IsCasting() and not IsChanneling() then 
+		if script_paladinHealsAndBuffs:healsAndBuffs() then
+			if IsMoving() then StopMoving(); return; end
+		end
 	end
 
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
-		local tickRandom = random(350, 500);
+		local tickRandom = random(250, 350);
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
 		elseif (not IsInCombat()) and (not IsMoving()) then
@@ -195,20 +208,10 @@ function script_paladin:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) then	
 
-		-- check for adds around us during combat and move to prevent pulling multiple enemies
-		if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0)
-		and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement())
-		and (not targetObj:IsCasting()) then
-			if (script_checkAdds:checkAdds()) then
-				
-				script_om:FORCEOM();
-			return 4;
-			end
-		end
 
 		-- Cant Attack dead targets
 		if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
-			self.waitTimer = GetTimeEX() + 1200;
+			self.waitTimer = GetTimeEX() + 1000;
 			return 0;
 		end
 		
@@ -231,6 +234,14 @@ function script_paladin:run(targetGUID)
 				end
 			end
 		end 
+
+		-- set aura when not in combat
+		if not IsInCombat() then
+			script_paladinCheckAura:checkAura();
+		end
+		
+		-- check aura - switch to devo aura if close to death
+		script_paladinCheckAura:changeAuraInCombat();
 	
 		-- Opener
 	
@@ -241,78 +252,70 @@ function script_paladin:run(targetGUID)
 			-- Check: Exorcism
 			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) then
 				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
+					targetObj:FaceTarget();
 					if (CastSpellByName("Exorcism", targetObj)) then 
 						self.message = ("Pulling with Exocism...");
-						return 0;
 					end
 				end
 			end
 			
 			-- reheck auto attack to initiate combat
-			if not IsAutoCasting("Attack") then
-				targetObj:AutoAttack();
-			end
+			if not IsAutoCasting("Attack") then targetObj:AutoAttack(); end
 
-			if targetObj:GetDistance() <= 15 and knowsCommand and not playerHasCommand and not playerHasCrusader and localMana >= self.drinkMana + 10 then
-				CastSpellByName("Seal of Command", localObj);
-			end
-	
-			-- move to the target
-			if targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight() and not script_paladinHealsAndBuffs:healsAndBuffs() then
-				return 3;
-			end
-	
-				-- heal check
-			if script_paladinHealsAndBuffs:healsAndBuffs() then
-				if IsMoving() then StopMoving(); return; end
+			local aggroRange = (targetObj:GetLevel() - GetLocalPlayer():GetLevel()) + 18;
+
+			if targetObj:GetDistance() <= aggroRange and localMana >= self.drinkMana + 10 then
+				if targetObj:GetDistance() <= 10 then
+					if (playerHasCommand or playerHasRighteousness or playerHasCrusade) and not IsSpellOnCD("Judgement") and HasSpell("Judgement") then
+						if CastSpellByName("Judgement", targetObj) then
+							self.waitTimer = GetTimeEX() + 500; end
+					end
+				end
+				if knowsCrusader and not playerHasCrusader and self.useSealOfCrusader and not playerHasCommand and not playerHasRighteousness then
+					CastSpellByName("Seal of the Crusader", localObj);
+				elseif knowsCommand and not playerHasCommand and not playerHasCrusader then
+					CastSpellByName("Seal of Command", localObj);
+				elseif knowsRighteousness and not playerHasRighteousness then
+					CastSpellByName("Seal of Righteousness", localObj);
+				end
+			self.waitTimer = GetTimeEX() + 150;
 			end
 				
-			if self.useJugement
-			and HasSpell("Judgement")
-			and not IsSpellOnCD("Judgement")
-			and playerHasRighteousness or playerHasCommand
-			and localMana >= 15
-			and targetObj:GetDistance() <= 10
-				
-			then
+			if self.useJugement and HasSpell("Judgement") and not IsSpellOnCD("Judgement") and (playerHasRighteousness or playerHasCommand) and localMana >= 12
+				and targetObj:GetDistance() <= 10 then
 				
 				CastSpellByName("Judgement", targetObj);
+				self.waitTimer = GetTimeEX() + 300;
 			end	
+
+			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
+				return 3;
+			end
+
 
 	-- Combat WE ARE NOW IN COMBAT
 
 		else	
 
-			-- Check move into melee range
 			if (targetObj:GetDistance() > self.meleeDistance) or (not targetObj:IsInLineOfSight()) then
 				return 3;
 			end
 
 			self.message = "Killing " .. targetObj:GetUnitName() .. "...";
 
-			-- Check: Do we have the right target (in UI) ??
 			if (GetTarget() ~= 0 and GetTarget() ~= nil) then
 				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) then
 					ClearTarget();
-					self.waitTimer = GetTimeEX() + 1500;
+					self.waitTimer = GetTimeEX() + 250;
 					targetObj = 0;
 					return 0;
 				end
 			end
 
-			-- check heals and buffs
-			if (not targetObj:IsFleeing()) and (localMana > 8) then
-				if script_paladinHealsAndBuffs:healsAndBuffs() then
-						if IsMoving() then StopMoving(); return; end
-
-				end
-			end
-
-			-- Run backwards if we are too close to the target
-			if (targetObj:GetDistance() < .2) then 
-				if (script_paladin:runBackwards(targetObj, 1.5)) then 
-					script_paladin.tickRate = 80;
-					return 4; 
+			if (targetObj:GetDistance() <= .5) then 
+				if (script_paladin:runBackwards(targetObj, 1)) then
+					script_grind.tickRate = 135;
+					return 4;
 				end 
 			end
 			
@@ -347,10 +350,10 @@ function script_paladin:run(targetGUID)
 			-- Check: Seal of the Crusader until we use judgement
 			if ( (self.useSealOfCrusader or self.onlyUseSealOfCrusader)
 			and (script_grind.enemiesAttackingUs() < 2 or localMana >= 80) )
-			and (not targetplayerHasCrusader)
+			and (not targetHasCrusader)
 			and (targetObj:GetDistance() < 15)
 			and (not playerHasCrusader)
-			and localMana > 15
+			and localMana > 12
 			and (not IsSpellOnCD("Judgement") or self.onlyUseSealOfCrusader)
 			and (targetObj:GetHealthPercentage() > 25) then
 				if (CastSpellByName("Seal of the Crusader", targetObj)) then
@@ -361,18 +364,12 @@ function script_paladin:run(targetGUID)
 
 		-- in melee range
 			if (targetObj:GetDistance() <= self.meleeDistance) then
-				
-				if (not targetObj:IsFleeing()) and (localMana > 8) then
-					if script_paladinHealsAndBuffs:healsAndBuffs() then
-						if IsMoving() then StopMoving(); return; end
-					end
-				end
 
 				-- hammer of justice when fleeing
 				if (targetObj:IsCasting()) or (targetObj:IsFleeing()) then
 					if (HasSpell("Hammer of Justice")) and (not IsSpellOnCD("Hammer of Justice")) and (localMana > 8) then
 						CastSpellByName("Hammer of Justice", targetObj)
-						self.waitTimer = GetTimeEX() + 2000;
+						self.waitTimer = GetTimeEX() + 1500;
 					end
 				end
 	
@@ -393,17 +390,17 @@ function script_paladin:run(targetGUID)
 				end
 
 				-- Seal of the Crusader until we use judgement
-				if (self.useSealOfCrusader or self.onlyUseSealOfCrusader) and (knowsCrusader) and (localMana > 15) and (targetHealth > 55)
+				if ((self.useSealOfCrusader and not targetHasCrusader) or self.onlyUseSealOfCrusader) and (knowsCrusader) and (localMana > 15) and (targetHealth > 55)
 				and (script_grind.enemiesAttackingUs() < 2 or localMana >= 80) then
-					if (targetplayerHasCrusader) and (not playerHasCrusader) and (not playerHasLight) then
+					if not targetHasCrusader and not playerHasCrusader and not playerHasLight then
 						CastSpellByName("Seal of the Crusader", localObj)
 						self.waitTimer = GetTimeEX() + 1500; 
 					end 
 				end
 
 				-- use Judgement when we have crusader buffed
-				if (self.useJudgement) and(HasSpell("Judgement")) and (not IsSpellOnCD("Judgement")) and playerHasCrusader and (localMana > 15) then
-					if (targetObj:GetDistance() < 10) and not targetplayerHasCrusader and (playerHasCrusader and not self.onlyUseSealOfCrusader) then
+				if (self.useJudgement) and (HasSpell("Judgement")) and (not IsSpellOnCD("Judgement")) and playerHasCrusader and (localMana > 12) then
+					if (targetObj:GetDistance() < 10) and not targetHasCrusader and (playerHasCrusader and not self.onlyUseSealOfCrusader) then
 						CastSpellByName("Judgement", targetObj)
 						self.waitTimer = GetTimeEX() + 1500; 
 					end
@@ -411,7 +408,7 @@ function script_paladin:run(targetGUID)
 
 				-- Check: Seal of Righteousness (before we have SoC)
 				if (not playerHasRighteousness) and (not playerHasCrusader) and (not knowsCommand) and
-					not playerHasLight and not playerHasWisdom and localMana > 15 then 
+					not playerHasLight and not playerHasWisdom and localMana > 20 then 
 					CastSpellByName("Seal of Righteousness", localObj)
 					self.waitTimer = GetTimeEX() + 1500;
 				end
@@ -425,8 +422,8 @@ function script_paladin:run(targetGUID)
 				end
 
 				-- Check: Use judgement if we are buffed with Righteousness or Command and the target is low
-				if (self.useJudgement) and (targetHealth < 10) and (localMana > 15) then
-					if playerHasRighteousness or playerHasCommand and (targetObj:GetDistance() < 10) then
+				if (self.useJudgement) and (targetHealth < 10) and (localMana > 12) and not IsSpellOnCD("Judgement") then
+					if (playerHasRighteousness or playerHasCommand) and (targetObj:GetDistance() < 10) then
 						CastSpellByName("Judgement", targetObj)
 						self.waitTimer = GetTimeEX() + 1500;
 					end
