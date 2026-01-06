@@ -99,43 +99,7 @@ function coremenu:draw()
 
 		--LoadScript("Pather", "scripts\\script_pather.lua");
 		--AddScriptToMode("Pather Debug", "script_pather");
-		--[[
-			----------------------------
-			Override Settings
-			----------------------------
-		]]--
-		--DrawPath(true);
-		--NewTheme(false);
 
 	end
 
-	--[[
-		----------------------------
-		Append To Menu
-		----------------------------
-	]]--
-	-- Grind 
-	--Separator();
-	--if (CollapsingHeader("Grind options")) then
-	--	script_grindMenu:menu();
-	--end
-	--if (CollapsingHeader("Follower options")) then
-	--	script_followEX:menu();
-	--end
-	--if (CollapsingHeader("Fishing options")) then
-	--	script_fish:menu();
-	--end
-	--Separator();
-	---- Add Combat scripts menus
-	--if (CollapsingHeader("Combat options")) then
-	--	script_mageEX:menu();
-	--	script_hunterEX:menu();
-	--	script_warlockEX:menu();
-	--	script_paladinEX:menu();
-	--	script_druidEX:menu();
-	--	script_priestEX:menu();
-	--	script_warriorEX:menu();
-	--	script_rogueEX:menu();
-	--	script_shamanEX:menu();
-	--end
 end
