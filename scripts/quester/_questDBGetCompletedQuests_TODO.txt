@@ -1,0 +1,41 @@
+_questDBGetCompletedQuests = {
+
+	include file....
+
+}
+
+function _questDBGetCompleteQuests:setup()
+
+run this to add to a table all the completed quest names saved in the file.
+
+end
+
+function _questDBGetCompletedQuests:run()
+
+run this to compare and complete quests in our table like old quest completed function already established
+
+end
+
+
+
+
+local path = 'C:/users/stuff/blah/thing/wasd_.txt'  -- wasd_ is the .txt file I want to open
+local newpath = path :sub( 1, -5 ) ..'new.txt'  --  C:/users/stuff/blah/thing/wasd_new.txt
+
+local iput = assert( io.input( path ) )
+local oput = assert( io.output( newpath ) )
+
+local linenum = 0  --  used as a counter
+while true do
+    linenum = linenum +1
+    local line = iput :read()
+    if line == nil then break end  --  break out of loop if there's nothing else to read
+
+    local newline, _ = line :gsub( 'this', 'that' )  --  do your changes here
+    if linenum == 1 then newline = 'HEADER: ' ..newline end  -- example of specific line edit
+
+    oput :write( linenum ..'  ' ..newline ..'\n' )  --  read() line strips newline char, so add it back
+end
+
+iput :close()
+oput :close()
