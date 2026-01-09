@@ -128,7 +128,7 @@ function script_gather:drawChestNodes()
 				-- show chests by name
 				for i=0,self.numChests - 1 do
 					if (self.chests[i][1] == id) then
-						chestName = "*"..self.chests[i][0].."*";
+						chestName = targetObj:GetUnitName();
 						local this = ""..dist.." yd";
 						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
 					end
@@ -157,6 +157,10 @@ local targetObj, targetType = GetFirstObject();
 			local dist = math.floor(targetObj:GetDistance());
 
 			if(onScreen) then
+
+				-- dont double display if we force display by ID
+				if not grind2DrawDataMenu.showGameObjectIDs then
+
 				for i=0,self.numHerbs - 1 do
 					if (self.herbs[i][1] == id) then
 						name = self.herbs[i][0];
@@ -177,7 +181,7 @@ local targetObj, targetType = GetFirstObject();
 				-- show chests by name
 				for i=0,self.numChests - 1 do
 					if (self.chests[i][1] == id) then
-						chestName = "*"..self.chests[i][0].."*";
+						chestName = targetObj:GetUnitName();
 						local this = ""..dist.." yd";
 						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
 					end
@@ -204,10 +208,15 @@ local targetObj, targetType = GetFirstObject();
 				-- draw chests by name
 				DrawText(chestName, _tX-25, _tY, 0, 255, 0);
 				DrawText(fishName, _tX-25, _tY, 0, 255, 0);
-				if (script_grindMenu.showIDD) then
-					if (id ~= nil) and (id ~= 0) then
+
+				end
+
+				if (script_grindMenu.showIDD) or grind2DrawDataMenu.showGameObjectIDs then
+					if (id ~= nil) and (id ~= 0) and targetObj:GetDistance() <= 350 then
 						local idd = "ID - "..id.."";
-						DrawText(idd, _tX-10, _tY-12, 255, 255, 0);
+						DrawText(targetObj:GetUnitName(), _tX-12, _tY, 255, 255, 0);
+						DrawText(math.floor(targetObj:GetDistance()).. " (yd) | "..idd, _tX-12, _tY+15, 255, 255, 0);
+
 					end
 				end
 			end
