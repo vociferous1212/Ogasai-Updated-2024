@@ -1,23 +1,25 @@
 coremenu = {
 
-	--Setup
 	isSetup = false,
 }
 
 function coremenu:reload()
+
 	self.isSetup = false;
+
 	coremenu:draw();
 end
 
 function coremenu:draw()
 
-	if (self.isSetup == false) and coremenu ~= nil then
-		self.isSetup = true;
+	if self.isSetup == false and coremenu ~= nil then
+
 		--[[
 			----------------------------
 			Core Files
 			----------------------------
 		]]--
+
 		include("core\\core.lua");
 		include("core\\functions.lua");
 		include("core\\racialSpells.lua");
@@ -25,11 +27,13 @@ function coremenu:draw()
 		-- Load DBs
 		include("scripts\\db\\vendorDB.lua");
 		include("scripts\\db\\hotspotDB.lua");
+
 		--[[
 			----------------------------
 			Class Rotations
 			----------------------------
 		]]--
+
 		LoadScript("Shaman", "scripts\\combat\\shaman\\script_shaman.lua");
 		AddScriptToCombat("Shaman", "script_shaman");
 
@@ -87,18 +91,17 @@ function coremenu:draw()
 		LoadScript("Gatherer", "scripts\\gather\\script_gatherer.lua");
 		AddScriptToMode("Gatherer", "script_gatherer");
 
-		LoadScript("Test Enviornment", "scripts\\testEnviornment.lua");
-		AddScriptToMode("Test Enviornment", "testEnviornment");
-
+		--LoadScript("Test Enviornment", "scripts\\testEnviornment.lua");
+		--AddScriptToMode("Test Enviornment", "testEnviornment");
 		-- Nav Mesh Runner by Rot, Improved by Logitech
 		--LoadScript("Runner", "scripts\\script_runner.lua");
 		--AddScriptToMode("Runner", "script_runner");
-
 		--LoadScript("Unstuck Test", "scripts\\script_unstuck.lua");
 		--AddScriptToMode("Unstuck Test", "script_unstuck");
-
 		--LoadScript("Pather", "scripts\\script_pather.lua");
 		--AddScriptToMode("Pather Debug", "script_pather");
+
+	self.isSetup = true;
 
 	end
 

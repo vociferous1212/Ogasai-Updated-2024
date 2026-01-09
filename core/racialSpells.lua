@@ -102,8 +102,9 @@ return false;
 end
 
 function Cannibalize()
-	i, t = GetFirstObject();
-	if (GetLocalPlayer():GetHealthPercentage() <= 70) then
+
+	if (GetLocalPlayer():GetHealthPercentage() <= 70) and HasSpell("Cannibalize") then
+		i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 then
 				if (i:GetDistance() <= 10) and (i:IsDead()) and (i:GetCreatureType() == "Humanoid" or i:GetCreatureType() == "Undead") and (i:IsInLineOfSight()) then
