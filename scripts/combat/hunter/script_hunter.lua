@@ -1,7 +1,6 @@
 script_hunter = {
 	message = 'Hunter Combat Script',
 
-
 	hunterChooseAspectLoaded = include("scripts\\combat\\hunter\\script_hunterChooseAspect.lua"),
 	hunterCheckPetFoodLoaded = include("scripts\\combat\\hunter\\script_hunterCheckPetFood.lua"),
 	hunterDoPetChecksLoaded = include("scripts\\combat\\hunter\\script_hunterDoPetChecks.lua"),
@@ -1107,6 +1106,7 @@ function script_hunter:rest()
 		if (GetPet():GetDistance() > 8) then
 			PetFollow();
 			self.waitTimer = GetTimeEX() + 1250;
+			grind2RunCombatState.blacklistTargetTimer = GetTimeEX() * 2;
 			return true;
 		end
 	end

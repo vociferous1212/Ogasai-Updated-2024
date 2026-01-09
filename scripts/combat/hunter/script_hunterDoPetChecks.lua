@@ -155,6 +155,7 @@ function script_hunterDoPetChecks:doPetChecks()
 				script_hunter.feedTimer = GetTimeEX() + 20000; 
 
 				script_hunter.waitTimer = GetTimeEX() + 5000; 
+
 				return true;
 			end
 		end
