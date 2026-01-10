@@ -84,7 +84,7 @@ function grind2RunCombatState:run()
 				if xx ~= 0 and x ~= 0 then
 					grind2MoveToTarget:run(localObj, xx, yy, zz);
 				end
-			elseif not IsInCombat() and enemyTarget:GetDistance() <= grind2.combatScriptRange and enemyTarget:IsInLineOfSight() then
+			elseif GetMyClass() ~= "HUNTER" and GetMyClass() ~= "MAGE" and enemyTarget:GetDistance() <= grind2.combatScriptRange and enemyTarget:IsInLineOfSight() then
 				if IsMoving() then
 					StopMoving();
 				end
