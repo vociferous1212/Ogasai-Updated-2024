@@ -8,7 +8,7 @@ function script_gatherMenu:menu()
 
 	local wasClicked = false;
 	
-	if (CollapsingHeader("Gather options")) then
+	if (CollapsingHeader("Gather Menu")) then
 
 		if (not script_gather.gatherAllPossible) then
 
@@ -96,5 +96,7 @@ function script_gatherMenu:menu()
 			script_gather.blacklistSetTime = SliderInt("BLT", 1, 300, script_gather.blacklistSetTime);
 
 		end
+		Text("");
+		Separator();
 	end
 end
