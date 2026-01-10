@@ -27,7 +27,7 @@ function script_hunterSetAmmo:setAmmo()
 		script_vendor.ammoName = script_hunter.ammoName;
 		script_vendorMenu.ammoName = script_hunter.ammoName;
 		script_hunter.ammoIsArrow = true;
-	end	
+	end
 
 	-- Save the name of pet food we use
 	if (GetContainerItemLink(script_hunter.bagWithPetFood-1, script_hunter.slotWithPetFood)  ~= nil) then

@@ -996,7 +996,7 @@ function script_druid:run(targetGUID)
 				end
 
 				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() <= 0.25) then 
+				if (targetObj:GetDistance() <= 0.2) then 
 					if (script_druid:runBackwards(targetObj, 1)) then 
 						self.waitTimer = GetTimeEX() + 350;
 						return 0;

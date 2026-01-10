@@ -41,15 +41,16 @@ script_hunter = {
 	useMultiShot = false,
 	--useScorpidSting = false,
 	waitAfterCombat = false,
-	spellRange = 35,
+	spellRange = 34,
 	bagsFull = false,
 	useRangedAttacks = true,
 	arcaneShotMana = 15,
 	serpentStingMana = 15,
-	minSpellRange = 13,
+	minSpellRange = 12,
 	scareAdds = true,	-- scare adds on/off
 	addScared = false,	-- is add scared/feared
 	scareBeastTimer = 0,
+	secondarySetup = false
 
 }	
 
@@ -58,23 +59,6 @@ function script_hunter:setup()
 
 	self.feedTimer = GetTimeEX();
 	self.waitTimer = GetTimeEX();
-	
-	-- set ammo if not already set
-	if self.ammoName == 0 or script_vendor.ammoName == nil or script_vendor.ammoName == 0 then
-		script_hunterSetAmmo:setAmmo();
-	end
-
-	--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo name is set to: "' .. self.ammoName .. '" ...');
-	if (not strfind(itemName, "Arrow")) then
-	--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo will be bought at "Bullet" vendors...');
-		script_vendor.itemIsArrow = false;
-		self.ammoIsArrow = false;
-		script_vendor.ammoName = itemName;
-	else
-	--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo will be bought at "Arrow" vendors...');
-		script_vendor.ammoName = itemName;
-		self.ammoIsArrow = true;
-	end	
 
 	-- Save the name of pet food we use
 	if (GetContainerItemLink(self.bagWithPetFood-1, self.slotWithPetFood)  ~= nil) then
@@ -202,6 +186,25 @@ end
 
 function script_hunter:run(targetGUID)
 
+	-- secondary setup to stop strfind error
+	if not self.secondarySetup then
+		-- set ammo if not already set
+		if self.ammoName == 0 or script_vendor.ammoName == nil or script_vendor.ammoName == 0 then
+			script_hunterSetAmmo:setAmmo();
+		end
+		--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo name is set to: "' .. self.ammoName .. '" ...');
+		if (not strfind(itemName, "Arrow")) then
+		--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo will be bought at "Bullet" vendors...');
+			script_vendor.itemIsArrow = false;
+			self.ammoIsArrow = false;
+			script_vendor.ammoName = itemName;
+		else
+		--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Ammo will be bought at "Arrow" vendors...');
+			script_vendor.ammoName = itemName;
+			self.ammoIsArrow = true;
+		end	
+		self.secondarySetup = true;
+	end
 -- set variables
 	local localObj = GetLocalPlayer();
 	local localMana = localObj:GetManaPercentage();
@@ -533,13 +536,13 @@ function script_hunter:run(targetGUID)
 				PetAttack();
 			end
 			if (not IsAutoCasting("Auto Shot")) and not targetObj:IsDead() and targetObj:IsInLineOfSight() and not IsMoving() then
-				if not CastSpellByName("Auto Shot", targetObj) then
-					if targetObj:GetDistance() >= self.minSpellRange then
-						targetObj:FaceTarget();
-					end
-				if targetObj:GetDistance() <= self.spellRange then
-					self.waitTimer = GetTimeEX() + 500;
+				if targetObj:GetDistance() >= self.minSpellRange then
+					targetObj:FaceTarget();
 				end
+				if not CastSpellByName("Auto Shot", targetObj) then
+					if targetObj:GetDistance() <= self.spellRange then
+						self.waitTimer = GetTimeEX() + 500;
+					end
 				end
 			end
 		end
@@ -672,6 +675,9 @@ function script_hunter:run(targetGUID)
 			and not IsMoving()
 			
 			then
+				if not IsMoving() then
+						targetObj:FaceTarget();
+					end
 
 				if (not IsAutoCasting("Auto Shot"))
 				and (targetObj:GetDistance() > self.minSpellRange)
@@ -681,10 +687,6 @@ function script_hunter:run(targetGUID)
 				and targetObj:CanAttack()
 				
 				then
-
-					if not IsMoving() then
-						targetObj:FaceTarget();
-					end
 
 					if not CastSpellByName("Auto Shot", targetObj) then
 						if targetObj:GetDistance() <= self.spellRange then
@@ -1364,7 +1366,7 @@ function script_hunter:hunterPull(targetObj)
 	-- use concussive shot
 	-- only use this to pull if we don't have an active pet'
 	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
-		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 7) then
+		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 15) then
 			if CastSpellByName("Concussive Shot") then
 				PetAttack();
 				self.waitTimer = GetTimeEX() + 500;
