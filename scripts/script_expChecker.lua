@@ -10,9 +10,9 @@ script_expChecker = {
 
 -- Calculate XP per hour and time to level
 function script_expChecker:calculateXPPerHour()
-    if (script_grind.pause and _quest.pause) then
-        return self.lastXPPerHour, self.lastTimeToLevel
-    end
+    --if (script_grind.pause and _quest.pause) then
+    --    return self.lastXPPerHour, self.lastTimeToLevel
+  --  end
 
     local currentXP = UnitXP("player")
     local currentTime = GetTimeEX() / 1000

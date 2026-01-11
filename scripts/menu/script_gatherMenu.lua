@@ -39,6 +39,7 @@ function script_gatherMenu:menu()
 		end
 
 		wasClicked, script_grind.gather = Checkbox("Use Gatherer", script_grind.gather);
+		if script_grind.gather == false then grind2.gather = false; else grind2.gather = true; end
 		
 		if (script_grind.gather) then
 
