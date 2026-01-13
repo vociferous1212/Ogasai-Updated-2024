@@ -135,7 +135,7 @@ function script_hunter:runBackwards(targetObj, range)
  		if (distance < range)  then
 
 			if script_checkAdds:checkAdds() then
-				return true;
+				return 4;
 			else
 				script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
 
@@ -990,7 +990,7 @@ function script_hunter:run(targetGUID)
 				end
 
 				-- cast wing clip
-				if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and (localMana > 10) and (targetHealth < 35) then
+				if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and not targetObj:HasDebuff("Wing Clip") and (localMana > 10) and (targetHealth < 35) then
 					CastSpellByName("Wing Clip");
 					self.waitTimer = GetTimeEX() + 1500;
 				end
@@ -1023,6 +1023,14 @@ function script_hunter:rest()
 
 	if (not self.isSetup) then
 		script_hunter:setup();
+	end
+
+	-- cancel feign death
+	if GetLocalPlayer():HasBuff("Feign Death") then
+		if (pet ~= 0 and pet ~= nil and not IsInCombat and pet:IsDead()) or (not IsInCombat() and not IsAnyTargetTargetingPlayer()) then
+			local x, y, z = GetLocalPlayer():GetPosition();
+			Move(x+1, y+1, z);
+		end
 	end
 
 	-- if we have any bandages then we can use first aid skill
