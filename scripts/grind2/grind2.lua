@@ -28,7 +28,11 @@ grind2 = {
 
 	combatScriptRange = 30, -- combat range of scripts
 	combatScriptReturn = "",
-	gather = true
+	gather = true,
+
+	bagsAreFull = false,
+	lootTargets = true,
+	useVendor = true
 
 
 
@@ -108,10 +112,26 @@ function grind2:run()
 	end
 
 -- check unstuck script
-	grind2CheckUnstuck:run()
+	grind2CheckUnstuck:run();
+
+-- flee combat if we are about to die
+	if grind2FleeCombat.fleeCombat and grind2SaveCoordinates.numberOfLocations >= 3 and GetLocalPlayer():GetLevel() >= 6 then
+		if not grind2.pause and IsInCombat() and grind2FleeCombat.healthToFlee >= GetLocalPlayer():GetHealthPercentage() then
+			grind2FleeCombat:run();
+			self.grinderMessage = "Fleeing combat";
+			return;
+		else
+			grind2SaveCoordinates.currentGoToLocation = grind2SaveCoordinates.numberOfLocations - 1;
+		end
+	end
 
 -- return if paused or for any reason
 	if self.timer > currentTime or self.pause or IsCasting() or IsChanneling() then
+
+		-- TEMPORARY - old combat helper to make combat scripts run somewhat decent
+		if IsInCombat() then
+			script_combatHelper:run()
+		end
 
 		-- face enemy target at all times
 		if not self.pause and self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and not IsMoving() and not IsLooting()
@@ -123,20 +143,13 @@ function grind2:run()
 		end
 
 		-- auto-loot pick pocket targets
-		if IsStealth() and HasSpell("Pick Pocket") and IsLooting() and currentTime > grind2DoLoot.lootTimer then
+		if IsStealth() and HasSpell("Pick Pocket") and IsLooting() and currentTime > grind2DoLoot.lootTimer and grind2.doLoot and not grind2.bagsAreFull and not AreBagsFull() then
 			LootTarget();
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click();
 			end
 			grind2DoLoot.lootTimer = currentTime + 750;
-		end
-
-		-- show message for loot target - placed here due to timer
-		if not IsAnyTargetTargetingPlayer() and not IsInCombat() then
-			if grind2DoLoot.lootTarget ~= nil and grind2DoLoot.lootTarget ~= 0 then
-				self.grinderMessage = "Moving to loot target - "..grind2DoLoot.lootTarget:GetUnitName().." | "..math.floor(grind2DoLoot.lootTarget:GetDistance()).." (yd)";
-			end
-		end
+		end		
 
 		-- show message for navigation
 		if not IsMoving() then grind2MoveToTarget.message = "idle..."; end
@@ -163,19 +176,21 @@ function grind2:run()
 	end
 
 -- run grind2 pre checks before entering combat
--- auto talents / clear targets / loot / 
+-- auto talents / clear targets / loot / ressurect / 
 	if grind2PreChecks:run() then
 
 		return;
 	end
 
 -- run gatherer
-	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() then
+	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() then
 
 		-- run gatherer
 		if script_gatherRun:gather() then
 
 			script_gatherRun:gather();
+
+			self.grinderMessage = "Gathering...";
 
 			if IsLooting() and not IsMoving() then
 				grind2:setTimer(500);

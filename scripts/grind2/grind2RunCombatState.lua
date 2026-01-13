@@ -36,6 +36,10 @@ function grind2RunCombatState:run()
 
 		_x, _y, _z = enemyTarget:GetPosition();
 
+		-- TEMPORARY - old combat helper to make combat scripts run somewhat decent
+		if IsInCombat() then
+			script_combatHelper:run()
+		end
 
 		if enemyTarget:CanAttack() and not enemyTarget:IsDead() then
 
@@ -83,7 +87,7 @@ function grind2RunCombatState:run()
 
 			-- TEMPORARY move to target
 			-- stop moving when we get to target and in melee range
-			if GetMyClass() ~= "HUNTER" and GetMyClass() ~= "MAGE" and enemyTarget:GetHealthPercentage() >= 97 and enemyTarget:GetDistance() <= grind2.combatScriptRange and enemyTarget:IsInLineOfSight() then
+			if GetMyClass() ~= "HUNTER" and GetMyClass() ~= "MAGE" and enemyTarget:GetHealthPercentage() >= 97 and enemyTarget:GetDistance() <= grind2.combatScriptRange - 2 and enemyTarget:IsInLineOfSight() then
 				if IsMoving() then
 					StopMoving();
 				end

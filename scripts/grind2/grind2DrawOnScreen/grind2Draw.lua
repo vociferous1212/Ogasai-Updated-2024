@@ -11,21 +11,23 @@ grind2Draw = {
 function grind2Draw:run()
 
 
-
 -- draw units on screen
 	grind2DrawUnitData:drawUnitsOnScreen();
 
+
 -- show grinder messages
-	if grind2DrawDataMenu.drawMessages then
+	if grind2DrawDataMenu.drawMessages and not grind2.pause then
 
 		grind2Messages:run()
 	end
+
 
 -- draw aggro circles
 	if grind2DrawAggroCircles.drawAggroCircles then
 
 		grind2DrawAggroCircles:run(grind2DrawAggroCircles.circleRange);
 	end
+
 
 -- draw gather and chest nodes
 	if grind2DrawDataMenu.drawObjects then

@@ -5,7 +5,11 @@ includeFiles = {
 	combatHelperIncluded = include("scripts\\script_combatHelper.lua"),
 	tempSetRestVarsIncluded = include("scripts\\grind2\\tempSetRestVars.lua"),
 	tempCombatScriptMessage = include("scripts\\grind2\\tempCombatMessage.lua"),
-
+	
+	grinder2MiscMenu = include("scripts\\grind2\\grind2Menu\\grind2MiscMenu.lua"),
+	grinder2AreBagsFull = include("scripts\\grind2\\grind2Inventory\\grind2AreBagsFull.lua"),
+	grinder2FleeCombat = include("scripts\\grind2\\grind2Targets\\grind2FleeCombat.lua"),
+	grinder2SaveCoordinates = include("scripts\\grind2\\grind2Nav\\grind2SaveCoordinates.lua"),
 	grinder2PreChecks = include("scripts\\grind2\\grind2PreChecks.lua"),
 	grinder2PreChecks2 = include("scripts\\grind2\\grind2PreChecks2.lua"),
 	grinder2PreChecks3 = include("scripts\\grind2\\grind2PreChecks3.lua"),

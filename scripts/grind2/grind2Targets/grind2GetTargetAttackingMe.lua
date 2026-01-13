@@ -6,6 +6,8 @@ function grind2GetTargetAttackingMe:run()
 
 	local bestDist = 1000;
 
+	local target = nil;
+
 	local i, t = GetFirstObject();
 
 	while i ~= 0 do

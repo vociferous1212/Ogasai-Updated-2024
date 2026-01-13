@@ -24,12 +24,10 @@ function grind2SelectDrawTargets:selectNPCTarget(target)
 		-- draw creature name
 		if self.drawName or (grind2DrawUnitData.drawTargeted and GetTarget() ~= nil and GetTarget() ~= 0 and GetTarget():GetGUID() == target:GetGUID()) then
 
-			-- friendlies
 			if not target:CanAttack() and grind2DrawUnitData.drawFriendlies or (grind2DrawUnitData.drawTargeted and GetTarget() ~= nil and GetTarget() ~= 0 and GetTarget():GetGUID() == target:GetGUID()) then
 				DrawText("" .. target:GetUnitName(), tX, tY-20, 0, 255, 0);
 			end
 
-			-- enemies
 			if target:CanAttack() then
 				DrawText("" .. target:GetUnitName(), tX, tY-20, 255, 255, 0);
 			end
@@ -39,12 +37,10 @@ function grind2SelectDrawTargets:selectNPCTarget(target)
 		-- draw creature level
 		if self.drawLevel or (grind2DrawUnitData.drawTargeted and GetTarget() ~= nil and GetTarget() ~= 0 and GetTarget():GetGUID() == target:GetGUID()) then
 
-			-- enemies
 			if target:CanAttack() then
 				DrawText(target:GetCreatureType() .. " - " .. target:GetLevel(), tX, tY-10, 255, 255, 0);
 			end
 
-			-- friendlies
 			if not target:CanAttack() and grind2DrawUnitData.drawFriendlies or (grind2DrawUnitData.drawTargeted and GetTarget() ~= nil and GetTarget() ~= 0 and GetTarget():GetGUID() == target:GetGUID()) then
 				DrawText(target:GetCreatureType() .. " - " .. target:GetLevel(), tX, tY-10, 0, 255, 0);
 			end
@@ -65,7 +61,7 @@ function grind2SelectDrawTargets:selectNPCTarget(target)
 			DrawText("RARE", tX, tY-25, 255, 255, 255);
 		end
 
-		-- draw elites if not in dungeon group (party members less than 3)
+		-- draw elites
 		if target:GetClassification() == 1 and GetNumPartyMembers() >= 4 then
 
 			DrawText("ELITE", tX, tY-25, 255, 255, 255);
@@ -78,7 +74,10 @@ function grind2SelectDrawTargets:selectNPCTarget(target)
 
 		-- draw unit distance
 		if self.drawDistance or (grind2DrawUnitData.drawTargeted and GetTarget() ~= nil and GetTarget() ~= 0 and GetTarget():GetGUID() == target:GetGUID())then
+		if target:GetDistance() > 3 then	
 			DrawText("" .. math.floor(distance) .. " yd.", tX, tY+10, 255, 255, 255);
+		else DrawText("" .. distance .. " yd.", tX, tY+10, 255, 255, 255);
+		end
 		end
 
 		-- draw blacklisted targets

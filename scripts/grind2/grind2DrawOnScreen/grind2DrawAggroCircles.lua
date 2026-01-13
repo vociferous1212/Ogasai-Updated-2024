@@ -78,17 +78,12 @@ function grind2DrawAggroCircles:run(maxRange)
  		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() ~= 1 then
 
 			-- set conditions
-			local aggro = i:GetLevel() - localObj:GetLevel() + 17.3;
+			local aggro = i:GetLevel() - localObj:GetLevel() + 17.8;
 
 			local cx, cy, cz = i:GetPosition();
 
 			local px, py, pz = localObj:GetPosition();
 
-			-- target is on a hill
-			if cz >= pz + 7 or pz >= cz + 7 and GetDistance3D(cx, cy, cz, px, py, pz) <= 17.3 then
-				aggro = i:GetLevel() - localObj:GetLevel() + 16;
-			end
-		
 			-- yellow - run draw circles based on target - not targeting me or I am targeting it
 			if i:GetUnitsTarget() == 0 or i:GetUnitsTarget() == nil then
 

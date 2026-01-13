@@ -12,6 +12,11 @@ function grind2Setup:run()
 		grind2.timer = GetTimeEX();
 		grind2.obtainNewTargetTimer = GetTimeEX();
 
+		vendorDB:setup()
+		vendorDB:loadDBVendors();
+		script_vendor:setup();
+
+
 		-- setup draw on screen folder
 		-- nothing here!
 

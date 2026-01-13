@@ -31,7 +31,7 @@ function grind2AssignATarget:run()
 
 		-- return the last target if we are in combat with it
 	if grind2.enemyTarget ~= nil then
-		if IsInCombat() and not grind2.enemyTarget:IsDead() and (grind2.enemyTarget:GetHealthPercentage() <= 99
+		if not grind2.enemyTarget:IsDead() and (grind2.enemyTarget:GetHealthPercentage() <= 99
 			or grind2IsTargetingMe:target(grind2.enemyTarget)) then
 
 			return grind2.enemyTarget;
@@ -39,9 +39,17 @@ function grind2AssignATarget:run()
 	end
 
 	-- return last target if it is not dead and we are still in combat
-	if IsInCombat() and grind2.lastTargetTargeted ~= nil then
+	if grind2.lastTargetTargeted ~= nil then
 		if not grind2.lastTargetTargeted:IsDead() and grind2IsTargetingMe:target(grind2.lastTargetTargeted) then
 			return grind2.lastTargetTargeted;
+		end
+	end
+
+	-- return any target attacking me if I am not in combat yet
+	if not IsInCombat() then
+		if grind2GetTargetAttackingMe:run() ~= nil then
+			grind2.enemyTarget = grind2GetTargetAttackingMe:run();
+			return grind2GetTargetAttackingMe:run();
 		end
 	end
 

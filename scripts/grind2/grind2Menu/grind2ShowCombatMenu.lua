@@ -33,7 +33,7 @@ function grind2ShowCombatMenu:run()
 		--end
 	end
 
-	if CollapsingHeader("Grinder Combat Settings") then
+	if CollapsingHeader("Grinder Combat Menu") then
 		
 		Text("Combat script range to attack targets");
 		grind2.combatScriptRange = SliderInt("Combat Range", 1, 40, grind2.combatScriptRange);
@@ -50,10 +50,23 @@ function grind2ShowCombatMenu:run()
 
 		Separator();
 
+		Text("Flee Combat - run to previously killed targets until out of combat")
+		wasClicked, grind2FleeCombat.fleeCombat = Checkbox("Flee Combat  ", grind2FleeCombat.fleeCombat);
+		if grind2FleeCombat.fleeCombat then
+			SameLine();
+			wasClicked, grind2FleeCombat.fleeWithAdds = Checkbox("Flee combat 2 or more targets", grind2FleeCombat.fleeWithAdds);
+		end
+		if grind2FleeCombat.fleeCombat then
+			Text("Health"); SameLine(); grind2FleeCombat.healthToFlee = SliderInt("Health To Flee", 10, 60, grind2FleeCombat.healthToFlee)
+			Text("Mana  "); SameLine(); grind2FleeCombat.manaToFlee = SliderInt("Mana To Flee", 0, 40, grind2FleeCombat.manaToFlee);
+			
+		end
+		Separator();
 	end
+
 
 	SameLine();
 
-	Text("	| "..tempCombatMessage:getClassScriptMessage())
+	Text("		| "..tempCombatMessage:getClassScriptMessage())
 
 end

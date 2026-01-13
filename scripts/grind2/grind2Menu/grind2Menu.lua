@@ -109,6 +109,10 @@ function grind2Menu:run()
 -- combat menu script
 	grind2ShowCombatMenu:run();
 
+-- miscellanous Menu
+	grind2MiscMenu:run();
+
+
 -- nav menu script
 	grind2NavMenu:run();
 
@@ -135,7 +139,7 @@ function grind2Menu:run()
 	SameLine();
 
 	if script_gather.nodeObj ~= nil then
-		Text("				|"..script_gather.nodeObj:GetUnitName());
+		Text("				| "..script_gather.nodeObj:GetUnitName());
 	else
 		Text("				| No Object...")
 	end
@@ -159,18 +163,18 @@ function grind2Menu:run()
 
 	Separator();
 
-	Text("Enemy Kills - "..grind2.numberOfKills);
+	Text("Enemy Kills | "..grind2.numberOfKills);
 
 	-- count your money
 	if grind2.totalGainedMoney < 100 then
 
-		Text("Money Gained - "..grind2.totalGainedMoney.." copper");
+		Text("Money Gained | "..grind2.totalGainedMoney.." copper");
 	elseif grind2.totalGainedMoney >= 100 and grind2.totalGainedMoney < 10000 then
 
-		Text("Money Gained - "..grind2MoneyCounter:silverFromCopper().." silver "..grind2MoneyCounter:copperFromSilver().." copper");
+		Text("Money Gained | "..grind2MoneyCounter:silverFromCopper().." silver "..grind2MoneyCounter:copperFromSilver().." copper");
 	elseif grind2.totalGainedMoney >= 10000 then
 	
-		Text("Money Gained - "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver "..grind2MoneyCounter:copperFromGold().." copper");
+		Text("Money Gained | "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver "..grind2MoneyCounter:copperFromGold().." copper");
 	end
 
 	Text("________________________________________________________________________________________________________________________________________________________________________")
