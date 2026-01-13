@@ -74,7 +74,7 @@ function script_gatherRun:gather()
 			end
 			if (IsMoving()) then
 				StopMoving();
-				script_gather.timer = GetTimeEX() + 950;
+				--script_gather.timer = GetTimeEX() + 950;
 				return true;
 			end
 			if IsCasting() or IsChanneling() then script_grind:setWaitTimer(500); return; end
@@ -105,7 +105,7 @@ function script_gatherRun:gather()
 					script_gather.blacklistTime = GetTimeEX() + script_gather.blacklistSetTime*1000;
 				end
 			end
-			script_gather.waitTimer = GetTimeEX() + 450;
+			--script_gather.waitTimer = GetTimeEX() + 450;
 		else
 			if (_x ~= 0) then
 
@@ -119,8 +119,9 @@ function script_gatherRun:gather()
 			end
 
 			-- mount up
+	-- causing stutter
 			if nDist >= 60 and not IsSwimming() and GetTimeEX() > script_grind.tryMountTimer and script_grind.hasAMount and (not IsInCombat())
-			and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount)
+			and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) and GetLocalPlayer():GetLevel() >= 40
 			and not IsCasting() and not IsChanneling() and not IsLooting()
 			then
 				if (IsMoving()) then

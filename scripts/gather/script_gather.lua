@@ -1,4 +1,4 @@
-script_gather = { isSetup = false, useVendor = false, useMount = true, nodeObj = nil, gatherDistance = 155, message = 'Gather...', collectMinerals = true, collectHerbs = true, herbs = {}, numHerbs = 0, minerals = {}, numMinerals = 0, lootDistance = 3, timer = 0, nodeID = 0, gatherAllPossible = true, timerSet = false, nodeGUID = 0, chests = {}, numChests = 0, lock = {}, numLock = 0, fish = {}, numFish = 0, collectChests = true, dist = 0, messageToGrinder = "", gathering = false, blacklistedNodes = {}, blacklistedNodesNum = 0, blacklistedNodesNameNum = 0, blacklistTime = 0, blacklistSetTime = 60, isChest = false, lastNode = 0, messageSent = false, safeGather = true,
+script_gather = { isSetup = false, useVendor = false, useMount = true, nodeObj = nil, gatherDistance = 155, message = 'Gather...', collectMinerals = true, collectHerbs = true, herbs = {}, numHerbs = 0, minerals = {}, numMinerals = 0, lootDistance = 3, timer = 0, nodeID = 0, gatherAllPossible = true, timerSet = false, nodeGUID = 0, chests = {}, numChests = 0, lock = {}, numLock = 0, fish = {}, numFish = 0, collectChests = false, dist = 0, messageToGrinder = "", gathering = false, blacklistedNodes = {}, blacklistedNodesNum = 0, blacklistedNodesNameNum = 0, blacklistTime = 0, blacklistSetTime = 60, isChest = false, lastNode = 0, messageSent = false, safeGather = true,
 }
 
 -- add node to blacklist table by GUID
@@ -147,7 +147,7 @@ function script_gather:drawGatherNodes()
 
 local targetObj, targetType = GetFirstObject();
 	while targetObj ~= 0 do
-		if (targetType == 5) then 
+		if (targetType == 5) and targetObj:GetDistance() <= 250 then 
 			local id = targetObj:GetObjectDisplayID();
 			local name = "";
 			local chestName = "";
