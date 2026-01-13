@@ -65,7 +65,7 @@ function script_combatHelper:mageStopFrostboltConditions()
 		if HasSpell("Frostbolt") and not GetLocalPlayer():IsStunned() and not IsMoving() and IsInCombat() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and not script_magePolymorph:isAddPolymorphed() then
 		
 			local target = script_grind.enemyObj;
-
+			if target == nil or target == 0 then target = grind2.enemyTarget; end
 			-- if target is below wand health or my mana is below wand mana (OR) target is not frozen (OR) distance is too close
 			if script_grind:enemiesAttackingUs() < 2 and IsCasting()
 		
@@ -242,10 +242,8 @@ function script_combatHelper:checkStopHeroicStrikeConditions()
 
 	-- check casting table and stop spell casting if target moves
 	if (HasSpell("Heroic Strike") or HasSpell("Maul"))
-	and (IsInCombat())
 	and (PlayerHasTarget())
 	and (GetTarget():GetDistance() > script_grind.combatScriptRange+3)
-	and (not script_checkAdds:checkAdds())
 	and (not IsMoving())
 	
 	then
@@ -283,10 +281,8 @@ function script_combatHelper:checkStopRaptorStrikeConditions()
 
 -- check casting table and stop spell casting if target moves
 	if (HasSpell("Raptor Strike"))
-	and (IsInCombat())
 	and (PlayerHasTarget())
 	and (GetLocalPlayer():GetUnitsTarget():GetDistance() > script_hunter.meleeDistance+2)
-	and (not script_checkAdds:checkAdds())
 	and (not IsMoving())
 
 	then

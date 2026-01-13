@@ -14,6 +14,9 @@ function script_checkAdds:checkAdds()
     if grindEnemy == 0 or grindEnemy == nil then
         grindEnemy =  _quest.enemyTarget
     end
+    if grindEnemy == 0 or grindEnemy == nil then
+        grindEnemy = grind2.enemyTarget;
+    end
 
 -- if we want to skip hard pulls and we have a valid enemy and we are greater than level 6 then
     if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) )
