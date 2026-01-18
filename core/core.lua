@@ -43,3 +43,12 @@ function CastHeal(spellName, target)
 	end
 	return false;
 end
+
+function truncateNumber(num, decimals)
+
+	if type(num) ~= "number" or type(decimals) ~= "number" or decimals < 0 then
+		return DEFAULT_CHAT_FRAME:AddMessage("No number to truncate");
+	end
+	local factor = 10 ^ decimals
+	return math.floor(num * factor) / factor
+end
