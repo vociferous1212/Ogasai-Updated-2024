@@ -320,6 +320,7 @@ function script_druid:run(targetGUID)
 		-- check heals and buffs
 		if (not IsInCombat() or not script_grind:isAnyTargetTargetingMe()) and (not HasForm()) then
 			if (script_druidHealsAndBuffs:healsAndBuffs()) then
+				if IsMoving() then StopMoving(); return; end
 				return true;
 			end
 		end
@@ -374,7 +375,8 @@ function script_druid:run(targetGUID)
 		-- check heals and buffs
 		if (not IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (not HasForm()) then
 			if (script_druidHealsAndBuffs:healsAndBuffs()) then
-				
+								if IsMoving() then StopMoving(); return; end
+
 			return true;
 			end
 		end
@@ -595,7 +597,8 @@ function script_druid:run(targetGUID)
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
 					if (script_druidHealsAndBuffs:healsAndBuffs()) then
-						
+										if IsMoving() then StopMoving(); return; end
+
 					return true;
 					end
 				end
@@ -907,7 +910,8 @@ function script_druid:run(targetGUID)
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
 					if (script_druidHealsAndBuffs:healsAndBuffs()) then
-						
+										if IsMoving() then StopMoving(); return; end
+
 					return true;
 					end
 				end
@@ -1274,7 +1278,8 @@ function script_druid:run(targetGUID)
 			then
 				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
 					if (script_druidHealsAndBuffs:healsAndBuffs()) then
-						
+										if IsMoving() then StopMoving(); return; end
+
 					return true;
 					end
 				end
@@ -1435,7 +1440,8 @@ function script_druid:rest()
 	-- check heals and buffs
 	if (not IsLooting()) and (not IsDrinking()) and (not IsEating()) and (not localObj:HasBuff("Frenzied Regeneration")) and (not IsInCombat()) and (not script_checkDebuffs:hasSilence()) then
 		if (script_druidHealsAndBuffs:healsAndBuffs()) then
-			
+							if IsMoving() then StopMoving(); return; end
+
 		return true;
 		end
 	end	

@@ -13,20 +13,12 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 
 	if (IsCasting()) or (IsChanneling()) then script_druid.waitTimer = GetTimeEX() + 1000; end if script_druid.waitTimer > GetTimeEX() then return; end
 
-	-- stand up if sitting
-	if (not IsStanding()) then
-		JumpOrAscendStart();
-	end
+	if (not IsStanding()) then JumpOrAscendStart();	end
 
 	-- bash before healing
-	if (PlayerHasTarget()) then
-		if (IsBearForm()) and (HasSpell("Bash")) and (not IsSpellOnCD("Bash")) and (localRage >= 10) and (myTarget:GetDistance() <= script_druid.meleeDistance) and (targetHealth >= 15) and (localHealth <=script_druid.healthToShift) then
-			CastSpellByName("Bash");
-			return true;
-		end
-	end
+	if (PlayerHasTarget()) then if (IsBearForm()) and (HasSpell("Bash")) and (not IsSpellOnCD("Bash")) and (localRage >= 10) and (myTarget:GetDistance() <= script_druid.meleeDistance) and (targetHealth >= 15) and (localHealth <=script_druid.healthToShift) then
+			CastSpellByName("Bash"); return true; end end
 
-	-- shapeshift out of bear form to heal
 	if ( (IsBearForm()) and (localHealth <= script_druid.healthToShift) and (localMana >= script_druid.shapeshiftMana) and localMana > 25 and (not hasRejuv) and (not hasRegrowth) )
 	or ( (IsBearForm() ) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
@@ -37,7 +29,6 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 		end
 	end
 
-	-- shapeshift out of cat form to heal
 	if ( (IsCatForm()) and (localHealth <= script_druid.healthToShift) and (localMana >= script_druid.shapeshiftMana) and localMana > 25 and (not hasRejuv) and (not hasRegrowth) )
 	or ( (IsCatForm()) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
@@ -83,10 +74,9 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 		script_druid.waitTimer = GetTimeEX() + 300;
 	end
 
-	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (localHealth <= 65) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) and (IsStanding()) and (not IsMounted()) then
+	if not IsSpellOnCD("Rejuvenation") and (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (localHealth <= 65) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) and (IsStanding()) and (not IsMounted()) then
 		CastSpellByName("Rejuvenation", localObj); if not IsMoving() then script_grind:setWaitTimer(1650); end script_druid.waitTimer = GetTimeEX() + 1650; return; end
 
-	-- heal - we left form out of combat regrowth
 	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not HasForm()) and (localHealth <= 70) and (localMana >= 35) and (not hasRegrowth) and (not IsMoving()) and (IsStanding()) and (not IsMounted()) and (not IsCasting()) and (not script_druid.hasRegrowth) then
 		if (HasSpell("Regrowth")) and (not localObj:HasBuff("Regrowth")) and (not IsSpellOnCD("Regrowth")) and (not IsCasting()) and (not script_druid.hasRegrowth) then
 			if (not localObj:HasBuff("Regrowth")) then
@@ -95,10 +85,7 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 					if (IsMoving()) then StopMoving(); return true; end
 					if (script_druid.hasRegrowth) then return false; end
 					if (not script_druid.hasRegrowth) then
-						if (IsMoving()) then
-							StopMoving();
-							return true;
-						end
+						if (IsMoving()) then StopMoving(); return true; end
 						script_druid.hasRegrowth = true; if not CastHeal("Regrowth", localObj) then script_druid.waitTimer = GetTimeEX() + 2850
 						script_grind:setWaitTimer(2850); return 4; end return 4;
 					end return 4; end end end end
@@ -136,6 +123,7 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 			return true;
 		end
 		if not IsSpellOnCD("Healing Touch") and (not IsCasting()) and (not IsChanneling()) then
+			if IsMoving() then StopMoving(); return true; end
 			if (not CastSpellByName("Healing Touch", localObj)) then
 				script_druid.waitTimer = GetTimeEX() + 3000;
 				script_grind:setWaitTimer(3000);
@@ -255,6 +243,7 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 		if (HasSpell("Healing Touch")) and (not IsLooting()) and (IsStanding()) then
 			if (localHealth <= script_druid.healingTouchHealth) and (localMana >= 25) and (not IsSpellOnCD("Healing Touch")) then
 				if (not IsCasting()) and (not IsChanneling()) then
+				if IsMoving() then StopMoving(); return true; end
 					if (not CastHeal("Healing Touch", localObj)) then
 						script_druid.waitTimer = GetTimeEX() + 5000;
 						script_grind:setWaitTimer(3000);
@@ -313,7 +302,7 @@ if (not IsInCombat()) then
 	end
 
 	if not IsSpellOnCD("Healing Touch") and (not HasSpell("Regrowth")) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < script_druid.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
-		if (not IsCasting()) and (not IsChanneling()) then if (not CastSpellByName("Healing Touch", localObj)) then
+		if (not IsCasting()) and (not IsChanneling()) then if IsMoving() then StopMoving(); return true; end if (not CastSpellByName("Healing Touch", localObj)) then
 				script_druid.waitTimer = GetTimeEX() + 3000; script_grind:setWaitTimer(3000); return true; end script_druid.waitTimer = GetTimeEX() + 300;
 		end end
 return false;

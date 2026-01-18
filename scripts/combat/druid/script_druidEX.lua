@@ -102,7 +102,7 @@ function script_druidEX:bearForm()
 	local localObj = GetLocalPlayer();
 	local locallevel = localObj:GetLevel();
 	
-	if (not IsMounted()) then
+	if (not IsMounted()) and not IsSpellOnCD("Bear Form") and not IsSpellOnCD("Dire Bear Form") then
 		if (not HasSpell("Dire Bear Form")) then
 			if (HasSpell("Bear Form")) and not IsSpellOnCD("Bear Form") then
 				if (CastSpellByName("Bear Form")) then
