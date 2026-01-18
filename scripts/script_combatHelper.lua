@@ -243,7 +243,7 @@ function script_combatHelper:checkStopHeroicStrikeConditions()
 	-- check casting table and stop spell casting if target moves
 	if (HasSpell("Heroic Strike") or HasSpell("Maul"))
 	and (PlayerHasTarget())
-	and (GetTarget():GetDistance() > script_grind.combatScriptRange+3)
+	and (GetTarget():GetDistance() > 5)
 	and (not IsMoving())
 	
 	then
