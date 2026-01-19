@@ -106,7 +106,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
     while theta <= 2 * PI do
         point = point + 1
         points[point] = { x = pointX + radius * cos(theta), y = pointY + radius * sin(theta) }
-        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 12) * cos(theta), y = pointY + (self.addsRange + safeDist + 12) * sin(theta) }
+        pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 2 + 12) * cos(theta), y = pointY + (self.addsRange + safeDist + 2 + 12) * sin(theta) }
         theta = theta + 2 * PI / quality
     end
 

@@ -25,7 +25,7 @@ function script_nav:loadHotspotDB(id)
 	local hotspot = hotspotDB:getHotSpotByID(id)
 	if (hotspot ~= nil and hotspot ~= -1) then
 		if (self.currentHotSpotName ~= hotspot['name']) then
-			script_grind.hotspotReached = false; self.savedLocations = {}; self.numSavedLocation = 0; self.currentGoToLocation = 0;
+			script_grind.hotspotReached = false; grind2.hotSpotReached = false; self.savedLocations = {}; self.numSavedLocation = 0; self.currentGoToLocation = 0;
 		end
 		self.currentHotSpotX , self.currentHotSpotY, self.currentHotSpotZ, self.currentHotSpotName =
 			hotspot['pos']['x'], hotspot['pos']['y'], hotspot['pos']['z'], hotspot['name']; return true;

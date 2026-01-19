@@ -121,7 +121,7 @@ function script_drawData:drawMonsterDataOnScreen(target)
 		if distance > 3 then
 			DrawText('' .. math.floor(distance) .. ' yd.', tX, tY+10, 255, 255, 255);
 		elseif distance <= 3 then
-			DrawText('' .. distance .. ' yd.', tX, tY+10, 255, 255, 255);
+			DrawText('' .. truncateNumber(distance, 2) .. ' yd.', tX, tY+10, 255, 255, 255);
 		end
 	end
 end
