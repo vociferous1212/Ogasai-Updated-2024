@@ -1,0 +1,456 @@
+grind2Unstuck = {
+    timer = 0,
+    message = 'Unstuck...',
+    _lx = 0,
+    _ly = 0,
+    _lz = 0,
+    _x = 0,
+    _y = 0,
+    _z = 0,
+    _xp = 0,
+    _yp = 0,
+    _zp = 0,
+    _xpl = 0,
+    _ypl = 0,
+    _zpl = 0,
+    _xpr = 0,
+    _ypr = 0,
+    _zpr = 0,
+    _angle = 0,
+    unstuckAngle = 0,
+    unstuckTime = GetTimeEX(),
+    turnSensitivity = 1.25,
+    _stuckThreshold = 2,
+    _isStuck = false,
+    _unstuckAttempts = 0,
+    _maxUnstuckAttempts = 3,
+    _turnAngles = {math.rad(45), math.rad(-45), math.rad(90), math.rad(-90)},
+    _probeDistance = 5,
+    _moveAttempts = 0
+}
+
+function grind2Unstuck:DeBugInfo()
+	-- color
+	local r = 255;
+	local g = 2;
+	local b = 233;
+	
+	-- position
+	local y = 152;
+	local x = 25;
+	
+	-- info
+	DrawRectFilled(x - 10, y - 2, x + 350, y + 16, 0, 0, 0, 160, 10, -10);
+	DrawLine(x - 10, y - 2, x - 10, y + 16, r, g, b, 2);
+	DrawText(self.message, x, y, r, g, b); y = y + 15;
+	
+end
+
+function grind2Unstuck:draw()
+
+	grind2Unstuck:DeBugInfo();
+
+	grind2Unstuck:drawChecks();
+end
+
+function grind2Unstuck:drawChecks()
+	local tX, tY, onScreen = WorldToScreen(_lx, _ly, _lz);
+	DrawText("Path Check", tX+50, tY-130, 255, 2, 233);
+
+	for i = 8, 10 do
+
+		tX, tY, onScreen = WorldToScreen(_lx, _ly, _lz+(i*0.2));
+		local X, Y, onScreens = WorldToScreen(_xpl, _ypl, _zpl+(i*0.2));
+	
+		if (onScreen and onScreens) then
+			DrawLine(tX, tY, X, Y, 255, 2, 233, 2);
+		end
+	end
+
+	for i = 8, 10 do
+
+		tX, tY, onScreen = WorldToScreen(_lx, _ly, _lz+(i*0.2));
+		X, Y, onScreens = WorldToScreen(_xp, _yp, _zp+(i*0.2));
+	
+		if (onScreen and onScreens) then
+			DrawLine(tX, tY, X, Y, 255, 2, 233, 2);
+		end
+	end
+
+	for i = 8, 10 do
+
+		tX, tY, onScreen = WorldToScreen(_lx, _ly, _lz+(i*0.2));
+		local X, Y, onScreens = WorldToScreen(_xpr, _ypr, _zpr+(i*0.2));
+	
+		if (onScreen and onScreens) then
+			DrawLine(tX, tY, X, Y, 255, 2, 233, 2);
+		end
+	end
+
+	tX, tY, onScreen = WorldToScreen(_lx, _ly, _lz+0.8);
+	DrawText("Jump Check", tX+50, tY, 255, 255, 0);
+	for i = 4, 6 do
+		
+		tX, tY, onScreen = WorldToScreen(_lx, _ly, _lz+(i*0.2));
+		local X, Y, onScreens = WorldToScreen(_x, _y, _z+(i*0.2));
+	
+		if (onScreen and onScreens) then
+			DrawLine(tX, tY, X, Y, 255, 255, 0, 2);
+		end
+	end
+end
+
+function grind2Unstuck:turn(changeAngle)
+	_lx, _ly, _lz = GetLocalPlayer():GetPosition();
+	_angle = GetLocalPlayer():GetAngle() + changeAngle;
+	self.unstuckAngle = _angle;
+	FacePosition(_lx+math.cos(_angle), _ly+math.sin(_angle), _lz);
+end
+
+function grind2Unstuck:walkForward(yards)
+	_lx, _ly, _lz = GetLocalPlayer():GetPosition();
+	if (self.unstuckTime < GetTimeEX()) then
+		self.unstuckTime = GetTimeEX() + 2000;
+		grind2MoveToTarget:run(GetLocalPlayer(), _lx+yards*math.cos(self.unstuckAngle), _ly+yards*math.sin(self.unstuckAngle), _lz);
+	end
+end
+
+function grind2Unstuck:getSlope(yardsInfront)
+	-- our pos plus 5 yards
+	_lx, _ly, _lz = GetLocalPlayer():GetPosition();
+	_angle = GetLocalPlayer():GetAngle();	
+	_lx, _ly = _lx+5*math.cos(_angle), _ly+5*math.sin(_angle);
+	
+	for i = 1, 100 do	
+
+		-- pos 1 - yardsInfront 
+		for y = 1, yardsInfront do
+			local _xpu, _ypu, _zpu = _lx+((4+y)*math.cos(_angle-i*0.01)), _ly+((5+y)*math.sin(_angle-i*0.01)), _lz;
+			local _xpd, _ypd, _zpd = _lx+((4+y)*math.cos(_angle+i*0.01)), _ly+((5+y)*math.sin(_angle+i*0.01)), _lz;
+		
+			local hitDown, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _xpd, _ypd, _zpd - (i*0.2));
+
+			if(not hitDown) then
+				return -(i*0.2);
+			end
+		end
+
+	end
+
+	return 0;
+end
+
+function grind2Unstuck:jumpObstacles()
+
+	if ( (grind2Unstuck:getObsMin(1) >= 0.24 and grind2Unstuck:getObsMax(1) < 2.2 and grind2Unstuck:getObsMax(1) > 1) or 
+		(grind2Unstuck:getObsMin(2) >= 0.3 and  grind2Unstuck:getObsMax(2) < 2.2 and grind2Unstuck:getObsMax(2) > 1) ) then
+		self.message = "Jumping over obstacle";
+		JumpOrAscendStart();
+	end
+end
+
+function grind2Unstuck:unstuck()
+	if (grind2Unstuck:pathClearAuto(1) or grind2Unstuck:pathClearAuto(2)) then
+		grind2Unstuck:walkForward(2);
+	end
+end
+
+function grind2Unstuck:pathClearAuto(yardsInfront)
+
+	-- Jump over obstacles
+	if (IsMoving()) then grind2Unstuck:jumpObstacles(); end
+
+	-- our pos
+	_lx, _ly, _lz = GetLocalPlayer():GetPosition();
+
+	_angle = GetLocalPlayer():GetAngle();	
+	
+	for i = 1, 2 do	
+
+		-- pos 1 - yardsInfront 
+		for y = 1, yardsInfront do
+			_xp, _yp, _zp = _lx+(y*math.cos(_angle)), _ly+(y*math.sin(_angle)), _lz;
+			_xpl, _ypl, _zpl = _lx+(y*math.cos(_angle-i*0.16)), _ly+(y*math.sin(_angle-i*0.16)), _lz;
+			_xpr, _ypr, _zpr = _lx+(y*math.cos(_angle+i*0.16)), _ly+(y*math.sin(_angle+i*0.16)), _lz;
+	
+			local hitM, _, _, _ = Raycast(_lx, _ly, _lz + (i*1.6),  _xp, _yp, _zp + (i*1.6));
+			local hitL, _, _, _ = Raycast(_lx, _ly, _lz + (i*1.4),  _xpl, _ypl, _zpl + (i*1.4));	
+			local hitR, _, _, _ = Raycast(_lx, _ly, _lz + (i*1.4),  _xpr, _ypr, _zpr + (i*1.4));
+
+			if(not hitM and not hitL) then
+				-- Path isn't clear
+				self.message = "Path not clear, turning left...";
+				--DEFAULT_CHAT_FRAME:AddMessage('grind2Unstuck: Turning left.');
+				grind2Unstuck:turn( - self.turnSensitivity); -- 3.14/2
+				return false;
+			end
+
+			if(not hitM and not hitR) then
+				-- Path isn't clear
+				self.message = "Path not clear, turning right...";
+				--DEFAULT_CHAT_FRAME:AddMessage('grind2Unstuck: Turning right.');
+				grind2Unstuck:turn( - self.turnSensitivity); -- -3.14/2
+				return false;
+			end
+
+			if(not hitL) then
+				-- Path isn't clear
+				self.message = "Path not clear, turning left..."
+				--DEFAULT_CHAT_FRAME:AddMessage('grind2Unstuck: Turning left.');
+				grind2Unstuck:turn( -.03); -- .-5
+				return false;
+			end
+
+			if(not hitR) then
+				-- Path isn't clear
+				self.message = "Path not clear, turning right..."
+				--DEFAULT_CHAT_FRAME:AddMessage('grind2Unstuck: Turning right.');
+				grind2Unstuck:turn( -.03); -- .-5
+				return false;
+			end
+			
+		end
+
+	end
+	
+	return true;
+end
+
+function grind2Unstuck:getObsMin(yardsInfront)
+
+	_lx, _ly, _lz = GetLocalPlayer():GetPosition();
+
+	_angle = GetLocalPlayer():GetAngle();
+
+	_x, _y, _z = _lx+(yardsInfront*math.cos(_angle)), _ly+(yardsInfront*math.sin(_angle)), _lz;	
+	
+	for i = 1, 20 do	
+
+		local hit, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _x, _y, _z + (i*0.2));
+	
+		local hitL, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _x+(yardsInfront*math.cos(_angle-i*0.02)), _y+(yardsInfront*math.sin(_angle-i*0.02)), _z + (i*0.2));	
+
+		local hitR, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _x+(yardsInfront*math.cos(_angle+i*0.02)), _y+(yardsInfront*math.sin(_angle+i*0.02)), _z + (i*0.2));		
+	
+		if(not hit or not hitL or not hitR) then
+			return i * 0.2;
+		end
+
+	end
+	
+	return 0;
+end
+
+function grind2Unstuck:getObsMax(yardsInfront)
+
+	_lx, _ly, _lz = GetLocalPlayer():GetPosition();
+
+	_angle = GetLocalPlayer():GetAngle();
+
+	_x, _y, _z = _lx+(yardsInfront*math.cos(_angle)), _ly+(yardsInfront*math.sin(_angle)), _lz;	
+	
+	local zHit = 0;
+
+	for i = 1, 20 do	
+
+		local hit, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _x, _y, _z + (i*0.2));
+	
+		local hitL, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _x+(yardsInfront*math.cos(_angle-i*0.02)), _y+(yardsInfront*math.sin(_angle-i*0.02)), _z + (i*0.2));	
+
+		local hitR, _, _, _ = Raycast(_lx, _ly, _lz + (i*0.2),  _x+(yardsInfront*math.cos(_angle+i*0.02)), _y+(yardsInfront*math.sin(_angle+i*0.02)), _z + (i*0.2));		
+	
+		if(not hit or not hitL or not hitR) then
+			zHit = i * 0.2;
+		end
+
+	end
+	
+	return zHit;
+end
+
+function grind2Unstuck:run()
+	local localObj = GetLocalPlayer();
+
+	if (self.timer == 0) then
+		self.timer = GetTimeEX();
+	end
+
+	if (self.timer > GetTimeEX()) or script_grind.unstuckTimer > GetTimeEX() then
+		return;
+	end
+
+	self.timer = GetTimeEX() + 150;
+
+	if (not IsMoving()) then
+		self.message = "Try to run into walls and over small obstacles...";
+	else
+		self.message = "Slope Z: " .. grind2Unstuck:getSlope(3) .. ' | Obstacle min-Z: ' .. grind2Unstuck:getObsMin(2) .. ' | Obstacle max-Z: ' .. grind2Unstuck:getObsMax(2);
+	end
+
+	--if (grind2Unstuck:pathClearAuto(2)) then
+	--else
+	--	StopMoving();
+	--end
+end
+
+
+function grind2Unstuck:checkUnstuck()
+    local _localObj = GetLocalPlayer()
+    if (_localObj == nil) then
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: No local player object")
+        return false
+    end
+
+	if script_grind.unstuckTimer > GetTimeEX() then
+		return false;
+	end
+
+    -- Initialize on first call or after loading screen
+    if (self.timer == 0) then
+        self.timer = GetTimeEX() + 2000
+        self._moveAttempts = 0
+        self._lx, self._ly, self._lz = _localObj:GetPosition()
+        if (self._lx == nil or self._ly == nil or self._lz == nil) then
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Initial position nil")
+            return false
+        end
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Initialized, pos: " .. self._lx .. ", " .. self._ly .. ", " .. self._lz)
+        return false
+    end
+
+    -- Check position every 2 seconds
+    if (GetTimeEX() < self.timer) then
+        return false
+    end
+
+    -- Get current position
+    local _x, _y, _z = _localObj:GetPosition()
+    if (_x == nil or _y == nil or _z == nil) then
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Current position nil")
+        return false
+    end
+
+    -- Calculate distance moved (2D to ignore Z-axis variations)
+    local _distance = 0
+    if (self._lx ~= nil and self._ly ~= nil) then
+        _distance = math.sqrt((_x - self._lx)^2 + (_y - self._ly)^2)
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Distance: " .. _distance .. ", IsMoving: " .. tostring(IsMoving()) .. ", Pos: " .. _x .. ", " .. _y .. ", " .. _z .. ", Last: " .. self._lx .. ", " .. self._ly .. ", " .. self._lz)
+    else
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Last position invalid, resetting")
+        self._lx, self._ly, self._lz = _x, _y, _z
+        self.timer = GetTimeEX() + 2000
+        return false
+    end
+
+    -- Update last position and timer
+    self._lx, self._ly, self._lz = _x, _y, _z
+    self.timer = GetTimeEX() + 2000
+    --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Updated last pos: " .. self._lx .. ", " .. self._ly .. ", " .. self._lz)
+
+    -- Check stuck condition
+    if (IsMoving() and _distance < self._stuckThreshold) then
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Potential stuck detected (moved less than " .. self._stuckThreshold .. " yards)")
+        self._isStuck = true
+        self._unstuckAttempts = self._unstuckAttempts + 1
+
+        -- Jump
+			if not IsInCombat() then
+				JumpOrAscendStart()
+			end
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Jumping")
+
+        -- Try raycasting for clear path
+        local _currentAngle = _localObj:GetAngle()
+        local _newX, _newY, _newZ
+        for i, _angleOffset in ipairs(self._turnAngles) do
+            local _probeAngle = _currentAngle + _angleOffset
+            local _probeX, _probeY = _x + self._probeDistance * math.cos(_probeAngle), _y + self._probeDistance * math.sin(_probeAngle)
+            local _probeZ = _z
+            local _hit, _, _, _ = Raycast(_x, _y, _z, _probeX, _probeY, _probeZ)
+            if (not _hit) then
+                _newX, _newY, _newZ = _probeX, _probeY, _probeZ
+                --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Clear path found at angle " .. math.deg(_angleOffset) .. ", target: " .. _probeX .. ", " .. _probeY .. ", " .. _probeZ)
+                break
+            end
+        end
+
+        -- Move to clear path
+        if (_newX ~= nil and _newY ~= nil and _newZ ~= nil) then
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Attempting Move to clear path: " .. _newX .. ", " .. _newY .. ", " .. _newZ)
+            --FacePosition(_x + math.cos(_currentAngle + self._turnAngles[1]), _y + math.sin(_currentAngle + self._turnAngles[1]), _z)
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Facing position: " .. (_x + math.cos(_currentAngle + self._turnAngles[1])) .. ", " .. (_y + math.sin(_currentAngle + self._turnAngles[1])))
+            grind2MoveToTarget:run(GetLocalPlayer(), _newX, _newY, _newZ)
+                --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Move succeeded, IsMoving: " .. tostring(IsMoving()))
+                self._moveAttempts = 0
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Move failed")
+            self._moveAttempts = self._moveAttempts + 1
+		self.timer = GetTimeEX() + 750;
+        end
+
+        -- Fallback: Turn and move 2 yards
+        if (self._unstuckAttempts <= self._maxUnstuckAttempts) then
+            local _turnDirection = 1
+            if (self._unstuckAttempts == 2) then
+                _turnDirection = -1
+            end
+            local _angle = _currentAngle + (self._turnAngles[1] * _turnDirection)
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Turning " .. (_turnDirection == 1 and "left" or "right") .. " to angle: " .. math.deg(_angle))
+           -- FacePosition(_x + math.cos(_angle), _y + math.sin(_angle), _z)
+            local _moveX, _moveY = _x + 2 * math.cos(_angle), _y + 2 * math.sin(_angle)
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Attempting fallback Move to: " .. _moveX .. ", " .. _moveY .. ", " .. _z)
+            grind2MoveToTarget:run(GetLocalPlayer(), _moveX, _moveY, _z)
+                --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Fallback Move succeeded, IsMoving: " .. tostring(IsMoving()))
+                self._moveAttempts = 0
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Fallback Move failed")
+            self._moveAttempts = self._moveAttempts + 1
+		self.timer = GetTimeEX() + 750;
+        end
+
+        -- Reset if max attempts reached
+        if (self._unstuckAttempts > self._maxUnstuckAttempts or self._moveAttempts >= 2) then
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Max attempts reached, trying probe distance 20")
+            local _currentAngle = _localObj:GetAngle()
+            local _newX, _newY, _newZ
+            for i, _angleOffset in ipairs(self._turnAngles) do
+                local _probeAngle = _currentAngle + _angleOffset
+                local _probeX, _probeY = _x + self._probeDistance * math.cos(_probeAngle), _y + self._probeDistance * math.sin(_probeAngle)
+                local _probeZ = _z
+                local _hit, _, _, _ = Raycast(_x, _y, _z, _probeX, _probeY, _probeZ)
+                if (not _hit) then
+                    _newX, _newY, _newZ = _probeX, _probeY, _probeZ
+                    --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Clear path found at angle " .. math.deg(_angleOffset) .. ", target: " .. _probeX .. ", " .. _probeY .. ", " .. _probeZ)
+                    break
+                end
+            end
+            if (_newX ~= nil and _newY ~= nil and _newZ ~= nil) then
+                --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Attempting Move to clear path: " .. _newX .. ", " .. _newY .. ", " .. _newZ)
+              --  FacePosition(_x + math.cos(_currentAngle + self._turnAngles[1]), _y + math.sin(_currentAngle + self._turnAngles[1]), _z)
+                --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Facing position: " .. (_x + math.cos(_currentAngle + self._turnAngles[1])) .. ", " .. (_y + math.sin(_currentAngle + self._turnAngles[1])))
+                grind2MoveToTarget:run(GetLocalPlayer(), _newX, _newY, _newZ)
+                    --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Move succeeded, IsMoving: " .. tostring(IsMoving()))
+                    self._unstuckAttempts = 0
+                    self._probeDistance = 5
+                    self._moveAttempts = 0
+               		self.timer = GetTimeEX() + 750;
+
+                --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Move failed")
+            end
+            --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: No clear path at 20 yards, giving up")
+            self._isStuck = false
+            self._unstuckAttempts = 0
+            self._moveAttempts = 0
+            self._probeDistance = 5
+            return false
+        end
+    end
+
+    -- Not stuck, reset state
+    if (true) then
+        self._isStuck = false
+        self._unstuckAttempts = 0
+        self._moveAttempts = 0
+        self._probeDistance = 5
+        --DEFAULT_CHAT_FRAME:AddMessage("grind2Unstuck:checkUnstuck: Not stuck (moved at least " .. self._stuckThreshold .. " yards or stopped moving), resetting")
+        return false
+    end
+end
