@@ -38,9 +38,11 @@ end
 function script_magePullSpells:fireMagePull(targetObj)
 
 	local targetObj = script_grind.enemyObj;
-
 	if targetObj == nil or targetObj == 0 then
 		targetObj = _quest.enemyTarget;
+	end
+	if targetObj == nil or targetObj == 0 then
+		targetObj = grind2.enemyTarget;
 	end
 
 	-- recheck line of sight on target

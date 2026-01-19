@@ -185,6 +185,7 @@ function script_paladin:run(targetGUID)
 	if not IsCasting() and not IsChanneling() then 
 		if script_paladinHealsAndBuffs:healsAndBuffs() then
 			if IsMoving() then StopMoving(); return; end
+			return true;
 		end
 	end
 

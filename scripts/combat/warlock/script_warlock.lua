@@ -1034,7 +1034,7 @@ function script_warlock:run(targetGUID)
 				end
 			end
 
-			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) then
+			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and localMana >= 20 then
 				CastSpellByName('Shadow Bolt', targetObj);
 				targetObj:FaceTarget();
 				self.waitTimer = GetTimeEX() + 2000;

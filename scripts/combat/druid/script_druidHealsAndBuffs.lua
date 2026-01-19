@@ -23,7 +23,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 	or ( (IsBearForm() ) and (localHealth <= 75) and (not IsInCombat()) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) )
 	then
 		if (not script_grind.adjustTickRate) then script_grind.tickRate = 135; end
-		if (script_druidEX:bearForm()) then if (script_druid.tickRate ~= nil and script_druid.tickRate ~= 0) then
+		if (script_druidEX:bearForm()) then if IsMoving() then StopMoving(); return true; end if (script_druid.tickRate ~= nil and script_druid.tickRate ~= 0) then
 				script_druid.waitTimer = GetTimeEX() + 1000;
 		end
 		end
@@ -66,16 +66,15 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 	end
 
 	-- healing touch rank 3
-	if not IsSpellOnCD("Healing Touch") and not IsInCombat() and not HasForm() and IsStanding() and not IsMoving() and localMana > 10 and HasSpell("Healing Touch") and localHealth <= 75  then
+	if not IsCasting() and not IsSpellOnCD("Healing Touch") and not IsInCombat() and not HasForm() and IsStanding() and localMana > 10 and HasSpell("Healing Touch") and localHealth <= 75  then
 		if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 		if (IsMoving()) then StopMoving(); return true; end
-		local rankHeal = "Rank 1"; if localObj:GetLevel() >= 20 then rankHeal = "Rank 3"; end
+		local rankHeal = "Rank 1"; if localObj:GetLevel() >= 24 then rankHeal = "Rank 3"; end
 		if CastSpellByName("Healing Touch("..rankHeal, localObj) then script_druid.waitTimer = GetTimeEX() + 1650; return true; end
-		script_druid.waitTimer = GetTimeEX() + 300;
 	end
 
 	if not IsSpellOnCD("Rejuvenation") and (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (localHealth <= 65) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) and (IsStanding()) and (not IsMounted()) then
-		CastSpellByName("Rejuvenation", localObj); if not IsMoving() then script_grind:setWaitTimer(1650); end script_druid.waitTimer = GetTimeEX() + 1650; return; end
+		if CastSpellByName("Rejuvenation", localObj) then script_grind:setWaitTimer(1650); script_druid.waitTimer = GetTimeEX() + 1650; return true; end end
 
 	if (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not HasForm()) and (localHealth <= 70) and (localMana >= 35) and (not hasRegrowth) and (not IsMoving()) and (IsStanding()) and (not IsMounted()) and (not IsCasting()) and (not script_druid.hasRegrowth) then
 		if (HasSpell("Regrowth")) and (not localObj:HasBuff("Regrowth")) and (not IsSpellOnCD("Regrowth")) and (not IsCasting()) and (not script_druid.hasRegrowth) then
@@ -232,10 +231,10 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 		-- Rejuvenation
 		if (HasSpell("Rejuvenation")) and (not localObj:HasBuff("Rejuvenation")) and (localHealth <= script_druid.rejuvenationHealth) and (not IsLooting()) and (IsStanding()) and (localHealth <= 80) and (not IsSpellOnCD("Rejuvenation")) then
 			if (localLevel < 10 and localMana >= 25) or (localLevel >= 10 and localMana >= script_druid.shapeshiftMana + 5) then 
-				if (CastSpellByName("Rejuvenation", localObj)) then
-					script_druid.waitTimer = GetTimeEX() + 1750;
-					if not IsMoving() then script_grind:setWaitTimer(1650); end
-				end
+				CastSpellByName("Rejuvenation", localObj);
+				script_druid.waitTimer = GetTimeEX() + 1750;
+				if not IsMoving() then script_grind:setWaitTimer(1650); end
+				return true;
 			end
 		end
 
@@ -244,7 +243,7 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 			if (localHealth <= script_druid.healingTouchHealth) and (localMana >= 25) and (not IsSpellOnCD("Healing Touch")) then
 				if (not IsCasting()) and (not IsChanneling()) then
 				if IsMoving() then StopMoving(); return true; end
-					if (not CastHeal("Healing Touch", localObj)) then
+					if (CastSpellByName("Healing Touch", localObj)) then
 						script_druid.waitTimer = GetTimeEX() + 5000;
 						script_grind:setWaitTimer(3000);
 						return true;
@@ -293,7 +292,10 @@ if (not IsInCombat()) then
 	end
 
 	-- if we have regrowth and rejuvenation and 2 or more targets are attacking us then cast healing touch
-	if not IsSpellOnCD("Healing Touch") and (HasSpell("Regrowth")) and (hasRegrowth or hasRejuv) and (script_grind:enemiesAttackingUs(10) > 2) and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted()) and (localHealth < script_druid.healthToShift) and (not IsSpellOnCD("Healing Touch")) and (not script_checkDebuffs:hasSilence())  then
+	if not IsSpellOnCD("Healing Touch") and (HasSpell("Regrowth")) and (hasRegrowth or hasRejuv)
+	and (script_grind:enemiesAttackingUs(10) > 2 or localHealth < script_druid.healthToShift)
+	and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted())
+	and (not script_checkDebuffs:hasSilence()) then
 		if (not IsCasting()) and (not IsChanneling()) then
 			CastSpellByName("Healing Touch", localObj);
 			script_druid.waitTimer = GetTimeEX() + 3000;

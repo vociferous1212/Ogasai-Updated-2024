@@ -261,17 +261,7 @@ function script_rogue:run(targetGUID)
 				return 4;
 			end
 
--- Check: Do we have the right target (in UI) ??
-				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
-						ClearTarget();
-						self.pickpocketUsed = false;
-						self.waitTimer = GetTimeEX() + 1500;
-						script_grind:setWaitTimer(1500);
-						targetObj = 0;
-						return 0;
-					end
-				end
+
 
 				local loot = script_grind.lootObj
 					local function checkLoot()
@@ -334,14 +324,7 @@ function script_rogue:run(targetGUID)
 					end
 				end
 			end 
-			-- Check: Do we have the right target (in UI) ??
-				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
-						ClearTarget();
-						targetObj = 0;
-						return 0;
-					end
-				end
+		
 			--stuck in combat
 			if (not PlayerHasTarget()) and (IsInCombat()) and (script_grind.enemiesAttackingUs() == 0 and (not targetObj:HasDebuff("Gouge"))) and (GetNumPartyMembers() < 1) then
 				self.message = "Stuck in combat... Waiting...";
@@ -456,17 +439,8 @@ function script_rogue:run(targetGUID)
 					return 0;					
 				end
 
-				-- Check: Do we have the right target (in UI) ??
-				if (GetTarget() ~= 0 and GetTarget() ~= nil) then
-				if (GetTarget():GetGUID() ~= targetObj:GetGUID()) or (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and GetTarget():GetGUID() ~= script_grind.enemyObj:GetGUID()) then
-						ClearTarget();
-						targetObj = 0;
-						return 0;
-					end
-				end
-
 				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() < .4) then 
+				if (targetObj:GetDistance() <= .5) then 
 					if (script_rogue:runBackwards(targetObj, 2)) then 
 						script_grind.tickRate = 80;
 						return 4; 

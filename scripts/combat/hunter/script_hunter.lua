@@ -237,8 +237,8 @@ function script_hunter:run(targetGUID)
 	if PlayerHasTarget() and targetObj ~= nil and targetObj ~= 0 then
 		
 		-- change our attack distance to melee distance if we don't have a pet or target is targeting me
-		if (GetTarget():GetDistance() < self.minSpellRange and script_grind:isTargetingMe(targetObj))
-		or (GetPet() == 0 or GetPet() == nil)
+		if IsInCombat() and (GetTarget():GetDistance() < self.minSpellRange and script_grind:isTargetingMe(targetObj))
+		or (IsInCombat() and (GetPet() == 0 or GetPet() == nil) and GetLocalPlayer():GetLevel() >= 10)
 		
 		then
 			script_grind.combatScriptRange = self.meleeDistance;

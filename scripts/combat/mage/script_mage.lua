@@ -791,7 +791,7 @@ function script_mage:run(targetGUID)
 			end
 
 			-- low level fireball
-			if (script_mage.frostMage) and (not HasSpell("Frostbolt")) then
+			if (script_mage.frostMage) and (not HasSpell("Frostbolt")) and localMana >= 50 then
 				CastSpellByName("Fireball", targetObj);
 			end
 			
@@ -856,7 +856,7 @@ function script_mage:run(targetGUID)
 						end
 				
 						-- cast fireball
-						if (not HasSpell("Pyroblast")) then
+						if (not HasSpell("Pyroblast")) and localMana >= 25 then
 							if (CastSpellByName("Fireball", targetObj)) then
 								
 							end
@@ -874,7 +874,7 @@ function script_mage:run(targetGUID)
 					return 3;
 				end	
 				-- cast fireball
-				if targetObj:IsInLineOfSight() and not IsMoving() then
+				if targetObj:IsInLineOfSight() and not IsMoving() and localMana >= 50 then
 					if (CastSpellByName("Fireball", targetObj)) then
 						script_grind:setWaitTimer(2500);
 						script_mage.waitTimer = GetTimeEX() + 2500;
