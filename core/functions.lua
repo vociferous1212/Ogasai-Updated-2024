@@ -219,18 +219,22 @@ function NumberTargetsAttackingPlayer()
 	local tempTarget = nil;
 	local i, t = GetFirstObject();
 	while i ~= 0 do
-		if t == 3 and i:GetDistance() <= 75 and not i:IsDead() and not i:IsCritter() then
-			if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
-				if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
-					numTargets = numTargets + 1;
-					tempTarget = i:GetGUID();
-				end
-				if GetPet() ~= 0 and GetPet() ~= nil and i:GetGUID() ~= tempTarget then
-					if i:GetUnitsTarget():GetGUID() == GetPet():GetGUID() then
+		if t == 3 then
+			if i:GetDistance() <= 75 and not i:IsDead() and not i:IsCritter() then
+				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
 						numTargets = numTargets + 1;
+						tempTarget = i:GetGUID();
 					end
-				end	
+					if GetPet() ~= 0 and GetPet() ~= nil then
+						if i:GetGUID() ~= tempTarget then
+							if i:GetUnitsTarget():GetGUID() == GetPet():GetGUID() then
+								numTargets = numTargets + 1;
+							end
+						end
+					end	
 
+				end
 			end
 		end
 	i, t = GetNextObject(i);
