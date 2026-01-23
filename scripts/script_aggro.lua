@@ -1,5 +1,5 @@
 script_aggro = {
-        currentRessAngle = 0,	-- res angle
+	currentRessAngle = 0,	-- res angle
 	rX = 0,			-- res position
 	rY = 0,			-- res position
 	rZ = 0,			-- res position

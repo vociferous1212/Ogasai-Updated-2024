@@ -72,7 +72,7 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
 				if nameTalent == "Improved Sinister Strike" then
 					if currRank == 1 then
-						script_rogue.cpGeneratorCost = 43;
+						script_rogue.cpGeneratorCost = 42;
 					elseif currRank == 2 then
 						script_rogue.cpGeneratorCost = 40;
 					end

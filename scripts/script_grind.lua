@@ -387,6 +387,9 @@ end
 -- RUN GRINDER
 function script_grind:run()
 
+if GetRealmName() == "Ashen Vanilla" then 
+	self.combatScriptRange = self.combatScriptRange + 1;
+end
 
 -- show grinder window
 	script_grind:window();

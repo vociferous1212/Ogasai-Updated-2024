@@ -99,12 +99,17 @@ function script_vendor:deleteKeepItem(itemNr)
 end
 
 function script_vendor:keepItem(name)
-	if strfind ~= nil then
-	for i = 0,self.keepNum-1 do
+
+	if GetLocalPlayer():GetLevel() == 1 then
+		return false;
+	end
+
+	for i = 0, self.keepNum - 1 do
+
 		if (strfind(self.keepItems[i], name)) then
+
 			return true;
 		end
-	end
 	end
 	
 	return false; 
@@ -314,9 +319,10 @@ function script_vendor:sell()
 	if (self.timer > GetTimeEX()) then
 		return true;
 	end
-
+	
+	-- causing stuttering < level 40 in grind 2
 	if not IsSwimming() and (script_vendor:getStatus() >= 1) and (not IsInCombat()) and GetTimeEX() > script_grind.tryMountTimer
-		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) and script_grind.hasAMount
+		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) and script_grind.hasAMount and GetLocalPlayer():GetLevel() >= 40
 	then
 		if (IsMoving()) then
 			StopMoving();

@@ -354,7 +354,9 @@ function script_unstuck:checkUnstuck()
         self._unstuckAttempts = self._unstuckAttempts + 1
 
         -- Jump
+		if not IsInCombat() then
             JumpOrAscendStart()
+		end
             --DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Jumping")
 
         -- Try raycasting for clear path
