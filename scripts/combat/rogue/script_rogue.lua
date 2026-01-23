@@ -146,6 +146,14 @@ function script_rogue:run(targetGUID)
 	--	TargetHasRangedWeapon(target);
 	--end
 	
+	-- Run backwards if we are too close to the target
+	if (targetObj:GetDistance() <= .4) then 
+		if (script_rogue:runBackwards(targetObj, 1)) then 
+			script_grind.tickRate = 80;
+			return 4; 
+		end 
+	end	
+
 	-- Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX())
 		or ( not HasSpell("Will of the Forsaken") and (localObj:IsFleeing() or localObj:IsConfused() or localObj:IsStunned()) ) then
@@ -437,15 +445,7 @@ function script_rogue:run(targetGUID)
 					self.waitTimer = GetTimeEX() + 1500;
 					self.riposteTimer = GetTimeEX() + 4500;
 					return 0;					
-				end
-
-				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() <= .5) then 
-					if (script_rogue:runBackwards(targetObj, 2)) then 
-						script_grind.tickRate = 80;
-						return 4; 
-					end 
-				end		
+				end	
 				
 				if (GetNumPartyMembers() >= 1) and (HasSpell("Feint")) and (script_grind:isTargetingMe(targetObj)) and (not IsSpellOnCD("Feint")) and (localEnergy >= 20) then
 					CastSpellByName("Feint", targetObj);
@@ -718,19 +718,13 @@ function script_rogue:runBackwards(targetObj, range)
 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
  		if (distance < range) then 		
 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
-
-				-- move fall-back
-				if not IsMoving() then
-					Move(moveX, moveY, moveZ)
-					script_nav:resetNavigate();
-				end
+			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ);
 				
 			if script_checkAdds:checkAdds() then
 				return 4;
 			end
 
-			self.waitTimer = GetTimeEX() + 500;
+			self.waitTimer = GetTimeEX() + 200;
 			script_grind:setWaitTimer(100);
 
 		return 4;

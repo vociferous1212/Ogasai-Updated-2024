@@ -28,7 +28,7 @@ function script_hunterDoPetChecks:doPetChecks()
 
 
 -- Check: If pet is dismissed then Call pet 
-	if (GetPet() == 0) and (script_hunter.hasPet) and (IsStanding()) and (not IsMounted()) then
+	if (GetPet() == 0) and (script_hunter.hasPet) and (IsStanding()) and (not IsMounted()) and HasSpell("Call Pet") then
 
 		script_hunter.message = "Pet is missing, calling pet...";
 
@@ -47,9 +47,9 @@ function script_hunterDoPetChecks:doPetChecks()
 
 
 -- Check: If pet is dead, then revive pet
-	if GetLocalPlayer():GetLevel() >= 10 and not IsMounted() then
+	if GetLocalPlayer():GetLevel() >= 10 and not IsMounted() and HasSpell("Call Pet")  then
 
-		if (GetPet() == nil or GetPet() == 0) or (GetPet() ~= 0 and GetPet():IsDead()) then
+		if (GetPet() == nil or GetPet() == 0) or (GetPet() ~= 0 and GetPet() ~= nil and GetPet():IsDead()) then
 
 			if IsStanding() and (script_hunter.hasPet) and (GetPet() ~= nil and GetPet():IsDead())
 			and (not IsInCombat()) and (HasSpell("Revive Pet")) then	

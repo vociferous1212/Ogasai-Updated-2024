@@ -416,13 +416,12 @@ function script_druid:run(targetGUID)
 		end
 
 	-- run backwards last error == need to face target
-		if GetLastError() == 99 and not IsCasting() and not IsChanneling() then
-			if (script_druid:runBackwards(targetObj, 1)) then
-				self.waitTimer = GetTimeEX() + 200;
-				ClearLastError();
-				return 4;
-			end
-		end
+		--if GetLastError() == 99 and not IsCasting() and not IsChanneling() then
+		--	if (script_druid:runBackwards(targetObj, 1)) then
+		--		ClearLastError();
+		--		return 4;
+		--	end
+		--end
 
 	-- remove travel form before combat
 	if (IsTravelForm()) then
@@ -624,7 +623,7 @@ function script_druid:run(targetGUID)
 
 		-- move to target
 		if targetObj ~= nil and targetObj ~= 0 and not IsCasting() and not IsChanneling() then
-			if targetObj:GetDistance() > self.spellRange or not targetObj:IsInLineOfSight() then
+			if (targetObj:GetDistance() > self.spellRange and targetObj:GetDistance() > 2) or not targetObj:IsInLineOfSight() then
 				return 3;
 			end
 		end
@@ -1004,7 +1003,7 @@ function script_druid:run(targetGUID)
 			-- do these attacks only in bear form
 			if (IsBearForm()) and (not IsCatForm()) then
 
-				if targetObj:GetDistance() > self.spellRange or not targetObj:IsInLineOfSight() and not IsCasting() and not IsChanneling() then
+				if ((targetObj:GetDistance() > self.spellRange and targetObj:GetDistance() > 2) or not targetObj:IsInLineOfSight()) and not IsCasting() and not IsChanneling() then
 						return 3;
 					end
 				end
@@ -1018,9 +1017,7 @@ function script_druid:run(targetGUID)
 
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() <= 0.4) then 
-					if (script_druid:runBackwards(targetObj, 2)) then 
-						self.waitTimer = GetTimeEX() + 350;
-						return 0;
+					if (script_druid:runBackwards(targetObj, 1)) then 
 					end 
 				end
 
@@ -1169,7 +1166,7 @@ function script_druid:run(targetGUID)
 
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() <= 0.4) then 
-					if (script_druid:runBackwards(targetObj, 2)) then 
+					if (script_druid:runBackwards(targetObj, 1)) then 
 						return 4; 
 					end 
 				end
@@ -1257,7 +1254,7 @@ function script_druid:run(targetGUID)
 
 				-- Run backwards if we are too close to the target
 				if (targetObj:GetDistance() <= 0.4) then 
-					if (script_druid:runBackwards(targetObj, 2)) then 
+					if (script_druid:runBackwards(targetObj, 1)) then 
 						return 4; 
 					end 
 				end
@@ -1287,21 +1284,20 @@ function script_druid:run(targetGUID)
 				end
 
 				-- check heals and buffs
-		if (localHealth <= self.healthToShift) and (not script_checkDebuffs:hasSilence()) and localMana >= self.shapeshiftMana then
-			if (targetHealth >= 25 and script_grind.enemiesAttackingUs(10) == 1) 
-			or (targetHealth >= 10 and script_grind.enemiesAttackingUs(10) > 1)
-			or (localHealth <self.healthToShift - 25 and targetHealth >= 10)
-			or (not IsBearForm() and not IsCatForm())
-			then
-				if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
-					if (script_druidHealsAndBuffs:healsAndBuffs()) then
-										if IsMoving() then StopMoving(); return true; end
-
-					return true;
+			if (localHealth <= self.healthToShift) and (not script_checkDebuffs:hasSilence()) and localMana >= self.shapeshiftMana then
+				if (targetHealth >= 25 and script_grind.enemiesAttackingUs(10) == 1) 
+				or (targetHealth >= 10 and script_grind.enemiesAttackingUs(10) > 1)
+				or (localHealth <self.healthToShift - 25 and targetHealth >= 10)
+				or (not IsBearForm() and not IsCatForm())
+				then
+					if (not localObj:HasBuff("Frenzied Regeneration")) and (not IsLooting()) then
+						if (script_druidHealsAndBuffs:healsAndBuffs()) then
+							if IsMoving() then StopMoving(); return true; end				
+						return true;	
+						end	
 					end
 				end
 			end
-		end
 
 				-- racial
 				if (targetObj:IsCasting() or script_druid:enemiesAttackingUs(10) >= 2) and (not IsMoving()) and (targetObj:GetDistance() <= 8) then
@@ -1312,9 +1308,8 @@ function script_druid:run(targetGUID)
 				-- keep moonfire up
 				if (localMana >= 30) and (targetHealth >= 5) and (not targetObj:HasDebuff("Moonfire")) and (HasSpell("Moonfire")) and (IsInCombat()) and (not HasForm()) and (not IsCasting()) and (not IsChanneling()) then
 					if (CastSpellByName("Moonfire", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1650;
+						self.waitTimer = GetTimeEX() + 1550;
 						if not IsMoving() then targetObj:FaceTarget(); end
-						return 0;
 					end
 				end
 
@@ -1338,7 +1333,7 @@ function script_druid:run(targetGUID)
 				-- Wrath
 				if (localMana > 30 and targetHealth > 15 and not HasSpell("Star Fire"))
 				or (localMana >= 10 and targetHealth >= 7 and HasSpell("Star Fire"))
-				or (not HasSpell("Bear Form") and localMana >= 30 and targetHealth >= 15) then
+				or (not HasSpell("Bear Form") and localMana >= 30 and targetHealth >= 15) and not IsMoving() then
 					if (not IsMoving()) then
 						targetObj:FaceTarget();
 						CastSpellByName("Wrath", targetObj);
@@ -1349,7 +1344,7 @@ function script_druid:run(targetGUID)
 				end
 
 				-- if low level use wrath on target if they have low health
-				if (localMana >= 30) and (not HasSpell("Moonfire")) then
+				if (localMana >= 30) and (not HasSpell("Moonfire")) and not IsMoving() then
 					targetObj:FaceTarget();
 					if (CastSpellByName("Wrath", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1850;
@@ -1373,7 +1368,7 @@ function script_druid:run(targetGUID)
 					end
 				end
 			end
-			if (targetObj:GetDistance() > self.spellRange) and not IsCasting() and not IsChanneling() then
+			if (targetObj:GetDistance() > self.spellRange and targetObj:GetDistance() > 2) and not IsCasting() and not IsChanneling() then
 				return 3;
 			end
 
@@ -1516,7 +1511,7 @@ function script_druid:rest()
 				self.tickRate = 500;
 				ClearTarget();
 				return true; 
-			else 
+			else
 				self.message = "No drinks! (or drink not included in script_helper)";
 				self.shitToDrink = false;
 				self.hasDrinks = false;
