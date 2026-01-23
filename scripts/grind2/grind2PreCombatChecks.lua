@@ -6,7 +6,7 @@ function grind2PreCombatChecks:run()
 
 	-- move away from additional targets in combat
 	if IsInCombat() and grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil then
-		if grind2.enemyTarget:GetHealthPercentage() >= 20 and not script_checkDebuffs:hasDisabledMovement() then
+		if grind2.enemyTarget:GetHealthPercentage() >= 25 and not script_checkDebuffs:hasDisabledMovement() then
 			if script_checkAdds:checkAdds() then
 				script_om:FORCEOM();
 			return;

@@ -2,7 +2,7 @@ grind2AdjustTimersMenu = {
 
 	doLootTimer = 650,
 
-	faceTargetTimer = 120,
+	faceTargetTimer = 750,
 
 	obtainNewTargetTimer = 1550,
 

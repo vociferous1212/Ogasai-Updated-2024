@@ -2,9 +2,9 @@ grind2FleeCombat = {
 
 	fleeCombat = true,
 
-	fleeWithAdds = false,
+	fleeWithAdds = true,
 
-	healthToFlee = 30,
+	healthToFlee = 36,
 
 	manaToFlee = 100
 
@@ -23,17 +23,14 @@ function grind2FleeCombat:run()
 		mana = player:GetManaPercentage();
 	end
 
-	if IsInCombat() and NumberTargetsAttackingPlayer() >= 2 and self.fleeWithAdds then
-		grind2SaveCoordinates:moveToSavedLocation();
-		return true;
-	end
-
-	if IsInCombat() and health <= self.healthToFlee and mana <= self.manaToFlee then
-		if GetPet() ~= nil and GetPet() ~= 0 then
-			PetFollow();
+	if IsInCombat() then
+		if (health <= self.healthToFlee and mana <= self.manaToFlee) or (NumberTargetsAttackingPlayer() >= 2 and self.fleeWithAdds) then
+			if GetPet() ~= nil and GetPet() ~= 0 then
+				PetFollow();
+			end
+			grind2SaveCoordinates:moveToSavedLocation();
+			return true;
 		end
-		grind2SaveCoordinates:moveToSavedLocation();
-		return true;
 	end
 
 return false;

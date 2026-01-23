@@ -8,6 +8,13 @@ function grind2Setup:run()
 
 	if not self.isSetup then
 
+		-- check if bags are full
+		grind2AreBagsFull:checkIfBagsAreFull()
+
+		--TEMPORARY
+		script_helper:setup()
+		--
+
 		hotspotDB:setup()
 
 		-- set all timers to current time at each reload

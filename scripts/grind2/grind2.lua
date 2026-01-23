@@ -1,6 +1,7 @@
 grind2 = {
 
 	grind2IncludeFiles = include("scripts\\grind2\\includeFiles.lua"),
+	grinderIncludeFiles2 = include("scripts\\grind2\\includeFiles2.lua"),
 	timer = GetTimeEX(),
 	obtainNewTargetTimer = GetTimeEX(),
 	faceTargetTimer = GetTimeEX(),
@@ -25,7 +26,9 @@ grind2 = {
 	bagsAreFull = false,
 	lootTargets = true,
 	useVendor = true,
-	currentLevel = GetLocalPlayer():GetLevel()
+	currentLevel = GetLocalPlayer():GetLevel(),
+	useVendor = true,
+	refillDrinkAndFoodAtVendor = false
 
 	}
 
@@ -104,22 +107,22 @@ function grind2:run()
 		end
 	end
 
+	-- face enemy target at all times
+	if not grind2.pause then
+		if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and not IsMoving() and not IsLooting() and player:GetCasting() ~= 6487 then
+			if self.enemyTarget:GetDistance() <= self.combatScriptRange + 1 and self.enemyTarget:IsInLineOfSight() and currentTime > self.faceTargetTimer then
+				self.enemyTarget:FaceTarget();
+				self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
+			end
+		end
+	end
+
 -- return if paused or for any reason
 	if self.timer > currentTime or grind2.pause or IsCasting() or IsChanneling() then
 
 		-- TEMPORARY - old combat helper to make combat scripts run somewhat decent
 		if IsInCombat() and not grind2.pause then
 			script_combatHelper:run()
-		end
-
-		-- face enemy target at all times
-		if not grind2.pause then
-			if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and not IsMoving() and not IsLooting() and player:GetCasting() ~= 6487 then
-				if self.enemyTarget:GetDistance() + 1 <= self.combatScriptRange and self.enemyTarget:IsInLineOfSight() and currentTime > self.faceTargetTimer then
-					self.enemyTarget:FaceTarget();
-					self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
-				end
-			end
 		end
 
 		-- auto-loot pick pocket targets
@@ -129,6 +132,7 @@ function grind2:run()
 				StaticPopup1Button1:Click();
 			end
 			grind2DoLoot.lootTimer = currentTime + 950;
+			return false;
 		end		
 
 		-- show message for navigation
@@ -139,6 +143,12 @@ function grind2:run()
 			self.grinderMessage = "";
 			self.enemyTarget = nil;
 			grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
+			grind2DoLoot.blacklistLootTimer = GetTimeEX() + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
+
+		end
+
+		if IsInCombat() or IsEating() or IsDrinking() or not IsStanding() then
+			grind2DoLoot.blacklistLootTimer = GetTimeEX() + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 		end
 
 		-- reset new target timer if casting
@@ -161,20 +171,6 @@ function grind2:run()
 		return;
 	end
 
--- run gatherer
-	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() then
-
-		-- run gatherer
-		if script_gatherRun:gather() then
-			script_gatherRun:gather();
-			self.grinderMessage = "Gathering...";
-			if IsLooting() and not IsMoving() then
-				grind2:setTimer(500);
-			end
-			return;
-		end
-	end
-
 -- run rest functions
 	if not IsInCombat() then
 		if grind2RunRestState:run() then
@@ -185,6 +181,20 @@ function grind2:run()
 			self.enemyTarget = nil;
 			if PlayerHasTarget() then ClearTarget(); end
 			grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+			return;
+		end
+	end
+
+-- run gatherer
+	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() then
+
+		-- run gatherer
+		if script_gatherRun:gather() then
+			script_gatherRun:gather();
+			self.grinderMessage = "Gathering...";
+			if IsLooting() and not IsMoving() then
+				grind2:setTimer(500);
+			end
 			return;
 		end
 	end
@@ -213,12 +223,13 @@ function grind2:run()
 
 		-- run combat pre-checks
 		-- double check enemyTarget, blacklisted, distance to grind zone, etc
-		grind2PreCombatChecks:run()
+		grind2PreCombatChecks:run();
 
 		-- double check loot
 		if IsInCombat() and IsLooting() then
 			LootTarget();
 			grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
+			return false;
 		end
 
 		-- return combat script message and run the combat script
@@ -236,7 +247,7 @@ function grind2:run()
 	
 			-- TEMPORARY set old combat script ranges
 			self.combatScriptRange = script_grind.combatScriptRange;
-
+	
 			-- run the combat scripts
 			grind2RunCombatState:run();
 		end

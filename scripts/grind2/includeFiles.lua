@@ -6,6 +6,7 @@ includeFiles = {
 	tempSetRestVarsIncluded = include("scripts\\grind2\\tempSetRestVars.lua"),
 	tempCombatScriptMessage = include("scripts\\grind2\\tempCombatMessage.lua"),
 	
+	grinder2Ressurect = include("scripts\\grind2\\grind2Ressurect.lua"),
 	grinder2BlacklistLoot = include("scripts\\grind2\\grind2Loot\\grind2BlacklistLoot.lua"),
 	grinder2IsAnyValidTargetInRange = include("scripts\\grind2\\grind2Targets\\grind2IsAnyValidTargetInRange.lua"),
 	grinder2IsLootSafeToLoot = include("scripts\\grind2\\grind2Loot\\grind2IsLootSafeToLoot.lua"),
@@ -29,6 +30,4 @@ includeFiles = {
 	grinder2DoLoot = include("scripts\\grind2\\grind2Loot\\grind2DoLoot.lua"),
 	grinder2FindLoot = include("scripts\\grind2\\grind2Loot\\grind2FindLoot.lua"),
 	grinder2FindSkinTarget = include("scripts\\grind2\\grind2Loot\\grind2FindSkinTarget.lua"),
-
-	grinderIncludeFiles2 = include("scripts\\grind2\\includeFiles2.lua")
 }

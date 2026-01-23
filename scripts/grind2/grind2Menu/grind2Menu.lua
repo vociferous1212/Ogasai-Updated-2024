@@ -138,7 +138,7 @@ function grind2Menu:run()
 
 	SameLine();
 
-	if script_gather.nodeObj ~= nil then
+	if script_gather.nodeObj ~= nil and script_gather.nodeObj ~= 0 then
 		Text("				| "..script_gather.nodeObj:GetUnitName());
 	else
 		Text("				| No Object...")
@@ -146,7 +146,15 @@ function grind2Menu:run()
 
 -- vendor menu script
 	if CollapsingHeader("Vendor Menu") then
-		script_vendorMenu:menu();
+
+		wasClicked, grind2.useVendor = Checkbox("Use Vendoring", grind2.useVendor);
+		Separator();
+
+		if grind2.useVendor then
+
+			script_vendorMenu:menu();
+		end
+
 	end
 
 	SameLine();

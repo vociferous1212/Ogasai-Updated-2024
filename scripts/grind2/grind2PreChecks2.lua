@@ -23,7 +23,7 @@ function grind2PreChecks2:run()
 	end
 
 -- reaffirm enemy target - we have a good target
-	if grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil and not IsStealth() then
+	if grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil and not IsStealth() and not grind2.enemyTarget:IsDead() and grind2IsTargetingMe:target(grind2.enemyTarget) then
 		if not PlayerHasTarget() then
 			grind2.enemyTarget:AutoAttack();
 		end

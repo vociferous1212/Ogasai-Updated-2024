@@ -23,9 +23,7 @@ function grind2RunCombatState:run()
 
 	local x, y, z = player:GetPosition();
 
-	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
-		_x, _y, _z = grind2.enemyTarget:GetPosition();
-	end
+	local _x, _y, _z = 0, 0, 0;
 
 	local enemyTarget = nil;
 
@@ -33,8 +31,6 @@ function grind2RunCombatState:run()
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 
 		enemyTarget = grind2.enemyTarget;
-
-		_x, _y, _z = enemyTarget:GetPosition();
 
 		-- TEMPORARY - old combat helper to make combat scripts run somewhat decent
 		if IsInCombat() then
@@ -84,27 +80,14 @@ function grind2RunCombatState:run()
 			--	end
 			--end
 
-			-- TEMPORARY move to target
-			-- stop moving when we get to target and in melee range
-			if not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() then
-				if GetMyClass() ~= "HUNTER" and GetMyClass() ~= "MAGE" and enemyTarget:GetHealthPercentage() >= 97 and enemyTarget:GetDistance() <= grind2.combatScriptRange and enemyTarget:IsInLineOfSight() then
-					if IsMoving() then
-						StopMoving();
-						return;
-					end
-				elseif script_grind.combatError == 3 or grind2.combatScriptReturn == "MOVE TO TARGET" or GetDistance3D(x, y, z, _x, _y, _z) > grind2.combatScriptRange then
-					if _x ~= 0 and x ~= 0 then
-						grind2MoveToTarget:run(player, _x, _y, _z);
-					end
-				else
-					script_grind.combatError = nil;
-				end
-			end
-
 			-- last target targeted
 			if enemyTarget ~= nil and enemyTarget ~= 0 then
-				grind2.lastTargetTargetedGUID = enemyTarget:GetGUID();
-				grind2.lastTargetTargeted = enemyTarget;
+				if grind2.lastTargetTargeted ~= 0 and grind2.lastTargetTargeted ~= nil then
+					if not grind2.lastTargetTargeted:IsDead() then
+						grind2.lastTargetTargetedGUID = enemyTarget:GetGUID();
+						grind2.lastTargetTargeted = enemyTarget;
+					end
+				end
 			end
 
 			-- TEMPORARY run old combat helper
@@ -118,8 +101,28 @@ function grind2RunCombatState:run()
 			-- run currently loaded combat script
 			--RunCombatScript(enemyTarget:GetGUID());
 		end
+
+		-- TEMPORARY move to target
+		-- stop moving when we get to target and in melee range
+		if not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() and not script_checkDebuffs:hasDisabledMovement() then
+			if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+				_x, _y, _z = grind2.enemyTarget:GetPosition();
+			end
+			if script_grind.combatError == 3 then
+				if _x ~= 0 and x ~= 0 and enemyTarget:GetDistance() > .5 and not enemyTarget:IsDead() and enemyTarget:CanAttack() then
+					grind2MoveToTarget:run(player, _x, _y, _z);
+					grind2.timer = 0;
+					self.timer = 0;
+					script_grind.combatError = nil;
+				end
+				return false;
+			else
+				script_grind.combatError = nil;
+			end
+		end
 	end
 
 	self.timer = currentTime + grind2AdjustTimersMenu.combatScriptTimer + 50;
+
 return true;
 end

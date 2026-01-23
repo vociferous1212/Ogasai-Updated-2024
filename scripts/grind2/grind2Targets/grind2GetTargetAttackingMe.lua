@@ -12,7 +12,7 @@ function grind2GetTargetAttackingMe:run()
 
 	while i ~= 0 do
 
-		if t == 3 then
+		if t == 3 and not i:IsDead() and i:CanAttack() then
 
 			if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
 			

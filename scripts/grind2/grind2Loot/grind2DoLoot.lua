@@ -8,28 +8,30 @@ grind2DoLoot = {
 
 	lootTimer = 0,
 
-	blacklistLootTimer = 0,
+	blacklistLootTimer = 0
 
-	lootTimerSet = false
 }
 
 function grind2DoLoot:run()
 
 	if self.blacklistLootTimer == 0 or self.blacklistLootTimer == nil then
-		self.blacklistLootTimer = GetTimeEX();
-	end
 
-	if not self.lootTimerSet then
-		self.blacklistLootTimer = GetTimeEX() + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
-		self.lootTimerSet = true;
+		self.blacklistLootTimer = GetTimeEX();
 	end
 
 	local player = GetLocalPlayer();
 
-	if IsAnyTargetTargetingPlayer() then
+	-- return false if and do not run script if any target is targeting player
+	if IsAnyTargetTargetingPlayer() or IsCasting() or IsChanneling() then
+
 		return false;
 	end
+	
+	-- return if timer is not done yet - wait
+	if self.timer > GetTimeEX() then
 
+		return true;
+	end
 	-- loot target if we skinned a target and the loot target turned nil
 	if IsLooting() and GetTimeEX() > self.timer then
 
@@ -41,7 +43,9 @@ function grind2DoLoot:run()
 			StaticPopup1Button1:Click()
 		end
 
-		self.timer = GetTimeEX() + 250;
+		self.timer = GetTimeEX() + 350;
+		grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
+		return false;
 
 	end
 
@@ -54,13 +58,13 @@ function grind2DoLoot:run()
 		self.lootTarget = grind2FindSkinTarget:target(self.lootDistance);
 	end
 
-	-- don't loot blacklisted targets
-	if grind2BlacklistLoot:isLootTargetBlacklisted(target) then
-		self.lootTarget = nil;
-	end		
-
 	-- do loot if we have a loot taregt
 	if self.lootTarget ~= nil and self.lootTarget ~= 0 and not player:IsDead() and not IsAnyTargetTargetingPlayer() then
+
+		-- don't loot blacklisted targets
+		if grind2BlacklistLoot:isLootTargetBlacklisted(self.lootTarget:GetGUID()) then
+			self.lootTarget = nil;
+		end		
 
 		-- add loot target to blacklist
 		if GetTimeEX() > self.blacklistLootTimer then
@@ -85,8 +89,8 @@ function grind2DoLoot:run()
 		-- close enough to loot target
 		if self.lootTarget:GetDistance() <= 3 then
 
-			self.lootTimerSet = false;
-			self.blacklistLootTimer = GetTimeEX() * 2;
+			-- reset loot timer if we reach target
+			--self.blacklistLootTimer = GetTimeEX() * 2;
 
 			-- stop moving
 			if IsMoving() then
@@ -107,14 +111,16 @@ function grind2DoLoot:run()
 					StaticPopup1Button1:Click()
 				end
 
-				self.timer = GetTimeEX() + 250;
+				self.timer = GetTimeEX() + 350;
+				grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
 
-				return true;
+				return false;
 			end
 
 			-- interact with the target to loot
 			if self.lootTarget:UnitInteract() then
 					
+				self.timer = GetTimeEX() + 150;
 				return true;
 			end
 

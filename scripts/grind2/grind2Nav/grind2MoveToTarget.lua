@@ -39,13 +39,13 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);	
 
 	-- If the target moves more than 2 yard then make a new path
-	if(GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) > 2
-		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
+	if (GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2
+		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 20) then
 		self.navPosition['x'] = _x;
 		self.navPosition['y'] = _y;
 		self.navPosition['z'] = _z;
 		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		self.lastnavIndex = 1; -- start at index 1, index 0 is our position
+		self.lastnavIndex = 1.5; -- start at index 1, index 0 is our position
 		self.message = "Generating Path";
 	end	
 
@@ -59,28 +59,11 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
 
 	-- If we are close to the next path node, increase our nav node index
-	if(GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) < self.nextNavNodeDistance) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= self.nextNavNodeDistance) then
 		self.lastnavIndex = 1 + self.lastnavIndex;		
 		if (GetPathSize(5) <= self.lastnavIndex) then
 			self.lastnavIndex = GetPathSize(5);
 		end
-	end
-
-	-- Check: If move to coords are too far away, something wrong, dont move... BUT WHY ?!
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 25) then
-		local random = math.random(-2, 2);
-		GeneratePath(_lx, _ly, _lz, _lx + random, _ly + random, _lz);
-		self.message = "Move coordinates incorrect";
-		return;
-	end
-
-	
-	if (not IsPathLoaded(5)) then
-		if not IsInCombat() then
-			self.timer = GetTimeEX() + 100;
-		end
-			self.message = "Path is loading";
-		return;
 	end
 
 	self.message = "Navigating...";
@@ -88,10 +71,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
-
-	if not IsInCombat() then
-		self.timer = GetTimeEX() + 100;
-	end
+	self.timer = GetTimeEX() + 75;
 
 return false;
 end

@@ -33,11 +33,11 @@ grind2IsTargetValid = {
 
 function grind2IsTargetValid:target(i)
 
-        if (not grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) or grind2IsTargetingMe:target(i)) and 
+        if (i:IsTappedByMe() and not i:IsDead()) or (not grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) or grind2IsTargetingMe:target(i) and not i:IsDead()) and 
         
-            (not grind2SafePull:targetHasAdds(i) or grind2SafePull.skipSafePull or grind2IsTargetingMe:target(i))
+            (not grind2SafePull:targetHasAdds(i) or grind2SafePull.skipSafePull or grind2IsTargetingMe:target(i) and not i:IsDead())
         
-            and (
+            and not i:IsDead() and (
             i:GetLevel() >= self.minLevel and i:GetLevel() <= self.maxLevel)
             and (not (self.skipHumanoid and i:GetCreatureType() == "Humanoid")
             and not (self.skipBeast and i:GetCreatureType() == "Beast")
@@ -53,16 +53,15 @@ function grind2IsTargetValid:target(i)
             )
 
             and (not grind2Blacklisting:isTargetBlacklisted(i:GetGUID())
-            or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and i:GetHealthPercentage() <= 92)
+            or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and i:GetHealthPercentage() <= 92 and not i:IsDead())
             or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and grind2IsTargetingMe:target(i) and i:GetDistance() <= 5)
             )
             or (grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or grind2IsTargetingGroup:target(i))
-            or (i:IsTappedByMe() and not i:IsDead())
             or ( (i:HasDebuff("Polymorph") or i:HasDebuff("Fear") ) and script_grind:enemiesAttackingUs() < 2
             )
 
         then
-            if grind2IsTargetValid:isTargetInRange(i) then
+            if grind2IsTargetValid:isTargetInRange(i) and not i:IsDead() then
 
                 return true;
             end
