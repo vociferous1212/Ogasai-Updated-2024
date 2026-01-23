@@ -38,7 +38,7 @@ function script_gatherRun:gather()
 	end
 
 	if (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(script_gather.nodeGUID))
-	and (script_gatherEX2:isNodeSafeToGather() and script_gather.safeGather or not script_gather.safeGather) then
+	and ((script_gatherEX2:isNodeSafeToGather() and script_gather.safeGather) or not script_gather.safeGather) then
 
 
 		script_gather.messageSent = false;
