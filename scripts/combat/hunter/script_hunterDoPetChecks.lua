@@ -195,9 +195,10 @@ function script_hunterDoPetChecks:doPetChecks()
 
 					CastSpellByName('Mend Pet');
 
-					script_hunter.waitTimer = GetTimeEX() + 1850; 
+					script_hunter.waitTimer = GetTimeEX() + 5000; 
 
-					script_grind:setWaitTimer(3000);
+					script_grind:setWaitTimer(5000);
+					grind2:setTimer(5000);
 					return true;
 				end
 			end

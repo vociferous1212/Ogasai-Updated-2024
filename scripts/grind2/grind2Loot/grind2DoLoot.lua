@@ -22,7 +22,7 @@ function grind2DoLoot:run()
 	local player = GetLocalPlayer();
 
 	-- return false if and do not run script if any target is targeting player
-	if IsAnyTargetTargetingPlayer() or IsCasting() or IsChanneling() then
+	if IsAnyTargetTargetingPlayer() or IsCasting() or IsChanneling() and not IsLooting() then
 
 		return false;
 	end
@@ -43,7 +43,7 @@ function grind2DoLoot:run()
 			StaticPopup1Button1:Click()
 		end
 
-		self.timer = GetTimeEX() + 350;
+		self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
 		grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
 		return false;
 
@@ -81,7 +81,7 @@ function grind2DoLoot:run()
 
 		if self.lootTarget:GetDistance() > 3 then
 
-			Move(xx, yy, zz);
+			grind2MoveToTarget:run(player, xx, yy, zz);
 
 			return true;
 		end
@@ -111,7 +111,7 @@ function grind2DoLoot:run()
 					StaticPopup1Button1:Click()
 				end
 
-				self.timer = GetTimeEX() + 350;
+				self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
 				grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
 
 				return false;
@@ -120,7 +120,7 @@ function grind2DoLoot:run()
 			-- interact with the target to loot
 			if self.lootTarget:UnitInteract() then
 					
-				self.timer = GetTimeEX() + 150;
+				self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
 				return true;
 			end
 

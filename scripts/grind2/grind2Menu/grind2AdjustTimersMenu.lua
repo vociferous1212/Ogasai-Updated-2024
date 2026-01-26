@@ -12,7 +12,14 @@ grind2AdjustTimersMenu = {
 
 	combatScriptTimer = 200,
 
-	blacklistLootTime = 30
+	blacklistLootTime = 30,
+
+
+
+
+	blacklistTargetTimer = 20,
+
+	paranoidTime = 60
 
 }
 
@@ -26,6 +33,25 @@ function grind2AdjustTimersMenu:run()
 
 		if Button("Set All Timers To Zero") then
 			grind2AdjustTimersMenu:setTimersToZero();
+		end
+
+		if Button("Set Speed Normal") then
+
+			grind2Paranoia:setSpeedNormal();
+		end
+
+		SameLine();
+
+		if Button("Set Speed Fast") then
+			
+			grind2Paranoia:setSpeedFast();
+		end
+
+		SameLine();
+
+		if Button("Set Speed Slow") then
+
+			grind2Paranoia:setSpeedSlow();
 		end
 
 		Separator();
@@ -69,7 +95,7 @@ function grind2AdjustTimersMenu:setTimersToZero()
 
 	self.doLootTimer = 0;
 
-	self.faceTargetTimer = 0;
+	--self.faceTargetTimer = 0;
 
 	self.obtainNewTargetTimer = 0;
 

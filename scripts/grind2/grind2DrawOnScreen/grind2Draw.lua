@@ -33,7 +33,8 @@ function grind2Draw:run()
 	if grind2DrawDataMenu.drawObjects then
 
 		-- should we draw chest nodes
-		if grind2DrawDataMenu.drawChestNodes then
+													-- don't double up on chests. something wrong in gatherer
+		if grind2DrawDataMenu.drawChestNodes and not grind2DrawDataMenu.drawGatherNodes then
 
 			script_gather:drawChestNodes();
 		end

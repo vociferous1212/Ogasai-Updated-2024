@@ -108,7 +108,12 @@ function script_hunter:setup()
 	end
 
 	if GetRealmName() == "Permadeath - EU" then 
-		self.eatHealth = 85;
+
+		if GetLocalPlayer():GetLevel() < 20 then
+			self.eatHealth = 85;
+		else
+			self.eatHealth = 70;
+		end
 	end
 
 	self.isSetup = true;
@@ -136,7 +141,7 @@ function script_hunter:runBackwards(targetObj, range)
  		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
- 		local moveX, moveY, moveZ = xT + xUV*30, yT + yUV*30, zT + zUV;		
+ 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
  		if (distance < range)  then
 
 			if script_checkAdds:checkAdds() then
@@ -244,7 +249,7 @@ function script_hunter:run(targetGUID)
 		-- change our attack distance to melee distance if we don't have a pet or target is targeting me
 		if (IsInCombat() and GetTarget():GetDistance() < self.minSpellRange and script_grind:isTargetingMe(targetObj))
 		or (IsInCombat() and GetLocalPlayer():GetLevel() > 9 and not HasPet())
-		or (not IsInCombat() and GetTarget():GetDistance() < self.minSpellRange)
+		or (not IsInCombat() and GetTarget():GetDistance() < self.minSpellRange and not HasPet())
 		
 		then
 			script_grind.combatScriptRange = self.meleeDistance;
@@ -351,7 +356,7 @@ function script_hunter:run(targetGUID)
 						PetFollow();
 					end		
 
-					self.waitTimer = GetTimeEX() + 1000;
+					self.waitTimer = GetTimeEX() + 500;
 				return 4;
 				end
 			end
@@ -787,7 +792,8 @@ function script_hunter:run(targetGUID)
 							end
 							CastSpellByName('Mend Pet');
 							script_hunter.waitTimer = GetTimeEX() + 550; 
-							script_grind:setWaitTimer(1000);
+							script_grind:setWaitTimer(5000);
+							grind2:setTimer(5000);
 							return true;
 						end
 					end
@@ -1034,11 +1040,13 @@ function script_hunter:rest()
 		script_hunter:setup();
 	end
 
-	if not PlayerHasTarget() then
-	script_grind.combatScriptRange = self.spellRange;
-	end
-	if PlayerHasTarget() and GetTarget():GetDistance() <= self.minSpellRange then
-		script_grind.combatScriptRange = self.meleeDistance;
+	if not IsInCombat() then
+		if not PlayerHasTarget() then
+			script_grind.combatScriptRange = self.spellRange;
+		end
+		if PlayerHasTarget() and GetTarget():GetDistance() <= self.minSpellRange then
+			script_grind.combatScriptRange = self.meleeDistance;
+		end
 	end
 
 	-- cancel feign death
@@ -1451,7 +1459,7 @@ function script_hunter:petAttackTargetAttackingMe()
 			if (t == 3 or typeObj == 4) and i:GetDistance() <= 50 and not i:IsCritter() and not i:IsDead() and i:CanAttack() then
 
 				-- if a target is targeting me then attack one of them
-				if script_grind:isTargetingMe(i) then
+				if script_grind:isTargetingMe(i) or grind2IsTargetingMe:target(i) then
 
 					-- we need to make sure the pet does have a target before we check for its target... target of target
 					if not PetHasTarget() then
@@ -1479,6 +1487,11 @@ function script_hunter:petAttackTargetAttackingMe()
 									-- send pet to attack target attacking me
 									PetAttack();
 
+									if script_grind.enemyObj == nil or script_grind.enemyObj == 0 then
+										if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+											script_grind.enemyObj = grind2.enemyTarget;
+										end
+									end
 									-- interact again with grinder object
 									if script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0 and i:GetGUID() ~= script_grind.enemyObj:GetGUID() then
 										if not IsAutoCasting("Attack") then

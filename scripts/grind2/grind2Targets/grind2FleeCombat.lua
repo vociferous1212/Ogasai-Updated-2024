@@ -2,7 +2,7 @@ grind2FleeCombat = {
 
 	fleeCombat = true,
 
-	fleeWithAdds = true,
+	fleeWithAdds = false,
 
 	healthToFlee = 36,
 
@@ -28,8 +28,9 @@ function grind2FleeCombat:run()
 			if GetPet() ~= nil and GetPet() ~= 0 then
 				PetFollow();
 			end
-			grind2SaveCoordinates:moveToSavedLocation();
-			return true;
+			if grind2SaveCoordinates:moveToSavedLocation() then
+				return true;
+			end
 		end
 	end
 

@@ -49,7 +49,7 @@ if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
 			end
-			grind2DoLoot.lootTimer = currentTime + 550;
+			grind2DoLoot.lootTimer = currentTime + grind2AdjustTimersMenu.doLootTimer;
 		end
 
 		-- do loot
@@ -57,7 +57,7 @@ if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end
 	
 			if grind2DoLoot:run() then
 
-				grind2DoLoot.lootTimer = currentTime + 550;
+				grind2DoLoot.lootTimer = currentTime + grind2AdjustTimersMenu.doLootTimer;
 
 				grind2.grinderMessage = "Moving to loot target";
 
@@ -96,7 +96,18 @@ if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end
 	-- move to hotspot
 	if not grind2HotSpot.hotSpotReached and not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() then
 	
-		grind2HotSpot:moveToHotspot();
+		if grind2SaveCoordinates.numberOfLocations >= 3 then
+
+			grind2SaveCoordinates:moveToSavedLocation();
+
+			return true;
+
+		elseif not grind2HotSpot.hotspotReached or grind2SaveCoordinates.numberOfLocations < 3 then
+
+			grind2HotSpot:moveToHotspot();
+
+			return true;
+		end
 
 		return true;
 	end

@@ -27,6 +27,7 @@ function grind2TargetMenu:run()
 			if Button("Add Target To Blacklist") then
 				if PlayerHasTarget() then
 					grind2Blacklisting:addTargetToBlacklist(GetLocalPlayer():GetUnitsTarget():GetGUID())
+					grind2RunCombatState.blacklistTargetTimer = GetTimeEX() + grind2RunCombatState.timeToBlacklistTarget * 1000;
 					ClearTarget();
 				end
 				if grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil then
@@ -54,7 +55,7 @@ function grind2TargetMenu:run()
 			SameLine();
 			wasClicked, grind2IsTargetValid.skipDemon = Checkbox("Demon ", grind2IsTargetValid.skipDemon);
 			Separator();
-			wasClicked, grind2IsTargetValid.skipUnknown = Checkbox("Unknown ", grind2IsTargetValid.skipUnknown);
+			wasClicked, grind2IsTargetValid.skipUnknown = Checkbox("Not Specified", grind2IsTargetValid.skipUnknown);
 			SameLine();
 			wasClicked, grind2IsTargetValid.skipDragonkin = Checkbox("Dragonkin ", grind2IsTargetValid.skipDragonkin);
 			SameLine();

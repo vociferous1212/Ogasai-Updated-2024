@@ -61,7 +61,7 @@ if localObj:HasBuff("Nature's Grasp") and IsInCombat() then return false; end
 		if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
 		if (IsMoving()) then StopMoving(); return true; end local time = 2250;
 		local rankHeal = "Rank 1"; if localObj:GetLevel() >= 24 then rankHeal = "Rank 3"; time = 2750; end
-		if CastSpellByName("Healing Touch("..rankHeal, localObj) then script_druid.waitTimer = GetTimeEX() + time; return true; end
+		if CastSpellByName("Healing Touch("..rankHeal, localObj) then script_druid.waitTimer = GetTimeEX() + time; grind2:setTimer(time); return true; end
 	end
 
 	if not IsSpellOnCD("Rejuvenation") and (not IsInCombat()) and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (localHealth <= 65) and (localMana >= 75) and (not hasRejuv) and (not hasRegrowth) and (IsStanding()) and (not IsMounted()) then

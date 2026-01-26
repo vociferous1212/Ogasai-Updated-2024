@@ -37,6 +37,9 @@ function grind2RunCombatState:run()
 			script_combatHelper:run()
 		end
 
+		-- stuck looting?
+		if IsLooting() then LootTarget(); end
+
 		if enemyTarget:CanAttack() and not enemyTarget:IsDead() then
 
 			-- stand up if sitting
@@ -50,6 +53,12 @@ function grind2RunCombatState:run()
 
 				enemyTarget:AutoAttack();
 				self.autoAttackTimer = currentTime + 2000;
+			end
+			
+			-- set blacklist target timer
+			if PlayerHasTarget() and not IsInCombat() and not self.blacklistTargetTimerSet then
+				self.blacklistTargetTimer = currentTime + self.timeToBlacklistTarget * 1000;
+				self.blacklistTargetTimerSet = true;
 			end
 
 			-- reset blacklist target timer
@@ -68,17 +77,6 @@ function grind2RunCombatState:run()
 					end
 				end
 			end
-
-			-- set blacklist target timer
-			if PlayerHasTarget() and not IsInCombat() then
-				self.blacklistTargetTimer = currentTime + self.timeToBlacklistTarget * 1000;
-			end
-
-			-- move to target
-			--if x ~= nil and _x ~= nil then
-			--	if enemyTarget:GetDistance() > grind2.combatScriptRange or not enemyTarget:IsInLineOfSight() then			--		grind2MoveToTarget:run(localObj, _x, _y, _z);
-			--	end
-			--end
 
 			-- last target targeted
 			if enemyTarget ~= nil and enemyTarget ~= 0 then

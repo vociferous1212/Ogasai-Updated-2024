@@ -45,6 +45,7 @@ local localObj = GetLocalPlayer();
 	if (self.pause) then self.usingQuester = false; script_grind.pause = true; _questDoCombat.blacklistTimer = GetTimeEX() + 10000; return; end
 
 	self.usingQuester = true;
+	if GetRealmName() == "Ashen Vanilla" then script_grind.combatScriptRange = script_grind.combatScriptRange + 1; end
 
 	local r, g, b = 0, 0, 0;
 	local y, x, width = 120, 25, 370;
@@ -53,11 +54,8 @@ local localObj = GetLocalPlayer();
 	DrawText("Current Quest - _questDB", x+800, y+485, r+255, g+0, b+0);
 	DrawText("".._questDB.curListQuest, x+800, y+500, r+255, g+0, b+0);
 
-	-- quester is getting stuck not looting... force it to loot
 	if IsLooting() and GetTimeEX() > self.lootTimer then LootTarget(); self.lootTimer = GetTimeEX() + 500; end
 
-
-	-- handle vendor
 	if script_grind.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 0) then
@@ -73,15 +71,10 @@ local localObj = GetLocalPlayer();
 	return true;
 	end
 
-	-- set wait time / tick rate for script
 	if ((self.waitTimer + self.tickRate * 1000) > GetTimeEX()) or self.pause then return; end
 
--- check intial unstuck
 	if not self.pause and GetTimeEX() > self.unstuckTimer then
-		if script_unstuck:checkUnstuck() then
-			self.unstuckTimer = GetTimeEX() + 150;
-		end
-	end
+		if script_unstuck:checkUnstuck() then self.unstuckTimer = GetTimeEX() + 150; end end
 
 	if (IsMoving()) and (not self.pause) and GetTimeEX() > self.unstuckTimer then
 		if (not script_unstuck:pathClearAuto(2)) then

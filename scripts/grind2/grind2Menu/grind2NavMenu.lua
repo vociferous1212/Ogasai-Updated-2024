@@ -19,7 +19,7 @@ function grind2NavMenu:run()
 		Separator();
 
 		Text("Distance to grind from hotspot");
-		grind2HotSpot.distanceToHotSpot = SliderInt("Distance to grind from hotspot", 50, 1000, grind2HotSpot.distanceToHotSpot);
+		grind2HotSpot.distanceToHotSpot = SliderInt("Distance to grind from hotspot", 50, 5000, grind2HotSpot.distanceToHotSpot);
 
 		Separator();
 
@@ -30,6 +30,9 @@ function grind2NavMenu:run()
 			script_grindMenu:printHotspot(); 
 			script_grind.hotspotReached = true;
 			grind2HotSpot.useHotSpots = false;
+			grind2SaveCoordinates.numberOfLocations = 0;
+			grind2SaveCoordinates.savedLocations = {};
+			grind2SaveCoordinates.currentLocationToMove = 0;
 		end
 
 		Separator();

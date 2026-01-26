@@ -23,7 +23,7 @@ function grind2HotSpot:moveToHotspot()
 
 	if script_nav.currentHotSpotX ~= 0 then
 
-		script_navEX:moveToTarget(GetLocalPlayer(), script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
+		grind2MoveToTarget:run(GetLocalPlayer(), script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 
 		grind2MoveToTarget.message = "Moving to hotspot " ..script_nav.currentHotSpotName.." | "..math.floor(grind2HotSpot:distanceToHotspot()).." (yd)";
 

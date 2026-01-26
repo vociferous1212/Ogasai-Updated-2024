@@ -103,10 +103,7 @@ function grind2AssignATarget:run()
 					if bestDistance > targetDistance then
 					
 						bestDistance = targetDistance;
-					end
-				
-					if targetDistance <= bestDistance then
-					
+		
 						bestTarget = i;
 					end
 				end

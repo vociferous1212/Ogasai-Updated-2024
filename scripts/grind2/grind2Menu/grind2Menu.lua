@@ -186,6 +186,20 @@ function grind2Menu:run()
 	end
 
 	Text("________________________________________________________________________________________________________________________________________________________________________")
+	
+	if not self.adjustScriptSpeed then
+		local speed = "";
+		if grind2.scriptSpeed == 100 then speed = "Normal"; elseif grind2.scriptSpeed == 75 then speed = " Fast"; elseif grind2.scriptSpeed == 400 then speed = "Slow"; end
+		Text("Paranoia - Current Script Speed == "..speed);
+	end
+
+	if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 and grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
+		if grind2Paranoia.paranoidTargetName ~= nil and grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
+			Text("Player in range - "..grind2Paranoia.paranoidTargetName.." | "..math.floor(grind2Paranoia.paranoidTargetDistance).." (yd)");
+			Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
+		end
+	end
+
 	wasClicked, self.adjustScriptSpeed = Checkbox("Adjust Bot Speed / Reaction Time", self.adjustScriptSpeed);
 
 -- script speed

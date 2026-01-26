@@ -5,7 +5,7 @@ grind2 = {
 	timer = GetTimeEX(),
 	obtainNewTargetTimer = GetTimeEX(),
 	faceTargetTimer = GetTimeEX(),
-	scriptSpeed = 100, -- tick rate / script speed
+	scriptSpeed = 100,
 	pause = true,
 	isSetup = false,
 	restMana = 0,
@@ -96,7 +96,7 @@ function grind2:run()
 
 -- flee combat if we are about to die - skip all timers
 	if grind2FleeCombat.fleeCombat and grind2SaveCoordinates.numberOfLocations >= 3 and player:GetLevel() >= 6 then
-		if not grind2.pause and IsInCombat() and grind2FleeCombat.healthToFlee >= playerHealth then
+		if not grind2.pause and IsInCombat() and (grind2FleeCombat.healthToFlee >= playerHealth or (NumberTargetsAttackingPlayer() >= 2 and grind2FleeCombat.fleeWithAdds) ) then
 			grind2FleeCombat:run();
 			self.grinderMessage = "Fleeing combat";
 			grind2.enemyTarget = nil;
@@ -131,7 +131,7 @@ function grind2:run()
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click();
 			end
-			grind2DoLoot.lootTimer = currentTime + 950;
+			grind2DoLoot.lootTimer = currentTime + grind2AdjustTimersMenu.doLootTimer;
 			return false;
 		end		
 
@@ -165,6 +165,9 @@ function grind2:run()
 	return;
 	end
 
+-- check paranoia
+	grind2Paranoia:checkAndDoParanoia();
+
 -- run grind2 pre checks before entering combat
 -- auto talents / clear targets / loot / ressurect / 
 	if grind2PreChecks:run() then
@@ -172,7 +175,7 @@ function grind2:run()
 	end
 
 -- run rest functions
-	if not IsInCombat() then
+	if not IsInCombat() and not player:IsDead() then
 		if grind2RunRestState:run() then
 			if IsEating() or IsDrinking() or IsCasting() or IsChanneling() then
 				grind2RunCombatState.blacklistTargetTimer = GetTimeEX() * 2;

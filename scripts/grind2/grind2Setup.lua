@@ -70,6 +70,10 @@ function grind2Setup:run()
 		grind2.startingMoney = GetMoney();
 		grind2.currentMoney = GetMoney();
 
+		if GetRealmName() == "Permadeath - EU" then 
+		grind2FleeCombat.fleeWithAdds = true;
+	end
+
 
 
 	end

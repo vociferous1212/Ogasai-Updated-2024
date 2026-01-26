@@ -71,6 +71,9 @@ function grind2SaveCoordinates:moveToSavedLocation()
 		
 		if grind2MoveToTarget:run(GetLocalPlayer(), grind2SaveCoordinates.savedLocations[grind2SaveCoordinates.currentLocationToMove-1]['x'], grind2SaveCoordinates.savedLocations[grind2SaveCoordinates.currentLocationToMove-1]['y'], grind2SaveCoordinates.savedLocations[grind2SaveCoordinates.currentLocationToMove-1]['z']) then
 			self.timer = GetTimeEX() + 100;
+			return true;
 		end
 	end
+
+return false;
 end

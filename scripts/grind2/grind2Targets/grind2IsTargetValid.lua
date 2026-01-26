@@ -48,7 +48,7 @@ function grind2IsTargetValid:target(i)
             and not (self.skipGiant and i:GetCreatureType() == "Giant")
             and not (self.skipMechanical and i:GetCreatureType() == "Mechanical")
             and not (self.skipUndead and i:GetCreatureType() == "Undead")
-            and not (self.skipUnknown and i:GetCreatureType() == "Not Specified")
+            and not (self.skipUnknown and (i:GetCreatureType() == "Not specified" or i:GetCreatureType() == "Not Specified" or i:GetCreatureType() == "Uknown") )
             and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
             )
 
