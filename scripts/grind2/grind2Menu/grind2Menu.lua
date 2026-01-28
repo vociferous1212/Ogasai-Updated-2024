@@ -32,7 +32,7 @@ function grind2Menu:run()
 	end
 
 -- show rested exp if we have any
-	if GetXPExhaustion() ~= nil then
+	if GetXPExhaustion() ~= nil and GetLocalPlayer():GetLevel() < 60 then
 	
 		-- exp bubbles count
 		local expBubbles = math.ceil(20 * GetXPExhaustion() / UnitXPMax("player"));

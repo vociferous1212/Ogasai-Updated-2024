@@ -76,16 +76,9 @@ function grind2:run()
 	local player = GetLocalPlayer();
 	local playerHealth = player:GetHealthPercentage();
 	local playerMana = player:GetManaPercentage();
-	local targetHealth = 0;
-	local targetMana = 0;
-	if self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
-		targetHealth = self.enemyTarget:GetHealthPercentage();
-		targetMana = self.enemyTarget:GetManaPercentage();
-	end
 
--- check unstuck script
 	grind2CheckUnstuck:run();
-
+	
 -- avoid elites...
 	if not player:IsDead() and script_vendor.status == 0 and not IsMounted() and not grind2.pause then 
 		if (script_aggro:avoidElite()) then
@@ -94,7 +87,9 @@ function grind2:run()
 		end
 	end
 
--- flee combat if we are about to die - skip all timers
+	if player:HasDebuff("Crystalline Slumber") or (not IsInCombat() and HasPet() and GetPet():HasDebuff("Crystalline Slumber")) then return; end
+
+-- flee combat if we are about to die
 	if grind2FleeCombat.fleeCombat and grind2SaveCoordinates.numberOfLocations >= 3 and player:GetLevel() >= 6 then
 		if not grind2.pause and IsInCombat() and (grind2FleeCombat.healthToFlee >= playerHealth or (NumberTargetsAttackingPlayer() >= 2 and grind2FleeCombat.fleeWithAdds) ) then
 			grind2FleeCombat:run();
@@ -175,7 +170,7 @@ function grind2:run()
 	end
 
 -- run rest functions
-	if not IsInCombat() and not player:IsDead() then
+	if not IsInCombat() and not player:IsDead() and not IsLooting() then
 		if grind2RunRestState:run() then
 			if IsEating() or IsDrinking() or IsCasting() or IsChanneling() then
 				grind2RunCombatState.blacklistTargetTimer = GetTimeEX() * 2;
@@ -189,7 +184,7 @@ function grind2:run()
 	end
 
 -- run gatherer
-	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() then
+	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() then
 
 		-- run gatherer
 		if script_gatherRun:gather() then

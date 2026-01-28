@@ -1,6 +1,5 @@
 script_hunterMenu = {
 	
-		quickGrind = false	
 }
 
 
@@ -24,20 +23,12 @@ function script_hunterMenu:menu()
 
 		Separator();
 
--- if we have a pet we can disable some settings and focus solely on grinding mobs
-		if GetLocalPlayer():GetLevel() > 10 then
-
-			wasClicked, self.quickGrind = Checkbox("Disable Some Settings - Quick Grind", self.quickGrind);
-
-			if self.quickGrind then
-
-				script_grind.skipLooting = true;
-				script_grind.gather = false;
-				script_hunter.useMark = false;
-				script_hunter.drinkMana = 15;
-				script_hunter.waitAfterCombat = false;
-				script_warlock.waitAfterCombat = false;
-				script_grindMenu.adjustTickRate = true;
+		if HasPet() then
+			if Button("Conserve Mana") then
+				script_hunter.drinkMana = 5;
+				script_hunter.arcaneShotMana = 35;
+				script_hunter.useMarkMana = 20;
+				script_hunter.serpentStingMana = 20;
 			end
 		end
 
@@ -97,21 +88,21 @@ function script_hunterMenu:menu()
 		Separator();
 
 -- wait after combat button
-		if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
+	--	if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
 
-			wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat)
+		--	wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat)
 
 				
 
-			if (script_hunter.waitAfterCombat) then
+		--	if (script_hunter.waitAfterCombat) then
 
 				-- these are tied together elsewhere...
-				 script_warlock.waitAfterCombat = true;
+		--		 script_warlock.waitAfterCombat = true;
 
-				Text("This will not allow the bot to chain pull targets'")
-			end
-		end
-		Separator();
+		--		Text("This will not allow the bot to chain pull targets'")
+		--	end
+		--end
+		--Separator();
 
 -- drink mana slider
 		Text('Drink below mana percentage');

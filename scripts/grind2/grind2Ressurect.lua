@@ -46,22 +46,21 @@ function grind2Ressurect:run()
 
 			-- Ressurrect within the ress distance to our corpse
 			local _lx, _ly, _lz = player:GetPosition();
+			local _cX, _cY, _cZ = GetCorpsePosition();
 
 			-- our distance is greater than set ress distance
 			if (GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
-				script_nav:moveToNav(player, GetCorpsePosition());
+				grind2MoveToTarget:run(player, _cX, _cY, _cZ);
 			else
 				-- if we are close enough and want to safetly res in the area
 				if (script_grind.safeRess) then
 					local rx, ry, rz = GetCorpsePosition();
 					if (grind2Ressurect:safeRess(rx, ry, rz, script_grind.ressDistance)) then
 						grind2.grinderMessage = "Finding a safe spot to ress...";
-						return true;
 					else
 						if (script_aggro.rTime > GetTimeEX()) then
 							script_nav:moveToNav(player, script_aggro.rX, script_aggro.rY, script_aggro.rZ);	
 							grind2.grinderMessage = "Finding a safe spot to ress...";
-							return true;
 						end
 					end
 				end

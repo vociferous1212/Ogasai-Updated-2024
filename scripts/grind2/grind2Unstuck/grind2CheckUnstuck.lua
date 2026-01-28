@@ -13,7 +13,7 @@ function grind2CheckUnstuck:run()
 
 		if grind2Unstuck:checkUnstuck() then
 
-			self.unstuckTimer = GetTimeEX() + 350;
+			self.unstuckTimer = GetTimeEX() + 250;
 		end
 	end
 
@@ -23,7 +23,7 @@ function grind2CheckUnstuck:run()
 
 		if not grind2Unstuck:pathClearAuto(2) then
 
-			self.unstuckTimer = GetTimeEX() + 450;
+			self.unstuckTimer = GetTimeEX() + 350;
 
 			grind2Unstuck:unstuck();
 		end

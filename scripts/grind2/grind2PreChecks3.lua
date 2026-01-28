@@ -21,7 +21,7 @@ function grind2PreChecks3:run()
 
 			grind2.grinderMessage = "Running the vendor routine: sell..."; 
 
-			if not IsMoving() then grind2:setTimer(200); end
+			if not IsMoving() then grind2:setTimer(75); end
 
 			-- return if we still need to sell
 			if script_vendor.status == 2 then return true; end

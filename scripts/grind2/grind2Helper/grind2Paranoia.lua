@@ -167,6 +167,6 @@ function grind2Paranoia:setSpeedSlow()
 
 	grind2AdjustTimersMenu.combatScriptTimer = 450;
 
-	grind2.scriptSpeed = 400;
+	grind2.scriptSpeed = 750;
 
 end

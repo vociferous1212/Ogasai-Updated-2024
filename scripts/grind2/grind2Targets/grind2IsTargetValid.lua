@@ -14,6 +14,9 @@ grind2IsTargetValid = {
     skipGiant = false,
     skipMechanical = false,
     skipUndead = false,
+	skipTargetByName = "",
+	skipTargetByName2 = "",
+	skipTargetByName3 = ""
 
 
 }
@@ -51,7 +54,7 @@ function grind2IsTargetValid:target(i)
             and not (self.skipUnknown and (i:GetCreatureType() == "Not specified" or i:GetCreatureType() == "Not Specified" or i:GetCreatureType() == "Uknown") )
             and not (self.skipElites and (i:GetClassification() == 1 or i:GetClassification() == 2))
             )
-
+	and (string.lower(i:GetUnitName()) ~= string.lower(self.skipTargetByName) and string.lower(i:GetUnitName()) ~= string.lower(self.skipTargetByName2) and string.lower(i:GetUnitName()) ~= string.lower(self.skipTargetByName3))
             and (not grind2Blacklisting:isTargetBlacklisted(i:GetGUID())
             or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and i:GetHealthPercentage() <= 92 and not i:IsDead())
             or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and grind2IsTargetingMe:target(i) and i:GetDistance() <= 5)

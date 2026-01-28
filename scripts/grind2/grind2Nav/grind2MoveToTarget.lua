@@ -17,6 +17,10 @@ grind2MoveToTarget = {
 
 function grind2MoveToTarget:run(player, _x, _y, _z)
 
+	if GetLocalPlayer():HasBuff("Aspect of the Cheetah") or IsMounted() then
+		self.nextNavNodeDistance = 6;
+	end
+
 -- set timer
 	if self.timer == 0 or self.timer == nil
 
@@ -30,7 +34,6 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 	localObj = GetLocalPlayer();
 
---
 	NavmeshSmooth(self.nextNavNodeDistance/2);
 
 	-- get current position
@@ -49,6 +52,8 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		self.message = "Generating Path";
 	end	
 
+	--script_runner:avoidToAggro(4)
+
 	if (not IsPathLoaded(5)) then
 		self.timer = GetTimeEX() + 100;
 		self.message = "Path is loading";
@@ -58,6 +63,11 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
 
+	self.message = "Navigating...";
+
+	-- Move to the next destination in the path
+	Move(_ix, _iy, _iz);
+
 	-- If we are close to the next path node, increase our nav node index
 	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= self.nextNavNodeDistance) then
 		self.lastnavIndex = 1 + self.lastnavIndex;		
@@ -65,11 +75,6 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 			self.lastnavIndex = GetPathSize(5);
 		end
 	end
-
-	self.message = "Navigating...";
-
-	-- Move to the next destination in the path
-	Move(_ix, _iy, _iz);
 
 	self.timer = GetTimeEX() + 75;
 

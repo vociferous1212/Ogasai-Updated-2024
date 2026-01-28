@@ -568,7 +568,7 @@ function script_rogue:run(targetGUID)
 				end
 
 				-- Keep Slice and Dice up
-				if (self.useSliceAndDice) and (not localObj:HasBuff('Slice and Dice')) and (targetHealth > 50) and (localCP > 0) and (localEnergy >= 25) then
+				if (self.useSliceAndDice) and not IsSpellOnCD("Slice and Dice") and (not localObj:HasBuff('Slice and Dice')) and (targetHealth > 50) and (localCP > 0) and (localEnergy >= 25) then
 					if (CastSpellByName("Slice and Dice", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1100;
 						return 0;

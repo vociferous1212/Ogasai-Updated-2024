@@ -4,28 +4,31 @@ grind2IsLootSafeToLoot = {
 
 -- rest FIRST if targets are near loot, return true
 
-function grind2IsLootSafeToLoot:anyTargetNearLoot(target)
+function grind2IsLootSafeToLoot:isAnyTargetNearLoot(target)
 
 	local lootTargetDistance = target:GetDistance();
 	local lX, lY, lZ = target:GetPosition();
 
 	local i, t = GetFirstObject();
 
-	while i ~= 0 do
+	if grind2DoLoot.lootTarget ~= nil and grind2DoLoot.lootTarget ~= 0 then
 
-		if t == 3 and not i:IsDead() and not i:IsCritter() and i:GetDistance() <= 20 then
+		while i ~= 0 do
 
-			local targetToCheck = i;
-			local iX, iY, iZ = i:GetPosition();
+			if t == 3 and not i:IsDead() and not i:IsCritter() and i:GetDistance() <= 20 and i:GetGUID() ~= grind2DoLoot.lootTarget:GetGUID() 
+				and (not HasPet() or (HasPet() and i:GetGUID() ~= GetPet():GetGUID())) then
 
-			local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 16;
+				local targetToCheck = i;
+				local iX, iY, iZ = i:GetPosition();
 
-			if GetDistance3D(iX, iY, iZ, lX, lY, lZ) <= aggro then
-				return true;
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 16;
+
+				if GetDistance3D(iX, iY, iZ, lX, lY, lZ) <= aggro then
+					return true;
+				end
 			end
+		i, t = GetNextObject(i);
 		end
-	i, t = GetNextObject(i);
 	end
-
 return false;
 end

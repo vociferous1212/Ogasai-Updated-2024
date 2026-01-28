@@ -75,7 +75,7 @@ function grind2DrawAggroCircles:run(maxRange)
 	while i ~= 0 do
 		
 		-- acceptable targets
- 		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() ~= 1 then
+ 		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() ~= 1 and i:GetLevel() > GetLocalPlayer():GetLevel() - 15 then
 
 			-- set conditions
 			local aggro = i:GetLevel() - localObj:GetLevel() + 17.8;

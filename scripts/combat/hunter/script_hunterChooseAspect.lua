@@ -24,6 +24,11 @@ if IsMounted() then script_helper:mountUp() return true end
 
 	hasCheetah = HasSpell("Aspect of the Cheetah");
 
+	if targetObj == 0 or targetObj == nil then
+		if grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil then
+			targetObj = grind2.enemyTarget;
+		end
+	end
 
 
 -- jump if we are sitting
@@ -86,13 +91,13 @@ if IsMounted() then script_helper:mountUp() return true end
 
 -- aspect of the cheetah
 	if (script_hunter.useCheetah) and (hasCheetah) and (not IsInCombat() and not IsMounted())
-	and (targetObj == nil or (targetObj ~= nil and targetObj ~= 0 and target:GetDistance() >= 50)) and (localMana > script_hunter.drinkMana + 10) then 
+	and (targetObj ~= nil and targetObj ~= 0 and targetObj:GetDistance() >= 65) and (localMana > script_hunter.drinkMana + 20) then 
 
 		if (not localObj:HasBuff('Aspect of the Cheetah')) then 
 
 			CastSpellByName('Aspect of the Cheetah'); 
 
-			script_hunter.waitTimer = GetTimeEX() + 1550;
+			--script_hunter.waitTimer = GetTimeEX() + 1550;
 
 			return true;  
 		end 

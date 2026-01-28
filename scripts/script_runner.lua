@@ -79,9 +79,9 @@ function script_runner:avoidToAggro(safeMargin)
 
     while currentObj ~= 0 do
         if typeObj == 3 then
-            aggro = currentObj:GetLevel() - localObj:GetLevel() + 21
+            aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
             local range = aggro + safeMargin
-            if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then	
+            if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
                 if (closestEnemy == 0) then
                     closestEnemy = currentObj
                 else
@@ -102,7 +102,7 @@ function script_runner:avoidToAggro(safeMargin)
         local safeRange = safeMargin + 1
         local intersectMob = script_runner:aggroIntersect(closestEnemy)
         if (intersectMob ~= nil) then
-            local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21
+            local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 18
             local x, y, z = closestEnemy:GetPosition()
             local xx, yy, zz = intersectMob:GetPosition()
             local centerX, centerY = (x + xx) / 2, (y + yy) / 2
@@ -112,6 +112,7 @@ function script_runner:avoidToAggro(safeMargin)
                 self.oscillationCount = 0
                 GeneratePath(xP, yP, zP, self.tx, self.ty, self.tz)
             end
+            return true;
         else
             script_runner:avoid(xT, yT, zP, aggro, safeRange)
             self.oscillationCount = self.oscillationCount + 1
@@ -119,12 +120,10 @@ function script_runner:avoidToAggro(safeMargin)
                 self.oscillationCount = 0
                 GeneratePath(xP, yP, zP, self.tx, self.ty, self.tz)
             end
+        return true;
         end
-
-        return true
     end
-
-    return false
+return false;
 end
 
 function script_runner:aggroIntersect(target)
@@ -133,7 +132,7 @@ function script_runner:aggroIntersect(target)
     local localObj = GetLocalPlayer()
     while currentObj ~= 0 do
         if typeObj == 3 then
-            local aggro = currentObj:GetLevel() - localObj:GetLevel() + 21
+            local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
             local range = aggro + (safeMargin or 5)
             if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then	
                 local xx, yy, zz = currentObj:GetPosition()
@@ -196,7 +195,7 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
     -- Move just outside the aggro range
     local moveToPoint = closestPoint
     
-    moveToPoint = closestPoint + 4
+    moveToPoint = closestPoint
     
     if (moveToPoint > point) then
         moveToPoint = 1
@@ -217,7 +216,7 @@ function script_runner:drawAggroCircles()
 
     while currentObj ~= 0 do
         if typeObj == 3 and not currentObj:IsDead() and currentObj:CanAttack() and not currentObj:IsCritter() then
-            local aggro = currentObj:GetLevel() - localObj:GetLevel() + 21
+            local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
             local cx, cy, cz = currentObj:GetPosition()
             script_runner:DrawCircles(cx, cy, cz, aggro)
             local intersectMob = script_runner:aggroIntersect(currentObj)

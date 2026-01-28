@@ -23,8 +23,14 @@ function grind2FleeCombat:run()
 		mana = player:GetManaPercentage();
 	end
 
+	local targetHealth = 100;
+
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		targetHealth = grind2.enemyTarget:GetHealthPercentage();
+	end
 	if IsInCombat() then
-		if (health <= self.healthToFlee and mana <= self.manaToFlee) or (NumberTargetsAttackingPlayer() >= 2 and self.fleeWithAdds) then
+		if (health <= self.healthToFlee and mana <= self.manaToFlee and (targetHealth > health or NumberTargetsAttackingPlayer() >= 2) )
+		or (NumberTargetsAttackingPlayer() >= 2 and self.fleeWithAdds) then
 			if GetPet() ~= nil and GetPet() ~= 0 then
 				PetFollow();
 			end

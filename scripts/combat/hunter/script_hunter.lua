@@ -22,7 +22,7 @@ script_hunter = {
 	quiverBagNr = 5,
 	ammoIsArrow = true,
 	useVendor = false,
-	buyWhenQuiverEmpty = true,
+	buyWhenQuiverEmpty = false,
 	stopWhenQuiverEmpty = false,
 	stopWhenBagsFull = true,
 	hsWhenStop = false,
@@ -116,6 +116,10 @@ function script_hunter:setup()
 		end
 	end
 
+	if HasSpell("Aspect of the Cheetah") then
+		self.useCheetah = true;
+	end
+
 	self.isSetup = true;
 
 end
@@ -125,7 +129,7 @@ function script_hunter:runBackwards(targetObj, range)
 
 	local localObj = GetLocalPlayer();
 
- 	if (targetObj ~= 0)
+ 	if (targetObj ~= 0) and IsInCombat()
 	and not script_checkDebuffs:hasDisabledMovement()
 	and not IsChanneling() and not IsCasting()
 
@@ -140,7 +144,7 @@ function script_hunter:runBackwards(targetObj, range)
  		local distance = targetObj:GetDistance();
  		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
- 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
+ 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
  		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
  		if (distance < range)  then
 
@@ -865,7 +869,7 @@ function script_hunter:run(targetGUID)
 		
 				-- use concussive shot
 				if (not IsSpellOnCD("Concussive Shot")) then
-					if (HasSpell("Concussive Shot")) and (localMana > 25)
+					if (HasSpell("Concussive Shot")) and (localMana > self.arcaneShotMana)
 					and (script_grind:isTargetingMe(targetObj) or targetObj:IsFleeing()) then
 						CastSpellByName("Concussive Shot");
 						self.waitTimer = GetTimeEX() + 1500;
@@ -1398,7 +1402,7 @@ function script_hunter:hunterPull(targetObj)
 	-- use concussive shot
 	-- only use this to pull if we don't have an active pet'
 	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
-		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > 15) then
+		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > self.arcaneShotMana) then
 			if CastSpellByName("Concussive Shot") then
 				PetAttack();
 				self.waitTimer = GetTimeEX() + 500;

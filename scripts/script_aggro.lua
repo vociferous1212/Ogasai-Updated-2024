@@ -631,7 +631,7 @@ function script_aggro:avoidElite() -- Runs away if there is atleast one elite wi
  				local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
  				local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
  				local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
- 				local moveX, moveY, moveZ = xT + xUV*100, yT + yUV*100, zT + zUV;			
+ 				local moveX, moveY, moveZ = xT + xUV*50, yT + yUV*50, zT + zUV;			
 				script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
 				if HasPet() then
 					PetFollow();

@@ -64,9 +64,10 @@ if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end
 				-- reset blacklist target timer for loot phase
 				grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
 				
-				-- wait time between each action - each time doLoot script is ran
-				grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
-				
+				if IsLooting() then
+					grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
+				end
+
 				return true;
 			end
 		end

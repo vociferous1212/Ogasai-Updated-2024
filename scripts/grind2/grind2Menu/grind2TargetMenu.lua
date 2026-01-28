@@ -70,6 +70,14 @@ function grind2TargetMenu:run()
 			wasClicked, grind2IsTargetValid.skipElites = Checkbox("Elites ", grind2IsTargetValid.skipElites);
 
 		end
+
+		Separator();
+
+		Text("		Skip Creature By Name");
+		grind2IsTargetValid.skipTargetByName = InputText("Unit Name", grind2IsTargetValid.skipTargetByName);
+		grind2IsTargetValid.skipTargetByName2 = InputText("Unit Name 2", grind2IsTargetValid.skipTargetByName2);
+		grind2IsTargetValid.skipTargetByName3 = InputText("Unit Name 3", grind2IsTargetValid.skipTargetByName3);
+
 		Text("")
 		Separator();
 	end
