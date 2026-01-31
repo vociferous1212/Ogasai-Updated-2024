@@ -1,12 +1,17 @@
 grind2PreChecks = {
 
 	autoTalent = false,
+	jumpTimer = 0
 
 }
 
 function grind2PreChecks:run()
 
 	local player = GetLocalPlayer();
+
+	local mana = player:GetManaPercentage();
+
+	local health = player:GetHealthPercentage();
 
 	local currentTime = GetTimeEX();
 
@@ -24,7 +29,11 @@ function grind2PreChecks:run()
 	end
 
 -- ressurect
-if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end end
+	if GetLocalPlayer():IsDead() then
+		if grind2Ressurect:run() then
+			return true;
+		end
+	end
 
 -- clear dead targets reset enemy target variable
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
@@ -73,19 +82,101 @@ if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end
 		end
 	end
 
--- run any other check before gaining hotspot
-	if grind2PreChecks2:run() then return true; end
-	if grind2PreChecks3:run() then return true; end
+-- random jump
+	if IsMoving() and not IsInCombat() then
+
+		local random = math.random(-100, 100);
+		local randomTimer = math.random(1500, 6500);
+
+		-- added random to slow it down
+		-- if randomTimer + old jump timer > current time then jump
+		if random >= 99 and GetTimeEX() > self.jumpTimer + randomTimer then
+
+			JumpOrAscendStart();
+
+			-- reset jump timer
+			self.jumpTimer = GetTimeEX();
+		end
+	end
+
+-- reaffirm enemy target - we have a good target
+	if grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil and not IsStealth() and not grind2.enemyTarget:IsDead() and grind2IsTargetingMe:target(grind2.enemyTarget) then
+		if not PlayerHasTarget() then
+			grind2.enemyTarget:AutoAttack();
+		end
+	end
+
+-- Update pull levels if we leveled up
+	if (grind2.currentLevel < GetLocalPlayer():GetLevel()) then
+		grind2IsTargetValid.minLevel = GetLocalPlayer():GetLevel() - 4;
+		grind2IsTargetValid.maxLevel = GetLocalPlayer():GetLevel() + 2;
+		grind2.currentLevel = GetLocalPlayer():GetLevel();
+	end
+
+-- check if bags are full
+	grind2AreBagsFull:checkIfBagsAreFull()
+
+	if not grind2.useVendor then
+		script_vendor.status = 0;
+	end
+
+-- if bags are full then do vendor
+	if grind2.useVendor and not IsInCombat() and script_vendor.status >= 1 then
+
+		-- mount
+		if not IsInCombat() then
+			if HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and mana >= 20
+			and not player:HasBuff("Aspect of the Cheetah") then
+				CastSpellByName("Aspect of the Cheetah");
+			end
+		end
+
+		-- sell
+		if (AreBagsFull() or grind2.bagsAreFull or script_vendor.status == 2) then
+				
+			-- sell to vendor
+			script_vendor:sell();
+
+			grind2.grinderMessage = "Running the vendor routine: sell..."; 
+
+			if not IsMoving() then grind2:setTimer(75); end
+
+			-- return if we still need to sell - at vendor
+			if script_vendor.status == 2 then
+				return true;
+			end
+
+			return true;
+		end
+
+		-- repair
+		if script_vendor.status == 2 then
+			script_vendor:repair();
+			return true;
+		end
+
+		-- buy ammo hunter
+		if script_vendor.status == 3 then
+			script_vendor:buyAmmo(script_hunter.quiverBagNr-1, script_hunter.ammoName, script_hunter.ammoIsArrow);
+			return true;
+		end
+	
+		-- refill drink/food
+		if grind2.refillDrinkAndFoodAtVendor then
+		-- nothing here yet
+		end
+
+	end
 
 
-	-- load hotspot if using auto shotspots
+-- load hotspot if using auto shotspots
 	if grind2HotSpot.useHotSpots then
 
 		grind2HotSpot:updateHotSpot();
 		script_nav:loadHotspotDB(id)
 	end
 
-	-- hotspot reached or not reached - return to hotspot - or when there are no valid targets nearby
+-- hotspot reached or not reached - return to hotspot - or when there are no valid targets nearby
 	if not IsInCombat() and grind2HotSpot.distanceToHotSpot <= grind2HotSpot:distanceToHotspot() or (grind2HotSpot.hotSpotReached and not grind2IsAnyValidTargetInRange:run()) then
 		
 		grind2HotSpot.hotSpotReached = false;
@@ -94,9 +185,16 @@ if GetLocalPlayer():IsDead() then if grind2Ressurect:run() then return true; end
 		grind2HotSpot.hotSpotReached = true;
 	end
 
-	-- move to hotspot
+-- move to hotspot
 	if not grind2HotSpot.hotSpotReached and not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() then
 	
+		if HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and not player:HasBuff("Aspect of the Cheetah") then
+			CastSpellByName("Aspect of the Cheetah");
+		end
+
+		-- mount
+		--
+
 		if grind2SaveCoordinates.numberOfLocations >= 3 then
 
 			grind2SaveCoordinates:moveToSavedLocation();

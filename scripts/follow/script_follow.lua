@@ -34,12 +34,16 @@ script_follow = {
 	adjustTickRate = false,
 	isInCombat = false,
 	
-	
-	
-	helperLoaded = include("scripts\\script_helper.lua"), drawDataLoaded = include("scripts\\script_drawData.lua"),
-	drawStatusLoaded = include("scripts\\script_drawStatus.lua"), checkDebuffsLoaded = include("scripts\\script_checkDebuffs.lua"),
-	unstuckLoaded = include("scripts\\script_unstuck.lua"), grindFunctions = include("scripts\\script_grind.lua"), vendorsLoaded = include("scripts\\script_vendor.lua"),
-	vendormenu = include("scripts\\menu\\script_vendorMenu.lua"), nav1 = include("scripts\\nav\\script_nav.lua"), mav2 = include("scripts\\nav\\script_navEX.lua"),
+	helperLoaded = include("scripts\\script_helper.lua"),
+	drawDataLoaded = include("scripts\\script_drawData.lua"),
+	drawStatusLoaded = include("scripts\\script_drawStatus.lua"),
+	checkDebuffsLoaded = include("scripts\\script_checkDebuffs.lua"),
+	unstuckLoaded = include("scripts\\script_unstuck.lua"),
+	grindFunctions = include("scripts\\script_grind.lua"),
+	vendorsLoaded = include("scripts\\script_vendor.lua"),
+	vendormenu = include("scripts\\menu\\script_vendorMenu.lua"),
+	nav1 = include("scripts\\nav\\script_nav.lua"),
+	nav2 = include("scripts\\nav\\script_navEX.lua"),
 	startChecksLoaded = include("scripts\\follow\\script_followStartChecks.lua"),
 
 	-- follow folder
@@ -162,7 +166,6 @@ function script_follow:run()
 	if (localObj:GetUnitsTarget() ~= 0) and localObj:GetUnitsTarget() ~= nil and self.enemyObj == nil then
 		self.enemyObj = localObj:GetUnitsTarget();
 	end
-
 
 
 -- RESTING PHASE			
@@ -381,7 +384,7 @@ function script_follow:run()
 				ClearTarget();
 			end
 		end
-    elseif (GetPartyLeaderObject() ~= 0 and GetPartyLeaderObject() ~= nil) and (not self.limitAttackDist) and (self.assistInCombat) then
+	elseif (GetPartyLeaderObject() ~= 0 and GetPartyLeaderObject() ~= nil) and (not self.limitAttackDist) and (self.assistInCombat) then
 
 		if (leader:GetUnitsTarget() ~= 0 and not leader:IsDead()) then
 

@@ -2,18 +2,18 @@ script_hunterScareBeast = {}
 
 function script_hunterScareBeast:getTargetNotScared()
 
-   	local currentObj, typeObj = GetFirstObject(); 
-   	while currentObj ~= 0 do 
-   		if typeObj == 3 then
+	local currentObj, typeObj = GetFirstObject(); 
+	while currentObj ~= 0 do 
+		if typeObj == 3 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
-               	if (script_grind:isTargetingMe(currentObj) and not currentObj:HasDebuff('Scare Beast')) and currentObj:IsInLineOfSight() then 
-                	return currentObj;
-               	end 
-            end 
-       	end
-        	currentObj, typeObj = GetNextObject(currentObj); 
-    end
-   	return nil;
+				if (script_grind:isTargetingMe(currentObj) and not currentObj:HasDebuff('Scare Beast')) and currentObj:IsInLineOfSight() then 
+					return currentObj;
+				end 
+			end 
+		end
+			currentObj, typeObj = GetNextObject(currentObj); 
+	end
+	return nil;
 end
 
 function script_hunterScareBeast:isTargetScared()
@@ -28,7 +28,7 @@ local currentObj, typeObj = GetFirstObject();
 		end
 		currentObj, typeObj = GetNextObject(currentObj); 
 	end
-    return false;
+	return false;
 
 end
 
@@ -37,7 +37,7 @@ function script_hunterScareBeast:isScareTargetValid()
 	local currentObj, typeObj = GetFirstObject(); 
 
 	while currentObj ~= 0 do 
-    		if typeObj == 3 and script_grind.enemyObj ~= nil then
+			if typeObj == 3 and script_grind.enemyObj ~= nil then
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= 50 then
 				if script_grind:isTargetingMe(currentObj) and currentObj:IsInLineOfSight()
 					and currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID() then
@@ -55,17 +55,17 @@ function script_hunterScareBeast:isScareTargetValid()
 				end
 			end 
 		end
-        currentObj, typeObj = GetNextObject(currentObj); 
-    end
-    return false;
+		currentObj, typeObj = GetNextObject(currentObj); 
+	end
+	return false;
 end
 
 function script_hunterScareBeast:scareAdd(targetObjGUID)
 
-    local currentObj, typeObj = GetFirstObject(); 
-    local localObj = GetLocalPlayer();
-    while currentObj ~= 0 do 
-    	if typeObj == 3 then
+	local currentObj, typeObj = GetFirstObject(); 
+	local localObj = GetLocalPlayer();
+	while currentObj ~= 0 do 
+		if typeObj == 3 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) and currentObj:IsInLineOfSight() then
 				if (currentObj:GetGUID() ~= targetObjGUID and script_grind:isTargetingMe(currentObj)) then
 					if script_hunterScareBeast:isScareTargetValid() and currentObj:GetGUID() ~= script_grind.enemyObj:GetGUID() then
@@ -90,7 +90,7 @@ function script_hunterScareBeast:scareAdd(targetObjGUID)
 				end 
 			end 
 		end
-        currentObj, typeObj = GetNextObject(currentObj); 
-    end
-    return false;
+		currentObj, typeObj = GetNextObject(currentObj); 
+	end
+	return false;
 end

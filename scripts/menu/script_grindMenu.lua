@@ -24,7 +24,7 @@ function script_grindMenu:setup()
 		script_paladin:setup();
 		script_warrior:setup();
 		script_rogue:setup();
-		script_warlock2:setup();
+		--script_warlock2:setup();
 	end
 
 	self.isSetup = true;

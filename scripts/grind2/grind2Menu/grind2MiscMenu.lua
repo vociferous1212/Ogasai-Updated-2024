@@ -8,6 +8,13 @@ function grind2MiscMenu:run()
 
 		wasClicked, grind2.lootTargets = Checkbox("Loot Targets", grind2.lootTargets);
 
+		Separator();
+
+		Text("Paranoia Time");
+		grind2Paranoia.paranoidSetTime = SliderInt("Paranoid Time", 0, 300, grind2Paranoia.paranoidSetTime);
+
+
+		Text("");
 		Text("Mount");
 		Text("Talents");
 		Text("First Aid");

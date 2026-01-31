@@ -17,12 +17,12 @@ function script_grindBotPausedChecks:botPausedChecks()
 	end
 
 -- temporary 2nd warlock script
-	if (script_warlock2.usingThisScript) then
-			EndWindow();
-		if (NewWindow("Warlock 2", 320, 320)) then
-			script_warlock2:menu();
-		end
-	end
+	--if (script_warlock2.usingThisScript) then
+	--		EndWindow();
+	--	if (NewWindow("Warlock 2", 320, 320)) then
+	--		script_warlock2:menu();
+	--	end
+	--end
 
 -- show collect garbage lua
 	if (script_grindMenu.showGarbageBox) then

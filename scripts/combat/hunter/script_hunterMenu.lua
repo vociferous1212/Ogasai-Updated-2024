@@ -87,23 +87,6 @@ function script_hunterMenu:menu()
 		
 		Separator();
 
--- wait after combat button
-	--	if (GetPet() ~= 0) and (GetLocalPlayer():GetLevel() >= 10) then
-
-		--	wasClicked, script_hunter.waitAfterCombat = Checkbox("Wait After Combat", script_hunter.waitAfterCombat)
-
-				
-
-		--	if (script_hunter.waitAfterCombat) then
-
-				-- these are tied together elsewhere...
-		--		 script_warlock.waitAfterCombat = true;
-
-		--		Text("This will not allow the bot to chain pull targets'")
-		--	end
-		--end
-		--Separator();
-
 -- drink mana slider
 		Text('Drink below mana percentage');
 		script_hunter.drinkMana = SliderInt("M%", 1, 100, script_hunter.drinkMana);

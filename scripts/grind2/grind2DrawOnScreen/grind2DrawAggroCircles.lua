@@ -75,7 +75,7 @@ function grind2DrawAggroCircles:run(maxRange)
 	while i ~= 0 do
 		
 		-- acceptable targets
- 		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() ~= 1 and i:GetLevel() > GetLocalPlayer():GetLevel() - 15 then
+		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() ~= 1 and i:GetLevel() > GetLocalPlayer():GetLevel() - 20 then
 
 			-- set conditions
 			local aggro = i:GetLevel() - localObj:GetLevel() + 17.8;
@@ -108,7 +108,7 @@ function grind2DrawAggroCircles:run(maxRange)
 
 			-- red - run draw circles if tapped by me or I am targeting it
 			if (i:IsTapped() and i:IsTappedByMe()) or (PlayerHasTarget() and i:GetGUID() == GetLocalPlayer():GetUnitsTarget():GetGUID()) then
-			 	
+				
 				if i:IsInLineOfSight() then
 					grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 0);
 				else
@@ -116,9 +116,9 @@ function grind2DrawAggroCircles:run(maxRange)
 				end
 			end
 
- 		end
+		end
 
 		-- get next target
- 		i, t = GetNextObject(i);
- 	end
+		i, t = GetNextObject(i);
+	end
 end

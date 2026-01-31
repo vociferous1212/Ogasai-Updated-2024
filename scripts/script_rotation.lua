@@ -201,9 +201,10 @@ function script_rotation:doSomeLoot()
 			if script_grind.lootObj == nil and HasSpell("Skinning") and script_grind.skinning and HasItem("Skinning Knife") then
 				script_grind.lootObj = script_grind:getSkinTarget(script_grind.findLootDistance);		
 			end
-			if IsLooting() and GetTimeEX() > script_grindDoLoot.timerWhileLooting then
-				LootTarget();
-				script_grindDoLoot.timerWhileLooting = GetTimeEX() + 500;
+			if IsLooting() then
+				if not LootTarget() then
+					return false;
+				end
 			end
 
 			-- do loot

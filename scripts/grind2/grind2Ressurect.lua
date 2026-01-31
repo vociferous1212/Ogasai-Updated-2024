@@ -86,7 +86,7 @@ function grind2Ressurect:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 	while currentObj ~= 0 do
 
 		-- NPC type 3
- 		if typeObj == 3 then
+		if typeObj == 3 then
 
 			-- acceptable targets
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() then
@@ -117,12 +117,12 @@ function grind2Ressurect:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 						end
 					end
 				end
- 			end
- 		end
+			end
+		end
 
 		-- get next target
- 		currentObj, typeObj = GetNextObject(currentObj);
- 	end
+		currentObj, typeObj = GetNextObject(currentObj);
+	end
 
 	-- avoid the closest mob
 	if (closestEnemy ~= 0) then

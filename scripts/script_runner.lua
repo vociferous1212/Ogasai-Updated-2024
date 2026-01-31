@@ -1,4 +1,4 @@
-script_runner = {
+﻿script_runner = {
     nRcombo = 0,
     runit = false,
     distDestination = 0,
@@ -76,12 +76,18 @@ function script_runner:avoidToAggro(safeMargin)
     local closestEnemy = 0
     local closestDist = 999
     local aggro = 0
+    grindEnemy = nil;
+     if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+        grindEnemy = grind2.enemyTarget:GetGUID();
+    end
 
     while currentObj ~= 0 do
         if typeObj == 3 then
             aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
             local range = aggro + safeMargin
             if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
+                if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
+
                 if (closestEnemy == 0) then
                     closestEnemy = currentObj
                 else
@@ -90,6 +96,7 @@ function script_runner:avoidToAggro(safeMargin)
                         closestDist = dist
                         closestEnemy = currentObj
                     end
+                end
                 end
             end
         end
@@ -106,20 +113,20 @@ function script_runner:avoidToAggro(safeMargin)
             local x, y, z = closestEnemy:GetPosition()
             local xx, yy, zz = intersectMob:GetPosition()
             local centerX, centerY = (x + xx) / 2, (y + yy) / 2
-            script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange)
-            self.oscillationCount = self.oscillationCount + 1
-            if self.oscillationCount > 2 then
-                self.oscillationCount = 0
+            script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange - 1)
+          --  self.oscillationCount = self.oscillationCount + 1
+           -- if self.oscillationCount > 2 then
+            --    self.oscillationCount = 0
                 GeneratePath(xP, yP, zP, self.tx, self.ty, self.tz)
-            end
+          --  end
             return true;
         else
-            script_runner:avoid(xT, yT, zP, aggro, safeRange)
-            self.oscillationCount = self.oscillationCount + 1
-            if self.oscillationCount > 2 then
-                self.oscillationCount = 0
+            script_runner:avoid(xT, yT, zP, aggro, safeRange - 1)
+           -- self.oscillationCount = self.oscillationCount + 1
+          --  if self.oscillationCount > 2 then
+             --   self.oscillationCount = 0
                 GeneratePath(xP, yP, zP, self.tx, self.ty, self.tz)
-            end
+           -- end
         return true;
         end
     end
@@ -130,15 +137,21 @@ function script_runner:aggroIntersect(target)
     local x, y, z = target:GetPosition()
     local currentObj, typeObj = GetFirstObject()
     local localObj = GetLocalPlayer()
+    local grindEnemy = nil;
+    if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+        grindEnemy = grind2.enemyTarget:GetGUID();
+    end
     while currentObj ~= 0 do
         if typeObj == 3 then
             local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
             local range = aggro + (safeMargin or 5)
-            if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then	
+            if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
+                if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
                 local xx, yy, zz = currentObj:GetPosition()
                 local dist = math.sqrt((x - xx)^2 + (y - yy)^2)
                 if (dist < aggro * 2) then
                     return currentObj
+                end
                 end
             end
         end
@@ -164,10 +177,14 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
     end
     for i = 1, point do
         local firstPoint = i
-        local secondPoint = i + 1
+        local secondPoint = i - 3;
+
+        -- second point negative sends the bot to the right of a target
+	-- get target distance to mob and theta of left and right, + or -, and run that direction
+	-- TO DO TODO
 
         if firstPoint == point then
-            secondPoint = 1
+            secondPoint = -1 
         end
 
         if points[firstPoint] and points[secondPoint] then
@@ -197,7 +214,7 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
     
     moveToPoint = closestPoint
     
-    if (moveToPoint > point) then
+    if (moveToPoint >= point) then
         moveToPoint = 1
     end
 

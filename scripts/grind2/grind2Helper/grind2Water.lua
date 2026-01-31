@@ -23,7 +23,7 @@ function grind2Water:setup()
 		grind2Water:addWater("Melon Juice");
 		grind2Water:addWater("Ice Cold Milk");
 		grind2Water:addWater("Refreshing Spring Water");
-   		grind2Water:addWater("Fizzy faire Drink");
+		grind2Water:addWater("Fizzy faire Drink");
 		grind2Water:addWater("Freshly-Squeezed Lemonade");
 		grind2Water:addWater("Hyjal Nectar");
 		grind2Water:addWater("Green Garden Tea");

@@ -157,36 +157,36 @@ function script_druid:setup()
 end
 
 function script_druid:enemiesAttackingUs(range) -- returns number of enemies attacking us within range
-    local unitsAttackingUs = 0; 
-    local currentObj, typeObj = GetFirstObject(); 
-    while currentObj ~= 0 do 
-    	if typeObj == 3 or typeObj == 4 then
+	local unitsAttackingUs = 0; 
+	local currentObj, typeObj = GetFirstObject(); 
+	while currentObj ~= 0 do 
+		if typeObj == 3 or typeObj == 4 then
 			if (currentObj:CanAttack() and not currentObj:IsDead()) then
 				if (script_grind:isTargetingMe(currentObj) and currentObj:GetDistance() <= range) then 
 					unitsAttackingUs = unitsAttackingUs + 1; 
 				end 
 			end 
-       	end
-        currentObj, typeObj = GetNextObject(currentObj); 
-    end
-    return unitsAttackingUs;
+		end
+		currentObj, typeObj = GetNextObject(currentObj); 
+	end
+	return unitsAttackingUs;
 end
 
 -- Run backwards if the target is within range
 function script_druid:runBackwards(targetObj, range) 
 	local localObj = GetLocalPlayer();
- 	if targetObj ~= 0 and (not script_checkDebuffs:hasDisabledMovement()) and not script_rotation.usingRotation then
- 		local xT, yT, zT = targetObj:GetPosition();
- 		local xP, yP, zP = localObj:GetPosition();
- 		local distance = targetObj:GetDistance();
- 		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
- 		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
- 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
- 		local moveX, moveY, moveZ = xT + xUV*16, yT + yUV*16, zT + zUV;		
- 		if (distance < range and targetObj:IsInLineOfSight()) then 
+	if targetObj ~= 0 and (not script_checkDebuffs:hasDisabledMovement()) and not script_rotation.usingRotation then
+		local xT, yT, zT = targetObj:GetPosition();
+		local xP, yP, zP = localObj:GetPosition();
+		local distance = targetObj:GetDistance();
+		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
+		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
+		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
+		local moveX, moveY, moveZ = xT + xUV*16, yT + yUV*16, zT + zUV;		
+		if (distance < range and targetObj:IsInLineOfSight()) then 
 			Move(moveX, moveY, moveZ);
- 			return true;
- 		end
+			return true;
+		end
 	end
 	return false;
 end
@@ -1200,7 +1200,7 @@ function script_druid:run(targetGUID)
 				end
 
 		-- Ferocious Bite with 5 CPs
-				if IsCatForm() and (localCP > 4) and (localEnergy >= 35) and (HasSpell("Ferocious Bite")) then
+				if IsCatForm() and (localCP > 4) and (localEnergy >= 35) and (HasSpell("Ferocious Bite")) and not IsSpellOnCD("Ferocious Bite") then
 					if (CastSpellByName("Ferocious Bite", targetObj)) then
 						self.waitTimer = GetTimeEX() + 1600;
 						return 0;

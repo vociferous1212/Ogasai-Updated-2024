@@ -14,13 +14,6 @@ grind2AdjustTimersMenu = {
 
 	blacklistLootTime = 30,
 
-
-
-
-	blacklistTargetTimer = 20,
-
-	paranoidTime = 60
-
 }
 
 -- show adjust timers menu
@@ -84,7 +77,7 @@ function grind2AdjustTimersMenu:run()
 		Text("Combat Script Timer - How fast combat script reacts");
 		self.combatScriptTimer = SliderInt("Combat Script Timer", 0, 2000, self.combatScriptTimer);
 
-		Text("Blacklist Loot Time")
+		Text("Blacklist Loot Time - Seconds")
 		self.blacklistLootTime = SliderInt("Blacklist Loot Timer", 0, 45, self.blacklistLootTime);
 	end
 end

@@ -443,6 +443,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (HasSpell("Charge")) and (not IsSpellOnCD("Charge")) and (targetObj:IsSpellInRange("Charge")) 
 					and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
 
+					self.waitTimer = GetTimeEX() + 500;
+
+
 					if Cast("Charge", targetObj) then 
 						--targetObj:FaceTarget();
 						targetObj:AutoAttack();
@@ -473,6 +476,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- Cant Attack dead targets
 			if (targetObj:IsDead()) or (not targetObj:CanAttack()) then
 				StopMoving();
+				ClearTarget();
+				targetObj = nil;
 				self.waitTimer = GetTimeEX() + 5000;
 			
 			end
@@ -611,7 +616,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 					)
 					)
 				and (not IsMoving()) and not targetObj:IsFleeing() then
-				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) then 
+				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) and not IsSpellOnCD("Heroic Strike") then 
 					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
 						CastSpellByName('Heroic Strike', targetObj);
@@ -878,7 +883,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				-- this needs to be rechecked and changed.... we can return here and skip all other non necessary spells
 				-- melee skill: Bloodthirst, save rage for this attack
 				if (HasSpell("Bloodthirst") and not IsSpellOnCD("Bloodthirst")) then 
-					if (localRage >= 25) then 
+					if (localRage >= 30) then 
 						if (Cast('Bloodthirst', targetObj)) then 
 						end
 					else 

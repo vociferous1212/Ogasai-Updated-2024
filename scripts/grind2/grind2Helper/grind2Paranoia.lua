@@ -141,11 +141,15 @@ end
 
 function grind2Paranoia:setSpeedFast()
 
-	grind2AdjustTimersMenu.doLootTimer = 150;
+	grind2AdjustTimersMenu.doLootTimer = 250;
+
+	if GetRealmName() == "Kalidar" then
+		grind2AdjustTimersMenu.doLootTimer = 500;
+	end
 
 	grind2AdjustTimersMenu.obtainNewTargetTimer = 150;
 
-	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 250;
+	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 75;
 
 	grind2AdjustTimersMenu.restTimer = 250;
 

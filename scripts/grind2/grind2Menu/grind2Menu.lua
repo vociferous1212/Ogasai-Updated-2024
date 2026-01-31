@@ -13,7 +13,8 @@ function grind2Menu:setup()
 
 		script_shaman:setup();		script_druid:setup();		script_mage:setup();
 		script_warlock:setup();		script_priest:setup();		script_paladin:setup();
-		script_warrior:setup();		script_rogue:setup();		script_warlock2:setup();
+		script_warrior:setup();		script_rogue:setup();		
+		--script_warlock2:setup();
 	end
 
 	self.isSetup = true;
@@ -103,7 +104,8 @@ function grind2Menu:run()
 			script_expChecker.lastLevel = GetLocalPlayer():GetLevel();
 		end
 	else
-		Text("		LOADING		");
+
+		ProgressBar("LOADING | ".. navProgress.."%", GetLoadNavmeshProgress());
 	end
 
 -- combat menu script
@@ -173,7 +175,7 @@ function grind2Menu:run()
 
 	Text("Enemy Kills  | "..grind2.numberOfKills);
 
-	-- count your money
+-- count your money
 	if grind2.totalGainedMoney < 100 then
 
 		Text("Money Gained | "..grind2.totalGainedMoney.." copper");
@@ -185,24 +187,36 @@ function grind2Menu:run()
 		Text("Money Gained | "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver ");
 	end
 
+-- Separator
 	Text("________________________________________________________________________________________________________________________________________________________________________")
 	
+-- show current script speed
 	if not self.adjustScriptSpeed then
 		local speed = "";
-		if grind2.scriptSpeed == 100 then speed = "Normal"; elseif grind2.scriptSpeed == 75 then speed = " Fast"; elseif grind2.scriptSpeed == 400 then speed = "Slow"; end
+		if grind2.scriptSpeed == 100 then
+			speed = "Normal";
+		elseif grind2.scriptSpeed == 75 then
+			speed = " Fast";
+		elseif grind2.scriptSpeed == 750 then
+			speed = "Slow";
+		end
+
 		Text("Paranoia - Current Script Speed == "..speed);
 	end
 
+-- show paranoia texts
 	if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 and grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
 		if grind2Paranoia.paranoidTargetName ~= nil and grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
 			Text("Player in range - "..grind2Paranoia.paranoidTargetName.." | "..math.floor(grind2Paranoia.paranoidTargetDistance).." (yd)");
 			Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
+			local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
+			DrawText("Player in range! | " .. grind2Paranoia.paranoidTarget:GetUnitName().. "| "..math.floor(grind2Paranoia.paranoidTarget:GetDistance()).." (yd)", tX - 50, tY - 100, 255, 255, 0);
 		end
 	end
 
+-- adjust script speed
 	wasClicked, self.adjustScriptSpeed = Checkbox("Adjust Bot Speed / Reaction Time", self.adjustScriptSpeed);
 
--- script speed
 	if self.adjustScriptSpeed then
 
 		Text("Grind script speed (miliseconds) - How fast the bot reacts");

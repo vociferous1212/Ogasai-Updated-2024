@@ -42,15 +42,15 @@ function script_druidEX2:menuThree()
 end
 
 function IsIdolOfFerocityEquipped()
-    local itemLink = GetInventoryItemLink("player", 18) -- Relic slot ID in 1.12.1
-    if itemLink then
-        local _, _, parsedItemLink = string.find(itemLink, "(item:%d+)")
-        if parsedItemLink then
-            local itemName = GetItemInfo(parsedItemLink)
-            if itemName and itemName == "Idol of Ferocity" then
-                return true
-            end
-        end
-    end
-    return false
+	local itemLink = GetInventoryItemLink("player", 18) -- Relic slot ID in 1.12.1
+	if itemLink then
+		local _, _, parsedItemLink = string.find(itemLink, "(item:%d+)")
+		if parsedItemLink then
+			local itemName = GetItemInfo(parsedItemLink)
+			if itemName and itemName == "Idol of Ferocity" then
+				return true
+			end
+		end
+	end
+	return false
 end

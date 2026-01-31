@@ -50,6 +50,10 @@ function grind2ShowCombatMenu:run()
 
 		Separator();
 
+		wasClicked, grind2.avoidTargets = Checkbox("Avoid Adds", grind2.avoidTargets);
+
+		Separator();
+
 		Text("Flee Combat - run to previously killed targets until out of combat")
 		wasClicked, grind2FleeCombat.fleeCombat = Checkbox("Flee Combat  ", grind2FleeCombat.fleeCombat);
 		if grind2FleeCombat.fleeCombat then

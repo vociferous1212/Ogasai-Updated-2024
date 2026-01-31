@@ -41,6 +41,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);	
 
+
 	-- If the target moves more than 2 yard then make a new path
 	if (GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2
 		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 20) then
@@ -51,9 +52,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		self.lastnavIndex = 1.5; -- start at index 1, index 0 is our position
 		self.message = "Generating Path";
 	end	
-
-	--script_runner:avoidToAggro(4)
-
+	
 	if (not IsPathLoaded(5)) then
 		self.timer = GetTimeEX() + 100;
 		self.message = "Path is loading";

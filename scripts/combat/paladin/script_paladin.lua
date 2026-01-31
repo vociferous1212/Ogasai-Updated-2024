@@ -10,36 +10,55 @@ script_paladin = {
 	paladinCheckAuraLoaded = include("scripts\\combat\\paladin\\script_paladinCheckAura.lua"),
 	paladinCheckBlessingLoaded = include("scripts\\combat\\paladin\\script_paladinCheckBlessing.lua"),
 	paladinFlashOfLightLoaded = include("scripts\\combat\\paladin\\script_paladinCastFlashOfLight.lua"),
-	isSetup = false, stopIfMHBroken = true, useFlashOfLightInCombat = true,
+	isSetup = false,
+	stopIfMHBroken = true,
+	useFlashOfLightInCombat = true,
 	waitTimer = 0,
-	eatHealth = 30, drinkMana = 25,
-	shieldHealth = 16, lohHealth = 12, holyLightHealth = 45, flashOfLightHealth = 30,
-	potionHealth = 15, potionMana = 20,
+	eatHealth = 30,
+	drinkMana = 25,
+	shieldHealth = 16,
+	lohHealth = 12,
+	holyLightHealth = 45,
+	flashOfLightHealth = 30,
+	potionHealth = 15,
+	potionMana = 20,
 	consecrationMana = 50,
 	meleeDistance = 3.5,
-	useSealOfCrusader = false, useJudgement = true, useBubbleHearth = false,
+	useSealOfCrusader = false,
+	useJudgement = true,
+	useBubbleHearth = false,
 	onlyUseSealOfCrusader = false,
+
 	-- auras
-	devoAura = true, retAura = false, sancAura = false,
+	devoAura = true,
+	retAura = false,
+	sancAura = false,
+
 	-- blessings
-	might = false, wisdom = false,
+	might = false,
+	wisdom = false,
+
+
 	startedNewCharacter = false,
 	tempTimer = 0,
 
 }
 
 function script_paladin:window()
-	if (self.isChecked) then
-		EndWindow();
-		if(NewWindow("Class Combat Options", 200, 200)) then
-			script_paladin:menuEX();
-		end
+
+	EndWindow();
+
+	if NewWindow("Class Combat Options", 200, 200) then
+
+		script_paladin:menuEX();
 	end
+
 end
 
 function script_paladin:setup()
 
 	if not self.isSetup then
+
 		script_paladinSetup:setup();
 	end
 
@@ -50,14 +69,14 @@ end
 function script_paladin:runBackwards(targetObj, range) 
 	local localObj = GetLocalPlayer();
 	if targetObj ~= 0 then
- 		local xT, yT, zT = targetObj:GetPosition();
- 		local xP, yP, zP = localObj:GetPosition();
- 		local distance = targetObj:GetDistance();
- 		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
- 		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
- 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
+		local xT, yT, zT = targetObj:GetPosition();
+		local xP, yP, zP = localObj:GetPosition();
+		local distance = targetObj:GetDistance();
+		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
+		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
+		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
 		local moveX, moveY, moveZ = xT + xUV*2, yT + yUV*2, zT + zUV;		
- 		if (distance < range) then 		
+		if (distance < range) then 		
 
 			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
 
@@ -106,11 +125,16 @@ function script_paladin:run(targetGUID)
 	script_grind.eatHealth = self.eatHealth;
 	script_grind.drinkMana = self.drinkMana;
 
+	-- check to see if we started a new character - flip some variables if we learned spells
 	if localObj:GetLevel() <= 4 then
+
 		self.startedNewCharacter = true;
 	end
+
 	if self.startedNewCharacter and not self.might then
+
 		self.might = true;
+
 		self.startedNewCharacter = false;
 	end
 
@@ -153,19 +177,17 @@ function script_paladin:run(targetGUID)
 	local targetHasWisdom = targetObj:HasDebuff("Judgement of Wisdom");
 	local targetHasLight = targetObj:HasDebuff("Judgement of Light");
 
-
-
 	if (targetObj == 0) or (targetObj == nil) then
 		return 2;
 	end	
 
-	
+-- face the target
 	if IsInCombat() and targetObj:GetDistance() <= self.meleeDistance and not IsMoving() and self.tempTimer < GetTimeEX() then
 		targetObj:FaceTarget();
-		self.tempTimer = GetTimeEX() + 50;
+		self.tempTimer = GetTimeEX() + 150;
 	end
 
-	-- Check: Do nothing if we are channeling or casting or wait timer
+-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling()) or (IsCasting()) or (self.waitTimer > GetTimeEX()) then
 		return 4;
 	end
@@ -181,7 +203,7 @@ function script_paladin:run(targetGUID)
 			end
 		end
 
-	-- heal check
+-- heal check
 	if not IsCasting() and not IsChanneling() then 
 		if script_paladinHealsAndBuffs:healsAndBuffs() then
 			if IsMoving() then StopMoving(); return; end

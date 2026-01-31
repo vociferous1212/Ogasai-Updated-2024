@@ -21,7 +21,7 @@ function script_hunterCheckPetFood:checkPetFood()
 
 						local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
 
-   							itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(iLink);
+							itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(iLink);
 
 						if (script_hunter.foodName == itemName) then
 

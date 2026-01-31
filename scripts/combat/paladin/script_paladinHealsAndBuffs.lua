@@ -7,7 +7,7 @@ script_paladinHealsAndBuffs = {
 
 function script_paladinHealsAndBuffs:healsAndBuffs()
 	
-	if IsCasting() or IsChanneling() then self.waitTimer = GetTimeEX() + 1000; end
+	if IsCasting() or IsChanneling() then self.waitTimer = GetTimeEX() + 1000; paladin.waitTimer = GetTimeEX() + 1000; end
 
 	if (IsCasting()) or (IsChanneling()) then
 		return;
@@ -55,7 +55,6 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	end
 
 	-- bubble hearth on player engange
-
 	if (script_paladin.useBubbleHearth) and (HasSpell("Divine Shield")) and (not IsSpellOnCD("Divine Shield")) then
 		if (GetTarget() ~= nil) and (targetObj ~= nil) then
 			if (UnitIsPlayer(targetObj)) and (UnitIsPVP(targetObj)) and (GetTarget() ~= localObj) then
@@ -213,7 +212,7 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99)) then
 		if localHealth <= 70 then
 			if IsMoving() then StopMoving(); return true; end
- 			if not CastSpellByName("Holy Light(Rank 1", localObj) then
+			if not CastSpellByName("Holy Light(Rank 1", localObj) then
 				script_paladin.waitTimer = GetTimeEX() + 500;
 				script_grind:setWaitTimer(500);
 				return false;

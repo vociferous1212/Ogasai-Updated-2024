@@ -22,7 +22,7 @@ script_hunter = {
 	quiverBagNr = 5,
 	ammoIsArrow = true,
 	useVendor = false,
-	buyWhenQuiverEmpty = false,
+	buyWhenQuiverEmpty = true,
 	stopWhenQuiverEmpty = false,
 	stopWhenBagsFull = true,
 	hsWhenStop = false,
@@ -65,7 +65,7 @@ function script_hunter:setup()
 	if (GetContainerItemLink(self.bagWithPetFood-1, self.slotWithPetFood)  ~= nil) then
 		local _, _, iLink = string.find(GetContainerItemLink(self.bagWithPetFood-1, self.slotWithPetFood), "(item:%d+)");
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
-   		itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(iLink);
+		itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(iLink);
 		self.foodName = itemName;
 		--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Pet food name is set to: "' .. self.foodName .. '" ...');
 	else
@@ -129,7 +129,7 @@ function script_hunter:runBackwards(targetObj, range)
 
 	local localObj = GetLocalPlayer();
 
- 	if (targetObj ~= 0) and IsInCombat()
+	if (targetObj ~= 0) and IsInCombat()
 	and not script_checkDebuffs:hasDisabledMovement()
 	and not IsChanneling() and not IsCasting()
 
@@ -139,14 +139,14 @@ function script_hunter:runBackwards(targetObj, range)
 			AssistUnit("pet");
 		end
 
- 		local xT, yT, zT = targetObj:GetPosition();
- 		local xP, yP, zP = localObj:GetPosition();
- 		local distance = targetObj:GetDistance();
- 		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
- 		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
- 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
- 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
- 		if (distance < range)  then
+		local xT, yT, zT = targetObj:GetPosition();
+		local xP, yP, zP = localObj:GetPosition();
+		local distance = targetObj:GetDistance();
+		local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
+		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
+		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
+		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
+		if (distance < range)  then
 
 			if script_checkAdds:checkAdds() then
 				return 4;
@@ -164,7 +164,7 @@ function script_hunter:runBackwards(targetObj, range)
 				script_grind:setWaitTimer(100);
 
 			return 4;
- 			end
+			end
 		end
 	end
 	return false;
@@ -832,7 +832,7 @@ function script_hunter:run(targetGUID)
 			end	
 
 			-- follower walk away from any target that is not attacking me and I am attacking it
-			if (GetNumPartyMembers() > 0) and not script_rotation.usingRotation and self.useRangedAttacks then
+			if (GetNumPartyMembers() > 0) and not script_rotation.usingRotation and self.useRangedAttacks and targetObj ~= 0 and targetObj ~= nil then
 				if (targetObj:IsInLineOfSight())
 				and (targetObj:GetUnitsTarget() ~= 0)
 				and (targetObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then

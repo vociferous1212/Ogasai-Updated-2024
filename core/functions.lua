@@ -1,30 +1,84 @@
 script_functions = {}
 
 function HasForm()
-	local player = GetLocalPlayer(); if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) or (player:HasBuff("Cat Form")) or (player:HasBuff("Aquatic Form")) or (player:HasBuff("Travel Form")) or (player:HasBuff("Moonkin Form")) or (player:HasBuff("Ghost Wolf")) then return true; end return false; end
+
+	local player = GetLocalPlayer();
+
+	if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form"))
+	or (player:HasBuff("Cat Form")) or (player:HasBuff("Aquatic Form"))
+	or (player:HasBuff("Travel Form")) or (player:HasBuff("Moonkin Form"))
+	or (player:HasBuff("Ghost Wolf")) then
+
+		return true;
+	end
+	
+return false;
+end
 
 function IsMoonkinForm()
-	local player = GetLocalPlayer(); if (player:HasBuff("Moonkin Form")) then return true; end return false; end
+	local player = GetLocalPlayer();
+	
+	if (player:HasBuff("Moonkin Form")) then
+	
+		return true;
+	end
+
+return false;
+end
 
 function IsCatForm()
-	local player = GetLocalPlayer(); if (player:HasBuff("Cat Form")) then return true; end return false; end
+	local player = GetLocalPlayer();
+	
+	if (player:HasBuff("Cat Form")) then
+	
+		return true;
+	end
+
+return false;
+end
 
 function IsBearForm()
-	local player = GetLocalPlayer(); if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) then return true; end return false; end
+	local player = GetLocalPlayer();
+	
+	if (player:HasBuff("Bear Form")) or (player:HasBuff("Dire Bear Form")) then
+		return true;
+	end
+	
+return false;
+end
 
 function IsTravelForm()
-	local player = GetLocalPlayer(); if (player:HasBuff("Travel Form")) then return true; end return false; end
+	local player = GetLocalPlayer();
+	
+	if (player:HasBuff("Travel Form")) then
+	
+		return true;
+	end
+
+return false;
+end
 
 function IsAquaticForm()
-	local player = GetLocalPlayer(); if (player:HasBuff("Aquatic Form")) then return true; end return false; end
+	local player = GetLocalPlayer();
+	
+	if (player:HasBuff("Aquatic Form")) then
+	
+	return true;
+	end
+	
+return false;
+end
 
 function CastGhostWolf()
 	local player = GetLocalPlayer();
 
 	if (HasSpell("Ghost Wolf")) and (not player:HasBuff("Ghost Wolf")) and (not IsSpellOnCD("Ghost Wolf")) and (not IsIndoors()) then
+
 		CastSpellByName("Ghost Wolf", player);
+
 		return true;
 	end
+
 return false;
 end
 

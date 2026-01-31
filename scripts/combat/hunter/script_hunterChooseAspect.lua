@@ -39,7 +39,7 @@ if IsMounted() then script_helper:mountUp() return true end
 
 
 -- use aspect of the mokney
-	if (hasMonkey) and (localObj:GetLevel() < 10) then 
+	if (hasMonkey) and (localObj:GetLevel() < 10) and not IsSpellOnCD("Aspect of the Monkey") then 
 
 		if (not localObj:HasBuff('Aspect of the Monkey')) then  
 
@@ -54,7 +54,7 @@ if IsMounted() then script_helper:mountUp() return true end
 
 
 -- use aspect of the monkey if target is too close
-	if (hasMonkey) and (targetObj ~= nil) and (targetObj ~= 0) then
+	if (hasMonkey) and (targetObj ~= nil) and (targetObj ~= 0) and not IsSpellOnCD("Aspect of the Monkey") then
 
 		if (targetObj:GetDistance() <= script_hunter.meleeDistance) and (IsInCombat()) and (localHealth <= 50) then
 
@@ -72,7 +72,7 @@ if IsMounted() then script_helper:mountUp() return true end
 
 
 -- use aspect of the hawk
-	if not IsMounted() and (targetObj ~= 0) and (targetObj ~= nil) then
+	if not IsMounted() and (targetObj ~= 0) and (targetObj ~= nil) and not IsSpellOnCD("Aspect of the Hawk") then
 
 		if (hasHawk) and (targetObj:GetDistance() <= 37) and targetObj:GetDistance() >= 12 and (not targetObj:IsDead()) and (targetObj:CanAttack()) then 
 
@@ -91,7 +91,8 @@ if IsMounted() then script_helper:mountUp() return true end
 
 -- aspect of the cheetah
 	if (script_hunter.useCheetah) and (hasCheetah) and (not IsInCombat() and not IsMounted())
-	and (targetObj ~= nil and targetObj ~= 0 and targetObj:GetDistance() >= 65) and (localMana > script_hunter.drinkMana + 20) then 
+	and (targetObj ~= nil and targetObj ~= 0 and targetObj:GetDistance() >= 75) and (localMana > script_hunter.drinkMana + 20)
+	and not IsSpellOnCD("Aspect of the Cheetah") and not IsSwimming() then 
 
 		if (not localObj:HasBuff('Aspect of the Cheetah')) then 
 
