@@ -1,0 +1,265 @@
+_questEX2 = {
+	checkBagTimer = 0,
+	checkInvTimer = 0,
+	flipVendor = true,
+	vendorBetweenQuests = false,
+	sellVendorX = 0,
+	sellVendorY = 0,
+	sellVendorZ = 0,
+	lootTimeout = 0, -- New: Timer for loot timeout
+	currentLootGUID = nil -- New: Tracks current loot target GUID
+}
+
+function _questEX2:doChecks()
+	local localObj = GetLocalPlayer()
+
+	-- thousand needles... shimmering flats grind area.
+	if GetMapID() == 400 then _quest.distToGrindFromHotspot = 500 end
+
+	if localObj:HasDebuff("Ressurection Sickness") then
+		if IsMoving() then
+			StopMoving()
+			return true
+		end
+		if IsStanding() then
+			SitOrStand()
+		end
+		_quest:setTimer(60000)
+	end
+
+	local myMoney = GetMoney()
+	if (myMoney ~= script_grind.currentMoney) then
+		script_grind.moneyObtainedCount = myMoney - script_grind.currentMoney
+	end
+
+	if IsInCombat() then
+		if (script_checkAdds:checkAdds()) then
+			script_om:FORCEOM()
+			return true
+		end
+	end
+
+	if _quest.waitTimer > GetTimeEX() then
+		return;
+	end
+
+	if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
+		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
+			_quest.enemyTarget = GetPet():GetUnitsTarget()
+			if not _quest.enemyTarget:IsDead() then
+				_quest.enemyTarget:AutoAttack()
+			end
+		end
+	end
+	if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor and script_vendor.sellVendor ~= 0 and script_vendor.sellVendor ~= nil then
+		self.sellVendorX, self.sellVendorY, self.sellVendorZ = script_vendor.sellVendor['pos']['x'],  script_vendor.sellVendor['pos']['y'],  script_vendor.sellVendor['pos']['z'];
+		local x, y, z = GetLocalPlayer():GetPosition()
+		if self.sellVendorX ~= 0 then
+			if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
+				script_vendor.status = 2
+				_questEX2.flipVendor = false
+			end
+		end
+	end
+
+   -- if GetLocalPlayer():GetLevel() < 10 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then
+	 --   CheckBagsForBetterGear()
+	  --  self.checkInvTimer = GetTimeEX() + 180000
+	--end
+	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
+		CheckBagsForBetterGear()
+		_questEquipItems:checkInventoryForBags()
+		self.checkBagTimer = GetTimeEX() + 180000
+	end
+	-- delete items
+	if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then
+		script_deleteItems:checkDeleteItems()
+	end
+
+	-- Check: Spend talent points
+	if not IsInCombat() and not localObj:IsDead() and script_grind.autoTalent then
+		if script_talent:learnTalents() then
+			_quest:setTimer(500)
+			_quest.message = "Checking/learning talent: " .. script_talent:getNextTalentName()
+			return true
+		end
+	end
+
+	if _quest.killStuffOnRoute and IsInCombat() and not _quest.isQuestComplete and GetTarget() == 0 or GetTarget() == nil then
+		if GetPet() ~= 0 and GetPet() ~= nil then
+			if GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil then
+				_quest.enemyTarget = GetPet():GetUnitsTarget()
+			end
+		end
+	end
+
+	-- buff other players
+	if not script_getSpells:cityZones() and not IsInCombat() and GetTimeEX() > script_grind.buffTimer and script_buffOtherPlayers.enableBuffs
+		and localObj:GetManaPercentage() >= 40 and script_vendor.status == 0 and IsStanding() then
+		if HasSpell("Arcane Intellect") or HasSpell("Mark of the Wild") or HasSpell("Power Word: Fortitude") or HasSpell("Blessing of Might") then
+			script_grind.buffTimer = GetTimeEX() + 5500
+			if not HasSpell("Blessing of Might") then
+				if script_buffOtherPlayers:doBuffs() then
+					_quest.message = "Buffing other players"
+					if not IsStanding() then JumpOrAscendStart() end
+					return true
+				elseif HasSpell("Blessing of Might") then
+					if script_buffOtherPlayers:doBuffsPaladin() then
+						_quest.message = "Buffing other players"
+						if IsStanding() then
+							JumpOrAscendStart()
+						end
+						return true
+					end
+				end
+			end
+		end
+	end
+
+	if (AreBagsFull()) then
+		_questEX.bagsFull = true
+	end
+
+	-- Check: If our gear is yellow
+	for i = 1, 16 do
+		local numItemsBroken = 0
+		local status = GetInventoryAlertStatus('' .. i)
+		numItemsBroken = numItemsBroken + 1
+		if (status ~= nil) and (numItemsBroken > 3 or status >= 4) then
+			if (status >= 3 and script_vendor.repairVendor ~= 0 and not IsInCombat()) then
+				script_vendor:repair()
+				return true
+			end
+		end
+	end
+	-- Check bags if they are full
+	local inventoryFull = true
+	if GetMyClass() ~= "HUNTER" then
+		for i = 1, 5 do
+			if (i ~= 0) then
+				for y=1,GetContainerNumSlots(i-1) do
+					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y)
+					if (itemCount == 0 or itemCount == nil) then
+						inventoryFull = false
+					end
+				end
+			end
+		end
+	elseif GetMyClass() == "HUNTER" then
+		for i = 1, 4 do
+			if (i ~= 0) then
+				for y=1,GetContainerNumSlots(i-1) do
+					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y)
+					if (itemCount == 0 or itemCount == nil) then
+						inventoryFull = false
+					end
+				end
+			end
+		end
+	end
+	-- Tell the grinder we cant loot
+	if (inventoryFull) then
+		_questEX.bagsFull = true
+	end
+
+	if script_grind.skipLooting then
+		script_grind.lootObj = nil
+	end
+
+	-- Loot objects with timeout
+	if (not IsInCombat()) and not script_grind.skipLooting then
+		if script_grind.lootObj == nil then
+			script_grind.lootObj = script_nav:getLootTarget(script_grind.findLootDistance)
+			-- New: Reset timer and GUID when selecting a new loot target
+			if script_grind.lootObj ~= nil then
+				self.lootTimeout = GetTimeEX() + 20000 -- 20-second timeout
+				self.currentLootGUID = script_grind.lootObj:GetGUID()
+			end
+		end
+
+		if script_grind.lootObj ~= nil then
+			if script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
+				script_grind.lootObj = nil
+				self.lootTimeout = 0
+				self.currentLootGUID = nil
+			end
+		end
+
+		if script_grind.lootObj ~= nil and not IsInCombat() and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
+			-- New: Check if looting has timed out
+			if self.currentLootGUID == script_grind.lootObj:GetGUID() and GetTimeEX() > self.lootTimeout then
+				ToFile("Loot timeout: Blacklisting loot target GUID: " .. script_grind.lootObj:GetGUID())
+				script_grind:addTargetToLootBlacklist(script_grind.lootObj)
+				script_grind.lootObj = nil
+				self.lootTimeout = 0
+				self.currentLootGUID = nil
+				_quest:setTimer(200) -- Minimal delay to reset state
+				return true
+			end
+
+			_quest.message = "Looting "..script_grind.lootObj:GetUnitName()..", "..math.floor(script_grind.lootObj:GetDistance()).." (yd)"
+			_questDoCombat.blacklistTimer = GetTimeEX() + 10000
+
+			if (script_grind.lootObj:GetDistance() <= script_grind.lootDistance) then
+				if (IsMoving()) then
+					StopMoving()
+					return true
+				end
+				if not IsMoving() and not IsLooting() and not IsInCombat() then
+					--_quest:setTimer(150) -- Commented out as in original
+				end
+			end
+
+			if (script_grindDoLoot:doLoot(localObj)) then
+				if IsLooting() then
+					if StaticPopup1:IsVisible() then
+						StaticPopup1Button1:Click()
+					end
+					_quest:setTimer(450)
+					-- New: Reset timer on successful loot start
+					self.lootTimeout = 0
+					self.currentLootGUID = nil
+				end
+				return true
+			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
+				ClearTarget()
+			end
+		end
+	end
+
+	if IsInCombat() and PlayerHasTarget() and GetNumPartyMembers() < 1 then
+		if (not script_grind:isAnyTargetTargetingMe() and GetTarget():GetHealthPercentage() > 99) then
+			if IsMoving() then
+				StopMoving()
+				return true
+			end
+			_quest.message = "Still in combat!"
+			return true
+		end
+	end
+	if (not script_grind.getSpells or localObj:IsDead() or IsGhost()) then
+		script_getSpells.getSpellsStatus = 0
+	end
+
+	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() and not IsInCombat() then
+		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
+			if (PlayerHasTarget()) then
+				ClearTarget()
+			end
+			_quest.message = "Moving to class trainer for spells"
+			if (IsMoving()) and (not _quest.pause) then
+				if (not script_unstuck:pathClearAuto(2)) then
+					script_unstuck:unstuck()
+					return true
+				end
+			end
+			return true
+		end
+	end
+	if (script_grind.getSpells) and (not IsInCombat()) then
+		if script_getSpells.getSpellsStatus > 0 then
+			return true
+		end
+	end
+	return false
+end
