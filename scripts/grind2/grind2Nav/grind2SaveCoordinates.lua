@@ -22,7 +22,7 @@ function grind2SaveCoordinates:saveTargetsLocation(target)
 
 			local distanceToLastSave = math.sqrt((x - self.savedLocations[i]['x']) ^ 2 + (y - self.savedLocations[i]['y']) ^ 2);
 
-			if (distanceToLastSave <= 40) then
+			if (distanceToLastSave <= 40) or not grind2HotSpot.hotSpotReached then
 
 				saveLocation = false;
 			end

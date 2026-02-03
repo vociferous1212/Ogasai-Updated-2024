@@ -1,7 +1,7 @@
 script_druidHealsAndBuffs = {}
 
 function script_druidHealsAndBuffs:healsAndBuffs()
-	
+
 	local localMana = 0;
 	local localRage = 0;
 	local localEnergy = 0;

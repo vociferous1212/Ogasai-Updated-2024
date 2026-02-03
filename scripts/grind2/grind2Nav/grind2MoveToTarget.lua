@@ -17,8 +17,20 @@ grind2MoveToTarget = {
 
 function grind2MoveToTarget:run(player, _x, _y, _z)
 
-	if GetLocalPlayer():HasBuff("Aspect of the Cheetah") or IsMounted() or GetLocalPlayer():GetSpeed() >= 8 then
+	local player = GetLocalPlayer();
+
+	local localObj = GetLocalPlayer();
+
+
+-- set distance to nav node further if we are moving faster
+	if player:HasBuff("Aspect of the Cheetah") or player:HasBuff("Ghost Wolf") or GetLocalPlayer():GetSpeed() >= 8 then
+
 		self.nextNavNodeDistance = 6;
+	
+		-- 100% mount speed or faster
+		if player:GetSpeed() >= 10 or IsMounted() then
+			self.nextNavNodeDistance = 8;
+		end
 	end
 
 -- set timer
@@ -31,18 +43,18 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	if self.timer > GetTimeEX() then
 		return;
 	end
-
-	localObj = GetLocalPlayer();
-
+	
+-- set nav smoothness
 	NavmeshSmooth(self.nextNavNodeDistance/2);
 
-	-- get current position
+-- get current position
 	local _lx, _ly, _lz = localObj:GetPosition();
 
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);	
 
 
-	-- If the target moves more than 2 yard then make a new path
+-- If the target moves more than 2 yard then make a new path
+-- or node is out of bounds
 	if (GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2
 		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 20) then
 		self.navPosition['x'] = _x;
@@ -53,29 +65,37 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		self.message = "Generating Path";
 	end	
 	
+-- path isn't loaded
 	if (not IsPathLoaded(5)) then
 		self.timer = GetTimeEX() + 50;
 		self.message = "Path is loading";
-		return;
+		return false;		-- return without pausing.... let the script load but continue moving to last "bad" path node
 	end
 
-	-- Get the current path node's coordinates
+-- Get the current path node's coordinates
 	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
 
 	self.message = "Navigating...";
 
-	-- Move to the next destination in the path
+-- we are swimming, try to stay at top of water
+	if IsSwimming() then
+		_lx, _ly, _lz = localObj:GetPosition();
+		_iz = _lz + 1;
+	end
+
+-- Move to the next destination in the path
 	Move(_ix, _iy, _iz);
 
-	-- If we are close to the next path node, increase our nav node index
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= self.nextNavNodeDistance + .5) then
+-- If we are close to the next path node, increase our nav node index
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= self.nextNavNodeDistance - 1) then
 		self.lastnavIndex = 1 + self.lastnavIndex;		
 		if (GetPathSize(5) <= self.lastnavIndex) then
 			self.lastnavIndex = GetPathSize(5);
 		end
 	end
 
-	self.timer = GetTimeEX() + 75;
+-- set script timer
+	self.timer = GetTimeEX() + 100;
 
 return false;
 end

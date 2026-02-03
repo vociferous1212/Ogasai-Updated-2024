@@ -14,6 +14,8 @@ function grind2PreChecks:run()
 
 	local health = player:GetHealthPercentage();
 
+	local level = player:GetLevel();
+
 	local currentTime = GetTimeEX();
 
 -- Check: Spend talent points
@@ -23,15 +25,8 @@ function grind2PreChecks:run()
 
 			grind2.grinderMessage = "Checking/learning talent: " .. script_talent:getNextTalentName();
 
-			grind2:setTimer(150);
+			grind2:setTimer(350);
 
-			return true;
-		end
-	end
-
--- ressurect
-	if GetLocalPlayer():IsDead() then
-		if grind2Ressurect:run() then
 			return true;
 		end
 	end
@@ -51,10 +46,17 @@ function grind2PreChecks:run()
 	end
 
 -- furbolg form! - try it once every 3 and 1/2 mins
-	if HasItem("Dartol's Rod of Transformation") and not IsInCombat() and not IsCasting() and not IsChanneling() and IsStanding() and not GetLocalPlayer():HasBuff("Furbolg Form") then
+	if grind2Menu.useFurbolgForm and HasItem("Dartol's Rod of Transformation") and not IsInCombat() and not IsCasting() and not IsChanneling() and IsStanding() and not GetLocalPlayer():HasBuff("Furbolg Form") then
 		if GetTimeEX() > self.rodTimerForFun then
 			UseItem("Dartol's Rod of Transformation");
 			self.rodTimerForFun = GetTimeEX() + 210000;
+		end
+	end
+
+-- check bags for new bags to equip if we are below level 10 - started a new character
+	if not IsInCombat() and level < 10 then
+		if grind2EquipBags:checkForBagsToEquip() then
+			return true;
 		end
 	end
 
@@ -62,6 +64,13 @@ function grind2PreChecks:run()
 	if not IsInCombat() and not IsMoving() and script_deleteItems.deleteItems and currentTime > script_deleteItems.deleteItemTimer then
 		script_deleteItems:checkDeleteItems();
 		script_deleteItems.deleteItemTimer = currentTime + 60000;
+	end
+
+-- use inventory items
+	if not IsInCombat() and not IsMoving() and not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() and not IsCasting() and not IsChanneling() then
+		if script_useItemsInInventory:useItems() then
+			grind2:setTimer(1500);
+		end
 	end
 
 -- do loot if we can

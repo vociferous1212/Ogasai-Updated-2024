@@ -13,22 +13,26 @@ function script_hunterMenu:menu()
 -- use ranged attacks or melee attacks
 		wasClicked, script_hunter.useRangedAttacks = Checkbox("Use Ranged Attacks", script_hunter.useRangedAttacks);
 
+-- ranged attack distance
 		if script_hunter.useRangedAttacks then
 
 			Text("MIN Ranged Attack Distsance");
 			script_hunter.minSpellRange = SliderInt("Min Dist yards", 8, 16, script_hunter.minSpellRange);
+
 			Text("MAX Ranged Attack Distsance");
 			script_hunter.spellRange = SliderInt("Max Dist yards", 30, 41, script_hunter.spellRange);
 		end
 
 		Separator();
 
+-- conserve mana button
 		if HasPet() then
 			if Button("Conserve Mana") then
 				script_hunter.drinkMana = 5;
 				script_hunter.arcaneShotMana = 35;
 				script_hunter.useMarkMana = 20;
 				script_hunter.serpentStingMana = 20;
+				script_hunter.potionMana = 0;
 			end
 		end
 
@@ -138,7 +142,7 @@ function script_hunterMenu:menu()
 		--end
 
 -- vendor settings
-		if (CollapsingHeader("|+| Vendor Settings -- These May Be Defunct")) then
+		if (CollapsingHeader("|+| Vendor Settings")) then
 			Text('Vendor/Bag settings:');
 			wasClicked, script_hunter.useVendor = Checkbox("Vendor when full inventory", script_hunter.useVendor);	
 		
@@ -163,6 +167,7 @@ function script_hunterMenu:menu()
 
 		Separator();
 
+-- feed pet options
 		if (CollapsingHeader("|+| Feed Pet Options")) then
 			wasClicked, script_hunter.useFeedPet = Checkbox("Auto Feed Pet", script_hunter.useFeedPet);
 	

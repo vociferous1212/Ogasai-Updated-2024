@@ -110,7 +110,7 @@ function grind2RunCombatState:run()
 				end
 
 			-- else if we are moving or in combat then reset the timer back to 15 seconds
-			elseif IsMoving() or IsInCombat() then
+			elseif IsMoving() or IsInCombat() or IsCasting() or IsChanneling() or IsEating() or IsDrinking() or not IsStanding() then
 
 				-- reset the blacklist timer
 				self.blacklistTargetTimer2 = currentTime + 15 * 1000;
@@ -182,6 +182,19 @@ function grind2RunCombatState:run()
 				_x, _y, _z = grind2.enemyTarget:GetPosition();
 			end
 
+			-- stop moving if we have reached a target
+			if IsInCombat() and PlayerHasTarget() then
+				if GetTarget():GetDistance() <= 2 then
+					if GetTarget():GetHealthPercentage() >= 20 and not script_checkAdds:checkAdds() then
+						if IsMoving() then
+							StopMoving();
+							script_grind.combatError = nil;
+							return false;
+						end
+					end
+				end
+			end
+
 			-- combat error == 3 from combat script
 			if script_grind.combatError == 3 then
 
@@ -214,5 +227,5 @@ function grind2RunCombatState:run()
 	-- timer per each time script is ran + combat script
 	self.timer = currentTime + grind2AdjustTimersMenu.combatScriptTimer + 50;
 
-return true;
+--return true;
 end

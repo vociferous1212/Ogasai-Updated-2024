@@ -244,6 +244,10 @@ function script_talent:learnTalents()
 	local level = GetLocalPlayer():GetLevel();
 	local lastTalentPointNr = (level-9);
 
+	if not self.isSetup then
+		script_talent:setup();
+	end
+
 	-- Do nothing if we are below level 10 
 	if (level < 10) then
 		return false;

@@ -218,8 +218,13 @@ FaceAngle([number] angle)
 in rad not degree, if you want to face 90  you need to convert to rad first
 x = math.rad(90)
 FaceAngle(x)
+
+-- get spell info
 GetSpellInfo([string] spellName) [number] CastTime, [number] MaxRange, [number] MinRange,
 [number] PowerType, [number] Cost, [number] SpellId, [CSpellInfo*] SpellObj
+
+local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo([string] spellName)
+
 HasSpell([string] spellName) [bool]
 IsSpellOnCD([string] spellName) [bool]
 AutoAttackTarget()

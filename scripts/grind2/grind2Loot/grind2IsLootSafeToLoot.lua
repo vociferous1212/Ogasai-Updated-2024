@@ -19,16 +19,19 @@ function grind2IsLootSafeToLoot:isAnyTargetNearLoot(target)
 				and (not HasPet() or (HasPet() and i:GetGUID() ~= GetPet():GetGUID())) then
 
 				local targetToCheck = i;
+
 				local iX, iY, iZ = i:GetPosition();
 
 				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 16;
 
-				if GetDistance3D(iX, iY, iZ, lX, lY, lZ) <= aggro then
+				if GetDistance3D(iX, iY, iZ, lX, lY, lZ) < aggro then
+
 					return true;
 				end
 			end
 		i, t = GetNextObject(i);
 		end
 	end
+
 return false;
 end

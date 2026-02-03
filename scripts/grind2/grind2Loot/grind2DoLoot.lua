@@ -2,7 +2,7 @@ grind2DoLoot = {
 
 	lootTarget = nil,
 
-	lootDistance = 65,
+	lootDistance = 100,
 
 	timer = 0,
 
@@ -74,9 +74,9 @@ function grind2DoLoot:run()
 			self.blacklistLootTimer = GetTimeEX() + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 		end
 
-		--if grind2IsLootSafeToLoot:isAnyTargetNearLoot(self.lootTarget) then
-		--	return false;
-		--end
+		if grind2IsLootSafeToLoot:isAnyTargetNearLoot(self.lootTarget) then
+			return false;
+		end
 
 		-- move to loot target
 		local xx, yy, zz = self.lootTarget:GetPosition();

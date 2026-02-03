@@ -280,6 +280,7 @@ script_grind = {
 	currentCastingTime = 0,
 	stopBotWhenInvFull = false,
 	hasAMount = true,
+	faceTargetTimer = GetTimeEX()
 }			
 
 -- run setup function
@@ -429,6 +430,17 @@ end
 		self.autoBlacklistTimer = GetTimeEX() + 15000;
 		CollectAllGarbage();
 		return;
+	end
+
+	if PlayerHasTarget() and not IsMoving() and IsInCombat() then
+		if script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil then
+			if GetTarget():GetGUID() == script_grind.enemyObj:GetGUID() then
+				if GetTimeEX() > self.faceTargetTimer then
+					self.enemyObj:FaceTarget();
+					self.faceTargetTimer = GetTimeEX() + 500;
+				end
+			end
+		end
 	end
 
 -- reset memory every so often

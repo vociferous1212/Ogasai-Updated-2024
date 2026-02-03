@@ -8,7 +8,10 @@ function _questDoOtherQuestTypes()
 
 	local distToGrind = GetDistance3D(px, py, pz, _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 
-	if _quest.currentType == 99 and not IsInCombat() and not _quest.isQuestComplete and not IsLooting() then _questEdgeCaseQuest:run() return true; end
+	if _quest.currentType == 99 and not IsInCombat() and not _quest.isQuestComplete and not IsLooting() then
+		_questEdgeCaseQuest:run()
+		return true;
+	end
 
 	if _quest.currentType == 3 and not IsInCombat() and (_quest.curGrindX ~= 0) and not _quest.isQuestComplete and not IsLooting() then
 		_quest.message = "Type quest == 3";

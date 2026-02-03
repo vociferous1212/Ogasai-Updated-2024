@@ -42,11 +42,11 @@ function grind2AssignATarget:run()
 
 				if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
 				
-					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
+					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() or (HasPet() and i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
 						
 						local health = i:GetHealthPercentage();
 
-						if health < bestHealth then
+						if bestHealth > health then
 				
 							bestHealth = health;
 
@@ -61,6 +61,7 @@ function grind2AssignATarget:run()
 		end
 	end
 
+	--[[
 	-- return the last target if we are in combat with it
 	if grind2.enemyTarget ~= nil then
 		if not grind2.enemyTarget:IsDead() and (grind2.enemyTarget:GetHealthPercentage() <= 99
@@ -76,6 +77,8 @@ function grind2AssignATarget:run()
 			return grind2.lastTargetTargeted;
 		end
 	end
+
+	]]--
 
 	-- return any target attacking me if I am not in combat yet
 	if not IsInCombat() then

@@ -1,4 +1,5 @@
 script_hunter = {
+
 	message = 'Hunter Combat Script',
 
 	hunterChooseAspectLoaded = include("scripts\\combat\\hunter\\script_hunterChooseAspect.lua"),
@@ -6,7 +7,6 @@ script_hunter = {
 	hunterDoPetChecksLoaded = include("scripts\\combat\\hunter\\script_hunterDoPetChecks.lua"),
 	hunterSetAmmoLoaded = include("scripts\\combat\\hunter\\script_hunterSetAmmo.lua"),
 	hunterScareBeastLoaded = include("scripts\\combat\\hunter\\script_hunterScareBeast.lua"),
-
 
 	drinkMana = 30,
 	eatHealth = 65,
@@ -61,52 +61,57 @@ function script_hunter:setup()
 	self.feedTimer = GetTimeEX();
 	self.waitTimer = GetTimeEX();
 
-	-- Save the name of pet food we use
+-- Save the name of pet food we use
 	if (GetContainerItemLink(self.bagWithPetFood-1, self.slotWithPetFood)  ~= nil) then
 		local _, _, iLink = string.find(GetContainerItemLink(self.bagWithPetFood-1, self.slotWithPetFood), "(item:%d+)");
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
 		itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(iLink);
 		self.foodName = itemName;
-		--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Pet food name is set to: "' .. self.foodName .. '" ...');
-	else
-		--DEFAULT_CHAT_FRAME:AddMessage('script_hunter: Please set the pet food name in hunter options...');
 	end
 
-	if (GetLocalPlayer():GetLevel() < 3) then
+-- don't buy ammo if less than level 4
+	if (GetLocalPlayer():GetLevel() < 4) then
 		self.buyWhenQuiverEmpty = false;
 	end
 	
+-- set drink / eat settings lower if low level
 	if (GetLocalPlayer():GetLevel() < 6) then
 		self.drinkMana = 25;
 		self.eatHealth = 35;
 	end
-	if (GetLocalPlayer():GetLevel() < 10) then
 
-		if GetLocalPlayer():GetLevel() >= 6 then
-			self.drinkMana = 15;
-		end
-
-		self.useMarkMana = 60;
-
+-- set drink mana lower if higher level
+	if GetLocalPlayer():GetLevel() >= 6 then
+		self.drinkMana = 15;
 	end
+
+-- set eat health higher if higher level
 	if GetLocalPlayer():GetLevel() > 15 then
 		self.eatHealth = 50;
 	end
+
+-- set hunters mark mana lower if lower level
+	if (GetLocalPlayer():GetLevel() < 10) then
+		self.useMarkMana = 60;
+	end
 	
-	-- we are level 10 or higher then change some settings
+-- level 10 + settings
 	if GetLocalPlayer():GetLevel() >= 10 then
 
-		-- check for spent talent points
+-- check for spent talent points
 		script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 
-		-- preserve some mana for mend pet
+-- preserve some mana for mend pet
 		self.arcaneShotMana = 25;
 		self.serpentStingMana = 15;
 	end
+
+-- if we have aimed shot then set mana lower to use more often
 	if HasSpell("Aimed Shot") then
 		self.arcaneShotMana = 15;
 	end
 
+-- hardcore realm - set mana / health higher
 	if GetRealmName() == "Permadeath - EU" then 
 
 		if GetLocalPlayer():GetLevel() < 20 then
@@ -116,6 +121,7 @@ function script_hunter:setup()
 		end
 	end
 
+-- turn on aspect of cheetah if we have it
 	if HasSpell("Aspect of the Cheetah") then
 		self.useCheetah = true;
 	end
@@ -124,8 +130,9 @@ function script_hunter:setup()
 
 end
 
--- Run backwards if the target is within range
 function script_hunter:runBackwards(targetObj, range) 
+
+	-- Run backwards if the target is within range
 
 	local localObj = GetLocalPlayer();
 
@@ -762,7 +769,7 @@ function script_hunter:run(targetGUID)
 	
 			-- Check: If pet is stunned, feared etc use Bestial Wrath
 			if (self.hasPet) and (HasPet()) and HasSpell("Bestial Wrath") and not IsSpellOnCD("Bestial Wrath") and localMana >= 6 then
-				if (targetHealth >= 30 and targetHealth <= 95) or petHP <= 50 or pet:IsStunned() or pet:IsConfused() or pet:IsFleeing() then 
+				if (targetHealth >= 55 and targetHealth <= 98) or petHP <= 50 or pet:IsStunned() or pet:IsConfused() or pet:IsFleeing() then 
 
 					CastSpellByName("Bestial Wrath");
 					self.waitTimer = GetTimeEX() + 1500;
@@ -771,7 +778,7 @@ function script_hunter:run(targetGUID)
 			end
 
 			-- pet intimidation
-			if HasSpell("Intimidation") and not IsSpellOnCD("Intimidation") and HasPet() and localMana >= 25 and targetHealth >= 25 then
+			if HasSpell("Intimidation") and not IsSpellOnCD("Intimidation") and HasPet() and localMana >= 25 and (targetHealth >= 55 or targetObj:IsCasting()) then
 				CastSpellByName("Intimidation");
 				self.waitTimer = GetTimeEX() + 1500;
 			end
@@ -892,8 +899,9 @@ function script_hunter:run(targetGUID)
 							
 						end
 
-						CastSpellByName("Serpent Sting");
-						self.waitTimer = GetTimeEX() + 1500;
+						if not CastSpellByName("Serpent Sting") then
+							self.waitTimer = GetTimeEX() + 1500;
+						end
 						
 					end
 				end
@@ -906,7 +914,6 @@ function script_hunter:run(targetGUID)
 							
 						end
 						self.waitTimer = GetTimeEX() + 1500;
-						
 					end
 				end
 
@@ -989,6 +996,9 @@ function script_hunter:run(targetGUID)
 							
 						end
 						CastSpellByName("Raptor Strike")
+						if HasPet() then
+							PetAttack();
+						end
 						self.waitTimer = GetTimeEX() + 500;
 						
 					
@@ -1414,7 +1424,7 @@ function script_hunter:hunterPull(targetObj)
 	-- use serpent sting
 	if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
 		if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana) then
-			if CastSpellByName("Serpent Sting") then
+			if not CastSpellByName("Serpent Sting") then
 				PetAttack();
 				self.waitTimer = GetTimeEX() + 500;
 			end
@@ -1440,9 +1450,11 @@ function script_hunter:hunterPull(targetObj)
 	end
 
 	if (targetObj:GetDistance() <= 10) then
+
 		if not IsAutoCasting("Attack") then
 			CastSpellByName("Attack");
 		end
+
 	elseif targetObj:GetDistance() > self.meleeDistance then 
 		return 3;
 	end
@@ -1492,11 +1504,10 @@ function script_hunter:petAttackTargetAttackingMe()
 									-- send pet to attack target attacking me
 									PetAttack();
 
-									if script_grind.enemyObj == nil or script_grind.enemyObj == 0 then
-										if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
-											script_grind.enemyObj = grind2.enemyTarget;
-										end
+									if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+										script_grind.enemyObj = grind2.enemyTarget;
 									end
+									
 									-- interact again with grinder object
 									if script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0 and i:GetGUID() ~= script_grind.enemyObj:GetGUID() then
 										if not IsAutoCasting("Attack") then
@@ -1522,21 +1533,28 @@ end
 
 function script_hunter:getPetsTarget()
 
-local target = nil;
+	local target = nil;
 
 	if HasPet() and PetHasTarget() then
+
 		if not GetPet():IsDead() and IsInCombat() then
+
 			local i, t = GetFirstObject();
 
 			while i ~= 0 do
+
 				if t == 3 or t == 4 then
+
 					if GetPet():GetUnitsTarget():GetGUID() == i:GetGUID() then
+
 						target = i;
 					end
 				end
+
 			i, t = GetNextObject(i);
 			end
 		end
 	end
+
 return target;
 end

@@ -132,5 +132,14 @@ function _questDoOtherQuestTypes2:run()
 						return true;
 					end
 				end
-				if script_goToFP:run() then return true; end end return true; end
-	if (_questDoOtherQuestTypes3:run()) then return true; end return false; end
+				if script_goToFP:run() then
+					return true;
+				end
+			end
+		return true;
+	end
+	if (_questDoOtherQuestTypes3:run()) then
+		return true;
+	end
+return false;
+end

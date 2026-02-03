@@ -1,6 +1,7 @@
 grind2 = {
 
 	grind2IncludeFiles = include("scripts\\grind2\\includeFiles.lua"),
+
 	timer = GetTimeEX(),						-- script timer
 	obtainNewTargetTimer = GetTimeEX(),			-- obtain new target timer
 	faceTargetTimer = GetTimeEX(),				-- face target timer
@@ -24,14 +25,14 @@ grind2 = {
 	bagsAreFull = false,						-- are bags full or not
 	lootTargets = true,							-- loot dead targets or not
 	useVendor = true,							-- use vendor or not
-	currentLevel = GetLocalPlayer():GetLevel(),	-- current level
+	currentLevel = PlayerLevel(),				-- current level
 	refillDrinkAndFoodAtVendor = false,			-- refill food and drink at vendor or not
 	avoidTargets = true,						-- avoid targets moving around nav ( it is quite buggy)
 	showingWindow = false,						-- show draw data when main menu is not collapsed
-	useParanoia = true,
-	useMount = false,
-	autoSelectTalents = false,
-	useFirstAid = false,
+	useParanoia = true,							-- use paranoia or not
+	useMount = false,							-- use mount or not
+	autoSelectTalents = false,					-- auto select talents or not
+	useFirstAid = false,						-- use first aid or not
 
 	}
 
@@ -94,12 +95,6 @@ end
 -- rest function
 function grind2:rest()
 
-	local player = GetLocalPlayer();
-
-	local health = player:GetHealthPercentage();
-
-	local mana = player:GetManaPercentage();
-
 	local pet = GetPet();
 
 	-- check setup
@@ -118,21 +113,27 @@ function grind2:rest()
 		self.message = "Resting...";
 
 		-- drink water
-		if not IsDrinking() and mana <= grind2.restMana then
+		if not IsDrinking() and PlayerMana() <= grind2.restMana then
+
+			grind2:setTimer(grind2AdjustTimersMenu.restTimer);
 
 			-- run drink water script
-			grind2Water:drink();
+			if grind2Water:drink() then
 
-			return true;
+				return true;
+			end
 		end
 
 		-- eat food
-		if not IsEating() and health <= grind2.restHealth then
+		if not IsEating() and PlayerHealth() <= grind2.restHealth then
+
+			grind2:setTimer(grind2AdjustTimersMenu.restTimer);
 
 			-- run eat food script
-			grind2Food:eat();
+			if grind2Food:eat() then
 
-			return true;
+				return true;
+			end
 		end
 
 		-- if we are drinking or eating then return
@@ -143,7 +144,7 @@ function grind2:rest()
 		end
 
 		-- Stop moving if we are and need to rest
-		if not IsInCombat() and IsMoving() and not player:IsMovementDisabed() then
+		if not IsInCombat() and IsMoving() and not Player():IsMovementDisabed() then
 
 			-- stop moving and return
 			StopMoving();
@@ -161,7 +162,7 @@ function grind2:rest()
 		end
 
 		-- return if we need to keep resting
-		if not IsInCombat() and ( (IsEating() and health < 95) or (IsDrinking() and mana < 95) ) then
+		if not IsInCombat() and ( (IsEating() and PlayerHealth() < 95) or (IsDrinking() and PlayerMana() < 95) ) then
 
 			-- return
 			return true;
@@ -170,14 +171,14 @@ function grind2:rest()
 		-- if done resting then stand up
 		if not IsStanding()
 
-		-- if we are eating and drinking and full health and mana
-		and (IsEating() and health >= 95 and IsDrinking() and mana >= 95) 
+		-- if we are eating and drinking and full PlayerHealth() and PlayerMana()
+		and (IsEating() and PlayerHealth() >= 95 and IsDrinking() and PlayerMana() >= 95) 
 
-		-- or we are not drinking and are eating and health is full
-		or (not IsDrinking() and IsEating() and health >= 95)
+		-- or we are not drinking and are eating and PlayerHealth() is full
+		or (not IsDrinking() and IsEating() and PlayerHealth() >= 95)
 
-		-- or we are not eating and are drinking and mana is full
-		or (not IsEating() and IsDrinking() and mana >= 95) then
+		-- or we are not eating and are drinking and PlayerMana() is full
+		or (not IsEating() and IsDrinking() and PlayerMana() >= 95) then
 
 			-- if we aren't already stadnding
 			if (not IsStanding()) then
@@ -218,64 +219,70 @@ function grind2:run()
 
 -- set variables
 	local currentTime = GetTimeEX();
-	local player = GetLocalPlayer();
-	local playerHealth = player:GetHealthPercentage();
-	local playerMana = player:GetManaPercentage();
-	local level = GetLocalPlayer():GetLevel();
 
 -- check unstuck
-	grind2CheckUnstuck:run();
-	
+	if not grind2.pause then
+
+		grind2CheckUnstuck:run();
+
+		if not Player():IsDead() then
 -- avoid elites...
 -- if not on way to vendor and already running and not if we are mounted and running
-	if not player:IsDead() and script_vendor.status == 0 and not IsMounted() and not grind2.pause then 
-		if (script_aggro:avoidElite()) then
-			grind2.grinderMessage = "Elite within range... running away...";
-			return; 
-		end
-	end
+			if script_vendor.status == 0 and not IsMounted() then 
+				if (script_aggro:avoidElite()) then
+					grind2.grinderMessage = "Elite within range... running away...";
+					return; 
+				end
+			end
 
 -- avoid targets when walking through nav
 -- avoid aggro ranges of targets that are not grinder target
--- don't do if we need to loot or under level 6
+-- don't do if we need to loot or under PlayerLevel() 6
 -- don't use in combat, combat scripts handle add movements
-	if not grind2.pause and not IsInCombat() and level >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets) and not player:IsDead() then
-		if script_runner:avoidToAggro(3) then
-			local _lx, _ly, _lz = player:GetPosition(); local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
-			GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
-			grind2PreChecks.jumpTimer = currentTime + 500;
-			Move(_ix, _iy, _iz);
-			return false;
-		end
-	end
+			if not IsIndoors() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets) then
+				if script_runner:avoidToAggro(3) then
+					local _lx, _ly, _lz = Player():GetPosition(); local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
+					GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
+					grind2PreChecks.jumpTimer = currentTime + 500;
+					Move(_ix, _iy, _iz);
+					return false;
+				end
+			end
 
--- flee combat if health and mana are low, or being attacking by too many targets
+-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
 -- mainly for hardcore
-	if grind2FleeCombat.fleeCombat and grind2SaveCoordinates.numberOfLocations >= 3 and player:GetLevel() >= 6 and not player:IsDead() then
-		if not grind2.pause and IsInCombat() and (grind2FleeCombat.healthToFlee >= playerHealth or (NumberTargetsAttackingPlayer() >= 2 and grind2FleeCombat.fleeWithAdds) ) then
-			grind2FleeCombat:run();
-			self.grinderMessage = "Fleeing combat";
-			grind2.enemyTarget = nil;
-			if PlayerHasTarget() then ClearTarget(); end
-			return;
-		else
-		-- last saved location is 1st go to location
-			grind2SaveCoordinates.currentGoToLocation = grind2SaveCoordinates.numberOfLocations - 1;
-		end
-	end
+			if not grind2.pause and IsInCombat() and grind2FleeCombat.fleeCombat then 
+				if grind2SaveCoordinates.numberOfLocations >= 3 and PlayerLevel() >= 6 and not Player():IsDead() then
+					if (grind2FleeCombat.healthToFlee >= PlayerHealth() and grind2FleeCombat.manaToFlee >= PlayerMana()) or (NumberTargetsAttackingPlayer() >= 2 and grind2FleeCombat.fleeWithAdds) then
+						grind2FleeCombat:run();
+						self.grinderMessage = "Fleeing combat";
+						grind2.enemyTarget = nil;
+						if PlayerHasTarget() then
+							ClearTarget();
+						end
+						if IsCasting() then
+							SpellStopCasting();
+						end
+						return;
+					end
+				end
+			else
+				-- last saved location is 1st go to location
+				grind2SaveCoordinates.currentGoToLocation = grind2SaveCoordinates.numberOfLocations - 1;
+			end
 
-	-- face enemy target at all times
-	if not grind2.pause then
-		if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and not IsMoving() and not IsLooting() and player:GetCasting() ~= 6487 then
-			if self.enemyTarget:GetDistance() <= self.combatScriptRange + 1 and self.enemyTarget:IsInLineOfSight() and currentTime > self.faceTargetTimer then
-				self.enemyTarget:FaceTarget();
-				self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
+-- face enemy target at all times
+			if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and not IsMoving() and not IsLooting() and Player():GetCasting() ~= 6487 then
+				if self.enemyTarget:GetDistance() <= self.combatScriptRange + 1 and self.enemyTarget:IsInLineOfSight() and currentTime > self.faceTargetTimer then
+					self.enemyTarget:FaceTarget();
+					self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
+				end
 			end
 		end
 	end
 
 -- return if paused or for any reason
-	if self.timer > currentTime or grind2.pause or IsCasting() or IsChanneling() then
+	if grind2.timer > currentTime or grind2.pause or IsCasting() or IsChanneling() then
 
 		-- run combat helper to stop spell casting / check for clutch issues
 		if IsInCombat() and not grind2.pause then script_combatHelper:run(); end
@@ -321,13 +328,20 @@ function grind2:run()
 	return;
 	end
 
+-- ressurect
+	if Player():IsDead() then
+		if grind2Ressurect:run() then
+			return;
+		end
+	end
+
 -- check paranoia
 	if self.useParanoia then
 		grind2Paranoia:checkAndDoParanoia();
 	end
 
 -- run rest functions
-	if not IsInCombat() and not player:IsDead() and not IsLooting() and not IsChanneling() and not IsCasting() then
+	if not IsInCombat() and not Player():IsDead() and not IsLooting() and not IsChanneling() and not IsCasting() then
 		if grind2:rest() then
 			if IsEating() or IsDrinking() or IsCasting() or IsChanneling() then
 				grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
@@ -347,7 +361,7 @@ function grind2:run()
 	end
 
 -- run gatherer
-	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() and not player:IsDead() then
+	if self.gather and not IsAnyTargetTargetingPlayer() and not IsInCombat() and not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() and not Player():IsDead() then
 		if script_gatherRun:gather() then
 			script_gatherRun:gather();
 			self.grinderMessage = "Gathering...";
@@ -362,7 +376,7 @@ function grind2:run()
 -- auto talents / clear targets / loot / ressurect / 
 	if grind2PreChecks:run() then return; end
 
-	if player:IsDead() then return; end
+	if Player():IsDead() then return; end
 
 -- assign a target
 	if not IsCasting() and not IsChanneling() and not IsEating() and not IsDrinking() and not IsLooting() and currentTime > self.obtainNewTargetTimer and (grind2HotSpot.hotSpotReached or IsInCombat()) then 
@@ -385,7 +399,7 @@ function grind2:run()
 		-- double check enemyTarget, blacklisted, distance to grind zone, etc
 
 		-- needs moved to combat helper
-		if player:HasDebuff("Crystalline Slumber") or (not IsInCombat() and HasPet() and GetPet():HasDebuff("Crystalline Slumber") ) then return; end
+		if Player():HasDebuff("Crystalline Slumber") or (not IsInCombat() and HasPet() and GetPet():HasDebuff("Crystalline Slumber") ) then return; end
 
 		-- move away from additional targets in combat
 		if IsInCombat() and grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil then

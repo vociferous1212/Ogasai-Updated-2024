@@ -75,8 +75,8 @@ function grind2Paranoia:checkAndDoParanoia()
 		end
 
 		-- reset variables
-		self.paranoidTargetGUID = nil;
 		self.paranoidTarget = nil;
+		self.paranoidTargetGUID = nil;
 		self.paranoidTimerSet = false;
 		self.paranoidTargetName = "";
 		self.paranoidTargetDistance = 0;
@@ -97,27 +97,22 @@ function grind2Paranoia:checkForPlayersNearby()
 
 			if i:GetDistance() <= self.paranoidRange and i:GetGUID() ~= nil and i:GetGUID() ~= 0 and i:GetGUID() ~= GetLocalPlayer():GetGUID() then
 
-				self.paranoidTargetGUID = i:GetGUID();
-
 				self.paranoidTarget = i;
 
-				self.paranoidTargetName = i:GetUnitName();
+				if self.paranoidTarget ~= nil then
 
-				self.paranoidTargetDistance = i:GetDistance();
+					self.paranoidTargetGUID = i:GetGUID();
 
-				return true;
+					self.paranoidTargetName = i:GetUnitName();
+
+					self.paranoidTargetDistance = i:GetDistance();
+
+					return true;
+				end
 			end
 		end
 	i, t = GetNextObject(i);
 	end
-
-	-- reset variables
-	self.paranoidTargetGUID = nil;
-	self.paranoidTarget = nil;
-	self.paranoidTimerSet = false;
-	self.paranoidTargetName = "";
-	self.paranoidTargetDistance = 0;
-	self.paranoidTime = GetTimeEX() * 2;
 
 return false;
 end
@@ -147,7 +142,7 @@ function grind2Paranoia:setSpeedFast()
 		grind2AdjustTimersMenu.doLootTimer = 1250;
 	end
 
-	grind2AdjustTimersMenu.obtainNewTargetTimer = 150;
+	grind2AdjustTimersMenu.obtainNewTargetTimer = 750;
 
 	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 75;
 

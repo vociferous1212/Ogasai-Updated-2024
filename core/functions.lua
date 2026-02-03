@@ -180,11 +180,21 @@ return false;
 end
 
 function RemoveForm()
-	script_druidEX:removeTravelForm();
-	script_druidEX:removeBearForm();
-	script_druidEX:removeCatForm();
-	script_druidEX:removeMoonkinForm();
-	script_shamanEX2:removeGhostWolf();
+
+	local player = GetLocalPlayer();
+
+	if player:HasBuff("Bear Form") and not IsSpellOnCD("Bear Form") then
+		CastSpellByName("Bear Form");
+	elseif player:HasBuff("Dire Bear Form") and not IsSpellOnCD("Dire Bear Form") then
+		CastSpellByName("Dire Bear Form");
+	elseif player:HasBuff("Cat Form") and not IsSpellOnCD("Cat Form") then
+		CastSpellByName("Cat Form");
+	elseif player:HasBuff("Moonkin Form") and not IsSpellOnCD("Moonkin Form") then
+		CastSpellByName("Moonkin Form");
+	elseif player:HasBuff("Ghost Wolf") and not IsSpellOnCD("Ghost Wolf")then
+		CastSpellByName("Ghost Wolf");
+	end
+
 return false;
 end
 
@@ -294,4 +304,148 @@ function NumberTargetsAttackingPlayer()
 	i, t = GetNextObject(i);
 	end
 return numTargets;
+end
+
+function PetHealth()
+
+	local health = 0;
+
+	if GetPet() ~= 0 and GetPet() ~= nil then
+	
+		health = GetPet():GetHealthPercentage();
+	end
+
+return health;
+end
+
+function PetFocus()
+
+	local focus = 0;
+
+	if GetPet() ~= 0 and GetPet() ~= nil then
+
+		if not GetPet():IsDead() then
+	
+			focus = GetPet():GetFocusPercentage();
+		end
+	end
+
+return focus;
+end
+
+function PlayerHealth()
+
+	local health = 0;
+
+	if GetLocalPlayer() ~= nil then
+		
+		health = GetLocalPlayer():GetHealthPercentage();
+	end
+
+return health;
+end
+
+function PlayerMana()
+
+	local mana = 0;
+
+	if GetLocalPlayer():HasBuff("Clearcasting") then
+	
+		return 100;
+	end
+
+	if GetLocalPlayer() ~= nil then
+
+		if GetMyClass() ~= "WARRIOR" and GetMyClass() ~= "ROGUE" then
+		
+			mana = GetLocalPlayer():GetManaPercentage();
+		end
+	end
+
+return mana;
+
+end
+
+function PlayerManaTotal()
+
+	local manaTotal = 0;
+
+	if GetLocalPlayer() ~= nil then
+
+		if GetMyClass() ~= "WARRIOR" and GetMyClass() ~= "ROGUE" then
+		
+			manaTotal = GetLocalPlayer():GetMana();
+		end
+	end
+
+return manaTotal;
+end
+
+function PlayerRage()
+
+	local rage = 0;
+
+	if GetLocalPlayer():HasBuff("Clearcasting") then
+	
+		return 100;
+	end
+
+	if GetLocalPlayer() ~= nil then
+
+		if GetMyClass() == "WARRIOR" or GetLocalPlayer():HasBuff("Bear Form") or GetLocalPlayer():HasBuff("Dire Bear Form") then
+		
+			rage = GetLocalPlayer():GetRagePercentage();
+		end
+	end
+
+return rage;
+end
+
+function PlayerEnergy()
+
+	local energy = 0;
+
+	if GetLocalPlayer():HasBuff("Clearcasting") then
+	
+		return 100;
+	end
+
+	if GetLocalPlayer() ~= nil then
+
+		if GetMyClass() == "ROGUE" or GetLocalPlayer():HasBuff("Cat Form") then
+		
+			energy = GetLocalPlayer():GetEnergyPercentage();
+		end
+	end
+
+return energy;
+end
+
+function PlayerComboPoints()
+
+	local comboPoints = 0;
+
+	if GetLocalPlayer() ~= nil and PlayerHasTarget() then
+		
+		comboPoints = GetComboPoints("player", "target");
+	end
+
+return comboPoints;
+end
+
+function PlayerLevel()
+
+	local level = 1;
+
+	if GetLocalPlayer() ~= nil then
+
+		level = GetLocalPlayer():GetLevel();
+	end
+
+return level;
+end
+
+function Player()
+
+	return GetLocalPlayer();
 end

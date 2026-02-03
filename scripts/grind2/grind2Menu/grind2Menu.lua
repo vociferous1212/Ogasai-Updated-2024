@@ -4,6 +4,8 @@ grind2Menu = {
 
 	adjustScriptSpeed = false,
 
+	useFurbolgForm = false
+
 	}
 
 
@@ -191,6 +193,13 @@ function grind2Menu:run()
 		Text("Money Gained | "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver ");
 	end
 
+-- misc / random stuff
+	if HasItem("Dartol's Rod of Transformation") then
+		Separator();
+		Text("			Miscellanous stuff")
+		wasClicked, self.useFurbolgForm = Checkbox("Furbolg Form", self.useFurbolgForm);
+	end
+
 -- Separator
 	Text("________________________________________________________________________________________________________________________________________________________________________")
 	
@@ -209,11 +218,18 @@ function grind2Menu:run()
 	end
 
 -- show paranoia texts
-	if grind2.useParanoia then
-		if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 and grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
-			if grind2Paranoia.paranoidTargetName ~= nil and grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
-				Text("Player in range - "..grind2Paranoia.paranoidTargetName.." | "..math.floor(grind2Paranoia.paranoidTargetDistance).." (yd)");
-				Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
+	if grind2.useParanoia and not grind2.pause then
+		if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 then
+			if grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
+				if grind2Paranoia.paranoidTargetName ~= nil then
+					if grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
+						-- for some reason bot is randomly closing when trying to display this data?
+						local name = grind2Paranoia.paranoidTargetName;
+						local distance = grind2Paranoia.paranoidTargetDistance;
+						Text("Player in range - "..name.." | "..math.floor(distance).." (yd)");
+						Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
+					end
+				end
 			end
 		end
 	end

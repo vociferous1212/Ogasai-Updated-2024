@@ -1,34 +1,50 @@
-script_useItemsInInventory = {}
+script_useItemsInInventory = {
+
+	localTimer = 0
+
+}
 
 function script_useItemsInInventory:useItems()
 
-   -- local table = { [Scum Covered Bag] = true}
+	-- local table = { [Scum Covered Bag] = true}
 
 	-- if has table item then use item.
 	-- recheck a single run through the inventory and use global vars for true or false.
 	-- self.hasScumCoveredBag
 
+	if self.localTimer > GetTimeEX() or IsLooting() then
+		return false;
+	end
+
 	if script_useItemsInInventory:useBigMouthClam() then
-		script_grind:setWaitTimer(500);
-		return true;
+		script_grind:setWaitTimer(1500);
+		grind2:setTimer(1500);
+		return false;
 	end
 
 	if script_useItemsInInventory:useThickShelledClam() then
-		script_grind:setWaitTimer(500);
-		return true;
+		script_grind:setWaitTimer(1500);
+		grind2:setTimer(1500);
+		return false;
 	end
 
 	if script_useItemsInInventory:useScumCoveredBag() then
-		script_grind:setWaitTimer(500);
-		return true;
+		script_grind:setWaitTimer(1500);
+		grind2:setTimer(1500);
+		return false;
 	end
 
+self.localTimer = GetTimeEX() + 1500;
 return false;
 end
 
 function script_useItemsInInventory:useBigMouthClam()
 	local itemSlot = nil
 	local itemSlot2 = nil
+
+	if self.localTimer > GetTimeEX() then
+		return false;
+	end
 
 	-- Search bags for Big-mouth Clam
 	for i = 0, 4 do
@@ -43,14 +59,18 @@ function script_useItemsInInventory:useBigMouthClam()
 				end
 			end
 		end
-		if itemSlot then break end
+		if itemSlot then
+			break
+		end
 	end
 
 	-- Use the item if found
-	if itemSlot and itemSlot2 then
-		UseContainerItem(itemSlot, itemSlot2)
-		if IsLooting() then LootTarget() end
-	return true;
+	if itemSlot and itemSlot2 and GetTimeEX() > self.localTimer and not IsLooting() then
+		self.localTimer = GetTimeEX() + 1500;
+		if not UseContainerItem(itemSlot, itemSlot2) then
+			self.localTimer = GetTimeEX() + 1500;
+			return true;
+		end
 	end
 return false;
 end
@@ -58,6 +78,10 @@ end
 function script_useItemsInInventory:useThickShelledClam()
 	local itemSlot = nil
 	local itemSlot2 = nil
+
+	if self.localTimer > GetTimeEX() then
+		return false;
+	end
 
 	-- Search bags for Big-mouth Clam
 	for i = 0, 4 do
@@ -72,14 +96,18 @@ function script_useItemsInInventory:useThickShelledClam()
 				end
 			end
 		end
-		if itemSlot then break end
+		if itemSlot then
+			break
+		end
 	end
 
 	-- Use the item if found
-	if itemSlot and itemSlot2 then
-		UseContainerItem(itemSlot, itemSlot2)
-		if IsLooting() then LootTarget() end
-	return true;
+	if itemSlot and itemSlot2 and GetTimeEX() > self.localTimer and not IsLooting() then
+		self.localTimer = GetTimeEX() + 1500;
+		if not UseContainerItem(itemSlot, itemSlot2) then
+			self.localTimer = GetTimeEX() + 1500;
+			return true;
+		end
 	end
 return false;
 end
@@ -87,6 +115,10 @@ end
 function script_useItemsInInventory:useScumCoveredBag()
 	local itemSlot = nil
 	local itemSlot2 = nil
+
+	if self.localTimer > GetTimeEX() then
+		return false;
+	end
 
 	-- Search bags for Big-mouth Clam
 	for i = 0, 4 do
@@ -101,14 +133,18 @@ function script_useItemsInInventory:useScumCoveredBag()
 				end
 			end
 		end
-		if itemSlot then break end
+		if itemSlot then
+			break
+		end
 	end
 
 	-- Use the item if found
-	if itemSlot and itemSlot2 then
-		UseContainerItem(itemSlot, itemSlot2)
-		if IsLooting() then LootTarget() end
-	return true;
+	if itemSlot and itemSlot2 and GetTimeEX() > self.localTimer and not IsLooting() then
+		self.localTimer = GetTimeEX() + 1500;
+		if not UseContainerItem(itemSlot, itemSlot2) then
+			self.localTimer = GetTimeEX() + 1500;
+			return true;
+		end
 	end
 return false;
 end

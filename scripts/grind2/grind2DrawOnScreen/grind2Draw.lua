@@ -47,7 +47,7 @@ function grind2Draw:run()
 	end
 
 -- draw paranoid target over player position
-	if grind2.useParanoia then
+	if grind2.useParanoia and not grind2.pause then
 		if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 and grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
 			if grind2Paranoia.paranoidTargetName ~= nil and grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
 				local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());

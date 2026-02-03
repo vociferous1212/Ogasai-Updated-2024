@@ -7,6 +7,8 @@ grind2Setup = {
 function grind2Setup:run()
 
 	if not self.isSetup then
+	
+		grind2FleeCombat:setup()
 
 		-- check if bags are full
 		grind2AreBagsFull:checkIfBagsAreFull()
@@ -73,10 +75,17 @@ function grind2Setup:run()
 		if GetRealmName() == "Permadeath - EU" then 
 			grind2FleeCombat.fleeWithAdds = true;
 			grind2FleeCombat.fleeCombat = true;
+		end
+
+		if HasItem("Dartol's Rod of Transformation") then
+			grind2Menu.useFurbolgForm = true;
+		end
+
+
+
+
+
 	end
 
-
-
-	end
 	self.isSetup = true;
 end
