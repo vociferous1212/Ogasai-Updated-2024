@@ -47,9 +47,6 @@ Required to use the bot:
 
 
 
-
-
-
                                   Ogasai Scripts - Updates to Logitechs original work
                                      
                                   please turn on auto-self cast in the interface menu
@@ -58,8 +55,8 @@ Required to use the bot:
   Changes are too numerous to report. The original design, combat, rest and targeting system, is based on Logitechs original scripts. 
 
 
-Edited mmaps
-https://drive.google.com/file/d/1kPlDG9XKgTygfWX4T7b47RKpKTmT06CZ/view?usp=sharing
+Manually updated navmesh files - has issues in teldrassil... much better elsewhere... : 
+https://drive.google.com/file/d/1VrMrXe4OPwipLNHnsImFKBOv8nZ4JkR1/view?usp=sharing
 
 Edit NavMesh by clicked "edit tiles". Click a tile holder until you see it 'light up' (the circle will become larger) - zoom in camera if needed... Hold 'ctrl' and left click where you want to place the new tile holder marker. Press the 'alt' key to undo last tile holder marker movement. Anything INSIDE the white tiles is an acceptable move path. Anything inside blue tiles is not an acceptable move path. Change as needed. Make sure Click - To - Move is enabled!
 ![oGasai](https://github.com/vociferous1212/Ogasai-pic/blob/main/mmaps.png?raw=true)
