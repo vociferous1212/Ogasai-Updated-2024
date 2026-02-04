@@ -298,13 +298,6 @@ function script_mage:run(targetGUID)
 	if (IsChanneling()) or (IsCasting()) or (localObj:HasBuff("Ice Block")) or (script_mage.waitTimer + script_grind.tickRate > GetTimeEX())
 	or localObj:IsStunned() then
 
-		if IsStanding() and IsInCombat() and PlayerHasTarget() and not IsMoving() and not localObj:IsStunned() then
-			if GetTarget():GetDistance() <= script_grind.combatScriptRange and GetTarget():IsInLineOfSight() then
-				if not IsMoving() and not IsPathLoaded(5) then
-					GetTarget():FaceTarget();
-				end
-			end
-		end
 	return 4;
 	end
 
@@ -402,9 +395,7 @@ function script_mage:run(targetGUID)
 		if (targetObj:GetDistance() > script_grind.combatScriptRange -1 or not targetObj:IsInLineOfSight()) and not targetObj:HasDebuff("Frost Nova") and not targetObj:HasDebuff("Frostbite") then
 			return 3;
 		end
-		if targetObj:GetDistance() <= script_grind.combatScriptRange and not IsMoving() and targetObj:GetHealthPercentage() <= 99 then
-			targetObj:FaceTarget();
-		end
+		
 
 		--	START OF COMBAT PHASE
 
@@ -461,9 +452,7 @@ function script_mage:run(targetGUID)
 						script_grind:setWaitTimer(3000);
 						script_mage.waitTimer = GetTimeEX() + 3000;
 					end
-					if (PlayerHasTarget()) and not IsMoving() then
-						targetObj:FaceTarget();
-					end
+					
 				end
 
 				-- fire mage selected use these spells instead
@@ -471,9 +460,7 @@ function script_mage:run(targetGUID)
 				if (script_magePullSpells.fireMagePull(targetObj)) then
 					script_grind:setWaitTimer(2600);
 					script_mage.waitTimer = GetTimeEX() + 2600;
-					if (PlayerHasTarget()) and not IsMoving() then
-						targetObj:FaceTarget();
-					end
+					
 				end
 			end
 			
@@ -814,7 +801,6 @@ function script_mage:run(targetGUID)
 
 					-- if not targetobj is in line of sight and it has frost nova or frost bite then try to attack out of line of sight target
 					if localMana >= script_mage.frostboltMana and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and not targetObj:IsInLineOfSight() and (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova")) then
-						targetObj:FaceTarget();
 						CastSpellByName("Frostbolt", targetObj);
 						script_mage.waitTimer = GetTimeEX() + 2500;
 						script_grind:setWaitTimer(1500);
@@ -822,9 +808,7 @@ function script_mage:run(targetGUID)
 
 					-- frost bolt main damage source
 					if localMana >= script_mage.frostboltMana and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and targetObj:IsInLineOfSight() then
-							targetObj:FaceTarget();
 						if (CastSpellByName("Frostbolt", targetObj)) then
-							targetObj:FaceTarget();
 							script_mage.waitTimer = GetTimeEX() + 500;
 							script_grind:setWaitTimer(300);
 							--

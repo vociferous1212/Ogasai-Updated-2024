@@ -34,6 +34,10 @@ function script_druidBearForm:runInCombat(targetObj)
 		end
 	end
 
+	if ((targetObj:GetDistance() > script_druid.spellRange and targetObj:GetDistance() > 2) or not targetObj:IsInLineOfSight()) and not IsCasting() and not IsChanneling() then
+		return 3;
+	end
+
 -- growl in group
 	if IsBearForm() and (GetNumPartyMembers() >= 2) and (not targetObj:IsTargetingMe()) and (targetObj:GetDistance() <= 10) then
 		if (not IsSpellOnCD("Growl")) then

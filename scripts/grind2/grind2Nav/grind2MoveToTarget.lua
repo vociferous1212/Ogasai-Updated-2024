@@ -79,6 +79,8 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 -- we are swimming, try to stay at top of water
 	if IsSwimming() then
+
+		-- + 1 each z move
 		_lx, _ly, _lz = localObj:GetPosition();
 		_iz = _lz + 1;
 	end
@@ -98,4 +100,13 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	self.timer = GetTimeEX() + 100;
 
 return false;
+end
+
+function grind2MoveToTarget:resetNav() -- navPathPosition used for navigate
+	local x, y, z = Player():GetPosition();
+	self.navPathPosition['x'] = x;
+	self.navPathPosition['y'] = y;
+	self.navPathPosition['z'] = z;
+	self.lastPathIndex = -1;
+	self.lastnavIndex = 0;
 end

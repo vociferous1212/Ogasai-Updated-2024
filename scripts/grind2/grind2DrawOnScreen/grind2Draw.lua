@@ -56,4 +56,10 @@ function grind2Draw:run()
 		end
 	end
 
+-- draw nav path
+	if grind2DrawDataMenu.drawPath and not grind2.pause then
+
+		grind2DrawNavPath:drawPath()
+	end
+
 end

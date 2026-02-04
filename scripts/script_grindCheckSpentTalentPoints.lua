@@ -50,9 +50,9 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 				-- frost mage 
 				if nameTalent == "Arctic Reach" then
 					if currRank == 1 then
-						script_mage.spellRange = 33;
+						script_mage.spellRange = 32;
 					elseif currRank == 2 then 
-						script_mage.spellRange = 36;
+						script_mage.spellRange = 35;
 					end
 
 				-- fire mage

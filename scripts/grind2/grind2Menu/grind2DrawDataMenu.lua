@@ -12,6 +12,10 @@ grind2DrawDataMenu = {
 
 	showGameObjectIDs = false,
 
+	newTheme = true,
+
+	drawPath = true
+
 
 }
 
@@ -22,7 +26,7 @@ function grind2DrawDataMenu:run()
 -- draw unit and message data on screen
 	if CollapsingHeader("Draw Data Menu") then
 
-		wasClicked, self.drawMessages = Checkbox("Draw Messages", self.drawMessages);
+		wasClicked, self.drawMessages = Checkbox("Messages", self.drawMessages);
 
 		SameLine();
 
@@ -30,7 +34,7 @@ function grind2DrawDataMenu:run()
 
 		SameLine();
 
-		wasClicked, self.drawUnits = Checkbox("Draw Units", self.drawUnits);
+		wasClicked, self.drawUnits = Checkbox("Units", self.drawUnits);
 
 		SameLine();
 
@@ -38,14 +42,37 @@ function grind2DrawDataMenu:run()
 
 		SameLine();
 
-		wasClicked, self.drawObjects = Checkbox("Draw Game Objects", self.drawObjects);
+		wasClicked, self.drawObjects = Checkbox("Game Objects", self.drawObjects);
 
+		SameLine();
+
+		Text(" | ");
+
+		SameLine();
+
+		wasClicked, self.newTheme = Checkbox("Theme", self.newTheme);
+
+		if not self.newTheme then
+			NewTheme(false);
+		else
+			NewTheme(true);
+		end
 		Separator();
 
 
 -- aggro circles
-		wasClicked, grind2DrawAggroCircles.drawAggroCircles = Checkbox("Draw Aggro Circles", grind2DrawAggroCircles.drawAggroCircles);
+		wasClicked, grind2DrawAggroCircles.drawAggroCircles = Checkbox("Aggro Circles", grind2DrawAggroCircles.drawAggroCircles);
 
+		SameLine();
+
+		Text(" | ");
+
+		SameLine();
+
+-- draw path
+		wasClicked, self.drawPath = Checkbox("Path", self.drawPath);
+
+-- aggro circles slider
 		if grind2DrawAggroCircles.drawAggroCircles then
 
 			Text("Aggro Circle Range")
@@ -53,6 +80,8 @@ function grind2DrawDataMenu:run()
 			grind2DrawAggroCircles.circleRange = SliderInt("Aggro Circle Range", 1, 150, grind2DrawAggroCircles.circleRange);
 
 		end
+
+		
 
 -- show or hide unit data on screen
 		if self.drawUnits then
@@ -90,6 +119,7 @@ function grind2DrawDataMenu:run()
 				wasClicked, grind2SelectDrawTargets.drawName = Checkbox("Name", grind2SelectDrawTargets.drawName);
 
 
+				Separator();
 
 
 				wasClicked, grind2DrawUnitData.drawPlayers = Checkbox("Draw Players ", grind2DrawUnitData.drawPlayers);
@@ -111,9 +141,12 @@ function grind2DrawDataMenu:run()
 				wasClicked, grind2DrawUnitData.drawTargeted = Checkbox("Draw Targeted ", grind2DrawUnitData.drawTargeted);
 
 
+				Separator();
+
+
 				if grind2DrawUnitData.drawNPC then
 
-					wasClicked, grind2DrawUnitData.drawFriendlies = Checkbox("Draw Friendlies ", grind2DrawUnitData.drawFriendlies);
+					wasClicked, grind2DrawUnitData.drawFriendlies = Checkbox("Draw Friendly NPC ", grind2DrawUnitData.drawFriendlies);
 
 					SameLine();
 					
@@ -121,7 +154,20 @@ function grind2DrawDataMenu:run()
 
 					SameLine();
 
-					wasClicked, grind2DrawUnitData.drawEnemies = Checkbox("Draw Enemies ", grind2DrawUnitData.drawEnemies);
+					wasClicked, grind2DrawUnitData.drawEnemies = Checkbox("Draw Enemy NPC ", grind2DrawUnitData.drawEnemies);
+				end
+
+				if grind2DrawUnitData.drawPlayers then
+				
+					wasClicked, grind2SelectDrawTargets.drawFriendlyPlayers = Checkbox("Draw Friendly Players", grind2SelectDrawTargets.drawFriendlyPlayers);
+
+					SameLine();
+
+					Text(" | ")
+
+					SameLine();
+
+					wasClicked, grind2SelectDrawTargets.drawEnemyPlayers = Checkbox("Draw Enemy Players", grind2SelectDrawTargets.drawEnemyPlayers);
 				end
 			end
 		end

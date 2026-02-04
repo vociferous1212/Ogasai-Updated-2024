@@ -24,6 +24,7 @@ includeFiles = {
 	grinder2Potions = include("scripts\\grind2\\grind2Helper\\grind2Potions.lua"),
 	grinder2Water =	include("scripts\\grind2\\grind2Helper\\grind2Water.lua"),
 	grinder2MoneyCounter = include("scripts\\grind2\\grind2Helper\\grind2MoneyCounter.lua"),
+	grinder2HandleSwimming = include("scripts\\grind2\\grind2Helper\\grind2HandleSwimming.lua"),
 
 
 -- grind2Inventory
@@ -55,6 +56,7 @@ includeFiles = {
 	grinder2SaveCoordinates = include("scripts\\grind2\\grind2Nav\\grind2SaveCoordinates.lua"),
 	grinder2Nav = include("scripts\\grind2\\grind2Nav\\grind2Nav.lua"),
 	grinder2MoveToTarget = include("scripts\\grind2\\grind2Nav\\grind2MoveToTarget.lua"),
+	grinder2DrawNavPath = include("scripts\\grind2\\grind2Nav\\grind2DrawNavPath.lua"),
 
 
 -- grind2Talents

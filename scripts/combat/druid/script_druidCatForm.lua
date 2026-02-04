@@ -30,6 +30,10 @@ function script_druidCatForm:runInCombat(targetObj)
 		return 0;
 	end
 
+	if ((targetObj:GetDistance() > script_druid.spellRange and targetObj:GetDistance() > 2) or not targetObj:IsInLineOfSight()) and not IsCasting() and not IsChanneling() then
+		return 3;
+	end
+
 -- Rip with 3 CPs
 	if IsCatForm() and (PlayerComboPoints() >= 3) and (PlayerEnergy() >= 30) and (not HasSpell("Ferocious Bite")) and (not targetObj:HasDebuff("Rip")) and (targetObj:GetCreatureType() ~= "Elemental") and (targetObj:GetCreatureType() ~= "Mechanical") then
 		if (script_druidEX2:castRip("Rip")) then

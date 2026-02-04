@@ -51,7 +51,9 @@ script_hunter = {
 	addScared = false,	-- is add scared/feared
 	scareBeastTimer = 0,
 	secondarySetup = false,
-	faceTargetTimer = 0
+	faceTargetTimer = 0,
+	petAttackTimer = 0,
+	petFollowTimer = 0,
 
 }	
 
@@ -276,7 +278,7 @@ function script_hunter:run(targetGUID)
 
 	if HasPet() and targetObj ~= nil and targetObj ~= 0 then
 		if not GetPet():IsInLineOfSight() and not targetObj:IsInLineOfSight() then
-			PetFollow();
+			if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 		end
 	end
 
@@ -323,7 +325,7 @@ function script_hunter:run(targetGUID)
 		--local xx, yy, zz = targetObj:GetPosition();
 		--local dist = GetDistance3D(x, y, z, xx, yy, zz);
 	--if not GetPet():IsDead() and script_grind:isTargetingMe(targetObj) and dist <= 3 then
-		--	PetAttack();
+		--	if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 		--if HasSpell("Feign Death") and not IsSpellOnCD("Feign Death") and not GetLocalPlayer():HasBuff("Feign Death") then
 		--	if CastSpellByName("Feign Death") then
 		--		self.waitTimer = GetTimeEX() + 2500;
@@ -339,8 +341,8 @@ function script_hunter:run(targetGUID)
 	and GetPet() ~= 0
 	and GetPet() ~= nil
 	and self.hasPet
-	and targetObj:GetUnitsTarget() ~= 0
-	and targetObj:GetUnitsTarget() ~= nil
+	and ((targetObj:GetUnitsTarget() ~= 0
+	and targetObj:GetUnitsTarget() ~= nil) or targetObj:IsStunned())
 	and not script_grind:isTargetingMe(targetObj)
 	and not script_checkDebuffs:hasDisabledMovement()
 	--and (targetObj:IsInLineOfSight())
@@ -352,7 +354,7 @@ function script_hunter:run(targetGUID)
 	then
 
 		-- run backwards
-		if (targetObj:GetUnitsTarget():GetGUID() == pet:GetGUID() or targetObj:IsFleeing())
+		if targetObj ~= nil and targetObj:IsStunned() or (targetObj:GetUnitsTarget() ~= 0 and targetObj:GetUnitsTarget() ~= nil and targetObj:GetUnitsTarget():GetGUID() == GetPet():GetGUID() or targetObj:IsFleeing())
 
 		then
 
@@ -362,9 +364,9 @@ function script_hunter:run(targetGUID)
 					self.message = "Moving away from target for range attacks...";
 					
 					if targetObj:IsInLineOfSight() then
-							PetAttack();
+							if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 					elseif not targetObj:IsInLineOfSight() then
-						PetFollow();
+						if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 					end		
 
 					self.waitTimer = GetTimeEX() + 500;
@@ -568,7 +570,7 @@ function script_hunter:run(targetGUID)
 		if (targetObj:GetDistance() < self.spellRange) and targetObj:GetDistance() > self.minSpellRange and (targetObj:IsInLineOfSight())
 		and not targetObj:IsDead() and targetObj:CanAttack() then
 			if (self.hasPet) then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 			end
 			if (not IsAutoCasting("Auto Shot")) and not targetObj:IsDead() and targetObj:IsInLineOfSight() and not IsMoving() then
 				if targetObj:GetDistance() >= self.minSpellRange then
@@ -614,11 +616,11 @@ function script_hunter:run(targetGUID)
 				targetObj:FaceTarget();
 					self.waitTimer = GetTimeEX() + 250;
 				end
-				if HasPet() then PetAttack(); end
+				if HasPet() then if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end; end
 				-- else move to target to melee
 			elseif (targetObj:GetDistance() < self.minSpellRange) or not targetObj:IsInLineOfSight() or not self.useRangedAttacks then
 				if (targetObj:GetDistance() > self.meleeDistance) then
-				if HasPet() then PetAttack(); end
+				if HasPet() then if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end; end
 					return 3;
 				end
 				-- recheck move to melee range
@@ -626,7 +628,7 @@ function script_hunter:run(targetGUID)
 				if not IsAutoCasting("Attack") then
 					targetObj:AutoAttack();
 				end
-				if HasPet() then PetAttack(); end
+				if HasPet() then if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end; end
 				return 3;
 			elseif targetObj:GetDistance() < self.minSpellRange then
 				return 3;
@@ -639,7 +641,7 @@ function script_hunter:run(targetGUID)
 			if script_hunter:hunterPull(targetObj) then 
 				self.waitTimer = GetTimeEX() + 250;
 			end
-			if HasPet() then PetAttack(); end
+			if HasPet() then if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end; end
 			script_grind:setWaitTimer(1500);
 			if (not IsMoving()) then
 				
@@ -728,7 +730,7 @@ function script_hunter:run(targetGUID)
 						if targetObj:GetDistance() <= self.spellRange then
 							self.waitTimer = GetTimeEX() + 500;
 						end
-						PetAttack();
+						if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 					end
 				end
 			end
@@ -790,7 +792,7 @@ function script_hunter:run(targetGUID)
 
 					-- pet is too far away to mend
 					if (GetPet():GetDistance() > 20) then
-						PetFollow();
+						if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 						return true;
 
 					-- pet is close enough to mend
@@ -824,7 +826,7 @@ function script_hunter:run(targetGUID)
 				-- Check: Mend the pet if it has lower than 70% HP and out of combat
 				if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
 					if (GetPet():GetDistance() > 20) then
-					PetFollow(); self.waitTimer = GetTimeEX() + 1000;
+					if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end; self.waitTimer = GetTimeEX() + 1000;
 						return true;
 					
 					elseif (GetPet():GetDistance() < 20) and (localMana >= 15) then
@@ -841,11 +843,11 @@ function script_hunter:run(targetGUID)
 			-- follower walk away from any target that is not attacking me and I am attacking it
 			if (GetNumPartyMembers() > 0) and not script_rotation.usingRotation and self.useRangedAttacks and targetObj ~= 0 and targetObj ~= nil then
 				if (targetObj:IsInLineOfSight())
-				and (targetObj:GetUnitsTarget() ~= 0)
-				and (targetObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) then
+				and (targetObj:GetUnitsTarget() ~= 0
+				and targetObj:GetUnitsTarget():GetGUID() ~= localObj:GetGUID()) or targetObj:IsStunned() then
 
 						if (script_hunter:runBackwards(targetObj, self.minSpellRange)) then
-							PetAttack();
+							if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 							self.message = "Moving away from target for range attacks...";
 						return 4;
 						end
@@ -865,7 +867,7 @@ function script_hunter:run(targetGUID)
 
 						CastSpellByName("Hunter's Mark");
 						self.waitTimer = GetTimeEX() + 1650;
-						PetAttack();
+						if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 						if (not IsMoving()) then
 							
 						end
@@ -939,7 +941,7 @@ function script_hunter:run(targetGUID)
 					-- Check: Mend the pet if it has lower than 70% HP and out of combat
 					if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
 						if (GetPet():GetDistance() > 20) then
-							PetFollow();
+							if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 							return true;
 						
 						elseif (GetPet():GetDistance() < 20) and (localMana >= 15) then
@@ -997,7 +999,7 @@ function script_hunter:run(targetGUID)
 						end
 						CastSpellByName("Raptor Strike")
 						if HasPet() then
-							PetAttack();
+							if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 						end
 						self.waitTimer = GetTimeEX() + 500;
 						
@@ -1153,7 +1155,7 @@ function script_hunter:rest()
 	and (self.hasPet) and (GetPet() ~= 0) then 
 		self.message = "Feeding the pet, pausing... Make sure food is in correct slot!";
 		if (GetPet():GetDistance() > 8) then
-			PetFollow();
+			if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 			self.waitTimer = GetTimeEX() + 1250;
 			grind2RunCombatState.blacklistTargetTimer = GetTimeEX() * 2;
 			return true;
@@ -1360,14 +1362,14 @@ function script_hunter:hunterPull(targetObj)
 	if self.waitTimer > GetTimeEX() or IsCasting() or IsChanneling() then return; end
 
 	if self.hasPet and HasPet() and not IsMoving() and not targetObj:IsDead() and targetObj:CanAttack() then
-		PetAttack();
+		if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 	end
 
 	-- use Hunter's Mark
 	if not IsSpellOnCD("Hunter's Mark") and (not IsInCombat()) and (self.useMark) and (localMana >= self.useMarkMana) and (not targetObj:HasDebuff("Hunter's Mark")) and (IsStanding()) then
 		if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (targetObj:CanAttack()) and (not targetObj:IsDead()) and (HasSpell("Hunter's Mark")) then
 			if CastSpellByName("Hunter's Mark") then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 				if (not IsMoving()) then
 					targetObj:FaceTarget();
 				end
@@ -1382,7 +1384,7 @@ function script_hunter:hunterPull(targetObj)
 			if IsMoving() then StopMoving() return true;
 			end
 			if CastSpellByName("Aimed Shot") then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 				self.waitTimer = GetTimeEX() + 3000;
 			end
 		return;
@@ -1403,7 +1405,7 @@ function script_hunter:hunterPull(targetObj)
 			self.waitTimer = GetTimeEX() + 500;
 		end
 		if (GetPet() ~= 0) and (self.hasPet) then
-			PetAttack();
+			if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 		end
 		--self.waitTimer = GetTimeEX() + 1500;
 		--script_grind:setWaitTimer(1500);
@@ -1415,7 +1417,7 @@ function script_hunter:hunterPull(targetObj)
 	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
 		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (localMana > self.arcaneShotMana) then
 			if CastSpellByName("Concussive Shot") then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 				self.waitTimer = GetTimeEX() + 500;
 			end		
 		end
@@ -1425,7 +1427,7 @@ function script_hunter:hunterPull(targetObj)
 	if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
 		if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana) then
 			if not CastSpellByName("Serpent Sting") then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 				self.waitTimer = GetTimeEX() + 500;
 			end
 		end
@@ -1435,7 +1437,7 @@ function script_hunter:hunterPull(targetObj)
 	--if (not targetObj:HasDebuff("Scorpid Sting")) then
 	--	if (HasSpell("Scorpid Sting")) and (targetObj:IsInLineOfSight()) and (localMana > 20) and (targetHealth > 30) then
 	--		CastSpellByName("Scorpid Sting");
-	--		PetAttack();		--		
+	--		if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;		--		
 	--	end
 	--end
 					
@@ -1443,7 +1445,7 @@ function script_hunter:hunterPull(targetObj)
 	if (not IsSpellOnCD("Arcane Shot")) and (IsStanding()) and not HasSpell("Aimed Shot") then
 		if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) and (localMana > self.arcaneShotMana) then
 			if CastSpellByName("Arcane Shot") then
-				PetAttack();
+				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 				self.waitTimer = GetTimeEX() + 500;
 			end	
 		end
@@ -1482,7 +1484,7 @@ function script_hunter:petAttackTargetAttackingMe()
 					if not PetHasTarget() then
 
 						-- get a target attacking me
-						PetAttack();
+						if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 					end
 
 					-- pet has a target
@@ -1502,7 +1504,7 @@ function script_hunter:petAttackTargetAttackingMe()
 									i:AutoAttack();
 
 									-- send pet to attack target attacking me
-									PetAttack();
+									if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 
 									if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 										script_grind.enemyObj = grind2.enemyTarget;

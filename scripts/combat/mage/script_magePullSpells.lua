@@ -18,16 +18,12 @@ function script_magePullSpells:frostMagePull(targetObj)
 			StopMoving();
 			return true;
 		end
-		if (PlayerHasTarget()) then
-			targetObj:FaceTarget();
-		end
+		
 		if targetObj:IsInLineOfSight() and not IsSpellOnCD("Frostbolt") then
 			if (CastSpellByName("Frostbolt", targetObj)) then
 				script_mage.waitTimer = GetTimeEX() + 2750;
 				script_grind:setWaitTimer(2750);
-				if (PlayerHasTarget()) then
-					targetObj:FaceTarget();
-				end
+				
 				return true;
 			end
 		end
@@ -52,16 +48,12 @@ function script_magePullSpells:fireMagePull(targetObj)
 		if (IsMoving()) then
 			StopMoving();
 		end
-		if (PlayerHasTarget()) then
-			targetObj:FaceTarget();
-		end
+		
 		if (HasSpell("Pyroblast")) and not IsSpellOnCD("Pyroblast") then
 			if (CastSpellByName("Pyroblast", targetObj)) then
 				script_mage.waitTimer = GetTimeEX() + 3000;
 				script_grind:setWaitTimer(3000);
-				if (PlayerHasTarget()) then
-					targetObj:FaceTarget();
-				end
+				
 				return true;
 			end
 		else

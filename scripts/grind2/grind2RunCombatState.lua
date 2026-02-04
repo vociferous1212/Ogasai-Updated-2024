@@ -184,12 +184,14 @@ function grind2RunCombatState:run()
 
 			-- stop moving if we have reached a target
 			if IsInCombat() and PlayerHasTarget() then
-				if GetTarget():GetDistance() <= 2 then
-					if GetTarget():GetHealthPercentage() >= 20 and not script_checkAdds:checkAdds() then
-						if IsMoving() then
-							StopMoving();
-							script_grind.combatError = nil;
-							return false;
+				if GetTarget():GetDistance() <= 1.5 then
+					if GetTarget():GetDistance() > .5 then
+						if GetTarget():GetHealthPercentage() >= 20 then
+							if IsMoving() then
+								StopMoving();
+								script_grind.combatError = nil;
+								return false;
+							end
 						end
 					end
 				end

@@ -322,7 +322,7 @@ function script_vendor:sell()
 	
 	-- causing stuttering < level 40 in grind 2
 	if not IsSwimming() and (script_vendor:getStatus() >= 1) and (not IsInCombat()) and GetTimeEX() > script_grind.tryMountTimer
-		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount) and script_grind.hasAMount and GetLocalPlayer():GetLevel() >= 40
+		and (not IsMounted()) and (not IsIndoors()) and (not HasForm()) and (script_grind.useMount or grind2.useMount) and script_grind.hasAMount and GetLocalPlayer():GetLevel() >= 40
 	then
 		if (IsMoving()) then
 			StopMoving();

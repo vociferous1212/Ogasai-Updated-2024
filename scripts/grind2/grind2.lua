@@ -33,6 +33,7 @@ grind2 = {
 	useMount = false,							-- use mount or not
 	autoSelectTalents = false,					-- auto select talents or not
 	useFirstAid = false,						-- use first aid or not
+	avoidEliteTimer = 0,						-- calling move function to oquick crashes nav...
 
 	}
 
@@ -220,32 +221,48 @@ function grind2:run()
 -- set variables
 	local currentTime = GetTimeEX();
 
--- check unstuck
-	if not grind2.pause then
+-- handle swimming
+	-- does not work... jumping in water counts as not swimming anymore
+	--grind2HandleSwimming:run()
 
+-- needs moved to checkdebuffs script...
+	if Player():HasDebuff("Dominate Mind") or Player():HasDebuff("Mind Control") then
+		return;
+	end
+
+-- do this stuff regardless of timer - each has their own conditions
+	if not grind2.pause then
+-- check unstuck
 		grind2CheckUnstuck:run();
 
 		if not Player():IsDead() then
+
 -- avoid elites...
 -- if not on way to vendor and already running and not if we are mounted and running
-			if script_vendor.status == 0 and not IsMounted() then 
+			if script_vendor.status == 0 and not IsMounted() and currentTime > self.avoidEliteTimer then 
 				if (script_aggro:avoidElite()) then
+					self.avoidEliteTimer = currentTime + 100;
 					grind2.grinderMessage = "Elite within range... running away...";
 					return; 
 				end
 			end
 
--- avoid targets when walking through nav
--- avoid aggro ranges of targets that are not grinder target
+-- avoid aggro ranges of targets that are not grinder target - when moving to grinder target, or through nav
 -- don't do if we need to loot or under PlayerLevel() 6
 -- don't use in combat, combat scripts handle add movements
 			if not IsIndoors() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets) then
-				if script_runner:avoidToAggro(3) then
-					local _lx, _ly, _lz = Player():GetPosition(); local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
+				if script_runner:avoidToAggro(3) and not IsInCombat() then
+					local _lx, _ly, _lz = Player():GetPosition();
+					local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
 					GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
+					-- reset jump timer.. don't jump into aggro ranges
 					grind2PreChecks.jumpTimer = currentTime + 500;
-					Move(_ix, _iy, _iz);
-					return false;
+					if Move(_ix, _iy, _iz) then
+						-- reset nav position
+						grind2MoveToTarget:resetNav();
+					end
+					grind2.grinderMessage = "Avoiding targets...";
+					return;
 				end
 			end
 
@@ -257,6 +274,8 @@ function grind2:run()
 						grind2FleeCombat:run();
 						self.grinderMessage = "Fleeing combat";
 						grind2.enemyTarget = nil;
+						grind2.lastTargetTargeted = nil;
+						grind2.lastTargetTargetedGUID = nil;
 						if PlayerHasTarget() then
 							ClearTarget();
 						end
@@ -278,8 +297,10 @@ function grind2:run()
 					self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
 				end
 			end
-		end
-	end
+		end	-- end of if not dead
+	end	-- end of if not paused
+
+
 
 -- return if paused or for any reason
 	if grind2.timer > currentTime or grind2.pause or IsCasting() or IsChanneling() then

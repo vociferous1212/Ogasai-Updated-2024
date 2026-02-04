@@ -53,25 +53,33 @@ function grind2PreChecks:run()
 		end
 	end
 
--- check bags for new bags to equip if we are below level 10 - started a new character
-	if not IsInCombat() and level < 10 then
-		if grind2EquipBags:checkForBagsToEquip() then
-			return true;
+
+
+-- check inventory stuffs
+	if not IsInCombat() and not IsMoving() then
+
+	-- check bags for new bags to equip if we are below level 10 - started a new character
+		if not IsInCombat() and level < 10 then
+			if grind2EquipBags:checkForBagsToEquip() then
+				return true;
+			end
+		end
+
+	-- delete inventory items - 45 seconds
+		if script_deleteItems.deleteItems and currentTime > script_deleteItems.deleteItemTimer then
+			script_deleteItems:checkDeleteItems();
+			script_deleteItems.deleteItemTimer = currentTime + 45000;
+		end
+
+	-- use inventory items
+		if not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() and not IsCasting() and not IsChanneling() then
+			if script_useItemsInInventory:useItems() then
+				grind2:setTimer(1500);
+			end
 		end
 	end
 
--- delete inventory items 
-	if not IsInCombat() and not IsMoving() and script_deleteItems.deleteItems and currentTime > script_deleteItems.deleteItemTimer then
-		script_deleteItems:checkDeleteItems();
-		script_deleteItems.deleteItemTimer = currentTime + 60000;
-	end
 
--- use inventory items
-	if not IsInCombat() and not IsMoving() and not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() and not IsCasting() and not IsChanneling() then
-		if script_useItemsInInventory:useItems() then
-			grind2:setTimer(1500);
-		end
-	end
 
 -- do loot if we can
 	if grind2.lootTargets and not grind2.bagsAreFull and not AreBagsFull() and not IsEating() and not IsDrinking() and IsStanding() and not IsAnyTargetTargetingPlayer() then
@@ -156,7 +164,7 @@ function grind2PreChecks:run()
 		end
 
 		-- sell
-		if (AreBagsFull() or grind2.bagsAreFull or script_vendor.status == 2) then
+		if (AreBagsFull() or grind2.bagsAreFull or script_vendor.status >= 1) then
 				
 			-- sell to vendor
 			script_vendor:sell();
@@ -190,6 +198,7 @@ function grind2PreChecks:run()
 		-- nothing here yet
 		end
 
+	return true;
 	end
 
 

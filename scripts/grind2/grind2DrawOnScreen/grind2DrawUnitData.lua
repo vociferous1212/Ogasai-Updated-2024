@@ -58,7 +58,7 @@ function grind2DrawUnitData:drawUnitsOnScreen()
 		if self.drawPlayers then
 		
 			-- draw friendly player targets
-			if targetType == 4 and not target:IsCritter() and not target:IsDead() and not target:CanAttack() then
+			if targetType == 4 and not target:IsCritter() and not target:IsDead() then
 		
 				grind2SelectDrawTargets:SelectPlayerTarget(target)
 			end

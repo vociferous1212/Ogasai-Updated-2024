@@ -81,10 +81,14 @@ function script_runner:avoidToAggro(safeMargin)
 		grindEnemy = grind2.enemyTarget:GetGUID();
 	end
 
+	if IsInCombat() then
+		return false;
+	end
+
 	while currentObj ~= 0 do
 		if typeObj == 3 then
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
-			local range = aggro + safeMargin
+			local range = aggro + safeMargin - 1
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
 				if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
 
@@ -106,14 +110,14 @@ function script_runner:avoidToAggro(safeMargin)
 	if (closestEnemy ~= 0) then
 		local xT, yT, zT = closestEnemy:GetPosition()
 		local xP, yP, zP = localObj:GetPosition()
-		local safeRange = safeMargin + 1
+		local safeRange = safeMargin - 1
 		local intersectMob = script_runner:aggroIntersect(closestEnemy)
 		if (intersectMob ~= nil) then
 			local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 18
 			local x, y, z = closestEnemy:GetPosition()
 			local xx, yy, zz = intersectMob:GetPosition()
 			local centerX, centerY = (x + xx) / 2, (y + yy) / 2
-			script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange - 1)
+			script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange + .5)
 		  --  self.oscillationCount = self.oscillationCount + 1
 		   -- if self.oscillationCount > 2 then
 			--    self.oscillationCount = 0
@@ -121,7 +125,7 @@ function script_runner:avoidToAggro(safeMargin)
 		  --  end
 			return true;
 		else
-			script_runner:avoid(xT, yT, zP, aggro, safeRange - 1)
+			script_runner:avoid(xT, yT, zP, aggro, safeRange + .5)
 		   -- self.oscillationCount = self.oscillationCount + 1
 		  --  if self.oscillationCount > 2 then
 			 --   self.oscillationCount = 0

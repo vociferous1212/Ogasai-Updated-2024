@@ -34,6 +34,9 @@ function grind2Menu:run()
 		return;
 	end
 
+	--if IsSwimming() then Text("Swimming - Attempting to count breath! | "..((grind2HandleSwimming.breathTimeLeft - GetTimeEX()) / 1000)..""); end
+
+
 -- show rested exp if we have any
 	if GetXPExhaustion() ~= nil and GetLocalPlayer():GetLevel() < 60 then
 	

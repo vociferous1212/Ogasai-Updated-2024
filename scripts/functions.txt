@@ -90,6 +90,24 @@ IsGhostWolf()	[bool]
 CallPet()	[bool]
 IsStealth()	[bool]
 
+-- easier to read and write...
+Player()	[wowunits object]
+PlayerLevel()	[number]
+PlayerHealth()	[number]
+PlayerMana()	[number]
+PlayerManaTotal()	[number ! not a percentage]
+PlayerRage()	[number]
+PlayerEnergy()	[number]
+PlayerComboPoints()	[number]
+PetFocus()	[number]
+PetHealth()	[number]
+
+NumberTargetsAttackingPlayer()	[number]
+IsAnyTargetTargetingPlayer() [bool]
+
+GetMyClass() ["STRING"]
+
+
 	-- local player has a target or pet has a target
 PlayerHasTarget()	[bool]
 PetHasTarget()	[bool]

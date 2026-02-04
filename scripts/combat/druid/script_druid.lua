@@ -184,9 +184,15 @@ function script_druid:runBackwards(targetObj, range)
 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
 		local moveX, moveY, moveZ = xT + xUV*16, yT + yUV*16, zT + zUV;		
 		if (distance < range and targetObj:IsInLineOfSight()) then 
-			Move(moveX, moveY, moveZ);
+			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
 			return true;
 		end
+
+		-- move fall-back
+				if not IsMoving() then
+					Move(moveX, moveY, moveZ)
+					script_nav:resetNavigate();
+				end
 	end
 	return false;
 end
