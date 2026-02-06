@@ -10,12 +10,6 @@ https://drive.google.com/file/d/1VrMrXe4OPwipLNHnsImFKBOv8nZ4JkR1/view?usp=shari
 
 Quester bot is limited. There are over 200 quests added with 99% of them functioning properly. It is best to start the bot on a fresh level 1 and let it do its thing. The bot does NOT remember what quests you have completed, and instead relies on using the current quest in your quest log to determine its position in the quester bot. It only does 1 quest at a time and does a lot of grinding between quests. If you have more than 1 quest in your quest log then the quester bot will fail to run. You can see all quests in a pop up window and manually remove completed entries, if you remember where you left off, and you don't have a quest in quest log. It is prudent to walk your bot to a new starter area, once you reach level 10, and complete low level quests. You want to be higher level than the area you are questing in to avoid catastrophic death loops. i.e. a Dwarf should walk to Elwynn and do the level 6-10 quests (bot will do this automatically if you start it in Elwynn) before moving to Westfall or Loch Modan. Quests in cities are reserved for moving back and forth between zones and the quester bot shouldn't be started in a city, start it in a zone outside of a city.
 
- Current known bugs - 
- - nav in teldrassil keeps freezing up, which makes the bot stop pathing and start moving in a straight line.
- - checkbox to avoid blacklisted targets causes bot to walk circles around the target with no clear path to continue grinding
- - sometimes when creating a new hotspot (while moving) the bot does not understand you are at a hotspot and need to manually move out of range or change hotspots to resolve
- - bot does not and CANNOT detect water and will navigate on the floor and drown - this is not fixable but can be negated with aquatic form or water breathing potions or underwater breathing spells
-
 
 ![oGasai](https://github.com/vociferous1212/Ogasai-pic/blob/main/oGasai.png?raw=true)
 ![oGasai](https://github.com/vociferous1212/Ogasai-pic/blob/main/blacklist.png?raw=true)
