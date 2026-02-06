@@ -55,7 +55,7 @@ function grind2MiscMenu:run()
 
 -- paranoia timer
 		if grind2.useParanoia then
-			Text("Paranoia Time");
+			Text("Paranoia Time (sec)");
 			grind2Paranoia.paranoidSetTime = SliderInt("Paranoid Time", 0, 300, grind2Paranoia.paranoidSetTime);
 					Separator();
 

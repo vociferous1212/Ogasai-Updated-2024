@@ -449,3 +449,10 @@ function Player()
 
 	return GetLocalPlayer();
 end
+
+function PlayerPosition()
+
+	local x, y, z = GetLocalPlayer():GetPosition();
+
+return x, y, z;
+end

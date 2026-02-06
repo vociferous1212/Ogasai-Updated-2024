@@ -1,4 +1,8 @@
-script_warlockFunctions = {}
+script_warlockFunctions = {
+
+	petAttackTimer = 0
+
+}
 
 -- used to turn off wand casting else it will 'stutter' and cause a wait timer lag
 function script_warlockFunctions:doesTargetHaveAllDots(target)
@@ -123,7 +127,10 @@ end
 function script_warlockFunctions:petAttack()
 
 	if (HasPet()) then
-		PetAttack();
+		if GetTimeEX() > self.petAttackTimer then
+			PetAttack();
+			self.petAttackTimer = GetTimeEX() + 1000;
+		end
 	end
 return true;
 end

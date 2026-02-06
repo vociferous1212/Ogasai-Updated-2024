@@ -34,7 +34,7 @@ grind2 = {
 	autoSelectTalents = false,					-- auto select talents or not
 	useFirstAid = false,						-- use first aid or not
 	avoidEliteTimer = 0,						-- calling move function to oquick crashes nav...
-
+	avoidTargetTimer = 0
 	}
 
 -- show grinder window
@@ -103,6 +103,11 @@ function grind2:rest()
 
 		-- run setup script
 		grind2Setup:run();
+	end
+
+	if grind2.timer > GetTimeEX() then
+	
+		return;
 	end
 
 	-- always run once
@@ -250,17 +255,19 @@ function grind2:run()
 -- avoid aggro ranges of targets that are not grinder target - when moving to grinder target, or through nav
 -- don't do if we need to loot or under PlayerLevel() 6
 -- don't use in combat, combat scripts handle add movements
-			if not IsIndoors() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets) then
+			if currentTime > self.avoidTargetTimer and not IsIndoors() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets) then
 				if script_runner:avoidToAggro(3) and not IsInCombat() then
 					local _lx, _ly, _lz = Player():GetPosition();
 					local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
-					GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
+					--GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
 					-- reset jump timer.. don't jump into aggro ranges
-					grind2PreChecks.jumpTimer = currentTime + 500;
+					grind2PreChecks.jumpTimer = currentTime + 1000;
 					if Move(_ix, _iy, _iz) then
 						-- reset nav position
-						grind2MoveToTarget:resetNav();
+						self.avoidTargetTimer = currentTime + 350;
+						grind2:SetTimer(700);
 					end
+					grind2MoveToTarget:resetNav();
 					grind2.grinderMessage = "Avoiding targets...";
 					return;
 				end
@@ -309,12 +316,12 @@ function grind2:run()
 		if IsInCombat() and not grind2.pause then script_combatHelper:run(); end
 
 		-- auto-loot pick pocket targets
-		if IsStealth() and HasSpell("Pick Pocket") and IsLooting() and currentTime > grind2DoLoot.lootTimer and grind2.doLoot and not grind2.bagsAreFull and not AreBagsFull() then
+		if IsStealth() and HasSpell("Pick Pocket") and IsLooting() and currentTime > grind2DoLoot.timer and grind2.doLoot and not grind2.bagsAreFull and not AreBagsFull() then
 			LootTarget();
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click();
 			end
-			grind2DoLoot.lootTimer = currentTime + grind2AdjustTimersMenu.doLootTimer;
+			grind2DoLoot.timer = currentTime + grind2AdjustTimersMenu.doLootTimer;
 			return false;
 		end		
 
@@ -470,10 +477,10 @@ function grind2:run()
 		end
 
 		-- double check loot
-		if IsInCombat() and IsLooting() then
+		if IsInCombat() and IsLooting() and currentTime > grind2DoLoot.timer then
 			LootTarget();
 			grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
-			return false;
+			grind2DoLoot.timer = currentTime + grind2AdjustTimersMenu.doLootTimer;
 		end
 
 		-- return combat script message and run the combat script

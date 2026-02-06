@@ -15,7 +15,7 @@ function script_druidBearForm:runInCombat(targetObj)
 	end
 
 -- Run backwards if we are too close to the target
-	if (targetObj:GetDistance() <= 0.5) then 
+	if (targetObj:GetDistance() <= 0.8) then 
 		if (script_druid:runBackwards(targetObj, .5)) then 
 			return 4;
 		end 

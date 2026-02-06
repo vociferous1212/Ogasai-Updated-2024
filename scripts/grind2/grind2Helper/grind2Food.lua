@@ -119,9 +119,9 @@ function grind2Food:eat()
 
 		if HasItem(self.food[i]) and not IsEating() and not IsMoving() then
 
-			if UseItem(self.food[i]) then
+			self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
 
-				self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
+			if UseItem(self.food[i]) then
 
 				return true;
 			end

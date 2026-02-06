@@ -6,8 +6,6 @@ grind2DoLoot = {
 
 	timer = 0,
 
-	lootTimer = 0,
-
 	blacklistLootTimer = 0,
 
 	lootTargetDistance = 2.5
@@ -32,23 +30,7 @@ function grind2DoLoot:run()
 	-- return if timer is not done yet - wait
 	if self.timer > GetTimeEX() then
 
-		return true;
-	end
-	-- loot target if we skinned a target and the loot target turned nil
-	if IsLooting() and GetTimeEX() > self.timer then
-
-		LootTarget();
-
-
-		if StaticPopup1:IsVisible() then
-
-			StaticPopup1Button1:Click()
-		end
-
-		self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
-		grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
 		return false;
-
 	end
 
 	-- get loot target
@@ -106,28 +88,20 @@ function grind2DoLoot:run()
 				return true;
 			end
 
-			-- if we are looting then loot the target
-			if IsLooting() and GetTimeEX() > self.timer then
-
-				LootTarget();
-
+			-- interact with the target to loot
+			if GetTimeEX() > self.timer and not IsLooting() and not IsCasting() and not IsChanneling() and IsStanding() then
+			
 				-- loot any BoP items
 				if StaticPopup1:IsVisible() then
 
 					StaticPopup1Button1:Click()
 				end
 
-				self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
-				grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
-
-				return false;
-			end
-
-			-- interact with the target to loot
-			if self.lootTarget:UnitInteract() then
-					
-				self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
-				return true;
+				if self.lootTarget:UnitInteract() then
+					grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
+					self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
+					return false;
+				end
 			end
 
 			return true;

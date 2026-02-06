@@ -335,7 +335,7 @@ function script_paladin:run(targetGUID)
 				end
 			end
 
-			if (targetObj:GetDistance() <= .5) then 
+			if (targetObj:GetDistance() <= .6) then 
 				if (script_paladin:runBackwards(targetObj, 1)) then
 					script_grind.tickRate = 135;
 					return 4;

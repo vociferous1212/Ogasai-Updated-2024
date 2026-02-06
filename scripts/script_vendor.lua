@@ -250,10 +250,10 @@ function script_vendor:repair()
 				Move(vX, vY, vZ);
 			end
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
-			if not IsMoving() and not IsPathLoaded(5) then
-				Move(vX, vY, vZ);
-				script_nav:resetNavigate();
-			end
+			--if not IsMoving() and not IsPathLoaded(5) then
+				--Move(vX, vY, vZ);
+				--script_nav:resetNavigate();
+			--end
 			return true;
 		end
 		
@@ -379,10 +379,10 @@ function script_vendor:sell()
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;
 			self.currentSlot = 0;
-			if not IsMoving() and not IsPathLoaded(5) then
-				Move(vX, vY, vZ);
+			--if not IsMoving() and not IsPathLoaded(5) then
+			--	Move(vX, vY, vZ);
 				--script_nav:resetNavigate();
-			end
+			--end
 			return true;
 		end
 
@@ -484,11 +484,11 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 			self.status = 3; -- moving to buy ammo at a vendor
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
-			if not IsMoving() and not IsPathLoaded(5) then
-				Move(vX, vY, vZ);
-				script_nav:resetNavigate();
+			--if not IsMoving() and not IsPathLoaded(5) then
+			--	Move(vX, vY, vZ);
+			--	script_nav:resetNavigate();
 
-			end
+			--end
 			return true;
 		end
 
@@ -628,11 +628,11 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 			self.status = 4; 
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
-			if not IsMoving() and not IsPathLoaded(5) then
-				Move(vX, vY, vZ);
-				script_nav:resetNavigate();
+			--if not IsMoving() and not IsPathLoaded(5) then
+			--	Move(vX, vY, vZ);
+			--	script_nav:resetNavigate();
 
-			end
+			--end
 			return true;
 		end
 		

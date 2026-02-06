@@ -45,13 +45,20 @@ function grind2Draw:run()
 			script_gather:drawGatherNodes();
 		end
 	end
+	
+	local tX, tY, onScreen = WorldToScreen(Player():GetPosition());
 
--- draw paranoid target over player position
+-- show paranoia texts
 	if grind2.useParanoia and not grind2.pause then
-		if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 and grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
-			if grind2Paranoia.paranoidTargetName ~= nil and grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
-				local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
-				DrawText("Player in range! | " .. grind2Paranoia.paranoidTarget:GetUnitName().. " | "..math.floor(grind2Paranoia.paranoidTarget:GetDistance()).." (yd)", tX - 75, tY - 100, 255, 255, 0);
+		if grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
+			if grind2Paranoia.paranoidTargetName ~= nil then
+				if grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
+					-- for some reason bot is randomly closing when trying to display this data?
+					local name = grind2Paranoia.paranoidTargetName;
+					local distance = grind2Paranoia.paranoidTargetDistance;
+					DrawText("Player in range - "..name.." | "..math.floor(distance).." (yd)", tX- 65, tY-120, 0, 255, 0);
+					DrawText("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000, tX - 65, tY - 100, 0, 255, 0);
+				end
 			end
 		end
 	end

@@ -4,7 +4,9 @@ grind2Menu = {
 
 	adjustScriptSpeed = false,
 
-	useFurbolgForm = false
+	useFurbolgForm = false,
+
+	--lastCastingID = 0	-- debug
 
 	}
 
@@ -196,6 +198,15 @@ function grind2Menu:run()
 		Text("Money Gained | "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver ");
 	end
 
+	--[[ some debug stuff
+-- show spell ID of spell being cast
+	if Player():GetCasting() ~= nil and Player():GetCasting() ~= 0 then
+		Text("Current Spell Casting ID | "..Player():GetCasting());
+		self.lastCastingID = Player():GetCasting();
+	else 
+		Text("Current Spell Casting ID | "..self.lastCastingID);
+	end
+	--]]
 -- misc / random stuff
 	if HasItem("Dartol's Rod of Transformation") then
 		Separator();
@@ -222,16 +233,14 @@ function grind2Menu:run()
 
 -- show paranoia texts
 	if grind2.useParanoia and not grind2.pause then
-		if grind2Paranoia.paranoidTarget ~= nil and grind2Paranoia.paranoidTarget ~= 0 then
-			if grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
-				if grind2Paranoia.paranoidTargetName ~= nil then
-					if grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
-						-- for some reason bot is randomly closing when trying to display this data?
-						local name = grind2Paranoia.paranoidTargetName;
-						local distance = grind2Paranoia.paranoidTargetDistance;
-						Text("Player in range - "..name.." | "..math.floor(distance).." (yd)");
-						Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
-					end
+		if grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
+			if grind2Paranoia.paranoidTargetName ~= nil then
+				if grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
+					-- for some reason bot is randomly closing when trying to display this data?
+					local name = grind2Paranoia.paranoidTargetName;
+					local distance = grind2Paranoia.paranoidTargetDistance;
+					Text("Player in range - "..name.." | "..math.floor(distance).." (yd)");
+					Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
 				end
 			end
 		end

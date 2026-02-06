@@ -74,7 +74,7 @@ function grind2PreChecks:run()
 	-- use inventory items
 		if not grind2.bagsAreFull and not AreBagsFull() and not IsLooting() and not IsCasting() and not IsChanneling() then
 			if script_useItemsInInventory:useItems() then
-				grind2:setTimer(1500);
+				grind2:setTimer(2000);
 			end
 		end
 	end
@@ -85,12 +85,14 @@ function grind2PreChecks:run()
 	if grind2.lootTargets and not grind2.bagsAreFull and not AreBagsFull() and not IsEating() and not IsDrinking() and IsStanding() and not IsAnyTargetTargetingPlayer() then
 		
 		-- fallback to loot targets - do loot
-		if IsLooting() and currentTime > grind2DoLoot.lootTimer then
-			LootTarget();
+		if IsLooting() and currentTime > grind2DoLoot.timer then
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
 			end
+
+			LootTarget();
 			grind2DoLoot.lootTimer = currentTime + grind2AdjustTimersMenu.doLootTimer;
+			grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
 		end
 
 		-- do loot
@@ -153,7 +155,7 @@ function grind2PreChecks:run()
 	end
 
 -- if bags are full then do vendor
-	if grind2.useVendor and not IsInCombat() and script_vendor.status >= 1 then
+	if grind2.useVendor and not IsInCombat() and script_vendor.status >= 1 and not IsCasting() and not IsChanneling() then
 
 		-- mount
 		if not IsInCombat() then
@@ -167,18 +169,14 @@ function grind2PreChecks:run()
 		if (AreBagsFull() or grind2.bagsAreFull or script_vendor.status >= 1) then
 				
 			-- sell to vendor
-			script_vendor:sell();
+			if script_vendor:sell() then
 
 			grind2.grinderMessage = "Running the vendor routine: sell..."; 
 
-			if not IsMoving() then grind2:setTimer(75); end
-
-			-- return if we still need to sell - at vendor
-			if script_vendor.status == 2 then
-				return true;
-			end
+			if not IsMoving() and PlayerHasTarget() and not GetTarget():CanAttack() then grind2:setTimer(75); end
 
 			return true;
+			end
 		end
 
 		-- repair

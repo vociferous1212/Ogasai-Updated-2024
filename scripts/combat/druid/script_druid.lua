@@ -321,6 +321,7 @@ function script_druid:run(targetGUID)
 			return true;
 		end
 	end
+
 	-- remove curse of thorns - causes A LOT of damage and can easily kill you... best to just force the bot to remove this specific one at all times
 	if (HasSpell("Remove Curse")) and (Player():HasDebuff("Curse of Thorns")) and (IsStanding()) and (not IsSpellOnCD("Remove Curse")) then
 		if (PlayerMana() >= 30) then

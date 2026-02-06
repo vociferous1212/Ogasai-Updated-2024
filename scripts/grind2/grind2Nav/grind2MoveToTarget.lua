@@ -89,7 +89,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	Move(_ix, _iy, _iz);
 
 -- If we are close to the next path node, increase our nav node index
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= self.nextNavNodeDistance - 1) then
+	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= 3) then
 		self.lastnavIndex = 1 + self.lastnavIndex;		
 		if (GetPathSize(5) <= self.lastnavIndex) then
 			self.lastnavIndex = GetPathSize(5);
@@ -103,10 +103,10 @@ return false;
 end
 
 function grind2MoveToTarget:resetNav() -- navPathPosition used for navigate
-	local x, y, z = Player():GetPosition();
-	self.navPathPosition['x'] = x;
-	self.navPathPosition['y'] = y;
-	self.navPathPosition['z'] = z;
+	local x, y, z = PlayerPosition();
+	self.navPosition['x'] = x;
+	self.navPosition['y'] = y;
+	self.navPosition['z'] = z;
 	self.lastPathIndex = -1;
 	self.lastnavIndex = 0;
 end

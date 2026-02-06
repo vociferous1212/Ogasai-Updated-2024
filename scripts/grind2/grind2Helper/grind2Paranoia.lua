@@ -27,7 +27,7 @@ function grind2Paranoia:checkAndDoParanoia()
 	if grind2Paranoia:checkForPlayersNearby() then
 
 		-- we have a target
-		if self.paranoidTargetGUID ~= nil and self.paranoidTargetGUID ~= 0 then
+		if self.paranoidTarget ~= nil and self.paranoidTarget ~= 0 then
 
 			if not self.paranoidTimerSet then
 
@@ -51,7 +51,7 @@ function grind2Paranoia:checkAndDoParanoia()
 			end
 
 			-- someone around for waaaay too long, logout...
-			if not IsInCombat() and currentTime > (self.paranoidSetTime * 4000) + self.paranoidTime then
+			if not IsInCombat() and not IsLooting() and currentTime > (self.paranoidSetTime * 4000) + self.paranoidTime then
 			
 				Logout();
 
@@ -62,15 +62,15 @@ function grind2Paranoia:checkAndDoParanoia()
 			end
 
 			-- someone around for too long, pause
-			if not IsInCombat() and currentTime > (self.paranoidSetTime * 1000 * 2) + self.paranoidTime then
+			if not IsInCombat() and not IsLooting() and currentTime > (self.paranoidSetTime * 1000 * 2) + self.paranoidTime then
 
-				return true;
-
+				return;
 			end
 		end
 	else
 
 		if not grind2Menu.adjustScriptSpeed then
+
 			grind2Paranoia:setSpeedFast();
 		end
 
@@ -78,7 +78,7 @@ function grind2Paranoia:checkAndDoParanoia()
 		self.paranoidTarget = nil;
 		self.paranoidTargetGUID = nil;
 		self.paranoidTimerSet = false;
-		self.paranoidTargetName = "";
+		self.paranoidTargetName = nil;
 		self.paranoidTargetDistance = 0;
 		self.paranoidTime = GetTimeEX() * 2;
 
@@ -95,22 +95,26 @@ function grind2Paranoia:checkForPlayersNearby()
 
 		if t == 4 then
 
-			if i:GetDistance() <= self.paranoidRange and i:GetGUID() ~= nil and i:GetGUID() ~= 0 and i:GetGUID() ~= GetLocalPlayer():GetGUID() then
+			if i:GetDistance() <= self.paranoidRange and i:GetGUID() ~= GetLocalPlayer():GetGUID() then
+			
+				if i:GetGUID() ~= nil and i:GetGUID() ~= 0 then
 
-				self.paranoidTarget = i;
+					self.paranoidTarget = i;
 
-				if self.paranoidTarget ~= nil then
+					if self.paranoidTarget ~= nil then
+						
+						self.paranoidTargetGUID = i:GetGUID();
+							
+						self.paranoidTargetName = i:GetUnitName();
 
-					self.paranoidTargetGUID = i:GetGUID();
-
-					self.paranoidTargetName = i:GetUnitName();
-
-					self.paranoidTargetDistance = i:GetDistance();
-
-					return true;
+						self.paranoidTargetDistance = i:GetDistance();
+					end
 				end
+
+				return true;
 			end
 		end
+
 	i, t = GetNextObject(i);
 	end
 
@@ -137,10 +141,6 @@ end
 function grind2Paranoia:setSpeedFast()
 
 	grind2AdjustTimersMenu.doLootTimer = 250;
-
-	if GetRealmName() == "Kalidar" then
-		grind2AdjustTimersMenu.doLootTimer = 1250;
-	end
 
 	grind2AdjustTimersMenu.obtainNewTargetTimer = 750;
 

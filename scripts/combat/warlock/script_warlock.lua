@@ -60,6 +60,7 @@ script_warlock = {
 	soulstoneTimer = 0,
 	useSoulstone = true,
 	spellRange = 29,
+	petFollowTimer = 0
 }
 
 function script_warlock:setup()
@@ -295,7 +296,6 @@ function script_warlock:run(targetGUID)
 
 	-- Check: Do nothing if we are channeling, casting
 	if (IsChanneling() or IsCasting()) then
-		if IsInCombat() and targetObj ~= 0 and targetObj ~= nil then targetObj:FaceTarget(); end
 		self.waitTimer = GetTimeEX() + 1000;
 		return 4;
 	end
@@ -340,7 +340,7 @@ function script_warlock:run(targetGUID)
 	end
 
 	if (HasPet()) and (IsInCombat()) and (not targetObj:IsInLineOfSight() or not GetPet():IsInLineOfSight()) then
-		PetFollow();
+		if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 	end
 
 
@@ -363,7 +363,7 @@ function script_warlock:run(targetGUID)
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
 				if (HasPet()) then
-					PetFollow();
+					if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 				end
 			return 4;
 			end
@@ -373,9 +373,6 @@ function script_warlock:run(targetGUID)
 	if (PlayerHasTarget()) and (not localObj:IsStunned()) and (script_checkDebuffs:hasSilence()) and (localObj:HasRangedWeapon()) and (IsInCombat()) then
 		if (not IsAutoCasting("Shoot")) then
 			script_warlockFunctions:petAttack();
-			if (GetLocalPlayer():GetUnitsTarget():GetDistance() < 30) then
-				GetLocalPlayer():GetUnitsTarget():FaceTarget();
-			end
 			CastSpellByName("Shoot");
 			self.waitTimer = GetTimeEX() + 250; 
 			return true;
@@ -441,10 +438,6 @@ function script_warlock:run(targetGUID)
 		-- used to keep target acquired
 		if (targetObj:GetDistance() < 35) then
 			targetObj:AutoAttack();
-		end
-
-		if targetObj:GetDistance() <= 4 and not IsMoving() then
-			targetObj:FaceTarget();
 		end
 
 		-- use shadowbolt on more than 1 target for increased survivability
@@ -513,15 +506,16 @@ function script_warlock:run(targetGUID)
 
 			-- if pet goes too far then recall
 			if (HasPet()) and (GetPet():GetDistance() > self.spellRange) then
-				PetFollow();
+				if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 			end
 
 			-- level 1 - 4 cast shadow bolt to start
 			if (not HasSpell("Corruption")) and (not HasSpell("Immolate")) and (not IsInCombat()) and (localMana > 25) and (targetObj:IsInLineOfSight()) and (not IsMoving()) and targetHealth >= 25 then
-				targetObj:FaceTarget();
-				if (Cast('Shadow Bolt', targetObj)) then
-					script_warlockFunctions:petAttack();
-					self.waitTimer = GetTimeEX() + 2350;
+				if not IsSpellOnCD("Shadow Bolt") then
+					if CastSpellByName('Shadow Bolt') then
+						script_warlockFunctions:petAttack();
+						self.waitTimer = GetTimeEX() + 2350;
+					end
 				end
 			end
 
@@ -531,7 +525,6 @@ function script_warlock:run(targetGUID)
 					StopMoving();
 					script_warlockFunctions:petAttack();
 				end
-				targetObj:FaceTarget();
 				if (not script_warlockFunctions:targetHasImmolate(targetObj)) and (not IsMoving()) then
 					if (not CastSpellByName("Immolate")) then
 						self.waitTimer = GetTimeEX() + 2800;
@@ -553,7 +546,6 @@ function script_warlock:run(targetGUID)
 			if (HasSpell("Siphon Life")) and (self.enableSiphonLife) and (PlayerHasTarget()) then
 					script_warlockFunctions:petAttack();
 					self.message = "Stacking DoT's";
-					targetObj:FaceTarget();
 				if (Cast("Siphon Life", targetObj)) then
 					script_warlockFunctions:petAttack();
 					self.waitTimer = GetTimeEX() + 1800; 
@@ -574,7 +566,6 @@ function script_warlock:run(targetGUID)
 					script_rotation.tickRate = 1750;
 					script_rotation.waitTimer = GetTimeEX() + 1750;
 				if (not IsMoving()) and (not script_warlockFunctions:targetHasCorruption(targetObj)) then
-					targetObj:FaceTarget();
 					script_warlockFunctions:petAttack();
 					if not (IsCasting()) and (not IsChanneling()) then
 						if (not script_warlockFunctions:castCorruption(targetObj)) then
@@ -591,14 +582,13 @@ function script_warlock:run(targetGUID)
 			end
 
 			-- shadow bolt to pull if we get a chance before actually entering combat phase
-			if (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) then
+			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") then
 				script_warlockFunctions:petAttack();
 				self.message = "Pulling Target";
 				if (IsMoving()) then
 					StopMoving();
 					return true;
 				end
-				targetObj:FaceTarget();
 				if (CastSpellByName("Shadow Bolt", targetObj)) then
 					self.waitTimer = GetTimeEX() + 1650;
 					script_grind:setWaitTimer(1650);
@@ -635,7 +625,7 @@ function script_warlock:run(targetGUID)
 				if (PetHasTarget()) then
 					if (GetPet():GetDistance() > 10) then
 						AssistUnit("pet");
-						PetFollow();
+						if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 					end
 				else
 					AssistUnit("pet");
@@ -655,7 +645,6 @@ function script_warlock:run(targetGUID)
 					if (not script_grind.adjustTickRate) then
 						script_grind.tickRate = 135;
 					end
-					targetObj:FaceTarget();
 					CastSpellByName('Drain Soul', targetObj);
 					self.message = "Gathering Soulshards";
 					return;
@@ -692,7 +681,7 @@ function script_warlock:run(targetGUID)
 			-- recall pet if too far > 30
 			if (HasPet()) and (GetPet():GetDistance() > 30) then
 				self.message = "Recalling Pet - too far!";
-				PetFollow();
+				if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 			end
 
 			-- Set the pet to attack
@@ -857,13 +846,12 @@ function script_warlock:run(targetGUID)
 
 			-- if pet goes too far then recall
 			if (HasPet()) and (GetPet():GetDistance() > 40) then
-				PetFollow();
+				if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 			end
 		
 			-- Wand if low mana
 			if (localMana <= 5) and (localObj:HasRangedWeapon()) and (not self.enableGatherShards) and (PlayerHasTarget()) then
 				if (not IsAutoCasting("Shoot")) and (not IsMoving()) then
-					targetObj:FaceTarget();
 					targetObj:CastSpell("Shoot");
 					self.waitTimer = GetTimeEX() + 250; 
 					return true;
@@ -874,7 +862,6 @@ function script_warlock:run(targetGUID)
 			if (self.enableSiphonLife) then
 				if (not targetObj:HasDebuff("Siphon Life") and targetHealth > 20) then
 					if (Cast('Siphon Life', targetObj)) then
-						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1600;
 						return 0;
 					end
@@ -949,7 +936,6 @@ function script_warlock:run(targetGUID)
 			if (self.enableCurseOfAgony) and (not IsMoving()) and (HasSpell("Curse of Agony")) then
 				if (not script_warlockFunctions:targetHasCurseOfAgony(targetObj) and not targetObj:HasDebuff("Cruse of Agony") and targetHealth > 20) and (not targetObj:HasDebuff("Curse of Weakness")) and (not targetObj:HasDebuff("Curse of Tongues")) then
 					if (Cast('Curse of Agony', targetObj)) then
-						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1600;
 						script_grind:setWaitTimer(1600);
 						return 0;
@@ -970,7 +956,6 @@ function script_warlock:run(targetGUID)
 						return;
 					end
 					if (not script_warlockFunctions:castImmolate(targetObj)) then
-						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 4250;
 						script_grind:setWaitTimer(3250);
 						return 4;
@@ -995,7 +980,6 @@ function script_warlock:run(targetGUID)
 				if (not IsMoving()) and (not script_warlockFunctions:targetHasCorruption(targetObj)) then
 					if not (IsCasting()) and (not IsChanneling()) then
 						if (not script_warlockFunctions:castCorruption(targetObj)) then
-							targetObj:FaceTarget();
 							self.waitTimer = GetTimeEX() + 1500;
 							script_grind:setWaitTimer(1500);
 							return 4;
@@ -1033,20 +1017,24 @@ function script_warlock:run(targetGUID)
 					self.waitTimer = GetTimeEX() + 2000;
 				end
 			end
+			
+			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt")
 
-			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and localMana >= 20 then
-				CastSpellByName('Shadow Bolt', targetObj);
-				targetObj:FaceTarget();
-				self.waitTimer = GetTimeEX() + 2000;
-				return 0;
+			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and not IsSpellOnCD("Shadow Bolt") and PlayerManaTotal() >= cost then
+				if not CastSpellByName('Shadow Bolt', targetObj) then
+					self.waitTimer = GetTimeEX() + 2000;
+					return 0;
+				end
 			end
 
 			if (self.useWand) and (targetHealth >= self.useWandHealth and localMana >= self.useWandMana) then
 
-				if (CastSpellByName("Shadow Bolt", targetObj)) then
-					targetObj:FaceTarget();
-					self.waitTimer = GetTimeEX() + 2000;
-					return 0;
+				if PlayerManaTotal() >= cost then
+
+					if not (CastSpellByName("Shadow Bolt", targetObj)) then
+						self.waitTimer = GetTimeEX() + 2000;
+						return 0;
+					end
 				end
 			end
 
@@ -1055,7 +1043,6 @@ function script_warlock:run(targetGUID)
 				if (script_warlockFunctions:doesTargetHaveAllDots(targetObj)) then
 					if (not IsAutoCasting("Shoot")) and (not IsMoving()) then
 						script_warlockFunctions:petAttack();
-						targetObj:FaceTarget();
 						CastSpellByName("Shoot");
 						self.waitTimer = GetTimeEX() + 250; 
 						return true;
@@ -1264,7 +1251,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 	if (not IsInCombat()) and (HasPet()) and (HasSpell("Health Funnel")) then
 		if (GetPet():GetHealthPercentage() < 50) and (localHealth > 60) then
 			if (GetPet():GetDistance() > 8) then
-				PetFollow();
+				if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 				self.waitTimer = GetTimeEX() + 500; 
 				return true;
 			end

@@ -87,7 +87,10 @@ function script_runner:avoidToAggro(safeMargin)
 
 	while currentObj ~= 0 do
 		if typeObj == 3 then
-			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
+			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18;
+			if GetRealmName() == "Kalidar" then
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
+			end
 			local range = aggro + safeMargin - 1
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
 				if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
@@ -114,24 +117,29 @@ function script_runner:avoidToAggro(safeMargin)
 		local intersectMob = script_runner:aggroIntersect(closestEnemy)
 		if (intersectMob ~= nil) then
 			local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 18
+			if GetRealmName() == "Kalidar" then
+				aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21.5;
+			end
 			local x, y, z = closestEnemy:GetPosition()
 			local xx, yy, zz = intersectMob:GetPosition()
 			local centerX, centerY = (x + xx) / 2, (y + yy) / 2
-			script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange + .5)
+			if script_runner:avoid(centerX, centerY, zP, aggroRange, safeRange + .5) then
 		  --  self.oscillationCount = self.oscillationCount + 1
 		   -- if self.oscillationCount > 2 then
 			--    self.oscillationCount = 0
 				GeneratePath(xP, yP, zP, self.tx, self.ty, self.tz)
 		  --  end
 			return true;
+			end
 		else
-			script_runner:avoid(xT, yT, zP, aggro, safeRange + .5)
+			if script_runner:avoid(xT, yT, zP, aggro, safeRange + .5) then
 		   -- self.oscillationCount = self.oscillationCount + 1
 		  --  if self.oscillationCount > 2 then
 			 --   self.oscillationCount = 0
 				GeneratePath(xP, yP, zP, self.tx, self.ty, self.tz)
 		   -- end
 		return true;
+		end
 		end
 	end
 return false;
@@ -148,7 +156,10 @@ function script_runner:aggroIntersect(target)
 	while currentObj ~= 0 do
 		if typeObj == 3 then
 			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
-			local range = aggro + (safeMargin or 5)
+			if GetRealmName() == "Kalidar" then
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
+			end
+			local range = aggro + (safeMargin or 3)
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
 				if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
 				local xx, yy, zz = currentObj:GetPosition()
@@ -238,6 +249,9 @@ function script_runner:drawAggroCircles()
 	while currentObj ~= 0 do
 		if typeObj == 3 and not currentObj:IsDead() and currentObj:CanAttack() and not currentObj:IsCritter() then
 			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
+			if GetRealmName() == "Kalidar" then
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
+			end
 			local cx, cy, cz = currentObj:GetPosition()
 			script_runner:DrawCircles(cx, cy, cz, aggro)
 			local intersectMob = script_runner:aggroIntersect(currentObj)

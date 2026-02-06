@@ -37,6 +37,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 
 	if (IsCasting()) or (IsChanneling()) then
 		script_druid.waitTimer = GetTimeEX() + 1000;
+		return false;
 	end
 
 	if script_druid.waitTimer > GetTimeEX() then
@@ -119,7 +120,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 	-- healing touch rank 3
 	if not IsCasting() and not IsSpellOnCD("Healing Touch") and not IsInCombat() and not HasForm() and IsStanding() and localMana > 10 and HasSpell("Healing Touch") and localHealth <= 75  then
 		if not script_grind.adjustTickRate then script_grind.tickRate = 100; end
-		if (IsMoving()) then StopMoving(); return true; end local time = 2250;
+		if (IsMoving()) then StopMoving(); return; end local time = 2250;
 		local rankHeal = "Rank 1"; if localObj:GetLevel() >= 24 then rankHeal = "Rank 3"; time = 2750; end
 		if CastSpellByName("Healing Touch("..rankHeal, localObj) then script_druid.waitTimer = GetTimeEX() + time; grind2:setTimer(time); return true; end
 	end
@@ -145,9 +146,9 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 							return true;
 						end
 						script_druid.hasRegrowth = true;
-						if not CastHeal("Regrowth", localObj) then
-							script_druid.waitTimer = GetTimeEX() + 2850
-							script_grind:setWaitTimer(2850);
+						if not CastSpellByName("Regrowth", localObj) then
+							script_druid.waitTimer = GetTimeEX() + 3000
+							script_grind:setWaitTimer(3000);
 							grind2:setTimer(3000);
 						return 4;
 						end
@@ -236,7 +237,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 						ClearTarget();
 					end
 				end
-				if (CastHeal("Mark of the Wild", localObj)) then
+				if (CastSpellByName("Mark of the Wild", localObj)) then
 					script_druid.waitTimer = GetTimeEX() + 2500;
 					script_grind:setWaitTimer(1600);
 					return true;
@@ -282,7 +283,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 							return true;
 						end
 						script_druid.hasRegrowth = true;
-						CastHeal("Regrowth", localObj);
+						CastSpellByName("Regrowth", localObj);
 						script_druid.waitTimer = GetTimeEX() + 3050
 						script_grind:setWaitTimer(3050);
 						grind2:setTimer(3050);

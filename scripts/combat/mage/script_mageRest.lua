@@ -198,22 +198,28 @@ function script_mageRest:rest()
 		
 		-- ice armor / frost armor
 		if not IsMounted() and script_mage.useFrostArmor and (HasSpell("Ice Armor")) and (not localObj:HasBuff("Ice Armor")) and (localMana > 20) then
-			if (not CastSpellByName("Ice Armor", localObj)) then
-				script_mage.waitTimer = GetTimeEX() + 1700;
-				script_grind:setWaitTimer(1700);
-				return true;
+			if not IsSpellOnCD("Ice Armor") then
+				if (not CastSpellByName("Ice Armor", localObj)) then
+					script_mage.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1700);
+					return true;
+				end
 			end
 		elseif script_mage.useFrostArmor and (not HasSpell("Ice Armor")) and (HasSpell("Frost Armor")) and (not localObj:HasBuff("Frost Armor")) and (localMana > 20) then	
-			if (not CastSpellByName("Frost Armor", localObj)) then
-				script_mage.waitTimer = GetTimeEX() + 1700;
-				script_grind:setWaitTimer(1700);
-				return true;
+			if not IsSpellOnCD("Frost Armor") then
+				if (not CastSpellByName("Frost Armor", localObj)) then
+					script_mage.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1700);
+					return true;
+				end
 			end
 		elseif script_mage.useMageArmor and HasSpell("Mage Armor") and not localObj:HasBuff("Mage Armor") and localMana >= 20 then
-			if (not CastSpellByName("Mage Armor", localObj)) then
-				script_mage.waitTimer = GetTimeEX() + 1700;
-				script_grind:setWaitTimer(1700);
-				return true;
+			if not IsSpellOnCD("Mage Armor") then
+				if (not CastSpellByName("Mage Armor", localObj)) then
+					script_mage.waitTimer = GetTimeEX() + 1700;
+					script_grind:setWaitTimer(1700);
+					return true;
+				end
 			end
 		end
 		-- dampen magic

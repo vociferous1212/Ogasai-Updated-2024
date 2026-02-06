@@ -386,6 +386,10 @@ function script_hunter:run(targetGUID)
 		if GetPet():HasBuff("Feed Pet Effect") then
 			self.message = "Pet is eating some food...";
 			script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
+			local currentTime = GetTimeEX();
+			grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
+			grind2RunCombatState.blacklistTargetTimer2 = currentTime * 2;
+			grind2DoLoot.blacklistLootTimer = currentTime + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 			return;
 		end
 	end
@@ -1425,7 +1429,8 @@ function script_hunter:hunterPull(targetObj)
 
 	-- use serpent sting
 	if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) and (IsStanding()) then
-		if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana) then
+		if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana)
+			and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon" and targetObj:GetCreatureType() ~= "Mechanical" then
 			if not CastSpellByName("Serpent Sting") then
 				if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
 				self.waitTimer = GetTimeEX() + 500;
@@ -1504,7 +1509,7 @@ function script_hunter:petAttackTargetAttackingMe()
 									i:AutoAttack();
 
 									-- send pet to attack target attacking me
-									if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
+									PetAttack();
 
 									if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 										script_grind.enemyObj = grind2.enemyTarget;
