@@ -1,7 +1,9 @@
 grind2PreChecks = {
 
 	autoTalent = false,
+
 	jumpTimer = 0,
+
 	rodTimerForFun = 0
 
 }
@@ -34,12 +36,21 @@ function grind2PreChecks:run()
 -- clear dead targets reset enemy target variable
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 		if grind2.enemyTarget:IsDead() then
+			-- + 1 to target killed
 			grind2.numberOfKills = grind2.numberOfKills + 1;
+			-- save coordinates to run out of combat and nav
 			grind2SaveCoordinates:saveTargetsLocation(grind2.enemyTarget);
+			-- reset grind enemy target
 			grind2.enemyTarget = nil;
+			-- reset grind last target
 			grind2.lastTargetTargeted = nil;
+			-- reset original grinder target - using old combat scripts
 			script_grind.enemyObj = nil;
+			-- send message
 			grind2.grinderMessage = "Clearing dead/tapped target";
+			-- reset new target timer
+			grind2.obtainNewTargetTimer = currentTime;
+			-- set timer
 			grind2:setTimer(grind2AdjustTimersMenu.waitAfterTargetKilledTimer);
 		return true;
 		end
@@ -239,7 +250,6 @@ function grind2PreChecks:run()
 			return true;
 		end
 
-		return true;
 	end
 
 return false;

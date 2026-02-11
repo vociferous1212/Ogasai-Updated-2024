@@ -34,7 +34,9 @@ grind2 = {
 	autoSelectTalents = false,					-- auto select talents or not
 	useFirstAid = false,						-- use first aid or not
 	avoidEliteTimer = 0,						-- calling move function to oquick crashes nav...
-	avoidTargetTimer = 0
+	avoidTargetTimer = 0,						-- timer to run avoid target script to stop navigation from crashing
+
+
 	}
 
 -- show grinder window
@@ -258,14 +260,14 @@ function grind2:run()
 			if currentTime > self.avoidTargetTimer and not IsIndoors() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets) then
 				if script_runner:avoidToAggro(3) and not IsInCombat() then
 					local _lx, _ly, _lz = Player():GetPosition();
-					local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
+					local _ix, _iy, _iz = GetPathPositionAtIndex(5, grind2MoveToTarget.lastnavIndex);
 					--GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
 					-- reset jump timer.. don't jump into aggro ranges
-					grind2PreChecks.jumpTimer = currentTime + 1000;
+					grind2PreChecks.jumpTimer = currentTime + 2500;
 					if Move(_ix, _iy, _iz) then
 						-- reset nav position
-						self.avoidTargetTimer = currentTime + 350;
-						grind2:SetTimer(700);
+						self.avoidTargetTimer = currentTime + 150;
+						grind2:SetTimer(500);
 					end
 					grind2MoveToTarget:resetNav();
 					grind2.grinderMessage = "Avoiding targets...";
@@ -310,13 +312,16 @@ function grind2:run()
 
 
 -- return if paused or for any reason
-	if grind2.timer > currentTime or grind2.pause or IsCasting() or IsChanneling() then
+	if grind2.timer > currentTime or grind2.pause or IsChanneling() or
+	(IsCasting() and not Player():GetCasting() == 5118 and not Player():GetCasting() == 1454) then
 
 		-- run combat helper to stop spell casting / check for clutch issues
-		if IsInCombat() and not grind2.pause then script_combatHelper:run(); end
+		if IsInCombat() and not grind2.pause then
+			script_combatHelper:run();
+		end
 
 		-- auto-loot pick pocket targets
-		if IsStealth() and HasSpell("Pick Pocket") and IsLooting() and currentTime > grind2DoLoot.timer and grind2.doLoot and not grind2.bagsAreFull and not AreBagsFull() then
+		if IsStealth() and HasSpell("Pick Pocket") and IsLooting() and grind2.doLoot and not grind2.bagsAreFull and not AreBagsFull() then
 			LootTarget();
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click();
@@ -342,9 +347,9 @@ function grind2:run()
 			grind2DoLoot.blacklistLootTimer = currentTime + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 		end
 
-		-- reset new target timer if casting
-		if IsCasting() or IsChanneling() then
-			self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;
+		-- no target timer if in combat
+		if IsInCombat() then
+			self.obtainNewTargetTimer = currentTime;
 		end
 
 		-- count your money
@@ -412,9 +417,13 @@ function grind2:run()
 		-- assign the target
 		self.enemyTarget = grind2AssignATarget:run();
 
-		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then self.enemyTarget:AutoAttack(); end
+		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
+			self.enemyTarget:AutoAttack();
+		end
 
-		if self.enemyTarget == nil or self.enemyTarget == 0 then self.grinderMessage = "Assigning a target"; end
+		if self.enemyTarget == nil or self.enemyTarget == 0 then
+			self.grinderMessage = "Assigning a target";
+		end
 
 		-- set grind script obtain target timer by adding current time + ratea adjusted in menu
 		self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;

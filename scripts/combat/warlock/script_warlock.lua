@@ -183,6 +183,7 @@ function script_warlock:run(targetGUID)
 	if (self.enableGatherShards) then
 		self.alwaysFear = false;
 	end
+
 	if (script_grindAreWeSwimming:areWeSwimming()) then
 		self.useUnendingBreath = true;
 	end
@@ -205,7 +206,7 @@ function script_warlock:run(targetGUID)
 	end
 
 
-	for i=0, 10 do
+	for i = 0, 10 do
 		-- Check: If the pet is void and has spell Consume Shadows
 		if (HasPet()) and (self.useVoid) then
 			name, __, __, __, __, __, __ = GetPetActionInfo(i);
@@ -260,7 +261,7 @@ function script_warlock:run(targetGUID)
 	-- set target health
 	targetHealth = targetObj:GetHealthPercentage();
 
-	if (HasSpell("Summon Imp")) and (not HasPet()) and (self.useImp or self.useVoid or self.useSuccubus or self.usefelHunter) then	
+	if not IsInCombat() and (HasSpell("Summon Imp")) and (not HasPet()) and (self.useImp or self.useVoid or self.useSuccubus or self.usefelHunter) then	
 		if (IsMoving()) then
 			StopMoving();
 		end
@@ -315,6 +316,9 @@ function script_warlock:run(targetGUID)
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 100;
 		end
+		if IsCasting() or IsChanneling() then
+			return false;
+		end
 		if (CastSpellByName("Summon Voidwalker")) then
 			self.waitTimer = GetTimeEX() + 12000;
 			script_grind:setWaitTimer(1200);
@@ -324,7 +328,7 @@ function script_warlock:run(targetGUID)
 
 -- resummon pet
 	if (self.useVoid or self.useImp or self.useSuccubus or self.useFelhunter) and (not HasPet()) and (HasSpell("Summon Imp")) 
-		and ( (localMana >= 45) or (localObj:HasBuff("Fel Domination") and localMana >= 30) ) then
+		and ( (localMana >= 45) or (localObj:HasBuff("Fel Domination") and localMana >= 30) ) and PlayerLevel() >= 10 then
 		if (IsMoving()) then
 			StopMoving();
 			return true;
@@ -365,12 +369,11 @@ function script_warlock:run(targetGUID)
 				if (HasPet()) then
 					if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 				end
-			return 4;
 			end
 		end
 
 	-- check for silence and use wand
-	if (PlayerHasTarget()) and (not localObj:IsStunned()) and (script_checkDebuffs:hasSilence()) and (localObj:HasRangedWeapon()) and (IsInCombat()) then
+	if (PlayerHasTarget()) and (not localObj:IsStunned()) and (script_checkDebuffs:hasSilence()) and (localObj:HasRangedWeapon()) and (IsInCombat()) and not IsSpellOnCD("Shoot") then
 		if (not IsAutoCasting("Shoot")) then
 			script_warlockFunctions:petAttack();
 			CastSpellByName("Shoot");
@@ -568,15 +571,11 @@ function script_warlock:run(targetGUID)
 				if (not IsMoving()) and (not script_warlockFunctions:targetHasCorruption(targetObj)) then
 					script_warlockFunctions:petAttack();
 					if not (IsCasting()) and (not IsChanneling()) then
-						if (not script_warlockFunctions:castCorruption(targetObj)) then
+						if (script_warlockFunctions:castCorruption(targetObj)) then
 							script_warlockFunctions:petAttack();
 							self.waitTimer = GetTimeEX() + 1500;
 							script_grind:setWaitTimer(1500);
-							return 4;
-						else
-							return 4;
 						end
-					return 4;
 					end
 				end				
 			end
@@ -765,7 +764,7 @@ function script_warlock:run(targetGUID)
 
 			if (HasSpell("Fear")) and (localMana >= 10) and (localHealth <= 30) and (script_grind:isTargetingMe(targetObj)) and (not targetObj:HasDebuff("Fear")) and (targetObj:GetCreatureType() ~= "Undead") and (targetObj:GetCreatureType() ~= "Mechanical") then
 				script_warlockFunctions:cast("Fear", targetObj);
-				self.waitTimer = GetTimeEX() + 3500;
+				self.waitTimer = GetTimeEX() + 2000;
 				return;
 			end
 
@@ -774,9 +773,11 @@ function script_warlock:run(targetGUID)
 				if (not script_grind.adjustTickRate) and (IsInCombat()) then
 					script_grind.tickRate = 135;
 				end
-				self.waitTimer = GetTimeEX() + 1900;
 
-				script_warlockFunctions:cast("Fear", targetObj);
+				if script_warlockFunctions:cast("Fear", targetObj) then
+					self.waitTimer = GetTimeEX() + 2000;
+				end
+
 			return;
 			end
 
@@ -850,7 +851,7 @@ function script_warlock:run(targetGUID)
 			end
 		
 			-- Wand if low mana
-			if (localMana <= 5) and (localObj:HasRangedWeapon()) and (not self.enableGatherShards) and (PlayerHasTarget()) then
+			if (localMana <= 5) and (localObj:HasRangedWeapon()) and (not self.enableGatherShards) and (PlayerHasTarget()) and not IsSpellOnCD("Shoot") then
 				if (not IsAutoCasting("Shoot")) and (not IsMoving()) then
 					targetObj:CastSpell("Shoot");
 					self.waitTimer = GetTimeEX() + 250; 
@@ -933,9 +934,9 @@ function script_warlock:run(targetGUID)
 			end 
 
 			-- Check: Keep the Curse of Agony up (24 s duration)
-			if (self.enableCurseOfAgony) and (not IsMoving()) and (HasSpell("Curse of Agony")) then
+			if (self.enableCurseOfAgony) and (not IsMoving()) and (HasSpell("Curse of Agony")) and not IsSpellOnCD("Curse of Agony") then
 				if (not script_warlockFunctions:targetHasCurseOfAgony(targetObj) and not targetObj:HasDebuff("Cruse of Agony") and targetHealth > 20) and (not targetObj:HasDebuff("Curse of Weakness")) and (not targetObj:HasDebuff("Curse of Tongues")) then
-					if (Cast('Curse of Agony', targetObj)) then
+					if (CastSpellByName('Curse of Agony', targetObj)) then
 						self.waitTimer = GetTimeEX() + 1600;
 						script_grind:setWaitTimer(1600);
 						return 0;
@@ -1039,7 +1040,7 @@ function script_warlock:run(targetGUID)
 			end
 
 			-- use wand sliders
-			if (self.useWand) and (localObj:HasRangedWeapon()) and (targetHealth < self.useWandHealth or localMana < self.useWandMana) then
+			if (self.useWand) and not IsSpellOnCD("Shoot") and (localObj:HasRangedWeapon()) and (targetHealth < self.useWandHealth or localMana < self.useWandMana) then
 				if (script_warlockFunctions:doesTargetHaveAllDots(targetObj)) then
 					if (not IsAutoCasting("Shoot")) and (not IsMoving()) then
 						script_warlockFunctions:petAttack();

@@ -13,7 +13,7 @@ function grind2DrawNavPath:drawPath()
 			firstIndex = grind2MoveToTarget.lastnavIndex;
 
 			-- if we are moving and don't do path node in previous index
-		if IsMoving() and (firstIndex - 1 <= GetPathSize(5)) then
+		if IsMoving() and (firstIndex - 1.5 <= GetPathSize(5)) then
 
 			-- -2 or else that path 'tears' off the screen into the sky... ?? why?
 			for index = firstIndex, GetPathSize(5) -5 do

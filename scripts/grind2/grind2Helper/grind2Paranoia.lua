@@ -52,6 +52,12 @@ function grind2Paranoia:checkAndDoParanoia()
 
 			-- someone around for waaaay too long, logout...
 			if not IsInCombat() and not IsLooting() and currentTime > (self.paranoidSetTime * 4000) + self.paranoidTime then
+
+				if HasSpell("Shadowmeld") and not IsSpellOnCD("Shadowmeld") and not Player():HasBuff("Shadowmeld") and not Player():HasBuff("Stealth") and not HasForm() then
+					if CastSpellByName("Shadowmeld") then
+						return true;
+					end
+				end
 			
 				Logout();
 
@@ -63,8 +69,14 @@ function grind2Paranoia:checkAndDoParanoia()
 
 			-- someone around for too long, pause
 			if not IsInCombat() and not IsLooting() and currentTime > (self.paranoidSetTime * 1000 * 2) + self.paranoidTime then
+			
+				if HasSpell("Shadowmeld") and not IsSpellOnCD("Shadowmeld") and not Player():HasBuff("Shadowmeld") and not Player():HasBuff("Stealth") and not HasForm() then
+					if CastSpellByName("Shadowmeld") then
+						return true;
+					end
+				end
 
-				return;
+				return true;
 			end
 		end
 	else
@@ -125,11 +137,11 @@ function grind2Paranoia:setSpeedNormal()
 
 	grind2AdjustTimersMenu.doLootTimer = 650;
 
-	grind2AdjustTimersMenu.obtainNewTargetTimer = 1550;
+	grind2AdjustTimersMenu.obtainNewTargetTimer = 2550;
 
 	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 550;
 
-	grind2AdjustTimersMenu.restTimer = 1550;
+	grind2AdjustTimersMenu.restTimer = 2250;
 
 	grind2AdjustTimersMenu.combatScriptTimer = 200;
 
@@ -142,11 +154,11 @@ function grind2Paranoia:setSpeedFast()
 
 	grind2AdjustTimersMenu.doLootTimer = 250;
 
-	grind2AdjustTimersMenu.obtainNewTargetTimer = 750;
+	grind2AdjustTimersMenu.obtainNewTargetTimer = 2000;
 
 	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 75;
 
-	grind2AdjustTimersMenu.restTimer = 750;
+	grind2AdjustTimersMenu.restTimer = 1550;
 
 	grind2AdjustTimersMenu.combatScriptTimer = 150;
 
@@ -158,11 +170,11 @@ function grind2Paranoia:setSpeedSlow()
 
 	grind2AdjustTimersMenu.doLootTimer = 900;
 
-	grind2AdjustTimersMenu.obtainNewTargetTimer = 3000;
+	grind2AdjustTimersMenu.obtainNewTargetTimer = 3500;
 
 	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 2750;
 
-	grind2AdjustTimersMenu.restTimer = 2500;
+	grind2AdjustTimersMenu.restTimer = 3000;
 
 	grind2AdjustTimersMenu.combatScriptTimer = 450;
 

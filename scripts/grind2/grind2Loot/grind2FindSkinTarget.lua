@@ -3,6 +3,11 @@ grind2FindSkinTarget = {
 }
 
 function grind2FindSkinTarget:target(lootRadius)
+
+	if IsAnyTargetTargetingPlayer() or not grind2.lootTargets then
+
+		return nil;
+	end
 		
 	local i, t = GetFirstObject();
 

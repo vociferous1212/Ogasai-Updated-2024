@@ -46,7 +46,7 @@ function grind2AssignATarget:run()
 						
 						local health = i:GetHealthPercentage();
 
-						if bestHealth > health then
+						if bestHealth < health then
 				
 							bestHealth = health;
 
@@ -91,6 +91,12 @@ function grind2AssignATarget:run()
 	while i ~= 0 do
 
 		if t == 3 then
+
+			-- target is not dead but is tapped by player
+			if not i:IsDead() and i:IsTapped() and i:IsTappedByMe() then
+
+				return i;
+			end
 
 			-- if we have a valid target for the grinder
 			if grind2IsTargetValid:target(i) then

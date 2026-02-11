@@ -50,7 +50,7 @@ function grind2AdjustTimersMenu:run()
 		Separator();
 
 		Text("Loot Timer");
-		self.doLootTimer = SliderInt("Loot Timer", 0, 2000, self.doLootTimer);
+		self.doLootTimer = SliderInt("Loot Timer", 0, 3000, self.doLootTimer);
 
 		Separator();
 
@@ -60,17 +60,17 @@ function grind2AdjustTimersMenu:run()
 		Separator();
 
 		Text("New Target Timer");
-		self.obtainNewTargetTimer = SliderInt("New Target Timer", 0, 2000, self.obtainNewTargetTimer);
+		self.obtainNewTargetTimer = SliderInt("New Target Timer", 0, 3000, self.obtainNewTargetTimer);
 
 		Separator();
 
 		Text("Wait After Target Killed Timer");
-		self.waitAfterTargetKilledTimer = SliderInt("Target Killed Timer", 0, 2000, self.waitAfterTargetKilledTimer);
+		self.waitAfterTargetKilledTimer = SliderInt("Target Killed Timer", 0, 3000, self.waitAfterTargetKilledTimer);
 		
 		Separator();
 
 		Text("Rest Timer");
-		self.restTimer = SliderInt("Rest Timer", 0, 2000, self.restTimer);
+		self.restTimer = SliderInt("Rest Timer", 0, 3000, self.restTimer);
 
 		Separator();
 

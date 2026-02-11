@@ -54,9 +54,12 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 
 -- If the target moves more than 2 yard then make a new path
--- or node is out of bounds
-	if (GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2
-		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 20) then
+	if GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2
+		-- or node is out of bounds
+		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 20
+		-- or distance from path node is greater than next node distance
+		or (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= self.nextNavNodeDistance and IsMoving()) then
+
 		self.navPosition['x'] = _x;
 		self.navPosition['y'] = _y;
 		self.navPosition['z'] = _z;

@@ -4,9 +4,9 @@ grind2FindLoot = {
 
 function grind2FindLoot:target(lootRadius)
 
-	if IsAnyTargetTargetingPlayer() then
+	if IsAnyTargetTargetingPlayer() or not grind2.lootTargets then
 
-		return false;
+		return nil;
 	end
 
 	local i, t = GetFirstObject();
@@ -27,10 +27,8 @@ function grind2FindLoot:target(lootRadius)
 
 					bestDist = dist;
 
-					if dist <= bestDist then
+					bestTarget = i;
 
-						bestTarget = i;
-					end
 				end
 			end
 		end

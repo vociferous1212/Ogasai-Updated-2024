@@ -208,13 +208,12 @@ function script_rotation:doSomeLoot()
 			end
 
 			-- do loot
-			if script_grind.lootObj ~= nil and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() then
+			if script_grind.lootObj ~= nil and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and not IsInCombat() then
 				script_grind.lootCheckTime = 10000;
 				script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 				script_grind.lootCheck['timer'] = GetTimeEX() + 10000;
-				
 				script_grindDoLoot:doLoot(GetLocalPlayer());
-				return true;
+				return;
 			end
-return false;
+return;
 end

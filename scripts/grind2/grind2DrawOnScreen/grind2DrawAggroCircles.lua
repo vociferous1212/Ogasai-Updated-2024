@@ -84,6 +84,10 @@ function grind2DrawAggroCircles:run(maxRange)
 
 			local px, py, pz = localObj:GetPosition();
 
+			-- player circle
+			--grind2DrawAggroCircles:DrawCircles(px, py, pz-.8, .5, 0, 255, 0);
+
+
 			-- yellow - run draw circles based on target - not targeting me or I am targeting it
 			if i:GetUnitsTarget() == 0 or i:GetUnitsTarget() == nil then
 

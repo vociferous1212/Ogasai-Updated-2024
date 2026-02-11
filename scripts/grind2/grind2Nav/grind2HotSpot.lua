@@ -33,6 +33,7 @@ function grind2HotSpot:moveToHotspot()
 		grind2.grinderMessage = "No hotspot loaded";
 	end
 
+return false;
 end
 
 function grind2HotSpot:distanceToHotspot()

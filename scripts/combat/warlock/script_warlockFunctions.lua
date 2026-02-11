@@ -42,8 +42,6 @@ function script_warlockFunctions:castCorruption(target)
 					target:FaceTarget();
 					CastSpellByName("Corruption");
 					return true;
-				else
-					return 4;
 				end
 			end
 		end

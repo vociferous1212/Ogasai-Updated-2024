@@ -794,13 +794,16 @@ function script_hunter:run(targetGUID)
 				-- Check: Mend the pet if it has lower than 70% HP and out of combat
 				if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
 
+				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
+				local percentOfManaCostOfMendPet = (cost / PlayerManaTotal()) * 100;
+
 					-- pet is too far away to mend
 					if (GetPet():GetDistance() > 20) then
 						if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 						return true;
 
 					-- pet is close enough to mend
-					elseif (GetPet():GetDistance() < 20) and (localMana >= 15) then
+					elseif (GetPet():GetDistance() < 20) and (localMana >= percentOfManaCostOfMendPet) then
 						if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
 							script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
 							if (IsMoving()) or (not IsStanding()) then
@@ -829,11 +832,15 @@ function script_hunter:run(targetGUID)
 			if (HasSpell("Mend Pet")) and (GetPet() ~= 0) then
 				-- Check: Mend the pet if it has lower than 70% HP and out of combat
 				if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
+
+				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
+				local percentOfManaCostOfMendPet = (cost / PlayerManaTotal()) * 100;
+
 					if (GetPet():GetDistance() > 20) then
 					if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end; self.waitTimer = GetTimeEX() + 1000;
 						return true;
 					
-					elseif (GetPet():GetDistance() < 20) and (localMana >= 15) then
+					elseif (GetPet():GetDistance() < 20) and (localMana >= percentOfManaCostOfMendPet) then
 						if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
 							script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
 							CastSpellByName('Mend Pet');
@@ -862,103 +869,103 @@ function script_hunter:run(targetGUID)
 -- target is far enough to use ranged attacks
 
 			if targetObj ~= nil and targetObj ~= 0 then
-			if (targetObj:GetDistance() > self.minSpellRange) and (targetObj:GetDistance() < self.spellRange) and self.useRangedAttacks then
+				if (targetObj:GetDistance() > self.minSpellRange) and (targetObj:GetDistance() < self.spellRange) and self.useRangedAttacks then
 
-				-- use Hunter's Mark first
-				if (self.useMark) then
-					if (HasSpell("Hunter's Mark")) and (not targetObj:HasDebuff("Hunter's Mark"))
-					and (targetObj:IsInLineOfSight()) and (targetHealth >= 50) and (localMana >= self.useMarkMana) then
+					-- use Hunter's Mark first
+					if (self.useMark) then
+						if (HasSpell("Hunter's Mark")) and (not targetObj:HasDebuff("Hunter's Mark"))
+						and (targetObj:IsInLineOfSight()) and (targetHealth >= 50) and (localMana >= self.useMarkMana) then
 
-						CastSpellByName("Hunter's Mark");
-						self.waitTimer = GetTimeEX() + 1650;
-						if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
-						if (not IsMoving()) then
-							
+							if CastSpellByName("Hunter's Mark") then
+								self.waitTimer = GetTimeEX() + 1650;
+								if GetTimeEX() > self.petAttackTimer then
+									PetAttack(); self.petAttackTimer = GetTimeEX() + 1000;
+								end;	
+							end
 						end
-
-						
 					end
-				end
 		
-				-- use concussive shot
-				if (not IsSpellOnCD("Concussive Shot")) then
-					if (HasSpell("Concussive Shot")) and (localMana > self.arcaneShotMana)
-					and (script_grind:isTargetingMe(targetObj) or targetObj:IsFleeing()) then
-						CastSpellByName("Concussive Shot");
-						self.waitTimer = GetTimeEX() + 1500;
-						if (not IsMoving()) then
+					-- use concussive shot
+					if (not IsSpellOnCD("Concussive Shot")) then
+						if (HasSpell("Concussive Shot")) and (localMana > self.arcaneShotMana)
+						and (script_grind:isTargetingMe(targetObj) or targetObj:IsFleeing()) then
+							CastSpellByName("Concussive Shot");
+							self.waitTimer = GetTimeEX() + 1500;
+							if (not IsMoving()) then
 							
-						end
+							end
 
 						
-					end	
-				end
+						end	
+					end
 
-				-- use serpent sting
-				if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
-					if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana)
-					and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon"
-					and targetObj:GetCreatureType() ~= "Mechanical"
-					and targetHealth >= 25
-					then
-						if (not IsMoving()) then
+					-- use serpent sting
+					if not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not self.useScorpidSting) then
+						if (HasSpell("Serpent Sting")) and (targetObj:IsInLineOfSight()) and (localMana > self.serpentStingMana)
+						and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon"
+						and targetObj:GetCreatureType() ~= "Mechanical"
+						and targetHealth >= 25
+						then
+							if (not IsMoving()) then
 							
-						end
+							end
 
-						if not CastSpellByName("Serpent Sting") then
+							if not CastSpellByName("Serpent Sting") then
+								self.waitTimer = GetTimeEX() + 1500;
+							end
+						
+						end
+					end
+
+					-- use arcane shot
+					if (not IsSpellOnCD("Arcane Shot")) and localMana >= self.arcaneShotMana and not HasSpell("Aimed Shot") then
+						if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) then
+							CastSpellByName("Arcane Shot");
+							if (not IsMoving()) then
+							
+							end
 							self.waitTimer = GetTimeEX() + 1500;
 						end
-						
 					end
-				end
 
-				-- use arcane shot
-				if (not IsSpellOnCD("Arcane Shot")) and localMana >= self.arcaneShotMana and not HasSpell("Aimed Shot") then
-					if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) then
-						CastSpellByName("Arcane Shot");
-						if (not IsMoving()) then
-							
+					-- aimed Shot
+					if not IsMoving() and HasSpell("Aimed Shot") and not IsSpellOnCD("Aimed Shot") and localMana >= self.arcaneShotMana and targetHealth >= 15 then
+						if CastSpellByName("Aimed Shot") then
+							self.waitTimer = GetTimeEX() + 3000;
 						end
-						self.waitTimer = GetTimeEX() + 1500;
 					end
-				end
-
-				-- aimed Shot
-				if not IsMoving() and HasSpell("Aimed Shot") and not IsSpellOnCD("Aimed Shot") and localMana >= self.arcaneShotMana and targetHealth >= 15 then
-					if CastSpellByName("Aimed Shot") then
-						self.waitTimer = GetTimeEX() + 3000;
-					end
-				end
 
 
-				-- multi shot
-				if (self.useMultiShot) then
-					if (HasSpell("Multi-Shot")) and (not IsSpellOnCD("Multi-Shot")) and (localMana >= 25) then
-						CastSpellByName("Multi-Shot");
-						self.waitTimer = GetTimeEX() + 1500;
+					-- multi shot
+					if (self.useMultiShot) then
+						if (HasSpell("Multi-Shot")) and (not IsSpellOnCD("Multi-Shot")) and (localMana >= 25) then
+							CastSpellByName("Multi-Shot");
+							self.waitTimer = GetTimeEX() + 1500;
 						
+						end
 					end
-				end
 	
-				-- mend pet
-				if (HasSpell("Mend Pet")) and (GetPet() ~= 0) then
-					-- Check: Mend the pet if it has lower than 70% HP and out of combat
-					if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
-						if (GetPet():GetDistance() > 20) then
-							if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
-							return true;
-						
-						elseif (GetPet():GetDistance() < 20) and (localMana >= 15) then
-							if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
-								script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
-								CastSpellByName('Mend Pet');
-								script_hunter.waitTimer = GetTimeEX() + 1850; 
+					-- mend pet
+					if (HasSpell("Mend Pet")) and (GetPet() ~= 0) then
+						-- Check: Mend the pet if it has lower than 70% HP and out of combat
+						if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
+						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
+						local percentOfManaCostOfMendPet = (cost / PlayerManaTotal()) * 100;
+							if (GetPet():GetDistance() > 20) then
+								if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 								return true;
+						
+							elseif (GetPet():GetDistance() < 20) and (localMana >= percentOfManaCostOfMendPet) then
+								if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
+									script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
+									CastSpellByName('Mend Pet');
+									script_hunter.waitTimer = GetTimeEX() + 1850; 
+									return true;
+								end
 							end
 						end
 					end
 				end
-			end
 			end
 -- melee attacks otherwise
 

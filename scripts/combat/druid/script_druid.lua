@@ -307,9 +307,11 @@ function script_druid:run(targetGUID)
 
 	if IsInCombat() and not HasForm() and PlayerHealth() <= self.healthToShift and GetLocalPlayer():HasBuff("Regrowth") then
 		if not IsCasting() and not IsChanneling() and PlayerMana() >= 25 then
-			if CastSpellByName("Healing Touch", Player()) then
-				self.waitTimer = GetTimeEX() + 3000;
-				return true;
+			if not CastSpellByName("Healing Touch", Player()) then
+				self.waitTimer = GetTimeEX() + 3500;
+				script_grind.waitTimer = GetTimeEX() + 3500;
+				grind2:setTimer(3500);
+				return 4
 			end
 		end
 	end
@@ -953,7 +955,9 @@ function script_druid:run(targetGUID)
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 100;
 				end
-				script_druidHealsAndBuffs:healsAndBuffs();
+				if script_druidHealsAndBuffs:healsAndBuffs() then
+					return true;
+				end
 				if (script_druidEX:bearForm()) then
 					self.waitTimer = GetTimeEX() + 1000;
 				end

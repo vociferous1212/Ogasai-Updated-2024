@@ -105,6 +105,9 @@ function grind2RunCombatState:run()
 					-- reset timer to 15 seconds
 					self.blacklistTargetTimer2 = currentTime + 15 * 1000;
 
+					-- obtain a new target immedietly
+					grind2.obtainNewTargetTimer = 0;
+
 					-- clear the blacklisted target
 					ClearTarget();
 				end
@@ -131,6 +134,10 @@ function grind2RunCombatState:run()
 
 						-- reset the blacklist timer
 						self.blacklistTargetTimer = currentTime + self.timeToBlacklistTarget * 1000;
+						
+						-- obtain a new target immedietly
+						grind2.obtainNewTargetTimer = 0;
+
 
 						-- clear the blacklisted target
 						ClearTarget();
