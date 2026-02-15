@@ -67,7 +67,7 @@ function script_paladinRest:rest()
 	end
 
 	-- Eat and Drink
-	if (not IsDrinking() and mana < script_paladin.drinkMana) and not IsSwimming() then
+	if (not IsDrinking() and mana < script_paladin.drinkMana) and not IsSwimming() and not IsCasting() then
 
 		script_paladin.message = "Need to drink...";
 
@@ -105,7 +105,7 @@ function script_paladinRest:rest()
 		end
 	end
 
-	if not IsEating() and health < script_paladin.eatHealth and not IsSwimming() then
+	if not IsEating() and health < script_paladin.eatHealth and not IsSwimming() and not IsCasting() then
 
 		-- Dismount
 		if IsMounted() then

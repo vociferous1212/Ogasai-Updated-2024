@@ -189,36 +189,28 @@ function script_mageRest:rest()
 		-- arcane intellect
 		if not IsMounted() and (HasSpell("Arcane Intellect")) and (not localObj:HasBuff("Arcane Intellect")) and (localMana > 25) then
 				if PlayerHasTarget() then if GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID() then ClearTarget(); end end
-			if (not CastSpellByName("Arcane Intellect", localObj)) then
-				script_mage.waitTimer = GetTimeEX() + 1700;
+			if (CastSpellByName("Arcane Intellect", localObj)) then
 				script_grind:setWaitTimer(1700);
-				return true;
 			end
 		end
 		
 		-- ice armor / frost armor
 		if not IsMounted() and script_mage.useFrostArmor and (HasSpell("Ice Armor")) and (not localObj:HasBuff("Ice Armor")) and (localMana > 20) then
 			if not IsSpellOnCD("Ice Armor") then
-				if (not CastSpellByName("Ice Armor", localObj)) then
-					script_mage.waitTimer = GetTimeEX() + 1700;
+				if (CastSpellByName("Ice Armor", localObj)) then
 					script_grind:setWaitTimer(1700);
-					return true;
 				end
 			end
 		elseif script_mage.useFrostArmor and (not HasSpell("Ice Armor")) and (HasSpell("Frost Armor")) and (not localObj:HasBuff("Frost Armor")) and (localMana > 20) then	
 			if not IsSpellOnCD("Frost Armor") then
-				if (not CastSpellByName("Frost Armor", localObj)) then
-					script_mage.waitTimer = GetTimeEX() + 1700;
+				if (CastSpellByName("Frost Armor", localObj)) then
 					script_grind:setWaitTimer(1700);
-					return true;
 				end
 			end
 		elseif script_mage.useMageArmor and HasSpell("Mage Armor") and not localObj:HasBuff("Mage Armor") and localMana >= 20 then
 			if not IsSpellOnCD("Mage Armor") then
-				if (not CastSpellByName("Mage Armor", localObj)) then
-					script_mage.waitTimer = GetTimeEX() + 1700;
+				if (CastSpellByName("Mage Armor", localObj)) then
 					script_grind:setWaitTimer(1700);
-					return true;
 				end
 			end
 		end
@@ -226,30 +218,24 @@ function script_mageRest:rest()
 		if (script_mage.useDampenMagic) then
 			if (HasSpell("Dampen Magic")) and (not localObj:HasBuff("Dampen Magic")) and (localMana > 15) then
 					if PlayerHasTarget() then if GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID() then ClearTarget(); end end
-					if (not CastSpellByName("Dampen Magic", localObj)) then
-					script_mage.waitTimer = GetTimeEX() + 1700;
+					if (CastSpellByName("Dampen Magic", localObj)) then
 					script_grind:setWaitTimer(1700);
-					return true;
 				end
 			end
 		end
 	
 		-- combustion
 		if (HasSpell("Combustion")) and (not IsSpellOnCD("Combustion")) and not (localObj:HasBuff("Combustion")) and (script_mage.fireMage) then	
-			if (not CastSpellByName("Combustion")) then
-				script_mage.waitTimer = GetTimeEX() + 1700;
+			if (CastSpellByName("Combustion")) then
 				script_grind:setWaitTimer(1700);
-				return true;
 			end
 		end
 
 		-- frost ward
 		if IsStanding() and (script_mage.useFrostWard) and (HasSpell("Frost Ward")) and (not localObj:HasBuff("Frost Ward")) then
 			if (localMana > 25) and (not localObj:HasBuff("Fire Ward")) then
-				if (not CastSpellByName("Frost Ward", localObj)) then
-					script_mage.waitTimer = GetTimeEX() + 1700;
+				if (CastSpellByName("Frost Ward", localObj)) then
 					script_grind:setWaitTimer(1700);
-					return true;
 				end
 			end
 		end
@@ -257,10 +243,8 @@ function script_mageRest:rest()
 		-- fire ward
 		if IsStanding() and (script_mage.useFireWard) and (HasSpell("Fire Ward")) and (not localObj:HasBuff("Fire Ward")) then
 			if (localMana > 50) and (not localObj:HasBuff("Frost Ward")) then
-				if (not CastSpellByName("Fire Ward", localObj)) then
-					script_mage.waitTimer = GetTimeEX() + 1700;
+				if (CastSpellByName("Fire Ward", localObj)) then
 					script_grind:setWaitTimer(1700);
-					return true;
 				end
 			end
 		end
@@ -268,9 +252,7 @@ function script_mageRest:rest()
 		-- remove curse
 		if (HasSpell("Remove Lesser Curse")) and (script_checkDebuffs:hasCurse()) and (localMana > 10) then
 			if CastSpellByName("Remove Lesser Curse", localObj) then
-				script_mage.waitTimer = GetTimeEX() + 1800;
 				script_grind:setWaitTimer(1800);
-				return true;
 			end
 		end
 	end

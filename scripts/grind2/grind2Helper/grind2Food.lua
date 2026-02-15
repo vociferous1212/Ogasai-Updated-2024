@@ -123,6 +123,8 @@ function grind2Food:eat()
 
 			if UseItem(self.food[i]) then
 
+				self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
+
 				return true;
 			end
 		end

@@ -39,6 +39,7 @@ script_warrior = {
 	overpowerTimer = 0,
 	executeRage = 15,
 	thunderclapRage = 20,
+	faceTargetTimer = 0,
 
 	-- note. the checkbox in the menu controls battle, defensive, berserker stance. all spells have arguments for which
 	-- stance they apply to and can be used in. if the palyer does not click defensive stance in-game then the bot
@@ -74,9 +75,11 @@ function script_warrior:setup()
 		script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 	end
 
+	if GetRealmName() == "Permadeath - EU" then
+		self.eatHealth = 70;
+	end
+
 	self.isSetup = true;
-
-
 end
 
 function script_warrior:spellAttack(spellName, target) -- used in Core files to control casting
@@ -84,9 +87,6 @@ function script_warrior:spellAttack(spellName, target) -- used in Core files to 
 		if (target:IsSpellInRange(spellName)) then
 			if (not IsSpellOnCD(spellName)) then
 				if (not IsAutoCasting(spellName)) then
-					if (self.enableFaceTarget) then
-						target:FaceTarget();
-					end
 				return target:CastSpell(spellName);
 				end
 			end
@@ -234,23 +234,21 @@ function script_warrior:run(targetGUID)	-- main content of script
 		script_warrior:setup();
 	end
 
-		script_grind.combatScriptRange = self.meleeDistance;
-		script_grind.eatHealth = self.eatHealth;
-		script_grind.drinkMana = 0;
+	script_grind.combatScriptRange = self.meleeDistance;
+	script_grind.eatHealth = self.eatHealth;
+	script_grind.drinkMana = 0;
 	
 	local localObj = GetLocalPlayer();
 	local localRage = localObj:GetRagePercentage();
 	local localHealth = localObj:GetHealthPercentage();
 	local localLevel = localObj:GetLevel();
 
-	if (localObj:IsDead()) then
-		 
-	end
-
+	-- no chage if using bow
 	if (self.useBow) or (self.defensiveStance) then
 		self.enableCharge = false;
 	end
 
+	-- stuck in combat
 	if (_quest.usingQuester) and (IsInCombat()) and (not script_grind:isAnyTargetTargetingMe()) and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99)) then
 		return;
 	end 
@@ -266,6 +264,12 @@ function script_warrior:run(targetGUID)	-- main content of script
 	-- Assign the target 
 	targetObj =  GetGUIDObject(targetGUID);
 
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		if targetObj:GetGUID() ~= grind2.enemyTarget:GetGUID() then
+			targetObj = nil;
+		end
+	end
+
 	if(targetObj == 0 or targetObj == nil) then
 		return 2;
 	end
@@ -277,18 +281,30 @@ function script_warrior:run(targetGUID)	-- main content of script
 		return 4;
 	end
 
+	-- do nothing if disarmed
 	if localObj:HasDebuff("Dropped Weapon") or localObj:HasDebuff("Disasrmed") or localObj:HasDebuff("Disarm") then
 		return 4;
 	end
 
--- Don't attack if we should rest first
+	-- Don't attack if we should rest first
+	-- don't use if using rotation
+	if not script_rotation.usingRotation or script_rotation.usingRotation and script_rotation.useRestFeature then
 		if (localHealth < self.eatHealth and not script_grind:isTargetingMe(targetObj)
-			and targetHealth > 99 and not targetObj:IsStunned()) then
+			and targetHealth > 99 and not targetObj:IsStunned()) or IsEating() then
 			if IsMoving() then StopMoving(); return true; end
 			self.message = "Need rest...";
 			return 4;
 		end
+	end
 
+	if targetObj ~= nil and targetObj ~= 0 and IsInCombat() and not IsMoving() then
+		if GetTimeEX() > self.faceTargetTimer and targetObj:GetDistance() <= self.meleeDistance then
+			targetObj:FaceTarget();
+			self.faceTargetTimer = GetTimeEX() + 2500;
+		end
+	end
+
+	-- keep auto attack on
 	if (IsInCombat()) and (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) then
 		if (not IsAutoCasting("Attack")) then
 			script_grind.enemyObj:AutoAttack();
@@ -298,38 +314,19 @@ function script_warrior:run(targetGUID)	-- main content of script
 	-- Check: Do nothing if we are channeling or casting or wait timer
 	if (IsChanneling()) or (IsCasting()) or (self.waitTimer >= GetTimeEX()) then
 
-		if IsInCombat() and GetTarget() ~= nil and GetTarget() ~= 0 then
-			GetTarget():FaceTarget();
-		end
-		-- heroic strike spell ID table
-		local hstable = {[78] = true, [284] = true, [285] = true, [1605] = true, [1606] = true, [1607] = true, [1608] = true, [1610] = true, [1611] = true, [6158] = true, [11564] = true, [11565] = true, [11566] = true, [11567] = true, [11570] = true, [11571] = true, [25286] = true, [25354] = true, [25710] = true, [25712] = true, [25958] = true, [12282] = true, [12663] = true, [12664] = true};
-
-		-- if the target leaves attack distance then stop spell casting heroic strike... we always do nothing if casting or channeling....
-		if (IsInCombat()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetDistance() > self.meleeDistance+1) then
-			if hstable[GetLocalPlayer():GetCasting()] then
-
-				SpellStopCasting();
-			end
-		end
-
-	return;
+		return;
 	end
 
-	
+	-- avoid adds in combat - check adds
 	if (IsInCombat() and script_grind:isAnyTargetTargetingMe()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
 		if (script_checkAdds:checkAdds()) then
-			
+			script_OM:FORCEOM();
+			self.waitTimer = GetTimeEX() + 1500;
 			return 4;
 		end
 	end
 
-	-- face the target
-	if IsInCombat() and PlayerHasTarget() then
-		if not IsMoving() and targetObj:GetDistance() <= self.meleeDistance + 2 then
-			GetTarget():FaceTarget();
-		end
-	end
-
+	-- throw
 	if self.useBow and GetLocalPlayer():HasRangedWeapon() and script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
 		if targetObj:GetDistance() <= 30 and targetObj:GetDistance() > 13 and targetObj:IsInLineOfSight() then
 			if IsMoving() then
@@ -346,7 +343,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(300, 800);
+		local tickRandom = random(200, 350);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -410,9 +407,10 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 		-- if party members >= 1 and in defensive stance then set battle shout
 		if (GetNumPartyMembers() >= 1) and (self.defensiveStance) then
-			if (not localObj:HasBuff("Battle Shout")) then 
+			if (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then 
 				if (localRage >= 10 and HasSpell("Battle Shout")) then 
-					CastSpellByName('Battle Shout'); 
+					if CastSpellByName('Battle Shout') then
+					end
 				end 
 			end
 		end
@@ -439,7 +437,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 
 			-- Check: Charge if possible in battle stance
-			if (self.enableCharge and self.battleStance) and not IsInCombat() and localHealth >= self.eatHealth then
+			if (self.enableCharge and self.battleStance) and not IsInCombat() and (localHealth >= self.eatHealth or script_rotation.usingRotation) then
 				if (HasSpell("Charge")) and (not IsSpellOnCD("Charge")) and (targetObj:IsSpellInRange("Charge")) 
 					and (targetObj:GetDistance() > 12) and (targetObj:IsInLineOfSight()) then
 
@@ -447,10 +445,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 
 					if Cast("Charge", targetObj) then 
-						--targetObj:FaceTarget();
 						targetObj:AutoAttack();
-						self.waitTimer = GetTimeEX() + 1000;
-						script_grind:setWaitTimer(1000);
+						self.waitTimer = GetTimeEX() + 1500;
+						script_grind:setWaitTimer(1500);
 						script_nav:resetNavPos();
 						script_nav:resetNavigate();
 					return 0;
@@ -482,19 +479,13 @@ function script_warrior:run(targetGUID)	-- main content of script
 			
 			end
 
-
 			-- Check move into melee range
 			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
 				return 3;
 			end
 
-			if IsInCombat() and not IsMoving() and targetObj:GetDistance() <= self.meleeDistance + 2 then targetObj:FaceTarget(); end
-
-
-
 			if (not IsAutoCasting("Attack")) and (targetObj:GetDistance() <= 8) and (not IsMoving()) then
 				targetObj:AutoAttack();
-				--targetObj:FaceTarget();
 			end
 
 			-- beserker rage
@@ -509,9 +500,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 	
 			-- Run backwards if we are too close to the target
-			if (targetObj:GetDistance() <= .2) then 
-				if (script_warrior:runBackwards(targetObj,3)) then 
-					return 4; 
+			if (targetObj:GetDistance() <= .8) and not script_rotation.usingRotation then 
+				if (script_warrior:runBackwards(targetObj, 2)) then
+					self.waitTimer = GetTimeEX() + 1500;
 				end 
 			end
 	
@@ -617,10 +608,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 					)
 				and (not IsMoving()) and not targetObj:IsFleeing() then
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) and not IsSpellOnCD("Heroic Strike") then 
-					targetObj:FaceTarget();
 					if (targetObj:GetDistance() <= self.meleeDistance) then
-						CastSpellByName('Heroic Strike', targetObj);
-						targetObj:FaceTarget();
+						if CastSpellByName('Heroic Strike', targetObj) then
+						end
 					end
 				end	
 			end
@@ -677,16 +667,12 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (HasSpell("Taunt")) and (not IsSpellOnCD("Taunt")) and (not targetObj:IsStunned()) then
 					if (targetHealth <= 96 and targetHealth >= 10) then
 						if (not targetObj:IsTargetingMe()) and (localObj:GetDistance() <= 10) then
-							if (CastSpellByName("Taunt")) then
-								targetObj:FaceTarget();
-								
+							if (CastSpellByName("Taunt")) then								
 							end
 						end
 						-- use taunt
 					elseif (targetHealth <= 60 and targetHealth >=10) and (not targetObj:IsTargetingMe()) and (not targetObj:IsStunned()) then
-						if (CastSpellByName("Taunt")) then
-							targetObj:FaceTarget();
-							
+						if (CastSpellByName("Taunt")) then							
 						end
 					end
 				end 
@@ -697,9 +683,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (HasSpell("Taunt")) and (not IsSpellOnCD("Taunt")) and (not targetObj:IsStunned()) then
 					if (targetHealth <= 99) and (IsSpellOnCD("Revenge") or not script_warrior:canRevenge()) and (localRage <= 15) then
 						if (not targetObj:IsTargetingMe()) and (localObj:GetDistance() <= 10) then
-							if (CastSpellByName("Taunt")) then
-								targetObj:FaceTarget();
-								
+							if (CastSpellByName("Taunt")) then								
 							end
 						end
 					end
@@ -852,10 +836,11 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 
 			-- Check: Keep Battle Shout up
-			if (not localObj:HasBuff("Battle Shout")) then 
+			if (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then 
 				if (localRage >= 10 and HasSpell("Battle Shout")) then 
-					CastSpellByName('Battle Shout'); 
+					if CastSpellByName('Battle Shout') then
 					return; 
+					end
 				end 
 			end
 
@@ -865,10 +850,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (targetObj:IsFleeing()) and (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 50;
 				end
-
-				--if (not IsMoving()) then
-				--	targetObj:FaceTarget();
-				--end
 		
 				if (localObj:IsCasting()) and (not IsAutoCasting("Attack")) then
 					targetObj:AutoAttack();
@@ -928,34 +909,29 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (self.useMockingBlow) and (script_warrior:canMockingBlow()) and (self.battleStance) then
 					if (localRage >= 10) and (not IsSpellOnCD("Mocking Blow")) then
 						if (Cast("Mocking Blow", targetObj)) then
-							
+							self.waitTimer = GetTimeEX() + 250;
 						end
 					end
-				end 
-
-				--if (targetObj:GetDistance() <= 8) and (not IsMoving()) then
-				--	targetObj:FaceTarget();
-				--end
+				end 	
 
 				-- melee Skill: Rend if we got more than 10 rage battle or bersker stance
 				if (self.battleStance) and (self.enableRend) then
-					if targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental'  and targetObj:GetCreatureType() ~= "Undead" and HasSpell('Rend') and not targetObj:HasDebuff("Rend") and targetHealth >= 30 and localRage >= 10 then 
-						if (Cast('Rend', targetObj)) then 
-							 
-						end 
+					if targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental'  and targetObj:GetCreatureType() ~= "Undead" and HasSpell('Rend') and not targetObj:HasDebuff("Rend") and targetHealth >= 30 and localRage >= 10 and not IsSpellOnCD("Rend") then 
+						if CastSpellByName("Rend") then
+							self.waitTimer = GetTimeEX() + 250;
+						end
 					end 
 				end
 
 				-- melee Skill: Heroic Strike if we got 15 rage battle stance
 			if (self.battleStance or (self.berserkerStance and (( (HasSpell("Bloodthirst") and IsSpellOnCD("Bloodthirst")) or localRage >= 50) or not HasSpell("Bloodthirst")))) and (not IsMoving()) and not targetObj:IsFleeing() then
 					if (localRage >= self.heroicStrikeRage) and not targetObj:IsFleeing() then 
-						targetObj:FaceTarget();
 						if (targetObj:GetDistance() <= self.meleeDistance) then
-							CastSpellByName('Heroic Strike', targetObj);
-							targetObj:FaceTarget();
+							if CastSpellByName('Heroic Strike', targetObj) then
+								self.waitTimer = GetTimeEX() + 250;
+							end
 							
 						end
-					targetObj:FaceTarget();
 					end 
 				end
 
@@ -965,9 +941,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 						if (localRage >= 45) and (targetObj:GetDebuffStacks("Sunder Armor") >= self.sunderStacks) then 
 							if (targetObj:GetDistance() <= 6) then
 								if (Cast('Heroic Strike', targetObj)) then
-									if (self.enableFaceTarget) then
-										targetObj:FaceTarget();
-									end
 								
 								end 
 							end
@@ -980,10 +953,6 @@ function script_warrior:run(targetGUID)	-- main content of script
 					if (localRage >= 65) and not targetObj:IsFleeing() then 
 						if (targetObj:GetDistance() <= 6) then
 							if (Cast('Heroic Strike', targetObj)) then
-								if (self.enableFaceTarget) then
-									targetObj:FaceTarget();
-									
-								end
 							end 
 						end
 					end 
@@ -1036,9 +1005,9 @@ function script_warrior:rest()
 	end
 
 	-- use battle shout if we have rage but need to rest and heal
-	if (localHealth <= self.eatHealth) and (localRage >= 10) and (not IsEating()) and (IsStanding()) and (not IsInCombat()) and (not localObj:HasBuff("Battle Shout")) then
-		CastSpellByName("Battle Shout");
-		self.waitTimer = GetTimeEX() + 1900;
+	if (localHealth <= self.eatHealth) and (localRage >= 10) and (not IsEating()) and (IsStanding()) and (not IsInCombat()) and (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then
+		if CastSpellByName("Battle Shout") then
+		end
 		
 	end
 	
@@ -1127,10 +1096,11 @@ function script_warrior:rest()
 			JumpOrAscendStart()
 		end
 	end
+
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = random(300, 850);
+		local tickRandom = random(200, 350);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;

@@ -1,6 +1,6 @@
 script_checkAdds = {
 	addsRange = 22,
-	checkAddsRange = 5,
+	checkAddsRange = 7,
 	closestEnemy = 0,
 	intersectEnemy = nil,
 }
@@ -111,19 +111,19 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
 	end
 
 	for i = 1, point do
-		local secondPoint = i
+		local secondPoint = i + 3
 		if pointsTwo[secondPoint] then
 			local dist = sqrt((pointsTwo[secondPoint].x - myX)^2 + (pointsTwo[secondPoint].y - myY)^2)
 			local enemyDist = sqrt((pointsTwo[secondPoint].x - pointX)^2 + (pointsTwo[secondPoint].y - pointY)^2)
 			if dist < closestDist and enemyDist >= self.addsRange then
 				closestDist = dist
-				farthestPoint = i + 2
+				farthestPoint = i + 5
 			end
 		end
 	end
 
 	if farthestPoint == 0 then
-		farthestPoint = 3
+		farthestPoint = 5
 	end
 
 	if farthestPoint ~= 0 and pointsTwo[farthestPoint] and pointZ then
@@ -261,7 +261,7 @@ function script_checkAdds:moveWhileResting(safeMargin)
 				local enemyDist = sqrt((pointsTwo[secondPoint].x - avoidX)^2 + (pointsTwo[secondPoint].y - avoidY)^2)
 				if dist < closestDist and enemyDist >= addsRange then
 					closestDist = dist
-					farthestPoint = i
+					farthestPoint = i + 3
 				end
 			end
 		end

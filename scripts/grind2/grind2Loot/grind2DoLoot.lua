@@ -24,13 +24,13 @@ function grind2DoLoot:run()
 	-- return false if and do not run script if any target is targeting player
 	if (IsAnyTargetTargetingPlayer() or IsCasting() or IsChanneling()) and not IsLooting() then
 
-		return false;
+		return;
 	end
 	
 	-- return if timer is not done yet - wait
 	if self.timer > GetTimeEX() then
 
-		return false;
+		return;
 	end
 
 	-- get loot target
@@ -56,14 +56,15 @@ function grind2DoLoot:run()
 			self.blacklistLootTimer = GetTimeEX() + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 		end
 
-		if grind2IsLootSafeToLoot:isAnyTargetNearLoot(self.lootTarget) then
+		-- kill targets around loot target
+		if grind2IsLootSafeToLoot:isAnyTargetNearLoot(self.lootTarget) and PlayerLevel() > 4 then
 			return false;
 		end
 
 		-- move to loot target
 		local xx, yy, zz = self.lootTarget:GetPosition();
 
-		if self.lootTarget:GetDistance() > self.lootTargetDistance then
+		if self.lootTarget:GetDistance() > self.lootTargetDistance and not IsAnyTargetTargetingPlayer() then
 
 			grind2MoveToTarget:run(player, xx, yy, zz);
 

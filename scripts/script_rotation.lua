@@ -25,6 +25,9 @@ script_rotation = {
 	aggroRangeTank = 50,
 	adjustTickRate = false,
 	lootTargets = true,
+	useRestFeature = true,
+	autoFaceTarget = false,
+	faceTargetTimer = 0,
 }
 
 function script_rotation:draw()
@@ -75,6 +78,11 @@ function script_rotation:run()
 	if (script_rotationMenu.pause) then 
 		self.message = "Paused by user..."; 
 		return; 
+	end
+
+	if IsInCombat() and GetTimeEX() > self.faceTargetTimer and self.autoFaceTarget and PlayerHasTarget() and self.enemyObj ~= nil and self.enemyObj ~= 0 and not IsMoving() then
+		self.enemyObj:FaceTarget();
+		self.faceTargetTimer = GetTimeEX() + 2000;
 	end
 
 
@@ -150,8 +158,10 @@ function script_rotation:run()
 			end
 
 			-- Rest
-			if (script_rotation:runRest()) then
-				return true;
+			if self.useRestFeature then
+				if (script_rotation:runRest()) then
+					return true;
+				end
 			end
 
 			self.message = "Waiting for a target...";

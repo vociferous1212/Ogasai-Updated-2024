@@ -189,7 +189,7 @@ function script_paladin:run(targetGUID)
 	end
 
 -- Check: Do nothing if we are channeling or casting or wait timer
-	if (IsChanneling()) or (IsCasting()) or (self.waitTimer > GetTimeEX()) then
+	if ( (IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast()) or (self.waitTimer > GetTimeEX()) then
 		return 4;
 	end
 
@@ -273,9 +273,8 @@ function script_paladin:run(targetGUID)
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
 		
 			-- Check: Exorcism
-			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) then
+			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) and localMana >= 30 then
 				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
-					targetObj:FaceTarget();
 					if (CastSpellByName("Exorcism", targetObj)) then 
 						self.message = ("Pulling with Exocism...");
 					end
@@ -295,10 +294,12 @@ function script_paladin:run(targetGUID)
 					end
 				end
 				if knowsCrusader and not playerHasCrusader and self.useSealOfCrusader and not playerHasCommand and not playerHasRighteousness then
-					CastSpellByName("Seal of the Crusader", localObj);
-				elseif knowsCommand and not playerHasCommand and not playerHasCrusader then
+					if not IsSpellOnCD("Seal of the Crusader") then
+						CastSpellByName("Seal of the Crusader", localObj);
+					end
+				elseif knowsCommand and not playerHasCommand and not playerHasCrusader and not IsSpellOnCD("Seal of Command") then
 					CastSpellByName("Seal of Command", localObj);
-				elseif knowsRighteousness and not playerHasRighteousness then
+				elseif knowsRighteousness and not playerHasRighteousness and not IsSpellOnCD("Seal of Righteousness") then
 					CastSpellByName("Seal of Righteousness", localObj);
 				end
 			self.waitTimer = GetTimeEX() + 150;
@@ -335,8 +336,8 @@ function script_paladin:run(targetGUID)
 				end
 			end
 
-			if (targetObj:GetDistance() <= .6) then 
-				if (script_paladin:runBackwards(targetObj, 1)) then
+			if (targetObj:GetDistance() <= .7) then 
+				if (script_paladin:runBackwards(targetObj, 2)) then
 					script_grind.tickRate = 135;
 					return 4;
 				end 
@@ -370,6 +371,14 @@ function script_paladin:run(targetGUID)
 				end 
 			end
 
+			-- Check: Exorcism
+			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) and localMana >= 30 then
+				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
+					if (CastSpellByName("Exorcism", targetObj)) then 
+					end
+				end
+			end
+
 			-- Check: Seal of the Crusader until we use judgement
 			if ( (self.useSealOfCrusader or self.onlyUseSealOfCrusader)
 			and (script_grind.enemiesAttackingUs() < 2 or localMana >= 80) )
@@ -378,7 +387,7 @@ function script_paladin:run(targetGUID)
 			and (not playerHasCrusader)
 			and localMana > 12
 			and (not IsSpellOnCD("Judgement") or self.onlyUseSealOfCrusader)
-			and (targetObj:GetHealthPercentage() > 25) then
+			and (targetObj:GetHealthPercentage() > 25) and not IsSpellOnCD("Seal of the Crusader") then
 				if (CastSpellByName("Seal of the Crusader", targetObj)) then
 					return 0;
 				end
@@ -414,7 +423,7 @@ function script_paladin:run(targetGUID)
 
 				-- Seal of the Crusader until we use judgement
 				if ((self.useSealOfCrusader and not targetHasCrusader) or self.onlyUseSealOfCrusader) and (knowsCrusader) and (localMana > 15) and (targetHealth > 55)
-				and (script_grind.enemiesAttackingUs() < 2 or localMana >= 80) then
+				and (script_grind.enemiesAttackingUs() < 2 or localMana >= 80) and not IsSpellOnCD("Seal of the Crusdaer") then
 					if not targetHasCrusader and not playerHasCrusader and not playerHasLight then
 						CastSpellByName("Seal of the Crusader", localObj)
 						self.waitTimer = GetTimeEX() + 1500; 
@@ -431,7 +440,7 @@ function script_paladin:run(targetGUID)
 
 				-- Check: Seal of Righteousness (before we have SoC)
 				if (not playerHasRighteousness) and (not playerHasCrusader) and (not knowsCommand) and
-					not playerHasLight and not playerHasWisdom and localMana > 20 then 
+					not playerHasLight and not playerHasWisdom and localMana > 20 and not IsSpellOnCD("Seal of Righteousness") then 
 					CastSpellByName("Seal of Righteousness", localObj)
 					self.waitTimer = GetTimeEX() + 1500;
 				end

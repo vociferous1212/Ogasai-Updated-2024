@@ -70,7 +70,7 @@ function grind2SelectDrawTargets:selectNPCTarget(target)
 		end
 
 		-- draw elites
-		if target:GetClassification() == 1 and GetNumPartyMembers() >= 4 then
+		if target:GetClassification() >= 1 and GetNumPartyMembers() < 2 then
 
 			DrawText("ELITE", tX, tY-25, 255, 255, 255);
 		end

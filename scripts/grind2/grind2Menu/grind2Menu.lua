@@ -6,7 +6,9 @@ grind2Menu = {
 
 	useFurbolgForm = false,
 
-	lastCastingID = 0	-- debug
+	lastCastingID = 0,	-- debug
+
+	collectGarbageTimer = 0,	-- collect lua garbage
 
 	}
 
@@ -27,6 +29,15 @@ end
 
 
 function grind2Menu:run()
+
+	-- periodically collect lua garbage
+	if GetTimeEX() > self.collectGarbageTimer then
+
+		collectgarbage();
+
+		-- 2 mins
+		self.collectGarbageTimer = GetTimeEX() + 120000;
+	end
 
 -- setup class scripts
 	if not self.isSetup then
@@ -198,6 +209,7 @@ function grind2Menu:run()
 		Text("Money Gained | "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver ");
 	end
 
+	--[[
 	-- some debug stuff
 -- show spell ID of spell being cast
 	if Player():GetCasting() ~= nil and Player():GetCasting() ~= 0 then
@@ -207,6 +219,7 @@ function grind2Menu:run()
 		Text("Current Spell Casting ID | "..self.lastCastingID);
 	end
 	--]]
+
 -- misc / random stuff
 	if HasItem("Dartol's Rod of Transformation") then
 		Separator();
@@ -220,9 +233,9 @@ function grind2Menu:run()
 -- show current script speed
 	if not self.adjustScriptSpeed then
 		local speed = "";
-		if grind2.scriptSpeed == 100 then
+		if grind2.scriptSpeed == 250 then
 			speed = "Normal";
-		elseif grind2.scriptSpeed == 75 then
+		elseif grind2.scriptSpeed == 100 then
 			speed = " Fast";
 		elseif grind2.scriptSpeed == 750 then
 			speed = "Slow";

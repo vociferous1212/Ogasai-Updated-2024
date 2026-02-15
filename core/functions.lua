@@ -456,3 +456,23 @@ function PlayerPosition()
 
 return x, y, z;
 end
+
+function MoveIfTargetIsNotInLineOfSightFallBack()
+
+	if PlayerHasTarget() then
+
+		local x, y, z = GetTarget():GetPosition();
+		
+		if GetTarget():IsInLineOfSight() then
+
+			if GetLastError() == 13553 then
+
+				Move(x, y, z);
+
+				ClearLastError();
+			end
+		end
+	end
+
+return false;
+end

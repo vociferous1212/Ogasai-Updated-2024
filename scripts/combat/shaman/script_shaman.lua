@@ -149,6 +149,10 @@ function script_shaman:setup()
 		script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 	end
 
+	if PlayerLevel() <= 4 then
+		self.drinkMana = 1;
+	end
+
 	self.isSetup = true;
 
 end
@@ -186,7 +190,6 @@ function script_shaman:spellAttack(spellName, target)
 		if (target:IsSpellInRange(spellName)) then
 			if (not IsSpellOnCD(spellName)) then
 				if (not IsAutoCasting(spellName)) then
-					target:FaceTarget();
 					--target:TargetEnemy();
 					return target:CastSpell(spellName);
 				end
@@ -524,9 +527,6 @@ function script_shaman:run(targetGUID)
 			end
 		end 
 		
-			if not IsMoving() and targetObj:GetDistance() <= self.meleeDistance then
-			targetObj:FaceTarget();
-		end
 
 		-- Opener
 		if (not IsInCombat()) then
@@ -537,12 +537,15 @@ function script_shaman:run(targetGUID)
 			if (IsMounted() and targetObj:GetDistance() < 25) then DisMount(); return 0; end
 
 			if (self.pullLightningBolt) then
+			
+				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lightning Bolt");
+				local percentOfManaCostOfLightningBolt = (cost / PlayerManaTotal()) * 100;
+
 				-- Check: Not in range
-				if (not targetObj:IsSpellInRange("Lightning Bolt"))
-				or (not targetObj:IsInLineOfSight()) then
+				if (not targetObj:IsSpellInRange("Lightning Bolt")) or (not targetObj:IsInLineOfSight()) then
 					return 3;
 				elseif (targetObj:IsInLineOfSight())
-					and (targetObj:IsSpellInRange("Lightning Bolt")) then
+					and (targetObj:IsSpellInRange("Lightning Bolt")) and not IsSpellOnCD("Lightning Bolt") and not IsCasting() and localMana >= percentOfManaCostOfLightningBolt then
 					targetObj:AutoAttack();
 					-- Pull with: Lighting Bolt
 					if (IsMoving()) then
@@ -552,8 +555,6 @@ function script_shaman:run(targetGUID)
 					if (CastSpellByName("Lightning Bolt", targetObj)) then
 						self.waitTimer = GetTimeEX() + 2500;
 						script_grind:setWaitTimer(2500);
-						targetObj:FaceTarget();
-						return 4;
 					end
 				end
 			elseif not IsCasting() and not IsChanneling() then
@@ -596,7 +597,6 @@ function script_shaman:run(targetGUID)
 				if (not script_shamanTotems:isFireTotemAlive()) then
 					if (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) and (targetHealth >= 10) then
 						CastSpellByName(self.totem2);
-						targetObj:FaceTarget();
 						self.waitTimer = GetTimeEX() + 1750;
 						return true;
 					end
@@ -666,7 +666,6 @@ function script_shaman:run(targetGUID)
 			if (self.useFireTotem) and (HasSpell(self.totem2)) and (not IsSpellOnCD(self.totem2)) and (localMana >= 15) and (targetHealth >= 10) then
 				if (not script_shamanTotems:isFireTotemAlive()) then
 					CastSpellByName(self.totem2);
-					targetObj:FaceTarget();
 					script_grind.tickRate = 150;
 					return true;
 				end
@@ -744,7 +743,6 @@ function script_shaman:run(targetGUID)
 						if (not IsSpellOnCD("Earth Shock")) then
 							if (CastSpellByName("Earth Shock", targetObj)) then
 								self.waitTimer = GetTimeEX() + 1750;
-								targetObj:FaceTarget();
 								JumpOrAscendStart();
 								return true;
 							end
@@ -761,7 +759,6 @@ function script_shaman:run(targetGUID)
 				and (not targetObj:HasDebuff("Flame Shock")) and (targetHealth >= 25) then
 					if (CastSpellByName("Flame Shock")) then
 						self.waitTimer = GetTimeEX() + 1750;
-						targetObj:FaceTarget();
 						JumpOrAscendStart();
 						return true;
 					end
@@ -777,7 +774,6 @@ function script_shaman:run(targetGUID)
 						and (not IsSpellOnCD("Earth Shock")) then	
 						if (CastSpellByName("Earth Shock", targetObj)) then
 							self.waitTimer = GetTimeEX() + 1750;
-							targetObj:FaceTarget();
 							JumpOrAscendStart();
 							return true;
 						end
@@ -807,11 +803,13 @@ function script_shaman:run(targetGUID)
 
 			-- cast lightning bolt in combat
 			if (self.useLightningBolt) then
-				if (localMana >= self.lightningBoltMana) and (targetHealth >= 20)
-					and (not IsMoving()) then
+				if (localMana >= self.lightningBoltMana) and (targetHealth >= 20) and not IsSpellOnCD("Lightning Bolt") then
+					if IsMoving() then
+						StopMoving();
+						return true;
+					end
 					if (CastSpellByName("Lightning Bolt", targetObj)) then
-						targetObj:FaceTarget();
-						fself.waitTimer = GetTimeEX() + 1850;
+						self.waitTimer = GetTimeEX() + 1850;
 						return 0;
 					end
 				end

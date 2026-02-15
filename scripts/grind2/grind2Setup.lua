@@ -77,9 +77,9 @@ function grind2Setup:run()
 			grind2FleeCombat.fleeCombat = true;
 		end
 
-		if HasItem("Dartol's Rod of Transformation") then
-			grind2Menu.useFurbolgForm = true;
-		end
+		--if HasItem("Dartol's Rod of Transformation") then
+		--	grind2Menu.useFurbolgForm = true;
+		--end
 
 
 

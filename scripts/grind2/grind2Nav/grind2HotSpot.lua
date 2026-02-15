@@ -1,6 +1,6 @@
 grind2HotSpot = {
 
-	distanceToHotSpot = 500,
+	distanceToHotSpot = 275,
 
 	hotSpotReached = false,
 

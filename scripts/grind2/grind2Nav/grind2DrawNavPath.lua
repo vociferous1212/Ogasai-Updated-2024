@@ -22,9 +22,9 @@ function grind2DrawNavPath:drawPath()
 
 				local _xx, _yy, _zz = GetPathPositionAtIndex(5, index+1);
 
-				local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z);
+				local _tX, _tY, onScreen = WorldToScreen(_x, _y, _z - 1);
 
-				local _tXX, _tYY, onScreens = WorldToScreen(_xx, _yy, _zz);
+				local _tXX, _tYY, onScreens = WorldToScreen(_xx, _yy, _zz - 1);
 
 				if(onScreen and onScreens) then
 
@@ -37,7 +37,7 @@ function grind2DrawNavPath:drawPath()
 
 						--script_aggro:DrawCircles(_x, _y, _z, 0.1);
 
-						script_aggro:DrawCircles(_xx, _yy, _zz, .3);
+						script_aggro:DrawCircles(_xx, _yy, _zz - 1, .3);
 					end
 				end
 			end

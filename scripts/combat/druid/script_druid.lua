@@ -227,21 +227,24 @@ function script_druid:run(targetGUID)
 	
 	if (Player():HasBuff("Regrowth")) then
 		script_druid.hasRegrowth = true;
+
 	elseif (not Player():HasBuff("Regrowth")) then
 		script_druid.hasRegrowth = false;
+
 	end
 
 	-- change combat script range only if we don't have a form and mana is lower than 30
 	-- don't change back to long range until combat has ended
 	-- only change to melee distance when in combat
 	if (self.useBear or self.useCat) or (not self.useBear and not self.useCat and PlayerMana() <= 30 and IsInCombat()) then
+
 		self.spellRange = self.meleeDistance;
 	elseif not self.useBear and not self.useCat and PlayerMana() >= 30 then
+
 		self.spellRange = 27;
 	end
 
 	script_grind.combatScriptRange = self.spellRange;
-
 
 	-- Assign the target 
 	targetObj = GetGUIDObject(targetGUID);
@@ -249,7 +252,7 @@ function script_druid:run(targetGUID)
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(350, 550);
+		local tickRandom = math.random(150, 350);
 		if IsCatForm() then tickRandom = 250; self.waitTimer = self.waitTimer - 500; end
 
 		if (IsMoving()) or (not IsInCombat()) or (targetObj:IsFleeing()) then
@@ -290,11 +293,6 @@ function script_druid:run(targetGUID)
 	-- stuck casting maul
 	local mtable = {[6807] = true, [6808] = true, [6809] = true, [7092] = true, [8972] = true, [9745] = true, [9880] = true, [9881] = true, [12161] = true, [20751] = true};
 
-	if (IsInCombat()) and (PlayerHasTarget()) and (IsCurrentAction(script_grind.autoAttackActionSlot) ~= 1) and (not script_checkAdds:checkAdds()) and (not IsMoving()) then
-		if not IsAutoCasting("Attack") then
-					GetTarget():AutoAttack();
-				end
-	end
 	if (IsInCombat()) and (PlayerHasTarget()) and (GetTarget():GetDistance() > self.meleeDistance+2) then
 		if mtable[GetLocalPlayer():GetCasting()] then
 			SpellStopCasting();
@@ -313,14 +311,6 @@ function script_druid:run(targetGUID)
 				grind2:setTimer(3500);
 				return 4
 			end
-		end
-	end
-
-	-- check heals and buffs
-	if (not IsInCombat() or not script_grind:isAnyTargetTargetingMe()) and (not HasForm()) then
-		if (script_druidHealsAndBuffs:healsAndBuffs()) then
-			if IsMoving() then StopMoving(); return true; end
-			return true;
 		end
 	end
 
@@ -372,12 +362,11 @@ function script_druid:run(targetGUID)
 		return 4;
 	end
 
-	-- check heals and buffs
-	if (not IsInCombat()) and (not IsBearForm() and not IsCatForm()) and (not HasForm()) then
+		-- check heals and buffs
+	if (not IsInCombat() or not script_grind:isAnyTargetTargetingMe()) and (not HasForm()) and not IsCasting() and not IsChanneling() then
 		if (script_druidHealsAndBuffs:healsAndBuffs()) then
-							if IsMoving() then StopMoving(); return true; end
-
-		return true;
+			if IsMoving() then StopMoving(); return true; end
+			return true;
 		end
 	end
 
@@ -574,9 +563,9 @@ function script_druid:run(targetGUID)
 			-- not if enemies attack us greater than 1
 				-- not if in form  -  not if enemy level greater than 2
 		if (IsInCombat()) and (script_grind.enemiesAttackingUs() == 1) and (not IsCatForm()) and (self.useCat) and (not self.useBear) and (not IsBearForm()) and (PlayerHealth() >= self.healthToShift + 10 or ( (hasRegrowth and hasRejuv) or not hasRejuv and not HasSpell("Regrowth")) ) and (PlayerMana() >= self.shapeshiftMana) and (targetObj:GetLevel() <= Player():GetLevel() +2) and (not IsDrinking()) and (not IsEating()) then
-			if (HasSpell("Cat Form")) then
-				CastSpellByName("Cat Form");
-				self.waitTimer = GetTimeEX() + 500;
+			if (HasSpell("Cat Form")) and not IsSpellOnCD("Cat Form") and not IsCasting() and not IsChanneling() then
+				if CastSpellByName("Cat Form") then
+				end
 			end
 		end
 
@@ -649,11 +638,12 @@ function script_druid:run(targetGUID)
 					StopMoving();
 					return true;
 				end
-				if (PlayerEnergy() >= self.clawEnergy) and (not IsSpellOnCD("Claw")) then
-					CastSpellByName("Claw", targetObj);
-					self.openerUsed = 0;
-					self.waitTimer = GetTimeEX() + 1600;
-					return 0;
+				if (PlayerEnergy() >= self.clawEnergy) and (not IsSpellOnCD("Claw")) and targetObj:GetDistance() <= 5 then
+					if not CastSpellByName("Claw", targetObj) then
+						self.openerUsed = 0;
+						self.waitTimer = GetTimeEX() + 1600;
+						return 0;
+					end
 				end
 			end
 							
@@ -782,9 +772,9 @@ function script_druid:run(targetGUID)
 
 		 then
 			-- cast cat form
-			if (HasSpell("Cat Form")) then
-				CastSpellByName("Cat Form");
-				self.waitTimer = GetTimeEX() + 500;
+			if (HasSpell("Cat Form")) and not IsSpellOnCD("Cat Form") and not IsCasting() and not IsChanneling() then
+				if CastSpellByName("Cat Form") then
+				end
 			end
 		end
 
@@ -959,7 +949,6 @@ function script_druid:run(targetGUID)
 					return true;
 				end
 				if (script_druidEX:bearForm()) then
-					self.waitTimer = GetTimeEX() + 1000;
 				end
 			end
 
@@ -1012,8 +1001,10 @@ function script_druid:run(targetGUID)
 				if (not script_grind.adjustTickRate) then
 					script_grind.tickRate = 100;
 				end
-				if (not CastSpellByName("Cat Form")) then
-					self.waitTimer = GetTimeEX() + 800;
+				if not IsSpellOnCD("Cat Form") then
+					if (not CastSpellByName("Cat Form")) then
+						self.waitTimer = GetTimeEX() + 800;
+					end
 				end
 			end
 
@@ -1036,8 +1027,8 @@ function script_druid:run(targetGUID)
 				--end
 
 				-- Run backwards if we are too close to the target
-				if (targetObj:GetDistance() <= 0.5) then 
-					if (script_druid:runBackwards(targetObj, 1)) then 
+				if (targetObj:GetDistance() <= 0.7) then 
+					if (script_druid:runBackwards(targetObj, 2)) then 
 						return 4; 
 					end 
 				end
@@ -1155,7 +1146,7 @@ function script_druid:run(targetGUID)
 		-- set tick rate for script to run
 		if (not script_grind.adjustTickRate) then
 	
-			local tickRandom = math.random(350, 550);
+			local tickRandom = math.random(150, 350);
 		
 			if (IsMoving()) or (not IsInCombat()) or (targetObj ~= nil and targetObj ~= 0 and targetObj:IsFleeing()) then
 				script_grind.tickRate = 135;
@@ -1179,7 +1170,7 @@ function script_druid:rest()
 	-- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(950, 1350);
+		local tickRandom = math.random(150, 350);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;
@@ -1193,7 +1184,6 @@ function script_druid:rest()
 	-- shapeshift into cat form after bear form
 	if (not IsInCombat()) and (IsBearForm()) and (self.useCat) and (not IsDrinking()) and (not IsEating()) and (PlayerMana() >= self.shapeshiftMana) then
 		if (script_druidEX:bearForm()) then
-			self.waitTimer = GetTimeEX() + 1500;
 		end
 	end
 
@@ -1202,7 +1192,7 @@ function script_druid:rest()
 		if (not script_grind.adjustTickRate) then
 			script_grind.tickRate = 100;
 		end
-		if (IsCatForm()) or (not IsCatForm()) then
+		if (IsCatForm()) then
 			CastSpellByName("Cat Form");
 			self.waitTimer = GetTimeEX() + 1500;
 			return 0;
@@ -1372,7 +1362,7 @@ function script_druid:rest()
 -- set tick rate for script to run
 	if (not script_grind.adjustTickRate) then
 
-		local tickRandom = math.random(350, 550);
+		local tickRandom = math.random(150, 350);
 
 		if (IsMoving()) or (not IsInCombat()) then
 			script_grind.tickRate = 135;

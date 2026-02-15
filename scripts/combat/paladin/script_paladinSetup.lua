@@ -49,5 +49,10 @@ function script_paladinSetup:setup()
 
 	end
 
+	if GetRealmName() == "Permadeath - EU" then
+
+		script_paladin.holyLightHealth = 55;
+	end
+
 	script_paladin.isSetup = true;
 end

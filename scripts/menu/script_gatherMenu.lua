@@ -1,4 +1,8 @@
-script_gatherMenu = {}
+script_gatherMenu = {
+
+	addItemToGather = "",
+
+}
 
 function script_gatherMenu:menu()
 
@@ -74,6 +78,9 @@ function script_gatherMenu:menu()
 				end
 			end
 			wasClicked, script_gather.safeGather = Checkbox("Safe Gathering", script_gather.safeGather);
+			
+			Separator();
+
 			SameLine() Text(""); SameLine(); 
 			if GetMapID() == 400 then
 				if Button("Collect Rocket Car Parts") then	
@@ -86,6 +93,17 @@ function script_gatherMenu:menu()
 					script_gather:addChest("rocket car", 454, 1, true);
 				end
 			end
+
+			if Button("Add Item To Gather") then
+				local itemID = tonumber(self.addItemToGather);
+				script_gather:addChest("Item", itemID)
+
+				if not script_gather.collectChests then
+					script_gather.collectChests = true;
+				end
+			end
+
+			self.addItemToGather = InputText("Gather Item", self.addItemToGather);
 
 			if (script_gather.safeGather) then
 				Text("Blacklisting gather nodes with 3 or more enemies in range");

@@ -198,11 +198,8 @@ function script_warlock:run(targetGUID)
 
 	
 	-- Check: Do nothing if we are channeling, casting
-	if (IsChanneling() or IsCasting() or self.waitTimer > GetTimeEX()) then
-		if (IsChanneling()) or (IsCasting()) then
-			self.waitTimer = GetTimeEX() + 500
-		end
-	return 4;
+	if ( (IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast()) or self.waitTimer > GetTimeEX() then
+		return 4;
 	end
 
 
@@ -580,8 +577,12 @@ function script_warlock:run(targetGUID)
 				end				
 			end
 
+			
+			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
+			local percentManaCostOfShadowBolt = (cost / PlayerManaTotal()) * 100;
+
 			-- shadow bolt to pull if we get a chance before actually entering combat phase
-			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") then
+			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and PlayerMana() >= percentManaCostOfShadowBolt then
 				script_warlockFunctions:petAttack();
 				self.message = "Pulling Target";
 				if (IsMoving()) then
@@ -872,9 +873,7 @@ function script_warlock:run(targetGUID)
 			-- life tap in combat
 			if HasSpell("Life Tap") and not IsSpellOnCD("Life Tap") and (localHealth > 35) and (localMana < 15) then
 				if (CastSpellByName("Life Tap")) then
-					self.waitTimer = GetTimeEX() + 1600;
 					self.message = "Using Life Tap!";
-					return true;
 				end
 			end
 
@@ -1147,8 +1146,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 	if (localMana < localHealth) and (HasSpell("Life Tap")) and (localHealth > self.lifeTapHealth) and (localMana < self.lifeTapMana) then
 		if (not IsInCombat()) and (not IsEating()) and (not IsDrinking()) and (not IsLooting()) and (IsStanding()) then
 			if (not IsSpellOnCD("Life Tap")) then
-				if (CastSpellByName("Life Tap", localObj)) then
-					self.waitTimer = GetTimeEX() + 1650;
+				if (CastSpellByName("Life Tap")) then
 				end
 			end
 		end
@@ -1221,7 +1219,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 	if (localMana > 30) and (IsStanding()) then
 		if(HasSpell("Demon Armor")) then
 			if (not localObj:HasBuff("Demon Armor")) then
-				if (not Buff("Demon Armor", localObj)) then
+				if (Buff("Demon Armor", localObj)) then
 					return false;
 				else
 					self.message = "Buffing...";
@@ -1229,7 +1227,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 				end
 			end
 		elseif (not localObj:HasBuff('Demon Skin') and HasSpell('Demon Skin')) and (IsStanding()) then
-			if (not Buff('Demon Skin', localObj)) then
+			if (Buff('Demon Skin', localObj)) then
 				return false;
 			else
 				self.message = "Buffing...";

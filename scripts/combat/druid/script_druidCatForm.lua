@@ -9,9 +9,9 @@ function script_druidCatForm:runInCombat(targetObj)
 	local targetHealth = targetObj:GetHealthPercentage();
 
 -- Run backwards if we are too close to the target
-	if (targetObj:GetDistance() <= 0.4) then 
+	if (targetObj:GetDistance() <= 0.7) then 
 
-		if (script_druid:runBackwards(targetObj, 1)) then 
+		if (script_druid:runBackwards(targetObj, 2)) then 
 
 			return 4; 
 		end 
@@ -30,7 +30,7 @@ function script_druidCatForm:runInCombat(targetObj)
 		return 0;
 	end
 
-	if ((targetObj:GetDistance() > script_druid.spellRange and targetObj:GetDistance() > 2) or not targetObj:IsInLineOfSight()) and not IsCasting() and not IsChanneling() then
+	if ((targetObj:GetDistance() > script_druid.spellRange) or not targetObj:IsInLineOfSight()) and not IsCasting() and not IsChanneling() then
 		return 3;
 	end
 
@@ -62,15 +62,15 @@ function script_druidCatForm:runInCombat(targetObj)
 	if IsCatForm() and (HasSpell("Rake")) and (not targetObj:HasDebuff("Rake")) and (targetHealth >= 30) and (PlayerEnergy() >= script_druid.rakeEnergy) and (targetObj:GetCreatureType() ~= "Elemental") and targetObj:GetCreatureType() ~= "Undead" and (targetObj:GetCreatureType() ~= "Mechanical") and (not IsSpellOnCD("Rake")) then
 		if (CastSpellByName("Rake", targetObj)) then
 			script_druid.waitTimer = GetTimeEX() + 2200;
-			return 0;
+			return true;
 		end
 	end
 
 -- Use Claw
 	if IsCatForm() and (PlayerEnergy() >= script_druid.clawEnergy) and (not IsSpellOnCD("Claw")) and not IsCasting() and not IsChanneling() then
-		if not CastSpellByName("Claw") then
-			script_druid.waitTimer = GetTimeEX() + 1600;
-			return 0;
+		if CastSpellByName("Claw") then
+			script_druid.waitTimer = GetTimeEX() + 1000;
+			return true;
 		end
 	end
 

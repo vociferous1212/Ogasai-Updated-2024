@@ -55,6 +55,11 @@ function grind2FleeCombat:run()
 
 -- paladin stuffs
 
+-- ROGUE
+	if HasSpell("Sprint") and not IsSpellOnCD("Sprint") and not Player():HasBuff("Sprint") then
+		CastSpellByName("Sprint");
+	end
+
 
 -- run out of combat... move to saved locations
 	if IsInCombat() then

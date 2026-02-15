@@ -69,6 +69,8 @@ function grind2Water:drink()
 
 			if UseItem(self.water[i]) then
 
+				self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
+
 				return true;
 			end
 		end

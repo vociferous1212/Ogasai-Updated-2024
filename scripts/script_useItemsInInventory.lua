@@ -69,7 +69,6 @@ function script_useItemsInInventory:useBigMouthClam()
 		self.localTimer = GetTimeEX() + 1500;
 		if not UseContainerItem(itemSlot, itemSlot2) then
 			self.localTimer = GetTimeEX() + 1500;
-			return true;
 		end
 	end
 return false;
@@ -106,7 +105,6 @@ function script_useItemsInInventory:useThickShelledClam()
 		self.localTimer = GetTimeEX() + 1500;
 		if not UseContainerItem(itemSlot, itemSlot2) then
 			self.localTimer = GetTimeEX() + 1500;
-			return true;
 		end
 	end
 return false;
@@ -143,7 +141,6 @@ function script_useItemsInInventory:useScumCoveredBag()
 		self.localTimer = GetTimeEX() + 1500;
 		if not UseContainerItem(itemSlot, itemSlot2) then
 			self.localTimer = GetTimeEX() + 1500;
-			return true;
 		end
 	end
 return false;

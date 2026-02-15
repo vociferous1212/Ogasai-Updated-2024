@@ -145,7 +145,7 @@ function grind2Paranoia:setSpeedNormal()
 
 	grind2AdjustTimersMenu.combatScriptTimer = 200;
 
-	grind2.scriptSpeed = 100;
+	grind2.scriptSpeed = 250;
 
 
 end
@@ -162,7 +162,7 @@ function grind2Paranoia:setSpeedFast()
 
 	grind2AdjustTimersMenu.combatScriptTimer = 150;
 
-	grind2.scriptSpeed = 75;
+	grind2.scriptSpeed = 100;
 
 end
 

@@ -45,8 +45,6 @@ if IsMounted() then script_helper:mountUp() return true end
 
 			CastSpellByName('Aspect of the Monkey'); 
 
-			script_hunter.waitTimer = GetTimeEX() + 1550;
-
 			return true; 
 		end
 	end
@@ -61,8 +59,6 @@ if IsMounted() then script_helper:mountUp() return true end
 			if (not localObj:HasBuff('Aspect of the Monkey')) then  
 
 				CastSpellByName('Aspect of the Monkey'); 
-
-				script_hunter.waitTimer = GetTimeEX() + 1550;
 
 				return true; 
 			end
@@ -80,8 +76,6 @@ if IsMounted() then script_helper:mountUp() return true end
 
 				CastSpellByName('Aspect of the Hawk'); 
 
-				script_hunter.waitTimer = GetTimeEX() + 1550;
-
 				return true; 
 			end 
 		end
@@ -97,8 +91,6 @@ if IsMounted() then script_helper:mountUp() return true end
 		if (not localObj:HasBuff('Aspect of the Cheetah')) then 
 
 			CastSpellByName('Aspect of the Cheetah'); 
-
-			--script_hunter.waitTimer = GetTimeEX() + 1550;
 
 			return true;  
 		end 

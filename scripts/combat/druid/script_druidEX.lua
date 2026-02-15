@@ -1,5 +1,7 @@
 script_druidEX = {
 
+	useLowRankHealingTouch = true,
+
 }
 
 function script_druidEX:castCharge()
@@ -104,19 +106,13 @@ function script_druidEX:bearForm()
 	
 	if (not IsMounted()) and not IsSpellOnCD("Bear Form") and not IsSpellOnCD("Dire Bear Form") then
 		if (not HasSpell("Dire Bear Form")) then
-			if (HasSpell("Bear Form")) and not IsSpellOnCD("Bear Form") then
-				if (CastSpellByName("Bear Form")) then
-					script_druid.waitTimer = GetTimeEX();
-					script_druid.tickRate = 135;
-					return true;
-				end
+			if (HasSpell("Bear Form")) then
+				CastSpellByName("Bear Form");
+				script_druid.tickRate = 135;
 			end
 		elseif (HasSpell("Dire Bear Form")) and not IsSpellOnCD("Dire Bear Form") then
-			if (CastSpellByName("Dire Bear Form")) then
-				script_druid.waitTimer = GetTimeEX();
-				script_druid.tickRate = 135;
-				return true;
-			end
+			CastSpellByName("Dire Bear Form")
+			script_druid.tickRate = 135;
 		end
 	end
 return false;
@@ -308,7 +304,7 @@ Separator();
 			script_druid.regrowthHealth = SliderInt("Regrowth below HP%", 15, 99, script_druid.regrowthHealth);
 		end
 
-		Text("Healing Touch below HP percentage");
+		Text("Healing Touch below HP percentage | ");	SameLine(); wasClicked, script_druidEX.useLowRankHealingTouch = Checkbox("Low Rank Heal - Conserve Mana", script_druidEX.useLowRankHealingTouch);
 		script_druid.healingTouchHealth = SliderInt("Healing Touch HP%", 15, 99, script_druid.healingTouchHealth);
 	end
 end

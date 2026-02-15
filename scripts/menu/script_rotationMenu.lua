@@ -20,7 +20,7 @@ function script_rotationMenu:menu()
 
 	SameLine(); 
 
-	if (Button("Reload Scripts")) then 
+	if (Button("Reload")) then 
 		coremenu:reload(); 
 	end
 
@@ -30,9 +30,17 @@ function script_rotationMenu:menu()
 		StopBot(); 
 	end
 
-	SameLine();
+	Separator();
 	
-	wasClicked, script_rotation.lootTargets = Checkbox("Auto-Loot", script_rotation.lootTargets);
+	wasClicked, script_rotation.lootTargets = Checkbox("Auto-Loot | ", script_rotation.lootTargets);
+
+	SameLine();
+
+	wasClicked, script_rotation.useRestFeature = Checkbox("Auto-Rest | ", script_rotation.useRestFeature);
+
+	SameLine();
+
+	wasClicked, script_rotation.autoFaceTarget = Checkbox("Face Target | ", script_rotation.autoFaceTarget);
 
 	Separator();
 

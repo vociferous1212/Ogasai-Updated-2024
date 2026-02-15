@@ -27,9 +27,17 @@ function grind2AssignATarget:run()
 
 	local bestTarget = nil;
 
-	local bestHealth = 100;
+	local bestHealth = 0;
 
 	local targetDistance = 0;
+
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		if not grind2.enemyTarget:CanAttack() or grind2.enemyTarget:IsDead() then
+			grind2.enemyTarget = nil;
+			script_grind.enemyObj = nil;
+			ClearTarget();
+		end
+	end
 
 	-- return lowest health target in combat with us
 	if IsInCombat() and NumberTargetsAttackingPlayer() >= 2 then

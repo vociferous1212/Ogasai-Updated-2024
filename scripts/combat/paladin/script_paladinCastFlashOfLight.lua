@@ -14,7 +14,7 @@ function script_paladinCastFlashOfLight:castFlashOfLight()
 	-- cast flash of light and return until health is full
 	if not self.healthFull then
 
-		if HasSpell("Flash of Light") and GetLocalPlayer():GetManaPercentage() >= 7 and not IsSpellOnCD("Flash of Light") then
+		if not IsCasting() and HasSpell("Flash of Light") and GetLocalPlayer():GetManaPercentage() >= 7 and not IsSpellOnCD("Flash of Light") then
 		
 			if CastSpellByName("Flash of Light", GetLocalPlayer()) then
 				return true;

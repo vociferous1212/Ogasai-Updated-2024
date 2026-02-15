@@ -12,7 +12,7 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 		paladin.waitTimer = GetTimeEX() + 1000;
 	end
 
-	if (IsCasting()) or (IsChanneling()) then
+	if (IsCasting()) or (IsChanneling()) and not instantCastSpells:isSpellInstantCast() then
 		return;
 	end
 	
@@ -35,7 +35,6 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	-- check aura
 	if not localObj:HasBuff("Deovotion Aura") and not localObj:HasBuff("Retribution Aura") and not localObj:HasBuff("Sanctity Aura") then
 		if script_paladinCheckAura:checkAura() then
-			script_paladin.waitTimer = GetTimeEX() + 1000;
 			return true;
 		end
 	end
@@ -44,7 +43,6 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	if (not localObj:HasBuff("Blessing of Wisdom") and script_paladin.wisdom) or (not localObj:HasBuff("Blessing of Might") and script_paladin.might) or (not localObj:HasBuff("Blessing of Kings") and script_paladin.kings) then
 		if localMana >= 10 then
 			if script_paladinCheckBlessing:checkBlessing() then
-				script_paladin.waitTimer = GetTimeEX() + 1500;
 				return true;
 			end
 		end
@@ -115,10 +113,11 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 				if (IsMoving()) then
 					StopMoving();
 				end
-				CastSpellByName("Flash of Light", localObj);
-				script_grind:setWaitTimer(1550);
-				script_paladin.waitTimer = GetTimeEX() + 1750;
-				return 0;
+				if CastSpellByName("Flash of Light", localObj) then
+					script_grind:setWaitTimer(1550);
+					script_paladin.waitTimer = GetTimeEX() + 1750;
+					return 0;
+				end
 			end
 		end
 	end
@@ -160,10 +159,11 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 			return true;
 		end
 
-		CastSpellByName("Flash of Light(Rank 1", localObj);
-		script_grind:setWaitTimer(1950);
-		script_paladin.waitTimer = GetTimeEX() + 2050;
-		return true;
+		if CastSpellByName("Flash of Light(Rank 1", localObj) then
+			script_grind:setWaitTimer(1950);
+			script_paladin.waitTimer = GetTimeEX() + 2050;
+			return true;
+		end
 	end
 
 		-- Flash of Light in combat

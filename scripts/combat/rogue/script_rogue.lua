@@ -358,7 +358,7 @@ function script_rogue:run(targetGUID)
 						CastStealth();
 					end
 					-- Use sprint (when stealthed for pull)
-					if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) and (IsStealth()) and (targetObj:GetDistance() >= 15) then
+					if (HasSpell("Sprint")) and (not IsSpellOnCD("Sprint")) and (IsStealth()) and (targetObj:GetDistance() >= 15) and not grind2.fleeCombat then
 						CastSpellByName("Sprint");
 					end
 				end	

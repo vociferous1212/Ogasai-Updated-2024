@@ -38,7 +38,7 @@ script_hunter = {
 	useCheetah = false,
 	useMarkMana = 7,
 	useMark = true,
-	useMultiShot = false,
+	useMultiShot = true,
 	--useScorpidSting = false,
 	waitAfterCombat = false,
 	spellRange = 34,
@@ -158,7 +158,7 @@ function script_hunter:runBackwards(targetObj, range)
 		if (distance < range)  then
 
 			if script_checkAdds:checkAdds() then
-				return 4;
+				return true;
 			else
 				script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
 
@@ -302,7 +302,6 @@ function script_hunter:run(targetGUID)
 	and (not targetObj:IsCasting()) then
 		if (script_checkAdds:checkAdds()) then
 			script_om:FORCEOM();
-		return 4;
 		end
 	end
 
@@ -774,7 +773,7 @@ function script_hunter:run(targetGUID)
 			end
 	
 			-- Check: If pet is stunned, feared etc use Bestial Wrath
-			if (self.hasPet) and (HasPet()) and HasSpell("Bestial Wrath") and not IsSpellOnCD("Bestial Wrath") and localMana >= 6 then
+			if (self.hasPet) and (HasPet()) and HasSpell("Bestial Wrath") and not IsSpellOnCD("Bestial Wrath") and localMana >= 10 then
 				if (targetHealth >= 55 and targetHealth <= 98) or petHP <= 50 or pet:IsStunned() or pet:IsConfused() or pet:IsFleeing() then 
 
 					CastSpellByName("Bestial Wrath");
@@ -872,7 +871,7 @@ function script_hunter:run(targetGUID)
 				if (targetObj:GetDistance() > self.minSpellRange) and (targetObj:GetDistance() < self.spellRange) and self.useRangedAttacks then
 
 					-- use Hunter's Mark first
-					if (self.useMark) then
+					if (self.useMark) and not IsSpellOnCD("Hunter's Mark") then
 						if (HasSpell("Hunter's Mark")) and (not targetObj:HasDebuff("Hunter's Mark"))
 						and (targetObj:IsInLineOfSight()) and (targetHealth >= 50) and (localMana >= self.useMarkMana) then
 
@@ -937,8 +936,8 @@ function script_hunter:run(targetGUID)
 
 
 					-- multi shot
-					if (self.useMultiShot) then
-						if (HasSpell("Multi-Shot")) and (not IsSpellOnCD("Multi-Shot")) and (localMana >= 25) then
+					if (self.useMultiShot) and NumberTargetsAttackingPlayer() >= 2 then
+						if (HasSpell("Multi-Shot")) and (not IsSpellOnCD("Multi-Shot")) and (localMana >= 15) then
 							CastSpellByName("Multi-Shot");
 							self.waitTimer = GetTimeEX() + 1500;
 						

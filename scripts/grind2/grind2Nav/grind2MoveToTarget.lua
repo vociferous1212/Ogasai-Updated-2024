@@ -48,23 +48,29 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	NavmeshSmooth(self.nextNavNodeDistance/2);
 
 -- get current position
-	local _lx, _ly, _lz = localObj:GetPosition();
+	local myX, myY, myZ = PlayerPosition();
 
-	local _ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);	
+	local pathX, pathY, pathZ = GetPathPositionAtIndex(5, self.lastnavIndex);	
 
+	-- If we are close to the next path node, increase our nav node index
+	if (GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ) <= 2) then
+		self.lastnavIndex = 1 + self.lastnavIndex;		
+		if (GetPathSize(5) <= self.lastnavIndex) then
+			self.lastnavIndex = GetPathSize(5);
+		end
+	end                  
 
 -- If the target moves more than 2 yard then make a new path
-	if GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2
+	if GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 1
 		-- or node is out of bounds
-		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 20
+		or GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= 20
 		-- or distance from path node is greater than next node distance
-		or (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= self.nextNavNodeDistance and IsMoving()) then
-
+		or (IsPathLoaded(5) and IsMoving() and GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= self.nextNavNodeDistance + 1.5) then
 		self.navPosition['x'] = _x;
 		self.navPosition['y'] = _y;
 		self.navPosition['z'] = _z;
-		GeneratePath(_lx, _ly, _lz, _x, _y, _z);
-		self.lastnavIndex = 1.5; -- start at index 1, index 0 is our position
+		GeneratePath(myX, myY, myZ, _x, _y, _z + 1);
+		self.lastnavIndex = 1; -- start at index 1, index 0 is our position
 		self.message = "Generating Path";
 	end	
 	
@@ -76,23 +82,23 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	end
 
 -- Get the current path node's coordinates
-	_ix, _iy, _iz = GetPathPositionAtIndex(5, self.lastnavIndex);
+	pathX, pathY, pathZ = GetPathPositionAtIndex(5, self.lastnavIndex);
 
 	self.message = "Navigating...";
 
 -- we are swimming, try to stay at top of water
-	if IsSwimming() then
+	if not Player():IsDead() and not IsGhost() and IsSwimming() then
 
 		-- + 1 each z move
-		_lx, _ly, _lz = localObj:GetPosition();
+		myX, myY, myZ = localObj:GetPosition();
 		_iz = _lz + 1;
 	end
 
 -- Move to the next destination in the path
-	Move(_ix, _iy, _iz);
+	Move(pathX, pathY, pathZ + 1);
 
 -- If we are close to the next path node, increase our nav node index
-	if (GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) <= 3) then
+	if (GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ) <= 3) then
 		self.lastnavIndex = 1 + self.lastnavIndex;		
 		if (GetPathSize(5) <= self.lastnavIndex) then
 			self.lastnavIndex = GetPathSize(5);

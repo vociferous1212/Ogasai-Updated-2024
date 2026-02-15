@@ -257,6 +257,8 @@ function script_combatHelper:checkStopHeroicStrikeConditions()
 		-- stop spell casting
 		if hstable[GetLocalPlayer():GetCasting()] then
 			SpellStopCasting();
+			script_druid.waitTimer = GetTimeEX() + 500;
+			script_warrior.waitTimer = GetTimeEX() + 500;
 		end
 
 		if (script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil) and (not script_checkAdds:checkAdds()) and not IsAutoCasting("Attack") then

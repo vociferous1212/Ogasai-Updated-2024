@@ -171,6 +171,10 @@ function grind2RunCombatState:run()
 				script_combatHelper:run()
 			end
 
+			if enemyTarget == nil or enemyTarget == 0 or enemyTarget:IsDead() or not enemyTarget:CanAttack() then
+				return;
+			end
+
 			-- TEMPORARY run old combat error
 			script_grind.combatError = RunCombatScript(enemyTarget:GetGUID());
 
@@ -205,7 +209,10 @@ function grind2RunCombatState:run()
 			end
 
 			-- combat error == 3 from combat script
-			if script_grind.combatError == 3 then
+			if script_grind.combatError == 3
+				-- target is fleeing
+				or ( (GetMyClass() == "WARRIOR" or GetMyClass() == "ROGUE" or (GetMyClass() == "DRUID" and HasForm()) )
+				and enemyTarget:IsFleeing() and enemyTarget:GetHealthPercentage() <= 20 and enemyTarget:GetDistance() > 1) then
 
 				-- valid coordinates and target distance is greater than .5 yards, enemy is not dead and we can attack it then
 				if _x ~= 0 and x ~= 0 and enemyTarget:GetDistance() > .5 and not enemyTarget:IsDead() and enemyTarget:CanAttack() then
@@ -231,6 +238,12 @@ function grind2RunCombatState:run()
 				script_grind.combatError = nil;
 			end
 		end
+	end
+
+	-- fall back function to move to target - if IsInLineOfSight() function fails to accurately determine line of sight
+	-- use GetLastError()
+	if enemyTarget:GetDistance() >= 2 and IsInCombat() then
+		MoveIfTargetIsNotInLineOfSightFallBack()
 	end
 
 	-- timer per each time script is ran + combat script

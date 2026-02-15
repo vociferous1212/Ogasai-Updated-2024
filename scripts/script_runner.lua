@@ -88,10 +88,13 @@ function script_runner:avoidToAggro(safeMargin)
 	while currentObj ~= 0 do
 		if typeObj == 3 then
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18;
-			if GetRealmName() == "Kalidar" then
+			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
 			end
-			local range = aggro + safeMargin - 1
+			if IsStealth() then
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 10;
+			end
+			local range = aggro + safeMargin
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
 				if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
 
@@ -113,12 +116,15 @@ function script_runner:avoidToAggro(safeMargin)
 	if (closestEnemy ~= 0) then
 		local xT, yT, zT = closestEnemy:GetPosition()
 		local xP, yP, zP = localObj:GetPosition()
-		local safeRange = safeMargin - 1
+		local safeRange = safeMargin
 		local intersectMob = script_runner:aggroIntersect(closestEnemy)
 		if (intersectMob ~= nil) then
 			local aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 18
-			if GetRealmName() == "Kalidar" then
+			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 21.5;
+			end
+			if IsStealth() then
+				aggroRange = intersectMob:GetLevel() - localObj:GetLevel() + 10;
 			end
 			local x, y, z = closestEnemy:GetPosition()
 			local xx, yy, zz = intersectMob:GetPosition()
@@ -156,12 +162,15 @@ function script_runner:aggroIntersect(target)
 	while currentObj ~= 0 do
 		if typeObj == 3 then
 			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
-			if GetRealmName() == "Kalidar" then
+			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
+			end
+			if IsStealth() then
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 10;
 			end
 			local range = aggro + (safeMargin or 3)
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
-				if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
+				if grindEnemy == nil or (PlayerHasTarget() and UnitReaction("player", "target") <= 3) or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
 				local xx, yy, zz = currentObj:GetPosition()
 				local dist = math.sqrt((x - xx)^2 + (y - yy)^2)
 				if (dist < aggro * 2) then
@@ -249,8 +258,11 @@ function script_runner:drawAggroCircles()
 	while currentObj ~= 0 do
 		if typeObj == 3 and not currentObj:IsDead() and currentObj:CanAttack() and not currentObj:IsCritter() then
 			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 18
-			if GetRealmName() == "Kalidar" then
+			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
+			end
+			if IsStealth() then
+				aggro = currentObj:GetLevel() - localObj:GetLevel() + 10;
 			end
 			local cx, cy, cz = currentObj:GetPosition()
 			script_runner:DrawCircles(cx, cy, cz, aggro)

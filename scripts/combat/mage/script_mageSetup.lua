@@ -90,7 +90,17 @@ function script_mageSetup:setup()
 		script_mage.useScorch = false;
 	end
 	
-	if GetLocalPlayer():GetLevel() < 7 then script_mage.moveAwayRest = false; end
+	if GetLocalPlayer():GetLevel() < 7 then
+		script_mage.moveAwayRest = false;
+	end
+
+	if PlayerLevel() <= 4 then
+		script_mage.drinkMana = 15;
+	end
+
+	if PlayerLevel() < 6 then
+		script_mage.drinkMana = 25;
+	end
 
 	-- if we have cone of cold we can start saving a lot of mana...
 	if HasSpell("Cone of Cold") then
