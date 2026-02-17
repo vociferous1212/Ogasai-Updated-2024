@@ -21,13 +21,23 @@ run object manager here
 
 function grind2AssignATarget:run()
 
+	-- clear any target not in combat with us that we have targeted
+	-- and get nearest enemy
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		if IsInCombat() and not grind2IsTargetingMe:target(grind2.enemyTarget) and not grind2IsTargetingPet:target(grind2.enemyTarget) then
+			grind2.enemyTarget = nil;
+			grind2.lastTargetTargeted = nil;
+			grind2.lastTargetTargetedGUID = nil;
+		end
+	end
+
 	local i, t = GetFirstObject();
 
 	local bestDistance = 1000;
 
 	local bestTarget = nil;
 
-	local bestHealth = 0;
+	local bestHealth = 100;
 
 	local targetDistance = 0;
 
@@ -47,6 +57,10 @@ function grind2AssignATarget:run()
 		while i ~= 0 do
 
 			if t == 3 and i:GetDistance() <= 65 and not i:IsDead() and not i:IsCritter() then
+
+				if totemsList:isTargetTotem(i) then
+					return i;
+				end
 
 				if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
 				
@@ -69,7 +83,6 @@ function grind2AssignATarget:run()
 		end
 	end
 
-	--[[
 	-- return the last target if we are in combat with it
 	if grind2.enemyTarget ~= nil then
 		if not grind2.enemyTarget:IsDead() and (grind2.enemyTarget:GetHealthPercentage() <= 99
@@ -79,32 +92,9 @@ function grind2AssignATarget:run()
 		end
 	end
 
-	-- return last target if it is not dead and we are still in combat
-	if grind2.lastTargetTargeted ~= nil then
-		if not grind2.lastTargetTargeted:IsDead() and grind2IsTargetingMe:target(grind2.lastTargetTargeted) then
-			return grind2.lastTargetTargeted;
-		end
-	end
-
-	]]--
-
-	-- return any target attacking me if I am not in combat yet
-	if not IsInCombat() then
-		if grind2GetTargetAttackingMe:run() ~= nil then
-			grind2.enemyTarget = grind2GetTargetAttackingMe:run();
-			return grind2GetTargetAttackingMe:run();
-		end
-	end
-
 	while i ~= 0 do
 
 		if t == 3 then
-
-			-- target is not dead but is tapped by player
-			if not i:IsDead() and i:IsTapped() and i:IsTappedByMe() then
-
-				return i;
-			end
 
 			-- if we have a valid target for the grinder
 			if grind2IsTargetValid:target(i) then
@@ -113,6 +103,12 @@ function grind2AssignATarget:run()
 				if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= grind2.findTargetDistance then
 					
 					targetDistance = i:GetDistance();
+
+					if IsInCombat() then
+						if totemsList:isTargetTotem(i) then
+							return i;
+						end
+					end
 
 					if bestDistance > targetDistance then
 					
@@ -132,8 +128,30 @@ function grind2AssignATarget:run()
 
 				end
 			end
+
+			-- target is not dead but is tapped by player
+			if not i:IsDead() and i:IsTapped() and i:IsTappedByMe() then
+
+				return i;
+			end
+
 		end
 	i, t = GetNextObject(i);
+	end
+
+		-- return last target if it is not dead and we are still in combat
+	if grind2.lastTargetTargeted ~= nil then
+		if not grind2.lastTargetTargeted:IsDead() and grind2IsTargetingMe:target(grind2.lastTargetTargeted) and grind2.lastTargetTargeted:GetHealthPercentage() >= 1 then
+			return grind2.lastTargetTargeted;
+		end
+	end
+
+	-- return any target attacking me if I am not in combat yet
+	if not IsInCombat() then
+		if grind2GetTargetAttackingMe:run() ~= nil then
+			grind2.enemyTarget = grind2GetTargetAttackingMe:run();
+			return grind2GetTargetAttackingMe:run();
+		end
 	end
 
 return bestTarget;

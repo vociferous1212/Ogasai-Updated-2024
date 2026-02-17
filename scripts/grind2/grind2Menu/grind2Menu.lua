@@ -10,6 +10,10 @@ grind2Menu = {
 
 	collectGarbageTimer = 0,	-- collect lua garbage
 
+	x = 0,
+	y = 0,
+	z = 0
+
 	}
 
 
@@ -128,6 +132,25 @@ function grind2Menu:run()
 	else
 
 		ProgressBar("LOADING | ".. navProgress.."%", GetLoadNavmeshProgress());
+	end
+
+	if grind2.pause then
+		if PlayerHasTarget() and self.x == 0 then
+			if Button("Move To Targeted Target") then
+				self.x, self.y, self.z = GetTarget():GetPosition();
+			end
+		elseif self.x ~= 0 then
+			if Button("Stop Moving!") then
+				self.x, self.y, self.z = 0, 0, 0;
+			end
+		end
+	
+		local x, y, z = PlayerPosition();
+		if self.x ~= 0 and GetDistance3D(x, y, z, self.x, self.y, self.z) > 5 then
+			grind2MoveToTarget:run(Player(), self.x, self.y, self.z);
+		else
+			self.x, self.y, self.z = 0, 0, 0;
+		end
 	end
 
 -- combat menu script

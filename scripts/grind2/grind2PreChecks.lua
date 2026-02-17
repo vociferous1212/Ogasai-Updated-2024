@@ -4,7 +4,9 @@ grind2PreChecks = {
 
 	jumpTimer = 0,
 
-	rodTimerForFun = 0
+	rodTimerForFun = 0,
+
+	jump = true,
 
 }
 
@@ -22,29 +24,6 @@ function grind2PreChecks:run()
 			grind2:setTimer(350);
 
 			return true;
-		end
-	end
-
--- clear dead targets reset enemy target variable
-	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
-		if grind2.enemyTarget:IsDead() then
-			-- + 1 to target killed
-			grind2.numberOfKills = grind2.numberOfKills + 1;
-			-- save coordinates to run out of combat and nav
-			grind2SaveCoordinates:saveTargetsLocation(grind2.enemyTarget);
-			-- reset grind enemy target
-			grind2.enemyTarget = nil;
-			-- reset grind last target
-			grind2.lastTargetTargeted = nil;
-			-- reset original grinder target - using old combat scripts
-			script_grind.enemyObj = nil;
-			-- send message
-			grind2.grinderMessage = "Clearing dead/tapped target";
-			-- reset new target timer
-			grind2.obtainNewTargetTimer = currentTime;
-			-- set timer
-			grind2:setTimer(grind2AdjustTimersMenu.waitAfterTargetKilledTimer);
-		return true;
 		end
 	end
 
@@ -112,9 +91,10 @@ function grind2PreChecks:run()
 				
 				if IsLooting() then
 					grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
+					grind2.obtainNewTargetTimer = 250;
 				end
 
-				return true;
+			return true;
 			end
 		end
 	end
@@ -133,7 +113,7 @@ function grind2PreChecks:run()
 	end
 
 -- random jump
-	if IsMoving() and not IsInCombat() then
+	if IsMoving() and not IsInCombat() and self.jump then
 
 		local random = math.random(-100, 100);
 		local randomTimer = math.random(2000, 6500);
@@ -160,10 +140,17 @@ function grind2PreChecks:run()
 
 -- Update pull levels if we leveled up
 	if (grind2.currentLevel < PlayerLevel()) then
-		grind2IsTargetValid.minLevel = PlayerLevel() - 4;
-		grind2IsTargetValid.maxLevel = PlayerLevel() + 2;
-		grind2.currentLevel = PlayerLevel();
+		if PlayerLevel() < 40 then
+			grind2IsTargetValid.minLevel = PlayerLevel() - 4;
+			grind2IsTargetValid.maxLevel = PlayerLevel() + 2;
+			grind2.currentLevel = PlayerLevel();
+		elseif PlayerLevel() >= 40 then
+			grind2IsTargetValid.minLevel = PlayerLevel() - 7;
+			grind2IsTargetValid.maxLevel = PlayerLevel() + 2;
+			grind2.currentLevel = PlayerLevel();
+		end
 	end
+	
 
 -- check if bags are full
 	grind2AreBagsFull:checkIfBagsAreFull()
@@ -175,15 +162,22 @@ function grind2PreChecks:run()
 -- if bags are full then do vendor
 	if grind2.useVendor and not IsInCombat() and not IsCasting() and not IsChanneling() then
 
-		-- add a mount timer.. keeps trying to mount / cast when it needs to do other things.. too quick
-		-- mount
 		if not IsInCombat() and script_vendor.status >= 1 then
-			if HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and PlayerMana() >= 20
+
+			-- reset variables
+			grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
+			grind2RunCombatState.blacklistTargetTimer2 = currentTime * 2;
+
+			
+			-- add a mount timer.. keeps trying to mount / cast when it needs to do other things.. too quick
+			-- mount
+			if script_hunter.useCheetah and HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and PlayerMana() >= 20
 			and not Player():HasBuff("Aspect of the Cheetah") then
 				if CastSpellByName("Aspect of the Cheetah") then
 					return true;
 				end
 			end
+
 			if not HasForm() and HasSpell("Cat Form") and not Player():HasBuff("Cat Form") and not IsSpellOnCD("Cat Form") and PlayerMana() >= 50 then
 				if CastSpellByName("Cat Form") then
 					return true;
@@ -244,12 +238,14 @@ function grind2PreChecks:run()
 	if not grind2HotSpot.hotSpotReached and not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() then
 	
 		-- cheetah hunter
-		if HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and not Player():HasBuff("Aspect of the Cheetah") and IsMoving() then
-			CastSpellByName("Aspect of the Cheetah");
+		if script_hunter.useCheetah and HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and not Player():HasBuff("Aspect of the Cheetah") and IsMoving() then
+			if CastSpellByName("Aspect of the Cheetah") then
+			end
 		end
 		-- cat form druid
 		if not HasForm() and HasSpell("Cat Form") and not Player():HasBuff("Cat Form") and not IsSpellOnCD("Cat Form") and PlayerMana() >= 50 and IsMoving() then
-			CastSpellByName("Cat Form");
+			if CastSpellByName("Cat Form") then
+			end
 		end
 
 		-- mount

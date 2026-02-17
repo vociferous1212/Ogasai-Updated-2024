@@ -1,6 +1,6 @@
 script_checkAdds = {
 	addsRange = 22,
-	checkAddsRange = 7,
+	checkAddsRange = 5,
 	closestEnemy = 0,
 	intersectEnemy = nil,
 }

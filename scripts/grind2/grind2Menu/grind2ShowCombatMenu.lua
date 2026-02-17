@@ -23,7 +23,7 @@ function grind2ShowCombatMenu:run()
 
 	elseif (class == 'PALADIN') then	script_paladinMenu:menu();
 
-	elseif (class == 'SHAMAN') then		script_shamanEX:menu();
+	elseif (class == 'SHAMAN') then		script_shamanMenu:menu();
 
 	elseif (class == 'WARLOCK') then	script_warlockEX:menu();
 
@@ -81,6 +81,10 @@ function grind2ShowCombatMenu:run()
 			Text("Mana  "); SameLine(); grind2FleeCombat.manaToFlee = SliderInt("Mana To Flee", 0, 40, grind2FleeCombat.manaToFlee);
 			
 		end
+
+		Text("Saved locations in current path = "..grind2SaveCoordinates.numberOfLocations);
+
+		Text("")
 		Separator();
 	end
 

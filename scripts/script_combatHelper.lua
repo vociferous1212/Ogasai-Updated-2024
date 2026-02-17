@@ -118,7 +118,7 @@ function script_combatHelper:mageStopFrostboltConditions()
 	
 					-- timer needed for bot to check everything and not recast frostbolt over and over...
 					script_grind.waitTimer = GetTimeEX() + 550;
-					script_mage.waitTimer = GetTimeEX() + 750;
+					script_mage.waitTimer = GetTimeEX() + 550;
 	
 					end
 				end

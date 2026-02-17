@@ -85,6 +85,9 @@ function script_gatherRun:gather()
 				return true;
 			end
 			if (not LootTarget()) and (script_gather.nodeObj:GameObjectInteract()) and (not IsMoving()) and (not IsLooting()) then
+				if script_gather.nodeObj:GetObjectDisplayID() == tonumber(script_gatherMenu.addItemToGather) then
+					script_gather:addNodeToBlacklist(script_gather.nodeGUID);
+				end
 				script_gather.timer = GetTimeEX() + 4550;
 				script_grind:setWaitTimer(2500);
 				_quest:setTimer(2500);

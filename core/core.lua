@@ -1,8 +1,14 @@
 -- load the navmesh once we enter the game
-if (not IsUsingNavmesh()) then UseNavmesh(true); end LoadNavmesh();
+if (not IsUsingNavmesh()) then
+	UseNavmesh(true);
+	LoadNavmesh();
+end
 
 -- stop the bot if we log out or load screen...
-if GetLocalPlayer() == nil or GetLocalPlayer() == 0 or script_grind == nil then StopBot(); ShowBar(); end
+if GetLocalPlayer() == nil or GetLocalPlayer() == 0 or script_grind == nil then
+	StopBot();
+	ShowBar();
+end
 
 function Cast(spellName, target)
 	if (HasSpell(spellName)) then

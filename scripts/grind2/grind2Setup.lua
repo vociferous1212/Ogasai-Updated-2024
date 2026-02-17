@@ -69,6 +69,19 @@ function grind2Setup:run()
 			grind2SafePull.skipSafePull = true;
 		end
 
+		if (level < 10) then
+		script_checkAdds.addsRange = 18;
+		end
+		if (level >= 10) and (level < 40) then
+			script_checkAdds.addsRange = 23;
+		end
+		if (level > 40) then
+			script_checkAdds.addsRange = 25;
+		end
+		if (level == 60) then
+			script_checkAdds.addsRange = 28;
+		end
+
 		grind2.startingMoney = GetMoney();
 		grind2.currentMoney = GetMoney();
 
@@ -81,8 +94,11 @@ function grind2Setup:run()
 		--	grind2Menu.useFurbolgForm = true;
 		--end
 
-
-
+	-- set pull levels to lower mobs allowed if level 40 or higher
+		if PlayerLevel() >= 40 then
+			grind2IsTargetValid.minLevel = PlayerLevel() - 7;
+			grind2IsTargetValid.maxLevel = PlayerLevel() + 2;
+		end
 
 
 	end

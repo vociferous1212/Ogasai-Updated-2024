@@ -145,14 +145,15 @@ function grind2RunCombatState:run()
 				end
 			end
 
+			--[[
 			-- last target targeted if we have a good target
-			if enemyTarget ~= nil and enemyTarget ~= 0 then
+			if enemyTarget ~= nil and enemyTarget ~= 0 and IsInCombat() then
 
 				-- and last target is valid
 				if grind2.lastTargetTargeted ~= 0 and grind2.lastTargetTargeted ~= nil then
 
 					-- and last target is not dead
-					if not grind2.lastTargetTargeted:IsDead() then
+					if not grind2.lastTargetTargeted:IsDead() and grind2.lastTargetTargeted:GetHealthPercentage() >= 1 then
 
 						-- last target is current target
 						-- set GUID
@@ -164,6 +165,8 @@ function grind2RunCombatState:run()
 				end
 			end
 
+			--]]
+
 			-- TEMPORARY run old combat helper
 			if IsInCombat() then
 
@@ -171,12 +174,28 @@ function grind2RunCombatState:run()
 				script_combatHelper:run()
 			end
 
+			-- return if we don't have a good target
 			if enemyTarget == nil or enemyTarget == 0 or enemyTarget:IsDead() or not enemyTarget:CanAttack() then
 				return;
 			end
 
-			-- TEMPORARY run old combat error
-			script_grind.combatError = RunCombatScript(enemyTarget:GetGUID());
+			-- clear target if it is out of grind range
+			if enemyTarget ~= nil and enemyTarget ~= 0 then
+				if not IsInCombat() and not grind2IsTargetValid:isTargetInRange(enemyTarget) and not grind2IsTargetingMe:target(enemyTarget) and not grind2IsTargetingPet:target(enemyTarget) then
+					if PlayerHasTarget() then
+						ClearTarget();
+					end
+					grind2.enemyTarget = nil;
+					grind2.lastTargetTargeted = nil;
+					grind2.lastTargetTargetedGUID = nil;
+					script_grind.enemyObj = nil;
+				end
+			end
+
+			if not enemyTarget:IsDead() and enemyTarget:CanAttack() then
+				-- TEMPORARY run old combat error
+				script_grind.combatError = RunCombatScript(enemyTarget:GetGUID());
+			end
 
 			-- run currently loaded combat script
 			--RunCombatScript(enemyTarget:GetGUID());
@@ -210,9 +229,9 @@ function grind2RunCombatState:run()
 
 			-- combat error == 3 from combat script
 			if script_grind.combatError == 3
-				-- target is fleeing
-				or ( (GetMyClass() == "WARRIOR" or GetMyClass() == "ROGUE" or (GetMyClass() == "DRUID" and HasForm()) )
-				and enemyTarget:IsFleeing() and enemyTarget:GetHealthPercentage() <= 20 and enemyTarget:GetDistance() > 1) then
+				-- target is fleeing and we are melee class
+				or ( (GetMyClass() == "WARRIOR" or GetMyClass() == "ROGUE" or GetMyClass() == "PALADIN" or GetMyClass() == "SHAMAN" or (GetMyClass() == "DRUID" and HasForm()) )
+				and enemyTarget:IsFleeing() and enemyTarget:GetHealthPercentage() <= 20 and enemyTarget:GetDistance() >= 3.5 and not IsCasting() and not IsChanneling()) then
 
 				-- valid coordinates and target distance is greater than .5 yards, enemy is not dead and we can attack it then
 				if _x ~= 0 and x ~= 0 and enemyTarget:GetDistance() > .5 and not enemyTarget:IsDead() and enemyTarget:CanAttack() then
@@ -249,5 +268,5 @@ function grind2RunCombatState:run()
 	-- timer per each time script is ran + combat script
 	self.timer = currentTime + grind2AdjustTimersMenu.combatScriptTimer + 50;
 
---return true;
+return false;
 end

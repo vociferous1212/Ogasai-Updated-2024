@@ -1,6 +1,6 @@
 grind2DrawAggroCircles = {
 
-	circleRange = 55,
+	circleRange = 45,
 
 	drawAggroCircles = true,
 

@@ -2,11 +2,17 @@ script_hunterChooseAspect = {}
 
 function script_hunterChooseAspect:chooseAspect(targetObj)
 
-if script_hunter.waitTimer > GetTimeEX() then
-	return false;
-end
+	if script_hunter.waitTimer > GetTimeEX() then
 
-if IsMounted() then script_helper:mountUp() return true end
+		return false;
+	end
+
+	if IsMounted() then
+
+		script_helper:mountUp()
+
+		return true;
+	end
 
 
 -- set variables
@@ -37,13 +43,18 @@ if IsMounted() then script_helper:mountUp() return true end
 	end
 	
 
+-- trueshot aura
+	if HasSpell("Trueshot Aura") and not Player():HasBuff("Trueshot Aura") and localMana >= 20 and not IsSpellOnCD("Trueshot Aura") then
+		CastSpellByName("Trueshot Aura");
+	end
 
 -- use aspect of the mokney
 	if (hasMonkey) and (localObj:GetLevel() < 10) and not IsSpellOnCD("Aspect of the Monkey") then 
 
 		if (not localObj:HasBuff('Aspect of the Monkey')) then  
 
-			CastSpellByName('Aspect of the Monkey'); 
+			if CastSpellByName('Aspect of the Monkey') then
+			end
 
 			return true; 
 		end
@@ -58,7 +69,8 @@ if IsMounted() then script_helper:mountUp() return true end
 
 			if (not localObj:HasBuff('Aspect of the Monkey')) then  
 
-				CastSpellByName('Aspect of the Monkey'); 
+				if CastSpellByName('Aspect of the Monkey') then
+				end
 
 				return true; 
 			end
@@ -74,7 +86,8 @@ if IsMounted() then script_helper:mountUp() return true end
 
 			if (not localObj:HasBuff('Aspect of the Hawk')) then 
 
-				CastSpellByName('Aspect of the Hawk'); 
+				if CastSpellByName('Aspect of the Hawk') then
+				end
 
 				return true; 
 			end 
@@ -90,7 +103,8 @@ if IsMounted() then script_helper:mountUp() return true end
 
 		if (not localObj:HasBuff('Aspect of the Cheetah')) then 
 
-			CastSpellByName('Aspect of the Cheetah'); 
+			if CastSpellByName('Aspect of the Cheetah') then
+			end
 
 			return true;  
 		end 

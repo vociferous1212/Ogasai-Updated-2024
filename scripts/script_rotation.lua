@@ -32,18 +32,34 @@ script_rotation = {
 
 function script_rotation:draw()
 	script_rotationEX:draw();
+
 end
 
 function script_rotation:setup()
+
 	script_helper:setup();
 	script_gather:setup();
 	script_grind:setup();
 	script_grind.findLootDistance = 35;
 	script_grind.lootDistance = 4;
-	script_druid.meleeDistance = 5; script_warrior.meleeDistance = 5; script_shaman.meleeDistance = 5; script_rogue.meleeDistance = 5; script_paladin.meleeDistance = 5;
+	script_druid.meleeDistance = 5;
+	script_warrior.meleeDistance = 5;
+	script_shaman.meleeDistance = 5;
+	script_rogue.meleeDistance = 5;
+	script_paladin.meleeDistance = 5;
 	script_hunter.meleeDistance = 5;
 	script_druid.healthToShift = 60;
 	script_paladin.holyLightHealth = 65;
+
+	script_shaman:setup();
+	script_druid:setup();
+	script_mage:setup();
+	script_warlock:setup();
+	script_priest:setup();
+	script_paladin:setup();
+	script_warrior:setup();
+	script_rogue:setup();	
+
 	self.isSetup = true;
 end
 
@@ -55,6 +71,7 @@ function script_rotation:window()
 	if (self.useExpChecker) then
 		script_expChecker:menu();
 	end
+
 end
 
 function script_rotation:run()
@@ -86,8 +103,13 @@ function script_rotation:run()
 	end
 
 
-	if (IsCasting() or IsChanneling()) then 
+	if ((IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast()) then 
 		return; 
+	end
+
+	-- player is stunned or confused of feared
+	if (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then --and not HasSpell("Will of the Forsaken") then
+		return;
 	end
 
 	if (self.waitTimer > GetTimeEX()) then
@@ -99,10 +121,10 @@ function script_rotation:run()
 	if (not localObj:IsDead()) then
 
 		-- do some loot
-		if (not IsInCombat() or IsLooting()) and self.lootTargets and not script_grind:shouldWeRest() then
+		if ((not IsInCombat() or not IsAnyTargetTargetingPlayer() or not PlayerHasTarget()) or IsLooting()) and self.lootTargets and (not script_grind:shouldWeRest() or not self.useRestFeature) then
 
 			if script_rotation:doSomeLoot() then
-				self.waitTimer = GetTimeEX() + 500;
+				self.waitTimer = GetTimeEX() + 150;
 				return true;
 			end
 		end
@@ -179,7 +201,7 @@ end
 
 function script_rotation:runRest()
 
-	if not IsInCombat() and not GetLocalPlayer():IsDead() then
+	if not IsInCombat() and not GetLocalPlayer():IsDead() and self.useRestFeature then
 
 		if (RunRestScript()) then
 
@@ -218,7 +240,7 @@ function script_rotation:doSomeLoot()
 			end
 
 			-- do loot
-			if script_grind.lootObj ~= nil and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() and not IsInCombat() then
+			if script_grind.lootObj ~= nil and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() then
 				script_grind.lootCheckTime = 10000;
 				script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 				script_grind.lootCheck['timer'] = GetTimeEX() + 10000;

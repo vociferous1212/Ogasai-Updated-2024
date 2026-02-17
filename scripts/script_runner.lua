@@ -86,7 +86,7 @@ function script_runner:avoidToAggro(safeMargin)
 	end
 
 	while currentObj ~= 0 do
-		if typeObj == 3 then
+		if typeObj == 3 and currentObj:GetLevel() >= 6 then
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18;
 			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
@@ -344,7 +344,7 @@ local function rP(text, r, g, b)
 	g = g or .91
 	b = b or .91
 	local header = "|cFFFC0000[|r|cFFFF7F00oGasai - Runner|r|cFFFC0000]|r "
-	DEFAULT_CHAT_FRAME:AddMessage(header .. text, r, g, b)
+	--DEFAULT_CHAT_FRAME:AddMessage(header .. text, r, g, b)
 end
 
 local function GetDistance3D(x1, y1, z1, x2, y2, z2)
@@ -467,7 +467,6 @@ function script_runner:run()
 end
 
 function script_runner:menu()
-	if (CollapsingHeader("[Runner")) then
 
 		if (not self.isSetup) then
 			script_runner:setup()
@@ -522,5 +521,4 @@ function script_runner:menu()
 		if Button("-") then self.safeDistance = self.safeDistance - 1 end
 
 		Separator()
-	end
 end

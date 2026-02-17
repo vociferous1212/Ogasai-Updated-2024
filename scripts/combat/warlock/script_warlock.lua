@@ -124,6 +124,13 @@ function script_warlock:setup()
 		self.useShadowbolt = false;
 	end
 
+	if PlayerLevel() < 10 and Player():HasRangedWeapon() then
+		self.useWandMana = 100;
+		self.enableCurseOfAgony = false;
+		self.enableImmolate = false;
+		self.enableCorruption = false;
+	end
+
 	script_warlockDOTS.waitTimer = GetTimeEX();
 
 	-- check for spent talent points
@@ -290,12 +297,6 @@ function script_warlock:run(targetGUID)
 				return 5; 
 			end
 		end
-	end
-
-	-- Check: Do nothing if we are channeling, casting
-	if (IsChanneling() or IsCasting()) then
-		self.waitTimer = GetTimeEX() + 1000;
-		return 4;
 	end
 
 	-- sacrifice voidwalker low health
@@ -506,15 +507,25 @@ function script_warlock:run(targetGUID)
 
 			-- if pet goes too far then recall
 			if (HasPet()) and (GetPet():GetDistance() > self.spellRange) then
-				if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
+				if GetTimeEX() > self.petFollowTimer then
+					PetFollow();
+					self.petFollowTimer = GetTimeEX() + 500;
+				end;
 			end
 
+			if HasSpell("Blood Fury") and not IsSpellOnCD("Blood Fury") and not Player():HasBuff("Blood Fury") then
+				if CastSpellByName("Blood Fury") then
+					self.waitTimer = GetTimeEX() + 1500;
+				end
+			end
+
+			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
 			-- level 1 - 4 cast shadow bolt to start
 			if (not HasSpell("Corruption")) and (not HasSpell("Immolate")) and (not IsInCombat()) and (localMana > 25) and (targetObj:IsInLineOfSight()) and (not IsMoving()) and targetHealth >= 25 then
 				if not IsSpellOnCD("Shadow Bolt") then
-					if CastSpellByName('Shadow Bolt') then
+					if not CastSpellByName('Shadow Bolt') then
 						script_warlockFunctions:petAttack();
-						self.waitTimer = GetTimeEX() + 2350;
+						self.waitTimer = GetTimeEX() + castTime;
 					end
 				end
 			end
@@ -579,19 +590,14 @@ function script_warlock:run(targetGUID)
 
 			
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
-			local percentManaCostOfShadowBolt = (cost / PlayerManaTotal()) * 100;
 
 			-- shadow bolt to pull if we get a chance before actually entering combat phase
-			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and PlayerMana() >= percentManaCostOfShadowBolt then
+			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and PlayerManaTotal() >= cost and not IsMoving() then
 				script_warlockFunctions:petAttack();
 				self.message = "Pulling Target";
-				if (IsMoving()) then
-					StopMoving();
-					return true;
-				end
-				if (CastSpellByName("Shadow Bolt", targetObj)) then
-					self.waitTimer = GetTimeEX() + 1650;
-					script_grind:setWaitTimer(1650);
+				if not (CastSpellByName("Shadow Bolt", targetObj)) then
+					self.waitTimer = GetTimeEX() + castTime;
+					script_grind:setWaitTimer(castTime);
 					return 0;
 				end
 			end
@@ -1022,7 +1028,7 @@ function script_warlock:run(targetGUID)
 
 			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and not IsSpellOnCD("Shadow Bolt") and PlayerManaTotal() >= cost then
 				if not CastSpellByName('Shadow Bolt', targetObj) then
-					self.waitTimer = GetTimeEX() + 2000;
+					self.waitTimer = GetTimeEX() + castTime;
 					return 0;
 				end
 			end
@@ -1032,7 +1038,7 @@ function script_warlock:run(targetGUID)
 				if PlayerManaTotal() >= cost then
 
 					if not (CastSpellByName("Shadow Bolt", targetObj)) then
-						self.waitTimer = GetTimeEX() + 2000;
+						self.waitTimer = GetTimeEX() + castTime;
 						return 0;
 					end
 				end

@@ -320,7 +320,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	-- avoid adds in combat - check adds
 	if (IsInCombat() and script_grind:isAnyTargetTargetingMe()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
 		if (script_checkAdds:checkAdds()) then
-			script_OM:FORCEOM();
+			script_om:FORCEOM();
 			self.waitTimer = GetTimeEX() + 1500;
 			return 4;
 		end
@@ -400,8 +400,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 		if (GetNumPartyMembers() >= 1) and (self.defensiveStance) or (IsInCombat()) then
 			if (not IsSpellOnCD('Bloodrage')) and (HasSpell('Bloodrage')) and (localHealth >= self.bloodRageHealth) 
 				and (targetObj:GetDistance() <= 40) then
-				CastSpellByName('Bloodrage'); 
-				
+				if CastSpellByName('Bloodrage') then
+					self.waitTimer = GetTimeEX() + 550;
+				end
 			end
 		end
 
@@ -409,7 +410,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 		if (GetNumPartyMembers() >= 1) and (self.defensiveStance) then
 			if (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then 
 				if (localRage >= 10 and HasSpell("Battle Shout")) then 
-					if CastSpellByName('Battle Shout') then
+					if not CastSpellByName('Battle Shout') then
+						self.waitTimer = GetTimeEX() + 550;
 					end
 				end 
 			end
@@ -609,7 +611,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 				and (not IsMoving()) and not targetObj:IsFleeing() then
 				if (localRage >= self.heroicStrikeRage) and (targetHealth <= 80) and not IsSpellOnCD("Heroic Strike") then 
 					if (targetObj:GetDistance() <= self.meleeDistance) then
-						if CastSpellByName('Heroic Strike', targetObj) then
+						if not CastSpellByName('Heroic Strike', targetObj) then
+							self.waitTimer = GetTimeEX() + 250;
 						end
 					end
 				end	
@@ -620,7 +623,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (self.defensiveStance) and (self.enableShieldBlock) and (targetObj:IsTargetingMe()) then
 				if (HasSpell("Shield Block")) and (not IsSpellOnCD("Shield Block")) and (localRage >= self.shieldBlockRage) and (localHealth <= self.shieldBlockHealth) and (targetObj:HasDebuff("Sunder Armor")) then
 					if (CastSpellByName("Shield Block")) then
-						
+						self.waitTimer = GetTimeEX() + 250;
 					end
 				end
 			end
@@ -798,9 +801,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (script_warrior:enemiesAttackingUs(5) >= 2 and HasSpell('Thunder Clap') and (localRage >= self.thunderclapRage)
 					and not IsSpellOnCD('Thunder Clap') and not targetObj:HasDebuff('Thunder Clap')) then 
 					if (localRage >= 20) then
-					CastSpellByName('Thunder Clap'); 
-					self.waitTimer = GetTimeEX() + 550;
-						
+						if CastSpellByName('Thunder Clap') then
+							self.waitTimer = GetTimeEX() + 550;
+						end
 					end
 				end
 			end
@@ -823,15 +826,15 @@ function script_warrior:run(targetGUID)	-- main content of script
 
 			-- Check: Use Orc Racial Blood Fury
 			if (not IsSpellOnCD('Blood Fury') and HasSpell('Blood Fury')) then 
-				CastSpellByName('Blood Fury'); 
-				 
+				if CastSpellByName('Blood Fury') then
+				end
 			end 
 
 			-- Check: Use Bloodrage when we have more than set HP
 			if (GetNumPartyMembers() <= 1) and (targetObj:GetDistance() <= 10) and targetHealth >= 20 then
 				if (not IsSpellOnCD('Bloodrage') and HasSpell('Bloodrage') and localHealth >= self.bloodRageHealth) then 
-					CastSpellByName('Bloodrage'); 
-					return;
+					if CastSpellByName('Bloodrage') then
+					end
 				end
 			end
 
@@ -839,7 +842,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then 
 				if (localRage >= 10 and HasSpell("Battle Shout")) then 
 					if CastSpellByName('Battle Shout') then
-					return; 
+						self.waitTimer = GetTimeEX() + 250;
 					end
 				end 
 			end
@@ -940,8 +943,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 					if (not targetObj:GetCreatureType() ~= 'Mechanical') and (not targetObj:GetCreatureType() ~= 'Elemental') and not targetObj:IsFleeing() then
 						if (localRage >= 45) and (targetObj:GetDebuffStacks("Sunder Armor") >= self.sunderStacks) then 
 							if (targetObj:GetDistance() <= 6) then
-								if (Cast('Heroic Strike', targetObj)) then
-								
+								if (CastSpellByName('Heroic Strike', targetObj)) then
+									self.waitTimer = GetTimeEX() + 250;
 								end 
 							end
 						end 
@@ -952,7 +955,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (self.defensiveStance) and not IsMoving() then
 					if (localRage >= 65) and not targetObj:IsFleeing() then 
 						if (targetObj:GetDistance() <= 6) then
-							if (Cast('Heroic Strike', targetObj)) then
+							if (CastSpellByName('Heroic Strike', targetObj)) then
+								self.waitTimer = GetTimeEX() + 250;
 							end 
 						end
 					end 
@@ -1007,6 +1011,7 @@ function script_warrior:rest()
 	-- use battle shout if we have rage but need to rest and heal
 	if (localHealth <= self.eatHealth) and (localRage >= 10) and (not IsEating()) and (IsStanding()) and (not IsInCombat()) and (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then
 		if CastSpellByName("Battle Shout") then
+			self.waitTimer = GetTimeEX() + 250;
 		end
 		
 	end

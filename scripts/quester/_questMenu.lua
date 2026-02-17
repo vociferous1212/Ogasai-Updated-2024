@@ -67,7 +67,7 @@ function _questMenu:menu()
 	elseif (class == 'PALADIN') then
 		script_paladinMenu:menu();
 	elseif (class == 'SHAMAN') then
-		script_shamanEX:menu();
+		script_shamanMenu:menu();
 	end
 	
 	if (CollapsingHeader("Quester")) then

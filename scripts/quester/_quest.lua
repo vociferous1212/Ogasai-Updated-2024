@@ -123,6 +123,10 @@ local localObj = GetLocalPlayer();
 		return;
 	end
 
+	if not IsMoving() then
+		_questEX.jumpTimer = 6000;
+	end
+
 	if not self.pause and GetTimeEX() > self.unstuckTimer then
 		if script_unstuck:checkUnstuck() then
 			self.unstuckTimer = GetTimeEX() + 150;

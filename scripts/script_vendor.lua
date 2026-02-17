@@ -165,16 +165,18 @@ function script_vendor:setup()
 	self.foodName = script_vendor:findFood();
 	self.drinkName = script_vendor:findDrink();
 
-	-- Put everything in our inventory at startup as "keep items" (won't be sold)
-	for i = 0,4 do 
-		for y=0,GetContainerNumSlots(i) do 
-			if (GetContainerItemLink(i,y) ~= nil) then
-				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
-				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
-				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
-				script_vendor:addSaveItem(itemName);
-			end
-		end 
+	if PlayerLevel() > 4 then
+		-- Put everything in our inventory at startup as "keep items" (won't be sold)
+		for i = 0,4 do 
+			for y=0,GetContainerNumSlots(i) do 
+				if (GetContainerItemLink(i,y) ~= nil) then
+					_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+					itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+					itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
+					script_vendor:addSaveItem(itemName);
+				end
+			end 
+		end
 	end
 
 	self.isSetup = true;
@@ -719,7 +721,7 @@ function script_vendor:removeShapeShift()
 			return true;
 		end
 	elseif (localObj:HasBuff("Ghost Wolf")) then
-		if (script_shamanEX2:removeGhostWolf()) then
+		if (script_shaman:removeGhostWolf()) then
 			return true;
 		end
 	end

@@ -158,7 +158,7 @@ function script_hunter:runBackwards(targetObj, range)
 		if (distance < range)  then
 
 			if script_checkAdds:checkAdds() then
-				return true;
+				return 4;
 			else
 				script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
 
@@ -309,10 +309,12 @@ function script_hunter:run(targetGUID)
 -- cast disengage if target is too close
 	if self.hasPet and HasPet() and IsInCombat() and HasSpell("Disengage") and not IsSpellOnCD("Disengage") then
 		if targetObj ~= nil and targetObj ~= 0 and GetLocalPlayer():GetManaPercentage() >= 8 then
-			if (script_grind:isTargetingMe(targetObj) and targetObj:GetDistance() <= self.meleeDistance) or (targetObj:GetDistance() <= self.meleeDistance and not GetPet():IsDead() and self.useRangedAttacks) then
+			if (script_grind:isTargetingMe(targetObj) and targetObj:GetDistance() <= self.meleeDistance) then	-- or (targetObj:GetDistance() <= self.meleeDistance and not GetPet():IsDead() and self.useRangedAttacks) then
 				
-				CastSpellByName("Disengage", targetObj);
-				self.waitTimer = GetTimeEX() + 250;
+				if CastSpellByName("Disengage", targetObj) then
+					CastSpellByName("Attack");
+					self.waitTimer = GetTimeEX() + 250;
+				end
 			end
 		end
 	end
@@ -598,17 +600,7 @@ function script_hunter:run(targetGUID)
 			script_hunter:petAttackTargetAttackingMe();
 
 		end	
-		-- Check: if we target player pets/totems
-		if (GetTarget() ~= 0) and (GetPet() ~= 0) then
-			if (GetTarget():GetGUID() ~= GetLocalPlayer():GetGUID())
-			and (GetTarget():GetGUID() ~= GetPet():GetGUID()) then
-				if (UnitPlayerControlled("target")) then 
-					script_grind:addTargetToBlacklist(targetObj:GetGUID());
-					return 5; 
-				end
-			end
-		end 
-
+	
 
 -- NOT in combat ---  do pull stuff
 
@@ -794,7 +786,6 @@ function script_hunter:run(targetGUID)
 				if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
 
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
-				local percentOfManaCostOfMendPet = (cost / PlayerManaTotal()) * 100;
 
 					-- pet is too far away to mend
 					if (GetPet():GetDistance() > 20) then
@@ -802,7 +793,7 @@ function script_hunter:run(targetGUID)
 						return true;
 
 					-- pet is close enough to mend
-					elseif (GetPet():GetDistance() < 20) and (localMana >= percentOfManaCostOfMendPet) then
+					elseif (GetPet():GetDistance() < 20) and (PlayerManaTotal() >= cost) then
 						if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
 							script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
 							if (IsMoving()) or (not IsStanding()) then
@@ -833,13 +824,12 @@ function script_hunter:run(targetGUID)
 				if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
 
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
-				local percentOfManaCostOfMendPet = (cost / PlayerManaTotal()) * 100;
 
 					if (GetPet():GetDistance() > 20) then
 					if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end; self.waitTimer = GetTimeEX() + 1000;
 						return true;
 					
-					elseif (GetPet():GetDistance() < 20) and (localMana >= percentOfManaCostOfMendPet) then
+					elseif (GetPet():GetDistance() < 20) and (PlayerManaTotal() >= cost) then
 						if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
 							script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
 							CastSpellByName('Mend Pet');
@@ -949,12 +939,11 @@ function script_hunter:run(targetGUID)
 						-- Check: Mend the pet if it has lower than 70% HP and out of combat
 						if (script_hunter.hasPet) and (petHP < 50) and (petHP > 0) then	
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
-						local percentOfManaCostOfMendPet = (cost / PlayerManaTotal()) * 100;
 							if (GetPet():GetDistance() > 20) then
 								if GetTimeEX() > self.petFollowTimer then PetFollow(); self.petFollowTimer = GetTimeEX() + 500; end;
 								return true;
 						
-							elseif (GetPet():GetDistance() < 20) and (localMana >= percentOfManaCostOfMendPet) then
+							elseif (GetPet():GetDistance() < 20) and (PlayerManaTotal() >= cost) then
 								if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) then
 									script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
 									CastSpellByName('Mend Pet');
@@ -970,90 +959,65 @@ function script_hunter:run(targetGUID)
 
 			-- Auto Attack
 			if targetObj ~= 0 and targetObj ~= nil then
-			if (targetObj:GetDistance() < self.minSpellRange) then
 
-				-- face the target if we are a melee hunter
-				if targetObj:GetDistance() <= 5 and not IsMoving() and not self.useRangedAttacks then
-					
-				end
-				if targetObj:GetDistance() > self.meleeDistance then
-					return 3;
-				end
+				if (targetObj:GetDistance() < self.minSpellRange) then
 
-				if not IsAutoCasting("Attack") then
-					targetObj:AutoAttack();
-				end
-
-				if GetPet() ~= 0 and GetPet() ~= nil and self.hasPet and script_grind:isTargetingMe(targetObj) then
-					if targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight() then
+					if targetObj:GetDistance() > self.meleeDistance then
 						return 3;
 					end
 
-					if targetObj:GetDistance() <= self.meleeDistance and not IsMoving() and script_grind:isTargetingMe(targetObj) then
-						
-						if not IsAutoCasting("Attack") then
-							targetObj:AutoAttack();
-						end
+					if not IsAutoCasting("Attack") then
+						targetObj:AutoAttack();
 					end
-				end
 
-				-- cast raptor strike
-				if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (localMana > 10) 
-				and (targetObj:GetDistance() <= self.meleeDistance) then
-					if (not IsMoving()) then
-						
+					if GetPet() ~= 0 and GetPet() ~= nil and self.hasPet and script_grind:isTargetingMe(targetObj) then
+						if targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight() then
+							return 3;
+						end
 					end
-					if (not IsSpellOnCD("Raptor Strike")) then
-						if (not IsMoving()) then
-							
+
+					-- cast raptor strike
+					if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (localMana > 10) 
+					and (targetObj:GetDistance() <= self.meleeDistance) then
+				
+						if (not IsSpellOnCD("Raptor Strike")) then
+							if CastSpellByName("Raptor Strike") then
+								if HasPet() then
+									if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
+								end
+								self.waitTimer = GetTimeEX() + 500;
+							end
 						end
-						CastSpellByName("Raptor Strike")
-						if HasPet() then
-							if GetTimeEX() > self.petAttackTimer then PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; end;
-						end
-						self.waitTimer = GetTimeEX() + 500;
-						
+					end
 					
+					-- check distance
+					if (targetObj:GetDistance() > self.meleeDistance) and (GetNumPartyMembers() == 0)
+					and (script_grind.isTargetingMe(targetObj)) then
+						return 3;
 					end
-				end
 
-				-- call pet if it's too far
-				--if (self.hasPet) and (GetPet() ~= 0 and GetPet() ~= nil) and GetPet():GetDistance() > self.spellRange then
-					--self.message = "Pet is too far... calling pet..."
-					--CallPet();
-				--end
+					if not IsAutoCasting("Attack") then
+						targetObj:AutoAttack();
+					end
 
-			
+					-- cast wing clip
+					if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and not targetObj:HasDebuff("Wing Clip") and (localMana > 10) and (targetHealth < 35) then
+						CastSpellByName("Wing Clip");
+						self.waitTimer = GetTimeEX() + 1500;
+					end
+
+					-- cast raptor strike
+					if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (localMana > 10)
+					and (targetObj:GetDistance() <= self.meleeDistance) then
 					
-				-- check distance
-				if (targetObj:GetDistance() > self.meleeDistance) and (GetNumPartyMembers() == 0)
-				and (script_grind.isTargetingMe(targetObj)) then
-					return 3;
-				end
-
-				-- cast wing clip
-				if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and not targetObj:HasDebuff("Wing Clip") and (localMana > 10) and (targetHealth < 35) then
-					CastSpellByName("Wing Clip");
-					self.waitTimer = GetTimeEX() + 1500;
-				end
-
-				-- cast raptor strike
-				if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (localMana > 10)
-				and (targetObj:GetDistance() <= self.meleeDistance) and (script_grind.isTargetingMe(targetObj)) then
-					if (not IsMoving()) then
+						if (not IsSpellOnCD("Raptor Strike")) then
 						
-					end
-					if (not IsSpellOnCD("Raptor Strike")) then
-						if (not IsMoving()) then
-							
+							if CastSpellByName("Raptor Strike") then
+								self.waitTimer = GetTimeEX() + 500;
+							end
 						end
-						CastSpellByName("Raptor Strike")
-						
-					
 					end
-				end
-	
-			end 
+				end 
 			end
 		end
 	end

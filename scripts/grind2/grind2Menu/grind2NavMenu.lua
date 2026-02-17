@@ -37,12 +37,14 @@ function grind2NavMenu:run()
 
 		Separator();
 
-		Text("Saved locations in current path = "..grind2SaveCoordinates.numberOfLocations);
+		Text("");
 
 
+		
 
-
-
+		if CollapsingHeader("| + | Go To Locations | + |") then
+			script_runner:menu()
+		end
 
 
 

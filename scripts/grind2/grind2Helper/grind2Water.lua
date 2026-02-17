@@ -56,7 +56,7 @@ function grind2Water:drink()
 		grind2Water:setup();
 	end
 
-	if self.timer > GetTimeEX() then
+	if self.timer > GetTimeEX() or IsDrinking() then
 
 		return false;
 	end

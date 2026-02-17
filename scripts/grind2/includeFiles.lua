@@ -25,6 +25,7 @@ includeFiles = {
 	grinder2Water =	include("scripts\\grind2\\grind2Helper\\grind2Water.lua"),
 	grinder2MoneyCounter = include("scripts\\grind2\\grind2Helper\\grind2MoneyCounter.lua"),
 	grinder2HandleSwimming = include("scripts\\grind2\\grind2Helper\\grind2HandleSwimming.lua"),
+	grinder2FleeCombat = include("scripts\\grind2\\grind2Helper\\grind2FleeCombat.lua"),
 
 
 -- grind2Inventory
@@ -67,7 +68,6 @@ includeFiles = {
 -- grind2Targets
 	grinder2AvoidTarget = include("scripts\\grind2\\grind2Nav\\grind2AvoidTarget.lua"),
 	grinder2IsAnyValidTargetInRange = include("scripts\\grind2\\grind2Targets\\grind2IsAnyValidTargetInRange.lua"),
-	grinder2FleeCombat = include("scripts\\grind2\\grind2Targets\\grind2FleeCombat.lua"),
 	grinder2AssignATarget = include("scripts\\grind2\\grind2Targets\\grind2AssignATarget.lua"),
 	grinder2Blacklisting = include("scripts\\grind2\\grind2Targets\\grind2Blacklisting.lua"),
 	grinder2IsTargetingGroup = include("scripts\\grind2\\grind2Targets\\grind2IsTargetingGroup.lua"),

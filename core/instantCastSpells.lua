@@ -11,6 +11,9 @@ function instantCastSpells:isSpellInstantCast()
 
 	local spellTable = {
 
+	-- racial
+			[20572] = true, -- Blood Fury Orc Racial
+
 	-- hunter
 			-- Aspects
 			[13165] = true, -- Aspect of the Hawk (Rank 1)
@@ -1039,7 +1042,7 @@ function instantCastSpells:isSpellInstantCast()
 			[20617] = true, -- Intercept (Rank 3)
 
 			-- Bloodrage
-			[2687]  = true, -- Bloodrage
+			--[2687]  = true, -- Bloodrage
 
 			-- Berserker Rage
 			[18499] = true, -- Berserker Rage

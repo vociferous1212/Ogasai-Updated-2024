@@ -35,15 +35,6 @@ function script_shamanTotems:useTotem()
 		CastSpellByName("Ghost Wolf");
 	end
 
-	if (hasTarget ~= 0) then
-		if (not IsAutoCasting("Attack")) then
-			targetObj:AutoAttack();
-			if (not IsMoving()) then
-				targetObj:FaceTarget();
-			end
-		end
-	end
-
 -- use earth totem
 	-- Totem 1
 	if (script_shaman.useEarthTotem) and (PlayerHasTarget()) and (not script_shamanTotems:isEarthTotemAlive()) and (localMana >= 20) and (HasSpell(script_shaman.totem)) and (not IsSpellOnCD(script_shaman.totem)) then

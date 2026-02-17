@@ -63,7 +63,7 @@ function script_rotationMenu:menu()
 	elseif (class == 'ROGUE') then
 		script_rogueEX:menu();
 	elseif (class == 'SHAMAN') then
-		script_shamanEX:menu();
+		script_shamanMenu:menu();
 	end	
 
 	Separator();

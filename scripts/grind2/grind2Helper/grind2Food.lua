@@ -110,7 +110,7 @@ function grind2Food:eat()
 		grind2Food:setup();
 	end
 
-	if self.timer > GetTimeEX() then
+	if self.timer > GetTimeEX() or IsEating() then
 
 		return false;
 	end

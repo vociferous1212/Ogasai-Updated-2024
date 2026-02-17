@@ -180,7 +180,10 @@ function script_hunterDoPetChecks:doPetChecks()
 				return true;
 			end
 
-			if (GetPet():GetDistance() < 20) and (localMana > 10) then
+			if (GetPet():GetDistance() < 20) and (localMana >= 20) and not IsInCombat() then
+
+				script_hunter.message = "Pet has lower than 60% HP, waiting for HP or mana...";
+
 
 				if (script_hunter.hasPet) and (petHP < 60) and (not IsInCombat()) and (petHP > 0) then
 
@@ -193,15 +196,17 @@ function script_hunterDoPetChecks:doPetChecks()
 						return true;
 					end
 
-					CastSpellByName('Mend Pet');
+					if CastSpellByName('Mend Pet') then
 
-					script_hunter.waitTimer = GetTimeEX() + 5000; 
+						script_hunter.waitTimer = GetTimeEX() + 5000; 
 
-					script_grind:setWaitTimer(5000);
-					grind2:setTimer(5000);
-					return true;
+						script_grind:setWaitTimer(5000);
+						grind2:setTimer(5000);
+						return true;
+					end
 				end
 			end
+		return true;
 		end
 	end
 	return false;

@@ -10,7 +10,9 @@ grind2MoveToTarget = {
 
 	timer = 0,						-- script timer
 
-	message = "idle..."
+	message = "idle...",
+
+	generateANewPath = false
 	
 
 }
@@ -65,13 +67,15 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		-- or node is out of bounds
 		or GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= 20
 		-- or distance from path node is greater than next node distance
-		or (IsPathLoaded(5) and IsMoving() and GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= self.nextNavNodeDistance + 1.5) then
+		or (IsPathLoaded(5) and IsMoving() and GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= self.nextNavNodeDistance + 1.5) 
+		or self.generateANewPath then
 		self.navPosition['x'] = _x;
 		self.navPosition['y'] = _y;
 		self.navPosition['z'] = _z;
 		GeneratePath(myX, myY, myZ, _x, _y, _z + 1);
 		self.lastnavIndex = 1; -- start at index 1, index 0 is our position
 		self.message = "Generating Path";
+		self.generateANewPath = false;
 	end	
 	
 -- path isn't loaded

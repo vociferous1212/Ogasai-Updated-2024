@@ -15,7 +15,7 @@ function grind2IsLootSafeToLoot:isAnyTargetNearLoot(target)
 
 		while i ~= 0 do
 
-			if t == 3 and not i:IsDead() and not i:IsCritter() and i:GetDistance() <= 20 and i:GetGUID() ~= grind2DoLoot.lootTarget:GetGUID() 
+			if t == 3 and not totemsList:isTargetTotem(i) and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:GetDistance() <= 20 and i:GetGUID() ~= grind2DoLoot.lootTarget:GetGUID() 
 				and (not HasPet() or (HasPet() and i:GetGUID() ~= GetPet():GetGUID())) then
 
 				local targetToCheck = i;

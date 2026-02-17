@@ -84,6 +84,7 @@ function script_shamanMenuEX:alternateTotemMenuEarth()
 			wasClicked, script_shamanTotems.tremorTotem = Checkbox("Tremor", script_shamanTotems.tremorTotem);
 		end
 	end
+	Separator();
 end
 
 

@@ -8,6 +8,10 @@ function grind2TargetMenu:run()
 
 		wasClicked, grind2SafePull.skipSafePull = Checkbox("Pull Targets With Adds  (Skip Safe Pulls)", grind2SafePull.skipSafePull);
 
+		if grind2SafePull.skipSafePull then
+			grind2FleeCombat.fleeWithAdds = false;
+		end
+
 		Separator();
 
 		Text("Distance find a new target to attack")

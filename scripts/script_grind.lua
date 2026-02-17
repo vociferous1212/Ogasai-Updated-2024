@@ -58,7 +58,7 @@ script_grind = {
 	warriorMenu = include("scripts\\combat\\warrior\\script_warriorEX.lua"),
 	  rogueMenu = include("scripts\\combat\\rogue\\script_rogueEX.lua"),
 	paladinMenu = include("scripts\\combat\\paladin\\script_paladinMenu.lua"),
-	 shamanMenu = include("scripts\\combat\\shaman\\script_shamanEX.lua"),
+	 shamanMenu = include("scripts\\combat\\shaman\\script_shamanMenu.lua"),
 	  druidMenu = include("scripts\\combat\\druid\\script_druidEX.lua"),
 	 hunterMenu = include("scripts\\combat\\hunter\\script_hunterMenu.lua"),
 
@@ -1761,7 +1761,7 @@ end
 	
 		-- use ghost wolf function
 			if not HasForm() and (HasSpell("Ghost Wolf")) then
-				if (script_shamanEX2:ghostWolf()) then
+				if (script_shaman:ghostWolf()) then
 					script_grind:setWaitTimer(4000);
 					script_grindEX.tryTravelFormTimer = GetTimeEX() + 15000;
 				end

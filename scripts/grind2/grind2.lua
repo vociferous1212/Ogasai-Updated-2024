@@ -98,8 +98,6 @@ end
 -- rest function
 function grind2:rest()
 
-	local pet = GetPet();
-
 	-- check setup
 	if not self.isSetup then
 
@@ -107,6 +105,7 @@ function grind2:rest()
 		grind2Setup:run();
 	end
 
+	-- return for timer
 	if grind2.timer > GetTimeEX() then
 	
 		return;
@@ -237,8 +236,13 @@ function grind2:run()
 		return;
 	end
 
--- do this stuff regardless of timer - each has their own conditions
+--[[
+
+--]]
+
+-- do this stuff if not paused regardless of timer - each has their own conditions
 	if not grind2.pause then
+
 -- check unstuck
 		grind2CheckUnstuck:run();
 
@@ -254,11 +258,15 @@ function grind2:run()
 					--GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
 					-- reset jump timer.. don't jump into aggro ranges
 					if Move(_ix, _iy, _iz) then
+						if GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 2 then
+							GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
+						end
 						-- reset nav position
 						self.avoidTargetTimer = currentTime + 125;
-						grind2PreChecks.jumpTimer = currentTime + 7500;
-						grind2:SetTimer(750);
+						grind2PreChecks.jump = false;
+						grind2:SetTimer(1000);
 						grind2MoveToTarget:resetNav();
+						grind2MoveToTarget.GenerateANewPath = true;
 					end
 					grind2.grinderMessage = "Avoiding targets...";
 					return;
@@ -273,6 +281,7 @@ function grind2:run()
 					self.avoidEliteTimer = currentTime + 75;
 					grind2PreChecks.jumpTimer = currentTime + 7500;
 					grind2.grinderMessage = "Elite within range... running away...";
+					grind2MoveToTarget.GenerateANewPath = true;
 					return; 
 				end
 			end
@@ -305,7 +314,7 @@ function grind2:run()
 
 -- face enemy target at all times
 			if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and IsStanding() and not IsMoving() and not IsLooting() and Player():GetCasting() ~= 6487 then
-				if self.enemyTarget:GetDistance() <= self.combatScriptRange + 1 or ( (IsCasting() or IsChanneling()) and (PlayerHasTarget() or IsInCombat()) )  then
+				if self.enemyTarget:GetDistance() <= self.combatScriptRange + 1 or ( (IsCasting() or (IsChanneling() and IsInCombat())) and (PlayerHasTarget() or IsInCombat()) )  then
 					if self.enemyTarget:IsInLineOfSight() and currentTime > self.faceTargetTimer then
 						self.enemyTarget:FaceTarget();
 						self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
@@ -316,9 +325,16 @@ function grind2:run()
 		end	-- end of if not dead
 	end	-- end of if not paused
 
+--[[
 
+--]]
 
--- return if paused or for any reason
+-- player is stunned or confused of feared
+	if (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then --and not HasSpell("Will of the Forsaken") then
+		return;
+	end
+
+-- return if paused or for any reason - return for any reason
 	if grind2.timer > currentTime or grind2.pause or ( (IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast()) then
 
 		-- run combat helper to stop spell casting / check for clutch issues
@@ -338,6 +354,8 @@ function grind2:run()
 
 		if not IsMoving() then
 			grind2MoveToTarget.message = "idle...";
+			-- reset jump timer if not moving
+			grind2PreChecks.jumpTimer = currentTime + 7500;
 		end
 
 		-- reset variables
@@ -364,7 +382,7 @@ function grind2:run()
 
 		-- no target timer if in combat
 		if IsInCombat() and not IsCasting() and not IsChanneling() then
-			self.obtainNewTargetTimer = currentTime;
+			self.obtainNewTargetTimer = currentTime + 500;
 		end
 
 		-- count your money
@@ -376,6 +394,10 @@ function grind2:run()
 	return;
 	end
 
+--[[
+
+--]]
+
 -- ressurect
 	if Player():IsDead() then
 		if grind2Ressurect:run() then
@@ -383,10 +405,18 @@ function grind2:run()
 		end
 	end
 
+--[[
+
+--]]
+
 -- check paranoia
 	if self.useParanoia then
 		grind2Paranoia:checkAndDoParanoia();
 	end
+
+--[[
+
+--]]
 
 -- run rest functions
 	if not IsInCombat() and not Player():IsDead() and not IsLooting() and not IsChanneling() and not IsCasting() and PlayerLevel() > 1 then
@@ -408,11 +438,47 @@ function grind2:run()
 		end
 	end
 
+--[[
+
+--]]
+
+	-- clear dead targets reset enemy target variable
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		if grind2.enemyTarget:IsDead() then
+			-- + 1 to target killed
+			grind2.numberOfKills = grind2.numberOfKills + 1;
+			-- save coordinates to run out of combat and nav
+			grind2SaveCoordinates:saveTargetsLocation(grind2.enemyTarget);
+			-- reset grind enemy target
+			grind2.enemyTarget = nil;
+			-- reset grind last target
+			grind2.lastTargetTargeted = nil;
+			-- reset original grinder target - using old combat scripts
+			script_grind.enemyObj = nil;
+			-- send message
+			grind2.grinderMessage = "Clearing dead/tapped target";
+			-- reset new target timer
+			grind2.obtainNewTargetTimer = currentTime;
+			-- set timer
+			grind2:setTimer(grind2AdjustTimersMenu.waitAfterTargetKilledTimer);
+		return true;
+		end
+	end
+
+--[[
+
+--]]
+
 -- run grind2 pre checks before entering combat
 -- auto talents / clear targets / loot / ressurect / 
 	if grind2PreChecks:run() then
 		return;
 	end
+
+	if not grind2PreChecks.jump then
+		grind2PreChecks.jump = true;
+	end
+
 
 	if Player():IsDead() then
 		return;
@@ -424,6 +490,10 @@ function grind2:run()
 			return;
 		end
 	end
+
+--[[
+
+--]]
 
 -- assign a target
 	if not IsCasting() and not IsChanneling() and not IsEating() and not IsDrinking() and not IsLooting() and currentTime > self.obtainNewTargetTimer and (grind2HotSpot.hotSpotReached or IsInCombat()) then 
@@ -442,6 +512,10 @@ function grind2:run()
 		-- set grind script obtain target timer by adding current time + ratea adjusted in menu
 		self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;
 	end
+
+--[[
+
+--]]
 
 -- do some combat if we have a target
 	if self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
@@ -524,5 +598,5 @@ function grind2:run()
 			grind2RunCombatState:run();
 		end
 	end
-return;
+--return;
 end

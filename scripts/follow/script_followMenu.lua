@@ -85,7 +85,7 @@ function script_followMenu:menu()
 	elseif (class == 'ROGUE') then
 		script_rogueEX:menu();
 	elseif (class == 'SHAMAN') then
-		script_shamanEX:menu();
+		script_shamanMenu:menu();
 	end	
 
 	if (class == 'PRIEST') and (CollapsingHeader("Priest Group Heals - Follower Script")) then

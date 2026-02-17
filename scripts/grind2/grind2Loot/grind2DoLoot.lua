@@ -99,7 +99,7 @@ function grind2DoLoot:run()
 				end
 
 				if self.lootTarget:UnitInteract() then
-					grind2:setTimer(grind2AdjustTimersMenu.doLootTimer);
+					grind2:setTimer(grind2AdjustTimersMenu.doLootTimer/2);
 					self.timer = GetTimeEX() + grind2AdjustTimersMenu.doLootTimer;
 					return false;
 				end

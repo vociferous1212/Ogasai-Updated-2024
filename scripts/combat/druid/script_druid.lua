@@ -1102,11 +1102,9 @@ function script_druid:run(targetGUID)
 				end
 
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Wrath");
-				local percentOfManaCostOfWrath = (cost / PlayerManaTotal()) * 100;
-
 				-- Wrath
 				if (PlayerMana() > 30 and targetHealth > 15 and not HasSpell("Star Fire"))
-				or (PlayerMana() >= percentOfManaCostOfWrath and targetHealth >= 7 and HasSpell("Star Fire"))
+				or (PlayerManaTotal() >= cost and targetHealth >= 7 and HasSpell("Star Fire"))
 				or (not HasSpell("Bear Form") and PlayerMana() >= 30 and targetHealth >= 15) and not IsMoving() then
 					if (not IsMoving()) then
 						CastSpellByName("Wrath", targetObj);

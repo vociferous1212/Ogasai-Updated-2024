@@ -5,15 +5,14 @@ script_priest = {
 	priestExtra2 = include("scripts\\combat\\priest\\script_priestEX.lua"),
 	priestExtra = include("scripts\\combat\\priest\\script_priestEX2.lua"),
 
-	--priestMenuLoaded = include("scripts\\combat\\priest\\script_priestMenu.lua"),
 	isSetup = false,	-- setup stuff
 	isChecked = true,	-- setup stuff
 	drinkMana = 45,	-- drink at health %
 	eatHealth = 35,	-- eat at health %
 	renewHP = 75,	-- renew at health %
 	shieldHP = 85,	-- shield at health %
-	flashHealHP = 65,	-- fleash heal at health %
-	lesserHealHP = 55,	-- lesser heal health
+	flashHealHP = 70,	-- fleash heal at health %
+	lesserHealHP = 65,	-- lesser heal health
 	healHP = 40,	-- heal(spell) health
 	greaterHealHP = 23, -- greater heal health
 	potionMana = 8,	-- use potion at mana %
@@ -244,6 +243,10 @@ function script_priest:run(targetGUID)
 		return 4;
 	end
 
+	if (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then
+		return 4;
+	end
+
 	-- set shadow form true
 	if (GetLocalPlayer():HasBuff("Shadowform")) then
 		self.shadowForm = true;
@@ -388,11 +391,13 @@ function script_priest:run(targetGUID)
 		-- use mind blast on CD
 		if (not IsMoving()) and (HasSpell("Mind Blast")) and (not IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() <= self.spellRange) then
-				if IsAutoCasting("Shoot") then SpellStopCasting(); end
-				
-				CastSpellByName("Mind Blast", targetObj);
-				self.waitTimer = GetTimeEX() + 1550;
-				return true;
+				if IsAutoCasting("Shoot") then
+					SpellStopCasting();
+				end
+				if CastSpellByName("Mind Blast", targetObj) then
+					self.waitTimer = GetTimeEX() + 1550;
+					return true;
+				end
 			end
 		end
 
@@ -423,6 +428,14 @@ function script_priest:run(targetGUID)
 			end
 
 			self.message = "Pulling " .. targetObj:GetUnitName() .. "...";
+
+			-- power word shield just before pulling
+			if targetObj:GetDistance() <= 45 and localMana >= self.drinkMana + 10 then
+				if not Player():HasDebuff("Weakened Soul") and not Player():HasBuff("Power Word: Shield") and not IsSpellOnCD("Power Word: Shield") then
+					if CastSpellByName("Power Word: Shield", Player()) then
+					end
+				end
+			end
 			
 			-- Opener check range of ALL SPELLS
 			if ( (targetObj:GetDistance() > self.spellRange and not IsCasting() and not IsChanneling()) or (not targetObj:IsInLineOfSight()) ) then
@@ -436,10 +449,13 @@ function script_priest:run(targetGUID)
 						StopMoving();
 						return true;
 					end
-					if IsAutoCasting("Shoot") then SpellStopCasting(); end
-					CastSpellByName("Mind Blast");
-					self.waitTimer = GetTimeEX() + 1850;
-					return 0;
+					if IsAutoCasting("Shoot") then
+						SpellStopCasting();
+					end
+					if CastSpellByName("Mind Blast") then
+						self.waitTimer = GetTimeEX() + 1850;
+						return 0;
+					end
 				end
 			end
 			
@@ -787,6 +803,10 @@ function script_priest:rest()
 	if (localHealth <= self.eatHealth) or (localMana <= self.drinkMana and not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/1.5) or (IsDrinking() or IsEating()) then
 		if (IsMoving()) and not script_rotation.usingRotation then
 			self.waitTimer = GetTimeEX() + 1000;
+			local currentTime = GetTimeEX();
+			grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
+			grind2RunCombatState.blacklistTargetTimer2 = currentTime * 2;
+			grind2DoLoot.blacklistLootTimer = currentTime + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 			StopMoving();
 			return true;
 		end
