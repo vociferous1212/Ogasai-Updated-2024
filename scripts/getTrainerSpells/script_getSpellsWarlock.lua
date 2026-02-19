@@ -66,8 +66,8 @@ function script_getSpellsWarlock:getTrainerTargetWarlock()
 		-- Orc/troll starter area
 		if ( (GetFaction() == 2 or GetFaction() == 116) and not a and not c and not d) or (script_getSpells:orcZones()) then
 			if (GetLocalPlayer():GetLevel() <= 6) then
-				vX, vY, vZ = -639.34399414063, -4230.1899414063, 38.134117126465;
-				script_getSpells.trainerTarget = "Frang";
+				vX, vY, vZ = -606.8740234375, -4111.8701171875, 42.94465637207;
+				script_getSpells.trainerTarget = "Nartok";
 			end
 			if (GetLocalPlayer():GetLevel() > 6 and GetLocalPlayer():GetLevel() <= 10) then
 				vX, vY, vZ = 356.19198608398, -4837.9501953125, 11.089032173157;

@@ -169,23 +169,28 @@ function script_hunterDoPetChecks:doPetChecks()
 	if (mendPet) then
 
 		-- Check: Mend the pet if it has lower than 70% HP and out of combat
-		if (script_hunter.hasPet) and (petHP < 60) and (petHP > 0) and (not IsInCombat()) then
+		if (script_hunter.hasPet) and (petHP <= script_hunter.mendPetHealth) and (petHP > 0) and (not IsInCombat()) then
 
-			if (GetPet():GetDistance() > 8) then
+			if (GetPet():GetDistance() > 8) and GetTimeEX() >= script_hunter.petFollowTimer then
 
 				PetFollow();
+
+				script_hunter.petFollowTimer = GetTimeEX() + 500;
 
 				script_hunter.waitTimer = GetTimeEX() + 1850; 
 
 				return true;
 			end
 
-			if (GetPet():GetDistance() < 20) and (localMana >= 20) and not IsInCombat() then
+			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
+
+
+			if GetPet():GetDistance() < 20 and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) and not IsInCombat() then
 
 				script_hunter.message = "Pet has lower than 60% HP, waiting for HP or mana...";
 
 
-				if (script_hunter.hasPet) and (petHP < 60) and (not IsInCombat()) and (petHP > 0) then
+				if (script_hunter.hasPet) and (petHP <= script_hunter.mendPetHealth) and (not IsInCombat()) and (petHP > 0) then
 
 					script_hunter.message = "Pet has lower than 60% HP, mending pet...";
 
@@ -210,6 +215,4 @@ function script_hunterDoPetChecks:doPetChecks()
 		end
 	end
 	return false;
-
-
 end

@@ -232,14 +232,14 @@ function grind2Menu:run()
 		Text("Money Gained | "..grind2MoneyCounter:goldFromCopper().." gold "..grind2MoneyCounter:silverFromGold().." silver ");
 	end
 
-	--[[
+	----[[
 	-- some debug stuff
 -- show spell ID of spell being cast
 	if Player():GetCasting() ~= nil and Player():GetCasting() ~= 0 then
 		Text("Current Spell Casting ID | "..Player():GetCasting());
 		self.lastCastingID = Player():GetCasting();
 	else 
-		Text("Current Spell Casting ID | "..self.lastCastingID);
+		Text("Last Spell Casting ID | "..self.lastCastingID);
 	end
 	--]]
 

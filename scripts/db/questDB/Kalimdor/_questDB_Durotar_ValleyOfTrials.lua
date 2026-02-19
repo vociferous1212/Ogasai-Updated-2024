@@ -34,7 +34,7 @@ end
 
 _questDB:addQuest("no", 1, "Cutting Teeth", "Gornek", -600.13201904297, -4186.1899414063, 41.089050292969, 14, 1, 6, -467.72756958008, -4308.0942382813, 47.28205871582, 1, 10, 0, 0, 0, 0, -600.13201904297, -4186.1899414063, 41.089050292969, "Gornek", "Mottled Boar", 0, 0, 0, 0, 2, "Kill 10 Mottled Boars then return to Gornek at the Den.", 0, 1);
 
-_questDB:addQuest("no", 1, "Your Place In The World", "Kaltunk", -607.43402099609, -4251.330078125, 38.956043243408, 14, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -600.13201904297, -4186.1899414063, 41.089050292969, "Gornek", 0, 0, 0, 0, 0, 0, "Speak with Gornek. You recall Kaltunk marking your map with his location and mentioning that Gornek resided in the Den, a building to the west. \n\n", 0, 1);
+--_questDB:addQuest("no", 1, "Your Place In The World", "Kaltunk", -607.43402099609, -4251.330078125, 38.956043243408, 14, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -600.13201904297, -4186.1899414063, 41.089050292969, "Gornek", 0, 0, 0, 0, 0, 0, "Speak with Gornek. You recall Kaltunk marking your map with his location and mentioning that Gornek resided in the Den, a building to the west. \n\n", 0, 1);
 
 self.isSetup = true;
 end

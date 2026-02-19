@@ -24,7 +24,7 @@ function grind2AssignATarget:run()
 	-- clear any target not in combat with us that we have targeted
 	-- and get nearest enemy
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
-		if IsInCombat() and not grind2IsTargetingMe:target(grind2.enemyTarget) and not grind2IsTargetingPet:target(grind2.enemyTarget) then
+		if IsInCombat() and not grind2IsTargetingMe:target(grind2.enemyTarget) and not grind2IsTargetingPet:target(grind2.enemyTarget) and (not grind2.enemyTarget:IsCasting() and grind2.enemyTarget:IsTappedByMe()) then
 			grind2.enemyTarget = nil;
 			grind2.lastTargetTargeted = nil;
 			grind2.lastTargetTargetedGUID = nil;
@@ -64,17 +64,21 @@ function grind2AssignATarget:run()
 
 				if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
 				
-					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() or (HasPet() and i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
+					if grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or (i:IsCasting() and i:IsTappedByMe()) then
 						
 						local health = i:GetHealthPercentage();
 
-						if bestHealth < health then
+						if bestHealth > health then
 				
 							bestHealth = health;
 
-							bestTarget = i;
+							if bestHealth <= health then
+
+								bestTarget = i;
+								bestHealth = health;
 
 							return i;
+							end
 						end
 					end
 				end
@@ -122,7 +126,7 @@ function grind2AssignATarget:run()
 			-- target is attacking me, pet, or group then return the target
 			if i:GetDistance() < 75 and i:CanAttack() then
 				
-				if grind2IsTargetingGroup:target(i) or grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) then
+				if grind2IsTargetingGroup:target(i) or grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or (i:IsCasting() and i:IsTappedByMe()) then
 
 					bestTarget = i;
 
@@ -141,7 +145,7 @@ function grind2AssignATarget:run()
 
 		-- return last target if it is not dead and we are still in combat
 	if grind2.lastTargetTargeted ~= nil then
-		if not grind2.lastTargetTargeted:IsDead() and grind2IsTargetingMe:target(grind2.lastTargetTargeted) and grind2.lastTargetTargeted:GetHealthPercentage() >= 1 then
+		if not grind2.lastTargetTargeted:IsDead() and (grind2IsTargetingMe:target(grind2.lastTargetTargeted) or grind2.lastTargetTargeted:IsCasting()) and grind2.lastTargetTargeted:GetHealthPercentage() >= 1 then
 			return grind2.lastTargetTargeted;
 		end
 	end

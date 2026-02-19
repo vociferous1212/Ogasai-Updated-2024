@@ -1392,8 +1392,8 @@ end
 		if not PlayerHasTarget() and PetHasTarget() and IsInCombat() and HasPet() then
 			if not GetPet():IsDead() then
 				AssistUnit("pet");
-				if script_hunter:getPetsTarget() ~= nil then
-					script_grind.enemyObj = script_hunter:getPetsTarget();
+				if script_hunterGetPetsTarget:run() ~= nil then
+					script_grind.enemyObj = script_hunterGetPetsTarget:run();
 				end
 			end
 		end

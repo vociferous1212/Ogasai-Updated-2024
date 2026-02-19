@@ -45,7 +45,7 @@ function script_shamanHealsAndBuffs:run()
 -- water breathing
 	if not IsSpellOnCD("Water Breathing") and IsSwimming() and Player():HasSpell("Water Breathing") and HasItem("Shiny Fish Scales") and not Player():HasBuff("Water Breathing") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Water Breathing");
-		if PlayerManaTotal() >= cost then
+		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 			if CastSpellByName("Water Breathing", Player()) then
 				script_shaman.waitTimer = GetTimeEX() + 1750;
 				script_grind:setWaitTimer(1750);
@@ -85,7 +85,7 @@ function script_shamanHealsAndBuffs:run()
 				castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lesser Healing Wave");
 			end
 
-			if PlayerManaTotal() >= cost then
+			if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 				if script_shaman:castHealingSpell() then
 					script_shaman.waitTimer = GetTimeEX() + 3000;
 					script_grind:setWaitTimer(3000);
@@ -99,7 +99,7 @@ function script_shamanHealsAndBuffs:run()
 	if (HasSpell("Cure Poison")) and (script_checkDebuffs:hasPoison()) and (IsStanding()) then
 		if (not IsSpellOnCD("Cure Poison")) and (localMana >= 25) then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Cure Poison");
-			if PlayerManaTotal() >= cost then
+			if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 				if (CastSpellByName("Cure Poison", Player())) then
 					script_shaman.waitTimer = GetTimeEX() + 1650;
 					script_grind:setWaitTimer(1650);
@@ -114,7 +114,7 @@ function script_shamanHealsAndBuffs:run()
 	if (HasSpell("Cure Disease")) and (script_checkDebuffs:hasDisease()) and (IsStanding()) then
 		if (not IsSpellOnCD("Cure Disease")) and (localMana >= 25) then
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Cure Disease");
-			if PlayerManaTotal() >= cost then
+			if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 				if (CastSpellByName("Cure Disease", Player())) then
 					script_shaman.waitTimer = GetTimeEX() + 1650;
 					script_grind:setWaitTimer(1650);
@@ -127,7 +127,7 @@ function script_shamanHealsAndBuffs:run()
 	-- purge enemy of magic
 	if (HasSpell("Purge")) and (script_checkDebuffs:enemyBuff()) and (PlayerHasTarget()) and not IsSpellOnCD("Purge") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Purge");
-		if (localMana >= 20) and PlayerManaTotal() >= cost then
+		if (localMana >= 20) and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 			if (CastSpellByName("Purge", targetObj)) then
 				script_shaman.waitTimer = GetTimeEX() + 1500;
 				return true;
@@ -138,7 +138,7 @@ function script_shamanHealsAndBuffs:run()
 	-- Check: Lightning Shield
 	if IsStanding() and HasSpell("Lightning Shield") and localMana >= 35 and not Player():HasBuff("Lightning Shield") and not IsSpellOnCD("Lightning Shield") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lightning Shield");
-		if PlayerManaTotal() >= cost then
+		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 			if (CastSpellByName("Lightning Shield")) then
 				script_shaman.waitTimer = GetTimeEX() + 500;
 				return true;

@@ -11,10 +11,13 @@ _questEX2 = {
 }
 
 function _questEX2:doChecks()
+
 	local localObj = GetLocalPlayer()
 
 	-- thousand needles... shimmering flats grind area.
-	if GetMapID() == 400 then _quest.distToGrindFromHotspot = 500 end
+	if GetMapID() == 400 then
+		_quest.distToGrindFromHotspot = 500;
+	end
 
 	if localObj:HasDebuff("Ressurection Sickness") then
 		if IsMoving() then
@@ -51,6 +54,7 @@ function _questEX2:doChecks()
 			end
 		end
 	end
+
 	if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor and script_vendor.sellVendor ~= 0 and script_vendor.sellVendor ~= nil then
 		self.sellVendorX, self.sellVendorY, self.sellVendorZ = script_vendor.sellVendor['pos']['x'],  script_vendor.sellVendor['pos']['y'],  script_vendor.sellVendor['pos']['z'];
 		local x, y, z = GetLocalPlayer():GetPosition()
@@ -62,15 +66,12 @@ function _questEX2:doChecks()
 		end
 	end
 
-   -- if GetLocalPlayer():GetLevel() < 10 and not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkInvTimer then
-	 --   CheckBagsForBetterGear()
-	  --  self.checkInvTimer = GetTimeEX() + 180000
-	--end
 	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
 		CheckBagsForBetterGear()
 		_questEquipItems:checkInventoryForBags()
 		self.checkBagTimer = GetTimeEX() + 180000
 	end
+
 	-- delete items
 	if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then
 		script_deleteItems:checkDeleteItems()

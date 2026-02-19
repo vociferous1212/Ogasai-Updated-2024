@@ -592,7 +592,7 @@ function script_warlock:run(targetGUID)
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
 
 			-- shadow bolt to pull if we get a chance before actually entering combat phase
-			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and PlayerManaTotal() >= cost and not IsMoving() then
+			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) and not IsMoving() then
 				script_warlockFunctions:petAttack();
 				self.message = "Pulling Target";
 				if not (CastSpellByName("Shadow Bolt", targetObj)) then
@@ -1026,7 +1026,7 @@ function script_warlock:run(targetGUID)
 			
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt")
 
-			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and not IsSpellOnCD("Shadow Bolt") and PlayerManaTotal() >= cost then
+			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and not IsSpellOnCD("Shadow Bolt") and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
 				if not CastSpellByName('Shadow Bolt', targetObj) then
 					self.waitTimer = GetTimeEX() + castTime;
 					return 0;
@@ -1035,7 +1035,7 @@ function script_warlock:run(targetGUID)
 
 			if (self.useWand) and (targetHealth >= self.useWandHealth and localMana >= self.useWandMana) then
 
-				if PlayerManaTotal() >= cost then
+				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
 
 					if not (CastSpellByName("Shadow Bolt", targetObj)) then
 						self.waitTimer = GetTimeEX() + castTime;

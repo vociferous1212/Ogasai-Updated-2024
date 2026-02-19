@@ -476,3 +476,15 @@ function MoveIfTargetIsNotInLineOfSightFallBack()
 
 return false;
 end
+
+-- get mana percentage will return indefined number instead of 0 when the target has no mana at all
+function CurrentTargetsMana(target)
+
+	if target ~= nil and target ~= 0 then
+		if target:GetManaPercentage() > 0 then
+			return target:GetManaPercentage();
+		end
+	end
+
+return 0;
+end

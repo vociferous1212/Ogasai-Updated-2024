@@ -23,15 +23,27 @@ function script_hunterMenu:menu()
 			script_hunter.spellRange = SliderInt("Max Dist yards", 30, 41, script_hunter.spellRange);
 		end
 
+		if HasPet() and script_hunter.hasPet then
+			Text("Mend Pet Health");
+			script_hunter.mendPetHealth = SliderInt("Health to Mend Pet", 10, 100, script_hunter.mendPetHealth);
+		end
 		Separator();
 
 -- conserve mana button
 		if HasPet() then
 			if Button("Conserve Mana") then
 				script_hunter.drinkMana = 5;
-				script_hunter.arcaneShotMana = 35;
-				script_hunter.useMarkMana = 20;
-				script_hunter.serpentStingMana = 20;
+				script_hunter.arcaneShotMana = 45;
+				script_hunter.useMarkMana = 30;
+				script_hunter.serpentStingMana = 30;
+				script_hunter.potionMana = 0;
+			end
+			SameLine();
+			if Button("Conserve NO Mana") then
+				script_hunter.drinkMana = 0;
+				script_hunter.arcaneShotMana = 0;
+				script_hunter.useMarkMana = 0;
+				script_hunter.serpentStingMana = 0;
 				script_hunter.potionMana = 0;
 			end
 		end
@@ -60,80 +72,73 @@ function script_hunterMenu:menu()
 -- use pet button
 		if (GetLocalPlayer():GetLevel() >= 10) then
 			wasClicked, script_hunter.hasPet = Checkbox("Use Pet", script_hunter.hasPet);
-			if (script_grindMenu.helpMenu) then
-				Text("*Use hunter class without pet enabled*");
-			end
 		end
 
 -- use bandages button
 		if (self.menuBandages) then
 			SameLine();
 			wasClicked, script_hunter.useBandage = Checkbox("Use Bandages", script_hunter.useBandage);
-			if (script_grindMenu.helpMenu) then
-				Text("*Use bandaged instead of food*")
-			end
 		end
 
 -- aspect of cheetah button
 		if (HasSpell("Aspect of the Cheetah")) then
 			Separator();
-			wasClicked, script_hunter.useCheetah = Checkbox("Use Cheetah", script_hunter.useCheetah);
-			if (script_grindMenu.helpMenu) then
-				Text("*Use Aspect of Cheetah between combat phases*")
-				Separator();
-			end
+			wasClicked, script_hunter.useCheetah = Checkbox("Use Cheetah |", script_hunter.useCheetah);
+		end
+		if HasSpell("Aimed Shot") then
+			SameLine();
+			wasClicked, script_hunter.useAimedShot = Checkbox("Use Aimed Shot |", script_hunter.useAimedShot);
 		end
 
 -- hunters mark button
 		if (HasSpell("Hunter's Mark")) then
-			wasClicked, script_hunter.useMark = Checkbox("Use Hunter's Mark", script_hunter.useMark);
+			wasClicked, script_hunter.useMark = Checkbox("Use Hunter's Mark |", script_hunter.useMark);
 		end
 		
+		-- multi shot button
+		if (HasSpell("Multi-Shot")) then
+			SameLine();
+			wasClicked, script_hunter.useMultiShot = Checkbox("Use MultiShot |", script_hunter.useMultiShot);
+		end
+
 		Separator();
 
 -- drink mana slider
 		Text('Drink below mana percentage');
-		script_hunter.drinkMana = SliderInt("M%", 1, 100, script_hunter.drinkMana);
-		if (script_grindMenu.helpMenu) then
-			Text("*Choose to drink when mana is at or below this percent*")
-			Separator();
-		end
-
+		script_hunter.drinkMana = SliderInt("M%", 0, 100, script_hunter.drinkMana);
+		
+		Separator();
 -- eat slider
 		Text('Eat below health percentage');
-		script_hunter.eatHealth = SliderInt("H%", 1, 100, script_hunter.eatHealth);
-		if (script_grindMenu.helpMenu) then
-			Text("**")
-		end
+		script_hunter.eatHealth = SliderInt("H%", 0, 100, script_hunter.eatHealth);
+		
+		Separator();
 
 -- health potions slider
 		Text('Use health potions below percentage');
-		script_hunter.potionHealth = SliderInt("HP%", 1, 99, script_hunter.potionHealth);
+		script_hunter.potionHealth = SliderInt("HP%", 0, 99, script_hunter.potionHealth);
+
+		Separator();
 
 -- mana potions slider
 		Text('Use mana potions below percentage');
-		script_hunter.potionMana = SliderInt("MP%", 1, 99, script_hunter.potionMana);
+		script_hunter.potionMana = SliderInt("MP%", 0, 99, script_hunter.potionMana);
 
 		Separator();
 
 -- hunters mark mana slider
 		if (script_hunter.useMark) then
 			Text("Use Hunter's' Mark above mana percentage");
-			script_hunter.useMarkMana = SliderInt("MM", 5, 100, script_hunter.useMarkMana);
+			script_hunter.useMarkMana = SliderInt("MM", 0, 100, script_hunter.useMarkMana);
 		end
 
 -- serpent sting mana slider
 		Text("Serpent Sting Mana")
-		script_hunter.serpentStingMana = SliderInt("SSM", 5, 50, script_hunter.serpentStingMana);
+		script_hunter.serpentStingMana = SliderInt("SSM", 0, 100, script_hunter.serpentStingMana);
 
 -- arcane shot mana slider
 		Text("Arcane/Aimed Shot Mana")
-		script_hunter.arcaneShotMana = SliderInt("ASM", 5, 50, script_hunter.arcaneShotMana);
-
--- multi shot button
-		if (HasSpell("Multi-Shot")) then
-			wasClicked, script_hunter.useMultiShot = Checkbox("Use MultiShot", script_hunter.useMultiShot);
-		end
+		script_hunter.arcaneShotMana = SliderInt("ASM", 0, 100, script_hunter.arcaneShotMana);
 
 -- scorpid sting button
 		--if (HasSpell("Scorpid Sting")) then

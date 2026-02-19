@@ -400,7 +400,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 		if (GetNumPartyMembers() >= 1) and (self.defensiveStance) or (IsInCombat()) then
 			if (not IsSpellOnCD('Bloodrage')) and (HasSpell('Bloodrage')) and (localHealth >= self.bloodRageHealth) 
 				and (targetObj:GetDistance() <= 40) then
-				if CastSpellByName('Bloodrage') then
+				if not CastSpellByName('Bloodrage') then
 					self.waitTimer = GetTimeEX() + 550;
 				end
 			end
@@ -477,7 +477,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				StopMoving();
 				ClearTarget();
 				targetObj = nil;
-				self.waitTimer = GetTimeEX() + 5000;
+				self.waitTimer = GetTimeEX() + 1000;
 			
 			end
 
@@ -493,7 +493,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- beserker rage
 			if self.berserkerStance and HasSpell("Berserker Rage") and not IsSpellOnCD("Berserker Rage") and targetHealth >= 20 then
 				CastSpellByName("Berserker Rage");
-				self.waitTimer = GetTimeEX() + 1500;
+				self.waitTimer = GetTimeEX() + 500;
 			end
 			
 			-- Dismount
@@ -504,7 +504,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- Run backwards if we are too close to the target
 			if (targetObj:GetDistance() <= .8) and not script_rotation.usingRotation then 
 				if (script_warrior:runBackwards(targetObj, 2)) then
-					self.waitTimer = GetTimeEX() + 1500;
+					self.waitTimer = GetTimeEX() + 500;
 				end 
 			end
 	
@@ -539,7 +539,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- check use last stand talent
 			if (HasSpell("Last Stand")) and (not IsSpellOnCD("Last Stand")) and (localHealth <= self.lastStandHealth) and (IsInCombat()) and (targetHealth > 10) then
 				CastSpellByName("Last Stand");
-				self.waitTimer = GetTimeEX() + 1500;
+				self.waitTimer = GetTimeEX() + 500;
 				
 			end
 
@@ -589,7 +589,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if self.berserkerStance and HasSpell("Whirlwind") and not IsSpellOnCD("Whirlwind") and script_grind.enemiesAttackingUs() >= 2 then
 				if localRage >= 25 then
 					CastSpellByName("Whirlwind");
-					self.waitTimer = GetTimeEX() + 1500;
+					self.waitTimer = GetTimeEX() + 500;
 				else
 					return;
 				end
@@ -634,7 +634,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 					if (not targetObj:GetCreatureType() ~= 'Mechanical') and (not targetObj:GetCreatureType() ~= 'Elemental') then
 						if (targetObj:GetDebuffStacks("Sunder Armor") < self.sunderStacks) then
 							if (Cast("Sunder Armor", targetObj)) then
-								self.waitTimer = GetTimeEX() + 1750;
+								self.waitTimer = GetTimeEX() + 750;
 							
 							end
 						end
@@ -833,7 +833,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- Check: Use Bloodrage when we have more than set HP
 			if (GetNumPartyMembers() <= 1) and (targetObj:GetDistance() <= 10) and targetHealth >= 20 then
 				if (not IsSpellOnCD('Bloodrage') and HasSpell('Bloodrage') and localHealth >= self.bloodRageHealth) then 
-					if CastSpellByName('Bloodrage') then
+					if not CastSpellByName('Bloodrage') then
 					end
 				end
 			end
@@ -841,7 +841,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- Check: Keep Battle Shout up
 			if (not localObj:HasBuff("Battle Shout")) and not IsSpellOnCD("Battle Shout") then 
 				if (localRage >= 10 and HasSpell("Battle Shout")) then 
-					if CastSpellByName('Battle Shout') then
+					if not CastSpellByName('Battle Shout') then
 						self.waitTimer = GetTimeEX() + 250;
 					end
 				end 
@@ -920,7 +920,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				-- melee Skill: Rend if we got more than 10 rage battle or bersker stance
 				if (self.battleStance) and (self.enableRend) then
 					if targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental'  and targetObj:GetCreatureType() ~= "Undead" and HasSpell('Rend') and not targetObj:HasDebuff("Rend") and targetHealth >= 30 and localRage >= 10 and not IsSpellOnCD("Rend") then 
-						if CastSpellByName("Rend") then
+						if not CastSpellByName("Rend") then
 							self.waitTimer = GetTimeEX() + 250;
 						end
 					end 
@@ -930,7 +930,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (self.battleStance or (self.berserkerStance and (( (HasSpell("Bloodthirst") and IsSpellOnCD("Bloodthirst")) or localRage >= 50) or not HasSpell("Bloodthirst")))) and (not IsMoving()) and not targetObj:IsFleeing() then
 					if (localRage >= self.heroicStrikeRage) and not targetObj:IsFleeing() then 
 						if (targetObj:GetDistance() <= self.meleeDistance) then
-							if CastSpellByName('Heroic Strike', targetObj) then
+							if not CastSpellByName('Heroic Strike', targetObj) then
 								self.waitTimer = GetTimeEX() + 250;
 							end
 							

@@ -10,6 +10,8 @@ grind2 = {
 	isSetup = false,							-- check intial setup
 	restMana = 0,								-- mana to rest and drink
 	restHealth = 0,								-- health to rest and eat
+	potionHealth = 0,							-- health to use healing potion
+	potionMana = 0,								-- health to use mana potion
 	grinderMessage = "",						-- messages
 	findTargetDistance = 250,					-- distance to find new target
 	lastTargetTargetedGUID = nil,				-- GUID of the last target targeted
@@ -236,6 +238,11 @@ function grind2:run()
 		return;
 	end
 
+	-- testing some things...
+	--if _quest:run() then
+	--	return;
+	--end
+
 --[[
 
 --]]
@@ -276,7 +283,7 @@ function grind2:run()
 			
 -- avoid elites...
 -- if not on way to vendor and already running and not if we are mounted and running
-			if script_vendor.status == 0 and not IsMounted() and currentTime > self.avoidEliteTimer then 
+			if script_vendor.status == 0 and not IsMounted() and currentTime > self.avoidEliteTimer and grind2IsTargetValid.skipElites then 
 				if (script_aggro:avoidElite()) then
 					self.avoidEliteTimer = currentTime + 75;
 					grind2PreChecks.jumpTimer = currentTime + 7500;
@@ -496,21 +503,25 @@ function grind2:run()
 --]]
 
 -- assign a target
-	if not IsCasting() and not IsChanneling() and not IsEating() and not IsDrinking() and not IsLooting() and currentTime > self.obtainNewTargetTimer and (grind2HotSpot.hotSpotReached or IsInCombat()) then 
+	if (not IsCasting() and not IsChanneling()) and not instantCastSpells:isSpellInstantCast() then
+		if not IsEating() and not IsDrinking() and not IsLooting() and currentTime > self.obtainNewTargetTimer then
+			if grind2HotSpot.hotSpotReached or IsInCombat() then 
 
-		-- assign the target
-		self.enemyTarget = grind2AssignATarget:run();
+				-- assign the target
+				self.enemyTarget = grind2AssignATarget:run();
 
-		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
-			self.enemyTarget:AutoAttack();
+				if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
+					self.enemyTarget:AutoAttack();
+				end
+
+				if self.enemyTarget == nil or self.enemyTarget == 0 then
+					self.grinderMessage = "Assigning a target";
+				end
+
+				-- set grind script obtain target timer by adding current time + ratea adjusted in menu
+				self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;
+			end
 		end
-
-		if self.enemyTarget == nil or self.enemyTarget == 0 then
-			self.grinderMessage = "Assigning a target";
-		end
-
-		-- set grind script obtain target timer by adding current time + ratea adjusted in menu
-		self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;
 	end
 
 --[[
@@ -563,7 +574,7 @@ function grind2:run()
 		-- clear blacklisted targets if they are not attacking me
 		if PlayerHasTarget() and grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil then
 
-			if not grind2IsTargetingMe:target(grind2.enemyTarget) and not grind2IsTargetingPet:target(grind2.enemyTarget) and grind2Blacklisting:isTargetBlacklisted(grind2.enemyTarget:GetGUID()) then
+			if (not grind2IsTargetingMe:target(grind2.enemyTarget) and not grind2IsTargetingPet:target(grind2.enemyTarget) and not grind2.enemyTarget:IsCasting()) and grind2Blacklisting:isTargetBlacklisted(grind2.enemyTarget:GetGUID()) then
 			
 				grind2.enemyTarget = nil;
 

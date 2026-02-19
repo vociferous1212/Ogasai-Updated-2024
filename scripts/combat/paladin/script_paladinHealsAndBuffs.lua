@@ -9,7 +9,7 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	
 	if IsCasting() or IsChanneling() then
 		self.waitTimer = GetTimeEX() + 1000;
-		paladin.waitTimer = GetTimeEX() + 1000;
+		script_paladin.waitTimer = GetTimeEX() + 1000;
 	end
 
 	if (IsCasting()) or (IsChanneling()) and not instantCastSpells:isSpellInstantCast() then

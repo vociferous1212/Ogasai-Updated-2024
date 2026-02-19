@@ -38,6 +38,7 @@ _quest = {
 	distToGrind = 0,
 	unstuckTimer = 0,
 	lootTimer = GetTimeEX(),
+	faceTargetTimer = GetTimeEX(),
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 }
@@ -118,6 +119,17 @@ local localObj = GetLocalPlayer();
 		end
 	return true;
 	end
+
+	-- face enemy target at all times
+	if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and IsStanding() and not IsMoving() and not IsLooting() and Player():GetCasting() ~= 6487 then
+		if self.enemyTarget:GetDistance() <= script_grind.combatScriptRange + 1 or ( (IsCasting() or (IsChanneling() and IsInCombat())) and ((PlayerHasTarget() and GetTarget():GetGUID() == self.enemyTarget:GetGUID()) or IsInCombat()) )  then
+			if self.enemyTarget:IsInLineOfSight() and GetTimeEX() > self.faceTargetTimer then
+				self.enemyTarget:FaceTarget();
+				self.faceTargetTimer = GetTimeEX() + 1500;
+			end
+		end
+	end
+
 
 	if ((self.waitTimer + self.tickRate * 1000) > GetTimeEX()) or self.pause then 
 		return;

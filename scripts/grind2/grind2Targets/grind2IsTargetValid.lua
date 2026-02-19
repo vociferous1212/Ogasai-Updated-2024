@@ -38,7 +38,7 @@ function grind2IsTargetValid:target(i)
 
 		if (i:IsTappedByMe() and not i:IsDead()) or (not grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) or grind2IsTargetingMe:target(i) and not i:IsDead()) and 
 		
-			(not grind2SafePull:targetHasAdds(i) or grind2SafePull.skipSafePull or grind2IsTargetingMe:target(i) and not i:IsDead())
+			(not grind2SafePull:targetHasAdds(i) or grind2SafePull.skipSafePull or grind2IsTargetingMe:target(i) and (not i:IsDead()))
 		
 			and not i:IsDead() and (
 			i:GetLevel() >= self.minLevel and i:GetLevel() <= self.maxLevel)
@@ -60,12 +60,12 @@ function grind2IsTargetValid:target(i)
 			or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and i:GetHealthPercentage() <= 92 and not i:IsDead())
 			or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and grind2IsTargetingMe:target(i) and i:GetDistance() <= 5)
 			)
-			or (grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or grind2IsTargetingGroup:target(i))
+			or (grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or grind2IsTargetingGroup:target(i) or (i:IsCasting() and i:IsTappedByMe()))
 			or ( (i:HasDebuff("Polymorph") or i:HasDebuff("Fear") ) and script_grind:enemiesAttackingUs() < 2
 			)
 
 		then
-			if grind2IsTargetValid:isTargetInRange(i) and not i:IsDead() then
+			if (grind2IsTargetValid:isTargetInRange(i) or i:IsTappedByMe()) and not i:IsDead() then
 
 				return true;
 			end

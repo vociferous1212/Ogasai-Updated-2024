@@ -86,7 +86,7 @@ function script_runner:avoidToAggro(safeMargin)
 	end
 
 	while currentObj ~= 0 do
-		if typeObj == 3 and currentObj:GetLevel() >= 6 then
+		if typeObj == 3 and currentObj:GetLevel() >= 6 and not currentObj:IsTapped() then
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18;
 			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;
@@ -98,15 +98,16 @@ function script_runner:avoidToAggro(safeMargin)
 			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and currentObj:GetDistance() <= range then
 				if grindEnemy == nil or (grindEnemy ~= nil and grindEnemy ~= currentObj:GetGUID()) then
 
-				if (closestEnemy == 0) then
-					closestEnemy = currentObj
-				else
-					local dist = currentObj:GetDistance()
-					if (dist < closestDist) then
-						closestDist = dist
+					if (closestEnemy == 0) then
 						closestEnemy = currentObj
+					else
+						local dist = currentObj:GetDistance()
+						if (dist < closestDist) then
+							closestDist = dist
+							closestEnemy = currentObj
+
+						end
 					end
-				end
 				end
 			end
 		end
@@ -192,6 +193,8 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 	local closestTargetPoint = 0
 	local closestTargetDist = 999
 	local quality = 120
+	local closestPointToDest = 0;
+
 
 	while theta <= 2 * PI do
 		point = point + 1
@@ -229,6 +232,7 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 			if (dist < closestDist) then
 				closestDist = dist
 				closestPoint = i
+				closestPointToDest = i;
 			end
 		end
 	end
@@ -244,6 +248,15 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 
 	if (moveToPoint == 0) then
 		moveToPoint = 1
+	end
+
+	local setPoint = 2;
+
+	local diffPoint = closestPointToDest - moveToPoint;
+	if (diffPoint <= 0) then
+		moveToPoint = closestPoint - setPoint;
+	else
+		moveToPoint = closestPoint + setPoint;
 	end
 
 	Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)

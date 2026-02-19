@@ -29,6 +29,12 @@ function script_paladinMenu:menu()
 		end
 		Separator();
 
+		if script_paladin.useJudgement then
+			Text("Judgement Mana");
+			script_paladin.judgementMana = SliderInt("Judgement Mana", 0, 100, script_paladin.judgementMana);
+			Separator();
+		end
+
 		if (HasSpell("Judgement")) then
 			wasClicked, script_paladin.useJudgement = Checkbox("Use Judgement", script_paladin.useJudgement);
 		end

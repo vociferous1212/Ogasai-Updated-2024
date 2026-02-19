@@ -1,6 +1,6 @@
 grind2DrawDataMenu = {
 
-	drawMessages = true,
+	drawMessages = false,
 
 	drawUnits = true,
 

@@ -32,6 +32,7 @@ function grind2PreChecks:run()
 		if GetTimeEX() > self.rodTimerForFun then
 			UseItem("Dartol's Rod of Transformation");
 			self.rodTimerForFun = GetTimeEX() + 210000;
+			return false;
 		end
 	end
 
@@ -220,7 +221,6 @@ function grind2PreChecks:run()
 
 -- load hotspot if using auto shotspots
 	if grind2HotSpot.useHotSpots then
-
 		grind2HotSpot:updateHotSpot();
 		script_nav:loadHotspotDB(id)
 	end

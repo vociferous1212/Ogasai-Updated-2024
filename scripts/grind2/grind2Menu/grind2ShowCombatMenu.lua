@@ -35,20 +35,39 @@ function grind2ShowCombatMenu:run()
 
 	if CollapsingHeader("Grinder Combat Menu") then
 		
+--[[
 		Text("Combat script range to attack targets");
 		grind2.combatScriptRange = SliderInt("Combat Range", 1, 40, grind2.combatScriptRange);
 
+--]]
+		Text("");
+		Text("Combat script range currently controlled by combat scripts");
+		Text("");
 		Separator();
-		
+
+		Text("");
+		Text("Drink/Eat/Potion sliders currently controlled by combat scripts");
+		Text("");
+		Separator();
+	
+--[[
 		Text("Mana to rest and drink");
 		grind2.restMana = SliderInt("Mana percent to rest", 1, 100, grind2.restMana);
-
-		Separator()
 
 		Text("Health to rest and eat");
 		grind2.restHealth = SliderInt("Health percent to rest", 1, 100, grind2.restHealth);
 
 		Separator();
+		Text("");
+
+		Text("Health to potion");
+		grind2.potionHealth = SliderInt("Health percent to use potion", 5, 100, grind2.potionHealth);
+
+		Text("Mana to potion");
+		grind2.potionMana = SliderInt("Mana percent to use potion", 5, 100, grind2.potionMana);
+
+		Separator();
+--]]
 
 -- avoid adds when moving through nav
 		Text("Avoid target while moving through nav - not in combat");

@@ -21,6 +21,12 @@ function grind2FleeCombat:setup()
 		self.manaToFlee = 100;
 	end
 
+	if PlayerLevel() <= 20 then
+		if GetMyClass() == "MAGE" or GetMyClass() == "WARLOCK" then
+			self.healthToFlee = 45;
+		end
+	end
+
 self.isSetup = true;
 end
 
@@ -40,6 +46,10 @@ function grind2FleeCombat:run()
 
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 		targetHealth = grind2.enemyTarget:GetHealthPercentage();
+	end
+
+	if GetTimeEX() > grind2.potionTimer then
+		grind2Potions:useHealthPotion();
 	end
 
 -- priest stuffs
@@ -112,6 +122,10 @@ function grind2FleeCombat:run()
 		if (health <= self.healthToFlee and mana <= self.manaToFlee) or (NumberTargetsAttackingPlayer() >= 2 and self.fleeWithAdds) then
 			if GetPet() ~= nil and GetPet() ~= 0 then
 				PetFollow();
+			end
+			local fbTable = {[116] = true, [205] = true, [837] = true, [7322] = true, [8406] = true, [8407] = true, [8408] = true, [10179] = true, [10180] = true, [10181] = true, [25304] = true};
+			if fbTable[GetLocalPlayer():GetCasting()] then
+				SpellStopCasting();
 			end
 			if grind2SaveCoordinates:moveToSavedLocation() then
 				return true;

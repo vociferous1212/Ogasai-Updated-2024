@@ -183,7 +183,7 @@ function script_shaman:checkEnhancement()
 					castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Windfury Weapon");
 				end
 
-				if PlayerManaTotal() >= cost then
+				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 					if (not CastSpellByName(self.enhanceWeapon)) then
 					self.message = "Applying " .. self.enhanceWeapon .. " on weapon...";
 					self.waitTimer = GetTimeEX() + 1750;
@@ -419,7 +419,7 @@ function script_shaman:run(targetGUID)
 				if (not targetObj:IsSpellInRange("Lightning Bolt")) or (not targetObj:IsInLineOfSight()) then
 					return 3;
 				elseif (targetObj:IsInLineOfSight())
-					and (targetObj:IsSpellInRange("Lightning Bolt")) and not IsSpellOnCD("Lightning Bolt") and not IsCasting() and PlayerManaTotal() >= cost then
+					and (targetObj:IsSpellInRange("Lightning Bolt")) and not IsSpellOnCD("Lightning Bolt") and not IsCasting() and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 					targetObj:AutoAttack();
 					-- Pull with: Lighting Bolt
 					if (IsMoving()) then
@@ -427,7 +427,7 @@ function script_shaman:run(targetGUID)
 						return true;
 					end
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lighting Bolt");
-					if PlayerManaTotal() >= cost then
+					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 						if (CastSpellByName("Lightning Bolt", targetObj)) then
 							self.waitTimer = GetTimeEX() + 2500;
 							script_grind:setWaitTimer(2500);
@@ -443,7 +443,7 @@ function script_shaman:run(targetGUID)
 
 			if targetObj:GetDistance() <= 20 and self.useEarthShock and not IsSpellOnCD("Earth Shock") and localMana >= self.earthShockMana and targetObj:IsInLineOfSight() then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Earth Shock");
-				if PlayerManaTotal() >= cost then
+				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 					if not CastSpellByName("Earth Shock") then
 						self.waitTimer = GetTimeEX() + 500;
 					end
@@ -627,7 +627,7 @@ function script_shaman:run(targetGUID)
 						or (localHealth <= 30 and localMana >= 15 and targethealth >= 25)
 						or localMana >= 80) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Earth Shock");
-						if (not IsSpellOnCD("Earth Shock"))  and PlayerManaTotal() >= cost then
+						if (not IsSpellOnCD("Earth Shock"))  and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 							if not (CastSpellByName("Earth Shock", targetObj)) then
 								self.waitTimer = GetTimeEX() + 500;
 								return true;
@@ -644,7 +644,7 @@ function script_shaman:run(targetGUID)
 				and (not IsSpellOnCD("Earth Shock")) and (localMana >= self.flameShockMana)
 				and (not targetObj:HasDebuff("Flame Shock")) and (targetHealth >= 25) then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Flame Shock");
-					if PlayerManaTotal() >= cost then
+					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 						if not (CastSpellByName("Flame Shock")) then
 							self.waitTimer = GetTimeEX() + 500;
 							return true;
@@ -659,7 +659,7 @@ function script_shaman:run(targetGUID)
 				and (targetObj:HasDebuff("Flame Shock") or targetHealth <= 50)
 				and (localMana >= self.earthShockMana) then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Earth Shock");
-					if (not IsSpellOnCD("Flame Shock")) and (not IsSpellOnCD("Earth Shock")) and PlayerManaTotal() >= cost then	
+					if (not IsSpellOnCD("Flame Shock")) and (not IsSpellOnCD("Earth Shock")) and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then	
 						if not (CastSpellByName("Earth Shock", targetObj)) then
 							self.waitTimer = GetTimeEX() + 500;
 							return true;
@@ -675,7 +675,7 @@ function script_shaman:run(targetGUID)
 					and (targetHealth >= 30)
 						and (not targetObj:HasDebuff("Frost Shock")) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Frost Shock");
-						if PlayerManaTotal() >= cost then
+						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 							if not (CastSpellByName("Frost Shock")) then
 								self.waitTimer = GetTimeEX() + 500;
 								return true;
@@ -700,7 +700,7 @@ function script_shaman:run(targetGUID)
 						return true;
 					end
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lighting Bolt");
-					if PlayerManaTotal() >= cost then
+					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 						if (CastSpellByName("Lightning Bolt", targetObj)) then
 							self.waitTimer = GetTimeEX() + 1850;
 							return 0;
@@ -750,7 +750,7 @@ function script_shaman:run(targetGUID)
 				-- Stormstrike
 				if (HasSpell("Stormstrike") and not IsSpellOnCD("Stormstrike")) then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Stormstrike");
-					if PlayerManaTotal() >= cost then
+					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 						if (CastSpellByName("Stormstrike", targetObj)) then
 							return true;
 						end
@@ -962,7 +962,7 @@ function script_shaman:castHealingSpell(localObj)
 	end
 
 	if (HasSpell(script_shaman.healingSpell)) then
-		if PlayerManaTotal() >= cost then
+		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 			if (not IsSpellOnCD(script_shaman.healingSpell)) then
 				if (not IsMoving()) and (IsStanding()) then
 					if (not IsCasting()) and (not IsChanneling()) then
@@ -986,7 +986,7 @@ function script_shaman:castLesserHealingWave(localObj)
 	local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lesser Healing Wave");
 
 	if (HasSpell("Lesser Healing Wave")) then
-		if PlayerManaTotal() >= cost then
+		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20) then
 			if (not IsSpellOnCD("Lesser Healing Wave")) then
 				if (not IsMoving()) and (IsStanding()) then
 					if (not IsCasting()) and (not IsChanneling()) then

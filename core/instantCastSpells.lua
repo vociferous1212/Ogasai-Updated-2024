@@ -11,6 +11,9 @@ function instantCastSpells:isSpellInstantCast()
 
 	local spellTable = {
 
+	-- items
+			[6405] = true,	-- dartol's rod of transformation (furbolg form)
+
 	-- racial
 			[20572] = true, -- Blood Fury Orc Racial
 
@@ -1173,8 +1176,10 @@ function instantCastSpells:isSpellInstantCast()
 
 	}
 
-	if spellTable[Player():GetCasting()] or spellTable[Player():GetChanneling()] then
-
+	if spellTable[Player():GetChanneling()] then
+		return true;
+	end
+	if spellTable[Player():GetCasting()] then
 		return true;
 	end
 

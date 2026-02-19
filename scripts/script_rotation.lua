@@ -24,9 +24,10 @@ script_rotation = {
 	showClassOptions = true,
 	aggroRangeTank = 50,
 	adjustTickRate = false,
-	lootTargets = true,
-	useRestFeature = true,
+	lootTargets = false,
+	useRestFeature = false,
 	autoFaceTarget = false,
+	moveToTarget = false,
 	faceTargetTimer = 0,
 }
 
@@ -92,116 +93,123 @@ function script_rotation:run()
 	--if (self.waitTimer > GetTimeEX()) then return; end
 	--if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end ReplaceEnchant();
 
-	if (script_rotationMenu.pause) then 
+-- return if paused or for any reason
+	if self.waitTimer > GetTimeEX() or script_rotationMenu.pause or Player():IsDead()
+	or ( (IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast())
+	or (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then 
+
 		self.message = "Paused by user..."; 
 		return; 
 	end
 
+-- face target
 	if IsInCombat() and GetTimeEX() > self.faceTargetTimer and self.autoFaceTarget and PlayerHasTarget() and self.enemyObj ~= nil and self.enemyObj ~= 0 and not IsMoving() then
-		self.enemyObj:FaceTarget();
-		self.faceTargetTimer = GetTimeEX() + 2000;
-	end
-
-
-	if ((IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast()) then 
-		return; 
-	end
-
-	-- player is stunned or confused of feared
-	if (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then --and not HasSpell("Will of the Forsaken") then
-		return;
-	end
-
-	if (self.waitTimer > GetTimeEX()) then
-		return;
+		if not self.enemyObj:IsDead() and self.enemyObj:CanAttack() then
+			self.enemyObj:FaceTarget();
+			self.faceTargetTimer = GetTimeEX() + 2000;
+		end
 	end
 
 	self.waitTimer = GetTimeEX() + self.tickRate;
 
-	if (not localObj:IsDead()) then
+-- do some loot
+	if ((not IsInCombat() or not IsAnyTargetTargetingPlayer() or not PlayerHasTarget()) or IsLooting()) and self.lootTargets and (not script_grind:shouldWeRest() or not self.useRestFeature) then
 
-		-- do some loot
-		if ((not IsInCombat() or not IsAnyTargetTargetingPlayer() or not PlayerHasTarget()) or IsLooting()) and self.lootTargets and (not script_grind:shouldWeRest() or not self.useRestFeature) then
-
-			if script_rotation:doSomeLoot() then
-				self.waitTimer = GetTimeEX() + 150;
-				return true;
-			end
+		if script_rotation:doSomeLoot() then
+			self.waitTimer = GetTimeEX() + 150;
+			return true;
 		end
+	end
 
-		if (GetTarget() ~= 0 and GetTarget() ~= nil) and (not IsLooting()) then
-			local target = GetTarget();
-			if (target:CanAttack()) and not target:IsDead() then
-				self.enemyObj = target;
-				if not IsAutoCasting("Attack") and not IsStealth() then
-					self.enemyObj:AutoAttack();
-				end
-			elseif (IsLooting()) then
-				self.enemyObj = nil;
-			elseif GetTarget():IsDead() then
-				ClearTarget();
-				self.enemyObj = nil;
-			end
+	-- Rest
+	if self.useRestFeature then
+		if (script_rotation:runRest()) then
+			return true;
 		end
-		
-		self.enemyObj = GetTarget();
+	end
 
-		if (self.enemyObj ~= 0) and (self.enemyObj:CanAttack()) then
+	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (not IsLooting()) then
+		local target = GetTarget();
+		if (target:CanAttack()) and not target:IsDead() then
+			self.enemyObj = target;
+			if not IsAutoCasting("Attack") and not IsStealth() then
+				self.enemyObj:AutoAttack();
+			end
+		elseif (IsLooting()) then
+			self.enemyObj = nil;
+			script_grind.enemyObj = nil;
+		elseif GetTarget():IsDead() then
+			ClearTarget();
+			self.enemyObj = nil;
+			script_grind.enemyObj = nil;
+		end
+	end
+	
 
-			-- Auto dismount if in range
-			if (IsMounted()) then 
+	if GetTarget() ~= nil and GetTarget() ~= 0 then
+		if GetTarget():CanAttack() and not GetTarget():IsDead() then
+			self.enemyObj = GetTarget();
+		end
+	end
+
+	if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
+		if (not self.enemyObj:CanAttack()) then
+			self.enemyObj = nil;
+			script_grind.enemyObj = nil;
+			ClearTarget();
+		end	
+	end
+
+	if (self.enemyObj ~= 0) and self.enemyObj ~= nil and (self.enemyObj:CanAttack()) then
+
+		-- Auto dismount if in range
+		if (IsMounted()) then 
 				
-				self.message = "Auto dismount if in range...";
+			self.message = "Auto dismount if in range...";
 
-				if (self.enemyObj:GetDistance() <= self.disMountRange) then
-					DisMount(); 
-					return; 
-				end
+			if (self.enemyObj:GetDistance() <= self.disMountRange) then
+				DisMount(); 
+				return; 
 			end
+		end
 
-			script_grind.enemyObj = self.enemyObj;
+		script_grind.enemyObj = self.enemyObj;
 
-			if (self.enemyObj:GetDistance() <= 45) and not self.enemyObj:IsDead() then
-
-				-- Attack the target
-				self.message = "Running the combat script on target...";
-				RunCombatScript(self.enemyObj:GetGUID());
-
-			end
-
-		else
-
-			if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-
-				if (not self.enemyObj:CanAttack()) then
-					ClearTarget();
-				end	
-
-			end
-
-			-- Rest
-			if self.useRestFeature then
-				if (script_rotation:runRest()) then
-					return true;
-				end
-			end
-
-			self.message = "Waiting for a target...";
+		if self.enemyObj:IsDead() or not self.enemyObj:CanAttack() then
+			self.enemyObj = nil;
+			script_grind.enemyObj = nil;
 			return;
 		end
 
-	return true;
-	else
+		if (self.enemyObj:GetDistance() <= 45) and not self.enemyObj:IsDead() then
 
-	-- Auto ress?
+			-- Attack the target
+			self.message = "Running the combat script on target...";
+			RunCombatScript(self.enemyObj:GetGUID());
+
+		end
+
+		if self.moveToTarget and PlayerHasTarget() and not IsCasting() and not IsChanneling() then
+			if self.enemyObj:GetDistance() > 6 then
+				local x, y, z = self.enemyObj:GetPosition();
+				if grind2MoveToTarget:run(Player(), x, y, z) then
+				end
+			end
+		end
 
 	end
+
+	if not PlayerHasTarget() then
+		self.message = "Waiting for a target...";
+	end
+
+return true;
 end
 
 
 function script_rotation:runRest()
 
-	if not IsInCombat() and not GetLocalPlayer():IsDead() and self.useRestFeature then
+	if not IsInCombat() and not GetLocalPlayer():IsDead() then
 
 		if (RunRestScript()) then
 
@@ -210,11 +218,6 @@ function script_rotation:runRest()
 			-- Stop moving
 			if (IsMoving() or IsMounted()) then 
 				return true; 
-			end
-
-			-- Add 2500 ms timer to the rest script rotations (timer could be set already)
-			if ((self.waitTimer - GetTimeEX()) < 2500) then 
-				self.waitTimer = GetTimeEX() + 2500;
 			end
 
 		return true;	

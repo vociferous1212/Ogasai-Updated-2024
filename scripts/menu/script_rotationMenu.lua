@@ -38,9 +38,13 @@ function script_rotationMenu:menu()
 
 	wasClicked, script_rotation.useRestFeature = Checkbox("Auto-Rest | ", script_rotation.useRestFeature);
 
-	SameLine();
+	Separator();
 
 	wasClicked, script_rotation.autoFaceTarget = Checkbox("Face Target | ", script_rotation.autoFaceTarget);
+
+	SameLine();
+
+	wasClicked, script_rotation.moveToTarget = Checkbox("Move To Target |", script_rotation.moveToTarget);
 
 	Separator();
 

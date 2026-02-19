@@ -8,6 +8,7 @@ function _questRetrieveQuest:run()
 			TargetByName(_quest.curQuestGiver);
 		end
 	end
+
 	-- get the moving targets position
 	if GetTarget() ~= nil and GetTarget() ~= 0 then
 		if GetTarget():GetUnitName() == _quest.curQuestGiver then

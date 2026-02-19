@@ -67,15 +67,21 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		-- or node is out of bounds
 		or GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= 20
 		-- or distance from path node is greater than next node distance
-		or (IsPathLoaded(5) and IsMoving() and GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= self.nextNavNodeDistance + 1.5) 
+		or (IsPathLoaded(5) and IsMoving() and GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= self.nextNavNodeDistance + 1.5)
+		-- or if we force generate a new path
 		or self.generateANewPath then
+		-- reset nav position
 		self.navPosition['x'] = _x;
 		self.navPosition['y'] = _y;
 		self.navPosition['z'] = _z;
+		-- generate a new path
 		GeneratePath(myX, myY, myZ, _x, _y, _z + 1);
+		-- reset last nav index position
 		self.lastnavIndex = 1; -- start at index 1, index 0 is our position
-		self.message = "Generating Path";
+		-- reset generate a new path var
 		self.generateANewPath = false;
+
+		self.message = "Generating Path";
 	end	
 	
 -- path isn't loaded
@@ -111,6 +117,10 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 -- set script timer
 	self.timer = GetTimeEX() + 100;
+
+	if not IsMoving() then
+		self.generateANewPath = true;
+	end
 
 return false;
 end

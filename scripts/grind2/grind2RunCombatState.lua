@@ -213,8 +213,8 @@ function grind2RunCombatState:run()
 			end
 
 			-- stop moving if we have reached a target
-			if IsInCombat() and PlayerHasTarget() then
-				if GetTarget():GetDistance() <= 1.5 then
+			if IsInCombat() and PlayerHasTarget() and not IsSpellOnCD("Disengage") and not IsSpellOnCD("Frost Nova") then
+				if GetTarget():GetDistance() <= 1.5 and not GetTarget():IsFleeing() then
 					if GetTarget():GetDistance() > .5 then
 						if GetTarget():GetHealthPercentage() >= 20 then
 							if IsMoving() then
@@ -231,7 +231,7 @@ function grind2RunCombatState:run()
 			if script_grind.combatError == 3
 				-- target is fleeing and we are melee class
 				or ( (GetMyClass() == "WARRIOR" or GetMyClass() == "ROGUE" or GetMyClass() == "PALADIN" or GetMyClass() == "SHAMAN" or (GetMyClass() == "DRUID" and HasForm()) )
-				and enemyTarget:IsFleeing() and enemyTarget:GetHealthPercentage() <= 20 and enemyTarget:GetDistance() >= 3.5 and not IsCasting() and not IsChanneling()) then
+				and enemyTarget:IsFleeing() and enemyTarget:GetHealthPercentage() <= 20 and enemyTarget:GetDistance() >= 3 and not IsCasting() and not IsChanneling()) then
 
 				-- valid coordinates and target distance is greater than .5 yards, enemy is not dead and we can attack it then
 				if _x ~= 0 and x ~= 0 and enemyTarget:GetDistance() > .5 and not enemyTarget:IsDead() and enemyTarget:CanAttack() then
