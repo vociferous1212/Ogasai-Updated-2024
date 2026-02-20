@@ -17,7 +17,6 @@ script_rotation = {
 	radarLoaded = include("scripts\\script_radar.lua"),
 	menuLoaded = include("scripts\\menu\\script_rotationMenu.lua"),
 	expExtra = include("scripts\\script_expChecker.lua"),
-	rotationEXLoaded = include("scripts\\script_rotationEX.lua"),
 
 	isSetup = false,
 	pullDistance = 150,
@@ -29,11 +28,62 @@ script_rotation = {
 	autoFaceTarget = false,
 	moveToTarget = false,
 	faceTargetTimer = 0,
+	drawEnabled = false,
+	drawAggro = true,
+
+	drawGather = false,
+
+	drawUnits = true,
+	drawChests = true,
+
+	aggroRangeTank = 50,
+
 }
 
 function script_rotation:draw()
-	script_rotationEX:draw();
 
+	script_rotation:window();
+
+	if (script_radar.showRadar) then
+		script_radar:draw()
+	end
+
+	if (self.drawAggro) then 
+		script_aggro:drawAggroCircles(self.aggroRangeTank); 
+	end
+
+	if (self.drawGather) then 
+		script_gather:drawGatherNodes(); 
+	end
+
+	if (self.drawUnits) then 
+		script_drawData:drawUnitsDataOnScreen(); 
+	end
+
+	if (not self.drawEnabled) then 
+		return; 
+	end
+
+	if (script_rotation.drawChests) then
+		script_gather:drawChestNodes();
+	end
+
+	-- color
+	local r, g, b = 255, 55, 55;
+
+	-- position
+	local y, x, width = 120, 25, 370;
+	local tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
+	if (onScreen) then
+		y, x = tY-25, tX+75;
+	end
+
+	-- info
+	if (not script_rotation.pause) then
+		DrawText('Script Idle: ' .. math.max(0, math.floor(script_rotation.waitTimer-GetTimeEX())) .. ' ms.', x+255, y, 255, 255, 255); y = y + 20;
+		DrawText(script_rotation.message or "error", x+255, y, 100, 255, 255);
+		DrawText('Status: ', x+255, y+30, r, g, b);
+	end
 end
 
 function script_rotation:setup()
@@ -65,11 +115,16 @@ function script_rotation:setup()
 end
 
 function script_rotation:window()
+
 	EndWindow();
-	if(NewWindow("Rotation", 320, 300)) then
+
+	if NewWindow("Rotation", 320, 300) then
+
 		script_rotationMenu:menu();
 	end
-	if (self.useExpChecker) then
+
+	if self.useExpChecker then
+
 		script_expChecker:menu();
 	end
 
@@ -79,88 +134,126 @@ function script_rotation:run()
 
 	localObj = GetLocalPlayer();
 
+-- using rotation
 	if script_rotationMenu.pause then
+
 		self.usingRotation = false;
 	else
 		self.usingRotation = true;
 	end
 
+-- setup
 	if (not self.isSetup) then 
+
 		script_rotation:setup(); 
 	end
 
-	-- quick enchanting and disenchanting
+-- draw text if target is not in line of sight
+	if script_rotation:isEnemyValid() and PlayerHasTarget() and not script_rotationMenu.pause then
+
+		if not self.enemyObj:IsInLineOfSight() then
+
+			local tX, tY, onScreen = WorldToScreen(Player():GetPosition());
+
+			DrawText("Target Not In Line Of Sight", tX- 65, tY-120, 0, 255, 0);
+		end
+	end
+
+-- quick enchanting and disenchanting
 	--if (self.waitTimer > GetTimeEX()) then return; end
 	--if IsLooting() then LootTarget(); self.waitTimer = GetTimeEX() + 500; end ReplaceEnchant();
 
 -- return if paused or for any reason
-	if self.waitTimer > GetTimeEX() or script_rotationMenu.pause or Player():IsDead()
-	or ( (IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast())
-	or (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then 
+	if self.waitTimer > GetTimeEX()
+	or script_rotationMenu.pause 
+	or Player():IsStunned() or Player():IsConfused() or Player():IsFleeing() or Player():IsDead()
+	or ( (IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast() ) then
 
 		self.message = "Paused by user..."; 
+
 		return; 
 	end
 
 -- face target
-	if IsInCombat() and GetTimeEX() > self.faceTargetTimer and self.autoFaceTarget and PlayerHasTarget() and self.enemyObj ~= nil and self.enemyObj ~= 0 and not IsMoving() then
-		if not self.enemyObj:IsDead() and self.enemyObj:CanAttack() then
-			self.enemyObj:FaceTarget();
-			self.faceTargetTimer = GetTimeEX() + 2000;
+	if IsInCombat() and GetTimeEX() > self.faceTargetTimer and self.autoFaceTarget and not IsMoving() then
+
+		if PlayerHasTarget() and script_rotation:isEnemyValid() then
+
+			if not self.enemyObj:IsDead() and self.enemyObj:CanAttack() then
+
+				if not self.enemyObj:FaceTarget() then
+
+					self.faceTargetTimer = GetTimeEX() + 2000;
+				end
+			end
 		end
 	end
 
 	self.waitTimer = GetTimeEX() + self.tickRate;
 
 -- do some loot
-	if ((not IsInCombat() or not IsAnyTargetTargetingPlayer() or not PlayerHasTarget()) or IsLooting()) and self.lootTargets and (not script_grind:shouldWeRest() or not self.useRestFeature) then
+	if ((not IsInCombat() or not IsAnyTargetTargetingPlayer() or not PlayerHasTarget()) or IsLooting()) and self.lootTargets then
 
-		if script_rotation:doSomeLoot() then
-			self.waitTimer = GetTimeEX() + 150;
-			return true;
+		if not script_grind:shouldWeRest() or not self.useRestFeature then
+
+			if script_rotation:doSomeLoot() then
+
+				self.waitTimer = GetTimeEX() + 150;
+
+				return true;
+			end
 		end
 	end
 
-	-- Rest
+-- Rest
 	if self.useRestFeature then
+
 		if (script_rotation:runRest()) then
+
 			return true;
 		end
 	end
 
-	if (GetTarget() ~= 0 and GetTarget() ~= nil) and (not IsLooting()) then
+-- player has a target
+	if PlayerHasTarget() and not IsLooting() then
+
 		local target = GetTarget();
-		if (target:CanAttack()) and not target:IsDead() then
+
+		if target:CanAttack() and not target:IsDead() and not target:IsCritter() then
+
 			self.enemyObj = target;
+
 			if not IsAutoCasting("Attack") and not IsStealth() then
+
 				self.enemyObj:AutoAttack();
 			end
+
 		elseif (IsLooting()) then
+
 			self.enemyObj = nil;
-			script_grind.enemyObj = nil;
-		elseif GetTarget():IsDead() then
+
+		elseif GetTarget():IsDead() or (script_rotation:isEnemyValid() and not GetTarget():CanAttack()) then
+
 			ClearTarget();
+
 			self.enemyObj = nil;
-			script_grind.enemyObj = nil;
+
+			return;
 		end
+	else
+		self.enemyObj = nil;
 	end
 	
+-- set enemy object
+	if script_rotation:isEnemyValid() and PlayerHasTarget() then
 
-	if GetTarget() ~= nil and GetTarget() ~= 0 then
 		if GetTarget():CanAttack() and not GetTarget():IsDead() then
+
 			self.enemyObj = GetTarget();
 		end
 	end
 
-	if (self.enemyObj ~= 0 and self.enemyObj ~= nil) then
-		if (not self.enemyObj:CanAttack()) then
-			self.enemyObj = nil;
-			script_grind.enemyObj = nil;
-			ClearTarget();
-		end	
-	end
-
-	if (self.enemyObj ~= 0) and self.enemyObj ~= nil and (self.enemyObj:CanAttack()) then
+	if script_rotation:isEnemyValid() and self.enemyObj:CanAttack() then
 
 		-- Auto dismount if in range
 		if (IsMounted()) then 
@@ -168,38 +261,41 @@ function script_rotation:run()
 			self.message = "Auto dismount if in range...";
 
 			if (self.enemyObj:GetDistance() <= self.disMountRange) then
+
 				DisMount(); 
+
 				return; 
 			end
 		end
 
-		script_grind.enemyObj = self.enemyObj;
-
-		if self.enemyObj:IsDead() or not self.enemyObj:CanAttack() then
-			self.enemyObj = nil;
-			script_grind.enemyObj = nil;
-			return;
-		end
-
-		if (self.enemyObj:GetDistance() <= 45) and not self.enemyObj:IsDead() then
+-- initiate combat
+		if self.enemyObj:GetDistance() <= 45 then
 
 			-- Attack the target
 			self.message = "Running the combat script on target...";
+
 			RunCombatScript(self.enemyObj:GetGUID());
 
 		end
 
+-- move to target
 		if self.moveToTarget and PlayerHasTarget() and not IsCasting() and not IsChanneling() then
+
 			if self.enemyObj:GetDistance() > 6 then
+
 				local x, y, z = self.enemyObj:GetPosition();
+
 				if grind2MoveToTarget:run(Player(), x, y, z) then
+
 				end
 			end
 		end
 
 	end
 
+-- show message
 	if not PlayerHasTarget() then
+
 		self.message = "Waiting for a target...";
 	end
 
@@ -251,4 +347,17 @@ function script_rotation:doSomeLoot()
 				return;
 			end
 return;
+end
+
+-- don't know why this wouldn't work as a local function
+function script_rotation:isEnemyValid()
+
+		local enemy = nil;
+
+		if self.enemyObj ~= nil and self.enemyObj ~= 0 then
+
+			return true;
+		end
+
+return false;
 end

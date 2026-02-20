@@ -37,6 +37,15 @@ function script_gatherRun:gather()
 		end
 	end
 
+	if (not IsStealth()) and (script_gather.safeGather) and (script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil) and not IsInCombat() then
+		if not IsStealth() and ( (script_grind.enemyObj == nil or self.enemyObj == 0 and not grind2.usingGrinder2) or (grind2.enemyTarget == nil or grind2.enemyTarget == 0 and grind2.usingGrinder2) ) and not IsInCombat() then
+			script_grind.enemyObj = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
+			if grind2.usingGrinder2 then
+				grind2.enemyTarget = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
+			end
+		end
+	end
+
 	if (script_gather.nodeObj ~= 0 and script_gather.nodeObj ~= nil) and (not script_gather:isNodeBlacklisted(script_gather.nodeGUID))
 	and ((script_gatherEX2:isNodeSafeToGather() and script_gather.safeGather) or not script_gather.safeGather) then
 
@@ -141,12 +150,18 @@ function script_gatherRun:gather()
 				end
 			return;
 			end
-					if not IsSwimming() then
-					script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
-					end
-					script_gather.messageToGrinder = "" ..nDist.. " (yd)";
-					script_grind.message = "Gathering - "..script_gather.nodeObj:GetUnitName().. " - "..math.floor(script_gather.nodeObj:GetDistance()).." (yd)";
-					if IsSwimming() or  ((not IsMoving()) and (nDist > 5)) then Move(_x, _y, _z); end
+
+			if not IsSwimming() and not grind2.usingGrinder2 then
+				script_navEX:moveToTarget(GetLocalPlayer(), _x, _y, _z);
+			end
+			if grind2.usingGrinder2 then
+				grind2MoveToTarget:run(Player(), _x, _y, _z);
+			end
+				script_gather.messageToGrinder = "" ..nDist.. " (yd)";
+				script_grind.message = "Gathering - "..script_gather.nodeObj:GetUnitName().. " - "..math.floor(script_gather.nodeObj:GetDistance()).." (yd)";
+				if IsSwimming() or ((not IsMoving()) and (nDist > 5)) then
+					Move(_x, _y, _z);
+				end
 
 				--return true;
 			end

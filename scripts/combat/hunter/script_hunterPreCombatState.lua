@@ -39,6 +39,18 @@ function script_hunterPreCombatState:run(targetObj)
 		end
 	end
 
+	-- pull with viper Sting
+	if script_hunter.useViperSting and HasSpell("Viper Sting") and not IsSpellOnCD("Viper Sting") and not targetObj:HasDebuff("Viper Sting") and CurrentTargetsMana(targetObj) >= 25 then
+		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Viper Sting");
+		if targetObj:GetHealthPercentage() >= 25 and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() > 10) then
+			if targetObj:IsInLineOfSight() and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Mechanical" then
+				if not CastSpellByName("Viper Sting") then
+					self.waitTimer = GetTimeEX() + 500;
+				end
+			end
+		end
+	end
+
 	-- aimed Shot
 	if HasSpell("Aimed Shot") and not IsSpellOnCD("Aimed Shot") and PlayerMana() >= 15 and script_hunter.useAimedShot then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Aimed Shot");
@@ -46,12 +58,12 @@ function script_hunterPreCombatState:run(targetObj)
 			if targetObj:GetDistance() <= script_hunter.spellRange and targetObj:IsInLineOfSight() then
 				if IsMoving() then StopMoving() return true;
 				end
-				if CastSpellByName("Aimed Shot") then
+				if not CastSpellByName("Aimed Shot") then
 					if GetTimeEX() > script_hunter.petAttackTimer then
 						PetAttack();
 						script_hunter.petAttackTimer = GetTimeEX() + 1000;
 					end
-					script_hunter.waitTimer = GetTimeEX() + 3000;
+				script_hunter.waitTimer = GetTimeEX() + 500;
 				end
 			return;
 			end
@@ -81,7 +93,7 @@ function script_hunterPreCombatState:run(targetObj)
 	-- use concussive shot
 	-- only use this to pull if we don't have an active pet'
 	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
-		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (PlayerMana() > script_hunter.arcaneShotMana) then
+		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (PlayerMana() > script_hunter.serpentStingMana) then
 			if not CastSpellByName("Concussive Shot") then
 				if GetTimeEX() > script_hunter.petAttackTimer then PetAttack();
 					script_hunter.petAttackTimer = GetTimeEX() + 1000;
@@ -92,7 +104,7 @@ function script_hunterPreCombatState:run(targetObj)
 	end
 
 	-- use viper sting
-	if CurrentTargetsMana(targetObj) >= 1 and HasSpell("Viper Sting") then
+	if script_hunter.useViperSting and CurrentTargetsMana(targetObj) >= 1 and HasSpell("Viper Sting") then
 		if not IsSpellOnCD("Viper Sting") and not targetObj:HasDebuff("Viper Sting") and IsStanding() then
 			if (targetObj:IsInLineOfSight()) and (PlayerMana() > 10)
 			and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon" and targetObj:GetCreatureType() ~= "Mechanical" then

@@ -37,7 +37,7 @@ grind2 = {
 	useFirstAid = false,						-- use first aid or not
 	avoidEliteTimer = 0,						-- calling move function to oquick crashes nav...
 	avoidTargetTimer = 0,						-- timer to run avoid target script to stop navigation from crashing
-
+	usingGrinder2 = false,
 
 	}
 
@@ -212,6 +212,8 @@ end
 
 function grind2:run()
 
+	self.usingGrinder2 = true;
+
 	-- run the setup if not already setup
 	if not grind2Setup.isSetup then
 
@@ -259,24 +261,32 @@ function grind2:run()
 -- don't do if we need to loot or under PlayerLevel() 6
 -- don't use in combat, combat scripts handle add movements
 			if currentTime > self.avoidTargetTimer and not IsIndoors() and not IsCasting() and not IsChanneling() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets or grind2.bagsAreFull or script_vendor.status >= 1) and (script_gather.nodeObj == nil or not grind2.gather) then
-				if script_runner:avoidToAggro(3) and not IsInCombat() then
+				if script_runner:avoidToAggro(4) then
+					grind2MoveToTarget:GenerateNewPath();
 					local _lx, _ly, _lz = Player():GetPosition();
 					local _ix, _iy, _iz = GetPathPositionAtIndex(5, grind2MoveToTarget.lastnavIndex);
 					--GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
-					-- reset jump timer.. don't jump into aggro ranges
 					if Move(_ix, _iy, _iz) then
-						if GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 2 then
+
+						if GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 2 then
 							GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
 						end
-						-- reset nav position
-						self.avoidTargetTimer = currentTime + 125;
+					
+						-- reset jump timer.. don't jump into aggro ranges
 						grind2PreChecks.jump = false;
-						grind2:SetTimer(1000);
+
+						-- reset nav position
 						grind2MoveToTarget:resetNav();
-						grind2MoveToTarget.GenerateANewPath = true;
+
 					end
+
 					grind2.grinderMessage = "Avoiding targets...";
-					return;
+
+					grind2MoveToTarget.GenerateANewPath = true;
+
+					self.avoidTargetTimer = currentTime + 100;
+
+				return;
 				end
 			end
 
@@ -323,8 +333,9 @@ function grind2:run()
 			if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and PlayerHasTarget() and IsStanding() and not IsMoving() and not IsLooting() and Player():GetCasting() ~= 6487 then
 				if self.enemyTarget:GetDistance() <= self.combatScriptRange + 1 or ( (IsCasting() or (IsChanneling() and IsInCombat())) and (PlayerHasTarget() or IsInCombat()) )  then
 					if self.enemyTarget:IsInLineOfSight() and currentTime > self.faceTargetTimer then
-						self.enemyTarget:FaceTarget();
-						self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
+						if not self.enemyTarget:FaceTarget() then
+							self.faceTargetTimer = currentTime + grind2AdjustTimersMenu.faceTargetTimer;
+						end
 					end
 				end
 			end
@@ -340,6 +351,24 @@ function grind2:run()
 	if (Player():IsStunned() or Player():IsConfused() or Player():IsFleeing()) then --and not HasSpell("Will of the Forsaken") then
 		return;
 	end
+
+	-- shadowmeld if we have it after feign death and wait for cooldown
+	if IsSpellOnCD("Feign Death") and Player():HasBuff("Feign Death") and HasPet() and not GetPet():IsDead() and IsInCombat() then
+		if not IsInCombat() then
+			if HasSpell("Shadowmeld") and not IsSpellOnCD("Shadowmeld") then
+				CastSpellByName("Shadowmeld");
+			end
+		end
+	return;
+	end
+
+	-- return for feign death if pet is not dead...
+	if Player():HasBuff("Feign Death") or (Player():HasBuff("Shadowmeld") and IsSpellOnCD("Feign Death")) and HasPet() then
+		if IsAnyTargetTargetingPet() then
+			return;
+		end
+	end
+
 
 -- return if paused or for any reason - return for any reason
 	if grind2.timer > currentTime or grind2.pause or ( (IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast()) then

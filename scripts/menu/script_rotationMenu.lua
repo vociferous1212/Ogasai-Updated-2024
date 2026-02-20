@@ -79,21 +79,21 @@ function script_rotationMenu:menu()
 
 		local wasClicked = false;
 
-		wasClicked, script_rotationEX.drawEnabled = Checkbox('Show status window', script_rotationEX.drawEnabled);
+		wasClicked, script_rotation.drawEnabled = Checkbox('Show status window', script_rotation.drawEnabled);
 
-		wasClicked, script_rotationEX.drawGather = Checkbox('Show gather nodes', script_rotationEX.drawGather);
+		wasClicked, script_rotation.drawGather = Checkbox('Show gather nodes', script_rotation.drawGather);
 		SameLine();
 		wasClicked, script_grindMenu.showIDD = Checkbox("Show Item ID's", script_grindMenu.showIDD);
 
-		wasClicked, script_rotationEX.drawUnits = Checkbox("Show unit info on screen", script_rotationEX.drawUnits);
+		wasClicked, script_rotation.drawUnits = Checkbox("Show unit info on screen", script_rotation.drawUnits);
 
-		wasClicked, script_rotationEX.drawAggro = Checkbox('Show aggro range circles', script_rotationEX.drawAggro);
+		wasClicked, script_rotation.drawAggro = Checkbox('Show aggro range circles', script_rotation.drawAggro);
 		
 		Separator();
 
-		if (script_rotationEX.drawAggro) then
+		if (script_rotation.drawAggro) then
 			Text("Aggro Circle Range");
-			script_rotationEX.aggroRangeTank = SliderInt("AR", 36, 300, script_rotationEX.aggroRangeTank);
+			script_rotation.aggroRangeTank = SliderInt("AR", 36, 300, script_rotation.aggroRangeTank);
 		end
 	end
 
@@ -106,7 +106,7 @@ function script_rotationMenu:menu()
 	end
 	
 
-	--wasClicked, script_rotationEX.drawChests = Checkbox("Draw Chests", script_rotationEX.drawChests);
+	--wasClicked, script_rotation.drawChests = Checkbox("Draw Chests", script_rotation.drawChests);
 
 	if script_rotation.lootTargets then
 		script_lootMenu:menu();

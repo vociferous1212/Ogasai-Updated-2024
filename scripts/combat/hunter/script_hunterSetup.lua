@@ -23,7 +23,7 @@ function script_hunterSetup:setup()
 -- set drink / eat settings lower if low level
 	if (GetLocalPlayer():GetLevel() < 6) then
 		script_hunter.drinkMana = 25;
-		script_hunter.eatHealth = 35;
+		script_hunter.eatHealth = 45;
 	end
 
 -- set drink mana lower if higher level

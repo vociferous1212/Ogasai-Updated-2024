@@ -12,16 +12,35 @@ grind2MoveToTarget = {
 
 	message = "idle...",
 
-	generateANewPath = false
+	generateANewPath = false,
+
+	goToX = 0,
+	goToY = 0,
+	goToZ = 0,
 	
 
 }
+
+function grind2MoveToTarget:GenerateNewPath()
+
+	local x, y, z = PlayerPosition();
+
+	if self.goToX ~= 0 then
+		self.navPosition['x'] = _x;
+		self.navPosition['y'] = _y;
+		self.navPosition['z'] = _z;
+		-- generate a new path
+		GeneratePath(x, y, z, self.goToX, self.goToY, self.goToZ + 1);
+	end
+end
 
 function grind2MoveToTarget:run(player, _x, _y, _z)
 
 	local player = GetLocalPlayer();
 
 	local localObj = GetLocalPlayer();
+
+	self.goToX, self.goToY, self.goToZ = _x, _y, _z;
 
 
 -- set distance to nav node further if we are moving faster
@@ -60,7 +79,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		if (GetPathSize(5) <= self.lastnavIndex) then
 			self.lastnavIndex = GetPathSize(5);
 		end
-	end                  
+	end              
 
 -- If the target moves more than 2 yard then make a new path
 	if GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 1

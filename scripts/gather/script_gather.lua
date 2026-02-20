@@ -37,6 +37,7 @@ script_gather = {
 	lastNode = 0,
 	messageSent = false,
 	safeGather = true,
+	drawFish = false,
 
 }
 
@@ -171,10 +172,14 @@ function script_gather:GetNode()
 					local dist = targetObj:GetDistance();
 					if(dist < self.gatherDistance and bestDist > dist) then
 						local _x, _y, _z = targetObj:GetPosition();
-						if(not IsNodeBlacklisted(_x, _y, _z, 5)) then
+
+						if (not IsNodeBlacklisted(_x, _y, _z, 5)) then
 							bestDist = dist;
-							bestTarget = targetObj;
-							self.nodeGUID = targetObj:GetGUID();
+
+							if bestDist <= dist then
+								bestTarget = targetObj;
+								self.nodeGUID = targetObj:GetGUID();
+							end
 						end
 					end
 				end
@@ -261,7 +266,7 @@ local targetObj, targetType = GetFirstObject();
 				end
 
 				for i=0,self.numFish - 1 do
-					if (self.fish[i][1] == id) then
+					if (self.fish[i][1] == id) and self.drawFish then
 						fishName = "*"..self.fish[i][0].."*";
 						local this = ""..dist.." yd";
 						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
@@ -280,7 +285,9 @@ local targetObj, targetType = GetFirstObject();
 				DrawText(name, _tX-10, _tY, 255, 255, 0);
 				-- draw chests by name
 				DrawText(chestName, _tX-25, _tY, 0, 255, 0);
+				if self.drawFish then
 				DrawText(fishName, _tX-25, _tY, 0, 255, 0);
+				end
 
 				end
 

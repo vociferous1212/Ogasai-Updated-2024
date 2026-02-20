@@ -17,6 +17,7 @@ function script_deleteItems:setup()
 	script_deleteItems:addDeleteItem("OOX-17/TN Distress Beacon");
 	script_deleteItems:addDeleteItem("OOX-09/HL Distress Beacon");
 	script_deleteItems:addDeleteItem("Flute of Xavaric");
+	script_deleteItems:addDeleteItem("A Mangled Journal");
 	script_deleteItems:addDeleteItem("Mangled Journal");
 	script_deleteItems:addDeleteItem("Wooden Key");
 	script_deleteItems:addDeleteItem("Kolkar Booty Key");

@@ -89,7 +89,7 @@ function grind2Ressurect:safeRess(corpseX, corpseY, corpseZ, ressRadius)
 		if typeObj == 3 then
 
 			-- acceptable targets
-			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() then
+			if currentObj:CanAttack() and not currentObj:IsDead() and not currentObj:IsCritter() and not friendlyEnemiesList:isEnemyNuetral(currentObj) then
 
 				-- set safe res distances based on level
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21;

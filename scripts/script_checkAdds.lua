@@ -61,6 +61,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 					and (not currentObj:HasDebuff("Fear"))
 					and currentObj:IsInLineOfSight()
 					and currentObj:GetHealthPercentage() >= 99
+					and not friendlyEnemiesList:isEnemyNuetral(currentObj)
 
 				then
 					local dist = currentObj:GetDistance()
@@ -106,7 +107,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
 	while theta <= 2 * PI do
 		point = point + 1
 		points[point] = { x = pointX + radius * cos(theta), y = pointY + radius * sin(theta) }
-		pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 2 + 12) * cos(theta), y = pointY + (self.addsRange + safeDist + 2 + 12) * sin(theta) }
+		pointsTwo[point] = { x = pointX + (self.addsRange + safeDist + 2 + 10) * cos(theta), y = pointY + (self.addsRange + safeDist + 2 + 10) * sin(theta) }
 		theta = theta + 2 * PI / quality
 	end
 
@@ -167,6 +168,7 @@ function script_checkAdds:aggroIntersect(target)
 					and not currentObj:HasDebuff("Fear")
 					and currentObj:IsInLineOfSight()
 					and currentObj:GetHealthPercentage() >= 99
+					and not friendlyEnemiesList:isEnemyNuetral(currentObj)
 
 
 				then
@@ -204,6 +206,7 @@ function script_checkAdds:moveWhileResting(safeMargin)
 					and (not currentObj:HasDebuff("Polymorph"))
 					and (not currentObj:HasDebuff("Fear"))
 					and currentObj:IsInLineOfSight()
+					and not friendlyEnemiesList:isEnemyNuetral(currentObj)
 				then
 					local dist = currentObj:GetDistance()
 					if dist <= (addsRange + 10) and dist < closestDist then

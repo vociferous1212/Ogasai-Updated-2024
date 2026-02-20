@@ -246,16 +246,15 @@ function script_vendor:repair()
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 1; -- moving to a repair vendor
-			if not IsSwimming() then
+			if not IsSwimming() and not grind2.usingGrinder2 then
 				script_navEX:moveToTarget(localObj, vX, vY, vZ);
-			elseif IsSwimming() then
+			elseif IsSwimming() and not grind2.usingGrinder2 then
 				Move(vX, vY, vZ);
+			elseif grind2.usingGrinder2 then
+				grind2MoveToTarget:run(Player(), vX, vY, vZ);
 			end
+
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
-			--if not IsMoving() and not IsPathLoaded(5) then
-				--Move(vX, vY, vZ);
-				--script_nav:resetNavigate();
-			--end
 			return true;
 		end
 		
@@ -372,10 +371,12 @@ function script_vendor:sell()
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
-			if not IsSwimming() then
+			if not IsSwimming() and not grind2.usingGrinder2 then
 				script_navEX:moveToTarget(localObj, vX, vY, vZ);
-			elseif IsSwimming() then
+			elseif IsSwimming() and not grind2.usingGrinder2 then
 				Move(vX, vY, vZ);
+			elseif grind2.usingGrinder2 then
+				grind2MoveToTarget:run(Player(), vX, vY, vZ);
 			end
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
@@ -478,11 +479,13 @@ function script_vendor:buyAmmo(quiverBagSlot, ammoName, itemIsArrow)
 		end
 	
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			if not IsSwimming() then
+			if not IsSwimming() and not grind2.usingGrinder2 then
 				script_navEX:moveToTarget(localObj, vX, vY, vZ);
-			elseif IsSwimming() then
+			elseif IsSwimming() and not grind2.usingGrinder2 then
 				Move(vX, vY, vZ);
-			end	
+			elseif grind2.usingGrinder2 then
+				grind2MoveToTarget:run(Player(), vX, vY, vZ);
+			end
 			self.status = 3; -- moving to buy ammo at a vendor
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			self.currentSlot = 0;
@@ -622,10 +625,12 @@ function script_vendor:buy(itemName, itemNum, isFood, isDrink)
 		end
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
-			if not IsSwimming() then
+			if not IsSwimming() and not grind2.usingGrinder2 then
 				script_navEX:moveToTarget(localObj, vX, vY, vZ);
-			elseif IsSwimming() then
+			elseif IsSwimming() and not grind2.usingGrinder2 then
 				Move(vX, vY, vZ);
+			elseif grind2.usingGrinder2 then
+				grind2MoveToTarget:run(Player(), vX, vY, vZ);
 			end
 			self.status = 4; 
 			self.message = 'Moving to ' .. vendor['name'] .. '...';

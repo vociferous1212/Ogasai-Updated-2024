@@ -39,6 +39,8 @@ function grind2AssignATarget:run()
 
 	local bestHealth = 100;
 
+	local bestMana = 100;
+
 	local targetDistance = 0;
 
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
@@ -68,6 +70,8 @@ function grind2AssignATarget:run()
 						
 						local health = i:GetHealthPercentage();
 
+						local mana = CurrentTargetsMana(i);
+
 						if bestHealth > health then
 				
 							bestHealth = health;
@@ -76,8 +80,27 @@ function grind2AssignATarget:run()
 
 								bestTarget = i;
 								bestHealth = health;
+							end
 
-							return i;
+							if mana > 1 then
+							
+								if bestMana > mana then
+
+									bestMana = mana;
+
+									if bestMana <= mana then
+
+										bestTarget = i;
+
+										bestmana = mana;
+										return i;
+									end
+								end
+							end
+							-- bot is not wanting to stick to 1 target?
+							if bestTarget ~= nil then
+								grind2.obtainNewTargetTimer = GetTimeEX() + 1000;
+								return bestTarget;
 							end
 						end
 					end
@@ -141,21 +164,6 @@ function grind2AssignATarget:run()
 
 		end
 	i, t = GetNextObject(i);
-	end
-
-		-- return last target if it is not dead and we are still in combat
-	if grind2.lastTargetTargeted ~= nil then
-		if not grind2.lastTargetTargeted:IsDead() and (grind2IsTargetingMe:target(grind2.lastTargetTargeted) or grind2.lastTargetTargeted:IsCasting()) and grind2.lastTargetTargeted:GetHealthPercentage() >= 1 then
-			return grind2.lastTargetTargeted;
-		end
-	end
-
-	-- return any target attacking me if I am not in combat yet
-	if not IsInCombat() then
-		if grind2GetTargetAttackingMe:run() ~= nil then
-			grind2.enemyTarget = grind2GetTargetAttackingMe:run();
-			return grind2GetTargetAttackingMe:run();
-		end
 	end
 
 return bestTarget;

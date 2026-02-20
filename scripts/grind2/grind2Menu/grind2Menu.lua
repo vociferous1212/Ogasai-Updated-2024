@@ -83,6 +83,7 @@ function grind2Menu:run()
 			if Button("  Stop  ") then
 
 				grind2.pause = true;
+				grind2.usingGrinder2 = false;
 			end
 		else
 
@@ -134,17 +135,26 @@ function grind2Menu:run()
 		ProgressBar("LOADING | ".. navProgress.."%", GetLoadNavmeshProgress());
 	end
 
+-- move to target button
 	if grind2.pause then
-		if PlayerHasTarget() and self.x == 0 then
-			if Button("Move To Targeted Target") then
-				self.x, self.y, self.z = GetTarget():GetPosition();
-			end
-		elseif self.x ~= 0 then
-			if Button("Stop Moving!") then
-				self.x, self.y, self.z = 0, 0, 0;
+		if PlayerHasTarget() then
+			if GetTarget():GetDistance() > 5 then
+				if self.x == 0 then
+					if Button("Move To Targeted Target") then
+						self.x, self.y, self.z = GetTarget():GetPosition();
+					end
+				elseif self.x ~= 0 then
+					if Button("Stop Moving!") then
+						self.x, self.y, self.z = 0, 0, 0;
+					end
+				end
+			elseif self.x ~= 0 then
+				if Button("Stop Moving!") then
+					self.x, self.y, self.z = 0, 0, 0;
+				end
 			end
 		end
-	
+
 		local x, y, z = PlayerPosition();
 		if self.x ~= 0 and GetDistance3D(x, y, z, self.x, self.y, self.z) > 5 then
 			grind2MoveToTarget:run(Player(), self.x, self.y, self.z);
@@ -177,7 +187,7 @@ function grind2Menu:run()
 		Text("				| No Target...");
 
 	else
-		Text("				| "..grind2.enemyTarget:GetUnitName().." "..math.floor(grind2.enemyTarget:GetDistance()).." (yd)");
+		Text("				| Enemy Target | "..grind2.enemyTarget:GetUnitName().." | "..math.floor(grind2.enemyTarget:GetDistance()).." (yd)");
 	end
 
 -- gather menu script
@@ -186,7 +196,7 @@ function grind2Menu:run()
 	SameLine();
 
 	if script_gather.nodeObj ~= nil and script_gather.nodeObj ~= 0 then
-		Text("				| "..script_gather.nodeObj:GetUnitName());
+		Text("				| Gathering | "..script_gather.nodeObj:GetUnitName().." | "..math.floor(script_gather.nodeObj:GetDistance()).." (yd)");
 	else
 		Text("				| No Object...")
 	end

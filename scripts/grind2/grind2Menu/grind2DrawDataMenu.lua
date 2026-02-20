@@ -187,6 +187,14 @@ function grind2DrawDataMenu:run()
 
 				wasClicked, self.drawGatherNodes = Checkbox("Herbs/Minerals", self.drawGatherNodes);
 
+				SameLine();
+
+				Text(" | ");
+
+				SameLine();
+
+				wasClicked, script_gather.drawFish = Checkbox("Draw Fish Pools", script_gather.drawFish);
+
 				Separator();
 
 				-- controlled in gatherer menu grind menu

@@ -211,6 +211,9 @@ function script_hunterDoPetChecks:doPetChecks()
 					end
 				end
 			end
+		if not IsCasting() and not IsChanneling() and not IsMoving() then
+			script_hunter.message = "Waiting to mend pet - low mana..."
+		end
 		return true;
 		end
 	end

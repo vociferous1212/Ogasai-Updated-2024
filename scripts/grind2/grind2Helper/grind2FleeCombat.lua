@@ -94,7 +94,7 @@ function grind2FleeCombat:run()
 	-- blink
 	if HasSpell("Blink") and not IsSpellOnCD("Blink") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Blink");
-		if PlayerManaTotal() >= cost then
+		if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
 			CastSpellByName("Blink");
 		end
 	end
@@ -103,9 +103,22 @@ function grind2FleeCombat:run()
 
 
 -- hunter
-	-- cheetah form if target is far enough away
-	-- keep checking.. if for some reason target is too close to we get hit then change back
-	-- feign death if pet is dead
+	-- feign death
+		-- controlled in grinder
+	if HasSpell("Feign Death") and not IsSpellOnCD("Feign Death") then
+		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Feign Death");
+		if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 5 then
+			CastSpellByName("Feign Death");
+			grind2:setTimer(5000);
+		end
+	end
+
+	-- aspect of the monkey
+	if not HasSpell("Feign Death") or (IsSpellOnCD("Feign Death") and not Player():HasBuff("Feign Death")) then
+		if HasSpell("Aspect of the Monkey") and not IsSpellOnCD("Aspect of the Monkey") and PlayerMana() >= 15 then
+			CastSpellByName("Aspect of the Monkey");
+		end
+	end
 
 -- paladin stuffs
 

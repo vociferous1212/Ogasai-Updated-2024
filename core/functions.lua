@@ -278,6 +278,23 @@ function IsAnyTargetTargetingPlayer()
 return false;
 end
 
+function IsAnyTargetTargetingPet()
+	local i, t = GetFirstObject()
+	while i ~= 0 do
+		if t == 3 and i:GetDistance() <= 75 and not i:IsDead() and not i:IsCritter() then
+			if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
+				if GetPet() ~= 0 and GetPet() ~= nil then
+					if i:GetUnitsTarget():GetGUID() == GetPet():GetGUID() and not GetPet():IsDead() then
+						return true;
+					end
+				end	
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+return false;
+end
+
 function NumberTargetsAttackingPlayer()
 	local numTargets = 0;
 	local tempTarget = nil;

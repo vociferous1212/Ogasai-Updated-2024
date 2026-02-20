@@ -8,7 +8,7 @@ function script_hunterMenu:menu()
 
 	local wasClicked = false;
 
-	if (CollapsingHeader("Hunter Combat Options")) then
+	if CollapsingHeader("Hunter Combat Options") then
 
 -- use ranged attacks or melee attacks
 		wasClicked, script_hunter.useRangedAttacks = Checkbox("Use Ranged Attacks", script_hunter.useRangedAttacks);
@@ -31,7 +31,7 @@ function script_hunterMenu:menu()
 
 -- conserve mana button
 		if HasPet() then
-			if Button("Conserve Mana") then
+			if Button("Conserve Mana for Mend Pet") then
 				script_hunter.drinkMana = 5;
 				script_hunter.arcaneShotMana = 45;
 				script_hunter.useMarkMana = 30;
@@ -49,23 +49,24 @@ function script_hunterMenu:menu()
 		end
 
 -- set bandages
-		if (HasItem("Linen Bandage")) or 
-			(HasItem("Heavy Linen Bandage")) or 
-			(HasItem("Wool Bandage")) or 
-			(HasItem("Heavy Wool Bandage")) or 
-			(HasItem("Silk Bandage")) or 
-			(HasItem("Heavy Silk Bandage")) or 
-			(HasItem("Mageweave Bandage")) or 
-			(HasItem("Heavy Mageweave Bandage")) or 
-			(HasItem("Runecloth Bandage")) or 
-			(HasItem("Heavy Runecloth Bandage")) then
+		if HasItem("Linen Bandage") or 
+			HasItem("Heavy Linen Bandage") or 
+			HasItem("Wool Bandage") or 
+			HasItem("Heavy Wool Bandage") or 
+			HasItem("Silk Bandage") or 
+			HasItem("Heavy Silk Bandage") or 
+			HasItem("Mageweave Bandage") or 
+			HasItem("Heavy Mageweave Bandage") or 
+			HasItem("Runecloth Bandage") or 
+			HasItem("Heavy Runecloth Bandage") then
 		
 			self.menuBandages = true;
 		else
 			self.menuBandages = false;
 		end
 		
-		if (self.menuBandages) or (GetLocalPlayer():GetLevel() >= 10) then
+-- seperate the menu if level to or we have bandages
+		if self.menuBandages or GetLocalPlayer():GetLevel() >= 10 then
 			Separator();
 		end
 
@@ -85,6 +86,8 @@ function script_hunterMenu:menu()
 			Separator();
 			wasClicked, script_hunter.useCheetah = Checkbox("Use Cheetah |", script_hunter.useCheetah);
 		end
+
+-- aimed shot button
 		if HasSpell("Aimed Shot") then
 			SameLine();
 			wasClicked, script_hunter.useAimedShot = Checkbox("Use Aimed Shot |", script_hunter.useAimedShot);
@@ -95,10 +98,16 @@ function script_hunterMenu:menu()
 			wasClicked, script_hunter.useMark = Checkbox("Use Hunter's Mark |", script_hunter.useMark);
 		end
 		
-		-- multi shot button
+-- multi shot button
 		if (HasSpell("Multi-Shot")) then
 			SameLine();
 			wasClicked, script_hunter.useMultiShot = Checkbox("Use MultiShot |", script_hunter.useMultiShot);
+		end
+
+-- viper sting
+		if HasSpell("Viper Sting") then
+			SameLine();
+			wasClicked, script_hunter.useViperSting = Checkbox("Use Viper Sting", script_hunter.useViperSting);
 		end
 
 		Separator();

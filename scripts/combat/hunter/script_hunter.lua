@@ -61,10 +61,16 @@ script_hunter = {
 	useAimedShot = true,
 	mendPetHealth = 50,
 	autoAttackTimer = GetTimeEX(),
+	useViperSting = true,
+	hasImprovedConcussiveShot = false,
 
 }	
 
 function script_hunter:rest()
+
+	if IsInCombat() then
+		return false;
+	end
 
 	if script_hunterRunRestState:run() then
 		return true;
@@ -81,7 +87,7 @@ end
 function script_hunter:runBackwards(targetObj, range) 
 
 	-- Run backwards if the target is within range
-	if (targetObj ~= 0) and IsInCombat()
+	if (targetObj ~= 0)
 	and not script_checkDebuffs:hasDisabledMovement()
 	and not IsChanneling() and not IsCasting()
 
@@ -100,9 +106,6 @@ function script_hunter:runBackwards(targetObj, range)
 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
 		if (distance < range)  then
 
-			if script_checkAdds:checkAdds() and IsMoving() then
-				return true;
-			else
 				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
 
 				-- move fall-back
@@ -111,12 +114,14 @@ function script_hunter:runBackwards(targetObj, range)
 					script_nav:resetNavigate();
 				end
 
+				if script_checkAdds:checkAdds() then
+				end
 
 				self.waitTimer = GetTimeEX() + 500;
 				script_grind:setWaitTimer(100);
 
 			return 4;
-			end
+			
 		end
 	end
 	return false;
@@ -195,7 +200,7 @@ function script_hunter:run(targetGUID)
 	script_grind.drinkMana = self.drinkMana;
 
 -- if we are dead then return
-	if Player():IsDead() then
+	if Player():IsDead() or Player():HasBuff("Feign Death") then
 		return;
 	end
 
@@ -210,9 +215,9 @@ function script_hunter:run(targetGUID)
 		-- if already in combat and target is less than ranged attack range and the target is targeting me (and not pet) then
 		if (IsInCombat() and GetTarget():GetDistance() < self.minSpellRange and script_grind:isTargetingMe(targetObj) and not targetObj:IsCasting() and not targetObj:IsStunned())
 		-- if already in combat and we are supposed to have a pet, but do not
-		or (IsInCombat() and Player():GetLevel() > 9 and not HasPet())
+		or (IsInCombat() and Player():GetLevel() > 9 and not (HasPet() or not self.hasPet))
 		-- if not in combat but the target is too close to do ranged attacks
-		or (not IsInCombat() and GetTarget():GetDistance() < self.minSpellRange and not HasPet())
+		or (not IsInCombat() and GetTarget():GetDistance() < self.minSpellRange and (not HasPet() or not self.hasPet))
 		
 		then
 			-- attack range is melee distance
@@ -230,8 +235,9 @@ function script_hunter:run(targetGUID)
 	end
 
 	-- pet follow if neither pet or target are in line of sight
-	if HasPet() and targetObj ~= nil and targetObj ~= 0 then
-		if not GetPet():IsInLineOfSight() and not targetObj:IsInLineOfSight() then
+	-- or pet distance is too far
+	if (HasPet() and self.hasPet) and targetObj ~= nil and targetObj ~= 0 then
+		if (not GetPet():IsInLineOfSight() and not targetObj:IsInLineOfSight()) or GetPet():GetDistance() > self.spellRange then
 			if GetTimeEX() > self.petFollowTimer then
 				PetFollow();
 				self.petFollowTimer = GetTimeEX() + 500;
@@ -271,7 +277,7 @@ function script_hunter:run(targetGUID)
 		-- have a valid target and player mana is enough to use disengage
 		if targetObj ~= nil and targetObj ~= 0 and PlayerMana() >= 8 then
 			-- if the target is targeting player or the target is within melee distance
-			if (script_grind:isTargetingMe(targetObj) or (targetObj:GetDistance() <= self.meleeDistance and self.useRangedAttacks)) then
+			if script_grind:isTargetingMe(targetObj) or targetObj:GetDistance() <= self.meleeDistance then
 				-- cast engage
 				if CastSpellByName("Disengage", targetObj) then
 					-- recast auto attack, disengage disables it
@@ -330,7 +336,6 @@ function script_hunter:run(targetGUID)
 								if targetObj:IsInLineOfSight() then
 									if GetTimeEX() > self.petAttackTimer then
 										PetAttack();
-										self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
 									end
 								-- target is not in line of sight anymore then pet follow
 								elseif not targetObj:IsInLineOfSight() then
@@ -340,7 +345,7 @@ function script_hunter:run(targetGUID)
 									end
 								end		
 							self.waitTimer = GetTimeEX() + 500;
-							return 4;
+							return true;
 							end
 						end
 					end			
@@ -355,7 +360,7 @@ function script_hunter:run(targetGUID)
 			
 		end
 	end
-	if not IsMounted() and HasPet() and not IsInCombat() then
+	if not IsMounted() and (HasPet() and self.hasPet) and not IsInCombat() then
 		if GetPet():HasBuff("Feed Pet Effect") then
 			self.message = "Pet is eating some food...";
 			script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
@@ -434,7 +439,7 @@ function script_hunter:run(targetGUID)
 
 
 -- force bot to attack pets target
-	if (IsInCombat()) and (HasPet()) and (not PlayerHasTarget()) and (GetNumPartyMembers() < 1) and (self.hasPet) and not GetPet():IsDead() then
+	if (IsInCombat()) and (HasPet() and self.hasPet) and (not PlayerHasTarget()) and (GetNumPartyMembers() < 1) and (self.hasPet) and not GetPet():IsDead() then
 		if (PetHasTarget()) and not script_grind:isTargetingMe(GetPet():GetUnitsTarget()) then
 				AssistUnit("pet");
 		-- don't return if we don't want to wait after combat phase
@@ -445,7 +450,7 @@ function script_hunter:run(targetGUID)
 			AssistUnit("pet");
 		end
 		-- fallback because it seems assist unit doesn't work right on some servers'
-		if HasPet() and GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil then
+		if (HasPet() and self.hasPet) and GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil then
 			AssistUnit("pet");
 		end
 	end
@@ -466,7 +471,7 @@ function script_hunter:run(targetGUID)
 	end
 
 	if script_grind.enemyObj ~= nil then
-		if (GetTarget() == nil or GetTarget() == 0) and not HasPet() then
+		if (GetTarget() == nil or GetTarget() == 0) and not (HasPet() or not self.hasPet) then
 			targetObj:AutoAttack();
 		end
 	end
@@ -491,7 +496,7 @@ function script_hunter:run(targetGUID)
 		end
 
 -- pet assist?
-		if not PlayerHasTarget() and PetHasTarget() and IsInCombat() and HasPet() then
+		if not PlayerHasTarget() and PetHasTarget() and IsInCombat() and (HasPet() and self.hasPet) then
 			if not GetPet():IsDead() then
 				AssistUnit("pet");
 			end
@@ -514,12 +519,6 @@ function script_hunter:run(targetGUID)
 -- Auto Attack
 		if (targetObj:GetDistance() < self.spellRange) and targetObj:GetDistance() > self.minSpellRange and (targetObj:IsInLineOfSight())
 		and not targetObj:IsDead() and targetObj:CanAttack() and self.useRangedAttacks then
-			if (self.hasPet) then
-				if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
-					PetAttack();
-					self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
-				end
-			end
 			if (not IsAutoCasting("Auto Shot")) and not targetObj:IsDead() and targetObj:IsInLineOfSight() and not IsMoving() then
 				if targetObj:GetDistance() >= self.minSpellRange then
 					
@@ -530,11 +529,17 @@ function script_hunter:run(targetGUID)
 					end
 				end
 			end
+			if (self.hasPet) and HasPet() and self.hasPet then
+				if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
+					PetAttack();
+					self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
+				end
+			end
 		end
 
 --send pet to attack something attacking me even if not main target - if we have 2 or more attacking us
 		-- set a timer to give the pet time to gain aggro on a Target
-		if IsInCombat() and HasPet()
+		if IsInCombat() and (HasPet() and self.hasPet)
 		and script_grind:enemiesAttackingUs() > 1 
 		and script_grind:isAnyTargetTargetingMe()
 		then
@@ -548,7 +553,7 @@ function script_hunter:run(targetGUID)
 -- NOT in combat ---  do pull stuff
 
 		-- target stuck out of line of sight but close enough?
-		if targetObj:GetDistance() <= self.meleeDistance and not targetObj:IsInLineOfSight() then
+		if targetObj:GetDistance() <= self.meleeDistance and not targetObj:IsInLineOfSight() and (HasPet() and self.hasPet) then
 			PetAttack();
 		end
 
@@ -558,7 +563,7 @@ function script_hunter:run(targetGUID)
 				if script_hunterPreCombatState:run(targetObj) then
 					self.waitTimer = GetTimeEX() + 250;
 				end
-				if HasPet() then
+				if HasPet() and self.hasPet then
 					if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
 						PetAttack();
 						self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
@@ -566,27 +571,32 @@ function script_hunter:run(targetGUID)
 					end
 				-- else move to target to melee
 			elseif (targetObj:GetDistance() < self.minSpellRange) or not targetObj:IsInLineOfSight() or not self.useRangedAttacks then
-				if (targetObj:GetDistance() > self.meleeDistance) then
-					if HasPet() then
+				if (targetObj:GetDistance() > self.meleeDistance) and (playerLevel() >= 10 or HasPet()) then
+					if HasPet() and self.hasPet then
 						if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
 							PetAttack();
 							self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
 						end
 					end
-				return 3;
+					return 3;
+				elseif PlayerLevel() < 10 or not HasPet() then
+					if script_hunter:runBackwards(targetObj, self.minSpellRange + 10) then
+						script_hunter.waitTimer = GetTimeEX() + 3500;
+						return 4;
+					end
 				end
 				-- recheck move to melee range
-			elseif targetObj:GetDistance() > self.meleeDistance and not self.useRangedAttacks then
+			elseif targetObj:GetDistance() > self.meleeDistance and not self.useRangedAttacks and IsInCombat() then
 				if not IsAutoCasting("Attack") then
 					targetObj:AutoAttack();
 				end
-				if HasPet() then if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
-					PetAttack();
-					self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
+				if HasPet() and self.hasPet then
+					if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
+						PetAttack();
+						self.petAttackTimer = GetTimeEX() + 1000;
+						self.petFollowTimer = GetTimeEX() + 1000;
 					end
 				end
-			return 3;
-			elseif targetObj:GetDistance() < self.minSpellRange then
 				return 3;
 			end
 		end
@@ -597,7 +607,7 @@ function script_hunter:run(targetGUID)
 			if script_hunterPreCombatState:run(targetObj) then 
 				self.waitTimer = GetTimeEX() + 250;
 			end
-			if HasPet() then
+			if HasPet() and self.hasPet then
 				if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
 					PetAttack();
 					self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
@@ -625,7 +635,7 @@ function script_hunter:run(targetGUID)
 			if targetObj:IsDead() then ClearTarget(); end
 
 -- check line of sight
-			if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > self.spellRange) and (GetTimeEX() >= self.petFollowTimer or not IsInCombat()) then
+			if (not targetObj:IsInLineOfSight() or targetObj:GetDistance() > self.spellRange) and (GetTimeEX() >= self.petFollowTimer or not IsInCombat()) and (not targtObj:IsStunned() or not HasPet()) then
 				return 3;
 			end
 
@@ -720,8 +730,9 @@ function script_hunter:run(targetGUID)
 			
 			then
 
-				CastSpellByName('Rapid Fire');
-				self.waitTimer = GetTimeEX() + 500;
+				if CastSpellByName('Rapid Fire') then
+					self.waitTimer = GetTimeEX() + 500;
+				end
 				
 			end
 
@@ -741,7 +752,7 @@ function script_hunter:run(targetGUID)
 			end
 
 -- pet intimidation
-			if HasSpell("Intimidation") and not IsSpellOnCD("Intimidation") and HasPet() and ( (IsInCombat() and targetHealth >= 55 and CurrentTargetsMana(targetObj) <= 10 and PlayerMana() >= 15) or targetObj:IsCasting() and PlayerManaTotal() >= 150) then
+			if HasSpell("Intimidation") and not IsSpellOnCD("Intimidation") and HasPet() and self.hasPet and ( (IsInCombat() and targetHealth >= 55 and CurrentTargetsMana(targetObj) <= 10 and PlayerMana() >= 15) or targetObj:IsCasting() and PlayerManaTotal() >= 150) then
 				if not CastSpellByName("Intimidation") then
 					self.waitTimer = GetTimeEX() + 500;
 				end
@@ -759,7 +770,8 @@ function script_hunter:run(targetGUID)
 						if (GetPet():GetDistance() > 20) then
 							if GetTimeEX() > self.petFollowTimer and GetTimeEX() >= self.petAttackTimer then
 								PetFollow();
-								self.petFollowTimer = GetTimeEX() + 500; self.petAttackTimer = GetTimeEX() + 500;
+								self.petFollowTimer = GetTimeEX() + 500;
+								self.petAttackTimer = GetTimeEX() + 500;
 							end
 							return true;
 						-- pet is close enough to mend
@@ -770,11 +782,12 @@ function script_hunter:run(targetGUID)
 									StopMoving();
 									return true;
 								end
-								CastSpellByName('Mend Pet');
-								script_hunter.waitTimer = GetTimeEX() + 550; 
-								script_grind:setWaitTimer(5000);
-								grind2:setTimer(5000);
-								return true;
+								if CastSpellByName('Mend Pet') then
+									script_hunter.waitTimer = GetTimeEX() + 550; 
+									script_grind:setWaitTimer(5000);
+									grind2:setTimer(5000);
+									return true;
+								end
 							end
 						end
 					end
@@ -807,9 +820,10 @@ function script_hunter:run(targetGUID)
 						elseif (GetPet():GetDistance() < 20) then
 							if (script_hunter.hasPet) and (petHP <= self.mendPetHealth) and (petHP > 0) then
 								script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
-								CastSpellByName('Mend Pet');
-								script_hunter.waitTimer = GetTimeEX() + 1850; 
-								return true;
+								if CastSpellByName('Mend Pet') then
+									script_hunter.waitTimer = GetTimeEX() + 1850; 
+									return true;
+								end
 							end
 						end
 					end
@@ -847,8 +861,8 @@ function script_hunter:run(targetGUID)
 							if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
 								if not CastSpellByName("Hunter's Mark") then
 									self.waitTimer = GetTimeEX() + 500;
-									if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
-										PetAttack(); self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
+									if GetTimeEX() > self.petAttackTimer then
+										PetAttack(); self.petAttackTimer = GetTimeEX() + 1000;
 									end
 								end
 							end
@@ -856,20 +870,21 @@ function script_hunter:run(targetGUID)
 					end
 		
 -- use concussive shot
-					if (not IsSpellOnCD("Concussive Shot")) then
-						if (HasSpell("Concussive Shot")) and (PlayerMana() > self.arcaneShotMana)
-						and (script_grind:isTargetingMe(targetObj) or targetObj:IsFleeing()) then
+					if (HasSpell("Concussive Shot")) then
+						if (not IsSpellOnCD("Concussive Shot")) then
+							if script_grind:isTargetingMe(targetObj) or targetObj:IsFleeing() or self.hasImprovedConcussiveShot or not HasPet() then
 							local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Concussive Shot");
-							if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
-								if not CastSpellByName("Concussive Shot") then
-									self.waitTimer = GetTimeEX() + 500;
+								if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 5 then
+									if not CastSpellByName("Concussive Shot") then
+										self.waitTimer = GetTimeEX() + 500;
+									end
 								end
 							end
-						end	
-					end
+						end
+					end	
 
 -- use viper Sting
-					if HasSpell("Viper Sting") and not IsSpellOnCD("Viper Sting") and not targetObj:HasDebuff("Viper Sting") and CurrentTargetsMana(targetObj) >= 25 then
+					if self.useViperSting and HasSpell("Viper Sting") and not IsSpellOnCD("Viper Sting") and not targetObj:HasDebuff("Viper Sting") and CurrentTargetsMana(targetObj) >= 25 then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Viper Sting");
 						if targetObj:GetHealthPercentage() >= 25 and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() > 10) then
 							if targetObj:IsInLineOfSight() and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Mechanical" then
@@ -883,23 +898,23 @@ function script_hunter:run(targetGUID)
 -- use serpent sting
 					if not self.useScorpidSting and (not targetObj:HasDebuff("Viper Sting") or CurrentTargetsMana(targetObj) <= 5) then
 						if HasSpell("Serpent Sting") and not IsSpellOnCD("Serpent Sting") and not targetObj:HasDebuff("Serpent Sting") then
-							if (targetObj:IsInLineOfSight()) and (PlayerMana() > self.serpentStingMana)
-							and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon"
-							and targetObj:GetCreatureType() ~= "Mechanical"
-							and targetHealth >= 25
-							then
-								local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Serpent Sting");
-								if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
-									if not CastSpellByName("Serpent Sting") then
-										self.waitTimer = GetTimeEX() + 500;
+							if (targetObj:IsInLineOfSight()) and (PlayerMana() > self.serpentStingMana) then
+								if targetObj:GetCreatureType() ~= "Elemental" or targetObj:GetUnitName() == "Tar Creeper" then
+									if targetObj:GetCreatureType() ~= "Demon" and targetObj:GetCreatureType() ~= "Mechanical" and targetHealth >= 25 then
+										local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Serpent Sting");
+										if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
+											if not CastSpellByName("Serpent Sting") then
+												self.waitTimer = GetTimeEX() + 500;
+											end
+										end
 									end
-								end
-							end	
+								end	
+							end
 						end
 					end
 
 -- use arcane shot
-					if (not IsSpellOnCD("Arcane Shot")) and PlayerMana() >= self.arcaneShotMana and (not HasSpell("Aimed Shot") or not self.useAimedShot) then
+					if (not IsSpellOnCD("Arcane Shot")) and not IsSpellOnCD("Aimed Shot") and PlayerMana() >= self.arcaneShotMana and (not HasSpell("Aimed Shot") or not self.useAimedShot) then
 						if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) then
 							local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Arcane Shot");
 							if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
@@ -911,7 +926,7 @@ function script_hunter:run(targetGUID)
 					end
 
 -- aimed Shot
-					if self.useAimedShot and not IsMoving() and HasSpell("Aimed Shot") and not IsSpellOnCD("Aimed Shot") and PlayerMana() >= self.arcaneShotMana and targetHealth >= 15 then
+					if self.useAimedShot and not IsMoving() and HasSpell("Aimed Shot") and not IsSpellOnCD("Aimed Shot") and not IsSpellOnCD("Arcane Shot") and PlayerMana() >= self.arcaneShotMana and targetHealth >= 15 then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Aimed Shot");
 						if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
 							if not CastSpellByName("Aimed Shot") then
@@ -939,7 +954,7 @@ function script_hunter:run(targetGUID)
 						if (script_hunter.hasPet) and (petHP <= self.mendPetHealth) and (petHP > 0) then	
 
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
-							if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
+							if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20 then
 
 								if (GetPet():GetDistance() > 20) then
 									if GetTimeEX() > self.petFollowTimer and GetTimeEX() >= self.petAttackTimer then
@@ -950,9 +965,10 @@ function script_hunter:run(targetGUID)
 								elseif (GetPet():GetDistance() < 20) then
 									if (script_hunter.hasPet) and (petHP <= self.mendPetHealth) and (petHP > 0) then
 										script_hunter.message = "Pet has lower than 50% HP, mending pet...";	
-										CastSpellByName('Mend Pet');
-										script_hunter.waitTimer = GetTimeEX() + 1850; 
-										return true;
+										if CastSpellByName('Mend Pet') then
+											script_hunter.waitTimer = GetTimeEX() + 1850; 
+											return true;
+										end
 									end
 								end
 							end
@@ -962,61 +978,63 @@ function script_hunter:run(targetGUID)
 			end
 -- melee attacks otherwise
 
-			if (targetObj:GetDistance() < self.minSpellRange) then
+			if targetObj ~= nil and targetObj ~= 0 and (targetObj:GetDistance() < self.minSpellRange) then
 
-				if targetObj:GetDistance() > self.meleeDistance and targetObj:GetDistance() < self.minSpellRange and ( (( (script_grind:isTargetingMe(targetObj) and not targetObj:IsCasting()) or targetObj:IsStunned()) and GetTimeEX() >= self.petFollowTimer) or not IsInCombat() ) then
+				if IsInCombat() and targetObj:GetDistance() > self.meleeDistance and targetObj:GetDistance() < self.minSpellRange and ( (( (script_grind:isTargetingMe(targetObj) and not targetObj:IsCasting()) or targetObj:IsStunned()) and GetTimeEX() >= self.petFollowTimer) or not IsInCombat() ) then
 					return 3;
 				end
 
-				-- auto attack
-				if not IsAutoCasting("Attack") and GetTimeEX() > self.autoAttackTimer then
-					CastSpellByName("Attack");
-					self.autoAttackTimer = GetTimeEX() + 3000;
-				end
-
-				if GetPet() ~= 0 and GetPet() ~= nil and self.hasPet and script_grind:isTargetingMe(targetObj) and not targetObj:IsCasting() then
-					if ((targetObj:GetDistance() > self.meleeDistance and targetObj:GetDistance() < self.minSpellRange) or not targetObj:IsInLineOfSight()) and (GetTimeEX() >= self.petFollowTimer or not IsInCombat()) then
-						return 3;
+				if targetObj:GetDistance() <= self.meleeDistance then
+					-- auto attack
+					if not IsAutoCasting("Attack") and GetTimeEX() > self.autoAttackTimer and IsSpellOnCD("Disengage") then
+						CastSpellByName("Attack");
+						self.autoAttackTimer = GetTimeEX() + 10000;
 					end
-				end
 
--- cast raptor strike
-				if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (PlayerMana() > 10) 
-				and (targetObj:GetDistance() <= self.meleeDistance) and not IsCasting() and not IsChanneling() then
-				
-					if (not IsSpellOnCD("Raptor Strike")) then
-						if not CastSpellByName("Raptor Strike") then
-							if HasPet() then
-								if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
-									PetAttack();
-									self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
-								end
-							end
-							self.waitTimer = GetTimeEX() + 500;
+					if IsInCombat() and GetPet() ~= 0 and GetPet() ~= nil and self.hasPet and script_grind:isTargetingMe(targetObj) and not targetObj:IsCasting() then
+						if ((targetObj:GetDistance() > self.meleeDistance and targetObj:GetDistance() < self.minSpellRange) or not targetObj:IsInLineOfSight()) and (GetTimeEX() >= self.petFollowTimer or not IsInCombat()) then
+							return 3;
 						end
 					end
-				end
-					
--- check distance
-				if (targetObj:GetDistance() > self.meleeDistance) and (GetNumPartyMembers() == 0)
-				and (script_grind.isTargetingMe(targetObj) and not targetObj:IsCasting()) and GetTimeEX() >= self.petFollowTimer then
-					return 3;
-				end
 
--- cast wing clip
-				if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and not targetObj:HasDebuff("Wing Clip") and (PlayerMana() > 10) and (targetHealth < 35) then
-					CastSpellByName("Wing Clip");
-					self.waitTimer = GetTimeEX() + 500;
-				end
-
--- cast raptor strike
-				if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (PlayerMana() > 10)
-				and (targetObj:GetDistance() <= self.meleeDistance) then
+	-- cast raptor strike
+					if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (PlayerMana() > 10) 
+					and (targetObj:GetDistance() <= self.meleeDistance) and not IsCasting() and not IsChanneling() then
+				
+						if (not IsSpellOnCD("Raptor Strike")) then
+							if not CastSpellByName("Raptor Strike") then
+								if HasPet() and self.hasPet then
+									if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
+										PetAttack();
+										self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
+									end
+								end
+								self.waitTimer = GetTimeEX() + 500;
+							end
+						end
+					end
 					
-					if (not IsSpellOnCD("Raptor Strike")) then
+	-- check distance
+					if (targetObj:GetDistance() > self.meleeDistance) and (GetNumPartyMembers() == 0)
+					and (script_grind.isTargetingMe(targetObj) and not targetObj:IsCasting()) and GetTimeEX() >= self.petFollowTimer then
+						return 3;
+					end
+
+	-- cast wing clip
+					if (HasSpell("Wing Clip")) and (not IsSpellOnCD("Wing Clip")) and not targetObj:HasDebuff("Wing Clip") and (PlayerMana() > 10) and (targetHealth < 35) then
+						CastSpellByName("Wing Clip");
+						self.waitTimer = GetTimeEX() + 500;
+					end
+
+	-- cast raptor strike
+					if (HasSpell("Raptor Strike")) and (not IsSpellOnCD("Raptor Strike")) and (PlayerMana() > 10)
+					and (targetObj:GetDistance() <= self.meleeDistance) then
+					
+						if (not IsSpellOnCD("Raptor Strike")) then
 						
-						if not CastSpellByName("Raptor Strike") then
-							self.waitTimer = GetTimeEX() + 500;
+							if not CastSpellByName("Raptor Strike") then
+								self.waitTimer = GetTimeEX() + 500;
+							end
 						end
 					end
 				end

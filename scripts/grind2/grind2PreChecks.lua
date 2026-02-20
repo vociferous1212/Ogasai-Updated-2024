@@ -65,7 +65,7 @@ function grind2PreChecks:run()
 
 
 -- do loot if we can
-	if grind2.lootTargets and not grind2.bagsAreFull and not AreBagsFull() and not IsEating() and not IsDrinking() then
+	if grind2.lootTargets and not grind2.bagsAreFull and not AreBagsFull() and not IsEating() and not IsDrinking() and not IsCasting() and not IsChanneling() then
 		
 		-- fallback to loot targets - do loot
 		if IsLooting() and currentTime > grind2DoLoot.timer then
@@ -79,7 +79,8 @@ function grind2PreChecks:run()
 		end
 
 		-- do loot
-		if not IsAnyTargetTargetingPlayer() or not IsInCombat() then
+			-- not if player is being tareted and not player has enemy target - or player has an enemy target and it is not casting - or player is not in combat
+		if (not IsAnyTargetTargetingPlayer() and ((self.enemyTarget == nil and self.enemyTarget ~= 0) or (self.enemyTarget ~= nil and self.enemyTarget ~= 0 and not self.enemyTarget:IsCasting()))) or not IsInCombat() then
 	
 			if grind2DoLoot:run() then
 

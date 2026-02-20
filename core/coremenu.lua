@@ -26,6 +26,8 @@ function coremenu:draw()
 		include("core\\racialSpells.lua");
 		include("core\\instantCastSpells.lua");
 		include("core\\totemsList.lua");
+
+		include("core\\friendlyEnemiesList.lua");
 		-- Load DBs
 		include("scripts\\db\\vendorDB.lua");
 		include("scripts\\db\\hotspotDB.lua");

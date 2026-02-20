@@ -29,16 +29,24 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 -- hunter
 
 			-- set hunter combat script attack range
-			if level >= 20 and class == "HUNTER" then
+			if class == "HUNTER" then
 
-				-- hawk eye talent in marksmanship tree
-				if nameTalent == "Hawk Eye" then
-					if currRank == 1 then
-						script_hunter.spellRange = 37;
-					elseif currRank == 2 then
-						script_hunter.spellRange = 39;
-					elseif currRank == 3 then
-						script_hunter.spellRange = 41;
+				if level >= 10 then
+					-- set concussive shot to cast more often in combat if player has improved talents
+					if nameTalent == "Improved Concussive Shot" then
+						script_hunter.hasImprovedConsussiveShot = true;
+					end
+ 				end
+				if level >= 20 then
+					-- hawk eye talent in marksmanship tree
+					if nameTalent == "Hawk Eye" then
+						if currRank == 1 then
+							script_hunter.spellRange = 37;
+						elseif currRank == 2 then
+							script_hunter.spellRange = 39;
+						elseif currRank == 3 then
+							script_hunter.spellRange = 41;
+						end
 					end
 				end
 			end

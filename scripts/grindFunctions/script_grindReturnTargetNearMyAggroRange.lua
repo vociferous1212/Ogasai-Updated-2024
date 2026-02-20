@@ -15,7 +15,7 @@ function script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange()
 
 			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter()
 			and i:IsInLineOfSight() and not script_grindIsTargetAggroBlacklisted:isTargetAggroBlacklisted(i:GetGUID())
-			and not script_grind:isTargetHardBlacklisted(i:GetGUID())
+			and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and not friendlyEnemiesList:isEnemyNuetral(i)
 			
 			then
 
