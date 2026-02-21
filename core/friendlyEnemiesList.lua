@@ -2,21 +2,47 @@ friendlyEnemiesList = {
 
 }
 
+--[[
+
+	local a = GetTarget():GetUnitName();
+	local b = GetTarget():GetLevel();
+	local c = GetZoneText();
+
+	ToFile('		["'..a..'"] = true,				 -- '..b..' | '..c);
+
+--]]
+
 function friendlyEnemiesList:isEnemyNuetral(target)
 
 	--UnitReaction(player, unit) does not work for my purposes. it requires a target to be targeted.
 
 	nuetralEnemiesTable = {
 
-		-- ungoro
-		["Bloodpetal Trapper"] = true,
-		["Bloodpetal Flayer"] = true,
-		["Bloodpetal Trapper"] = true,
-		["Bloodpetal Thresher"] = true,
-		["Bloodpetal Lasher"] = true,
-
 		-- Starting zones (level 5-10)
+		["Mangy Duskbat"] = true,				 -- 4 | Tirisfal Glades
+		["Ragged Scavenger"] = true,			 -- 2 | Tirisfal Glades
+		["Plainstrider"] = true,				 -- 2 | Mulgore
+		["Mountain Cougar"] = true,				 -- 3 | Mulgore
+		["Mindless Zombie"] = true,				 -- 1 | Tirisfal Glades
+		["Wretched Zombie"] = true,				 -- 1 | Tirisfal Glades
+		["Duskbat"] = true,						 -- 1 | Tirisfal Glades
+		["Young Night Web Spider"] = true,		 -- 2 | Tirisfal Glades
+		["Young Scavenger"] = true,				 -- 1 | Tirisfal Glades
+		["Rattlecage Skeleton"] = true,			 -- 2 | Tirisfal Glades
+		["Young Thistle Boar"] = true,			 -- 2 | Teldrassil
+		["Young Nightsaber"] = true,			 -- 1 | Teldrassil
+		["Grell"] = true,						 -- 3 | Teldrassil
+		["Grellkin"] = true,					 -- 3 | Teldrassil
+		["Thistle Boar"] = true,				 -- 3 | Teldrassil
+		["Mangy Nightsaber"] = true,			 -- 2 | Teldrassil
+		["Ragged Young Wolf"] = true,			 -- 1 | Dun Morogh
+		["Ragged Timber Wolf"] = true,			 -- 2 | Dun Morogh
+		["Small Crag Boar"] = true,				 -- 3 | Dun Morogh
+		["Rockjaw Trogg"] = true,				 -- 2 | Dun Morogh
+		["Burly Rockjaw Trogg"] = true,			 -- 2 | Dun Morogh
 		["Crag Boar"] = true,                    -- 5 - 6 Dun Morogh
+		["Mottled Boar"] = true,				 -- 1 - 4 Durotar
+		["Scorpid Worker"] = true,				 -- 2 - 4 Durotar
 		["Stonetusk Boar"] = true,               -- 5 - 6 Elwynn Forest
 		["Strigid Owl"] = true,                  -- 5 - 6 Teldrassil
 		["Adult Plainstrider"] = true,           -- 6 - 7 Mulgore
@@ -100,6 +126,14 @@ function friendlyEnemiesList:isEnemyNuetral(target)
 		["Saltwater Snapjaw"] = true,            -- 49 - 50 The Hinterlands
 		["Ironbeak Hunter"] = true,              -- 50 - 51 Felwood
 		["Coralshell Tortoise"] = true,          -- 50 - 52 Azshara
+
+		-- 50 - 60
+		-- ungoro
+		["Bloodpetal Trapper"] = true,
+		["Bloodpetal Flayer"] = true,
+		["Bloodpetal Trapper"] = true,
+		["Bloodpetal Thresher"] = true,
+		["Bloodpetal Lasher"] = true,
 	
 	}
 

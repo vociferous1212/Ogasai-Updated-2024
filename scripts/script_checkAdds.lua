@@ -62,6 +62,7 @@ function script_checkAdds:avoidToAggro(safeMargin)
 					and currentObj:IsInLineOfSight()
 					and currentObj:GetHealthPercentage() >= 99
 					and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+					and not currentObj:IsTapped()
 
 				then
 					local dist = currentObj:GetDistance()
@@ -169,6 +170,7 @@ function script_checkAdds:aggroIntersect(target)
 					and currentObj:IsInLineOfSight()
 					and currentObj:GetHealthPercentage() >= 99
 					and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+					and not currentObj:IsTapped()
 
 
 				then
@@ -207,6 +209,8 @@ function script_checkAdds:moveWhileResting(safeMargin)
 					and (not currentObj:HasDebuff("Fear"))
 					and currentObj:IsInLineOfSight()
 					and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+					and not currentObj:IsTapped()
+
 				then
 					local dist = currentObj:GetDistance()
 					if dist <= (addsRange + 10) and dist < closestDist then

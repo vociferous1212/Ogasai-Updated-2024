@@ -126,9 +126,31 @@ function script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 			if level >= 20 and class == "PRIEST" then
 			
 				if nameTalent == "Shadow Reach" then
-					script_priest.spellRange = script_priest.spellRange;
+					if currRank == 1 then
+						script_priest.spellRange = 31;
+					elseif currRank == 2 then
+						script_priest.spellRange = 33;
+					elseif currRank == 3 then
+						script_priest.spellRange = 35;
+					end
+				end
+
+				if nameTalent == "Improved Mind Blast" then
+					if currRank == 1 then
+						script_priest.mindBlastCooldownTime = 7500;
+					elseif currRank == 2 then
+						script_priest.mindBlastCooldownTime = 7000;
+					elseif currRank == 3 then
+						script_priest.mindBlastCooldownTime = 6500;
+					elseif currRank == 4 then
+						script_priest.mindBlastCooldownTime = 6000;
+					elseif currRank == 5 then
+						script_priest.mindBlastCooldownTime = 5500;
+					end
 				end
 			end
+
+
 
 -- shaman
 

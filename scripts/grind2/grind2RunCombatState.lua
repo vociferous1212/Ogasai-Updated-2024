@@ -192,6 +192,12 @@ function grind2RunCombatState:run()
 				end
 			end
 
+			if grind2.enemyTarget ~= nil then
+				if grind2.enemyTarget:IsDead() then
+					grind2:clearTarget();
+				end
+			end
+
 			if not enemyTarget:IsDead() and enemyTarget:CanAttack() then
 				-- TEMPORARY run old combat error
 				script_grind.combatError = RunCombatScript(enemyTarget:GetGUID());

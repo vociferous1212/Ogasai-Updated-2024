@@ -5,28 +5,36 @@ script_hunterPreCombatState = {
 function script_hunterPreCombatState:run(targetObj)
 
 	if (not IsStanding()) then 
+
 		JumpOrAscendStart();
 	end
 
 	if IsMounted() then
+
 		script_helper:mountUp();
 	end
 
 	if script_hunter.waitTimer > GetTimeEX() or ( (IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast()) then
+
 		return;
 	end
 
 	if script_hunter.hasPet and HasPet() and not IsMoving() and not targetObj:IsDead() and targetObj:CanAttack() then
+
 		if GetTimeEX() > script_hunter.petAttackTimer then
+
 			PetAttack();
+
 			script_hunter.petAttackTimer = GetTimeEX() + 1000;
 		end
 	end
 
 	-- use Hunter's Mark
-	if not IsSpellOnCD("Hunter's Mark") and (not IsInCombat()) and (script_hunter.useMark) and (PlayerMana() >= script_hunter.useMarkMana) and (not targetObj:HasDebuff("Hunter's Mark")) and (IsStanding()) then
-		if (GetLocalPlayer():GetUnitsTarget() ~= 0) and (targetObj:CanAttack()) and (not targetObj:IsDead()) and (HasSpell("Hunter's Mark")) then
+	if PlayerHasTarget() and HasSpell("Hunter's Mark") and not IsSpellOnCD("Hunter's Mark") and not IsInCombat() and script_hunter.useMark then
+		if not targetObj:HasDebuff("Hunter's Mark") and PlayerMana() >= script_hunter.useMarkMana then
+
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Hunter's Mark");
+
 			if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 5) then
 				if not CastSpellByName("Hunter's Mark") then
 					if GetTimeEX() > script_hunter.petAttackTimer then
@@ -73,7 +81,7 @@ function script_hunterPreCombatState:run(targetObj)
 	-- auto shot
 	if (not IsAutoCasting("Auto Shot")) and (targetObj:IsInLineOfSight())
 	and (IsStanding()) and (targetObj:GetDistance() > script_hunter.minSpellRange)
-	and not targetObj:IsDead() and not IsMoving() then
+	and not targetObj:IsDead() and not IsMoving() and script_hunter.useRangedAttacks then
 		
 		if CastSpellByName("Auto Shot", targetObj) then 
 

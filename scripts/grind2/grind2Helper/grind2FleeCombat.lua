@@ -48,7 +48,7 @@ function grind2FleeCombat:run()
 		targetHealth = grind2.enemyTarget:GetHealthPercentage();
 	end
 
-	if GetTimeEX() > grind2.potionTimer then
+	if GetTimeEX() > grind2Potions.potionTimer then
 		grind2Potions:useHealthPotion();
 	end
 

@@ -36,14 +36,17 @@ function grind2SafePull:targetHasAdds(target)
 			-- acceptable targets
 			if (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - self.safePullLevel) and (not i:IsCasting()) then
 
-				-- i position
-				cx, cy, cz = i:GetPosition();
+				if not friendlyEnemiesList:isEnemyNuetral(i) then
 
-				-- acceptable range
-				if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) then	
+					-- i position
+					cx, cy, cz = i:GetPosition();
 
-					-- accpetable targets in range
-					countUnitsInRange = countUnitsInRange + 1;
+					-- acceptable range
+					if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) then	
+
+						-- accpetable targets in range
+						countUnitsInRange = countUnitsInRange + 1;
+					end
 				end
 			end
 		end

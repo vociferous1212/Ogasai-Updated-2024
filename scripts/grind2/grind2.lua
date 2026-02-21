@@ -99,6 +99,8 @@ end
 
 -- rest function
 function grind2:rest()
+	
+	local currentTime = GetTimeEX();
 
 	-- check setup
 	if not self.isSetup then
@@ -120,6 +122,15 @@ function grind2:rest()
 	if (RunRestScript()) then
 
 		self.message = "Resting...";
+
+		-- player has no drinks and mana is lower than drink mana, reset variables so we don't blacklist targets and loot while standing and waiting around
+		if IsStanding() and not IsInCombat() and not IsDrinking() and not IsEating() and not IsMoving() then
+			if (PlayerMana() < grind2.restMana or PlayerHealth() < grind2.restHealth) then
+				grind2DoLoot.blacklistLootTimer = currentTime + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
+				grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
+				grind2RunCombatState.blacklistTargetTimer2 = currentTime * 2;
+			end
+		end
 
 		-- drink water
 		if not IsDrinking() and PlayerMana() <= grind2.restMana and not IsMoving() and not IsCasting() and not IsChanneling() then
@@ -352,7 +363,7 @@ function grind2:run()
 		return;
 	end
 
-	-- shadowmeld if we have it after feign death and wait for cooldown
+-- shadowmeld if we have it after feign death and wait for cooldown
 	if IsSpellOnCD("Feign Death") and Player():HasBuff("Feign Death") and HasPet() and not GetPet():IsDead() and IsInCombat() then
 		if not IsInCombat() then
 			if HasSpell("Shadowmeld") and not IsSpellOnCD("Shadowmeld") then
@@ -362,7 +373,7 @@ function grind2:run()
 	return;
 	end
 
-	-- return for feign death if pet is not dead...
+-- return for feign death if pet is not dead...
 	if Player():HasBuff("Feign Death") or (Player():HasBuff("Shadowmeld") and IsSpellOnCD("Feign Death")) and HasPet() then
 		if IsAnyTargetTargetingPet() then
 			return;
@@ -370,6 +381,11 @@ function grind2:run()
 	end
 
 
+--[[
+
+
+--]]
+		
 -- return if paused or for any reason - return for any reason
 	if grind2.timer > currentTime or grind2.pause or ( (IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast()) then
 
@@ -481,22 +497,7 @@ function grind2:run()
 	-- clear dead targets reset enemy target variable
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 		if grind2.enemyTarget:IsDead() then
-			-- + 1 to target killed
-			grind2.numberOfKills = grind2.numberOfKills + 1;
-			-- save coordinates to run out of combat and nav
-			grind2SaveCoordinates:saveTargetsLocation(grind2.enemyTarget);
-			-- reset grind enemy target
-			grind2.enemyTarget = nil;
-			-- reset grind last target
-			grind2.lastTargetTargeted = nil;
-			-- reset original grinder target - using old combat scripts
-			script_grind.enemyObj = nil;
-			-- send message
-			grind2.grinderMessage = "Clearing dead/tapped target";
-			-- reset new target timer
-			grind2.obtainNewTargetTimer = currentTime;
-			-- set timer
-			grind2:setTimer(grind2AdjustTimersMenu.waitAfterTargetKilledTimer);
+			grind2:clearTarget();
 		return true;
 		end
 	end
@@ -532,8 +533,8 @@ function grind2:run()
 --]]
 
 -- assign a target
-	if (not IsCasting() and not IsChanneling()) and not instantCastSpells:isSpellInstantCast() then
-		if not IsEating() and not IsDrinking() and not IsLooting() and currentTime > self.obtainNewTargetTimer then
+	if (not IsCasting() and not IsChanneling()) and not instantCastSpells:isSpellInstantCast() and self.obtainNewTargetTimer ~= nil then
+		if not IsEating() and not IsDrinking() and not IsLooting() and GetTimeEX() > self.obtainNewTargetTimer then
 			if grind2HotSpot.hotSpotReached or IsInCombat() then 
 
 				-- assign the target
@@ -636,7 +637,46 @@ function grind2:run()
 	
 			-- run the combat scripts
 			grind2RunCombatState:run();
+
+			-- don't run timer if player is moving...
+			-- only if we have a valid enemy target
+			if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
+				-- not if we are moving... but make sure we have a target first and are actually in combat
+				if (IsInCombat() and PlayerHasTarget() and not IsMoving())
+				-- not if we need to move...
+				or (self.enemyTarget:GetDistance() < self.combatScriptRange and self.enemyTarget:IsInLineOfSight()) then
+					grind2.timer = GetTimeEX() + grind2AdjustTimersMenu.combatScriptTimer;
+				end
+			end
 		end
 	end
 --return;
+end
+
+function grind2:clearTarget()
+
+	-- + 1 to target killed
+	grind2.numberOfKills = grind2.numberOfKills + 1;
+
+	-- save coordinates to run out of combat and nav
+	grind2SaveCoordinates:saveTargetsLocation(grind2.enemyTarget);
+
+	-- reset grind enemy target
+	grind2.enemyTarget = nil;
+
+	-- reset grind last target
+	grind2.lastTargetTargeted = nil;
+
+	-- reset original grinder target - using old combat scripts
+	script_grind.enemyObj = nil;
+
+	-- send message
+	grind2.grinderMessage = "Clearing dead/tapped target";
+
+	-- reset new target timer
+	grind2.obtainNewTargetTimer = currentTime;
+
+	-- set timer
+	grind2:setTimer(grind2AdjustTimersMenu.waitAfterTargetKilledTimer);
+
 end

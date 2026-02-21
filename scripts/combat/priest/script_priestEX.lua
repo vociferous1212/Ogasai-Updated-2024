@@ -34,8 +34,8 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	end
 
 -- return false for any reason
-	if IsCasting() or IsChanneling() or self.waitTimer > GetTimeEX() or IsMoving() or Player():IsStunned() then
-		return false;
+	if ((IsCasting() or IsChanneling()) and not instantCastSpells:isSpellInstantCast()) or self.waitTimer > GetTimeEX() or IsMoving() or Player():IsStunned() or Player():IsConfused() or Player():IsFleeing() then
+		return;
 	end
 
 	-- dismount before combat
@@ -82,9 +82,10 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	
 		-- Buff Inner Fire
 		if (not IsInCombat()) and (not Player():HasBuff("Inner Fire")) and (HasSpell("Inner Fire")) and (PlayerMana() >= 8)  and not IsSpellOnCD("Inner Fire") then
-			Buff("Inner Fire", Player());
-			self.waitTimer = GetTimeEX() + 1250;
-			return true; -- keep trying until cast
+			if not Buff("Inner Fire", Player()) then
+				self.waitTimer = GetTimeEX() + 550;
+				return true; -- keep trying until cast
+			end
 		end
 	
 		-- Buff Fortitude
@@ -106,6 +107,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 			end
 		end
 	
+		--[[
 		-- Cast Shield Power Word: Shield
 		if (PlayerMana() >= 10) and (PlayerHealth() <= script_priest.shieldHP) and (not Player():HasDebuff("Weakened Soul")) and (IsInCombat()) and (HasSpell("Power Word: Shield")) and not IsSpellOnCD("Power Word: Shield") then
 			if ( (not PlayerHasTarget()) or (PlayerHasTarget() and script_grind.enemyObj ~= 0 and script_grind.enemyObj ~= nil and script_grind.enemyObj:GetHealthPercentage() >= 20) ) then
@@ -118,6 +120,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 				end
 			end
 		end
+		--]]
 
 		-- Cast Renew
 		if (not script_priest.shadowForm) then	-- if not in shadowform
@@ -187,10 +190,11 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 	
 		--Check Disease Debuffs -- cure disease
 		if (script_checkDebuffs:hasDisease()) then
-			if (PlayerMana() > 20) and (HasSpell("Cure Disease")) then
-				CastSpellByName("Cure Disease", Player());
-				self.waitTimer = GetTimeEX() + 1750;
-				return true;
+			if (PlayerMana() > 20) and (HasSpell("Cure Disease")) and not IsSpellOnCD("Cure Disease") then
+				if not CastSpellByName("Cure Disease", Player()) then
+					self.waitTimer = GetTimeEX() + 550;
+					return true;
+				end
 			end
 		end
 
@@ -219,9 +223,13 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 					if IsAutoCasting("Shoot") then
 						SpellStopCasting();
 					end
-					CastSpellByName("Mind Blast", targetObj);
-					self.waitTimer = GetTimeEX() + 1550;
-					return true;
+					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mind Blast");
+					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
+						if not CastSpellByName("Mind Blast", targetObj) then
+							self.waitTimer = GetTimeEX() + 550;
+							return true;
+						end
+					end
 				end
 			end
 		end

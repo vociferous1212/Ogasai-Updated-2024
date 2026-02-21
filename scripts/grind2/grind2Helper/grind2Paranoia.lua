@@ -81,7 +81,7 @@ function grind2Paranoia:checkAndDoParanoia()
 		end
 	else
 
-		if not grind2Menu.adjustScriptSpeed then
+		if not grind2Menu.adjustScriptSpeed and not grind2Menu.scriptSpeedWasAdjusted then
 
 			grind2Paranoia:setSpeedFast();
 		end
@@ -143,7 +143,7 @@ function grind2Paranoia:setSpeedNormal()
 
 	grind2AdjustTimersMenu.restTimer = 2250;
 
-	grind2AdjustTimersMenu.combatScriptTimer = 200;
+	grind2AdjustTimersMenu.combatScriptTimer = 350;
 
 	grind2.scriptSpeed = 250;
 
@@ -160,7 +160,7 @@ function grind2Paranoia:setSpeedFast()
 
 	grind2AdjustTimersMenu.restTimer = 1550;
 
-	grind2AdjustTimersMenu.combatScriptTimer = 150;
+	grind2AdjustTimersMenu.combatScriptTimer = 50;
 
 	grind2.scriptSpeed = 100;
 
@@ -176,7 +176,7 @@ function grind2Paranoia:setSpeedSlow()
 
 	grind2AdjustTimersMenu.restTimer = 3000;
 
-	grind2AdjustTimersMenu.combatScriptTimer = 450;
+	grind2AdjustTimersMenu.combatScriptTimer = 750;
 
 	grind2.scriptSpeed = 750;
 

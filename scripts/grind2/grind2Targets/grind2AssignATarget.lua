@@ -82,18 +82,17 @@ function grind2AssignATarget:run()
 								bestHealth = health;
 							end
 
-							if mana > 1 then
+							if mana >= 10 then
 							
 								if bestMana > mana then
 
 									bestMana = mana;
 
-									if bestMana <= mana then
+									if bestMana < mana then
 
 										bestTarget = i;
 
 										bestmana = mana;
-										return i;
 									end
 								end
 							end
@@ -119,6 +118,7 @@ function grind2AssignATarget:run()
 		end
 	end
 
+-- fiind best target by distance if it's in range of hotpost and a valid target
 	while i ~= 0 do
 
 		if t == 3 then
@@ -164,6 +164,28 @@ function grind2AssignATarget:run()
 
 		end
 	i, t = GetNextObject(i);
+	end
+
+-- return any target attacking me if all conditions fail
+	if IsInCombat() and bestTarget == nil then
+
+		local i, t = GetFirstObject();
+
+		while i ~= 0 do
+
+			if t == 3 then
+
+				-- target is attacking me, pet, or group then return the target
+				if i:GetDistance() < 75 and i:CanAttack() and not i:IsDead() then
+				
+					if grind2IsTargetingGroup:target(i) or grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or (i:IsCasting() and i:IsTappedByMe()) then
+
+						bestTarget = i;
+					end
+				end
+			end
+		i, t = GetNextObject(i);
+		end
 	end
 
 return bestTarget;

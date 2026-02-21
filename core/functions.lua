@@ -505,3 +505,17 @@ function CurrentTargetsMana(target)
 
 return 0;
 end
+
+function GetSpellCost(spell)
+
+	local tempCost = 0;
+
+	local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo(spell);
+
+	if cost ~= nil and cost ~= 0 then
+
+		tempCost = cost;
+	end
+
+return tempCost;	
+end

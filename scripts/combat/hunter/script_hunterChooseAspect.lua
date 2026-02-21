@@ -49,7 +49,7 @@ function script_hunterChooseAspect:chooseAspect(targetObj)
 	end
 
 -- use aspect of the mokney
-	if (hasMonkey) and (localObj:GetLevel() < 10) and not IsSpellOnCD("Aspect of the Monkey") then 
+	if (hasMonkey) and (localObj:GetLevel() < 10 or (not script_hunter.useRangedAttacks and PlayerHasTarget() and targetObj:GetDistance() <= 37)) and not IsSpellOnCD("Aspect of the Monkey") then 
 
 		if (not localObj:HasBuff('Aspect of the Monkey')) then  
 
@@ -82,7 +82,7 @@ function script_hunterChooseAspect:chooseAspect(targetObj)
 -- use aspect of the hawk
 	if not IsMounted() and (targetObj ~= 0) and (targetObj ~= nil) and not IsSpellOnCD("Aspect of the Hawk") then
 
-		if (hasHawk) and (targetObj:GetDistance() <= 37) and targetObj:GetDistance() >= 12 and (not targetObj:IsDead()) and (targetObj:CanAttack()) then 
+		if (hasHawk) and (targetObj:GetDistance() <= 37 and script_hunter.useRangedAttacks) and targetObj:GetDistance() >= 12 and (not targetObj:IsDead()) and (targetObj:CanAttack()) then 
 
 			if (not localObj:HasBuff('Aspect of the Hawk')) then 
 

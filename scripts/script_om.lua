@@ -27,6 +27,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:HasDebuff("Fear"))
 			and currentObj:GetHealthPercentage() >= 99
 			and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+			and not currentObj:IsTapped()
 
 
 		then
@@ -49,6 +50,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 				and (not currentObj:HasDebuff("Fear"))
 				and currentObj:GetHealthPercentage() >= 99
 				and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+				and not currentObj:IsTapped()
 
 			then
 	
@@ -81,6 +83,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:HasDebuff("Fear"))
 			and currentObj:GetHealthPercentage() >= 99
 			and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+			and not currentObj:IsTapped()
 
 		then
 				script_checkAdds.closestEnemy = currentObj;
@@ -103,6 +106,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 				and (not currentObj:HasDebuff("Fear"))
 				and currentObj:GetHealthPercentage() >= 99
 				and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+				and not currentObj:IsTapped()
 
 			then
 
@@ -143,6 +147,7 @@ if (script_grind.enemyObj ~= nil and script_grind.enemyObj ~= 0) then
 			and (not currentObj:HasDebuff("Fear"))
 			and currentObj:GetHealthPercentage() >= 99
 			and not friendlyEnemiesList:isEnemyNuetral(currentObj)
+			and not currentObj:IsTapped()
 
 		then		
 				script_checkAdds.closestEnemy = currentObj;

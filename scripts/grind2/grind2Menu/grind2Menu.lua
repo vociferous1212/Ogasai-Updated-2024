@@ -4,6 +4,8 @@ grind2Menu = {
 
 	adjustScriptSpeed = false,
 
+	scriptSpeedWasAdjusted = false,
+
 	useFurbolgForm = false,
 
 	lastCastingID = 0,	-- debug
@@ -263,50 +265,11 @@ function grind2Menu:run()
 -- Separator
 	Text("________________________________________________________________________________________________________________________________________________________________________")
 	
--- show current script speed
-	if not self.adjustScriptSpeed then
-		local speed = "";
-		if grind2.scriptSpeed == 250 then
-			speed = "Normal";
-		elseif grind2.scriptSpeed == 100 then
-			speed = " Fast";
-		elseif grind2.scriptSpeed == 750 then
-			speed = "Slow";
-		end
-
-		Text("Paranoia - Current Script Speed == "..speed);
-	end
-
--- show paranoia texts
-	if grind2.useParanoia and not grind2.pause then
-		if grind2Paranoia.paranoidTargetGUID ~= nil and grind2Paranoia.paranoidTargetGUID ~= 0 then
-			if grind2Paranoia.paranoidTargetName ~= nil then
-				if grind2Paranoia.paranoidTargetDistance ~= nil and grind2Paranoia.paranoidTargetDistance ~= 0 then
-					-- for some reason bot is randomly closing when trying to display this data?
-					local name = grind2Paranoia.paranoidTargetName;
-					local distance = grind2Paranoia.paranoidTargetDistance;
-					Text("Player in range - "..name.." | "..math.floor(distance).." (yd)");
-					Text("Timer - "..math.floor((GetTimeEX() - grind2Paranoia.paranoidTime) + grind2Paranoia.paranoidSetTime) / 1000);
-				end
-			end
-		end
-	end
-
--- adjust script speed
-	wasClicked, self.adjustScriptSpeed = Checkbox("Adjust Bot Speed / Reaction Time", self.adjustScriptSpeed);
-
-	if self.adjustScriptSpeed then
-
-		Text("Grind script speed (miliseconds) - How fast the bot reacts");
-
-		Text("Normal human speed is 250ms between actions")
-
-		grind2.scriptSpeed = SliderInt(" (ms) Script Speed", 0, 1000, grind2.scriptSpeed);
 
 -- adjust timers menu
-		grind2AdjustTimersMenu:run()
+	grind2AdjustTimersMenu:run()
 
-	end
+
 
 -- end of main menu function
 end

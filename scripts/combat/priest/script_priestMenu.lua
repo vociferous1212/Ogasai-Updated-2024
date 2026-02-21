@@ -44,7 +44,7 @@ function script_priestMenu:menu()
 			-- hide spell if not obtained yet
 			if (HasSpell("Mind Blast")) then
 				Text('Mind Blast above Self mana percent');
-				script_priest.mindBlastMana = SliderInt("MBM%", 10, 100, script_priest.mindBlastMana);
+				script_priest.mindBlastMana = SliderInt("MBM%", 0, 100, script_priest.mindBlastMana);
 			end
 
 			Separator();
@@ -55,7 +55,7 @@ function script_priestMenu:menu()
 				Text("Shadow Word: Pain above mana percent");
 				SameLine();
 				wasClicked, script_priest.useDOTOnAdds = Checkbox("DOT Adds", script_priest.useDOTOnAdds);
-				script_priest.swpMana = SliderInt("SPM", 10, 100, script_priest.swpMana)
+				script_priest.swpMana = SliderInt("SPM", 0, 100, script_priest.swpMana)
 			end
 
 			Separator();
@@ -135,11 +135,6 @@ function script_priestMenu:menu()
 			-- hide spell if not obtained yet
 			if (HasSpell("Renew")) then
 				script_priest.renewHP = SliderInt("Renew HP%", 1, 99, script_priest.renewHP);	
-			end
-
-			-- hide spell if not obtained yet
-			if (HasSpell("Power Word: Shield")) then
-				script_priest.shieldHP = SliderInt("Shield HP%", 1, 99, script_priest.shieldHP);
 			end
 
 			-- hide spell if not obtained yet

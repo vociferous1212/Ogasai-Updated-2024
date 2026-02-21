@@ -75,55 +75,56 @@ function grind2DrawAggroCircles:run(maxRange)
 	while i ~= 0 do
 		
 		-- acceptable targets
-		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() ~= 1 and i:GetLevel() > GetLocalPlayer():GetLevel() - 20 then
+		if t == 3 and i:GetDistance() < maxRange and not i:IsDead() and i:CanAttack() and not i:IsCritter() and i:GetLevel() > GetLocalPlayer():GetLevel() - 30 then
 
-			-- set conditions
-			local aggro = i:GetLevel() - localObj:GetLevel() + 17.8;
+			if not friendlyEnemiesList:isEnemyNuetral(i) or (PlayerHasTarget() and GetTarget():GetGUID() == i:GetGUID()) then
+				-- set conditions
+				local aggro = i:GetLevel() - localObj:GetLevel() + 17.8;
 
-			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
-				aggro = i:GetLevel() - localObj:GetLevel() + 19.5;
-			end
-
-			local cx, cy, cz = i:GetPosition();
-
-			local px, py, pz = localObj:GetPosition();
-
-			-- player circle
-			--grind2DrawAggroCircles:DrawCircles(px, py, pz-.8, .5, 0, 255, 0);
-
-
-			-- yellow - run draw circles based on target - not targeting me or I am targeting it
-			if i:GetUnitsTarget() == 0 or i:GetUnitsTarget() == nil then
-
-				if i:IsInLineOfSight() then
-					grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 255, 0);
-				else
-					grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 255);
+				if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
+					aggro = i:GetLevel() - localObj:GetLevel() + 19.5;
 				end
-				-- draw elite circles
-				--if i:GetClassification() == 1 or i:GetClassification() == 2 then
+
+				local cx, cy, cz = i:GetPosition();
+
+				local px, py, pz = localObj:GetPosition();
+
+				-- player circle
+				--grind2DrawAggroCircles:DrawCircles(px, py, pz-.8, .5, 0, 255, 0);
+
+
+				-- yellow - run draw circles based on target - not targeting me or I am targeting it
+				if i:GetUnitsTarget() == 0 or i:GetUnitsTarget() == nil then
+
+					if i:IsInLineOfSight() then
+						grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 255, 0);
+					else
+						grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 255);
+					end
+					-- draw elite circles
+					--if i:GetClassification() == 1 or i:GetClassification() == 2 then
 			
-			end
-
-			-- red - run draw circles on target - target is targeting me
-			if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
-
-				if grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or grind2IsTargetingGroup:target(i) then
-
-					grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 0);
 				end
-			end
 
-			-- red - run draw circles if tapped by me or I am targeting it
-			if (i:IsTapped() and i:IsTappedByMe()) or (PlayerHasTarget() and i:GetGUID() == GetLocalPlayer():GetUnitsTarget():GetGUID()) then
+				-- red - run draw circles on target - target is targeting me
+				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
+
+					if grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or grind2IsTargetingGroup:target(i) then
+
+						grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 0);
+					end
+				end
+
+				-- red - run draw circles if tapped by me or I am targeting it
+				if (i:IsTapped() and i:IsTappedByMe()) or (PlayerHasTarget() and i:GetGUID() == GetLocalPlayer():GetUnitsTarget():GetGUID()) then
 				
-				if i:IsInLineOfSight() then
-					grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 0);
-				else
-					grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 0, 150, 255);
+					if i:IsInLineOfSight() then
+						grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 255, 0, 0);
+					else
+						grind2DrawAggroCircles:DrawCircles(cx, cy, cz, aggro, 0, 150, 255);
+					end
 				end
 			end
-
 		end
 
 		-- get next target
