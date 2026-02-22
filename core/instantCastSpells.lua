@@ -1,15 +1,6 @@
 ﻿instantCastSpells = {
 
-
-}
-
-
--- get spell info API doesn't work this purpose.
-
--- the bot returns when casting, pausing for a moment
-function instantCastSpells:isSpellInstantCast()
-
-	local spellTable = {
+spellTable = {
 
 	-- items
 			[6405] = true,	-- dartol's rod of transformation (furbolg form)
@@ -1176,10 +1167,19 @@ function instantCastSpells:isSpellInstantCast()
 
 	}
 
-	if spellTable[Player():GetChanneling()] then
+
+}
+
+
+-- get spell info API doesn't work this purpose.
+
+-- the bot returns when casting, pausing for a moment
+function instantCastSpells:isSpellInstantCast()
+
+	if self.spellTable[Player():GetChanneling()] then
 		return true;
 	end
-	if spellTable[Player():GetCasting()] then
+	if self.spellTable[Player():GetCasting()] then
 		return true;
 	end
 

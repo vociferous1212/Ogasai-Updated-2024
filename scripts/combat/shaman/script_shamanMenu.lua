@@ -14,6 +14,18 @@ function script_shamanMenu:menu()
 
 		wasClicked, script_shaman.stopIfMHBroken = Checkbox("Stop bot if main hand is broken (red)...", script_shaman.stopIfMHBroken);
 
+		if Button("Quick Grind - Use no drinks") then
+			DEFAULT_CHAT_FRAME:AddMessage("Drink mana set to 0. Menu set to only use Earth Shock and Totems for certain situations, | i.e. interrupts or fleeing targets.")
+			script_shaman.drinkMana = 0;
+			script_shaman.useEarthTotem = false;
+			script_shaman.useFireTotem = false;
+			script_shaman.useWaterTotem = false;
+			script_shaman.useAirTotem = false;
+			script_shaman.useFrostShock = false;
+			script_shaman.useFlameShock = false;
+			script_shaman.earthShockMana = 70;
+		end
+
 		-- melee distance
 		script_shaman.meleeDistance = SliderFloat("Melee range", 1, 6, script_shaman.meleeDistance);
 

@@ -75,6 +75,10 @@ function script_rogueSetup:setup()
 	if GetLocalPlayer():GetLevel() >= 10 then
 		script_grindCheckSpentTalentPoints:checkSpentTalentPoints()
 	end
+
+	if GetRealmName() == "Permadeath - EU" then
+		script_rogue.eatHealth = 70;
+	end
 	
 	script_rogue.isSetup = true;
 end

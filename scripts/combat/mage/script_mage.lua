@@ -123,13 +123,9 @@ function script_mage:runBackwards(targetObj, range)
 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
 		if (distance < range) then
 
-			-- check for adds 
-			if script_checkAdds:checkAdds() then
+			if (distance < range)  then
 
-				return 4;
-			else
-
-				script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
+				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
 
 				-- move fall-back
 				if not IsMoving() then
@@ -137,12 +133,14 @@ function script_mage:runBackwards(targetObj, range)
 					script_nav:resetNavigate();
 				end
 
-			
+				if script_checkAdds:checkAdds() then
+				end
 
-			self.waitTimer = GetTimeEX() + 500;
-			script_grind:setWaitTimer(100);
+				self.waitTimer = GetTimeEX() + 500;
+				script_grind:setWaitTimer(100);
 
 			return 4;
+			
 			end
 		end
 	end
@@ -362,7 +360,8 @@ function script_mage:run(targetGUID)
 	and (not targetObj:IsCasting()) then
 		if (script_checkAdds:checkAdds()) then
 			script_om:FORCEOM();
-			--return true;
+			self.waitTimer = GetTimeEX() + 750
+			return true;
 		end
 	end
 

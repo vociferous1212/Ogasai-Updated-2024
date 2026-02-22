@@ -55,6 +55,10 @@ function script_mageSetup:setup()
 	if (GetLocalPlayer():GetLevel() < 10) and (localObj:HasRangedWeapon()) then
 		script_mage.useWandHealth = 75;
 	end
+
+	if PlayerLevel() >= 10 and PlayerLevel() < 20 then
+		script_mage.useWandHealth = 35;
+	end
 	
 	-- set group settings mainly used for easy follower reloads
 	if (GetNumPartyMembers() > 1) then

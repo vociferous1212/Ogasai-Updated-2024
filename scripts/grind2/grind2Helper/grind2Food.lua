@@ -117,7 +117,7 @@ function grind2Food:eat()
 
 	for i = 0, self.numFood do
 
-		if HasItem(self.food[i]) and not IsEating() and not IsMoving() then
+		if HasItem(self.food[i]) and not IsEating() and not IsMoving() and not IsSpellOnCD("Eat") then
 
 			self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
 

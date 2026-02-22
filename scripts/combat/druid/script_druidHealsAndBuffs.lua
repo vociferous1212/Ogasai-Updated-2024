@@ -37,7 +37,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 
 	if (IsCasting()) or (IsChanneling()) then
 		script_druid.waitTimer = GetTimeEX() + 1000;
-		return false;
+		return;
 	end
 
 	if script_druid.waitTimer > GetTimeEX() then
@@ -87,6 +87,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 		end
 	end
 
+--[[
 -- return until nature's grasp is used
 	if localObj:HasBuff("Nature's Grasp") and IsInCombat() then
 		return false;
@@ -99,6 +100,8 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 		script_druid.naturesGraspTimer = GetTimeEX() + 60000;
 		return true;
 	end
+
+--]]
 
 	if not IsInCombat() and IsStanding() and
 		( (HasSpell("Omen of Clarity") and not localObj:HasBuff("Omen of Clarity")) or
@@ -129,16 +132,9 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 				StopMoving();
 				return true;
 			end
-			local time = 2250;
-			local rankHeal = "Rank 1";
-			if localObj:GetLevel() >= 24 then
-				rankHeal = "Rank 3";
-				time = 2750;
-			end
-			if CastSpellByName("Healing Touch("..rankHeal, localObj) then
-				script_druid.waitTimer = GetTimeEX() + time;
-				grind2:setTimer(time);
-				return true;
+			if not CastSpellByName("Healing Touch("..rankHeal, localObj) then
+				script_druid.waitTimer = GetTimeEX() + 500;
+				grind2:setTimer(2500);
 			end
 		end
 	end
@@ -169,11 +165,10 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 							return true;
 						end
 						script_druid.hasRegrowth = true;
-						if CastSpellByName("Regrowth", localObj) then
-							script_druid.waitTimer = GetTimeEX() + 3000
+						if not CastSpellByName("Regrowth", localObj) then
+							script_druid.waitTimer = GetTimeEX() + 500
 							script_grind:setWaitTimer(3000);
-							grind2:setTimer(3000);
-						return 4;
+							grind2:setTimer(500);
 						end
 					return 4;
 					end
@@ -310,11 +305,10 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 							return true;
 						end
 						script_druid.hasRegrowth = true;
-						if CastSpellByName("Regrowth", localObj) then
-							script_druid.waitTimer = GetTimeEX() + 3050
-							script_grind:setWaitTimer(3050);
-							grind2:setTimer(3050);
-							return 4;
+						if not CastSpellByName("Regrowth", localObj) then
+							script_druid.waitTimer = GetTimeEX() + 550
+							script_grind:setWaitTimer(350);
+							grind2:setTimer(500);
 						end
 						return 4;
 					end
@@ -401,9 +395,9 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 	and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted())
 	and (not script_checkDebuffs:hasSilence()) then
 		if (not IsCasting()) and (not IsChanneling()) then
-			CastSpellByName("Healing Touch", localObj);
-			script_druid.waitTimer = GetTimeEX() + 3000;
-			return true;
+			if not CastSpellByName("Healing Touch", localObj) then
+				script_druid.waitTimer = GetTimeEX() + 500;
+			end
 		end
 	end
 
@@ -417,7 +411,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 			end
 
 			if not CastSpellByName("Healing Touch", localObj) then
-				script_druid.waitTimer = GetTimeEX() + 3000;
+				script_druid.waitTimer = GetTimeEX() + 500;
 				script_grind:setWaitTimer(3000);
 				return true;
 			end

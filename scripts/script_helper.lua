@@ -344,7 +344,7 @@ end
 function script_helper:eat()
 	if self.eatTimer == 0 then self.eatTimer = GetTimeEX(); end
 	for i=0,self.numFood do
-		if (HasItem(self.food[i])) and not IsEating() and not IsMoving() and GetTimeEX() > self.eatTimer then
+		if (HasItem(self.food[i])) and not IsEating() and not IsMoving() and GetTimeEX() > self.eatTimer and not IsSpellOnCD("Eat") then
 			if (UseItem(self.food[i])) then
 				self.eatTimer = GetTimeEX() + 2000;
 				script_grind:setWaitTimer(2000);
@@ -359,7 +359,7 @@ end
 function script_helper:drinkWater()
 	if self.drinkTimer == 0 then self.drinkTimer = GetTimeEX(); end
 	for i=0,self.numWater do
-		if (HasItem(self.water[i])) and not IsDrinking() and not IsMoving() and GetTimeEX() > self.drinkTimer then
+		if (HasItem(self.water[i])) and not IsDrinking() and not IsMoving() and GetTimeEX() > self.drinkTimer and not IsSpellOnCD("Drink") then
 			if (UseItem(self.water[i])) then
 				self.drinkTimer = GetTimeEX() + 2000;
 				script_grind:setWaitTimer(2000);

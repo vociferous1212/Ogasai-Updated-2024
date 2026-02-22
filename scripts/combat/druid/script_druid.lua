@@ -285,6 +285,7 @@ function script_druid:run(targetGUID)
 	and (GetLocalPlayer():GetHealthPercentage() >= self.healthToShift - 10) then
 		if (script_checkAdds:checkAdds()) then
 			script_om:FORCEOM();
+			self.waitTimer = GetTimeEX() + 550;
 		return 4;
 		end
 	end
@@ -738,7 +739,7 @@ function script_druid:run(targetGUID)
 
 			-- Demoralizing Roar
 			if (HasSpell("Demoralizing Roar")) and (not targetObj:HasBuff("Demoralizing Roar")) and (PlayerRage() > 10) and (not targetObj:HasDebuff("Demoralizing Shout")) and (not IsSpellOnCD("Demoralizing Roar")) then
-				if script_grindNumEnemiesInRange.numEnemiesInRange(10) == 1 or script_grind.enemiesAttackingUs() >= 2 then
+				if script_grindNumEnemiesInRange:numEnemiesInRange(10) == 1 or NumberTargetsAttackingPlayer() >= 2 then
 					if (CastSpellByName("Demoralizing Roar")) then
 						return 0;
 					end

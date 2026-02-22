@@ -269,6 +269,7 @@ function script_hunter:run(targetGUID)
 			if script_checkAdds:checkAdds() then
 				-- keep rechecking for new add targets
 				script_om:FORCEOM();
+				self.waitTimer = GetTimeEX() + 550;
 			end
 		end
 	end

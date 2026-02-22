@@ -29,6 +29,11 @@ function grind2Paranoia:checkAndDoParanoia()
 		-- we have a target
 		if self.paranoidTarget ~= nil and self.paranoidTarget ~= 0 then
 
+			if script_buffOtherPlayers:doBuffs() then
+
+				return true;
+			end
+
 			if not self.paranoidTimerSet then
 
 				self.paranoidTime = currentTime;
@@ -61,6 +66,8 @@ function grind2Paranoia:checkAndDoParanoia()
 			
 				Logout();
 
+				self.paranoidTime = GetTimeEX() + self.paranoidSetTime;
+
 				StopBot();
 
 				return true;
@@ -68,7 +75,7 @@ function grind2Paranoia:checkAndDoParanoia()
 			end
 
 			-- someone around for too long, pause
-			if not IsInCombat() and not IsLooting() and currentTime > (self.paranoidSetTime * 1000 * 2) + self.paranoidTime then
+			if not IsInCombat() and not IsLooting() and currentTime > (self.paranoidSetTime * 3000) + self.paranoidTime then
 			
 				if HasSpell("Shadowmeld") and not IsSpellOnCD("Shadowmeld") and not Player():HasBuff("Shadowmeld") and not Player():HasBuff("Stealth") and not HasForm() then
 					if CastSpellByName("Shadowmeld") then
@@ -76,7 +83,13 @@ function grind2Paranoia:checkAndDoParanoia()
 					end
 				end
 
-				return true;
+				if HasSpell("Stealth") and not IsSpellOnCD("Stealth") and not Player():HasBuff("Stealth") then
+					if CastSpellByName("Stealth") then
+						return true;
+					end
+				end
+
+			return true;
 			end
 		end
 	else

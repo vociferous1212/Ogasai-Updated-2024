@@ -2,11 +2,22 @@ script_buffOtherPlayers = {
 
 	enableBuffs = true,
 
+	timer = GetTimeEX()
+
 }
 
 function script_buffOtherPlayers:doBuffs()
 
-	local i, t = GetFirstObject();
+	if self.timer > GetTimeEX() then
+
+		return false;
+	end
+
+	if grind2.useParanoia then
+
+		self.enableBuffs = true;
+	end
+
 	-- target levels that allow different rank buffs
 	local Sp = {1,2,14,26,38,50};
 
@@ -33,47 +44,54 @@ function script_buffOtherPlayers:doBuffs()
 	end
 
 	if not IsMounted() and not HasForm() then
-	while i ~= 0 do
-		if (i:GetDistance() <= 30) then
-			if t == 4 then
-				-- target doesn't have buff already and is within distance and is in line of sight
-				if (HasSpell(buff2)) and (i:GetDistance() < 28) and (not i:HasBuff(buff2))
-				and (not i:CanAttack()) and (i:IsInLineOfSight()) and (not i:IsDead())
-				and not i:HasBuff("Arcane Brilliance") and not i:HasBuff("Gift of the Wild") and not i:HasBuff("Prayer of Fortitude") then
+	
+		local i, t = GetFirstObject();
 
-					-- run the table to find the proper spell rank to use
-					for r=6, 1, -1 do 
-	
-						-- level is within spell range to use
-						if i:GetLevel() >= Sp[r] then
-	
-							-- needed to actually target the player... can be called from a different function though
-							name = i:GetUnitName();
-							TargetByName(name);
+		while i ~= 0 do
 
-							-- we have to target a target to check unit on taxi
-							if (PlayerHasTarget()) and (UnitOnTaxi("target"))  then
-								ClearTarget();
-							end
+			if (i:GetDistance() <= 30) then
+
+				if t == 4 then
+
+					-- target doesn't have buff already and is within distance and is in line of sight
+					if (HasSpell(buff2)) and (i:GetDistance() < 28) and (not i:HasBuff(buff2))
+					and (not i:CanAttack()) and (i:IsInLineOfSight()) and (not i:IsDead())
+					and not i:HasBuff("Arcane Brilliance") and not i:HasBuff("Gift of the Wild") and not i:HasBuff("Prayer of Fortitude") then
+
+						-- run the table to find the proper spell rank to use
+						for r=6, 1, -1 do 
 	
-							local myTarget = i;
+							-- level is within spell range to use
+							if i:GetLevel() >= Sp[r] then
 	
-							-- finish the missing syntax from above
-							local b = "), myTarget";
+								-- needed to actually target the player... can be called from a different function though
+								name = i:GetUnitName();
+								TargetByName(name);
+
+								-- we have to target a target to check unit on taxi
+								if (PlayerHasTarget()) and (UnitOnTaxi("target"))  then
+									ClearTarget();
+								end
 	
-							if (CastSpellByName(buff..r..b)) then
-								script_grind:setWaitTimer(1500);
-							--CastSpellByName("Power Word: Fortitude(Rank ", myTarget);
+								local myTarget = i;
 	
-							return true;
+								-- finish the missing syntax from above
+								local b = "), myTarget";
+	
+								if not (CastSpellByName(buff..r..b)) then
+									script_grind:setWaitTimer(1500);
+								--CastSpellByName("Power Word: Fortitude(Rank ", myTarget);
+									-- 5 min timer. 60 seconds * 5
+									self.timer = GetTimeEX() + 60000 * 5;
+								return true;
+								end
 							end
 						end
-					end
-				end		
+					end		
+				end
 			end
+		i, t = GetNextObject(i);
 		end
-	i, t = GetNextObject(i);
-	end
 	end
 return false;
 end

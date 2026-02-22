@@ -147,8 +147,9 @@ function script_rogue:run(targetGUID)
 	--end
 	
 	-- Run backwards if we are too close to the target
-	if (targetObj:GetDistance() <= .4) then 
-		if (script_rogue:runBackwards(targetObj, 1)) then 
+	if (targetObj:GetDistance() <= .8) then 
+		if (script_rogue:runBackwards(targetObj, 2)) then 
+			self.waitTimer = GetTimeEX() + 500;
 			script_grind.tickRate = 80;
 			return 4; 
 		end 
@@ -199,7 +200,7 @@ function script_rogue:run(targetGUID)
 			and (not script_checkDebuffs:hasDisabledMovement())
 			and (not targetObj:IsCasting()) then
 				if (script_checkAdds:checkAdds()) then
-				self.waitTimer = GetTimeEX() + 2500;
+				self.waitTimer = GetTimeEX() + 550;
 					script_om:FORCEOM();
 				return 4;
 				end

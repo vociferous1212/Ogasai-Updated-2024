@@ -362,6 +362,7 @@ function script_priest:run(targetGUID)
 		if (not IsCasting()) and (not IsChanneling()) and (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) then
 			if (script_checkAdds:checkAdds()) then
 				script_om:FORCEOM();
+				self.waitTimer = GetTimeEX() + 550;
 				return 4;
 			end
 		end
@@ -447,7 +448,7 @@ function script_priest:run(targetGUID)
 			-- also used before we have mind blast
 			if self.useSmite and (not HasSpell("Mind Blast")) and (targetObj:GetDistance() <= self.spellRange) and (not IsMoving()) and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 7 then
+				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not CastSpellByName("Smite", targetObj) then
 					self.waitTimer = GetTimeEX() + 500;
 					return 0;
@@ -504,7 +505,7 @@ function script_priest:run(targetGUID)
 			-- Use Smite and wand
 			elseif (self.useSmite) and (localMana >= self.useWandMana) and (targetHealth >= self.useWandHealth or (localMana >= 75 and not localObj:HasRangedWeapon())) and not IsMoving() and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 7 then
+				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not CastSpellByName("Smite", targetObj) then
 						self.waitTimer = GetTimeEX() + 500;
 						return 0; -- keep trying until cast
@@ -519,7 +520,7 @@ function script_priest:run(targetGUID)
 			-- Use Smite if we have it
 			elseif (self.useSmite) and not IsMoving() and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 7 then
+				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not (CastSpellByName("Smite", targetObj)) then
 						self.waitTimer = GetTimeEX() + 500;
 						return 0; -- keep trying until cast
@@ -682,7 +683,7 @@ function script_priest:run(targetGUID)
 					return true;
 				end
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 7 then
+				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not (CastSpellByName("Smite", targetObj)) then 
 						self.waitTimer = GetTimeEX() + 500;
 						return 0; -- keep trying until cast

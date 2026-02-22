@@ -29,7 +29,6 @@ script_grind = {
 	fpDBLoaded 		= include("scripts\\db\\fpDB.lua"),
 	goToFPLoaded 		= include("scripts\\getTrainerSpells\\script_goToFP.lua"),
 
-	prioritizeTotemsLoaded	= include("scripts\\script_killTotems.lua"),
 	combatHelperLoaded	= include("scripts\\script_combatHelper.lua"),
 
 	assignTargetFunctionLoaded = include("scripts\\script_grindAssignTarget.lua"), 
@@ -982,12 +981,6 @@ end
 			self.lastTarget = self.enemyObj:GetGUID();
 		end
 	end
-
--- prioritize totems
-	--if IsInCombat() and GetTimeEX() > self.checkTotemKillTimer then
-	--	script_killTotems:checkForTotems(10);
-	--	self.checkTotemKillTimer = GetTimeEX() + 5000;
-	--end
 	
 
 

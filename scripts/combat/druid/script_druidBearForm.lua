@@ -15,7 +15,7 @@ function script_druidBearForm:runInCombat(targetObj)
 	end
 
 -- Run backwards if we are too close to the target
-	if (targetObj:GetDistance() <= 0.8) then 
+	if (targetObj:GetDistance() <= 1) then 
 		if (script_druid:runBackwards(targetObj, 2)) then 
 			return 4;
 		end 
@@ -69,14 +69,14 @@ function script_druidBearForm:runInCombat(targetObj)
 	end
 
 -- Enrage
-	if IsBearForm() and (HasSpell("Enrage")) and (not IsSpellOnCD("Enrage")) and (targetObj:GetDistance() < 30) and (PlayerHealth() > 65) and (targetHealth >= 40) then
+	if IsBearForm() and (HasSpell("Enrage")) and (not IsSpellOnCD("Enrage")) and (targetObj:GetDistance() < 30) and (PlayerHealth() > 65) and (targetHealth >= 40)  then
 		if (CastSpellByName("Enrage")) then
 			return 0;
 		end
 	end
 
 -- demo Roar
-	if IsBearForm() and (HasSpell("Demoralizing Roar")) and not IsSpellOnCD("Demoralizing Roar") and (not targetObj:HasDebuff("Demoralizing Roar")) and (PlayerRage() >= 10) then
+	if IsBearForm() and (HasSpell("Demoralizing Roar")) and not IsSpellOnCD("Demoralizing Roar") and (not targetObj:HasDebuff("Demoralizing Roar")) and (PlayerRage() >= 10) and (script_grindNumEnemiesInRange:numEnemiesInRange(10) == 1 or NumberTargetsAttackingPlayer() >= 2) then
 		if (CastSpellByName("Demoralizing Roar")) then
 			return 0;
 		end

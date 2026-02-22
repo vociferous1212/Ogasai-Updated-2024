@@ -67,11 +67,12 @@ function script_paladinRest:rest()
 	end
 
 	-- Eat and Drink
-	if (not IsDrinking() and mana < script_paladin.drinkMana) and not IsSwimming() and not IsCasting() then
+	if (not IsDrinking() and mana < script_paladin.drinkMana) and not IsSwimming() and not IsCasting() and not IsSpellOnCD("Drink") and IsStanding() then
 
 		script_paladin.message = "Need to drink...";
 
 		script_paladin.waitTimer = GetTimeEX() + 2000;
+		grind2:setTimer(500);
 
 		-- Dismount
 		if IsMounted() then 
@@ -93,6 +94,7 @@ function script_paladinRest:rest()
 			script_paladin.message = "Drinking..."; 
 
 			script_paladin.waitTimer = GetTimeEX() + 2000;
+			grind2:setTimer(500);
 
 			return true; 
 		else 
@@ -105,7 +107,7 @@ function script_paladinRest:rest()
 		end
 	end
 
-	if not IsEating() and health < script_paladin.eatHealth and not IsSwimming() and not IsCasting() then
+	if not IsEating() and health < script_paladin.eatHealth and not IsSwimming() and not IsCasting() and not IsSpellOnCD("Eat") then
 
 		-- Dismount
 		if IsMounted() then
@@ -115,7 +117,8 @@ function script_paladinRest:rest()
 
 		script_paladin.message = "Need to eat...";
 
-		script_paladin.waitTimer = GetTimeEX() + 2000;	
+		script_paladin.waitTimer = GetTimeEX() + 2000;
+		grind2:setTimer(500);
 
 		if IsMoving() then
 
@@ -129,6 +132,7 @@ function script_paladinRest:rest()
 			script_paladin.message = "Eating...";
 			
 			script_paladin.waitTimer = GetTimeEX() + 2000;
+			grind2:setTimer(500);
 
 			return true; 
 		else 

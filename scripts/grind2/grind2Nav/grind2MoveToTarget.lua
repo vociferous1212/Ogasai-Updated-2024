@@ -82,7 +82,9 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	end              
 
 -- If the target moves more than 2 yard then make a new path
-	if GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 1
+	if (PlayerHasTarget() and GetTarget():IsFleeing() and IsInCombat() and GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 2.5)
+		
+		or (not IsInCombat() and GetDistance3D(_x, _y, _z, self.navPosition['x'], self.navPosition['y'], self.navPosition['z']) >= 1)
 		-- or node is out of bounds
 		or GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ + 1) >= 20
 		-- or distance from path node is greater than next node distance
@@ -139,6 +141,15 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 	if not IsMoving() then
 		self.generateANewPath = true;
+	end
+
+	if PlayerHasTarget() and GetTarget():IsFleeing() and IsInCombat() and not IsMoving() then
+		if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+			if grind2.enemyTarget:GetDistance() > 3 then
+				local x, y, z = grind2.enemyTarget:GetPosition();
+				Move(x, y, z);
+			end
+		end
 	end
 
 return false;

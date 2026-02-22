@@ -1,5 +1,6 @@
 grind2IsLootSafeToLoot = {
 
+	enemyTarget = nil,
 }
 
 -- rest FIRST if targets are near loot, return true
@@ -20,7 +21,7 @@ function grind2IsLootSafeToLoot:isAnyTargetNearLoot(target)
 			-- type 3 is NPC
 			if t == 3 then
 				-- if not a totem and target can attack and not target is dead and not target is critter and distance is within aggro distance
-				if not totemsList:isTargetTotem(i) and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:GetDistance() <= 20 then
+				if not totemsList:isTargetTotem(i) and not friendlyEnemiesList:isEnemyNuetral(i) and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:GetDistance() <= 20 and (not i:IsTapped() or i:IsTappedByMe()) then
 					-- if the target is not my current loot target...
 					if i:GetGUID() ~= grind2DoLoot.lootTarget:GetGUID() then
 						-- if target is not players pet
@@ -45,6 +46,8 @@ function grind2IsLootSafeToLoot:isAnyTargetNearLoot(target)
 								-- a target is within aggro range of loot, return true
 								if GetDistance3D(iX, iY, iZ, lX, lY, lZ) <= aggro then
 
+									self.enemyTarget = i;
+
 									return true;
 								end
 							end
@@ -56,5 +59,6 @@ function grind2IsLootSafeToLoot:isAnyTargetNearLoot(target)
 		end
 	end
 
+self.enemyTarget = nil;
 return false;
 end

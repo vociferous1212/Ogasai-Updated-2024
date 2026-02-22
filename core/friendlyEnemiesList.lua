@@ -1,21 +1,5 @@
 friendlyEnemiesList = {
 
-}
-
---[[
-
-	local a = GetTarget():GetUnitName();
-	local b = GetTarget():GetLevel();
-	local c = GetZoneText();
-
-	ToFile('		["'..a..'"] = true,				 -- '..b..' | '..c);
-
---]]
-
-function friendlyEnemiesList:isEnemyNuetral(target)
-
-	--UnitReaction(player, unit) does not work for my purposes. it requires a target to be targeted.
-
 	nuetralEnemiesTable = {
 
 		-- Starting zones (level 5-10)
@@ -134,10 +118,26 @@ function friendlyEnemiesList:isEnemyNuetral(target)
 		["Bloodpetal Trapper"] = true,
 		["Bloodpetal Thresher"] = true,
 		["Bloodpetal Lasher"] = true,
-	
-	}
 
-	if nuetralEnemiesTable[target:GetUnitName()] then
+		}
+
+}
+
+--[[
+
+	local a = GetTarget():GetUnitName();
+	local b = GetTarget():GetLevel();
+	local c = GetZoneText();
+
+	ToFile('		["'..a..'"] = true,				 -- '..b..' | '..c);
+
+--]]
+
+function friendlyEnemiesList:isEnemyNuetral(target)
+
+	--UnitReaction(player, unit) does not work for my purposes. it requires a target to be targeted.
+
+	if self.nuetralEnemiesTable[target:GetUnitName()] then
 
 		return true;
 	end

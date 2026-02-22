@@ -89,7 +89,6 @@ function script_paladin:runBackwards(targetObj, range)
 				end
 				
 			if script_checkAdds:checkAdds() then
-				return 4;
 			end
 
 		return 4;
@@ -193,8 +192,11 @@ function script_paladin:run(targetGUID)
 		and (targetObj:GetHealthPercentage() >= 20) and (not script_checkDebuffs:hasDisabledMovement())
 		and (not targetObj:IsCasting()) then
 			if (script_checkAdds:checkAdds()) then
-				script_om:FORCEOM(); script_paladin.tickRate = 50; script_grind.tickRate = 50;
-				self.waitTimer = GetTimeEX() + 750; return true;
+				script_om:FORCEOM();
+				script_paladin.tickRate = 50;
+				script_grind.tickRate = 50;
+				self.waitTimer = GetTimeEX() + 550;
+				return true;
 			end
 		end
 
@@ -271,7 +273,7 @@ function script_paladin:run(targetGUID)
 			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) then
 				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Exorcism");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) and localHealth >= self.holyLightHealth then
+					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) and localHealth >= self.holyLightHealth then
 						if (CastSpellByName("Exorcism", targetObj)) then 
 							self.waitTimer = GetTimeEX() + 500;
 							self.message = ("Pulling with Exorcism...");
@@ -288,21 +290,25 @@ function script_paladin:run(targetGUID)
 			if targetObj:GetDistance() <= aggroRange and localMana >= self.drinkMana + 10 then
 				if targetObj:GetDistance() <= 10 then
 					if (playerHasCommand or playerHasRighteousness or playerHasCrusade) and not IsSpellOnCD("Judgement") and HasSpell("Judgement") then
-						if CastSpellByName("Judgement", targetObj) then
-							self.waitTimer = GetTimeEX() + 500; end
+						if not CastSpellByName("Judgement", targetObj) then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				end
 				if knowsCrusader and not playerHasCrusader and self.useSealOfCrusader and not playerHasCommand and not playerHasRighteousness then
 					if not IsSpellOnCD("Seal of the Crusader") then
-						CastSpellByName("Seal of the Crusader", localObj);
-						self.waitTimer = GetTimeEX() + 500;
+						if not CastSpellByName("Seal of the Crusader", localObj) then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				elseif knowsCommand and not playerHasCommand and not playerHasCrusader and not IsSpellOnCD("Seal of Command") then
-					CastSpellByName("Seal of Command", localObj);
-					self.waitTimer = GetTimeEX() + 500;
+					if not CastSpellByName("Seal of Command", localObj) then
+						self.waitTimer = GetTimeEX() + 500;
+					end
 				elseif knowsRighteousness and not playerHasRighteousness and not IsSpellOnCD("Seal of Righteousness") then
-					CastSpellByName("Seal of Righteousness", localObj);
-					self.waitTimer = GetTimeEX() + 500;
+					if not CastSpellByName("Seal of Righteousness", localObj) then
+						self.waitTimer = GetTimeEX() + 500;
+					end
 				end
 			self.waitTimer = GetTimeEX() + 150;
 			end
@@ -310,8 +316,9 @@ function script_paladin:run(targetGUID)
 			if self.useJugement and HasSpell("Judgement") and not IsSpellOnCD("Judgement") and (playerHasRighteousness or playerHasCommand) and localMana >= 12
 				and targetObj:GetDistance() <= 10 then
 				
-				CastSpellByName("Judgement", targetObj);
-				self.waitTimer = GetTimeEX() + 300;
+				if not CastSpellByName("Judgement", targetObj) then
+					self.waitTimer = GetTimeEX() + 300;
+				end
 			end	
 
 			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
@@ -338,8 +345,8 @@ function script_paladin:run(targetGUID)
 				end
 			end
 
-			if (targetObj:GetDistance() <= .7) and not script_rotation.usingRotation then 
-				if (script_paladin:runBackwards(targetObj, 2)) then
+			if (targetObj:GetDistance() <= 1) and not script_rotation.usingRotation then 
+				if (script_paladin:runBackwards(targetObj, 3)) then
 					script_grind.tickRate = 135;
 					return 4;
 				end 
@@ -352,8 +359,9 @@ function script_paladin:run(targetGUID)
 
 			-- Check: Stun with HoJ before healing if available
 			if (IsInCombat()) and (targetObj:GetDistance() <= self.meleeDistance)
+			and PlayerHealth() <= self.holyLightHealth
 			and (HasSpell("Hammer of Justice")) and (not IsSpellOnCD("Hammer of Justice")) then
-				if (CastSpellByName("Hammer of Justice", targetObj)) then
+				if not (CastSpellByName("Hammer of Justice", targetObj)) then
 					self.waitTimer = GetTimeEX() + 500;
 					return 0;
 				end
@@ -377,8 +385,8 @@ function script_paladin:run(targetGUID)
 			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) then
 				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Exorcism");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) and localHealth >= self.holyLightHealth then
-						if (CastSpellByName("Exorcism", targetObj)) then
+					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) and localHealth >= self.holyLightHealth then
+						if not (CastSpellByName("Exorcism", targetObj)) then
 							self.waitTimer = GetTimeEX() + 500;
 						end
 					end
@@ -394,7 +402,7 @@ function script_paladin:run(targetGUID)
 			and localMana > 12
 			and (not IsSpellOnCD("Judgement") or self.onlyUseSealOfCrusader)
 			and (targetObj:GetHealthPercentage() > 25) and not IsSpellOnCD("Seal of the Crusader") then
-				if (CastSpellByName("Seal of the Crusader", targetObj)) then
+				if not (CastSpellByName("Seal of the Crusader", targetObj)) then
 					self.waitTimer = GetTimeEX() + 500;
 					return 0;
 				end
@@ -407,24 +415,36 @@ function script_paladin:run(targetGUID)
 				-- hammer of justice when fleeing
 				if (targetObj:IsCasting()) or (targetObj:IsFleeing()) then
 					if (HasSpell("Hammer of Justice")) and (not IsSpellOnCD("Hammer of Justice")) and (localMana > 8) then
-						CastSpellByName("Hammer of Justice", targetObj)
-						self.waitTimer = GetTimeEX() + 1500;
+						if not CastSpellByName("Hammer of Justice", targetObj) then
+							self.waitTimer = GetTimeEX() + 500;
+						end
+					end
+				end
+
+				-- stone form
+				if PlayerHealth() <= 75 then
+					if HasSpell("Stone Form") and not IsSpellOnCD("Stone Form") and not Player():HasBuff("Stone Form") then
+						if not CastSpellByName("Stone Form") then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				end
 	
 				-- On low health do seal of light
 				if (knowsLight) and (not playerHasLight) and (localMana > 15) then
 					if (targetHealth > 50) or (script_grind:enemiesAttackingUs() > 1) or (localMana >= 25 and localHealth <= 50) then
-						CastSpellByName("Seal of Light")
-						self.waitTimer = GetTimeEX() + 1000;
+						if not CastSpellByName("Seal of Light") then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				end
 
 				-- on low mana do seal of wisdom
 				if knowsWisdom and not playerHasLight and not playerHasWisdom then
 					if (localMana <= 25 and localHealth >= 75) or (targetHealth > 50) then
-						CastSpellByName("Seal of Wisdom", targetObj)
-						self.waitTimer = GetTimeEX() + 1000;
+						if not CastSpellByName("Seal of Wisdom", targetObj) then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				end
 
@@ -432,8 +452,9 @@ function script_paladin:run(targetGUID)
 				if ((self.useSealOfCrusader and not targetHasCrusader) or self.onlyUseSealOfCrusader) and (knowsCrusader) and (localMana > 15) and (targetHealth > 55)
 				and (script_grind.enemiesAttackingUs() < 2 or localMana >= 80) and not IsSpellOnCD("Seal of the Crusdaer") then
 					if not targetHasCrusader and not playerHasCrusader and not playerHasLight then
-						CastSpellByName("Seal of the Crusader", localObj)
-						self.waitTimer = GetTimeEX() + 500; 
+						if not CastSpellByName("Seal of the Crusader", localObj) then
+							self.waitTimer = GetTimeEX() + 500; 
+						end
 					end 
 				end
 
@@ -441,8 +462,8 @@ function script_paladin:run(targetGUID)
 				if (self.useJudgement) and (HasSpell("Judgement")) and (not IsSpellOnCD("Judgement")) and playerHasCrusader and (localMana >= self.judgementMana) then
 					if (targetObj:GetDistance() < 10) and not targetHasCrusader and (playerHasCrusader and not self.onlyUseSealOfCrusader) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Judgement");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) then
-							if CastSpellByName("Judgement", targetObj) then
+						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
+							if not CastSpellByName("Judgement", targetObj) then
 								self.waitTimer = GetTimeEX() + 500;
 							end
 						end
@@ -452,16 +473,17 @@ function script_paladin:run(targetGUID)
 				-- Check: Seal of Righteousness (before we have SoC)
 				if (not playerHasRighteousness) and (not playerHasCrusader) and (not knowsCommand) and
 					not playerHasLight and not playerHasWisdom and localMana > 20 and not IsSpellOnCD("Seal of Righteousness") then 
-					CastSpellByName("Seal of Righteousness", localObj)
-					self.waitTimer = GetTimeEX() + 500;
+					if not CastSpellByName("Seal of Righteousness", localObj) then
+						self.waitTimer = GetTimeEX() + 500;
+					end
 				end
 
 				-- Check: Judgement with Righteousness or Command if we have a lot of mana
 				if (self.useJudgement) and (localMana >= self.judgementMana) and (not IsSpellOnCD("Judgement")) then
 					if playerHasRighteousness or playerHasCommand then 
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Judgement");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) then
-							if CastSpellByName("Judgement", targetObj) then
+						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
+							if not CastSpellByName("Judgement", targetObj) then
 								self.waitTimer = GetTimeEX() + 500;
 							end
 						end
@@ -472,8 +494,8 @@ function script_paladin:run(targetGUID)
 				if (self.useJudgement) and (targetHealth < 10) and (localMana >= self.judgementMana) and not IsSpellOnCD("Judgement") then
 					if (playerHasRighteousness or playerHasCommand) and (targetObj:GetDistance() < 10) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Judgement");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) then
-							if CastSpellByName("Judgement", targetObj) then
+						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
+							if not CastSpellByName("Judgement", targetObj) then
 								self.waitTimer = GetTimeEX() + 500;
 							end
 						end
@@ -483,15 +505,18 @@ function script_paladin:run(targetGUID)
 				-- Check: Seal of Command
 				if (knowsCommand) and (not playerHasCommand) and (localMana > 15) then
 					if not playerHasCrusader and (not localObj:HasBuff("Seal of Light")) and not localObj:HasBuff("Seal of Wisdom") then 
-						CastSpellByName("Seal of Command", localObj)
-						self.waitTimer = GetTimeEX() + 500;
+						if not CastSpellByName("Seal of Command", localObj) then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				end
 
 				-- Consecration when we have adds
 				if (HasSpell("Consecration")) and (not IsSpellOnCD("Consecration")) and (localMana >= self.consecrationMana) then
 					if (script_grind:enemiesAttackingUs() >= 2) then
-						CastSpellByName("Consecration"); self.waitTimer = GetTimeEX() + 500;
+						if not CastSpellByName("Consecration") then
+							self.waitTimer = GetTimeEX() + 500;
+						end
 					end
 				end
 

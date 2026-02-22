@@ -63,7 +63,7 @@ function grind2Water:drink()
 
 	for i = 0, self.numWater do
 
-		if HasItem(self.water[i]) and not IsDrinking() and not IsMoving() then
+		if HasItem(self.water[i]) and not IsDrinking() and not IsMoving() and not IsSpellOnCD("Drink") then
 			
 			self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
 

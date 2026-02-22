@@ -86,7 +86,7 @@ function script_runner:avoidToAggro(safeMargin)
 	end
 
 	while currentObj ~= 0 do
-		if typeObj == 3 and currentObj:GetLevel() >= 6 and not currentObj:IsTapped() and not friendlyEnemiesList:isEnemyNuetral(currentObj) and not currentObj:IsTapped() and not script_grind:isTargetingMe(currentObj)  then
+		if typeObj == 3 and currentObj:GetLevel() >= 6 and not currentObj:IsTapped() and not friendlyEnemiesList:isEnemyNuetral(currentObj) and not currentObj:IsTapped() and not script_grind:isTargetingMe(currentObj) and currentObj:IsInLineOfSight() then
 			aggro = currentObj:GetLevel() - localObj:GetLevel() + 18;
 			if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 				aggro = currentObj:GetLevel() - localObj:GetLevel() + 21.5;

@@ -255,8 +255,16 @@ return false;
 end
 
 function IsDisarmed()
-local INVSLOT_MAINHAND = 16; local mainHandTexture = GetInventoryItemTexture("player", INVSLOT_MAINHAND);
-if mainHandTexture then return false; end return true; end
+
+	local INVSLOT_MAINHAND = 16;
+
+	local mainHandTexture = GetInventoryItemTexture("player", INVSLOT_MAINHAND);
+
+		if mainHandTexture then
+			return false;
+		end
+	return true;
+end
 
 function IsAnyTargetTargetingPlayer()
 	local i, t = GetFirstObject()

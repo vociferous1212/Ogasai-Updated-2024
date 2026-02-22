@@ -24,8 +24,9 @@ function script_paladinCheckBlessing:checkBlessing()
 				end
 			end
 		end
-		CastSpellByName("Blessing of Might", GetLocalPlayer());
-		return true;
+		if not CastSpellByName("Blessing of Might", GetLocalPlayer()) then
+			return true;
+		end
 	end
 
 -- cast blessing of Wisdom
@@ -39,8 +40,9 @@ function script_paladinCheckBlessing:checkBlessing()
 				end
 			end
 		end
-		CastSpellByName("Blessing of Wisdom", GetLocalPlayer());
-		return true;
+		if not CastSpellByName("Blessing of Wisdom", GetLocalPlayer()) then
+			return true;
+		end
 	end
 
 	if script_paladin.kings and HasSpell("Blessing of Kings") and not GetLocalPlayer():HasBuff("Blessing of Kings") then
@@ -52,8 +54,9 @@ function script_paladinCheckBlessing:checkBlessing()
 				end
 			end
 		end
-		CastSpellByName("Blessing of Kings", GetLocalPlayer());
-		return true;
+		if not CastSpellByName("Blessing of Kings", GetLocalPlayer()) then
+			return true;
+		end
 	end
 return false;
 end

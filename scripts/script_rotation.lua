@@ -299,7 +299,8 @@ function script_rotation:run()
 		self.message = "Waiting for a target...";
 	end
 
-return true;
+
+
 end
 
 

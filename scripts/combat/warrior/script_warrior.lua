@@ -321,7 +321,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	if (IsInCombat() and script_grind:isAnyTargetTargetingMe()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0) and targetObj:GetHealthPercentage() <= 99 then
 		if (script_checkAdds:checkAdds()) then
 			script_om:FORCEOM();
-			self.waitTimer = GetTimeEX() + 1500;
+			self.waitTimer = GetTimeEX() + 550;
 			return 4;
 		end
 	end
@@ -502,8 +502,8 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 	
 			-- Run backwards if we are too close to the target
-			if (targetObj:GetDistance() <= .8) and not script_rotation.usingRotation then 
-				if (script_warrior:runBackwards(targetObj, 2)) then
+			if (targetObj:GetDistance() <= 1) and not script_rotation.usingRotation then 
+				if (script_warrior:runBackwards(targetObj, 1)) then
 					self.waitTimer = GetTimeEX() + 500;
 				end 
 			end
@@ -783,9 +783,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- War Stomp Tauren Racial
 			if (HasSpell("War Stomp")) and (not IsSpellOnCD("War Stomp")) and (not IsMoving()) and (targetObj:GetDistance() <= 6) and (not targetObj:HasDebuff("Concussive Blow")) then
 				if (targetObj:IsCasting()) or (script_warrior:enemiesAttackingUs(2)) or (targetObj:IsFleeing()) then
-					CastSpellByName("War Stomp");
-					self.waitTimer = GetTimeEX() + 200;
-					
+					if not CastSpellByName("War Stomp") then
+						self.waitTimer = GetTimeEX() + 500;
+					end
 				end
 			end
 
@@ -827,6 +827,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			-- Check: Use Orc Racial Blood Fury
 			if (not IsSpellOnCD('Blood Fury') and HasSpell('Blood Fury')) then 
 				if CastSpellByName('Blood Fury') then
+					self.waitTimer = GetTimeEX() + 500;
 				end
 			end 
 
@@ -834,6 +835,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (GetNumPartyMembers() <= 1) and (targetObj:GetDistance() <= 10) and targetHealth >= 20 then
 				if (not IsSpellOnCD('Bloodrage') and HasSpell('Bloodrage') and localHealth >= self.bloodRageHealth) then 
 					if not CastSpellByName('Bloodrage') then
+						self.waitTimer = GetTimeEX() + 500;
 					end
 				end
 			end
@@ -921,7 +923,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (self.battleStance) and (self.enableRend) then
 					if targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental'  and targetObj:GetCreatureType() ~= "Undead" and HasSpell('Rend') and not targetObj:HasDebuff("Rend") and targetHealth >= 30 and localRage >= 10 and not IsSpellOnCD("Rend") then 
 						if not CastSpellByName("Rend") then
-							self.waitTimer = GetTimeEX() + 250;
+							self.waitTimer = GetTimeEX() + 550;
 						end
 					end 
 				end

@@ -35,7 +35,6 @@ grind2 = {
 	useMount = false,							-- use mount or not
 	autoSelectTalents = false,					-- auto select talents or not
 	useFirstAid = false,						-- use first aid or not
-	avoidEliteTimer = 0,						-- calling move function to oquick crashes nav...
 	avoidTargetTimer = 0,						-- timer to run avoid target script to stop navigation from crashing
 	usingGrinder2 = false,
 
@@ -109,6 +108,10 @@ function grind2:rest()
 		grind2Setup:run();
 	end
 
+	if IsInCombat() then
+		return false;
+	end
+
 	-- return for timer
 	if grind2.timer > GetTimeEX() then
 	
@@ -132,27 +135,29 @@ function grind2:rest()
 			end
 		end
 
-		-- drink water
-		if not IsDrinking() and PlayerMana() <= grind2.restMana and not IsMoving() and not IsCasting() and not IsChanneling() then
+		if not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() then
+			-- drink water
+			if not IsDrinking() and PlayerMana() <= grind2.restMana and not IsMoving() and not IsCasting() and not IsChanneling() then
 
-			grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-
-			-- run drink water script
-			if grind2Water:drink() then
-						
 				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+
+				-- run drink water script
+				if grind2Water:drink() then
+						
+					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+				end
 			end
-		end
 
-		-- eat food
-		if not IsEating() and PlayerHealth() <= grind2.restHealth and not IsMoving() and not IsCasting() and not IsChanneling() then
+			-- eat food
+			if not IsEating() and PlayerHealth() <= grind2.restHealth and not IsMoving() and not IsCasting() and not IsChanneling() then
 
-			grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-
-			-- run eat food script
-			if grind2Food:eat() then
-						
 				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+
+				-- run eat food script
+				if grind2Food:eat() then
+						
+					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+				end
 			end
 		end
 
@@ -295,7 +300,7 @@ function grind2:run()
 
 					grind2MoveToTarget.GenerateANewPath = true;
 
-					self.avoidTargetTimer = currentTime + 100;
+					self.avoidTargetTimer = currentTime + 1000;
 
 				return;
 				end
@@ -304,9 +309,9 @@ function grind2:run()
 			
 -- avoid elites...
 -- if not on way to vendor and already running and not if we are mounted and running
-			if script_vendor.status == 0 and not IsMounted() and currentTime > self.avoidEliteTimer and grind2IsTargetValid.skipElites then 
+			if script_vendor.status == 0 and not IsMounted() and grind2IsTargetValid.skipElites then 
 				if (script_aggro:avoidElite()) then
-					self.avoidEliteTimer = currentTime + 75;
+					grind2:setTimer(1500);
 					grind2PreChecks.jumpTimer = currentTime + 7500;
 					grind2.grinderMessage = "Elite within range... running away...";
 					grind2MoveToTarget.GenerateANewPath = true;
@@ -463,7 +468,9 @@ function grind2:run()
 
 -- check paranoia
 	if self.useParanoia then
-		grind2Paranoia:checkAndDoParanoia();
+		if grind2Paranoia:checkAndDoParanoia() then
+			return;
+		end
 	end
 
 --[[
@@ -650,7 +657,7 @@ function grind2:run()
 			end
 		end
 	end
---return;
+return true;
 end
 
 function grind2:clearTarget()

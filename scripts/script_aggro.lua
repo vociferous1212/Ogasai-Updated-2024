@@ -547,7 +547,7 @@ function script_aggro:drawAggroCircles(maxRange)
 	while currentObj ~= 0 do
 		
 		-- acceptable targets
-		if typeObj == 3 and currentObj:GetDistance() < maxRange and not currentObj:IsDead() and currentObj:CanAttack() and not currentObj:IsCritter() and currentObj:GetLevel() ~= 1 then
+		if typeObj == 3 and not friendlyEnemiesList:isEnemyNuetral(currentObj) and currentObj:GetDistance() < maxRange and not currentObj:IsDead() and currentObj:CanAttack() and not currentObj:IsCritter() and currentObj:GetLevel() ~= 1 then
 
 			-- set conditions
 			local aggro = currentObj:GetLevel() - localObj:GetLevel() + 19.5;
@@ -624,14 +624,14 @@ function script_aggro:avoidElite() -- Runs away if there is atleast one elite wi
 	while currentObj ~= 0 do
 		if typeObj == 3 and (currentObj:GetClassification() >= 1) and currentObj:GetUnitName() ~= "Swiftmane" then
 			local tX, tY, tZ = GetDistance3D(x, y, z, tX, tY, tZ);
-			range = currentObj:GetLevel() - localObj:GetLevel() + 30;
-			if (currentObj:CanAttack() and currentObj:GetDistance() <= range or grind2IsTargetingMe:target(currentObj)) and not currentObj:IsDead() then	
+			range = currentObj:GetLevel() - localObj:GetLevel() + 35;
+			if currentObj:CanAttack() and (currentObj:GetDistance() <= range or grind2IsTargetingMe:target(currentObj)) and not currentObj:IsDead() then	
 				local xT, yT, zT = currentObj:GetPosition();
 				local xP, yP, zP = localObj:GetPosition();
 				local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
 				local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
 				local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
-				local moveX, moveY, moveZ = xT + xUV*50, yT + yUV*50, zT + zUV;	
+				local moveX, moveY, moveZ = xT + xUV*30, yT + yUV*30, zT + zUV;	
 				if not grind2.usingGrinder2 then
 					script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
 				elseif grind2.usingGrinder2 then

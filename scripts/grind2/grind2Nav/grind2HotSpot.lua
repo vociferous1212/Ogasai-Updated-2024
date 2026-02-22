@@ -21,7 +21,8 @@ end
 
 function grind2HotSpot:moveToHotspot()
 
-	if script_nav.currentHotSpotX ~= 0 then
+	if script_nav.currentHotSpotX ~= 0
+		and (grind2HotSpot:distanceToHotspot() > self.distanceToHotSpot or (self.hotSpotReached and not grind2IsAnyValidTargetInRange:run() and grind2HotSpot:distanceToHotspot() > 50))  then
 
 		grind2MoveToTarget:run(GetLocalPlayer(), script_nav.currentHotSpotX, script_nav.currentHotSpotY, script_nav.currentHotSpotZ);
 

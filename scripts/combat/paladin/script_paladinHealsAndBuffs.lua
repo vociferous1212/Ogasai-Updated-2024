@@ -43,6 +43,7 @@ function script_paladinHealsAndBuffs:healsAndBuffs()
 	if (not localObj:HasBuff("Blessing of Wisdom") and script_paladin.wisdom) or (not localObj:HasBuff("Blessing of Might") and script_paladin.might) or (not localObj:HasBuff("Blessing of Kings") and script_paladin.kings) then
 		if localMana >= 10 then
 			if script_paladinCheckBlessing:checkBlessing() then
+				script_paladin.waitTimer = GetTimeEX() + 500;
 				return true;
 			end
 		end
