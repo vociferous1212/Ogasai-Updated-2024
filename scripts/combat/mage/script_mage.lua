@@ -125,7 +125,11 @@ function script_mage:runBackwards(targetObj, range)
 
 			if (distance < range)  then
 
+				if not grind2.usingGrinder2 then
 				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
+				else
+					grind2MoveToTarget:run(Player(), moveX, moveY, moveZ+2);
+				end
 
 				-- move fall-back
 				if not IsMoving() then

@@ -60,6 +60,7 @@ function grind2IsTargetValid:target(i)
 			or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and i:GetHealthPercentage() <= 92 and not i:IsDead())
 			or (grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) and grind2IsTargetingMe:target(i) and i:GetDistance() <= 5)
 			)
+			or (totemsList:isTargetTotem(i) and GetMyClass() ~= "SHAMAN")
 			or (grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or grind2IsTargetingGroup:target(i) or (i:IsCasting() and i:IsTappedByMe()))
 			or ( (i:HasDebuff("Polymorph") or i:HasDebuff("Fear") ) and script_grind:enemiesAttackingUs() < 2
 			)

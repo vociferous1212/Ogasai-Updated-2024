@@ -201,7 +201,7 @@ function script_hunterDoPetChecks:doPetChecks()
 						return true;
 					end
 
-					if CastSpellByName('Mend Pet') then
+					if not CastSpellByName('Mend Pet') then
 
 						script_hunter.waitTimer = GetTimeEX() + 5000; 
 
@@ -211,9 +211,9 @@ function script_hunterDoPetChecks:doPetChecks()
 					end
 				end
 			end
-		if not IsCasting() and not IsChanneling() and not IsMoving() then
-			script_hunter.message = "Waiting to mend pet - low mana..."
-		end
+			if not IsCasting() and not IsChanneling() and not IsMoving() then
+				script_hunter.message = "Waiting to mend pet - low mana..."
+			end
 		return true;
 		end
 	end

@@ -147,7 +147,7 @@ function script_hunterRunRestState:run()
 
 	-- night elve stealth while resting
 	if (IsDrinking() or IsEating()) and (HasSpell("Shadowmeld")) and (not IsSpellOnCD("Shadowmeld"))
-	and (not localObj:HasBuff("Shadowmeld")) then
+	and (not localObj:HasBuff("Shadowmeld")) and not localObj:HasDebuff("Faerie Fire") then
 		if (CastSpellByName("Shadowmeld")) then
 			
 		end

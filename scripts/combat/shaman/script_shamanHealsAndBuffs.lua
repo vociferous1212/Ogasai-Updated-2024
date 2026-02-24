@@ -43,7 +43,7 @@ function script_shamanHealsAndBuffs:run()
 	end
 
 -- water breathing
-	if not IsSpellOnCD("Water Breathing") and IsSwimming() and Player():HasSpell("Water Breathing") and HasItem("Shiny Fish Scales") and not Player():HasBuff("Water Breathing") then
+	if not IsSpellOnCD("Water Breathing") and IsSwimming() and HasSpell("Water Breathing") and HasItem("Shiny Fish Scales") and not Player():HasBuff("Water Breathing") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Water Breathing");
 		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 			if CastSpellByName("Water Breathing", Player()) then

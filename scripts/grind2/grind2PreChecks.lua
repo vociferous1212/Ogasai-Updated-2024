@@ -96,7 +96,7 @@ function grind2PreChecks:run()
 					grind2.obtainNewTargetTimer = 250;
 				end
 
-			return true;
+			--return true;
 			end
 		end
 	end
@@ -107,6 +107,8 @@ function grind2PreChecks:run()
 		if script_gatherRun:gather() then
 			script_gatherRun:gather();
 			grind2.grinderMessage = "Gathering...";
+			grind2RunCombatState.blacklistTargetTimer = currentTime * 2;
+			grind2RunCombatState.blacklistTargetTimer2 = currentTime * 2;
 			if IsLooting() and not IsMoving() then
 				grind2:setTimer(500);
 			end
@@ -227,7 +229,8 @@ function grind2PreChecks:run()
 	end
 
 -- hotspot reached or not reached - return to hotspot - or when there are no valid targets nearby
-	if not IsInCombat() and grind2HotSpot.distanceToHotSpot <= grind2HotSpot:distanceToHotspot() or (grind2HotSpot.hotSpotReached and not grind2IsAnyValidTargetInRange:run()) then
+	if not IsInCombat() and grind2HotSpot.distanceToHotSpot <= grind2HotSpot:distanceToHotspot()
+	or (grind2HotSpot.hotSpotReached and not grind2IsAnyValidTargetInRange:run()) then
 		
 		grind2HotSpot.hotSpotReached = false;
 	else

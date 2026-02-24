@@ -52,7 +52,7 @@ function grind2DrawUnitData:drawUnitsOnScreen()
 
 				grind2SelectDrawTargets:selectNPCTarget(target);
 			end
-				
+	
 		end
 
 		if self.drawPlayers then

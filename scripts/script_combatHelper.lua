@@ -38,6 +38,7 @@ function script_combatHelper:run()
 
 		if GetMyClass() == "HUNTER" then
 			script_combatHelper:checkStopRaptorStrikeConditions()
+			script_combatHelper:checkStopAimedShotConditions()
 
 				-- feign death if pet is dead
 			if IsInCombat() and (script_hunter.hasPet) and HasPet() then
@@ -297,4 +298,28 @@ function script_combatHelper:checkStopRaptorStrikeConditions()
 			SpellStopCasting();
 		end
 	end
+end
+
+function script_combatHelper:checkStopAimedShotConditions()
+
+	local aTable = {
+		
+		[19434] = true,
+		[20900] = true,
+		[20901] = true,
+		[20902] = true,
+		[20903] = true,
+		[20904] = true,
+
+	}
+
+	if HasSpell("Aimed Shot") and aTable[GetLocalPlayer():GetCasting()] or aTable[GetLocalPlayer():GetChanneling()] then
+		if PlayerHasTarget() then
+			if GetTarget():GetDistance() < script_hunter.minSpellRange then
+				SpellStopCasting();
+				script_hunter.waitTimer = GetTimeEX() + 500;
+			end
+		end
+	end
+
 end

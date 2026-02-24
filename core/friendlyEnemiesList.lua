@@ -119,6 +119,8 @@ friendlyEnemiesList = {
 		["Bloodpetal Thresher"] = true,
 		["Bloodpetal Lasher"] = true,
 
+		["Winterspring Screecher"] = true,
+
 		}
 
 }

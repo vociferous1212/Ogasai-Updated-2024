@@ -132,6 +132,12 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 				StopMoving();
 				return true;
 			end
+
+			local rankHeal = "Rank 1)";
+			if PlayerLevel() >= 30 then
+				rankHeal = "Rank 3)";
+			end
+
 			if not CastSpellByName("Healing Touch("..rankHeal, localObj) then
 				script_druid.waitTimer = GetTimeEX() + 500;
 				grind2:setTimer(2500);

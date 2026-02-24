@@ -106,23 +106,26 @@ function script_hunter:runBackwards(targetObj, range)
 		local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
-		if (distance < range)  then
+		if (distance <= range)  then
 
+			if not grind2.usingGrinder2 then
 				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
+			else
+				grind2MoveToTarget:run(Player(), moveX, moveY, moveZ+2);
+			end
+			-- move fall-back
+			if not IsMoving() then
+				Move(moveX, moveY, moveZ)
+				script_nav:resetNavigate();
+			end
 
-				-- move fall-back
-				if not IsMoving() then
-					Move(moveX, moveY, moveZ)
-					script_nav:resetNavigate();
-				end
+			if script_checkAdds:checkAdds() then
+			end
 
-				if script_checkAdds:checkAdds() then
-				end
-
-				self.waitTimer = GetTimeEX() + 500;
-				script_grind:setWaitTimer(100);
-
-			return 4;
+			self.waitTimer = GetTimeEX() + 500;
+			script_grind:setWaitTimer(100);
+	
+		return 4;
 			
 		end
 	end
@@ -250,7 +253,6 @@ function script_hunter:run(targetGUID)
 -- if we don't have the right target then clear target
 	if targetObj == 0 or targetObj == nil then
 		ClearTarget();
-		return;
 	end
 
 -- set pet to false if less than level 10
@@ -259,7 +261,7 @@ function script_hunter:run(targetGUID)
 			self.hasPet = false;
 		end
 	end
-	
+
 -- check for adds around us during combat and move to prevent pulling multiple enemies
 	-- if already in combat and we want to skip hard pulls, and are not in a group, and target health is greater than fleeing health
 	if IsInCombat() and script_grind.skipHardPull and GetNumPartyMembers() == 0 and (targetObj:GetHealthPercentage() >= 20) then
@@ -482,6 +484,8 @@ function script_hunter:run(targetGUID)
 -- we have a valid enemy
 	if (targetObj ~= 0 and targetObj ~= nil) then
 
+		if targetObj:IsDead() then ClearTarget(); end
+
 		self.message = "Killing " .. targetObj:GetUnitName() .. "...";
 
 -- if pet leaves attack range then call pet
@@ -559,6 +563,11 @@ function script_hunter:run(targetGUID)
 		if targetObj:GetDistance() <= self.meleeDistance and not targetObj:IsInLineOfSight() and (HasPet() and self.hasPet) then
 			PetAttack();
 		end
+		
+		-- send pet to attack something not in light of sight but we are close enough to it... we are going to walk to melee range anyways. preemptive?
+		if not IsInCombat() and not targetObj:IsInLineOfSight() and targetObj:GetDistance() <= self.minSpellRange then
+			PetAttack();
+		end
 
 -- do pull function if we are far enough away
 		if (Player():GetLevel() < self.minSpellRange) then
@@ -567,24 +576,19 @@ function script_hunter:run(targetGUID)
 					self.waitTimer = GetTimeEX() + 250;
 				end
 				if HasPet() and self.hasPet then
-					if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
 						PetAttack();
-						self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
-						end
 					end
 				-- else move to target to melee
 			elseif (targetObj:GetDistance() < self.minSpellRange) or not targetObj:IsInLineOfSight() or not self.useRangedAttacks then
 				if (targetObj:GetDistance() > self.meleeDistance) and (PlayerLevel() >= 10 or HasPet()) then
 					if HasPet() and self.hasPet then
-						if GetTimeEX() > self.petAttackTimer and GetTimeEX() >= self.petFollowTimer then
 							PetAttack();
-							self.petAttackTimer = GetTimeEX() + 1000; self.petFollowTimer = GetTimeEX() + 1000;
-						end
 					end
+					CastSpellByName("Attack");
 					return 3;
 				elseif (PlayerLevel() < 10 or not HasPet()) and not IsInCombat() then
 					if script_hunter:runBackwards(targetObj, self.minSpellRange + 10) then
-						script_hunter.waitTimer = GetTimeEX() + 2500;
+						script_hunter.waitTimer = GetTimeEX() + 1500;
 						return 4;
 					end
 				end
@@ -625,7 +629,7 @@ function script_hunter:run(targetGUID)
 
 		else
 
-		script_hunterInCombatState:run(targetObj);
+			script_hunterInCombatState:run(targetObj);
 		end
 	end
 end

@@ -34,7 +34,7 @@ function script_hunterMenu:menu()
 			if Button("Conserve Mana for Mend Pet") then
 				script_hunter.drinkMana = 5;
 				script_hunter.arcaneShotMana = 45;
-				script_hunter.useMarkMana = 30;
+				script_hunter.useMarkMana = 10;
 				script_hunter.serpentStingMana = 30;
 				script_hunter.potionMana = 0;
 			end

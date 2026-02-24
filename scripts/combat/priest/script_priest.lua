@@ -38,6 +38,7 @@ script_priest = {
 	spellRange = 30,
 	mindBlastTimer = GetTimeEX(),
 	mindBlastCDTime = 8000,
+	pwShieldTimer = GetTimeEX(),
 }
 
 function script_priest:heal(spellName, target)
@@ -111,7 +112,11 @@ function script_priest:runBackwards(targetObj, range)
 	
 		if (distance <= range) then
 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ);
+			if not grind2.usingGrinder2 then
+				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
+			else
+				grind2MoveToTarget:run(Player(), moveX, moveY, moveZ+2);
+			end
 
 				-- move fall-back
 				if not IsMoving() then
@@ -257,11 +262,14 @@ function script_priest:run(targetGUID)
 	end
 
 -- Cast Shield Power Word: Shield
-	if  PlayerHasTarget() and (not localObj:HasDebuff("Weakened Soul")) and not localObj:HasBuff("Power Word: Shield") and (HasSpell("Power Word: Shield")) and not IsSpellOnCD("Power Word: Shield") then
+	if (PlayerHasTarget() and GetTarget():GetDistance() <= 40) and (not localObj:HasDebuff("Weakened Soul")) and not localObj:HasBuff("Power Word: Shield") and (HasSpell("Power Word: Shield")) and not IsSpellOnCD("Power Word: Shield") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Power Word: Shield");
 			if (IsInCombat() and (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) or (not IsInCombat() and PlayerMana() >= self.drinkMana + 10) then
-				if not CastSpellByName("Power Word: Shield", localObj) then
-					return;
+				if GetTimeEX() >= self.pwShieldTimer then
+					if not CastSpellByName("Power Word: Shield", localObj) then
+						self.pwShieldTimer = GetTimeEX() + 1000;
+						return;
+					end
 				end
 			end
 	return;
@@ -345,7 +353,7 @@ function script_priest:run(targetGUID)
 		if (not IsAutoCasting("Shoot")) and (self.useWand) and not IsSpellOnCD("Shoot") then
 			self.message = "Using wand...";
 			targetObj:CastSpell("Shoot");
-			self.waitTimer = GetTimeEX() + 100;
+			self.waitTimer = GetTimeEX() + 500;
 			return true; -- return true - if not AutoCasting then false
 		end
 	end
@@ -490,15 +498,15 @@ function script_priest:run(targetGUID)
 				-- vampiric embrace
 			elseif (HasSpell("Vampiric Embrace")) and (not IsSpellOnCD("Vampiric Embrace")) and (not targetObj:HasDebuff("Vampiric Embrace")) and (not IsMoving()) and (targetObj:IsInLineOfSight()) then
 				if (Cast("Vampiric Embrace", targetObj)) then	
-					self.waitTimer = GetTimeEX() + 1850;
+					self.waitTimer = GetTimeEX() + 550;
 					return 0; -- keep trying until cast
 				end
 				--shadow word pain if mindblast is on CD to pull if no wand
-			elseif (HasSpell("Shadow Word: Pain")) and (not targetObj:HasDebuff("Shadow Word: Pain")) and (IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) then
+			elseif (HasSpell("Shadow Word: Pain")) and (not targetObj:HasDebuff("Shadow Word: Pain")) and (IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) and localMana >= self.swpMana then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Word: Pain");
 				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
 					if (Cast("Shadow Word: Pain", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1950;
+						self.waitTimer = GetTimeEX() + 550;
 						return 0; -- keep trying until cast
 					end
 				end
@@ -516,7 +524,6 @@ function script_priest:run(targetGUID)
 					self.waitTimer = GetTimeEX() + 500;
 					return 0;
 				end
-
 			-- Use Smite if we have it
 			elseif (self.useSmite) and not IsMoving() and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
@@ -531,6 +538,14 @@ function script_priest:run(targetGUID)
 						self.waitTimer = GetTimeEX() + 550;
 						return 0;
 					end
+				end
+			elseif localMana < self.swpMana and localObj:HasRangedWeapon() then
+				if targetObj:GetDistance() > 30 then
+					return 3;
+				end
+				if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) and not IsMoving() and not IsCasting() and not IsChanneling() and not IsSpellOnCD("Shoot") then
+					targetObj:CastSpell("Shoot");
+					script_priest.waitTimer = GetTimeEX() + 550;
 				end
 			end
 
@@ -663,14 +678,14 @@ function script_priest:run(targetGUID)
 			if (not IsInCombat()) and (not localObj:HasBuff("Inner Fire")) and (HasSpell("Inner Fire")) and (localMana >= 25) and not IsSpellOnCD("Inner Fire") then
 				if not Buff("Inner Fire", localObj) then
 					self.waitTimer = GetTimeEX() + 550;
-					return; -- keep trying until cast
+					return true; -- keep trying until cast
 				end
 				-- check inner fire in combat
 			elseif (IsInCombat()) and (not localObj:HasBuff("Inner Fire")) and (HasSpell("Inner Fire")) and (localMana >= 8) and not IsSpellOnCD("Inner Fire") then
 				if (localObj:HasBuff("Power Word: Shield")) then
 					if not Buff("Inner Fire", localObj) then
 						self.waitTimer = GetTimeEX() + 550;
-						return; -- keep trying until cast
+						return true; -- keep trying until cast
 					end
 				end
 			end
@@ -729,18 +744,16 @@ function script_priest:run(targetGUID)
 			if (not IsMoving()) and (PlayerHasTarget()) and (GetLocalPlayer():GetUnitsTarget():GetGUID() == targetObj:GetGUID()) and (self.useWand) and (not localObj:IsCasting() or not localObj:IsChanneling()) and (not script_checkAdds:checkAdds())
 				and ( (not self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) or (self.useSmite and localMana <= self.useWandMana or targetHealth <= self.useWandHealth) ) then
 				if (localObj:HasDebuff("Weakened Soul") or localHealth >= self.shieldHP or localMana < 10) or (localObj:HasBuff("Renew") or localMana < 10 or localHealth >= self.renewHP) or (IsSpellOnCD("Mind Blast") or (targetHealth <= self.useWandHealth or localMana <= self.useWandMana)) or (self.useSmite and (localMana <= self.useWandMana or targetHealth <= self.useWandHealth)) then
-				if (localObj:HasRangedWeapon()) then
-					if (targetObj:GetDistance() > 26) or (not targetObj:IsInLineOfSight()) then
-						self.waitTimer = GetTimeEX() + 1000;
-						return 3;
+					if (localObj:HasRangedWeapon()) then
+						if (targetObj:GetDistance() > 26) or (not targetObj:IsInLineOfSight()) then
+							self.waitTimer = GetTimeEX() + 1000;
+							return 3;
+						end
+						if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) and not IsMoving() and not IsCasting() and not IsChanneling() and not IsSpellOnCD("Shoot") then
+							targetObj:CastSpell("Shoot");
+							script_priest.waitTimer = GetTimeEX() + 550;
+						end
 					end
-					if (not IsAutoCasting("Shoot")) and (PlayerHasTarget()) and not IsMoving() and not IsCasting() and not IsSpellOnCD("Shoot") then
-						targetObj:CastSpell("Shoot");
-						self.waitTimer = GetTimeEX() + 500;
-						return true;
-					end
-
-				end
 				end
 			end
 		end

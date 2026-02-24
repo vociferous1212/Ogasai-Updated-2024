@@ -184,7 +184,11 @@ function script_druid:runBackwards(targetObj, range)
 		local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;	
 		local moveX, moveY, moveZ = xT + xUV*16, yT + yUV*16, zT + zUV;		
 		if (distance < range and targetObj:IsInLineOfSight()) then 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
+			if not grind2.usingGrinder2 then
+				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
+			else
+				grind2MoveToTarget:run(Player(), moveX, moveY, moveZ+2);
+			end
 			return true;
 		end
 

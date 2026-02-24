@@ -24,8 +24,12 @@ function script_warlockFunctions:castImmolate(target)
 		if (not script_warlockFunctions:targetHasImmolate(target)) then
 			if (not targetObj:HasDebuff("Immolate")) then
 				if (not IsCasting()) and (not IsChanneling()) then
-					CastSpellByName("Immolate");
-					return true;
+					if not IsSpellOnCD("Immolate") then
+						if not CastSpellByName("Immolate") then
+							script_warlock.waitTimer = GetTimeEX() + 500;
+							return true;
+						end
+					end
 				else
 					return 4;
 				end
@@ -39,9 +43,12 @@ function script_warlockFunctions:castCorruption(target)
 		if (not script_warlockFunctions:targetHasCorruption(target)) then
 			if (not targetObj:HasDebuff("Corruption")) then
 				if (not IsCasting()) and (not IsChanneling()) then
-					target:FaceTarget();
-					CastSpellByName("Corruption");
-					return true;
+					if not IsSpellOnCD("Corruption") then
+						if not CastSpellByName("Corruption") then
+							script_warlock.waitTimer = GetTimeEX() + 500;
+							return true;
+						end
+					end
 				end
 			end
 		end

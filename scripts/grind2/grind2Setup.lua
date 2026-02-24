@@ -99,7 +99,14 @@ function grind2Setup:run()
 			grind2IsTargetValid.minLevel = PlayerLevel() - 7;
 			grind2IsTargetValid.maxLevel = PlayerLevel() + 2;
 		end
-
+		if PlayerLevel() >= 51 then
+			grind2IsTargetValid.minLevel = PlayerLevel() - 9;
+			grind2IsTargetValid.maxLevel = PlayerLevel() + 2;
+		end
+		if PlayerLevel() == 60 then
+			grind2IsTargetValid.minLevel = 1;
+			grind2IsTargetValid.maxLevel = 60;
+		end
 
 	end
 

@@ -80,7 +80,11 @@ function script_paladin:runBackwards(targetObj, range)
 		local moveX, moveY, moveZ = xT + xUV*5, yT + yUV*5, zT + zUV;		
 		if (distance < range) then 		
 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ)
+			if not grind2.usingGrinder2 then
+				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
+			else
+				grind2MoveToTarget:run(Player(), moveX, moveY, moveZ+2);
+			end
 
 				-- move fall-back
 				if not IsMoving() then

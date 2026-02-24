@@ -719,7 +719,11 @@ function script_rogue:runBackwards(targetObj, range)
 		local moveX, moveY, moveZ = xT + xUV*15, yT + yUV*15, zT + zUV;		
 		if (distance < range) then 		
 
-			script_navEXCombat:moveToTarget(localObj, moveX, moveY, moveZ);
+			if not grind2.usingGrinder2 then
+				script_navEXCombat:moveToTarget(Player(), moveX, moveY, moveZ)
+			else
+				grind2MoveToTarget:run(Player(), moveX, moveY, moveZ+2);
+			end
 				
 			if script_checkAdds:checkAdds() then
 				return 4;

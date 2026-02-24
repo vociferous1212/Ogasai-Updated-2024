@@ -126,7 +126,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	end
 
 -- Move to the next destination in the path
-	Move(pathX, pathY, pathZ + 1);
+	Move(pathX, pathY, pathZ + 2);
 
 -- If we are close to the next path node, increase our nav node index
 	if (GetDistance3D(myX, myY, myZ, pathX, pathY, pathZ) <= 3) then
@@ -145,7 +145,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 	if PlayerHasTarget() and GetTarget():IsFleeing() and IsInCombat() and not IsMoving() then
 		if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
-			if grind2.enemyTarget:GetDistance() > 3 then
+			if grind2.enemyTarget:GetDistance() > 3 and not grind2.enemyTarget:IsDead() then
 				local x, y, z = grind2.enemyTarget:GetPosition();
 				Move(x, y, z);
 			end

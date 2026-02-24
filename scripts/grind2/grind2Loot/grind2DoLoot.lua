@@ -66,13 +66,10 @@ function grind2DoLoot:run()
 
 		if self.lootTarget:GetDistance() > self.lootTargetDistance and not IsAnyTargetTargetingPlayer() then
 
-			grind2MoveToTarget:run(player, xx, yy, zz);
+			if grind2MoveToTarget:run(player, xx, yy, zz) then
 
-			if not IsMoving() then
-				Move(xx, yy, zz);
+				return true;
 			end
-
-			return true;
 		end
 
 		-- close enough to loot target

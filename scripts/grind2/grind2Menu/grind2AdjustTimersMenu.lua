@@ -67,13 +67,20 @@ function grind2AdjustTimersMenu:run()
 		grind2Paranoia:setSpeedSlow();
 		grind2Menu.scriptSpeedWasAdjusted = true;
 	end
+
+-- set timers to zero
+	SameLine();
+	if Button("Set All Timers To Zero") then
+		grind2AdjustTimersMenu:setTimersToZero();
+		DEFAULT_CHAT_FRAME:AddMessage("All timers set to 0. Timers left are necessary to allow server-to-client updates to prevent disconnects and bugs.")
+	end
 	Separator();
 
 
 -- adjust script speed
-	wasClicked, self.adjustScriptSpeed = Checkbox("Adjust Bot Speed / Reaction Time", self.adjustScriptSpeed);
+	wasClicked, grind2Menu.adjustScriptSpeed = Checkbox("Manually Adjust Bot Speed / Reaction Time", grind2Menu.adjustScriptSpeed);
 
-	if self.adjustScriptSpeed then
+	if grind2Menu.adjustScriptSpeed then
 
 		Text("Grind script speed (miliseconds) - How fast the bot reacts");
 
@@ -86,10 +93,6 @@ function grind2AdjustTimersMenu:run()
 
 			Text("		ADJUST SCRIPTS TIMERS AND SPEED");
 			Text("		Miliseconds - 1000ms = 1 second")
-
-			if Button("Set All Timers To Zero") then
-				grind2AdjustTimersMenu:setTimersToZero();
-			end
 
 			Separator();
 

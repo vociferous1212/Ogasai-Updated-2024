@@ -1,4 +1,5 @@
 vendorDB = {
+	includeVendorListTable = include("scripts\\db\\vendorList.lua"),
 	vendorList = {},
 	numVendors = 0,
 	includeVendorDB_1_10 = include("scripts\\db\\vendorDB_1_10.lua"),

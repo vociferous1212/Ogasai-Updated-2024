@@ -18,11 +18,23 @@ grind2Paranoia = {
 
 	paranoidTargetDistance = 0,
 
+	scriptAutoAdjustedSpeed = true,
+
 }
 
 function grind2Paranoia:checkAndDoParanoia()
 
 	local currentTime = GetTimeEX();
+
+		-- set speed fast if we are in combat about close to death... fuck it
+		if grind2.scriptSpeed > 0 and not grind2Menu.adjustScriptSpeed then
+			if self.scriptAutoAdjustedSpeed and (PlayerHealth() <= 30 or NumberTargetsAttackingPlayer() >= 2) then
+				grind2Paranoia:setSpeedFast();
+				return false;
+			elseif self.scriptAutoAdjustedSpeed and PlayerHealth() > 30 then
+				self.scriptAutoAdjustedSpeed = false;
+			end
+		end
 
 	if grind2Paranoia:checkForPlayersNearby() then
 
@@ -40,18 +52,21 @@ function grind2Paranoia:checkAndDoParanoia()
 
 				self.paranoidTimerSet = true;
 			end
+					
 
 			-- someone around, run bot normal speed - less than paranoid set time
 			if currentTime < (self.paranoidSetTime * 1000) + self.paranoidTime then
 
 				grind2Paranoia:setSpeedNormal();
+				self.scriptAutoAdjustedSpeed = true;
 				
 			end
 
 			-- someone around for too long, run bot slower - more than paranoid set time
 			if currentTime > (self.paranoidSetTime * 1000) + self.paranoidTime then
 
-				grind2Paranoia:setSpeedSlow()
+				grind2Paranoia:setSpeedSlow();
+				self.scriptAutoAdjustedSpeed = true;
 
 			end
 
@@ -94,18 +109,19 @@ function grind2Paranoia:checkAndDoParanoia()
 		end
 	else
 
-		if not grind2Menu.adjustScriptSpeed and not grind2Menu.scriptSpeedWasAdjusted then
+		-- if we don't want to adjust script speed and we haven't set all timers to zero already
+		if not grind2Menu.adjustScriptSpeed and grind2.scriptSpeed > 0 then
 
 			grind2Paranoia:setSpeedFast();
-		end
 
-		-- reset variables
-		self.paranoidTarget = nil;
-		self.paranoidTargetGUID = nil;
-		self.paranoidTimerSet = false;
-		self.paranoidTargetName = nil;
-		self.paranoidTargetDistance = 0;
-		self.paranoidTime = GetTimeEX() * 2;
+			-- reset variables
+			self.paranoidTarget = nil;
+			self.paranoidTargetGUID = nil;
+			self.paranoidTimerSet = false;
+			self.paranoidTargetName = nil;
+			self.paranoidTargetDistance = 0;
+			self.paranoidTime = GetTimeEX() * 2;
+		end
 
 	end
 
@@ -169,7 +185,7 @@ function grind2Paranoia:setSpeedFast()
 
 	grind2AdjustTimersMenu.obtainNewTargetTimer = 1000;
 
-	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 75;
+	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 125;
 
 	grind2AdjustTimersMenu.restTimer = 1550;
 

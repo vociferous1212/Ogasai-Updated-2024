@@ -400,7 +400,7 @@ function script_warlock:run(targetGUID)
 		local immolateTable = {[348] = true, [707] = true, [1094] = true, [2941] = true, [11665] = true, [11667] = true, [11668] = true, [265309] = true}
 		local corruptionTable = {[172] = true, [6222] = true, [6223] = true, [7648] = true, [11671] = true, [11672] = true}
 		if (targetObj:HasDebuff("Immolate") or targetObj:HasDebuff("Corruption")) and (IsCasting() or IsChanneling()) then
-			if immolateTable[GetSpellCasting()] or corruptionTable[GetSpellCasting()] then
+			if immolateTable[Player():GetCasting()] or corruptionTable[Player():GetCasting()] then
 				StopSpellCasting();
 				script_grind:setWaitTimer(500);
 				self.waitTimer = GetTimeEX() + 500;
@@ -548,7 +548,7 @@ function script_warlock:run(targetGUID)
 				end
 				if (not script_warlockFunctions:targetHasImmolate(targetObj)) and (not IsMoving()) then
 					if (not CastSpellByName("Immolate")) then
-						self.waitTimer = GetTimeEX() + 500;
+						self.waitTimer = GetTimeEX() + 1500;
 						script_grind:setWaitTimer(2800);
 					end
 				end
@@ -598,11 +598,12 @@ function script_warlock:run(targetGUID)
 			
 
 			-- shadow bolt to pull if we get a chance before actually entering combat phase
-			if not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and not IsMoving() then
+			if not IsMoving() and not IsInCombat() and (HasSpell("Shadow Bolt")) and (PlayerHasTarget()) and (targetObj:GetDistance() <= 29) and not IsSpellOnCD("Shadow Bolt") and not IsMoving() then
 				script_warlockFunctions:petAttack();
 				self.message = "Pulling Target";
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
 				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
+					if IsMoving() then StopMoving(); return true; end
 					if not (CastSpellByName("Shadow Bolt", targetObj)) then
 						self.waitTimer = GetTimeEX() + castTime;
 						script_grind:setWaitTimer(castTime);
@@ -970,7 +971,7 @@ function script_warlock:run(targetGUID)
 					if (IsCasting()) or (IsChanneling()) then
 						return;
 					end
-					if (not script_warlockFunctions:castImmolate(targetObj)) then
+					if (script_warlockFunctions:castImmolate(targetObj)) then
 						self.waitTimer = GetTimeEX() + 4250;
 						script_grind:setWaitTimer(3250);
 						return 4;

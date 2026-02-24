@@ -17,7 +17,7 @@ function grind2GetTargetAttackingMe:run()
 			if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
 			
 				if (i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID())
-				or (GetPet() ~= nil and GetPet() ~= 0 and i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) then
+				or (GetPet() ~= nil and GetPet() ~= 0 and i:GetUnitsTarget():GetGUID() == GetPet():GetGUID()) and not totemsList:isTargetTotem(i) then
 
 					local dist = i:GetDistance();
 

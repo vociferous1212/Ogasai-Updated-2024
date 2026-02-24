@@ -34,7 +34,7 @@ function grind2RunCombatState:run()
 	local enemyTarget = nil;
 
 -- if target is not dead and we can attack it
-	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 and not grind2.enemyTarget:IsDead() then
 
 		-- the grind2 script enemy target is this scripts enemyTarget
 		enemyTarget = grind2.enemyTarget;

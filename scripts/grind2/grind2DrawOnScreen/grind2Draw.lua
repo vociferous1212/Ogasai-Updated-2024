@@ -10,10 +10,10 @@ grind2Draw = {
 
 function grind2Draw:run()
 
-
--- draw units on screen
-	grind2DrawUnitData:drawUnitsOnScreen();
-
+-- draw units on screen - players and NPCS
+	if grind2DrawDataMenu.drawUnits then
+		grind2DrawUnitData:drawUnitsOnScreen();
+	end
 
 -- show grinder messages
 	if grind2DrawDataMenu.drawMessages and not grind2.pause then

@@ -45,6 +45,7 @@ function script_hunterPetAttackTarget:run()
 
 									-- send pet to attack target attacking me
 									PetAttack();
+									script_hunter.petAttackTimer = GetTimeEX() + 500;
 
 									if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
 										script_grind.enemyObj = grind2.enemyTarget;

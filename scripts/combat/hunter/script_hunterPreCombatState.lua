@@ -19,16 +19,6 @@ function script_hunterPreCombatState:run(targetObj)
 		return;
 	end
 
-	if script_hunter.hasPet and HasPet() and not IsMoving() and not targetObj:IsDead() and targetObj:CanAttack() then
-
-		if GetTimeEX() > script_hunter.petAttackTimer then
-
-			PetAttack();
-
-			script_hunter.petAttackTimer = GetTimeEX() + 1000;
-		end
-	end
-
 	-- use Hunter's Mark
 	if PlayerHasTarget() and HasSpell("Hunter's Mark") and not IsSpellOnCD("Hunter's Mark") and not IsInCombat() and script_hunter.useMark then
 		if not targetObj:HasDebuff("Hunter's Mark") and PlayerMana() >= script_hunter.useMarkMana then
@@ -44,6 +34,16 @@ function script_hunterPreCombatState:run(targetObj)
 					script_hunter.waitTimer = GetTimeEX() + 500;
 				end
 			end
+		end
+	end
+
+	if script_hunter.hasPet and HasPet() and not IsMoving() and not targetObj:IsDead() and targetObj:CanAttack() and IsAutoCasting("Shoot") then
+
+		if GetTimeEX() > script_hunter.petAttackTimer then
+
+			PetAttack();
+
+			script_hunter.petAttackTimer = GetTimeEX() + 500;
 		end
 	end
 

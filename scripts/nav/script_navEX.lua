@@ -19,6 +19,10 @@ function script_navEX:moveToTarget(localObj, _x, _y, _z) -- use when moving to m
 
 	local _ix, _iy, _iz = GetPathPositionAtIndex(5, script_nav.lastnavIndex);	
 
+	if _z == nil then
+		return;
+	end
+
 	-- If the target moves more than 2 yard then make a new path
 	if(GetDistance3D(_x, _y, _z, script_nav.navPosition['x'], script_nav.navPosition['y'], script_nav.navPosition['z']) > 2
 		or GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) > 20) then

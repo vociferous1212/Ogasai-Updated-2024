@@ -1,6 +1,6 @@
 ﻿instantCastSpells = {
 
-spellTable = {
+	spellTable = {
 
 	-- items
 			[6405] = true,	-- dartol's rod of transformation (furbolg form)

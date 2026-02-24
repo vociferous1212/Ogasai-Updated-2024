@@ -312,8 +312,10 @@ function NumberTargetsAttackingPlayer()
 			if i:GetDistance() <= 75 and not i:IsDead() and not i:IsCritter() then
 				if i:GetUnitsTarget() ~= 0 and i:GetUnitsTarget() ~= nil then
 					if i:GetUnitsTarget():GetGUID() == GetLocalPlayer():GetGUID() then
-						numTargets = numTargets + 1;
-						tempTarget = i:GetGUID();
+						if not totemsList:isTargetTotem(i) then
+							numTargets = numTargets + 1;
+							tempTarget = i:GetGUID();
+						end
 					end
 					if GetPet() ~= 0 and GetPet() ~= nil then
 						if i:GetGUID() ~= tempTarget then

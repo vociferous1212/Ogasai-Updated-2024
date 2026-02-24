@@ -160,6 +160,8 @@
 			["Entangling Totem"] = true,
 			["Blinding Totem"] = true,
 
+			["Moonflare Totem"] = true,
+
 			}
 
 
@@ -167,7 +169,8 @@
 
 function totemsList:isTargetTotem(i)
 	
-	if self.totems[i:GetUnitName()] and i:CanAttack() and not i:IsDead() then
+			-- need to remmber to sort the totems for shaman
+	if (self.totems[i:GetUnitName()] or i:GetCreatureType() == "Totem") and i:CanAttack() and not i:IsDead() then
 		return true;
 	end
 

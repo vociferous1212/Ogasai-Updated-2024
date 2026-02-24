@@ -142,7 +142,7 @@ function grind2:rest()
 				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
 
 				-- run drink water script
-				if grind2Water:drink() then
+				if not grind2Water:drink() then
 						
 					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
 				end
@@ -154,7 +154,7 @@ function grind2:rest()
 				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
 
 				-- run eat food script
-				if grind2Food:eat() then
+				if not grind2Food:eat() then
 						
 					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
 				end
@@ -432,16 +432,6 @@ function grind2:run()
 			grind2DoLoot.blacklistLootTimer = currentTime + (grind2AdjustTimersMenu.blacklistLootTime * 1000);
 		end
 
-		-- reset target timer if casting
-		if IsChanneling() or IsCasting() then
-			self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;
-		end
-
-		-- no target timer if in combat
-		if IsInCombat() and not IsCasting() and not IsChanneling() then
-			self.obtainNewTargetTimer = currentTime + 500;
-		end
-
 		-- count your money
 		self.currentMoney = GetMoney();
 		if self.startingMoney ~= self.currentMoney then
@@ -454,6 +444,19 @@ function grind2:run()
 --[[
 
 --]]
+
+
+-- clear dead targets reset enemy target variable
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		if grind2.enemyTarget:IsDead() then
+			grind2:clearTarget();
+		end
+	end
+
+	--[[
+
+--]]
+
 
 -- ressurect
 	if Player():IsDead() then
@@ -501,13 +504,9 @@ function grind2:run()
 
 --]]
 
-	-- clear dead targets reset enemy target variable
-	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
-		if grind2.enemyTarget:IsDead() then
-			grind2:clearTarget();
-		return true;
-		end
-	end
+	
+
+
 
 --[[
 
@@ -528,10 +527,25 @@ function grind2:run()
 		return;
 	end
 
-	-- return to loot - make sure to collect it
-	if grind2DoLoot.lootTarget ~= nil then
-		if not grind2IsLootSafeToLoot:isAnyTargetNearLoot(grind2DoLoot.lootTarget) and not AreBagsFull() and not grind2.bagsAreFull and grind2.lootTargets and not IsInCombat() then
-			return;
+-- return to loot - make sure to collect it
+	if grind2DoLoot.lootTarget ~= nil and grind2.lootTargets then
+
+		-- if we should loot, and can loot, and can hold the items
+		if not grind2IsLootSafeToLoot:isAnyTargetNearLoot(grind2DoLoot.lootTarget) and not AreBagsFull() and not grind2.bagsAreFull then
+			
+			-- not if we are in combat, or we are in combat and our target hasn't been attacked yet
+			if (not IsInCombat() or (IsInCombat() and PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99))
+			
+			-- or even if in combat but not if something is targeting me - and not if I have a target, or my target hasn't been attacked yet
+			or (not IsAnyTargetTargetingPlayer() and (not PlayerHasTarget() or (PlayerHasTarget() and GetTarget():GetHealthPercentage() >= 99)))
+			
+			-- or we have a target and it's dead - we have loot target
+			or (PlayerHasTarget() and GetTarget():IsDead())
+
+			then
+			
+				return;
+			end
 		end
 	end
 
@@ -540,7 +554,6 @@ function grind2:run()
 --]]
 
 -- assign a target
-	if (not IsCasting() and not IsChanneling()) and not instantCastSpells:isSpellInstantCast() and self.obtainNewTargetTimer ~= nil then
 		if not IsEating() and not IsDrinking() and not IsLooting() and GetTimeEX() > self.obtainNewTargetTimer then
 			if grind2HotSpot.hotSpotReached or IsInCombat() then 
 
@@ -556,10 +569,9 @@ function grind2:run()
 				end
 
 				-- set grind script obtain target timer by adding current time + ratea adjusted in menu
-				self.obtainNewTargetTimer = currentTime + grind2AdjustTimersMenu.obtainNewTargetTimer;
+				self.obtainNewTargetTimer = GetTimeEX() + grind2AdjustTimersMenu.obtainNewTargetTimer;
 			end
 		end
-	end
 
 --[[
 
@@ -662,8 +674,12 @@ end
 
 function grind2:clearTarget()
 
-	-- + 1 to target killed
-	grind2.numberOfKills = grind2.numberOfKills + 1;
+	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then
+		if grind2.enemyTarget ~= totemsList:isTargetTotem(grind2.enemyTarget) then
+			-- + 1 to target killed
+			grind2.numberOfKills = grind2.numberOfKills + 1;
+		end
+	end
 
 	-- save coordinates to run out of combat and nav
 	grind2SaveCoordinates:saveTargetsLocation(grind2.enemyTarget);
@@ -681,7 +697,7 @@ function grind2:clearTarget()
 	grind2.grinderMessage = "Clearing dead/tapped target";
 
 	-- reset new target timer
-	grind2.obtainNewTargetTimer = currentTime;
+	grind2.obtainNewTargetTimer = GetTimeEX() + grind2AdjustTimersMenu.waitAfterTargetKilledTimer;
 
 	-- set timer
 	grind2:setTimer(grind2AdjustTimersMenu.waitAfterTargetKilledTimer);

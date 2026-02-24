@@ -55,11 +55,20 @@ function grind2SelectDrawTargets:selectNPCTarget(target)
 		end
 
 		-- draw my target "TARGETED"
-		if GetTarget() ~= 0 and GetTarget() ~= nil then
+		if GetTarget() ~= 0 and GetTarget() ~= nil and grind2DrawUnitData.drawTargeted then
 
 			if GetTarget():GetGUID() == target:GetGUID() and GetTarget():GetGUID() ~= player:GetGUID() then 
 
 				DrawText("TARGETED", tX, tY-40, 255, 0, 0); 
+			end
+		end
+
+		-- player is targeting me
+		if grind2DrawUnitData.drawTargeted then
+			if target:GetUnitsTarget() ~= 0 and target:GetUnitsTarget() ~= nil then
+				if target:GetUnitsTarget():GetGUID() == Player():GetGUID() then
+					DrawText("TARGETING ME", tX, tY-50, 255, 0, 0); 
+				end
 			end
 		end
 
@@ -160,6 +169,15 @@ function grind2SelectDrawTargets:SelectPlayerTarget(target)
 					DrawText("TARGETED", tX, tY-40, 255, 0, 0); 
 				end
 			end	
+
+			-- player is targeting me
+			if grind2DrawDataMenu.drawUnits then
+				if target:GetUnitsTarget() ~= 0 and target:GetUnitsTarget() ~= nil then
+					if target:GetUnitsTarget():GetGUID() == Player():GetGUID() then
+						DrawText("TARGETING ME", tX, tY-50, 255, 0, 0); 
+					end
+				end
+			end
 		end
 	end
 end

@@ -30,6 +30,15 @@ function grind2AssignATarget:run()
 			grind2.lastTargetTargetedGUID = nil;
 		end
 	end
+	--[[
+	-- reaffirm enemy target - we have a good target
+	if NumberTargetsAttackingPlayer() <= 1 or Player():IsCasting() or Player():IsChanneling() then
+		if grind2.enemyTarget ~= 0 and grind2.enemyTarget ~= nil and not grind2.enemyTarget:IsDead() and grind2IsTargetingMe:target(grind2.enemyTarget) then
+			return grind2.enemyTarget;
+		end
+	end
+
+	--]]
 
 	local i, t = GetFirstObject();
 
@@ -60,10 +69,6 @@ function grind2AssignATarget:run()
 
 			if t == 3 and i:GetDistance() <= 65 and not i:IsDead() and not i:IsCritter() then
 
-				if totemsList:isTargetTotem(i) then
-					return i;
-				end
-
 				if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
 				
 					if grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or (i:IsCasting() and i:IsTappedByMe()) then
@@ -80,8 +85,9 @@ function grind2AssignATarget:run()
 
 								bestTarget = i;
 								bestHealth = health;
-							end
+							end								
 
+							----[[
 							if mana >= 10 then
 							
 								if bestMana > mana then
@@ -91,14 +97,15 @@ function grind2AssignATarget:run()
 									if bestMana < mana then
 
 										bestTarget = i;
-
 										bestmana = mana;
 									end
 								end
 							end
+							--]]
+
 							-- bot is not wanting to stick to 1 target?
 							if bestTarget ~= nil then
-								grind2.obtainNewTargetTimer = GetTimeEX() + 1000;
+								grind2.obtainNewTargetTimer = GetTimeEX() + 500;
 								return bestTarget;
 							end
 						end
@@ -106,15 +113,6 @@ function grind2AssignATarget:run()
 				end
 			end
 		i, t = GetNextObject(i);
-		end
-	end
-
-	-- return the last target if we are in combat with it
-	if grind2.enemyTarget ~= nil then
-		if not grind2.enemyTarget:IsDead() and (grind2.enemyTarget:GetHealthPercentage() <= 99
-			or grind2IsTargetingMe:target(grind2.enemyTarget)) then
-
-			return grind2.enemyTarget;
 		end
 	end
 
@@ -130,12 +128,6 @@ function grind2AssignATarget:run()
 				if not i:IsDead() and not i:IsCritter() and i:CanAttack() and i:GetDistance() <= grind2.findTargetDistance then
 					
 					targetDistance = i:GetDistance();
-
-					if IsInCombat() then
-						if totemsList:isTargetTotem(i) then
-							return i;
-						end
-					end
 
 					if bestDistance > targetDistance then
 					
@@ -159,8 +151,20 @@ function grind2AssignATarget:run()
 			-- target is not dead but is tapped by player
 			if not i:IsDead() and i:IsTapped() and i:IsTappedByMe() then
 
-				return i;
+				bestTarget = i;
 			end
+
+			----[[
+			if IsInCombat() and GetMyClass() ~= "SHAMAN" then
+				if i:GetDistance() <= 40 then 
+					if not i:IsDead() and i:GetHealthPercentage() > 0 then
+						if totemsList:isTargetTotem(i) or i:GetCreatureType() == "Totem" then
+							bestTarget = i;								
+						end
+					end
+				end
+			end
+			--]]
 
 		end
 	i, t = GetNextObject(i);
@@ -168,6 +172,14 @@ function grind2AssignATarget:run()
 
 -- return any target attacking me if all conditions fail
 	if IsInCombat() and bestTarget == nil then
+
+		if HasPet() then
+			if GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil and not GetPet():IsDead() then
+				if not totemsList:isTargetTotem(GetPet():GetUnitsTarget()) and not GetPet():GetUnitsTarget():IsDead() then
+					return GetPet():GetUnitsTarget();
+				end
+			end
+		end
 
 		local i, t = GetFirstObject();
 
@@ -179,8 +191,12 @@ function grind2AssignATarget:run()
 				if i:GetDistance() < 75 and i:CanAttack() and not i:IsDead() then
 				
 					if grind2IsTargetingGroup:target(i) or grind2IsTargetingMe:target(i) or grind2IsTargetingPet:target(i) or (i:IsCasting() and i:IsTappedByMe()) then
-
-						bestTarget = i;
+						
+						if GetMyClass() ~= "SHAMAN" then
+							if not totemsList:isTargetTotem(i) then
+								bestTarget = i;
+							end
+						end
 					end
 				end
 			end

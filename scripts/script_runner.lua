@@ -192,7 +192,7 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 	local closestPoint = 0
 	local closestTargetPoint = 0
 	local closestTargetDist = 999
-	local quality = 120
+	local quality = 300;
 	local closestPointToDest = 0;
 
 

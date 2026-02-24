@@ -137,7 +137,7 @@ end
 function script_gather:ShouldGather(id)
 	local herbSkill = script_gather:getHerbSkill();
 	local miningSkill = script_gather:getMiningSkill();
-	if(self.collectMinerals) then
+	if(self.collectMinerals) and HasItem("Mining Pick") then
 		for i=0,self.numMinerals - 1 do
 			if(self.minerals[i][1] == id and (self.minerals[i][2] or ((self.minerals[i][3] <= miningSkill) and self.gatherAllPossible))) then
 				return true;		
@@ -167,18 +167,20 @@ function script_gather:GetNode()
 	local bestTarget = nil;
 	while targetObj ~= 0 do
 		if (targetType == 5) then --GameObject
-			if (script_gather:ShouldGather(targetObj:GetObjectDisplayID())) then
-				if (not script_gather:isNodeBlacklisted(targetObj:GetGUID())) then
-					local dist = targetObj:GetDistance();
-					if(dist < self.gatherDistance and bestDist > dist) then
-						local _x, _y, _z = targetObj:GetPosition();
+			if (script_gather:ShouldGather(targetObj:GetObjectDisplayID())) and targetObj:GetUnitName() ~= "Izzy's Holdings" then
+				if (targetObj:GetUnitName() ~= "Alliance Chest") or (not script_getSpells:areWeAlliance() and targetObj:GetUnitName() ~= "Horde Chest" or script_getSpells:areWeAlliance()) then
+					if (not script_gather:isNodeBlacklisted(targetObj:GetGUID())) then
+						local dist = targetObj:GetDistance();
+						if(dist < self.gatherDistance and bestDist > dist) then
+							local _x, _y, _z = targetObj:GetPosition();
 
-						if (not IsNodeBlacklisted(_x, _y, _z, 5)) then
-							bestDist = dist;
+							if (not IsNodeBlacklisted(_x, _y, _z, 5)) then
+								bestDist = dist;
 
-							if bestDist <= dist then
-								bestTarget = targetObj;
-								self.nodeGUID = targetObj:GetGUID();
+								if bestDist <= dist then
+									bestTarget = targetObj;
+									self.nodeGUID = targetObj:GetGUID();
+								end
 							end
 						end
 					end
@@ -205,7 +207,7 @@ function script_gather:drawChestNodes()
 
 				-- show chests by name
 				for i=0,self.numChests - 1 do
-					if (self.chests[i][1] == id) then
+					if (self.chests[i][1] == id) and targetObj:GetUnitName() ~= "Izzy's Holdings" then
 						chestName = targetObj:GetUnitName();
 						local this = ""..dist.." yd";
 						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
@@ -258,7 +260,7 @@ local targetObj, targetType = GetFirstObject();
 
 				-- show chests by name
 				for i=0,self.numChests - 1 do
-					if (self.chests[i][1] == id) then
+					if (self.chests[i][1] == id) and targetObj:GetUnitName() ~= "Izzy's Holdings" then
 						chestName = targetObj:GetUnitName();
 						local this = ""..dist.." yd";
 						DrawText(this, _tX-10, _tY+12, 0, 255, 0);
@@ -320,7 +322,7 @@ function script_gather:currentGatherName()
 			end
 		end
 		for i=0, self.numChests -1 do
-			if (self.chests[i][1] == self.nodeID) then
+			if (self.chests[i][1] == self.nodeID) and targetObj:GetUnitName() ~= "Izzy's Holdings" then
 				name = self.chests[i][0];
 			end
 		end
