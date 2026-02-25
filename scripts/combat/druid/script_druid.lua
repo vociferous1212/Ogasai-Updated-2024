@@ -828,11 +828,12 @@ function script_druid:run(targetGUID)
 			end
 
 			-- Wrath to pull if no moonfire spell
-			if (not HasSpell("Moonfire") or not self.pullWithMoonfire) and (PlayerMana() >= self.drinkMana) and (not IsMoving()) and (targetObj:GetDistance() <= self.spellRange) then
+			if not IsInCombat() and (not HasSpell("Moonfire") or not self.pullWithMoonfire) and (PlayerMana() >= self.drinkMana) and (not IsMoving()) and (targetObj:GetDistance() <= self.spellRange) then
 				if IsMoving() then StopMoving(); return true; end
 				if (CastSpellByName("Wrath", targetObj)) then
 					self.waitTimer = GetTimeEX() + 1950;
 					script_grind:setWaitTimer(1950);
+					grind2:setTimer(1500);
 					self.tickRate = 1200;
 					self.message = "Casting Wrath!";
 					return 0; -- keep trying until cast
@@ -1109,20 +1110,26 @@ function script_druid:run(targetGUID)
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Wrath");
 				-- Wrath
 				if (PlayerMana() > 30 and targetHealth > 15 and not HasSpell("Star Fire"))
-				or (((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 30) and targetHealth >= 7 and HasSpell("Star Fire"))
+				or (((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 30) and targetHealth >= 7 and HasSpell("Star Fire"))
 				or (not HasSpell("Bear Form") and PlayerMana() >= 30 and targetHealth >= 15) and not IsMoving() then
 					if (not IsMoving()) then
-						CastSpellByName("Wrath", targetObj);
-						self.waitTimer = GetTimeEX() + 2000;
-						script_grind:setWaitTimer(2000);
+						if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 30 then
+							if not CastSpellByName("Wrath", targetObj) then
+								self.waitTimer = GetTimeEX() + 2000;
+								script_grind:setWaitTimer(2000);
+							end
+						end
 					end
 				end
 
-				-- if low level use wrath on target if they have low health
-				if (PlayerMana() >= 30) and (not HasSpell("Moonfire")) and not IsMoving() then
-					if (CastSpellByName("Wrath", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1850;
-						return 0;
+				-- if low level use wrath
+				if not HasSpell("Moonfire") and not IsMoving() then
+					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 35 then
+
+						if not (CastSpellByName("Wrath", targetObj)) then
+							self.waitTimer = GetTimeEX() + 550;
+							return 0;
+						end
 					end
 				end
 	

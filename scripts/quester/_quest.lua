@@ -117,6 +117,8 @@ local localObj = GetLocalPlayer();
 		self.usingQuester = false;
 		script_grind.pause = true;
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
+
 	return;
 	end
 
@@ -358,7 +360,7 @@ local localObj = GetLocalPlayer();
 		if _questDBReturnQuest:returnAQuest() then
 			self.enemyTarget = nil;
 			self.message = "Returning quest!";
-			_questAcceptQuest.noQuestTimer = GetTimeEX() + 5000;
+			_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
 		return true;
 		end
 	end

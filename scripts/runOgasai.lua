@@ -253,6 +253,12 @@ end
 
 function runOgasai:run()
 
+
+
+	-- need a loot controller to control both blacklist tables, or integrate them
+	-- bot is getting stuck in grinder with a valid loot target...
+	-- if lootObj ~= nil then check tables
+
 	self.usingRunOgasai = true;
 
 	local quest = _quest.currentQuest;
@@ -291,7 +297,7 @@ function runOgasai:run()
 	end
 
 -- force use grinder 2 when in combat
-	if (IsInCombat() or PlayerHasTarget() and GetTarget():CanAttack()) and not self.pause and not script_rotation.usingRotation then
+	if (IsInCombat() or PlayerHasTarget() and GetTarget():CanAttack() and not GetTarget():IsDead()) and not self.pause and not script_rotation.usingRotation then
 		runOgasai:runGrinder();
 		grind2.pause = false;
 		self.timer = GetTimeEX() + 1000;

@@ -127,6 +127,12 @@ function grind2:rest()
 
 		self.message = "Resting...";
 
+		if not IsInCombat() then
+			if PlayerHasTarget() then
+				ClearTarget();
+			end
+		end
+
 		-- player has no drinks and mana is lower than drink mana, reset variables so we don't blacklist targets and loot while standing and waiting around
 		if IsStanding() and not IsInCombat() and not IsDrinking() and not IsEating() and not IsMoving() then
 			if (PlayerMana() < grind2.restMana or PlayerHealth() < grind2.restHealth) then
@@ -389,6 +395,17 @@ function grind2:run()
 		end
 	end
 
+	if self.runBack then
+		if PlayerHasTarget() then
+			if GetTarget():GetDistance() <= 3 then
+				if not script_druid:runBackwards(GetTarget(), 1) then
+					self.runBack = false;
+				end
+			end
+		end
+		return;
+	end
+				
 
 --[[
 
@@ -445,7 +462,7 @@ function grind2:run()
 	return;
 	end
 
-								-- handle some events...
+-- handle some events...
 	-- getting really really tired of server bugs.........
 	-- Hook UIErrorsFrame:AddMessage so we always get the real error text
 
@@ -457,10 +474,7 @@ function grind2:run()
 				UIErrorsFrame.AddMessage = function(frame, msg, r, g, b, id)
 					-- Detect facing error
 					if msg == ERR_BADATTACKFACING then
-						--DEFAULT_CHAT_FRAME:AddMessage("Detected facing error: " .. msg)
-						if not script_mage:runBackwards(GetTarget(), 3) then
-							self.eventTimer = GetTimeEX() + 2500;
-						end
+						self.runBack = true;
 					end
 
 					-- Detect out of range

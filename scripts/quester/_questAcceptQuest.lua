@@ -5,9 +5,9 @@ _questAcceptQuest = {
 
 function _questAcceptQuest:run()
 
-	if IsMoving() then
+	if IsMoving() or not PlayerHasTarget() then
 
-		self.noQuestTimer = GetTimeEX() + 5000;
+		self.noQuestTimer = GetTimeEX() + 7000;
 	end
 
 	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) and not IsMoving() then
@@ -54,7 +54,7 @@ function _questAcceptQuest:run()
 
 					if GetTimeEX() >= self.noQuestTimer then
 						_questDBHandleDB:turnQuestCompleted();
-						self.noQuestTimer = GetTimeEX() + 3000;
+						self.noQuestTimer = GetTimeEX() + 7000;
 					end
 
 					if (AcceptQuest()) then
