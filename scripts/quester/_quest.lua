@@ -125,7 +125,7 @@ local localObj = GetLocalPlayer();
 		if self.enemyTarget:GetDistance() <= script_grind.combatScriptRange + 1 or ( (IsCasting() or (IsChanneling() and IsInCombat())) and ((PlayerHasTarget() and GetTarget():GetGUID() == self.enemyTarget:GetGUID()) or IsInCombat()) )  then
 			if self.enemyTarget:IsInLineOfSight() and GetTimeEX() > self.faceTargetTimer then
 				self.enemyTarget:FaceTarget();
-				self.faceTargetTimer = GetTimeEX() + 1500;
+				self.faceTargetTimer = GetTimeEX() + 500;
 			end
 		end
 	end

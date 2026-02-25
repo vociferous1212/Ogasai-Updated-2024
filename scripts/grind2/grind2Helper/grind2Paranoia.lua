@@ -168,7 +168,7 @@ function grind2Paranoia:setSpeedNormal()
 
 	grind2AdjustTimersMenu.obtainNewTargetTimer = 1750;
 
-	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 550;
+	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 1550;
 
 	grind2AdjustTimersMenu.restTimer = 2250;
 
@@ -185,7 +185,7 @@ function grind2Paranoia:setSpeedFast()
 
 	grind2AdjustTimersMenu.obtainNewTargetTimer = 1000;
 
-	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 125;
+	grind2AdjustTimersMenu.waitAfterTargetKilledTimer = 325;
 
 	grind2AdjustTimersMenu.restTimer = 1550;
 

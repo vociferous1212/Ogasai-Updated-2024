@@ -121,6 +121,8 @@ friendlyEnemiesList = {
 
 		["Winterspring Screecher"] = true,
 
+		["Carrion Grub"] = true,
+
 		}
 
 }

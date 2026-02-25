@@ -120,6 +120,7 @@ function script_hunter:runBackwards(targetObj, range)
 			end
 
 			if script_checkAdds:checkAdds() then
+				return true;
 			end
 
 			self.waitTimer = GetTimeEX() + 500;

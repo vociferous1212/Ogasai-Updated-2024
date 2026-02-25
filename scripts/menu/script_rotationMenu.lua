@@ -11,6 +11,7 @@ function script_rotationMenu:menu()
 	if (not self.pause) then 
 		if (Button("Pause")) then 
 			self.pause = true; 
+			runOgasai.pause = true;
 		end
 	else 
 		if (Button("Resume")) then 

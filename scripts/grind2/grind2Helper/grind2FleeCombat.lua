@@ -113,12 +113,14 @@ function grind2FleeCombat:run()
 		end
 	end
 
+--[[
 	-- aspect of the monkey
 	if not HasSpell("Feign Death") or (IsSpellOnCD("Feign Death") and not Player():HasBuff("Feign Death")) then
 		if HasSpell("Aspect of the Monkey") and not IsSpellOnCD("Aspect of the Monkey") and PlayerMana() >= 15 then
 			CastSpellByName("Aspect of the Monkey");
 		end
 	end
+--]]
 
 -- paladin stuffs
 

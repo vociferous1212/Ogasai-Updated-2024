@@ -294,6 +294,8 @@ function grind2:run()
 						-- reset nav position
 						grind2MoveToTarget:resetNav();
 
+
+
 					end
 
 					grind2.grinderMessage = "Avoiding targets...";
@@ -669,8 +671,58 @@ function grind2:run()
 			end
 		end
 	end
+
+--[[
+
+
+--]]
+
+
+-- move to hotspot
+	if not grind2HotSpot.hotSpotReached and not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() then
+	
+		-- cheetah hunter
+		if script_hunter.useCheetah and HasSpell("Aspect of the Cheetah") and not IsSpellOnCD("Aspect of the Cheetah") and not Player():HasBuff("Aspect of the Cheetah") and IsMoving() then
+			if CastSpellByName("Aspect of the Cheetah") then
+			end
+		end
+		-- cat form druid
+		if not HasForm() and HasSpell("Cat Form") and not Player():HasBuff("Cat Form") and not IsSpellOnCD("Cat Form") and PlayerMana() >= 50 and IsMoving() then
+			if CastSpellByName("Cat Form") then
+			end
+		end
+
+		-- mount
+		--
+
+		if grind2SaveCoordinates.numberOfLocations >= 3 then
+
+			grind2SaveCoordinates:moveToSavedLocation();
+
+			return true;
+
+		elseif not grind2HotSpot.hotspotReached or grind2SaveCoordinates.numberOfLocations < 3 then
+
+			grind2HotSpot:moveToHotspot();
+
+			return true;
+		end
+	end
+
+
+-- end of grind run function
 return true;
 end
+
+
+
+
+--[[
+
+
+--]]
+
+
 
 function grind2:clearTarget()
 

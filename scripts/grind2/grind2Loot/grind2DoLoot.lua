@@ -73,7 +73,7 @@ function grind2DoLoot:run()
 		end
 
 		-- close enough to loot target
-		if self.lootTarget:GetDistance() <= 3 then
+		if self.lootTarget:GetDistance() <= self.lootTargetDistance then
 
 			-- reset loot timer if we reach target
 			--self.blacklistLootTimer = GetTimeEX() * 2;

@@ -19,6 +19,7 @@ function _questMenu:menu()
 		if (Button("Pause Bot")) then
 			script_paranoia.currentTime = GetTimeEX() + (45*1000);
 			_quest.pause = true;
+			runOgasai.pause = true;
 		end
 	else
 		if (Button("Resume Bot")) then

@@ -86,6 +86,7 @@ function grind2Menu:run()
 
 				grind2.pause = true;
 				grind2.usingGrinder2 = false;
+				runOgasai.pause = true;
 			end
 		else
 
@@ -99,10 +100,7 @@ function grind2Menu:run()
 
 		if Button(" Reload ") then
 
-			if coremenu:reload() then
-
-				coremenu:reload();
-			end
+			coremenu:reload();
 
 			self.isSetup = false;
 		end

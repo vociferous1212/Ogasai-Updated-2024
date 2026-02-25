@@ -100,7 +100,7 @@ function script_hunterPreCombatState:run(targetObj)
 
 	-- use concussive shot
 	-- only use this to pull if we don't have an active pet'
-	if (not IsSpellOnCD("Concussive Shot")) and (IsStanding()) then
+	if (not IsSpellOnCD("Concussive Shot")) and IsStanding() then
 		if (HasSpell("Concussive Shot")) and (targetObj:IsInLineOfSight()) and (PlayerMana() > script_hunter.serpentStingMana) then
 			if not CastSpellByName("Concussive Shot") then
 				if GetTimeEX() > script_hunter.petAttackTimer then PetAttack();

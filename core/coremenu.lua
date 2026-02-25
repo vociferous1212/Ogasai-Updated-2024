@@ -74,6 +74,9 @@ function coremenu:draw()
 			----------------------------
 		]]--
 
+		LoadScript("Ogasai TESTING grinder + quester", "scripts\\runOgasai.lua");
+		AddScriptToMode("Ogasai TESTING grinder + quester", "runOgasai");
+
 		LoadScript("Grinder", "scripts\\script_grind.lua");
 		AddScriptToMode("Grinder", "script_grind");
 
