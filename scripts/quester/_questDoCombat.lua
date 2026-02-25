@@ -8,9 +8,28 @@ function _questDoCombat:doCombat()
 	
 	return;
 	end
-if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() then
-if GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() and (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 50 then local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
-		if not _quest.isQuestComplete then x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ; else x, y, z = _questDB:getReturnTargetPos(); end if x ~= 0 then if script_navEX:moveToTarget(localObj, x, y, z) then _quest.message = "Running out of combat"; if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then CastSpellByName("Earthbind Totem"); end return true; end end return true; end end
+
+	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() then
+		if GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() and (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 50 then
+		local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
+	
+			if not _quest.isQuestComplete then
+				x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ;
+			else
+				x, y, z = _questDB:getReturnTargetPos();
+			end
+			if x ~= 0 then
+				if script_navEX:moveToTarget(localObj, x, y, z) then
+					_quest.message = "Running out of combat";
+					if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
+						CastSpellByName("Earthbind Totem");
+					end
+					return true;
+				end
+			end
+		return true;
+		end
+	end
 
 
 
@@ -149,8 +168,6 @@ if GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() an
 						end
 					end
 
-				_quest.enemyTarget:FaceTarget();
-
 				end
 				if not _quest.enemyTarget:CanAttack() or (_quest.enemyTarget:IsTapped() and not _quest.enemyTarget:IsTappedByMe() and not script_grind:isTargetingMe(_quest.enemyTarget:GetGUID())) then
 					_quest.enemyTarget = nil;
@@ -168,7 +185,7 @@ if GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() an
 					end
 				end
 								-- move to target
-				if (script_grind.combatError == 3) and (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight()) then
+				if (script_grind.combatError == 3) or (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight()) then
 
 				
 

@@ -21,6 +21,8 @@ run object manager here
 
 function grind2AssignATarget:run()
 
+	script_grindBlacklistAreaWithElite:blacklistAreaWithElite();
+
 	-- clear any target not in combat with us that we have targeted
 	-- and get nearest enemy
 	if grind2.enemyTarget ~= nil and grind2.enemyTarget ~= 0 then

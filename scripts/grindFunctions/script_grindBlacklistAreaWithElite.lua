@@ -17,18 +17,35 @@ function script_grindBlacklistAreaWithElite:blacklistAreaWithElite()
 
 			tarX, tarY, tarZ = i:GetPosition();
 
-			if script_grind:isTargetHardBlacklisted(i:GetGUID()) and (i:GetClassification() == 1 or i:GetClassification() == 2) then
+			if not grind2.usingGrinder2 then
+				if script_grind:isTargetHardBlacklisted(i:GetGUID()) and (i:GetClassification() == 1 or i:GetClassification() == 2) then
 
-				eliteTarget = i;
+					eliteTarget = i;
 
-				eliteX, eliteY, eliteZ = eliteTarget:GetPosition();
-			end
+					eliteX, eliteY, eliteZ = eliteTarget:GetPosition();
+				end
 
-			if GetDistance3D(tarX, tarY, tarZ, eliteX, eliteY, eliteZ) <= 40 then
+				if GetDistance3D(tarX, tarY, tarZ, eliteX, eliteY, eliteZ) <= 40 then
 
-				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
+					if not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 
-					script_grind:addTargetToHardBlacklist(i:GetGUID());
+						script_grind:addTargetToHardBlacklist(i:GetGUID());
+					end
+				end
+			else
+				if (i:GetClassification() == 1 or i:GetClassification() == 2) then
+
+					eliteTarget = i;
+
+					eliteX, eliteY, eliteZ = eliteTarget:GetPosition();
+				end
+
+				if GetDistance3D(tarX, tarY, tarZ, eliteX, eliteY, eliteZ) <= 40 then
+
+					if not grind2Blacklisting:isTargetBlacklisted(i:GetGUID()) then
+
+						grind2Blacklisting:addTargetToBlacklist(i:GetGUID());
+					end
 				end
 			end
 		end

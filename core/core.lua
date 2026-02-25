@@ -60,3 +60,13 @@ function truncateNumber(num, decimals)
 	local factor = 10 ^ decimals
 	return math.floor(num * factor) / factor
 end
+
+function MapToWorld(mapX, mapY)
+	local x, y, z = PlayerPosition();
+
+	local worldX = (mapX - 131.3) / -0.0288
+	local worldY = (mapY - 244.4) / -0.0345
+	local worldZ = z -- z cannot be recovered from 2D map coords return worldX, worldY, worldZ end
+
+return worldX, worldY, worldZ;
+end

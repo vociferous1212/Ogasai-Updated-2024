@@ -32,6 +32,10 @@ function _questDBHandleDB:turnQuestCompleted()
 			
 						CloseQuest();
 
+						_quest.weHaveQuest = false;
+
+						_quest.questIsComplete = false;
+
 						--_questDB.questList[i]['questName'] = "nnil";
 						_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
 						_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();

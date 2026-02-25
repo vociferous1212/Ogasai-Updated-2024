@@ -23,7 +23,11 @@ function _questDoOtherQuestTypes3:run()
 			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 			return true;
 		end
-		if distToGrind <= 10 and HasItem(_quest.usingItem) then
+		if distToGrind <= 10 and HasItem(_quest.usingItem) and not IsMoving() then
+			if HasForm() then
+				RemoveForm();
+				return true;
+			end
 			UseItem(_quest.usingItem);
 			if IsMoving() then StopMoving(); end
 			return true;

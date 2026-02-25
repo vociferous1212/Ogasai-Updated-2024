@@ -26,6 +26,7 @@ function _questMenu:menu()
 			script_grind.myTime = GetTimeEX();
 			script_paranoia.currentTime = GetTimeEX() + (45*1000);
 			_quest.pause = false;
+			runOgasai.pause = false;
 		end
 	end
 
@@ -85,6 +86,7 @@ function _questMenu:menu()
 		ToFile(" ________________________________________________ ");
 		Text("");
 	end
+	Text("");
 	if (CollapsingHeader(">>> |+| Quest Options")) then
 
 local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
@@ -154,12 +156,18 @@ if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_
 -- end quest options
 end
 
-	script_targetMenu:menu();
-	script_miscMenu:menu();
+	if not _quest.usingQuester then
+		script_targetMenu:menu();
+		script_miscMenu:menu();
+	end
 
 	script_lootMenu:menu();
 	
 	script_gatherMenu:menu();
+
+	if CollapsingHeader("Vendor Options") then
+		script_vendorMenu:menu();
+	end
 
 	script_displayOptionsMenu:menu();
 

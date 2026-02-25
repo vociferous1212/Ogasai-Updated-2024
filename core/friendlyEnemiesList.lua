@@ -24,6 +24,11 @@ friendlyEnemiesList = {
 		["Small Crag Boar"] = true,				 -- 3 | Dun Morogh
 		["Rockjaw Trogg"] = true,				 -- 2 | Dun Morogh
 		["Burly Rockjaw Trogg"] = true,			 -- 2 | Dun Morogh
+		["Young Wolf"] = true,					 -- 2 | Northshire
+		["Timber Wolf"] = true,					 -- 2 | Northshire
+		["Kobold Worker"] = true,
+		["Kobold Vermin"] = true,
+		["Kobold Laborer"] = true,
 		["Crag Boar"] = true,                    -- 5 - 6 Dun Morogh
 		["Mottled Boar"] = true,				 -- 1 - 4 Durotar
 		["Scorpid Worker"] = true,				 -- 2 - 4 Durotar
@@ -122,6 +127,7 @@ friendlyEnemiesList = {
 		["Winterspring Screecher"] = true,
 
 		["Carrion Grub"] = true,
+		["Carrion Devourer"] = true,
 
 		}
 

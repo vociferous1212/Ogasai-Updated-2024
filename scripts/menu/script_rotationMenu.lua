@@ -16,6 +16,7 @@ function script_rotationMenu:menu()
 	else 
 		if (Button("Resume")) then 
 			self.pause = false; 
+			runOgasai.pause = false;
 		end 
 	end
 

@@ -93,6 +93,7 @@ function grind2Menu:run()
 			if Button(" Resume ") then
 
 				grind2.pause = false;
+				runOgasai.pause = false;
 			end
 		end
 

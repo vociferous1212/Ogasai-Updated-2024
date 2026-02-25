@@ -38,7 +38,10 @@ function _questDoOtherQuestTypes()
 				end
 			end
 			if (cooldownTime == 0) and not usedItem then
-		
+				if HasForm() then
+					RemoveForm();
+					return true;
+				end
 				UseItem(_quest.usingItem)
 
 				_quest.isQuestComplete = true;
@@ -68,7 +71,10 @@ function _questDoOtherQuestTypes()
 		local x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ;
 
 		if GetDistance3D(px, py, pz, x, y, z) < 10 and HasItem(_quest.usingItem) then
-
+		if HasForm() then
+					RemoveForm();
+					return true;
+				end
 			UseItem(_quest.usingItem)
 
 			--return true;
@@ -104,7 +110,10 @@ function _questDoOtherQuestTypes()
 		local x, y, z = _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ;
 
 		if GetDistance3D(px, py, pz, x, y, z) < 10 and HasItem(_quest.usingItem) then
-
+		if HasForm() then
+					RemoveForm();
+					return true;
+				end
 			UseItem(_quest.usingItem)
 
 			--return true;

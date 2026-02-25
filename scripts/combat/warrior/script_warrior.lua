@@ -506,9 +506,9 @@ function script_warrior:run(targetGUID)	-- main content of script
 			end
 	
 			-- Run backwards if we are too close to the target
-			if (targetObj:GetDistance() <= 1) and not script_rotation.usingRotation then 
+			if (targetObj:GetDistance() <= .8) and not script_rotation.usingRotation then 
 				if (script_warrior:runBackwards(targetObj, 1)) then
-					self.waitTimer = GetTimeEX() + 500;
+					self.waitTimer = GetTimeEX() + 250;
 				end 
 			end
 	

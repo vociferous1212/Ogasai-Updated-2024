@@ -5,11 +5,10 @@ function _questSetQuest:setOurCurrentQuest()
 	-- set our current quest
 	for y=0, _questDB.numQuests -1 do
 
-		-- get our quest log entry number to check (bot currently only does 1 at a time)
-		for i=0, GetNumQuestLogEntries() -1 do
+
 
 			-- get the objectives for the quest to match in DB
-			local questDescription, questObjectives = GetQuestLogQuestText(i);
+			local questDescription, questObjectives = GetQuestLogQuestText(y);
 
 			-- if the quest is not completed
 			if _questDB.questList[y]['completed'] == "no" then
@@ -47,7 +46,7 @@ function _questSetQuest:setOurCurrentQuest()
 						end
 					end
 				end	
-			end
+			
 		end
 	end
 end

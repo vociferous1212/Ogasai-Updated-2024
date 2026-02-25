@@ -86,9 +86,6 @@ function coremenu:draw()
 		LoadScript("Quester", "scripts\\quester\\_quest.lua");
 		AddScriptToMode("Quester 1 - 20", "_quest");
 
-		LoadScript("Follower", "scripts\\follow\\script_follow.lua");
-		AddScriptToMode("Follower", "script_follow");
-
 		LoadScript("Rotation", "scripts\\script_rotation.lua");
 		AddScriptToMode("Rotation", "script_rotation");
 
@@ -97,6 +94,9 @@ function coremenu:draw()
 
 		LoadScript("Gatherer", "scripts\\gather\\script_gatherer.lua");
 		AddScriptToMode("Gatherer", "script_gatherer");
+
+		LoadScript("Follower", "scripts\\follow\\script_follow.lua");
+		AddScriptToMode("Follower", "script_follow");
 
 		--LoadScript("Test Enviornment", "scripts\\testEnviornment.lua");
 		--AddScriptToMode("Test Enviornment", "testEnviornment");

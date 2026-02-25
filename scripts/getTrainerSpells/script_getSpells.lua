@@ -175,6 +175,7 @@ if (not script_unstuck:pathClearAuto(2)) then
 				self.trainerTarget = GetTarget();
 			end
 
+			if not IsMoving() then
 				if (GetTarget():UnitInteract()) then
 					self.waitTimer = GetTimeEX() + 2000;
 					SelectGossipOption(1);
@@ -185,13 +186,13 @@ if (not script_unstuck:pathClearAuto(2)) then
 				-- buy from trainer spell index
 					BuyTrainerService(i);
 				end
-			
-			
-			
+			end
 		end
+
 	if (script_getSpells:checkForSpellsNeeded()) then
 		return true;
 	end
+
 return false;
 end
 function script_getSpells:cityZones()

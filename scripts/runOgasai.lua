@@ -1,5 +1,9 @@
 runOgasai = {
 
+	showingWindow = true,
+
+	usingRunOgasai = false,
+
 	pause = true,
 
 	manuallyRunQuester = false,
@@ -7,6 +11,39 @@ runOgasai = {
 	manuallyRunGrinder = false,
 
 	manuallyRunRotation = false,
+
+	currentQuest = "",
+
+	timer = GetTimeEX(),
+
+	quests = {
+
+		starterQuests = {
+			[1] = "Report to Sen'jin Village",
+			[2] = "Report to Goldshire",
+			[3] = "Vital Intelligence",
+			[4] = "Rest and Relaxation",
+			[5] = "Senir's Observations",
+			[6] = "Rites of the Earthmother"
+		},
+
+
+		leaveZone1Quests = {
+			[1] = "Delivery to Silverpine Forest",
+			[2] = "Report to Gryan Stoutmantle",
+			[3] = "Mountaineer Stormpike's Task",
+			[4] = "Teldrassil",
+			[5] = "A Sacred Burial",
+			[6] = "Conscript of the Horde",
+		},
+
+		leaveZone2Quests = {
+			[1] = "abc123",
+			[2] = "zyx098"
+
+		},
+
+	}
 
 }
 
@@ -31,6 +68,9 @@ function runOgasai:runGrinder()
 
 	grind2:run();
 
+	if self.showingWindow then
+		grind2:draw();
+	end
 end
 
 
@@ -54,7 +94,12 @@ function runOgasai:runQuester()
 	end
 
 	_quest:run();
+
+	if self.showingWindow then
+		_quest:draw();
+	end
 end
+
 
 function runOgasai:runRotation()
 
@@ -76,10 +121,18 @@ function runOgasai:runRotation()
 
 	script_rotation:run();
 
-	script_rotation:draw();
+	if self.showingWindow then
+		script_rotation:draw();
+	end
 end
 
+-- run fisher ?
 
+
+--[[
+
+
+--]]
 
 
 function runOgasai:draw()
@@ -97,6 +150,8 @@ function runOgasai:menu()
 	EndWindow();
 
 	if NewWindow("Ogasai", 400, 400) then
+
+		self.showingWindow = true;
 
 		if not self.pause then
 			if Button("Pause") then
@@ -144,7 +199,7 @@ function runOgasai:menu()
 
 		Text("");
 
-		Text("Testing stuff. will do start quests in night elf area,")
+		Text("Testing stuff. will do start quests in each area,")
 		Text("then run grinder aftwards until level 6.")
 		Text("Plans to add pathing between towns on roads...")
 		Separator();
@@ -182,8 +237,9 @@ function runOgasai:menu()
 				self.pause = false;
 				runOgasai:runRotation();
 			end
-
 		end
+	else
+		self.showingWindow = false;
 	end
 end
 
@@ -197,21 +253,50 @@ end
 
 function runOgasai:run()
 
+	self.usingRunOgasai = true;
+
 	local quest = _quest.currentQuest;
 
-	-- show ogasai menu
-	runOgasai:menu();
+	-- if paused then show corrosponding windows
+	if self.pause or (not grind2.usingGrinder2 and not _quest.usingQuester and not script_rotation.usingRotation) then
+		-- show ogasai menu
+		runOgasai:menu();
+	end
 
+-- if paused then show windows
 	if self.pause then
-		if self.manuallyRunQuester then
+		if self.manuallyRunQuester and self.showingWindow then
 			_quest:window();
+			_quest:draw();
 		end
-		if self.manuallyRunGrinder then
+		if self.manuallyRunGrinder and self.showingWindow then
 			grind2:window();
+			grind2:draw();
 		end
-		if self.manuallyRunRotation then
+		if self.manuallyRunRotation and self.showingWindow then
 			script_rotation:window();
+			script_rotation:draw();
 		end
+		if not self.manuallyRunGrinder and not self.manuallyRunQuester and not self.manuallyRunRotation and self.showingWindow then
+			if PlayerLevel() <= 20 then
+				_quest:window();
+			end
+			grind2:window();
+			grind2:draw();
+		end
+
+		grind2.pause = true;
+		_quest.pause = true;
+		script_rotationMenu.pause = true;
+	end
+
+-- force use grinder 2 when in combat
+	if (IsInCombat() or PlayerHasTarget() and GetTarget():CanAttack()) and not self.pause and not script_rotation.usingRotation then
+		runOgasai:runGrinder();
+		grind2.pause = false;
+		self.timer = GetTimeEX() + 1000;
+		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+		return;
 	end
 
 -- test run each mode
@@ -235,66 +320,163 @@ function runOgasai:run()
 	end
 
 
+--[[
 
 
+--]]
+
+--[[
 
 
-
-
-
-
-
-
-
-
-
-
-
+--]]
 
 	-- return if paused
-	if self.pause or (grind2.usingGrinder2 and grind2.pause) or (_quest.usingQuester and _quest.pause) or (script_rotation.usingRotation and script_rotationMenu.pause) then
-
+	if self.pause or self.timer > GetTimeEX() or (grind2.usingGrinder2 and grind2.pause) or (_quest.usingQuester and _quest.pause) or (script_rotation.usingRotation and script_rotationMenu.pause) then
+		if not grind2.showingWindow then
+			ShowBar();
+		end
 		return;
 	end
 
-
--- night elf 1 - 6
--- i need to specify breaks in the quester for this to work. tick a variable to true, or whatever, when a set of quests are complete?
+--[[
 
 
-	-- player is not level 10 yet so grind to level 10
-	if PlayerLevel() < 10 and PlayerLevel() >= 6 then
+--]]
 
-		if quest == "need to find a good quest to stop the bot" then
 
-			runOgasai:runGrinder();
-
-		end
-
-		-- need to make a path to run to dolanaar
-		-- player level is greater than 6 so run to dolanaar
-		if quest ~= "find a good quest to stop at" then
-
-			runOgasai:runQuester();
-		end
-		
-
--- if player level is less than 6 and we have the end quest for the starter area then run the griner until level 6 is reached
-	elseif PlayerLevel() < 6 then
-
-		if quest == "Dolanaar Delivery" then
-
-			runOgasai:runGrinder();
-		end
-
-		-- player level is less than 6 so run the quester in the starter area
-
-		if quest ~= "Dolanaar Delivery" then
-
-			runOgasai:runQuester();
-		end	
+-- no quests after level 20 currently - force run grinder
+	if PlayerLevel() >= 20 then
+		DEFAULT_CHAT_FRAME:AddMessage(" ");
+		DEFAULT_CHAT_FRAME:AddMessage("No quests at this level - running grinder.");
+		DEFAULT_CHAT_FRAME:AddMessage(" ");
+		self.manuallyRunGrinder = true;
 	end
 
+--[[
+
+
+--]]
+
+
+	if PlayerLevel() >= 10 and PlayerLevel() <= 20 then
+	
+		-- why does this need to be 2 for it to not return anything?
+		for i = 1, 2 do
+			if quest == self.quests.leaveZone2Quests[i] then
+				self.currentQuest = self.quests.leaveZone2Quests[i];
+				break;
+			end
+		end
+
+		-- no quest found run grinder
+		if _questDB.curListQuest == nil then
+			runOgasai:runGrinder();
+			return;
+		end
+
+		if quest == self.currentQuest then
+
+			runOgasai:runGrinder();
+
+		end
+
+		if quest ~= self.currentQuest then
+
+			runOgasai:runQuester();
+		end
+
+		
+	end
+
+
+--[[
+
+
+--]]
+
+
+
+	if PlayerLevel() <= 10 then
+
+		-- this is a little confusing....
+		-- local 'quest' is the quester script current quest
+		-- while self.currentquest is our transition quests in this script table
+		-- if we have a trasisition quest then we have a current quest
+		-- transition quests will be where paths need to be ran AND they start / end the sequence
+		for i = 1, 6 do
+			if quest == self.quests.starterQuests[i] then
+				self.currentQuest = self.quests.starterQuests[i];
+				break;
+			end
+		end
+
+		-- check for zone 1 quests
+		for i = 1, 6 do
+			if quest == self.quests.leaveZone1Quests[i] then
+				self.currentQuest = self.quests.leaveZone1Quests[i];
+				break;
+			end
+		end
+
+		-- player is not level 10 yet so grind to level 10
+		if PlayerLevel() >= 6 then
+
+			-- no quest found run grinder
+			if _questDB.curListQuest == nil then
+				runOgasai:runGrinder();
+				return;
+			end
+
+			if quest == self.quests.leaveZone1Quests[i] then
+
+				runOgasai:runGrinder();
+
+			end
+
+			if quest ~= self.quests.leaveZone1Quests[i] then
+
+				runOgasai:runQuester();
+			end
+
+			
+
+		end
+
+
+--[[
+
+
+--]]
+
+
+		-- run transition quests
+		if PlayerLevel() >= 6 and PlayerLevel() < 10 and quest == self.currentQuest then
+			
+				runOgasai:runQuester();
+
+		-- if player level is less than 6 and we have the end quest for the starter area then run the griner until level 6 is reached
+		elseif PlayerLevel() < 6 then
+
+			-- no quest found run grinder
+			if _questDB.curListQuest == nil then
+				runOgasai:runGrinder();
+				return;
+			end
+
+			if quest == self.currentQuest then
+
+				runOgasai:runGrinder();
+			end
+
+			-- player level is less than 6 so run the quester in the starter area
+			if quest ~= self.currentQuest then
+
+				runOgasai:runQuester();
+			end	
+
+			
+		end
+	end
 end
 
 
@@ -323,5 +505,3 @@ end
 
 
 -- need to check by race and/or zone
-
-

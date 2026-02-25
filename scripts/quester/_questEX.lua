@@ -23,6 +23,7 @@ function _questEX:doStartChecks()
 		end
 	end
 
+-- pause bot if we are on a taxi
 	if PlayerHasTarget() and _quest.currentType == 10 then
 		if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
 			if UnitOnTaxi("player") then
@@ -31,6 +32,7 @@ function _questEX:doStartChecks()
 		end
 	end
 
+-- unpase bot after taxi
 	if _quest.currentType == 10 and _quest.pause then
 		if PlayerHasTarget() then
 			if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
@@ -41,6 +43,7 @@ function _questEX:doStartChecks()
 		end
 	end
 
+-- move away from fire if we are standing in it
 	if GetTimeEX() > self.standingInFireTimer and not IsInCombat() then
 		script_helper:areWeStandingInFire()
 		self.standingInFireTimer = GetTimeEX() + 5000;
@@ -53,6 +56,7 @@ function _questEX:doChecks()
 
 	local localObj = GetLocalPlayer();
 
+-- random jump
 	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() and script_grind.jump then
 		local jumpRandom = random(0, 10);
 
@@ -63,6 +67,7 @@ function _questEX:doChecks()
 		end
 	end
 
+-- run rest
 	if not localObj:IsDead() then
 		if _quest:runRest() then
 			_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
@@ -71,8 +76,8 @@ function _questEX:doChecks()
 		end
 	end
 
+-- try to survive water
 	local sx, sy, sz = 0, 0, 0;
-	
 	if not IsSwimming() then
 		sx, sy, sz = localObj:GetPosition();
 		self.breathTimer = GetTimeEX() + 45000;
@@ -86,6 +91,7 @@ function _questEX:doChecks()
 	return;
 	end
 	
+-- reset blacklist timer
 	if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
 	end

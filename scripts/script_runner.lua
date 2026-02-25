@@ -211,7 +211,7 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 	-- TO DO TODO
 
 		if firstPoint == point then
-			secondPoint = -1 
+			secondPoint = -5 
 		end
 
 		if points[firstPoint] and points[secondPoint] then
@@ -247,10 +247,10 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 	end
 
 	if (moveToPoint == 0) then
-		moveToPoint = 1
+		moveToPoint = -1
 	end
 
-	local setPoint = 2;
+	local setPoint = 1;
 
 	local diffPoint = closestPointToDest - moveToPoint;
 	if (diffPoint <= 0) then
@@ -260,6 +260,8 @@ function script_runner:avoid(pointX,pointY,pointZ, radius, safeDist)
 	end
 
 	Move(pointsTwo[moveToPoint].x, pointsTwo[moveToPoint].y, pointZ)
+						grind2MoveToTarget:GenerateNewPath();
+
 end
 
 function script_runner:drawAggroCircles()

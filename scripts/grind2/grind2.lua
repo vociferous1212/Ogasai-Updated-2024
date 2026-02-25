@@ -37,6 +37,7 @@ grind2 = {
 	useFirstAid = false,						-- use first aid or not
 	avoidTargetTimer = 0,						-- timer to run avoid target script to stop navigation from crashing
 	usingGrinder2 = false,
+	eventTimer = GetTimeEX(),
 
 	}
 
@@ -276,17 +277,14 @@ function grind2:run()
 -- avoid aggro ranges of targets that are not grinder target - when moving to grinder target, or through nav
 -- don't do if we need to loot or under PlayerLevel() 6
 -- don't use in combat, combat scripts handle add movements
-			if currentTime > self.avoidTargetTimer and not IsIndoors() and not IsCasting() and not IsChanneling() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets or grind2.bagsAreFull or script_vendor.status >= 1) and (script_gather.nodeObj == nil or not grind2.gather) then
+				if currentTime > self.avoidTargetTimer and not IsIndoors() and not IsCasting() and not IsChanneling() and not IsInCombat() and PlayerLevel() >= 6 and self.avoidTargets and (grind2DoLoot.lootTarget == nil or not grind2.lootTargets or grind2.bagsAreFull or script_vendor.status >= 1) and (script_gather.nodeObj == nil or not grind2.gather) then
 				if script_runner:avoidToAggro(4) then
-					grind2MoveToTarget:GenerateNewPath();
 					local _lx, _ly, _lz = Player():GetPosition();
 					local _ix, _iy, _iz = GetPathPositionAtIndex(5, grind2MoveToTarget.lastnavIndex);
 					--GeneratePath(_lx, _ly, _lz, script_aggro.tx, script_aggro.ty, script_aggro.tz);
-					if Move(_ix, _iy, _iz) then
+					--if Move(_ix, _iy, _iz) then
 
-						if GetDistance3D(_lx, _ly, _lz, _ix, _iy, _iz) >= 2 then
-							GeneratePath(_lx, _ly, _lz, _ix, _iy, _iz);
-						end
+					
 					
 						-- reset jump timer.. don't jump into aggro ranges
 						grind2PreChecks.jump = false;
@@ -296,13 +294,15 @@ function grind2:run()
 
 
 
-					end
+					--end
 
 					grind2.grinderMessage = "Avoiding targets...";
 
 					grind2MoveToTarget.GenerateANewPath = true;
 
-					self.avoidTargetTimer = currentTime + 1000;
+					self.avoidTargetTimer = currentTime + 50;
+
+					grind2SetTimer(500);
 
 				return;
 				end
@@ -358,8 +358,10 @@ function grind2:run()
 				end
 			end
 
+
 		end	-- end of if not dead
 	end	-- end of if not paused
+
 
 --[[
 
@@ -442,6 +444,35 @@ function grind2:run()
 		 
 	return;
 	end
+
+								-- handle some events...
+	-- getting really really tired of server bugs.........
+	-- Hook UIErrorsFrame:AddMessage so we always get the real error text
+
+		if IsInCombat() and not IsMoving() and PlayerHasTarget() and GetTimeEX() > self.eventTimer then
+			if GetTarget():GetDistance() <= 3 then
+
+				local original_AddMessage = UIErrorsFrame.AddMessage
+
+				UIErrorsFrame.AddMessage = function(frame, msg, r, g, b, id)
+					-- Detect facing error
+					if msg == ERR_BADATTACKFACING then
+						--DEFAULT_CHAT_FRAME:AddMessage("Detected facing error: " .. msg)
+						if not script_mage:runBackwards(GetTarget(), 3) then
+							self.eventTimer = GetTimeEX() + 2500;
+						end
+					end
+
+					-- Detect out of range
+				--	if msg == ERR_OUT_OF_RANGE then
+					--end
+
+				-- Always call the original function so errors still appear normally
+					return original_AddMessage(frame, msg, r, g, b, id)
+				end
+			end
+		end
+
 
 --[[
 
