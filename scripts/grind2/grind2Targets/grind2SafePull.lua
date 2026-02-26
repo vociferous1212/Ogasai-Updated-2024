@@ -23,7 +23,7 @@ function grind2SafePull:targetHasAdds(target)
 	local aggro = 0;
 	local cx, cy, cz = 0, 0, 0;
 	local tx, ty, tz = target:GetPosition();
-
+	local questTarget = nil;
 	-- run object manager
 	while i ~= 0 do
 	
@@ -36,13 +36,24 @@ function grind2SafePull:targetHasAdds(target)
 			-- acceptable targets
 			if (i:CanAttack()) and (not i:IsDead()) and (not i:IsCritter()) and (i:GetGUID() ~= GetLocalPlayer():GetGUID()) and (i:GetLevel() >= GetLocalPlayer():GetLevel() - self.safePullLevel) and (not i:IsCasting()) then
 
+				if _quest.usingQuester then
+					if _questQuestTargets:isUnitQuestTarget(i) then
+						questTarget = i;
+					end
+				end
+
 				if not friendlyEnemiesList:isEnemyNuetral(i) then
 
 					-- i position
 					cx, cy, cz = i:GetPosition();
 
 					-- acceptable range
-					if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) then	
+					if (GetDistance3D(tx, ty, tz, cx, cy, cz) <= aggro) then
+					
+						if questTarget ~= nil then
+							_quest.enemyTarget = i;
+						return false;
+						end
 
 						-- accpetable targets in range
 						countUnitsInRange = countUnitsInRange + 1;

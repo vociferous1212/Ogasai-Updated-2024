@@ -13,8 +13,17 @@ grind2FleeCombat = {
 
 function grind2FleeCombat:setup()
 
+	if GetRealmName() == "Permadeath - EU" then
+		self.fleeCombat = true;
+		self.fleeWithAdds = true;
+	end
+
 	if GetMyClass() == "DRUID" or GetMyClass() == "SHAMAN" or GetMyClass() == "PRIEST" or GetMyClass() == "PALADIN" then
-		self.manaToFlee = 20;
+		if PlayerLevel() <= 10 then
+			self.manaToFlee = 40;
+		else
+			self.manaToFlee = 20;
+		end
 	end
 
 	if GetMyClass() == "WARLOCK" or GetMyClass() == "MAGE" or GetMyClass() == "HUNTER" then

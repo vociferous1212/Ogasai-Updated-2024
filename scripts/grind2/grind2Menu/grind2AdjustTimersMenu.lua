@@ -51,6 +51,7 @@ function grind2AdjustTimersMenu:run()
 	if Button("Set Speed Fast") then	
 		grind2Paranoia:setSpeedFast();
 		grind2Menu.scriptSpeedWasAdjusted = true;
+		grind2Paranoia.manuallyAdjustedSpeed = false;
 	end
 
 -- set speed normal button
@@ -58,6 +59,7 @@ function grind2AdjustTimersMenu:run()
 		if Button("Set Speed Normal") then
 		grind2Paranoia:setSpeedNormal();
 		grind2Menu.scriptSpeedWasAdjusted = true;
+		grind2Paranoia.manuallyAdjustedSpeed = true;
 	end
 
 -- set speed slow button
@@ -66,6 +68,7 @@ function grind2AdjustTimersMenu:run()
 
 		grind2Paranoia:setSpeedSlow();
 		grind2Menu.scriptSpeedWasAdjusted = true;
+		grind2Paranoia.manuallyAdjustedSpeed = true;
 	end
 
 -- set timers to zero
@@ -145,4 +148,6 @@ function grind2AdjustTimersMenu:setTimersToZero()
 	self.restTimer = 0;
 
 	self.combatScriptTimer = 0;
+
+	grind2Paranoia.manuallyAdjustedSpeed = true;
 end

@@ -13,11 +13,12 @@ script_getSpells = {
 	getSpellsStatus = 0,
 	trainerTarget = nil,
 	isSetup = false,
-	waitTimer = 0,
+	waitTimer = GetTimeEX(),
 
 }
 function script_getSpells:setup()
-	self.waitTimer = GetTimeEX(); self.isSetup = true;
+
+	self.isSetup = true;
 end
 
 function script_getSpells:checkForSpellsNeeded()
@@ -70,9 +71,16 @@ return false;
 end
 
 function script_getSpells:run()
-		if (self.waitTimer > GetTimeEX()) then
-			return;
+
+		if self.waitTimer == 0 or self.waitTimer == nil then
+			self.waitTimer = GetTimeEX();
 		end
+
+		if (self.waitTimer > GetTimeEX()) then
+
+			return false;
+		end
+
 		self.getSpellsStatus = 1;
 
 		script_grind.currentTime2 = GetTimeEX();
@@ -180,6 +188,8 @@ if (not script_unstuck:pathClearAuto(2)) then
 					self.waitTimer = GetTimeEX() + 2000;
 					SelectGossipOption(1);
 				end
+
+				ClearTarget();
 			
 				-- need to do check for spells? this just buys anything available
 				for i = 1, 15 do
@@ -245,6 +255,7 @@ function script_getSpells:cowZones()
 
 return false;
 end
+
 function script_getSpells:deadZones()
 	local map = GetMapID();
 		if map == 130 or map == 85 or map == 1497 or map == 267 or (map == 267 and not script_getSpells:areWeAlliance()) then

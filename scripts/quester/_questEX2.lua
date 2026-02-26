@@ -67,7 +67,7 @@ function _questEX2:doChecks()
 	end
 
 	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
-		CheckBagsForBetterGear()
+		--CheckBagsForBetterGear()
 		_questEquipItems:checkInventoryForBags()
 		self.checkBagTimer = GetTimeEX() + 180000
 	end
@@ -135,13 +135,17 @@ function _questEX2:doChecks()
 	end
 	-- Check bags if they are full
 	local inventoryFull = true
+	local numSlots = 0;
 	if GetMyClass() ~= "HUNTER" then
 		for i = 1, 5 do
 			if (i ~= 0) then
 				for y=1,GetContainerNumSlots(i-1) do
 					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y)
 					if (itemCount == 0 or itemCount == nil) then
-						inventoryFull = false
+						numSlots = numSlots + 1;
+						if numSlots >= 2 then
+							inventoryFull = false
+						end
 					end
 				end
 			end
@@ -244,9 +248,7 @@ function _questEX2:doChecks()
 
 	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() and not IsInCombat() then
 		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
-			if (PlayerHasTarget()) then
-				ClearTarget()
-			end
+			
 			_quest.message = "Moving to class trainer for spells"
 			if (IsMoving()) and (not _quest.pause) then
 				if (not script_unstuck:pathClearAuto(2)) then
@@ -259,6 +261,10 @@ function _questEX2:doChecks()
 	end
 	if (script_grind.getSpells) and (not IsInCombat()) then
 		if script_getSpells.getSpellsStatus > 0 then
+			_questEX2.flipVendor = true;
+		if (PlayerHasTarget()) and not IsInCombat() then
+				ClearTarget()
+			end
 			return true
 		end
 	end

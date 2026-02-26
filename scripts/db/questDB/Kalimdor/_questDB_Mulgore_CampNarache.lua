@@ -10,7 +10,7 @@ function _questDB_Mulgore_CampNarache:setup()
 
 _questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820861816406, 215, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2333.5400390625, -393.07299804688, -8.0124425888062, "Baine Bloodhoof", 0, 0, 0, 0, 0, 2, "Take the Totem of Hawkwind to Baine Bloodhoof in Bloodhoof Village. Follow the road out of Camp Narache.", 0, 1);
 
-_questDB:addQuest("no", 1, "Break Sharptusk!", "Brave Windfeather", -2920.3586425781, -254.90600585938, 52.97253036499, 215, 4, 8, -2940.2119140625, -1217.6257324219, 61.54547882080, 1, 1, 0, 0, 0, 0, -2920.3586425781, -254.90600585938, 52.97253036499, "Brave Windfeather", "Chief Sharptusk Thornmantle", 0, 0, 0, 0, 2, "Bring the head of Chief Sharptusk Thornmantle to Brave Windfeather in Red Cloud Mesa.", 0, 1);
+_questDB:addQuest("no", 1, "Break Sharptusk!", "Brave Windfeather", -2938.1630859375, -1226.8836669922, 63.937282562256,  215, 4, 8, -2940.2119140625, -1217.6257324219, 61.54547882080, 1, 1, 0, 0, 0, 0, -2920.3586425781, -254.90600585938, 52.97253036499, "Brave Windfeather", "Chief Sharptusk Thornmantle", 0, 0, 0, 0, 2, "Bring the head of Chief Sharptusk Thornmantle to Brave Windfeather in Red Cloud Mesa.", 0, 1);
 
 if GetMyClass() == "SHAMAN" then
 
@@ -24,7 +24,7 @@ end
 
 _questDB:addQuest("no", 1, "Rite of Strength", "Seer Graytongue", -3430.3100585938, -139.2799987793, 103.0778427124, 215, 3, 6, -3169.2238769531, -1054.2880859375, 54.741600036621, 1, 20, 20, 0, 0, 0, -2877.9499511719, -221.83000183105, 54.820789337158, "Chief Hawkwind", "Bristleback Quilboar", "Bristleback Shaman", 0, 0, 0, 5, "Kill Bristlebacks in Brambleblade Ravine and bring 12 Bristleback Belts to Chief Hawkwind in Camp Narache.", 0, 1);
 
-_questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820789337158, 215, 3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3426.2470703125, -139.44728088379, 101.6287689209, "Seer Graytongue", 0, 0, 0, 0, 0, 0, "Travel to Seer Graytongue who lives in the hills directly south of Camp Narache.", 0, 0);
+_questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820789337158, 215, 3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3426.2470703125, -139.44728088379, 101.6287689209, "Seer Graytongue", 0, 0, 0, 0, 0, 0, "Travel to Seer Graytongue who lives in the hills directly south of Camp Narache.", 0, 1);
 
 _questDB:addQuest("no", 1, "The Battleboars", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940914154053, 215, 3, 6, -3101.59765625, -821.95526123047, 50.618579864502, 1, 20, 0, 0, 0, 0, -2912.6999511719, -257.54000854492, 52.940921783447, "Grull Hawkwind", "Battleboar", 0, 0, 0, 0, 0, "Grull Hawkwind in Camp Narache wants you to kill Battleboars and bring back 8 Battleboar Snouts and 8 Battleboar Flanks.", 0, 1);
 

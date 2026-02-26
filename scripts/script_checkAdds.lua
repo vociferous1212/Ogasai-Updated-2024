@@ -18,6 +18,10 @@ function script_checkAdds:checkAdds()
 		grindEnemy = grind2.enemyTarget;
 	end
 
+	if _quest.usingQuester and _quest.enemyTarget ~= 0 and _quest.enemyTarget ~= nil then
+		grindenemy = _quest.enemyTarget;
+	end
+
 -- if we want to skip hard pulls and we have a valid enemy and we are greater than level 6 then
 	if script_grind.skipHardPull and ( (grindEnemy ~= nil and grindEnemy ~= 0) or (questEnemy ~= nil and questEnemy ~= 0) )
 		and not IsChanneling() and GetNumPartyMembers() < 2 and GetLocalPlayer():GetLevel() >= 6 and not script_rotation.usingRotation and IsInCombat() then

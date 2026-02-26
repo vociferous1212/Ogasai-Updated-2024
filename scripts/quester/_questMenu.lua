@@ -5,6 +5,12 @@ _questMenu = {
 
 function _questMenu:menu()
 
+		if (Button("Current Spot Is Grind Spot")) then
+			_quest.grindSpotReached = true;
+			_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
+		end
+	Separator();
+
 	local wasClicked = false;
 
 	--nav mesh progress

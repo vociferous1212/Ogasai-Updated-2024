@@ -20,6 +20,8 @@ grind2Paranoia = {
 
 	scriptAutoAdjustedSpeed = true,
 
+	manuallyAdjustSpeed = false,
+
 }
 
 function grind2Paranoia:checkAndDoParanoia()
@@ -109,19 +111,23 @@ function grind2Paranoia:checkAndDoParanoia()
 		end
 	else
 
+		if self.manuallyAdjustSpeed and grind2.scriptSpeed == 250 then
+			self.manuallyAdjustSpeed = false;
+		end
+
 		-- if we don't want to adjust script speed and we haven't set all timers to zero already
-		if not grind2Menu.adjustScriptSpeed and grind2.scriptSpeed > 0 then
+		if not grind2Menu.adjustScriptSpeed and grind2.scriptSpeed > 0 and not self.manuallyAdjustedSpeed then
 
 			grind2Paranoia:setSpeedFast();
-
-			-- reset variables
-			self.paranoidTarget = nil;
-			self.paranoidTargetGUID = nil;
-			self.paranoidTimerSet = false;
-			self.paranoidTargetName = nil;
-			self.paranoidTargetDistance = 0;
-			self.paranoidTime = GetTimeEX() * 2;
 		end
+
+		-- reset variables
+		self.paranoidTarget = nil;
+		self.paranoidTargetGUID = nil;
+		self.paranoidTimerSet = false;
+		self.paranoidTargetName = nil;
+		self.paranoidTargetDistance = 0;
+		self.paranoidTime = GetTimeEX() * 2;
 
 	end
 

@@ -56,20 +56,17 @@ function grind2Water:drink()
 		grind2Water:setup();
 	end
 
-	if self.timer > GetTimeEX() or IsDrinking() then
-
-		return false;
-	end
-
 	for i = 0, self.numWater do
 
-		if HasItem(self.water[i]) and not IsDrinking() and not IsMoving() and not IsSpellOnCD("Drink") then
+		if not Player():HasBuff("Drink") and HasItem(self.water[i]) and not IsDrinking() and not IsMoving() and not IsSpellOnCD("Drink") and GetTimeEX() > self.timer then
 			
 			self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
 
 			if UseItem(self.water[i]) then
 
 				self.timer = GetTimeEX() + 2500 + grind2.scriptSpeed;
+
+				grind2:setTimer(2500);
 
 				return true;
 			end

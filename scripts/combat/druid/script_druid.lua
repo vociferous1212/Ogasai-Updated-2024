@@ -830,13 +830,12 @@ function script_druid:run(targetGUID)
 			-- Wrath to pull if no moonfire spell
 			if not IsInCombat() and (not HasSpell("Moonfire") or not self.pullWithMoonfire) and (PlayerMana() >= self.drinkMana) and (not IsMoving()) and (targetObj:GetDistance() <= self.spellRange) then
 				if IsMoving() then StopMoving(); return true; end
-				if (CastSpellByName("Wrath", targetObj)) then
-					self.waitTimer = GetTimeEX() + 1950;
-					script_grind:setWaitTimer(1950);
-					grind2:setTimer(1500);
-					self.tickRate = 1200;
+				if (not CastSpellByName("Wrath", targetObj)) then
+					self.waitTimer = GetTimeEX() + 550;
+					--script_grind:setWaitTimer(1950);
+					--grind2:setTimer(1500);
 					self.message = "Casting Wrath!";
-					return 0; -- keep trying until cast
+					return; -- keep trying until cast
 				end
 			end
 			
@@ -1085,17 +1084,23 @@ function script_druid:run(targetGUID)
 					self.waitTimer = GetTimeEX() + 200;
 				end
 
-				-- keep moonfire up
-				if (PlayerMana() >= 30) and (targetHealth >= 5) and (not targetObj:HasDebuff("Moonfire")) and (HasSpell("Moonfire")) and (IsInCombat()) and (not HasForm()) and (not IsCasting()) and (not IsChanneling()) then
-					if (CastSpellByName("Moonfire", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1550;
+				-- spam wrath until target is close
+				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Wrath");
+				if PlayerLevel() <= 10 and targetHealth >= 75 then
+					if not IsMoving() then
+						if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 35 then
+
+							if not (CastSpellByName("Wrath", targetObj)) then
+								self.waitTimer = GetTimeEX() + 550;
+							end
+						end
 					end
 				end
 
 				-- spam moonfire until target is killed
 				if (PlayerMana() > 30) and (targetHealth < 10) and (not IsSpellOnCD("Moonfire")) and (HasSpell("Moonfire")) then
-					if (CastSpellByName("Moonfire", targetObj)) then
-						self.waitTimer = GetTimeEX() + 1650;
+					if (not CastSpellByName("Moonfire", targetObj)) then
+						self.waitTimer = GetTimeEX() + 550;
 						return 0;
 					end
 				end
@@ -1107,7 +1112,13 @@ function script_druid:run(targetGUID)
 					end
 				end
 
-				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Wrath");
+					-- keep moonfire up
+				if (PlayerMana() >= 30) and (targetHealth >= 5) and (not targetObj:HasDebuff("Moonfire")) and (HasSpell("Moonfire")) and (IsInCombat()) and (not HasForm()) and (not IsCasting()) and (not IsChanneling()) then
+					if (not CastSpellByName("Moonfire", targetObj)) then
+						self.waitTimer = GetTimeEX() + 550;
+					end
+				end
+
 				-- Wrath
 				if (PlayerMana() > 30 and targetHealth > 15 and not HasSpell("Star Fire"))
 				or (((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 30) and targetHealth >= 7 and HasSpell("Star Fire"))
@@ -1124,11 +1135,18 @@ function script_druid:run(targetGUID)
 
 				-- if low level use wrath
 				if not HasSpell("Moonfire") and not IsMoving() then
-					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 35 then
+					local wrathMana = 35;
+					if PlayerLevel() == 1 then
+						wrathMana = 60;
+					elseif PlayerLevel() == 2 then
+						wrathMana = 50;
+					elseif PlayerLevel() == 3 then
+						wrathMana = 40;
+					end
+					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= wrathMana then
 
 						if not (CastSpellByName("Wrath", targetObj)) then
 							self.waitTimer = GetTimeEX() + 550;
-							return 0;
 						end
 					end
 				end
@@ -1222,7 +1240,7 @@ function script_druid:rest()
 	-- check heals and buffs
 	if (not IsLooting()) and (not IsDrinking()) and (not IsEating()) and (not Player():HasBuff("Frenzied Regeneration")) and (not IsInCombat()) and (not script_checkDebuffs:hasSilence()) then
 		if (script_druidHealsAndBuffs:healsAndBuffs()) then
-							if IsMoving() then StopMoving(); return true; end
+			if IsMoving() then StopMoving(); return true; end
 
 		return true;
 		end
@@ -1276,7 +1294,7 @@ function script_druid:rest()
 				return true;
 			end
 
-			if (script_helper:drinkWater()) and (not IsInCombat()) then 
+			if (not script_helper:drinkWater()) and (not IsInCombat()) then 
 				self.message = "Drinking..."; 
 				self.waitTimer = GetTimeEX() + 1800;
 				script_grind:setWaitTimer(1800);
@@ -1309,7 +1327,7 @@ function script_druid:rest()
 				return true;
 			end
 			
-			if (script_helper:eat()) and (not IsInCombat()) then 
+			if (not script_helper:eat()) and (not IsInCombat()) then 
 				self.message = "Eating..."; 
 				self.waitTimer = GetTimeEX() + 1500;
 				return true; 

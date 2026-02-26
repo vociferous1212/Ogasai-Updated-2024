@@ -35,15 +35,22 @@ function _questAcceptQuest:run()
 
 			TargetByName(_quest.curQuestGiver);
 
-			_quest:setTimer(1200); 
+			_quest:setTimer(600); 
 
 			_quest.curQuestGiver = GetTarget();
 
-			if (GetTarget() ~= nil) and (GetTarget() ~= 0) then
+			if PlayerHasTarget() then
+
+				if GetTarget():GetUnitName() == _quest.curQuestGiver then
+					if GetTimeEX() >= self.noQuestTimer then
+						_questDBHandleDB:turnQuestCompleted();
+						self.noQuestTimer = GetTimeEX() + 7000;
+					end
+				end
 
 				if (GetTarget():UnitInteract()) then
 
-					_quest:setTimer(1200);
+					_quest:setTimer(600);
 
 					if GetTarget() == nil then
 
@@ -52,10 +59,6 @@ function _questAcceptQuest:run()
 					return;
 					end
 
-					if GetTimeEX() >= self.noQuestTimer then
-						_questDBHandleDB:turnQuestCompleted();
-						self.noQuestTimer = GetTimeEX() + 7000;
-					end
 
 					if (AcceptQuest()) then
 

@@ -45,7 +45,7 @@ _questDB:addQuest("no", 1, "Rite of Vision", "Zarlam Two-Moons", -2243.479980468
 
 _questDB:addQuest("no", 1, "Rite of Vision", "Baine Bloodhoof", -2333.5400390625, -393.07299804688, -8.0124425888062, 215, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2243.4799804688, -405.84298706055, -9.4245004653931, "Zarlam Two-Moons", 0, 0, 0, 0, 0, 0, "Speak with Zarlman Two-Moons in Bloodhoof Village.", 0, 3);
 
-_questDB:addQuest("no", 1, "A Task Unfinished", "Antur Fallow", -3066.0200195313, 68.800201416016, 79.383514404297, 215, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2363.7182617188, -348.39907836914, -8.9568128585815, "Innkeeper Kauth", 0, 0, 0, 0, 0, 1, "Bring the Bundle of Furs to Innkeeper Kauth in Bloodhoof Village.", 0, 1);
+_questDB:addQuest("no", 1, "A Task Unfinished", "Antur Fallow", -3066.0200195313, 68.800201416016, 79.383514404297, 215, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2353.9011230469, -354.67288208008, -8.9569635391235, "Innkeeper Kauth", 0, 0, 0, 0, 0, 1, "Bring the Bundle of Furs to Innkeeper Kauth in Bloodhoof Village.", 0, 1);
 
 self.isSetup = true;
 end

@@ -1,5 +1,7 @@
 runOgasai = {
 
+	isSetup = false,
+
 	showingWindow = true,
 
 	usingRunOgasai = false,
@@ -16,27 +18,51 @@ runOgasai = {
 
 	timer = GetTimeEX(),
 
+	usedVendor = true,		-- flip vendor between quester to grinder
+
+	usedVendor2 = true,		-- flip vendor between grinder to quester
+
+	-- quests to allow breaks and pauses between quester and grinder sequences
 	quests = {
 
-		starterQuests = {
+		-- hearthstone out of start caves - last quest before heading to new area
+		starterHearthstoneQuests = {
+			[1] = "Break Sharptusk!",
+			[2] = "The Stolen Journal",
+			[3] = "Bounty on Garrick Padfoot",
+			[4] = "The Red Messenger",
+			[5] = "Webwood Egg",
+			[6] = "Burning Blade Medallion",
+
+		},
+
+		-- leaving level 1-6 areas
+		leaveStarterZoneQuests = {
 			[1] = "Report to Sen'jin Village",
 			[2] = "Report to Goldshire",
 			[3] = "Vital Intelligence",
 			[4] = "Rest and Relaxation",
 			[5] = "Senir's Observations",
-			[6] = "Rites of the Earthmother"
+
+			-- 2 of the same named quests... need to check description on some
+			[6] = {
+				name = "Rites of the Earthmother",
+				desc = "Take the Totem of Hawkwind to Baine Bloodhoof in Bloodhoof Village. Follow the road out of Camp Narache.",
+			}
 		},
 
 
+		-- leaving level 6 - 10 areas
 		leaveZone1Quests = {
 			[1] = "Delivery to Silverpine Forest",
-			[2] = "Report to Gryan Stoutmantle",
-			[3] = "Mountaineer Stormpike's Task",
-			[4] = "Teldrassil",
-			[5] = "A Sacred Burial",
+			[2] = "Mountaineer Stormpike's Task",
+			[3] = "Teldrassil",
+			[4] = "A Sacred Burial",
+			[5] = "Report to Gryan Stoutmantle",
 			[6] = "Conscript of the Horde",
 		},
 
+		-- leaving level 10 - 20 areas
 		leaveZone2Quests = {
 			[1] = "abc123",
 			[2] = "zyx098"
@@ -251,8 +277,18 @@ end
 --]]
 
 
+function runOgasai:setup()
+_questDB:setup()
+_questDB:getQuestStartPos()
+_questSetQuest:setOurCurrentQuest()
+self.isSetup = true;
+return false;
+end
 function runOgasai:run()
 
+	if not self.isSetup then
+		runOgasai:setup();
+	end
 
 
 	-- need a loot controller to control both blacklist tables, or integrate them
@@ -262,6 +298,7 @@ function runOgasai:run()
 	self.usingRunOgasai = true;
 
 	local quest = _quest.currentQuest;
+	local questDesc = _quest.currentDesc;
 
 	-- if paused then show corrosponding windows
 	if self.pause or (not grind2.usingGrinder2 and not _quest.usingQuester and not script_rotation.usingRotation) then
@@ -284,9 +321,9 @@ function runOgasai:run()
 			script_rotation:draw();
 		end
 		if not self.manuallyRunGrinder and not self.manuallyRunQuester and not self.manuallyRunRotation and self.showingWindow then
-			if PlayerLevel() <= 20 then
+			--if PlayerLevel() <= 20 then
 				_quest:window();
-			end
+			--end
 			grind2:window();
 			grind2:draw();
 		end
@@ -296,14 +333,15 @@ function runOgasai:run()
 		script_rotationMenu.pause = true;
 	end
 
+--[[
 -- force use grinder 2 when in combat
-	if (IsInCombat() or PlayerHasTarget() and GetTarget():CanAttack() and not GetTarget():IsDead()) and not self.pause and not script_rotation.usingRotation then
+	if IsInCombat() and not self.pause and not script_rotation.usingRotation then
 		runOgasai:runGrinder();
 		grind2.pause = false;
-		self.timer = GetTimeEX() + 1000;
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
-		return;
+		return true;
 	end
+--]]
 
 -- test run each mode
 	if self.manuallyRunGrinder and not self.manuallyRunQuester and not self.manuallyRunRotation and not self.pause then
@@ -349,6 +387,58 @@ function runOgasai:run()
 
 --]]
 
+	-- if we have no quest and current quest in quester is nil then get a quest to check
+		if GetNumQuestLogEntries() == nil or GetNumQuestLogEntries() == 0 or _quest.currentQuest == nil then
+			runOgasai:runQuester();
+			return;
+		end
+
+	-- this is a little confusing....
+		-- local 'quest' is the quester script current quest
+		-- while self.currentquest is our transition quests in this script table
+		-- if we have a trasisition quest then we have a current quest
+		-- transition quests will be where paths need to be ran AND they start / end the sequence
+		if PlayerLevel() <= 6 then
+			if quest == self.quests.leaveStarterZoneQuests[6].name then
+				if questDesc == self.quests.leaveStarterZoneQuests[6].desc then
+					self.currentQuest = self.quests.leaveStarterZoneQuests[6].name;
+				end
+			end
+
+			for i = 0, 5 do
+				if quest == self.quests.leaveStarterZoneQuests[i] then
+					self.currentQuest = self.quests.leaveStarterZoneQuests[i]
+					break;
+				end
+			end
+		end
+
+		if PlayerLevel() >= 6 and PlayerLevel() <= 10 then
+			-- check for zone 1 quests
+			for i = 1, 6 do
+				if quest == self.quests.leaveZone1Quests[i] then
+					self.currentQuest = self.quests.leaveZone1Quests[i];
+					break;
+				end
+			end
+		end
+
+		if PlayerLevel() <= 20 and PlayerLevel() >= 10 then
+			-- why does this need to be 2 for it to not return anything?
+			-- add more entries...
+			for i = 1, 2 do
+				if quest == self.quests.leaveZone2Quests[i] then
+					self.currentQuest = self.quests.leaveZone2Quests[i];
+					break;
+				end
+			end
+		end
+
+
+
+
+
+
 
 -- no quests after level 20 currently - force run grinder
 	if PlayerLevel() >= 20 then
@@ -361,18 +451,12 @@ function runOgasai:run()
 --[[
 
 
+PLAYER LEVEL 10 - 20
+
 --]]
 
 
-	if PlayerLevel() >= 10 and PlayerLevel() <= 20 then
-	
-		-- why does this need to be 2 for it to not return anything?
-		for i = 1, 2 do
-			if quest == self.quests.leaveZone2Quests[i] then
-				self.currentQuest = self.quests.leaveZone2Quests[i];
-				break;
-			end
-		end
+	if PlayerLevel() >= 10 and PlayerLevel() < 20 then
 
 		-- no quest found run grinder
 		if _questDB.curListQuest == nil then
@@ -380,108 +464,128 @@ function runOgasai:run()
 			return;
 		end
 
+		-- we have transition quest and level 10 is not reached, run grinder
 		if quest == self.currentQuest then
 
-			runOgasai:runGrinder();
+			if not self.usedVendor then
+				script_vendor.status = 1;
+				self.usedVendor = true;
+			end
 
+			self.usedVendor2 = false;
+
+			runOgasai:runGrinder();
 		end
 
+		-- run quester until transtion quest is reached
 		if quest ~= self.currentQuest then
+			if not self.usedVendor2 then
+				script_vendor.status = 1;
+				self.usedVendor2 = false;
+			end
+
+			self.usedVendor = false;
+
+			runOgasai:runQuester();
+		end
+	end
+
+
+
+
+--[[
+
+PLAYER LEVEL 6 - 10
+
+--]]
+
+
+	-- run transition quests heading to new area
+	if PlayerLevel() >= 6 and PlayerLevel() < 10 then
+
+		-- no quest found run grinder
+		if _questDB.curListQuest == nil then
+			runOgasai:runGrinder();
+			return;
+		end
+			
+		-- we have transition quest and level 10 is not reached, run grinder
+		if quest == self.currentQuest then
+
+			if not self.usedVendor then
+				script_vendor.status = 1;
+				self.usedVendor = true;
+			end
+
+			self.usedVendor2 = false;
+
+			runOgasai:runGrinder();
+		end
+
+		-- run quester until transtion quest is reached
+		if quest ~= self.currentQuest then
+			if not self.usedVendor2 then
+				script_vendor.status = 1;
+				self.usedVendor2 = false;
+			end
+
+			self.usedVendor = false;
 
 			runOgasai:runQuester();
 		end
 
-		
-	end
-
-
 --[[
 
+PLAYER LEVEL LESS THAN 6
 
 --]]
 
+	-- if player level is less than 6 and we have the end quest for the starter area then run the griner until level 6 is reached
+	elseif PlayerLevel() < 6 then
 
-
-	if PlayerLevel() <= 10 then
-
-		-- this is a little confusing....
-		-- local 'quest' is the quester script current quest
-		-- while self.currentquest is our transition quests in this script table
-		-- if we have a trasisition quest then we have a current quest
-		-- transition quests will be where paths need to be ran AND they start / end the sequence
-		for i = 1, 6 do
-			if quest == self.quests.starterQuests[i] then
-				self.currentQuest = self.quests.starterQuests[i];
-				break;
-			end
+		-- no quest found run grinder
+		if _questDB.curListQuest == nil then
+			runOgasai:runGrinder();
+			return;
 		end
 
-		-- check for zone 1 quests
-		for i = 1, 6 do
-			if quest == self.quests.leaveZone1Quests[i] then
-				self.currentQuest = self.quests.leaveZone1Quests[i];
-				break;
+		-- we have the right quest and are not high enough level to run previous conditions, run grinder
+		if quest == self.currentQuest then
+
+			if not self.usedVendor then
+				script_vendor.status = 1;
+				self.usedVendor = true;
 			end
+
+			self.usedVendor2 = false;
+
+			runOgasai:runGrinder();
 		end
 
-		-- player is not level 10 yet so grind to level 10
-		if PlayerLevel() >= 6 then
+		-- player level is less than 6 so run the quester in the starter area
+		if quest ~= self.currentQuest then
 
-			-- no quest found run grinder
-			if _questDB.curListQuest == nil then
-				runOgasai:runGrinder();
-				return;
+			for i = 1, 6 do
+				if _quest.currentQuest == self.quests.starterHearthstoneQuests[i] and not IsInCombat() and not IsCasting() and not IsChanneling() then
+					if _quest.isQuestComplete then
+						if (GetContainerItemCooldown(0, 1) == 0) then
+							if IsMoving() then
+								StopMoving();
+								return;
+							end
+							UseItem('Hearthstone'); 
+							return;
+						end
+					end
+				end
 			end
 
-			if quest == self.quests.leaveZone1Quests[i] then
+			self.usedVendor = false;
 
-				runOgasai:runGrinder();
-
-			end
-
-			if quest ~= self.quests.leaveZone1Quests[i] then
-
-				runOgasai:runQuester();
-			end
+			runOgasai:runQuester();
+		end	
 
 			
-
-		end
-
-
---[[
-
-
---]]
-
-
-		-- run transition quests
-		if PlayerLevel() >= 6 and PlayerLevel() < 10 and quest == self.currentQuest then
-			
-				runOgasai:runQuester();
-
-		-- if player level is less than 6 and we have the end quest for the starter area then run the griner until level 6 is reached
-		elseif PlayerLevel() < 6 then
-
-			-- no quest found run grinder
-			if _questDB.curListQuest == nil then
-				runOgasai:runGrinder();
-				return;
-			end
-
-			if quest == self.currentQuest then
-
-				runOgasai:runGrinder();
-			end
-
-			-- player level is less than 6 so run the quester in the starter area
-			if quest ~= self.currentQuest then
-
-				runOgasai:runQuester();
-			end	
-
-			
-		end
 	end
 end
 

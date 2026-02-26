@@ -229,7 +229,7 @@ function grind2PreChecks:run()
 	end
 
 -- hotspot reached or not reached - return to hotspot - or when there are no valid targets nearby
-	if not IsInCombat() and grind2HotSpot.distanceToHotSpot <= grind2HotSpot:distanceToHotspot()
+	if (not IsInCombat() and grind2HotSpot.distanceToHotSpot <= grind2HotSpot:distanceToHotspot())
 	or (grind2HotSpot.hotSpotReached and not grind2IsAnyValidTargetInRange:run()) then
 		
 		grind2HotSpot.hotSpotReached = false;

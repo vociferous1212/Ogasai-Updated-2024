@@ -17,6 +17,7 @@ _questIncludeFiles = {
 	questDBGatherGetInventoryIncluded = include("scripts\\db\\questDB\\_questDBGatherGetInventory.lua"),
 	questDBHandleDBIncluded = include("scripts\\db\\questDB\\_questDBHandleDB.lua"),
 
+	questTargetsDBIncluded = include("scripts\\db\\questDB\\_questQuestTargets.lua"),
 
 	questerHandleVendorIncluded = include("scripts\\quester\\_questHandleVendor.lua"),
 	questerEXIncluded = include("scripts\\quester\\_questEX.lua"),

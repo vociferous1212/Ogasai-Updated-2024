@@ -76,9 +76,10 @@ function _questEX:doChecks()
 		end
 	end
 
+--[[
 -- try to survive water
 	local sx, sy, sz = 0, 0, 0;
-	if not IsSwimming() then
+	if not IsSwimming() and not IsMoving() then
 		sx, sy, sz = localObj:GetPosition();
 		self.breathTimer = GetTimeEX() + 45000;
 	end
@@ -90,7 +91,8 @@ function _questEX:doChecks()
 		end
 	return;
 	end
-	
+--]]
+
 -- reset blacklist timer
 	if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
 		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;

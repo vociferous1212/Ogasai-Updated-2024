@@ -40,10 +40,16 @@ function _questDoCombat:doCombat()
 
 
 		-- get a target if we have none
-		if (PlayerHasTarget()) and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) and GetTarget():CanAttack() and not GetTarget():IsDead() then
+		if (not PlayerHasTarget()) and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) and PlayerHasTarget() and GetTarget():CanAttack() and not GetTarget():IsDead() then
 
-			_quest.enemyTarget = script_grindAssignTarget:assignTarget();
+			_quest.enemyTarget = grind2AssignATarget:run();
 
+		end
+
+		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
+			if grind2SafePull:targetHasAdds(_quest.enemyTarget) then
+				_quest.enemyTarget = nil;
+			end
 		end
 
 -- move away from adds script conditions
@@ -185,7 +191,7 @@ function _questDoCombat:doCombat()
 					end
 				end
 								-- move to target
-				if (script_grind.combatError == 3) or (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight()) then
+				if (script_grind.combatError == 3 and (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight())) or (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight()) then
 
 				
 
@@ -202,7 +208,9 @@ function _questDoCombat:doCombat()
 					return false;
 				end
 				
-			script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
+			--script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
+			grind2.enemyTarget = _quest.enemyTarget;
+			script_grind.combatError = grind2RunCombatState:run();
 			_quest.waitTimer = GetTimeEX() + 50;
 			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 

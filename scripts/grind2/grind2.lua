@@ -109,12 +109,8 @@ function grind2:rest()
 		grind2Setup:run();
 	end
 
-	if IsInCombat() then
-		return false;
-	end
-
 	-- return for timer
-	if grind2.timer > GetTimeEX() then
+	if grind2.timer > GetTimeEX() or IsCasting() or IsChanneling() or IsInCombat() then
 	
 		return;
 	end
@@ -127,11 +123,8 @@ function grind2:rest()
 
 		self.message = "Resting...";
 
-		if not IsInCombat() then
-			if PlayerHasTarget() then
-				ClearTarget();
-			end
-		end
+		if IsCasting() or IsChanneling() then return; end
+
 
 		-- player has no drinks and mana is lower than drink mana, reset variables so we don't blacklist targets and loot while standing and waiting around
 		if IsStanding() and not IsInCombat() and not IsDrinking() and not IsEating() and not IsMoving() then
@@ -142,34 +135,15 @@ function grind2:rest()
 			end
 		end
 
-		if not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() then
-			-- drink water
-			if not IsDrinking() and PlayerMana() <= grind2.restMana and not IsMoving() and not IsCasting() and not IsChanneling() then
-
-				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-
-				-- run drink water script
-				if not grind2Water:drink() then
-						
-					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-				end
-			end
-
-			-- eat food
-			if not IsEating() and PlayerHealth() <= grind2.restHealth and not IsMoving() and not IsCasting() and not IsChanneling() then
-
-				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-
-				-- run eat food script
-				if not grind2Food:eat() then
-						
-					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-				end
-			end
-		end
+	
 
 		-- if we are drinking or eating then return
-		if (IsDrinking() or IsEating()) and (not IsInCombat()) then
+		if (IsDrinking() or IsEating() or Player():HasBuff("Drink") or Player():HasBuff("Eat")) and (not IsInCombat()) then
+
+			if PlayerHasTarget() then
+				ClearTarget();
+			end
+
 
 			-- return
 			return true;
@@ -220,6 +194,38 @@ function grind2:rest()
 
 				-- done with script
 				return false;
+			end
+		end
+
+		if Player():HasBuff("Eat") or Player():HasBuff("Drink") then return; end
+
+		if not Player():HasBuff("Drink") and not Player():HasBuff("Eat") and not IsInCombat() and not IsCasting() and not IsChanneling() and not IsLooting() and IsStanding() and not IsMoving() and not IsDrinking() and not IsEating() then
+			-- drink water
+			if not Player():HasBuff("Drink") and not IsDrinking() and PlayerMana() <= grind2.restMana and not IsMoving() and not IsCasting() and not IsChanneling() and GetTimeEX() > (grind2.timer and grind2Water.timer) then
+
+				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+
+				-- run drink water script
+				if grind2Water:drink() then
+						
+					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+
+					return true;
+				end
+			end
+
+			-- eat food
+			if not Player():HasBuff("Eat") and not IsEating() and PlayerHealth() <= grind2.restHealth and not IsMoving() and not IsCasting() and not IsChanneling() and GetTimeEX() > (grind2.timer and grind2Food.timer) then
+
+				grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+
+				-- run eat food script
+				if not grind2Food:eat() then
+						
+					grind2:setTimer(grind2AdjustTimersMenu.restTimer);
+
+					return true;
+				end
 			end
 		end
 
@@ -401,9 +407,9 @@ function grind2:run()
 				if not script_druid:runBackwards(GetTarget(), 1) then
 					self.runBack = false;
 				end
+			return;
 			end
 		end
-		return;
 	end
 				
 
@@ -540,7 +546,7 @@ function grind2:run()
 				ClearTarget();
 			end
 			grind2:setTimer(grind2AdjustTimersMenu.restTimer);
-			return;
+		return;
 		end
 		if (IsEating() or IsDrinking()) and not IsInCombat() then
 			return;

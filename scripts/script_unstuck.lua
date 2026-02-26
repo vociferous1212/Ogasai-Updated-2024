@@ -354,7 +354,7 @@ function script_unstuck:checkUnstuck()
 		self._unstuckAttempts = self._unstuckAttempts + 1
 
 		-- Jump
-		if not IsInCombat() then
+		if not IsInCombat() and not IsSwimming() then
 			JumpOrAscendStart()
 		end
 			--DEFAULT_CHAT_FRAME:AddMessage("script_unstuck:checkUnstuck: Jumping")

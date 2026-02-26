@@ -62,10 +62,10 @@ function script_helper:setup()
 	script_helper:addWater("Ice Cold Milk");
 	script_helper:addWater("Refreshing Spring Water");
 	script_helper:addWater("Fizzy faire Drink");
-		script_helper:addWater("Freshly-Squeezed Lemonade");
-		script_helper:addWater("Hyjal Nectar");
-		script_helper:addWater("Green Garden Tea");
-		script_helper:addWater("Bottle Winterspring Water");
+	script_helper:addWater("Freshly-Squeezed Lemonade");
+	script_helper:addWater("Hyjal Nectar");
+	script_helper:addWater("Green Garden Tea");
+	script_helper:addWater("Bottle Winterspring Water");
 
 	-- Mage water
 	script_helper:addWater("Conjured Crystal Water");
@@ -349,6 +349,7 @@ function script_helper:eat()
 				self.eatTimer = GetTimeEX() + 2000;
 				script_grind:setWaitTimer(2000);
 				_quest:setTimer(1200);
+				grind2:setTimer(2000);
 				return true;
 			end
 		end
@@ -364,6 +365,7 @@ function script_helper:drinkWater()
 				self.drinkTimer = GetTimeEX() + 2000;
 				script_grind:setWaitTimer(2000);
 				_quest:setTimer(1600);
+				grind2:setTimer(2000);
 				return true;
 			end
 		end

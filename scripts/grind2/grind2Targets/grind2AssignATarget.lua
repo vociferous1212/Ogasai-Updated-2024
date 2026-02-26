@@ -199,6 +199,8 @@ function grind2AssignATarget:run()
 								bestTarget = i;
 							end
 						end
+
+						bestTarget = i;
 					end
 				end
 			end

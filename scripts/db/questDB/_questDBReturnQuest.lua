@@ -89,12 +89,12 @@ function _questDBReturnQuest:returnAQuest()
 				name = GetTarget();
 			end
 			if ((GetTarget() ~= 0 and GetTarget() ~= nil) or id ~= nil) and not IsMoving() then
-					_quest.waitTimer = GetTimeEX() + 2000;
+					_quest.waitTimer = GetTimeEX() + 1000;
 				if not IsMoving() and ((id ~= nil and id:GameObjectInteract()) or (GetTarget():UnitInteract())) then
 
 					_quest.weCompletedQuest = true;
 					
-					self.waitTimer = GetTimeEX() + 2000;
+					self.waitTimer = GetTimeEX() + 1000;
 
 						CompleteQuest();
 						SelectGossipActiveQuest(1);
@@ -240,18 +240,18 @@ if bestRewardIndex > 0 and bestItemName then
 	GetQuestReward(bestRewardIndex)
 	GetQuestReward(QuestFrameRewardPanel, bestRewardIndex)
 	CompleteQuest()
-	self.waitTimer = GetTimeEX() + 2000
+	self.waitTimer = GetTimeEX() + 1000
 	UseItem(bestItemName)
 else
 	GetQuestReward(1)
 	GetQuestReward(QuestFrameRewardPanel, 1)
 	CompleteQuest()
-	self.waitTimer = GetTimeEX() + 2000
+	self.waitTimer = GetTimeEX() + 1000
 end
 						
 						if (not GetQuestReward(rewardNum)) then
 							SelectActiveQuest(1);
-							self.waitTimer = GetTimeEX() + 2000;
+							self.waitTimer = GetTimeEX() + 1000;
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
 							CompleteQuest();
@@ -269,7 +269,7 @@ end
 			end
 			_quest.message = "Moving to quest return target - "..name.." : "..dist.." (yd)";
 			--if (GetDistance3D(px, py, pz, x, y, z) < 25) then
-				script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+				grind2MoveToTarget:run(GetLocalPlayer(), x, y, z);
 			--else
 				--script_runner:run(x, y, z)
 			--end

@@ -4,7 +4,7 @@ _quest = {
 	pause = true,
 	isSetup = false,
 	waitTimer = GetTimeEX(),
-	tickRate = 1,
+	tickRate = .5,
 	currentQuest = nil,
 	enemyTarget = nil,
 	targetKilledNum = 0,
@@ -92,6 +92,54 @@ local localObj = GetLocalPlayer();
 
 --]]
 
+if self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
+	if IsInCombat() and not script_grind:isTargetingMe(self.enemyTarget) and self.enemyTarget:GetHealthPercentage() >= 99 and not IsCasting() and not IsChanneling() then
+		self.enemyTarget = nil;
+		ClearTarget();
+	end
+end
+
+-- assign target is not working while in combat???
+	if self.enemyTarget == nil or self.enemyTarget == 0 and IsInCombat() then
+		if PlayerHasTarget() then
+			if not GetTarget():IsDead() and GetTarget():CanAttack() then
+				self.enemyTarget = GetTarget();
+			end
+		end
+	end
+
+	-- move away from additional targets in combat
+		if IsInCombat() and self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
+			if self.enemyTarget:GetHealthPercentage() >= 25 and not script_checkDebuffs:hasDisabledMovement() then
+				if script_checkAdds:checkAdds() then
+					script_om:FORCEOM();
+				return;
+				end
+			end
+		end
+
+		-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
+		-- mainly for hardcore
+	if not self.pause and IsInCombat() and grind2FleeCombat.fleeCombat then 
+		if grind2SaveCoordinates.numberOfLocations >= 3 and PlayerLevel() >= 6 and not Player():IsDead() then
+			if (grind2FleeCombat.healthToFlee >= PlayerHealth() and grind2FleeCombat.manaToFlee >= PlayerMana()) or (NumberTargetsAttackingPlayer() >= 2 and grind2FleeCombat.fleeWithAdds) then
+				grind2FleeCombat:run();
+				self.message = "Fleeing combat";
+				self.enemyTarget = nil;
+				if PlayerHasTarget() then
+					ClearTarget();
+				end
+				if IsCasting() then
+					SpellStopCasting();
+				end
+				return;
+			end
+		end
+	else
+		-- last saved location is 1st go to location
+		grind2SaveCoordinates.currentGoToLocation = grind2SaveCoordinates.numberOfLocations - 1;
+	end
+
 -- setup bot / do start checks
 	if _questEX:doStartChecks() then
 		return;
@@ -110,7 +158,6 @@ local localObj = GetLocalPlayer();
 			DEFAULT_CHAT_FRAME:AddMessage("No quest found to run");
 			self.deletememessage = true;
 		end
-		self.pause = true;
 		return;
 	end
 	if (self.pause) then
@@ -147,6 +194,8 @@ local localObj = GetLocalPlayer();
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 0) then
 			_questHandleVendor:vendor();
+			_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 			return true;
 		elseif (vendorStatus == 0) then
 			_questEX.bagsFull = false;
@@ -163,7 +212,7 @@ local localObj = GetLocalPlayer();
 		if self.enemyTarget:GetDistance() <= script_grind.combatScriptRange + 1 or ( (IsCasting() or (IsChanneling() and IsInCombat())) and ((PlayerHasTarget() and GetTarget():GetGUID() == self.enemyTarget:GetGUID()) or IsInCombat()) )  then
 			if self.enemyTarget:IsInLineOfSight() and GetTimeEX() > self.faceTargetTimer then
 				if not self.enemyTarget:FaceTarget() then
-					self.faceTargetTimer = GetTimeEX() + 500;
+					self.faceTargetTimer = GetTimeEX() + 1000;
 				end
 			end
 		end
@@ -216,9 +265,9 @@ local localObj = GetLocalPlayer();
 -- do questex checks
 		if _questEX:doChecks() then
 			if script_grind.lootObj ~= nil and not _questEX.bagsFull then
-				if not IsInCombat() and (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
-					ClearTarget();
-				end
+				--if not IsInCombat() and (not script_grind.isAnyTargetTargetingMe()) and (PlayerHasTarget() and not GetTarget():GetGUID() == script_grind.lootObj:GetGUID()) then
+				--	ClearTarget();
+				--end
 			end
 		return;
 		end
@@ -228,6 +277,10 @@ local localObj = GetLocalPlayer();
 
 
 --]]
+
+if IsLooting() then
+	_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+end
 
 -- return for loot??
 		if script_grind.lootObj ~= nil and IsLooting() then
@@ -246,6 +299,7 @@ local localObj = GetLocalPlayer();
 
 			if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and self.enemyTarget:IsDead() then
 				script_grind.monsterKillCount = script_grind.monsterKillCount + 1;
+				grind2SaveCoordinates:saveTargetsLocation(self.enemyTarget);
 				self.enemyTarget = nil
 			end
 
@@ -268,7 +322,6 @@ local localObj = GetLocalPlayer();
 
 
 --]]
-
 -- run combat
 			if self.enemyTarget ~= nil and self.enemyTarget ~= 0 and not IsAutoCasting("Attack") then
 				self.enemyTarget:AutoAttack();
@@ -357,11 +410,17 @@ local localObj = GetLocalPlayer();
 
 	-- return a completed quest to quest return target
 	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil and not IsInCombat() then
-		if _questDBReturnQuest:returnAQuest() then
-			self.enemyTarget = nil;
-			self.message = "Returning quest!";
-			_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
-		return true;
+		if (AreBagsFull()) then
+			_questEX.bagsFull = true
+			script_vendor.status = 1;
+		end
+		if not AreBagsFull() then
+			if _questDBReturnQuest:returnAQuest() then
+				self.enemyTarget = nil;
+				self.message = "Returning quest!";
+				_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
+			return true;
+			end
 		end
 	end
 
@@ -395,7 +454,11 @@ local localObj = GetLocalPlayer();
 
 	if _questDB.curDesc ~= _quest.currentDesc then
 
-		if _questDBHandleDB:turnOldQuestCompleted() then self.tickRate = .1; _quest:setTimer(100); return true; end end
+		if _questDBHandleDB:turnOldQuestCompleted() then
+			self.tickRate = 0;
+			return true;
+		end
+	end
 	
 	if script_grind.lootObj == nil and script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
 		if script_gatherRun:gather() then
@@ -489,6 +552,8 @@ local localObj = GetLocalPlayer();
 			end
 
 			_quest.message = "Moving to grind spot";
+			_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 		end
 	end

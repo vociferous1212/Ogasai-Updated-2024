@@ -460,6 +460,7 @@ function handleSwimming()
 		script_grindEX.swimTimer = 0
 	end
 
+--[[
 	-- Check if swimming and not casting/channeling
 	if script_grindAreWeSwimming:areWeSwimming() and not IsCasting() and not IsChanneling() then
 		-- Surface every 10 seconds to avoid drowning
@@ -475,4 +476,7 @@ function handleSwimming()
 		script_grindEX.swimTimer = GetTimeEX() + 10000
 		return false
 	end
+
+--]]
+
 end
