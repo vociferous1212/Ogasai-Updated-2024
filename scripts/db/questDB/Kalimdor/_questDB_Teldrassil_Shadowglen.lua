@@ -38,15 +38,7 @@ end
 if GetMyClass() == "WARRIOR" then
 	_questDB:addQuest("no", 0, "Simple Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10526.599609375, 778.08599853516, 1329.5993652344, "Alyissia", 0, 0, 0, 0, 0, 0, "Read the Simple Sigil and speak to Alyissia in Shadowglen.", 0, 1);
 end
-if GetMyClass() == "HUNTER" then
-	_questDB:addQuest("no", 0, "", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, , , 0, 0, 0, 0, 0, 0, , 0, 1);
-end
-if GetMyClass() == "PRIEST" then
-	_questDB:addQuest("no", 0, "", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, , , 0, 0, 0, 0, 0, 0, , 0, 1);
-end
-if GetMyClass() == "DRUID" then
-	_questDB:addQuest("no", 0, "", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, , , 0, 0, 0, 0, 0, 0, , 0, 1);
-end
+
 
 -- level 1 night elf starter quest # 2
 _questDB:addQuest("no", 0, "The Balance of Nature", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 10596.055664063, 793.87274169922, 1309.9134521484, 1, 7, 7, 0, 0, 0, 10328.900390625, 826.05200195313, 1326.380859375, "Conservator Ilthalaine", "Mangy Nightsaber", "Thistle Boar", 0, 0, 0, 2, "Conservator Ilthalaine needs you to kill 7 Mangy Nightsabers and 7 Thistle Boars.", 0, 1);
