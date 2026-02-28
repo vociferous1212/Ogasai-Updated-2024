@@ -1,3 +1,7 @@
+-- discord channel invite
+https://discord.gg/cTSdYAM
+
+-- discord channel
 https://discord.com/channels/255957722141425664/255957722141425664
 
 
