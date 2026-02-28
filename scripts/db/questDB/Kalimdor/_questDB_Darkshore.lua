@@ -1,5 +1,7 @@
 _questDB_Darkshore = {isSetup = false}
 
+----_questDB:addQuest(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherName, gatherName2, rewardNum, desc);
+
 function _questDB_Darkshore:setup()
 --_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
 --_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
@@ -29,7 +31,7 @@ _questDB:addQuest("no", 0, "Bashal'Aran", "Asterion", 6748.6401367188, 48.615798
 
 _questDB:addQuest("no", 0, "Bashal'Aran", "Thundris Windweaver", 6580.9702148438, 492.2919921875, 8.2341928482056, 148, 10, 20, 6748.6401367188, 48.615798950195, 48.635097503662, 0, 0, 0, 0, 0, 0, 6748.6401367188, 48.615798950195, 48.635097503662, "Asterion", 0, 0, 0, 0, 0, 0, "Find the source of the strange blue aura in the ruins of Bashal'Aran.", 0, 1);
 
-_questDB:addQuest("no", 0, "Buzzbox 827", "Wizbang Cranktoggle", 6406.1098632813, 519.81500244141, 23.884471893311, 148, 10, 20, 6189.8002929688, 551.27038574219, 5.3186078071594, 1, 10, 0, 0, 0, 0, 6311.884765625, 541.22802734375, 13.545527458191, 356, 0, 0, 0, 0, 0, 0, "Collect 6 Crawler Legs and place them in Buzzbox 827.", 0, 1);
+_questDB:addQuest("no", 0, "Buzzbox 827", "Wizbang Cranktoggle", 6406.1098632813, 519.81500244141, 23.884471893311, 148, 10, 20, 6189.8002929688, 551.27038574219, 5.3186078071594, 1, 10, 0, 0, 0, 0, 6311.884765625, 541.22802734375, 13.545527458191, 356, "Pygmy Tide Crawler", 0, 0, 0, 0, 0, "Collect 6 Crawler Legs and place them in Buzzbox 827.", 0, 1);
 
 self.isSetup = true;
 end

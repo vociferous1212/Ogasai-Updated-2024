@@ -7,6 +7,8 @@ function coremenu:reload()
 
 	self.isSetup = false;
 
+	runOgasai:setup();
+
 	coremenu:draw();
 end
 
@@ -26,8 +28,9 @@ function coremenu:draw()
 		include("core\\racialSpells.lua");
 		include("core\\instantCastSpells.lua");
 		include("core\\totemsList.lua");
-
+		include("core\\itemsList.lua");
 		include("core\\friendlyEnemiesList.lua");
+
 		-- Load DBs
 		include("scripts\\db\\vendorDB.lua");
 		include("scripts\\db\\hotspotDB.lua");
@@ -74,8 +77,8 @@ function coremenu:draw()
 			----------------------------
 		]]--
 
-		LoadScript("Ogasai TESTING grinder + quester", "scripts\\runOgasai.lua");
-		AddScriptToMode("Ogasai TESTING grinder + quester", "runOgasai");
+		LoadScript("Ogasai", "core\\runOgasai.lua");
+		AddScriptToMode("Ogasai", "runOgasai");
 
 		LoadScript("Grinder", "scripts\\script_grind.lua");
 		AddScriptToMode("Grinder", "script_grind");

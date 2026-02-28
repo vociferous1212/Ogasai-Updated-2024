@@ -9,12 +9,13 @@ function script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange()
 
 	local tx, ty, tz = 0, 0, 0;
 
+	local aggroTarget = nil;
+
 	while i ~= 0 do
 
 		if t == 3 or t == 4 then
 
-			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter()
-			and i:IsInLineOfSight() and not script_grindIsTargetAggroBlacklisted:isTargetAggroBlacklisted(i:GetGUID())
+			if i:GetDistance() <= 30 and i:CanAttack() and not i:IsDead() and not i:IsCritter() and i:IsInLineOfSight()
 			and not script_grind:isTargetHardBlacklisted(i:GetGUID()) and not friendlyEnemiesList:isEnemyNuetral(i)
 			
 			then
@@ -25,35 +26,27 @@ function script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange()
 
 				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
 
-				if range <= aggro and (not PlayerHasTarget()) then
+				if GetRealmName() == "Permadeath - EU" then
 
-					name = i:GetUnitName();
-
-					TargetByName(name);
-
-					if (UnitIsEnemy("target","player")) then
+					aggro = i:GetLevel() - PlayerLevel() + 17.2;
 					
-						if not IsAutoCasting("Attack") then
-							i:AutoAttack();
-						end
-
-						return i;
+					if PlayerLevel() <= 5 then
+						aggro = i:GetLevel() - PlayerLevel() + 15;
 					end
+				end
 
-				elseif (not script_grind.hotspotReached or _quest.usingQuester) and (not IsInCombat()) then	
+				if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
+					aggro = i:GetLevel() - PlayerLevel() + 19.5;
+				end
 
-					script_grindAddTargetToAggroBlacklist:addTargetToAggroBlacklist(i:GetGUID());
+				if range <= aggro then
 
-					if (PlayerHasTarget()) then
+					aggroTarget = i;
 
-						ClearTarget();
-					end
-
-				return nil;
 				end
 			end
 		end
 	i, t = GetNextObject(i);
 	end
-return nil;
+return aggroTarget;
 end

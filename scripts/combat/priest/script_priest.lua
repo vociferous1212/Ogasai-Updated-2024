@@ -264,7 +264,7 @@ function script_priest:run(targetGUID)
 -- Cast Shield Power Word: Shield
 	if (PlayerHasTarget() and GetTarget():GetDistance() <= 40) and (not localObj:HasDebuff("Weakened Soul")) and not localObj:HasBuff("Power Word: Shield") and (HasSpell("Power Word: Shield")) and not IsSpellOnCD("Power Word: Shield") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Power Word: Shield");
-			if (IsInCombat() and (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) or (not IsInCombat() and PlayerMana() >= self.drinkMana + 10) then
+			if (IsInCombat() and (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) or (not IsInCombat() and PlayerMana() >= self.drinkMana + 10) then
 				if GetTimeEX() >= self.pwShieldTimer then
 					if not CastSpellByName("Power Word: Shield", localObj) then
 						self.pwShieldTimer = GetTimeEX() + 1000;
@@ -275,16 +275,19 @@ function script_priest:run(targetGUID)
 	return;
 	end
 
+	if targetObj == nil then return; end
+
 	-- use mind blast on CD
 	if targetObj ~= nil and targetObj ~= 0 then
 		if (not IsMoving()) and (HasSpell("Mind Blast")) and GetTimeEX() > self.mindBlastTimer and (targetObj:IsInLineOfSight()) then
 			if (targetHealth >= 20) and (localMana >= self.mindBlastMana) and (targetObj:GetDistance() <= self.spellRange) then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mind Blast");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20 then
-					if IsAutoCasting("Shoot") then
-						SpellStopCasting();
-					end
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20 then
+					
 					if not IsSpellOnCD("Mind Blast") then
+						if IsAutoCasting("Shoot") then
+							SpellStopCasting();
+						end
 						if not CastSpellByName("Mind Blast", targetObj) then
 							self.waitTimer = GetTimeEX() + 750;
 							self.mindBlastTimer = GetTimeEX() + castTime + self.mindBlastCDTime;
@@ -456,7 +459,7 @@ function script_priest:run(targetGUID)
 			-- also used before we have mind blast
 			if self.useSmite and (not HasSpell("Mind Blast")) and (targetObj:GetDistance() <= self.spellRange) and (not IsMoving()) and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not CastSpellByName("Smite", targetObj) then
 					self.waitTimer = GetTimeEX() + 500;
 					return 0;
@@ -476,7 +479,7 @@ function script_priest:run(targetGUID)
 			if not IsMoving() and IsStanding() and not self.useSmite and not HasSpell("Mind Blast") then
 
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Word: Pain");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
 					if (not Cast("Shadow Word: Pain", targetObj)) then	
 						self.waitTimer = GetTimeEX() + 550;
 					end
@@ -504,7 +507,7 @@ function script_priest:run(targetGUID)
 				--shadow word pain if mindblast is on CD to pull if no wand
 			elseif (HasSpell("Shadow Word: Pain")) and (not targetObj:HasDebuff("Shadow Word: Pain")) and (IsSpellOnCD("Mind Blast")) and (targetObj:IsInLineOfSight()) and localMana >= self.swpMana then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Word: Pain");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
 					if (Cast("Shadow Word: Pain", targetObj)) then
 						self.waitTimer = GetTimeEX() + 550;
 						return 0; -- keep trying until cast
@@ -513,7 +516,7 @@ function script_priest:run(targetGUID)
 			-- Use Smite and wand
 			elseif (self.useSmite) and (localMana >= self.useWandMana) and (targetHealth >= self.useWandHealth or (localMana >= 75 and not localObj:HasRangedWeapon())) and not IsMoving() and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not CastSpellByName("Smite", targetObj) then
 						self.waitTimer = GetTimeEX() + 500;
 						return 0; -- keep trying until cast
@@ -527,7 +530,7 @@ function script_priest:run(targetGUID)
 			-- Use Smite if we have it
 			elseif (self.useSmite) and not IsMoving() and not IsSpellOnCD("Smite") then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not (CastSpellByName("Smite", targetObj)) then
 						self.waitTimer = GetTimeEX() + 500;
 						return 0; -- keep trying until cast
@@ -539,7 +542,7 @@ function script_priest:run(targetGUID)
 						return 0;
 					end
 				end
-			elseif localMana < self.swpMana and localObj:HasRangedWeapon() then
+			elseif (localMana < self.swpMana or localMana < self.mindBlastMana) and localObj:HasRangedWeapon() then
 				if targetObj:GetDistance() > 30 then
 					return 3;
 				end
@@ -642,7 +645,7 @@ function script_priest:run(targetGUID)
 			-- Check: Keep Shadow Word: Pain up
 			if (not targetObj:HasDebuff("Shadow Word: Pain")) and (HasSpell("Shadow Word: Pain")) and (localMana >= self.swpMana) and (targetHealth >= 20) then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Word: Pain");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
 					if not Cast("Shadow Word: Pain", targetObj) then 
 						self.waitTimer = GetTimeEX() + 550;
 						return; -- keep trying until cast
@@ -698,7 +701,7 @@ function script_priest:run(targetGUID)
 					return true;
 				end
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Smite");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or ( (PlayerMana() >= 7 and PlayerLevel() > 2) or (PlayerMana() >= 15 and PlayerLevel() <= 2) ) then
 					if not (CastSpellByName("Smite", targetObj)) then 
 						self.waitTimer = GetTimeEX() + 500;
 						return 0; -- keep trying until cast
@@ -821,7 +824,7 @@ function script_priest:rest()
 	end
 
 	-- Eat and Drink
-	if (not IsDrinking() and localMana < self.drinkMana) and (not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/1.5) and not (IsEating() or IsDrinking()) then
+	if PlayerLevel() >= 3 and (not IsDrinking() and localMana < self.drinkMana) and (not localObj:HasBuff("Spirit Tap")) or (localObj:HasBuff("Spirit Tap") and localMana <= self.drinkMana/1.5) and not (IsEating() or IsDrinking()) then
 
 		ClearTarget();
 

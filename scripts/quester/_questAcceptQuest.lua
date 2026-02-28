@@ -5,9 +5,20 @@ _questAcceptQuest = {
 
 function _questAcceptQuest:run()
 
-	if IsMoving() or not PlayerHasTarget() then
+	if IsMoving() or not PlayerHasTarget() or _quest.curQuestGiver == nil then
 
 		self.noQuestTimer = GetTimeEX() + 7000;
+	end
+
+	if _quest.curQuestGiver ~= nil then
+		if PlayerHasTarget() then
+			if GetTarget():GetUnitName() == _quest.curQuestGiver then
+				if GetTimeEX() >= self.noQuestTimer then
+					_questDBHandleDB:turnQuestCompleted();
+					self.noQuestTimer = GetTimeEX() + 7000;
+				end
+			end
+		end
 	end
 
 	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) and not IsMoving() then
@@ -41,13 +52,7 @@ function _questAcceptQuest:run()
 
 			if PlayerHasTarget() then
 
-				if GetTarget():GetUnitName() == _quest.curQuestGiver then
-					if GetTimeEX() >= self.noQuestTimer then
-						_questDBHandleDB:turnQuestCompleted();
-						self.noQuestTimer = GetTimeEX() + 7000;
-					end
-				end
-
+				
 				if (GetTarget():UnitInteract()) then
 
 					_quest:setTimer(600);

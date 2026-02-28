@@ -338,7 +338,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 		if (HasSpell("Healing Touch")) and (not IsLooting()) and (IsStanding()) and not IsCasting() and not IsChanneling() then
 			if (localHealth <= script_druid.healingTouchHealth) and (localMana >= 25) and (not IsSpellOnCD("Healing Touch")) then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Healing Touch");
-				if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 25 then
+				if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 25 then
 					if (not IsCasting()) and (not IsChanneling()) then
 						if IsMoving() then
 							StopMoving();
@@ -403,7 +403,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 	and (not IsBearForm() and not IsCatForm() and not isMoonkin and not IsTravelForm() and not IsMounted())
 	and (not script_checkDebuffs:hasSilence()) then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Healing Touch");
-		if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 25 then
+		if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 25 then
 			if (not IsCasting()) and (not IsChanneling()) then
 				if not CastSpellByName("Healing Touch", localObj) then
 					script_druid.waitTimer = GetTimeEX() + 500;
@@ -422,7 +422,7 @@ function script_druidHealsAndBuffs:healsAndBuffs()
 			end
 
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Healing Touch");
-			if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 25 then
+			if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 25 then
 
 				if not CastSpellByName("Healing Touch", localObj) then
 					script_druid.waitTimer = GetTimeEX() + 500;

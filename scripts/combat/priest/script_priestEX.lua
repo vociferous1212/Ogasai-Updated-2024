@@ -224,7 +224,7 @@ function script_priestEX:healsAndBuffs(localObj, localMana)
 						SpellStopCasting();
 					end
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mind Blast");
-					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
+					if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15 then
 						if not CastSpellByName("Mind Blast", targetObj) then
 							self.waitTimer = GetTimeEX() + 550;
 							return true;

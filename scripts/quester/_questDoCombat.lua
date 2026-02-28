@@ -9,9 +9,15 @@ function _questDoCombat:doCombat()
 	return;
 	end
 
+		
+
+	-- flee combat
 	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() then
-		if GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() and (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 50 then
-		local x, y z = 0, 0, 0; _quest.enemyTarget = nil;
+		if PlayerLevel() >= 4 and (GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() and GetTarget():GetHealthPercentage() < 60) or (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 60 then
+		
+		_quest.message = "FLEEING COMBAT";
+			local x, y, z = 0, 0, 0;
+			_quest.enemyTarget = nil;
 	
 			if not _quest.isQuestComplete then
 				x, y, z = _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ;
@@ -19,15 +25,16 @@ function _questDoCombat:doCombat()
 				x, y, z = _questDB:getReturnTargetPos();
 			end
 			if x ~= 0 then
-				if script_navEX:moveToTarget(localObj, x, y, z) then
+				if grind2MoveToTarget:run(localObj, x, y, z) then
 					_quest.message = "Running out of combat";
 					if HasSpell("Earthbind Totem") and not IsSpellOnCD("Earthbind Totem") then
 						CastSpellByName("Earthbind Totem");
 					end
 					return true;
 				end
+				if not IsPathLoaded(5) then Move(x, y, z); end
 			end
-		return true;
+		return;
 		end
 	end
 
@@ -39,18 +46,15 @@ function _questDoCombat:doCombat()
 			script_expChecker:targetLevels();
 
 
+	-- this was causing bot to do nothing but aqcuire new targets and not move to quest spots
 		-- get a target if we have none
-		if (not PlayerHasTarget()) and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) and PlayerHasTarget() and GetTarget():CanAttack() and not GetTarget():IsDead() then
+		--if (((not PlayerHasTarget() and _quest.enemyTarget == nil or _quest.enemyTarget == 0) or (PlayerHasTarget() and not GetTarget():CanAttack() and not GetTarget():IsDead())) and (_quest.grindSpotReached or IsInCombat())) then
 
-			_quest.enemyTarget = grind2AssignATarget:run();
+		--	_quest.enemyTarget = _questDBTargets:getTarget();
 
-		end
+		--end
 
-		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
-			if grind2SafePull:targetHasAdds(_quest.enemyTarget) then
-				_quest.enemyTarget = nil;
-			end
-		end
+		
 
 -- move away from adds script conditions
 		if (IsInCombat()) and (_quest.enemyTarget ~= nil) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (script_grind:isTargetingMe2(_quest.enemyTarget)) and (_quest.enemyTarget:IsInLineOfSight()) and (not _quest.enemyTarget:IsCasting()) and (not _quest.enemyTarget:IsFleeing()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) then
@@ -61,20 +65,27 @@ function _questDoCombat:doCombat()
 			end
 
 			-- check and do move away from adds during combat
-			if (script_checkAdds:checkAdds()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) and (_quest.enemyTarget:GetManaPercentage() <= 5) then
-				script_om:FORCEOM();
-				_quest.waitTimer = GetTimeEX() + 2000;
-				return;
+			if IsInCombat() and PlayerLevel() >= 6 then
+				if (script_checkAdds:checkAdds()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) and (_quest.enemyTarget:GetManaPercentage() <= 5) then
+					script_om:FORCEOM();
+					return true;
+				end
 			end
 		end	
 
+		if self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
+			if IsInCombat() and not script_grind:isTargetingMe(self.enemyTarget) and self.enemyTarget:GetHealthPercentage() >= 99 and not IsCasting() and not IsChanneling() then
+				self.enemyTarget = nil;
+				ClearTarget();
+			end
+		end
 
 		-- reset blacklist target timer
 		if (PlayerHasTarget() and IsInCombat()) or (PlayerHasTarget() and GetTarget():IsDead()) or IsMoving() then
 			self.blacklistTimer = GetTimeEX() + 10000;
 		end
 		-- we are in combat or we have a target
-		if IsInCombat() and (_quest.enemyTarget ~= nil or _quest.enemyTarget == nil) then
+		if IsInCombat() or (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) then
 
 			-- clear target if it is not tapped by me (don't attack others targets)
 			if GetTarget() ~= 0 and GetTarget() ~= nil then
@@ -123,7 +134,7 @@ function _questDoCombat:doCombat()
 		if (_quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0) and (_quest.enemyTarget:IsDead()) and not IsInCombat() then
 			local x, y, z = _quest.enemyTarget:GetPosition();
 			if (_quest.enemyTarget:GetDistance() > 5) and ( (GetPet() == nil or GetPet() == 0) or (GetPet() ~= nil and GetPet() ~= 0 and (GetPet():GetUnitsTarget() == nil or GetPet():GetUnitsTarget() == 0)) ) then
-				--script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
+				--grind2MoveToTarget:run(GetLocalPlayer(), x, y, z);
 				return true;
 			else
 				if not script_grind:isAnyTargetTargetingMe() then
@@ -134,19 +145,58 @@ function _questDoCombat:doCombat()
 
 			end
 		end
-		
-		-- get a new target if it's closer
-		if GetTimeEX() > self.targetingTimer and self.enemyTarget == nil then
 
-			self.enemyTarget = _questDBTargets:getTarget();
+		-- assign target is not working while in combat???
+	if (self.enemyTarget == nil or self.enemyTarget == 0) and IsInCombat() and (_quest.grindSpotReached or IsInCombat()) then
+		if PlayerHasTarget() then
+			if not GetTarget():IsDead() and GetTarget():CanAttack() and script_grind:isTargetingMe(GetTarget()) then
+				self.enemyTarget = GetTarget();
+			end
+		end
+	end
+
+		-- move to target
+		if ((_quest_enemeyTarget ~= nil and _quest.enemyTarget ~= 0) or PlayerHasTarget()) then
+					-- assign target is not working while in combat???
+			if self.enemyTarget == nil or self.enemyTarget == 0 and IsInCombat() then
+				if PlayerHasTarget() then
+					if not GetTarget():IsDead() and GetTarget():CanAttack() and script_grind:isTargetingMe(GetTarget()) then
+						self.enemyTarget = GetTarget();
+						return;
+					end
+				end
+			end
+			if IsChanneling() or IsCasting() then
+				self.blacklistTimer = GetTimeEX() + 10000;
+			end
+			if not IsMoving() and not IsInCombat() and _quest.enemyTarget ~= nil and GetTimeEX() > self.blacklistTimer then
+				if not _questQuestTargets:isUnitQuestTarget(_quest.enemyTarget) then
+					script_grind:addTargetToHardBlacklist(_quest.enemyTarget:GetGUID())
+					DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
+					ClearTarget();
+					_quest.enemyTarget = nil;
+					self.blacklistTimer = GetTimeEX() + 10000;
+				end
+			end
+			
+		end
+		
+
+
+		-- get a new target if it's closer
+		if GetTimeEX() > self.targetingTimer and IsInCombat() then
+
+			_quest.enemyTarget = _questDBTargets:getTarget();
 
 			self.targetingTimer = GetTimeEX() + 2500;
 
+			if (IsInCombat()) and (self.enemyTarget == 0 or self.enemyTarget == nil) then
+				self.enemyTarget = _questDBTargets:getTarget()
+			end
+
 		end
 
-		if (IsInCombat()) and (self.enemyTarget == 0 or self.enemyTarget == nil) then
-				self.enemyTarget = script_grindAssignTarget:assignTarget();
-		end
+		
 		if GetPet() ~= 0 and GetPet() ~= nil and GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 and  GetTarget() ~= 0 and GetTarget() ~= nil then
 			if GetPet():GetUnitsTarget():GetGUID() ~= GetTarget():GetGUID() then
 				_quest.enemyTarget = GetPet():GetUnitsTarget();
@@ -157,15 +207,25 @@ function _questDoCombat:doCombat()
 			_quest.enemyTarget = nil;
 		end end
 
+		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
+			if script_grind:isTargetHardBlacklisted(_quest.enemyTarget:GetGUID()) then
+				_quest.enemyTarget = nil;
+				ClearTarget();
+			end
+		end
+
 		_questDoCombat:getLowestHealthTargetAttackingUs();
+
+	
 
 		-- do something
 		if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 and GetTarget() ~= nil and GetTarget() ~= 0 then
 
 			if not _quest.enemyTarget:IsDead() and _quest.enemyTarget:CanAttack() then
 
-				_quest.message = "Running Combat ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd)";
-
+				if not IsMoving() then
+					_quest.message = "Running Combat ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd)";
+				end
 				if IsInCombat() and not IsMoving() and _quest.enemyTarget:CanAttack() then
 
 					if _quest.enemyTarget:GetDistance() <= script_grind.combatScriptRange then
@@ -190,33 +250,52 @@ function _questDoCombat:doCombat()
 					_quest.enemyTarget:AutoAttack();
 					end
 				end
-								-- move to target
-				if (script_grind.combatError == 3 and (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight())) or (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight()) then
 
-				
-
-					local x, y, z = _quest.enemyTarget:GetPosition();
-					script_navEX:moveToTarget(GetLocalPlayer(), x, y, z);
 					if not IsMoving() and not IsInCombat() and _quest.enemyTarget ~= nil and GetTimeEX() > self.blacklistTimer then
-						script_grind:addTargetToHardBlacklist(_quest.enemyTarget:GetGUID())
-						DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
-						ClearTarget();
-						_quest.enemyTarget = nil;
-						self.blacklistTimer = GetTimeEX() + 10000;
-					return true;
+						if not _questQuestTargets:isUnitQuestTarget(_quest.enemyTarget) then
+							script_grind:addTargetToHardBlacklist(_quest.enemyTarget:GetGUID())
+							DEFAULT_CHAT_FRAME:AddMessage("Cannot find a path to target and 10 seconds have passed... Automatically Blacklisting ".._quest.enemyTarget:GetUnitName()..", "..math.floor(_quest.enemyTarget:GetDistance()).." (yd), Time: "..GetTimeStamp().."");
+							ClearTarget();
+							_quest.enemyTarget = nil;
+							self.blacklistTimer = GetTimeEX() + 10000;
+						return true;
+						end
 					end
-					return false;
+
+					-- stop moving if we have reached a target
+			if IsInCombat() and PlayerHasTarget() and not IsSpellOnCD("Disengage") and not IsSpellOnCD("Frost Nova") then
+				if GetTarget():GetDistance() <= 1.5 and not GetTarget():IsFleeing() and not GetTarget():IsDead() and PlayerHealth() > 80 then
+					if GetTarget():GetDistance() > .5 then
+						if GetTarget():GetHealthPercentage() >= 20 then
+							if IsMoving() then
+								StopMoving();
+								script_grind.combatError = nil;
+								return false;
+							end
+						end
+					end
 				end
+			end
 				
-			--script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
-			grind2.enemyTarget = _quest.enemyTarget;
-			script_grind.combatError = grind2RunCombatState:run();
-			_quest.waitTimer = GetTimeEX() + 50;
+				
+			script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
+			--grind2.enemyTarget = _quest.enemyTarget;
+			--script_grind.combatError = grind2RunCombatState:run();
 			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 
+			if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
+			local x, y, z = _quest.enemyTarget:GetPosition();
+				if x ~= 0 and ((script_grind.combatError == 3 and _quest.enemyTarget:GetDistance() >= script_grind.combatScriptRange) or (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight())) and _quest.enemyTarget:GetDistance() > 2 then
+					grind2MoveToTarget:run(GetLocalPlayer(), x, y, z);
+					
+				return false;
+				end
+			end
+			return;
 			end
 		end
 	end
+return false;
 end
 
 -- get the lowest health target in combat with us

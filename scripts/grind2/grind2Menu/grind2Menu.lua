@@ -71,6 +71,7 @@ function grind2Menu:run()
 			-- show reamining bubbles
 			Text('Rested Exp: '..GetXPExhaustion()..' - '..expBubbles.. ' bubbles');
 		end
+		Separator();
 	end
 
 -- get navmesh load progress

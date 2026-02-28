@@ -52,6 +52,7 @@ script_hunter = {
 	useRangedAttacks = true,
 	arcaneShotMana = 15,
 	serpentStingMana = 15,
+	useSerpentSting = true,
 	minSpellRange = 13,
 	scareAdds = true,	-- scare adds on/off
 	addScared = false,	-- is add scared/feared
@@ -324,7 +325,7 @@ function script_hunter:run(targetGUID)
 		-- target enemy has a target or the target is stunned, and our pet is not dead
 		if ((targetObj:GetUnitsTarget() ~= 0 and targetObj:GetUnitsTarget() ~= nil) or targetObj:IsStunned()) and not GetPet():IsDead() then
 			-- if the target is not targeting player, movement is not disabled and not using rotation
-			if not script_grind:isTargetingMe(targetObj) and not script_checkDebuffs:hasDisabledMovement() and not script_rotation.usingRotation then
+			if not script_grind:isTargetingMe(targetObj) and not script_checkDebuffs:hasDisabledMovement() and (not script_rotation.usingRotation or script_rotation.moveToTarget) then
 				-- if not is casting and not is channeling a spell and player is using ranged attacks
 				if not IsChanneling() and not IsCasting() and script_hunter.useRangedAttacks then
 					-- have a valid target and it is stunned
@@ -381,7 +382,7 @@ function script_hunter:run(targetGUID)
 	
 			-- move backwards if target too close for melee attacks
 			if targetObj ~= 0 and targetObj ~= nil then
-				if (targetObj:GetDistance() <= .4) and not script_rotation.usingRotation then
+				if (targetObj:GetDistance() <= .4) and (not script_rotation.usingRotation or script_rotation.moveToTarget) then
 
 					if (script_hunter:runBackwards(targetObj, 2)) then
 						return 4;
@@ -590,6 +591,7 @@ function script_hunter:run(targetGUID)
 				elseif (PlayerLevel() < 10 or not HasPet()) and not IsInCombat() then
 					if script_hunter:runBackwards(targetObj, self.minSpellRange + 10) then
 						script_hunter.waitTimer = GetTimeEX() + 1500;
+						_quest.waitTimer = GetTimeEX() + 2500;
 						return 4;
 					end
 				end

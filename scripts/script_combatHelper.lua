@@ -8,6 +8,7 @@ script_combatHelper =  { castingTimer = 0,
 function script_combatHelper:run()
 
 		if script_grind.enemyObj == nil then script_grind.enemyObj = grind2.enemyTarget; end
+		if _quest.enemyTarget ~= nil then script_grind.enemyObj = _quest.enemyTarget; end
 
 		if HasSpell("Escape Artist") and not IsSpellOnCD("Escape Artist") and script_checkDebuffs:hasDisabledMovement() then
 			EscapeArtist()

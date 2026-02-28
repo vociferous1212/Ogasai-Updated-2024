@@ -81,6 +81,7 @@ function _questDB:setup()
 
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, desc, rewardNum, useItem, gossipOption)
 
+	if not self.isSetup then
 	-- 50-60
 		_questDB_UnGoro:setup();
 
@@ -135,6 +136,7 @@ function _questDB:setup()
 		_questDB_Mulgore_BloodhoofVillage:setup();
 		_questDB_Mulgore_CampNarache:setup();
 
+	end
 	self.isSetup = true;
 
 end
@@ -190,7 +192,27 @@ function _questDB:getQuestStartPos()
 
 	_questDB:getCurrentQuestMapID();
 
+	
+	_questDBHandleDB:turnOldQuestCompleted()
+
 	for i=0, self.numQuests -1 do
+
+		local questDescription, questObjectives = GetQuestLogQuestText(i);
+
+		if GetNumQuestLogEntries() ~= nil and GetNumQuestLogEntries() ~= 0 then
+			_questDB.curDesc = questObjectives;
+			if self.questList[i]['desc'] == _questDB.curDesc then
+				_questDB.curListQuest = self.questList[i]['questName'];
+				_quest.currentQuest = self.questList[i]['questName']
+				_quest.currentType = _questDB.questList[i]['type'];
+				_quest.usingItem = _questDB.questList[i]['useItem'];
+				_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+				_quest.currentMapID = _questDB.questList[i]['mapID'];
+				x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
+
+				return x, y, z;
+			end
+		end
 
 		if self.questList[i]['completed'] ~= "nnil" then
 
@@ -198,6 +220,7 @@ function _questDB:getQuestStartPos()
 
 				if self.questList[i]['faction'] == GetMyFaction() or (self.questList[i]['faction'] == 2 and GetMapID() == self.questList[i]['mapID']) then
 
+					-- don't change map ID if we change zones
 					if _quest.currentQuest ~= nil and (GetMapID() == 1537 or GetMapID() == 1519 or GetMapID() == 1657 or GetMapID() == 1637 or GetMapID() == 1638 or GetMapID() == 1497 or GetMapID() ~= _quest.currentMapID) then
 						myMapID = _quest.currentMapID;
 					else
@@ -343,9 +366,10 @@ end
 
 function _questDB:getCurrentQuestMapID()
 	
-	local questDescription, questObjectives = GetQuestLogQuestText(1);
+
 
 	for i=0, self.numQuests -1 do
+		local questDescription, questObjectives = GetQuestLogQuestText(i);
 		if self.questList[i]['questName'] == _quest.currentQuest then
 			if self.questList[i]['desc'] == questObjectives then
 				_quest.currentMapID = self.questList[i]['mapID'];

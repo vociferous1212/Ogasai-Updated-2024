@@ -137,7 +137,7 @@ function script_grindDoLoot:doLoot(localObj)
 		end
 
 	-- loot attempt #1
-		if (IsLooting()) then
+		if (IsLooting()) and GetNumPartyMembers() == 0 then
 				LootTarget(); CloseLoot(); self.timerWhileLooting = GetTimeEX() + 500;
 			if StaticPopup1:IsVisible() then
 				StaticPopup1Button1:Click()
@@ -245,7 +245,7 @@ function script_grindDoLoot:doLoot(localObj)
 			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 		end
 
-		if (GetTimeEX() >= script_grind.blacklistLootTimeCheck) then
+		if (GetTimeEX() >= script_grind.blacklistLootTimeCheck + 5000) then
 
 			-- add to blacklist
 			if (script_grind.lootObj ~= nil and script_grind.loobObj ~= 0) then

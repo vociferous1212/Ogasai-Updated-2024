@@ -4,6 +4,10 @@ script_hunterPreCombatState = {
 
 function script_hunterPreCombatState:run(targetObj)
 
+	if targetObj == nil or targetObj == 0 then
+		return;
+	end
+
 	if (not IsStanding()) then 
 
 		JumpOrAscendStart();
@@ -25,7 +29,7 @@ function script_hunterPreCombatState:run(targetObj)
 
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Hunter's Mark");
 
-			if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 5) then
+			if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 5) then
 				if not CastSpellByName("Hunter's Mark") then
 					if GetTimeEX() > script_hunter.petAttackTimer then
 						PetAttack();
@@ -50,7 +54,7 @@ function script_hunterPreCombatState:run(targetObj)
 	-- pull with viper Sting
 	if script_hunter.useViperSting and HasSpell("Viper Sting") and not IsSpellOnCD("Viper Sting") and not targetObj:HasDebuff("Viper Sting") and CurrentTargetsMana(targetObj) >= 25 then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Viper Sting");
-		if targetObj:GetHealthPercentage() >= 25 and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() > 10) then
+		if targetObj:GetHealthPercentage() >= 25 and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() > 10) then
 			if targetObj:IsInLineOfSight() and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Mechanical" then
 				if not CastSpellByName("Viper Sting") then
 					self.waitTimer = GetTimeEX() + 500;
@@ -62,7 +66,7 @@ function script_hunterPreCombatState:run(targetObj)
 	-- aimed Shot
 	if HasSpell("Aimed Shot") and not IsSpellOnCD("Aimed Shot") and PlayerMana() >= 15 and script_hunter.useAimedShot then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Aimed Shot");
-		if (((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) and cost ~= 0) or PlayerMana() >= 10 then
+		if (((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) and cost ~= 0) or PlayerMana() >= 10 then
 			if targetObj:GetDistance() <= script_hunter.spellRange and targetObj:IsInLineOfSight() then
 				if IsMoving() then StopMoving() return true;
 				end
@@ -117,7 +121,7 @@ function script_hunterPreCombatState:run(targetObj)
 			if (targetObj:IsInLineOfSight()) and (PlayerMana() > 10)
 			and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon" and targetObj:GetCreatureType() ~= "Mechanical" then
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Viper Sting");
-				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
+				if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
 					if not CastSpellByName("Serpent Sting") then
 						if GetTimeEX() > script_hunter.petAttackTimer then
 							PetAttack();
@@ -130,11 +134,11 @@ function script_hunterPreCombatState:run(targetObj)
 		end
 	else
 	-- use serpent sting
-		if HasSpell("Serpent Sting") and not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not script_hunter.useScorpidSting) and (IsStanding()) then
+		if script_hunter.useSerpentSting and HasSpell("Serpent Sting") and not IsSpellOnCD("Serpent Sting") and (not targetObj:HasDebuff("Serpent Sting")) and (not script_hunter.useScorpidSting) and (IsStanding()) then
 			if (targetObj:IsInLineOfSight()) and (PlayerMana() > script_hunter.serpentStingMana)
 				and targetObj:GetCreatureType() ~= "Elemental" and targetObj:GetCreatureType() ~= "Demon" and targetObj:GetCreatureType() ~= "Mechanical" then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Serpent Sting");
-				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
+				if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
 					if not CastSpellByName("Serpent Sting") then
 						if GetTimeEX() > script_hunter.petAttackTimer then
 							PetAttack();
@@ -159,7 +163,7 @@ function script_hunterPreCombatState:run(targetObj)
 	if (not IsSpellOnCD("Arcane Shot")) and (IsStanding()) and (not HasSpell("Aimed Shot") or not script_hunter.useAimedShot) then
 		if (HasSpell("Arcane Shot")) and (targetObj:IsInLineOfSight()) and (PlayerMana() > script_hunter.arcaneShotMana) then
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Arcane Shot");
-			if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
+			if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 15) then
 				if not CastSpellByName("Arcane Shot") then
 					if GetTimeEX() > script_hunter.petAttackTimer then
 						PetAttack();

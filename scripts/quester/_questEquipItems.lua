@@ -44,26 +44,50 @@ function _questEquipItems:checkInventoryForBags()
 	-- do we have a bag in slot 4?
 	if _questEquipItems:checkMyBags() then
 
-		for i = 0, 5 do 
+		if GetMyClass() == "HUNTER" then
+			for i = 0, 3 do 
 
-			for y=0,GetContainerNumSlots(i) do 
+				for y=0,GetContainerNumSlots(i) do 
 	
-				if (GetContainerItemLink(i,y) ~= nil) then
+					if (GetContainerItemLink(i,y) ~= nil) then
 
-					_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+						_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
 			
-					itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink); 
+						itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink); 
 
-					for u = 0, self.bagTableNum -1 do
-						if itemName == self.bagTable[u]['name'] then
-							name = itemName
+						for u = 0, self.bagTableNum -1 do
+							if itemName == self.bagTable[u]['name'] then
+								name = itemName
+							end
+						end
+						if (UseItem(name)) then
+							_quest:setTimer(500);
 						end
 					end
-					if (UseItem(name)) then
-						_quest:setTimer(500);
+				end 
+			end
+		else
+			for i = 0, 4 do 
+
+				for y=0,GetContainerNumSlots(i) do 
+	
+					if (GetContainerItemLink(i,y) ~= nil) then
+
+						_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
+			
+						itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink); 
+
+						for u = 0, self.bagTableNum -1 do
+							if itemName == self.bagTable[u]['name'] then
+								name = itemName
+							end
+						end
+						if (UseItem(name)) then
+							_quest:setTimer(500);
+						end
 					end
-				end
-			end 
+				end 
+			end
 		end
 	end
 

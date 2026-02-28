@@ -18,11 +18,15 @@ function _questDoOtherQuestTypes()
 
 		-- type 3 is use an item an xyz and quest is marked complete 
 
-		if not HasItem(_quest.usingItem) then _quest.message = "No quest item to use!"; end
+		if not HasItem(_quest.usingItem) then
+			_quest.message = "No quest item to use!";
+		end
+
+					local usedItem = false;
+
 		if distToGrind <= 5 and not IsMoving() and not IsChanneling() and not IsCasting() and not IsInCombat() and HasItem(_quest.usingItem) then
 
 			local cooldownTime = GetTimeEX();
-			local usedItem = false;
 
 			for i=0, 6 do
 				for y=0,GetContainerNumSlots(i) do 
@@ -43,7 +47,7 @@ function _questDoOtherQuestTypes()
 					return true;
 				end
 				UseItem(_quest.usingItem)
-
+				_quest.waitTimer = GetTimeEX() + 5000;
 				_quest.isQuestComplete = true;
 				usedItem = true;
 			else
@@ -52,10 +56,10 @@ function _questDoOtherQuestTypes()
 				return false;
 			end
 
-		return true;
-		elseif distToGrind > 5 then
+			return true;
+		elseif distToGrind > 5 and usedItem then
 		
-			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+			grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 			if not IsMoving() then
 				Move(_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
 			end
@@ -82,7 +86,7 @@ function _questDoOtherQuestTypes()
 		return true;
 		elseif distToGrind > 5 and not HasItem(_quest.usingItem) then
 		
-			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+			grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 	
 				
 			if not IsMoving() then
@@ -110,18 +114,19 @@ function _questDoOtherQuestTypes()
 		local x, y, z = _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ;
 
 		if GetDistance3D(px, py, pz, x, y, z) < 10 and HasItem(_quest.usingItem) then
-		if HasForm() then
-					RemoveForm();
-					return true;
-				end
-			UseItem(_quest.usingItem)
-
+			if HasForm() then
+				RemoveForm();
+				return true;
+			end
+			if HasItem(_quest.usingItem) then
+				UseItem(_quest.usingItem)
+			end
 			--return true;
 
 		return true;
 		elseif distToGrind > 5 then
 		
-			script_navEX:moveToTarget(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+			grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 	
 				
 			if not IsMoving() then

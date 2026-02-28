@@ -531,7 +531,7 @@ function script_warlock:run(targetGUID)
 			if (not HasSpell("Corruption")) and (not HasSpell("Immolate")) and (not IsInCombat()) and (localMana > 20) and (targetObj:IsInLineOfSight()) and (not IsMoving()) and targetHealth >= 25 then
 				if not IsSpellOnCD("Shadow Bolt") then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
-					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20 then
+					if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 20 then
 						if not CastSpellByName('Shadow Bolt') then
 							script_warlockFunctions:petAttack();
 							self.waitTimer = GetTimeEX() + castTime;
@@ -602,7 +602,7 @@ function script_warlock:run(targetGUID)
 				script_warlockFunctions:petAttack();
 				self.message = "Pulling Target";
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt");
-				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
+				if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
 					if IsMoving() then StopMoving(); return true; end
 					if not (CastSpellByName("Shadow Bolt", targetObj)) then
 						self.waitTimer = GetTimeEX() + castTime;
@@ -1036,7 +1036,7 @@ function script_warlock:run(targetGUID)
 			
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Shadow Bolt")
 
-			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and not IsSpellOnCD("Shadow Bolt") and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
+			if (self.useShadowBolt) and (not self.useWand) and (not IsMoving()) and not IsSpellOnCD("Shadow Bolt") and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
 				if not CastSpellByName('Shadow Bolt', targetObj) then
 					self.waitTimer = GetTimeEX() + castTime;
 					return 0;
@@ -1045,7 +1045,7 @@ function script_warlock:run(targetGUID)
 
 			if (self.useWand) and (targetHealth >= self.useWandHealth and localMana >= self.useWandMana) then
 
-				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
+				if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 15) then
 
 					if not (CastSpellByName("Shadow Bolt", targetObj)) then
 						self.waitTimer = GetTimeEX() + castTime;
@@ -1169,7 +1169,7 @@ local px, py, pz = GetLocalPlayer():GetPosition();
 	end			
 		
 	-- Eat and Drink
-	if (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
+	if PlayerLevel() >= 3 and (not IsDrinking() and localMana < self.drinkMana) and (not IsSwimming()) then
 		self.message = "Need to drink...";
 		self.waitTimer = GetTimeEX() + 2000;
 		if (IsMoving()) then

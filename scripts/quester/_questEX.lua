@@ -23,26 +23,6 @@ function _questEX:doStartChecks()
 		end
 	end
 
--- pause bot if we are on a taxi
-	if PlayerHasTarget() and _quest.currentType == 10 then
-		if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
-			if UnitOnTaxi("player") then
-				_quest.pause = true;
-			end
-		end
-	end
-
--- unpase bot after taxi
-	if _quest.currentType == 10 and _quest.pause then
-		if PlayerHasTarget() then
-			if GetTarget():GetUnitName() == GetLocalPlayer():GetUnitName() then
-				if not UnitOnTaxi("Player") then
-					_quest.pause = false;
-				end
-			end
-		end
-	end
-
 -- move away from fire if we are standing in it
 	if GetTimeEX() > self.standingInFireTimer and not IsInCombat() then
 		script_helper:areWeStandingInFire()
@@ -58,20 +38,22 @@ function _questEX:doChecks()
 
 -- random jump
 	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() and script_grind.jump then
-		local jumpRandom = random(0, 10);
+		local jumpRandom = random(0, 100);
 
-		if (jumpRandom == 10 and IsMoving() and not IsInCombat()) then
-			local randomTimer = math.random(3000, 12000);
+		if (jumpRandom == 100 and IsMoving() and not IsInCombat()) then
+			local randomTimer = math.random(6000, 12000);
 			self.jumpTimer = GetTimeEX() + randomTimer;
 			JumpOrAscendStart();
 		end
 	end
 
 -- run rest
-	if not localObj:IsDead() then
+	if not localObj:IsDead() and not IsInCombat() then
 		if _quest:runRest() then
-			_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
-			_quest:setTimer(300);
+			if not PlayerHasTarget() then
+				_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+			end
+			_quest:setTimer(2000);
 			return true;
 		end
 	end
@@ -104,7 +86,7 @@ function _questEX:doChecks()
 	
 	script_grind.nextToNodeDist = 3;
 	
-	NavmeshSmooth(2);
+	--NavmeshSmooth(2);
 	
 	if GetNumQuestLogEntries() == 0 then
 		_quest.weHaveQuest = false;
@@ -144,17 +126,17 @@ function _questEX:doChecks()
 			else
 				-- Ressurrect within the ress distance to our corpse
 				if (GetDistance3D(_lx, _ly, _lz, GetCorpsePosition()) > script_grind.ressDistance) then
-					script_nav:moveToNav(localObj, GetCorpsePosition());
+					local x, y, z = GetCorpsePosition();
+					grind2MoveToTarget:run(Player(), x, y, z);
 					return true;
 				else
 					if (script_grind.safeRess) then
 						local rx, ry, rz = GetCorpsePosition();
 						if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
 							script_grind.message = "Finding a safe spot to ress...";
-							return true;
 						else
 							if (script_aggro.rTime > GetTimeEX()) then
-								script_nav:moveToNav(localObj, script_aggro.rX, script_aggro.rY, script_aggro.rZ);
+								grind2MoveToTarget:run(Player(), script_aggro.rX, script_aggro.rY, script_aggro.rZ);
 								script_grind.message = "Finding a safe spot to ress...";
 								return true;
 							end

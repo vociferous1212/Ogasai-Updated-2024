@@ -129,6 +129,9 @@ friendlyEnemiesList = {
 		["Carrion Grub"] = true,
 		["Carrion Devourer"] = true,
 
+
+		["Anaya Dawnrunner"] = true,	-- darkshore amteh'aran
+
 		}
 
 }

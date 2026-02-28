@@ -7,7 +7,6 @@ _questIncludeFiles = {
 	grindMenu = include("scripts\\menu\\script_grindMenu.lua"),
 	questerMenuIncluded = include("scripts\\quester\\_questMenu.lua"),
 	questerMenuEXIncluded = include("scripts\\quester\\_questMenuEX.lua"),
-	questerMenuEX2Included = include("scripts\\quester\\_questMenuEX2.lua"),
 
 	questerDBIncluded = include("scripts\\db\\questDB\\_questDB.lua"),
 	questerDBTargetsIncluded = include("scripts\\db\\questDB\\_questDBTargets.lua"),
@@ -26,7 +25,6 @@ _questIncludeFiles = {
 	questerDoCombatIncluded = include("scripts\\quester\\_questDoCombat.lua"),
 	questerRunRestIncluded = include("scripts\\quester\\_questRunRest.lua"),
 	questerEdgeCaseQuestIncluded = include("scripts\\quester\\_questEdgeCaseQuest.lua"),
-	questerEdgeCaseQuest2Included = include("scripts\\quester\\_questEdgeCaseQuest2.lua"),
 	questerWindowIncluded = include("scripts\\quester\\_questWindow.lua"),
 	setCurrentQuestIncluded = include("scripts\\quester\\_questSetQuest.lua"),
 

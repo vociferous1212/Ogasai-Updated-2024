@@ -25,7 +25,7 @@ function script_hunterMenu:menu()
 
 		if HasPet() and script_hunter.hasPet then
 			Text("Mend Pet Health");
-			script_hunter.mendPetHealth = SliderInt("Health to Mend Pet", 10, 100, script_hunter.mendPetHealth);
+			script_hunter.mendPetHealth = SliderInt("Health to Mend Pet", 0, 100, script_hunter.mendPetHealth);
 		end
 		Separator();
 
@@ -91,6 +91,11 @@ function script_hunterMenu:menu()
 		if HasSpell("Aimed Shot") then
 			SameLine();
 			wasClicked, script_hunter.useAimedShot = Checkbox("Use Aimed Shot |", script_hunter.useAimedShot);
+		end
+
+		if HasSpell("Serpent Sting") then
+			SameLine();
+			wasClicked, script_hunter.useSerpentSting = Checkbox("Use Serpent Sting", script_hunter.useSerpentSting);
 		end
 
 -- hunters mark button

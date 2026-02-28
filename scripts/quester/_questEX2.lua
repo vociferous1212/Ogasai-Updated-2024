@@ -2,7 +2,8 @@ _questEX2 = {
 	checkBagTimer = 0,
 	checkInvTimer = 0,
 	flipVendor = true,
-	vendorBetweenQuests = false,
+	vendorBetweenQuests = true,
+	lastVendorTime = GetTimeEX(),
 	sellVendorX = 0,
 	sellVendorY = 0,
 	sellVendorZ = 0,
@@ -46,6 +47,8 @@ function _questEX2:doChecks()
 		return;
 	end
 
+--[[
+
 	if _quest.killStuffOnRoute and IsInCombat() and GetPet() ~= nil and GetPet() ~= 0 and (_quest.enemyTarget == nil or _quest.enemyTarget == 0) then
 		if GetPet():GetUnitsTarget() ~= nil and GetPet():GetUnitsTarget() ~= 0 then
 			_quest.enemyTarget = GetPet():GetUnitsTarget()
@@ -54,22 +57,25 @@ function _questEX2:doChecks()
 			end
 		end
 	end
-
-	if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor and script_vendor.sellVendor ~= 0 and script_vendor.sellVendor ~= nil then
-		self.sellVendorX, self.sellVendorY, self.sellVendorZ = script_vendor.sellVendor['pos']['x'],  script_vendor.sellVendor['pos']['y'],  script_vendor.sellVendor['pos']['z'];
-		local x, y, z = GetLocalPlayer():GetPosition()
-		if self.sellVendorX ~= 0 then
-			if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
-				script_vendor.status = 2
-				_questEX2.flipVendor = false
+--]]
+		if GetTimeEX() > self.lastVendorTime and PlayerLevel() > 2 then
+			if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor and script_vendor.sellVendor ~= 0 and script_vendor.sellVendor ~= nil then
+				self.sellVendorX, self.sellVendorY, self.sellVendorZ = script_vendor.sellVendor['pos']['x'],  script_vendor.sellVendor['pos']['y'],  script_vendor.sellVendor['pos']['z'];
+				local x, y, z = GetLocalPlayer():GetPosition()
+				if self.sellVendorX ~= 0 then
+					if GetDistance3D(x, y, z, self.sellVendorX, self.sellVendorY, self.sellVendorZ) <= 65 then
+						script_vendor.status = 2
+						_questEX2.flipVendor = false
+						self.lastVendorTime = GetTimeEX() + 240000;
+					end
+				end
 			end
 		end
-	end
 
 	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
 		--CheckBagsForBetterGear()
 		_questEquipItems:checkInventoryForBags()
-		self.checkBagTimer = GetTimeEX() + 180000
+		self.checkBagTimer = GetTimeEX() + 60000
 	end
 
 	-- delete items
@@ -137,7 +143,7 @@ function _questEX2:doChecks()
 	local inventoryFull = true
 	local numSlots = 0;
 	if GetMyClass() ~= "HUNTER" then
-		for i = 1, 5 do
+		for i = 1, 4 do
 			if (i ~= 0) then
 				for y=1,GetContainerNumSlots(i-1) do
 					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y)
@@ -151,7 +157,7 @@ function _questEX2:doChecks()
 			end
 		end
 	elseif GetMyClass() == "HUNTER" then
-		for i = 1, 4 do
+		for i = 1, 3 do
 			if (i ~= 0) then
 				for y=1,GetContainerNumSlots(i-1) do
 					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(i-1,y)
@@ -193,7 +199,7 @@ function _questEX2:doChecks()
 		if script_grind.lootObj ~= nil and not IsInCombat() and not script_grind.skipLooting and not script_grindEX.bagsFull and not script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()) then
 			-- New: Check if looting has timed out
 			if self.currentLootGUID == script_grind.lootObj:GetGUID() and GetTimeEX() > self.lootTimeout then
-				ToFile("Loot timeout: Blacklisting loot target GUID: " .. script_grind.lootObj:GetGUID())
+				DEFAULT_CHAT_FRAME:AddMessage("Loot timeout: Blacklisting loot target GUID: " .. script_grind.lootObj:GetGUID())
 				script_grind:addTargetToLootBlacklist(script_grind.lootObj)
 				script_grind.lootObj = nil
 				self.lootTimeout = 0
@@ -203,7 +209,6 @@ function _questEX2:doChecks()
 			end
 
 			_quest.message = "Looting "..script_grind.lootObj:GetUnitName()..", "..math.floor(script_grind.lootObj:GetDistance()).." (yd)"
-			_questDoCombat.blacklistTimer = GetTimeEX() + 10000
 
 			if (script_grind.lootObj:GetDistance() <= script_grind.lootDistance) then
 				if (IsMoving()) then
@@ -215,7 +220,9 @@ function _questEX2:doChecks()
 				end
 			end
 
-			if (script_grindDoLoot:doLoot(localObj)) then
+			if not IsInCombat() and (script_grindDoLoot:doLoot(localObj)) then
+					_quest.tickRate = 1;
+					_questDoCombat.blacklistTimer = GetTimeEX() + 10000
 				if IsLooting() then
 					if StaticPopup1:IsVisible() then
 						StaticPopup1Button1:Click()
@@ -229,6 +236,7 @@ function _questEX2:doChecks()
 			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
 				ClearTarget()
 			end
+		return;
 		end
 	end
 
@@ -246,9 +254,10 @@ function _questEX2:doChecks()
 		script_getSpells.getSpellsStatus = 0
 	end
 
+	if IsInCombat() then return; end
 	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() and not IsInCombat() then
 		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
-			
+			_questEX2.flipVendor = false;
 			_quest.message = "Moving to class trainer for spells"
 			if (IsMoving()) and (not _quest.pause) then
 				if (not script_unstuck:pathClearAuto(2)) then
@@ -261,7 +270,6 @@ function _questEX2:doChecks()
 	end
 	if (script_grind.getSpells) and (not IsInCombat()) then
 		if script_getSpells.getSpellsStatus > 0 then
-			_questEX2.flipVendor = true;
 		if (PlayerHasTarget()) and not IsInCombat() then
 				ClearTarget()
 			end

@@ -48,7 +48,7 @@ function _questSetup:run()
 
 	_questDoCombat.waitTimer = GetTimeEX();
 
-	_questDoCombat.blacklistTimer = GetTimeEX();
+	_questDoCombat.blacklistTimer = GetTimeEX() + 60000;
 
 	_questDoCombat.targetingTimer = GetTimeEX();
 

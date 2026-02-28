@@ -66,7 +66,7 @@ function grind2IsTargetValid:target(i)
 			)
 
 		then
-			if (grind2IsTargetValid:isTargetInRange(i) or i:IsTappedByMe() or grind2IsTargetingMe:target(i) or runOgasai.runningCombat) and not i:IsDead() then
+			if ((grind2IsTargetValid:isTargetInRange(i) or _quest.usingQuester) or i:IsTappedByMe() or grind2IsTargetingMe:target(i) or runOgasai.runningCombat) and not i:IsDead() then
 
 				return true;
 			end

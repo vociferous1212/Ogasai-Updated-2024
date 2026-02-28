@@ -13,7 +13,7 @@ script_getSpells = {
 	getSpellsStatus = 0,
 	trainerTarget = nil,
 	isSetup = false,
-	waitTimer = GetTimeEX(),
+	timer = GetTimeEX(),
 
 }
 function script_getSpells:setup()
@@ -72,13 +72,9 @@ end
 
 function script_getSpells:run()
 
-		if self.waitTimer == 0 or self.waitTimer == nil then
-			self.waitTimer = GetTimeEX();
-		end
+		if (self.timer > GetTimeEX()) then
 
-		if (self.waitTimer > GetTimeEX()) then
-
-			return false;
+			return;
 		end
 
 		self.getSpellsStatus = 1;
@@ -185,7 +181,6 @@ if (not script_unstuck:pathClearAuto(2)) then
 
 			if not IsMoving() then
 				if (GetTarget():UnitInteract()) then
-					self.waitTimer = GetTimeEX() + 2000;
 					SelectGossipOption(1);
 				end
 
@@ -195,9 +190,15 @@ if (not script_unstuck:pathClearAuto(2)) then
 				for i = 1, 15 do
 				-- buy from trainer spell index
 					BuyTrainerService(i);
+
 				end
 			end
+
+			
+				
+			
 		end
+		
 
 	if (script_getSpells:checkForSpellsNeeded()) then
 		return true;

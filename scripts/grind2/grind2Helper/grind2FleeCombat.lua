@@ -103,7 +103,7 @@ function grind2FleeCombat:run()
 	-- blink
 	if HasSpell("Blink") and not IsSpellOnCD("Blink") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Blink");
-		if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
+		if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10 then
 			CastSpellByName("Blink");
 		end
 	end
@@ -116,7 +116,7 @@ function grind2FleeCombat:run()
 		-- controlled in grinder
 	if HasSpell("Feign Death") and not IsSpellOnCD("Feign Death") then
 		local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Feign Death");
-		if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 5 then
+		if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 5 then
 			CastSpellByName("Feign Death");
 			grind2:setTimer(5000);
 		end

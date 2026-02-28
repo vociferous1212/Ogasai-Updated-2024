@@ -281,12 +281,12 @@ function script_rotation:run()
 -- move to target
 		if self.moveToTarget and PlayerHasTarget() and not IsCasting() and not IsChanneling() then
 
-			if self.enemyObj:GetDistance() > 6 then
+			if self.enemyObj:GetDistance() > script_grind.combatScriptRange or not self.enemyObj:IsInLineOfSight() then
 
 				local x, y, z = self.enemyObj:GetPosition();
 
 				if grind2MoveToTarget:run(Player(), x, y, z) then
-
+					return false;
 				end
 			end
 		end

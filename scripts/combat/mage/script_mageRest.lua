@@ -271,22 +271,24 @@ function script_mageRest:rest()
 		or (IsDrinking() and localHealth <= 80 and not IsEating()) then
 
 			-- eat something
-			if (script_helper:eat()) then
+			if PlayerLevel() >= 2 then
+				if (script_helper:eat()) then
 
-				-- drink something if we should
-				if not IsDrinking() and localMana <= 85 then
-					script_helper:drinkWater();
+					-- drink something if we should
+					if not IsDrinking() and localMana <= 85 then
+						script_helper:drinkWater();
+					end
+
+					script_mage.message = "Eating..."; 
+					script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
+					script_mage.waitTimer = GetTimeEX() + 500;
+					return true; 
+
+				-- we have no food
+				else
+					script_mage.message = "No food! (or food not included in script_helper)";
+					return true; 
 				end
-
-				script_mage.message = "Eating..."; 
-				script_grind.autoBlacklistTimer = GetTimeEX() + 15000;
-				script_mage.waitTimer = GetTimeEX() + 500;
-				return true; 
-
-			-- we have no food
-			else
-				script_mage.message = "No food! (or food not included in script_helper)";
-				return true; 
 			end
 		end
 		

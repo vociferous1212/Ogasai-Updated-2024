@@ -11,13 +11,15 @@ function _questMenuEX:menu()
 
 		if NewWindow("Quest Info", 320, 320) then
 
+			Text("	*Not all of these have been tested!*");
+
 			local x, y, z = GetLocalPlayer():GetPosition();
 
 			if not _questDB.isSetup then
 				_questDB:setup();
 			end
 			
-	local wasClicked = false;
+			local wasClicked = false;
 			if CollapsingHeader("Eastern Kingdoms") then
 				if CollapsingHeader(">>> |+| Tirisfal Glades") then
 					local num = 0;
@@ -194,12 +196,163 @@ function _questMenuEX:menu()
 					end
 				end
 				
+		if CollapsingHeader(">>> |+| Redridge Mountains") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 44 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+						end
+					end
+				end
 
 
-				_questMenuEX2:menuEasternKingdom();
+	if CollapsingHeader(">>> |+| Duskwood") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 10 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+						end
+					end
+				end
+
+if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 267 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+						end
+					end
+				end
+
+				if CollapsingHeader(">>> |+| Stranglethorn Vale") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 33 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+						end
+					end
+				end
+
+				if CollapsingHeader(">>> |+| Searing Gorge") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 51 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
 
 
 			end -- end eastern kingdoms
+
+
+
+
+
 
 			if CollapsingHeader("Kalimdor") then
 
@@ -315,12 +468,124 @@ function _questMenuEX:menu()
 						end
 					end
 				end
-if CollapsingHeader(">>> |+| Thousand Needles") then
+				if CollapsingHeader(">>> |+| Darkshore") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 148 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
+				if CollapsingHeader(">>> |+| Stonetalon Mountains") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 406 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
+				if CollapsingHeader(">>> |+| Thousand Needles") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
 					for i=0, _questDB.numQuests -1 do
 						if _questDB.questList[i]['mapID'] == 400 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
+				if CollapsingHeader(">>> |+| Tanaris") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 440 then
+							num = num + 1
+							local factiontemp = _questDB.questList[i]['faction'];
+							local faction = "";
+							local type = _questDB.questList[i]['type'];
+							if factiontemp == 0 then
+								faction = "Alliance";
+							else
+								faction = "Horde";
+							end
+							name = _questDB.questList[i]['questName'];
+							local min = _questDB.questList[i]['minLevel'];
+							local max = _questDB.questList[i]['maxLevel'];
+							local compltemp = _questDB.questList[i]['completed'];
+							if compltemp == "nnil" then
+								compl = "Yes";
+							else
+								compl = "No";
+							end
+							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+						end
+					end
+				end
+				if CollapsingHeader(">>> |+| Un'Goro Crater") then
+					local num = 0;
+					local minlevel = 0;
+					local maxlevel = 0
+					for i=0, _questDB.numQuests -1 do
+						if _questDB.questList[i]['mapID'] == 490 then
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";

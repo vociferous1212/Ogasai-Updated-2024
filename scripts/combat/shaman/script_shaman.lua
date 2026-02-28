@@ -186,7 +186,7 @@ function script_shaman:checkEnhancement()
 					castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Windfury Weapon");
 				end
 
-				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+				if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 					if (not CastSpellByName(self.enhanceWeapon)) then
 						self.message = "Applying " .. self.enhanceWeapon .. " on weapon...";
 						self.waitTimer = GetTimeEX() + 500;
@@ -379,8 +379,11 @@ function script_shaman:run(targetGUID)
 	--Valid Enemy
 	if (targetObj ~= 0) and (not localObj:IsStunned()) and (not script_checkDebuffs:hasDisabledMovement()) then
 	
-	script_grind.combatScriptRange = self.meleeDistance;
-
+	if not IsInCombat() and self.pullLightningBolt then
+		script_grind.combatScriptRange = 30;
+	else
+		script_grind.combatScriptRange = self.meleeDistance;
+	end
 		-- Cant Attack dead targets
 		if (targetObj:IsDead() or not targetObj:CanAttack()) then
 			return 0;
@@ -408,7 +411,6 @@ function script_shaman:run(targetGUID)
 				end
 			end
 		end 
-		
 
 		-- Opener
 		if (not IsInCombat()) then
@@ -418,7 +420,8 @@ function script_shaman:run(targetGUID)
 			-- Dismount
 			if (IsMounted() and targetObj:GetDistance() < 25) then DisMount(); return 0; end
 
-			if (self.pullLightningBolt) then
+			
+			if (self.pullLightningBolt) and not IsSpellOnCD("Lightning Bolt") then
 			
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lightning Bolt");
 
@@ -426,31 +429,34 @@ function script_shaman:run(targetGUID)
 				if (not targetObj:IsSpellInRange("Lightning Bolt")) or (not targetObj:IsInLineOfSight()) then
 					return 3;
 				elseif (targetObj:IsInLineOfSight())
-					and (targetObj:IsSpellInRange("Lightning Bolt")) and not IsSpellOnCD("Lightning Bolt") and not IsCasting() and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+					and (targetObj:IsSpellInRange("Lightning Bolt")) and not IsSpellOnCD("Lightning Bolt") and not IsCasting() and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 					targetObj:AutoAttack();
-					-- Pull with: Lighting Bolt
+					-- Pull with: Lightning Bolt
 					if (IsMoving()) then
-						StopMoving();
-						return true;
-					end
-					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lighting Bolt");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
-						if (CastSpellByName("Lightning Bolt", targetObj)) then
+							StopMoving();
+							return true;
+						end
+					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lightning Bolt");
+					if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+						
+						if (not CastSpellByName("Lightning Bolt", targetObj)) then
 							self.waitTimer = GetTimeEX() + 2500;
 							script_grind:setWaitTimer(2500);
+							_quest.waitTimer = GetTimeEX() + 3000;
 						end
 					end
 				end
 			elseif not IsCasting() and not IsChanneling() then
-				if (targetObj:GetDistance() <= self.meleeDistance) then
+				if (targetObj:GetDistance() > self.meleeDistance) then
 					targetObj:AutoAttack();
 					return 3;
 				end
 			end
 
+
 			if targetObj:GetDistance() <= 20 and self.useEarthShock and not IsSpellOnCD("Earth Shock") and targetObj:IsInLineOfSight() then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Earth Shock");
-				if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+				if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 					if not CastSpellByName("Earth Shock") then
 						self.waitTimer = GetTimeEX() + 500;
 					end
@@ -541,6 +547,7 @@ function script_shaman:run(targetGUID)
 			if (targetObj:GetDistance() > self.meleeDistance or not targetObj:IsInLineOfSight()) then
 				return 3;
 			end
+
 
 			if (localMana >= 20) and (targetObj:GetDistance() <= 20) and (not script_grind.skipHardPull or (script_grind.skipHardPull and not script_checkAdds:checkAdds())) then
 				if (script_shamanTotems:useTotem()) then
@@ -634,7 +641,7 @@ function script_shaman:run(targetGUID)
 						or (localHealth <= 30 and localMana >= 15 and targethealth >= 25)
 						or localMana >= 80) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Earth Shock");
-						if (not IsSpellOnCD("Earth Shock")) and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+						if (not IsSpellOnCD("Earth Shock")) and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 							if not (CastSpellByName("Earth Shock", targetObj)) then
 								self.waitTimer = GetTimeEX() + 500;
 								return true;
@@ -651,7 +658,7 @@ function script_shaman:run(targetGUID)
 				and (not IsSpellOnCD("Earth Shock")) and (localMana >= self.flameShockMana)
 				and (not targetObj:HasDebuff("Flame Shock")) and (targetHealth >= 25) then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Flame Shock");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+					if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 						if not (CastSpellByName("Flame Shock")) then
 							self.waitTimer = GetTimeEX() + 500;
 							return true;
@@ -666,7 +673,7 @@ function script_shaman:run(targetGUID)
 				and (targetObj:HasDebuff("Flame Shock") or targetHealth <= 50)
 				and (localMana >= self.earthShockMana) then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Earth Shock");
-					if (not IsSpellOnCD("Flame Shock")) and (not IsSpellOnCD("Earth Shock")) and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then	
+					if (not IsSpellOnCD("Flame Shock")) and (not IsSpellOnCD("Earth Shock")) and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then	
 						if not (CastSpellByName("Earth Shock", targetObj)) then
 							self.waitTimer = GetTimeEX() + 500;
 							return true;
@@ -682,7 +689,7 @@ function script_shaman:run(targetGUID)
 					and (targetHealth >= 30)
 						and (not targetObj:HasDebuff("Frost Shock")) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Frost Shock");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+						if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 							if not (CastSpellByName("Frost Shock")) then
 								self.waitTimer = GetTimeEX() + 500;
 								return true;
@@ -706,8 +713,8 @@ function script_shaman:run(targetGUID)
 						StopMoving();
 						return true;
 					end
-					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lighting Bolt");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lightning Bolt");
+					if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 						if (CastSpellByName("Lightning Bolt", targetObj)) then
 							self.waitTimer = GetTimeEX() + 1850;
 							return 0;
@@ -757,7 +764,7 @@ function script_shaman:run(targetGUID)
 				-- Stormstrike
 				if (HasSpell("Stormstrike") and not IsSpellOnCD("Stormstrike")) then
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Stormstrike");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+					if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 						if (CastSpellByName("Stormstrike", targetObj)) then
 							return true;
 						end
@@ -859,7 +866,7 @@ function script_shaman:rest()
 	end
 
 	-- Drink something
-	if (not IsDrinking() and localMana < self.drinkMana) and (not IsMoving()) and (not IsInCombat()) then
+	if PlayerLevel() >= 4 and (not IsDrinking() and localMana < self.drinkMana) and (not IsMoving()) and (not IsInCombat()) then
 		self.waitTimer = GetTimeEX() + 2000;
 		script_grind:setWaitTimer(2000);
 		self.message = "Need to drink...";
@@ -969,7 +976,7 @@ function script_shaman:castHealingSpell(localObj)
 	end
 
 	if (HasSpell(script_shaman.healingSpell)) then
-		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+		if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 			if (not IsSpellOnCD(script_shaman.healingSpell)) then
 				if (not IsMoving()) and (IsStanding()) then
 					if (not IsCasting()) and (not IsChanneling()) then
@@ -993,7 +1000,7 @@ function script_shaman:castLesserHealingWave(localObj)
 	local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Lesser Healing Wave");
 
 	if (HasSpell("Lesser Healing Wave")) then
-		if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
+		if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) then
 			if (not IsSpellOnCD("Lesser Healing Wave")) then
 				if (not IsMoving()) and (IsStanding()) then
 					if (not IsCasting()) and (not IsChanneling()) then

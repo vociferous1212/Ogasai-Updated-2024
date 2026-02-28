@@ -405,7 +405,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (not IsSpellOnCD('Bloodrage')) and (HasSpell('Bloodrage')) and (localHealth >= self.bloodRageHealth) 
 				and (targetObj:GetDistance() <= 40) then
 				if not CastSpellByName('Bloodrage') then
-					self.waitTimer = GetTimeEX() + 550;
+					self.waitTimer = GetTimeEX() + 1550;
 				end
 			end
 		end
@@ -839,7 +839,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 			if (GetNumPartyMembers() <= 1) and (targetObj:GetDistance() <= 10) and targetHealth >= 20 then
 				if (not IsSpellOnCD('Bloodrage') and HasSpell('Bloodrage') and localHealth >= self.bloodRageHealth) then 
 					if not CastSpellByName('Bloodrage') then
-						self.waitTimer = GetTimeEX() + 500;
+						self.waitTimer = GetTimeEX() + 1500;
 					end
 				end
 			end
@@ -927,7 +927,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 				if (self.battleStance) and (self.enableRend) then
 					if targetObj:GetCreatureType() ~= 'Mechanical' and targetObj:GetCreatureType() ~= 'Elemental'  and targetObj:GetCreatureType() ~= "Undead" and HasSpell('Rend') and not targetObj:HasDebuff("Rend") and targetHealth >= 30 and localRage >= 10 and not IsSpellOnCD("Rend") then 
 						if not CastSpellByName("Rend") then
-							self.waitTimer = GetTimeEX() + 550;
+							self.waitTimer = GetTimeEX() + 1550;
 						end
 					end 
 				end

@@ -24,6 +24,7 @@ script_fish = {
 	savedLocations = {},
 	numSavedLocation = 0,
 	currentGoToLocation = 0,
+	usingFisher = false,
 }
 
 function script_fish:GetBobber()
@@ -136,6 +137,8 @@ function script_fish:run()
 		script_fish:setup();
 	return;
 	end
+
+	self.usingFisher = true;
 	
 	local localObj = GetLocalPlayer();
 	local isInCombat = IsInCombat();
@@ -359,11 +362,14 @@ function script_fish:menu()
 
 		if (not self.pause) then 
 			if (Button("Pause Bot")) then 
-				self.pause = true; 
+				self.usingFisher = false;
+				self.pause = true;
+				runOgasai.pause = true;
 			end
 		else 
 			if (Button("Resume Bot")) then 
 				self.pause = false; 
+				runOgasai.pause = false;
 			end 
 		end
 

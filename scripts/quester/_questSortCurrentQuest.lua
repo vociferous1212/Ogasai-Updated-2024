@@ -23,8 +23,9 @@ function _questSortCurrentQuest:run()
 				_quest.tickRate = .2;
 				_quest.message = "Completing previous quests in list";
 				_quest:setTimer(150)
-			return;
+			return true;
 			end
 		end
 	end
+return false;
 end

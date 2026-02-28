@@ -259,7 +259,7 @@ function script_druid:run(targetGUID)
 		local tickRandom = math.random(150, 350);
 		if IsCatForm() then tickRandom = 250; self.waitTimer = self.waitTimer - 500; end
 
-		if (IsMoving()) or (not IsInCombat()) or (targetObj:IsFleeing()) then
+		if (IsMoving()) or (not IsInCombat()) or (targetObj~= nil and targetObj ~= 0 and targetObj:IsFleeing()) then
 			script_grind.tickRate = 135;
 		elseif (not IsInCombat()) and (not IsMoving()) then
 			script_grind.tickRate = tickRandom
@@ -282,6 +282,8 @@ function script_druid:run(targetGUID)
 		self.message = "Waiting! Stuck in combat phase!";
 		return 4;
 	end
+
+	if targetObj == nil or targetObj == 0 then return; end
 
 	-- move away from add targets in combat
 	if (IsInCombat()) and (script_grind.skipHardPull) and (GetNumPartyMembers() == 0)
@@ -578,7 +580,7 @@ function script_druid:run(targetGUID)
 			-- not in a party and not if target has entangling roots
 				-- 2 or more enemies only
 		if (not IsBearForm()) and (not IsCatForm()) and (IsInCombat()) and targetObj ~= 0 and targetObj ~= nil then
-			if (targetObj:IsCasting() or script_druid:enemiesAttackingUs(6) >= 2) and (GetNumPartyMembers() == 0) and (not targetObj:HasDebuff("Entangling Roots")) and (targetObj:GetDistance() <= 8) then
+			if (targetObj:IsCasting() or script_druid:enemiesAttackingUs(12) >= 2) and (GetNumPartyMembers() == 0) and (not targetObj:HasDebuff("Entangling Roots")) and (targetObj:GetDistance() <= 8) then
 				CheckRacialSpells();
 				self.waitTimer = GetTimeEX() + 200;
 			end
@@ -1088,7 +1090,7 @@ function script_druid:run(targetGUID)
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Wrath");
 				if PlayerLevel() <= 10 and targetHealth >= 75 then
 					if not IsMoving() then
-						if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 35 then
+						if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 35 then
 
 							if not (CastSpellByName("Wrath", targetObj)) then
 								self.waitTimer = GetTimeEX() + 550;
@@ -1119,12 +1121,22 @@ function script_druid:run(targetGUID)
 					end
 				end
 
+				local wrathMana = 35;
+				if PlayerLevel() == 1 then
+					wrathMana = 70;
+				elseif PlayerLevel() == 2 then
+					wrathMana = 50;
+				elseif PlayerLevel() == 3 then
+					wrathMana = 40;
+				end
+								local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Wrath");
+
 				-- Wrath
-				if (PlayerMana() > 30 and targetHealth > 15 and not HasSpell("Star Fire"))
-				or (((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 30) and targetHealth >= 7 and HasSpell("Star Fire"))
-				or (not HasSpell("Bear Form") and PlayerMana() >= 30 and targetHealth >= 15) and not IsMoving() then
+				if (PlayerMana() > wrathMana and targetHealth > 15 and not HasSpell("Star Fire"))
+				or (((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= wrathMana) and targetHealth >= 7 and HasSpell("Star Fire"))
+				or (not HasSpell("Bear Form") and PlayerMana() >= wrathMana and targetHealth >= 15) and not IsMoving() then
 					if (not IsMoving()) then
-						if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 30 then
+						if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= wrathMana then
 							if not CastSpellByName("Wrath", targetObj) then
 								self.waitTimer = GetTimeEX() + 2000;
 								script_grind:setWaitTimer(2000);
@@ -1135,15 +1147,7 @@ function script_druid:run(targetGUID)
 
 				-- if low level use wrath
 				if not HasSpell("Moonfire") and not IsMoving() then
-					local wrathMana = 35;
-					if PlayerLevel() == 1 then
-						wrathMana = 60;
-					elseif PlayerLevel() == 2 then
-						wrathMana = 50;
-					elseif PlayerLevel() == 3 then
-						wrathMana = 40;
-					end
-					if (PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= wrathMana then
+					if (cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= wrathMana then
 
 						if not (CastSpellByName("Wrath", targetObj)) then
 							self.waitTimer = GetTimeEX() + 550;
@@ -1277,7 +1281,7 @@ function script_druid:rest()
 	end
 
 	-- Drink something if not in form
-	if (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not IsInCombat()) and (not IsDrinking()) and (PlayerMana() <= self.drinkMana) and (not Player():HasBuff("Innervate")) then
+	if PlayerLevel() >= 3 and (not IsBearForm()) and (not IsCatForm()) and (not IsTravelForm()) and (not IsInCombat()) and (not IsDrinking()) and (PlayerMana() <= self.drinkMana) and (not Player():HasBuff("Innervate")) then
 		
 			self.message = "Need to drink...";
 

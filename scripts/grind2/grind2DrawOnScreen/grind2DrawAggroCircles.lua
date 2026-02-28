@@ -81,6 +81,12 @@ function grind2DrawAggroCircles:run(maxRange)
 				-- set conditions
 				local aggro = i:GetLevel() - localObj:GetLevel() + 17.8;
 
+				if GetRealmName() == "Permadeath - EU" then
+					if PlayerLevel() <= 5 then
+						aggro = i:GetLevel() - localObj:GetLevel() + 15;
+					end
+				end
+
 				if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
 					aggro = i:GetLevel() - localObj:GetLevel() + 19.5;
 				end

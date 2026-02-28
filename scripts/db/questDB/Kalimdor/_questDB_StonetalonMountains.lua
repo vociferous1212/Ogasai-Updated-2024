@@ -8,9 +8,9 @@ local questDescription, questObjectives = GetQuestLogQuestText(1);
 
 --(completed, faction, questName, giverName, posX, posY, posZ, mapID, minLevel, maxLevel, grindX, grindY, grindZ, type, numKill, numKill2, numKill3, numGather, numGather2, returnX, returnY, returnZ, returnTarget, targetName, targetName2, targetName3, gatherID, gatherID2, rewardNum, desc, useItem, gossipOption)
 
---_questDB:addQuest("no", 0, "", "", xyz, 440, 40, 50, xyz, type
---_questDB:addQuest("no", 0, "", "", xyz, 440, 40, 50, xyz, type
---_questDB:addQuest("no", 0, "", "", xyz, 440, 40, 50, xyz, type
+--_questDB:addQuest("no", 0, "", "", xyz, 406, 40, 50, xyz, type
+--_questDB:addQuest("no", 0, "", "", xyz, 406, 40, 50, xyz, type
+--_questDB:addQuest("no", 0, "", "", xyz, 406, 40, 50, xyz, type
 
 
 -- 1. Ordanus (Kill, requires Cenarius’ Legacy, Quest ID 1088)

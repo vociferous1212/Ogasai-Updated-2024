@@ -1,4 +1,13 @@
-fpDB = {isSetup = false, fpList = {}, numfps = 0, cityList = {}, numCity = 0, goToNearestFPBool = false, goToAshenvaleBool = false, goToCityBool = false, test = "",
+fpDB = {
+	isSetup = false,
+	fpList = {},
+	numfps = 0,
+	cityList = {},
+	numCity = 0,
+	goToNearestFPBool = false,
+	goToAshenvaleBool = false,
+	goToCityBool = false,
+	test = "",
 
 }
 		
@@ -129,16 +138,20 @@ function fpDB:setup()
 	-- wetlands
 	fpDB:addFP("Shellei Brondir", 0, 11, "Theramore, Wetlands", -3793.1999511719, -782.05200195313, 9.0148887634277);
 
-	-- crossroads
-	fpDB:addFP("Devrak", 1, 17, "Crossroads, The Barrens", -437.1369934082, -2596, 95.787719726563);
 
+	-- keep this order for now
+	-- reads table from bottom to top...
 	-- camp tarujo
 	fpDB:addFP("Omusa Thunderhorn", 1, 17, "Camp Taurajo, The Barrens",-2384.080078125, -1880.9399414063, 95.850372314453);
-
 	-- ratchet
 	fpDB:addFP("Bragok", 0, 17, "Ratchet, The Barrens", -898.24597167969, -3769.6499023438, 11.710169792175);
 	fpDB:addFP("Bragok", 1, 17, "Ratchet, The Barrens", -898.24597167969, -3769.6499023438, 11.710169792175);
+	-- crossroads
+	fpDB:addFP("Devrak", 1, 17, "Crossroads, The Barrens", -437.1369934082, -2596, 95.787719726563);
 
+
+
+	
 	-- darkshire
 	fpDB:addFP("Felicia Maline", 0, 10, "Darkshire, Duskwood", -10513.799804688, -1258.7900390625, 41.431617736816);
 

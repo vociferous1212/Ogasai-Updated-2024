@@ -105,7 +105,7 @@ function script_hunterRunRestState:run()
 	end
 
 	-- Eat and Drink
-	if not IsMoving() and (not IsDrinking() and localMana < script_hunter.drinkMana) then
+	if not IsMoving() and (not IsDrinking() and localMana < script_hunter.drinkMana) and PlayerLevel() >= 6 then
 			script_hunter.message = "Need to drink...";
 			if (IsMoving()) then
 				StopMoving();

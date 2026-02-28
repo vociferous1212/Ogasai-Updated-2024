@@ -277,7 +277,7 @@ function script_paladin:run(targetGUID)
 			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) then
 				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Exorcism");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) and localHealth >= self.holyLightHealth then
+					if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) and localHealth >= self.holyLightHealth then
 						if (CastSpellByName("Exorcism", targetObj)) then 
 							self.waitTimer = GetTimeEX() + 500;
 							self.message = ("Pulling with Exorcism...");
@@ -389,7 +389,7 @@ function script_paladin:run(targetGUID)
 			if (targetObj:GetDistance() < 30) and (HasSpell("Exorcism")) and (not IsSpellOnCD("Exorcism")) then
 				if (targetObj:GetCreatureType() == "Demon") or (targetObj:GetCreatureType() == "Undead") then
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Exorcism");
-					if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) and localHealth >= self.holyLightHealth then
+					if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) and localHealth >= self.holyLightHealth then
 						if not (CastSpellByName("Exorcism", targetObj)) then
 							self.waitTimer = GetTimeEX() + 500;
 						end
@@ -466,7 +466,7 @@ function script_paladin:run(targetGUID)
 				if (self.useJudgement) and (HasSpell("Judgement")) and (not IsSpellOnCD("Judgement")) and playerHasCrusader and (localMana >= self.judgementMana) then
 					if (targetObj:GetDistance() < 10) and not targetHasCrusader and (playerHasCrusader and not self.onlyUseSealOfCrusader) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Judgement");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
+						if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
 							if not CastSpellByName("Judgement", targetObj) then
 								self.waitTimer = GetTimeEX() + 500;
 							end
@@ -486,7 +486,7 @@ function script_paladin:run(targetGUID)
 				if (self.useJudgement) and (localMana >= self.judgementMana) and (not IsSpellOnCD("Judgement")) then
 					if playerHasRighteousness or playerHasCommand then 
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Judgement");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
+						if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
 							if not CastSpellByName("Judgement", targetObj) then
 								self.waitTimer = GetTimeEX() + 500;
 							end
@@ -498,7 +498,7 @@ function script_paladin:run(targetGUID)
 				if (self.useJudgement) and (targetHealth < 10) and (localMana >= self.judgementMana) and not IsSpellOnCD("Judgement") then
 					if (playerHasRighteousness or playerHasCommand) and (targetObj:GetDistance() < 10) then
 						local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Judgement");
-						if ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
+						if ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 10) then
 							if not CastSpellByName("Judgement", targetObj) then
 								self.waitTimer = GetTimeEX() + 500;
 							end

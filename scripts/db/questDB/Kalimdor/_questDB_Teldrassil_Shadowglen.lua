@@ -31,11 +31,21 @@ _questDB:addQuest("no", 0, "The Woodland Protector", "Tarindrella", 10297.985351
 -- level 1 night elf start quest # 3
 _questDB:addQuest("no", 0, "The Woodland Protector", "Melithar Staghelm", 10389.799804688, 763.47698974609, 1319.9537353516, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10298.233398438, 870.58386230469, 1335.6284179688, "Tarindrella", 0, 0, 0, 0, 0, 0, "Seek out the dryad known as Tarindrella.", 0, 1);
 
+-- class quests
 if GetMyClass() == "ROGUE" then
-_questDB:addQuest("no", 0, "Encrypted Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10519.099609375, 778.01397705078, 1329.5992431641, "Frahun Shadewhisper", 0, 0, 0, 0, 0, 0, "Read the Encrypted Sigil and speak to Frahun Shadewhisper in Shadowglen.", 0, 1);
+	_questDB:addQuest("no", 0, "Encrypted Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10519.099609375, 778.01397705078, 1329.5992431641, "Frahun Shadewhisper", 0, 0, 0, 0, 0, 0, "Read the Encrypted Sigil and speak to Frahun Shadewhisper in Shadowglen.", 0, 1);
 end
 if GetMyClass() == "WARRIOR" then
-_questDB:addQuest("no", 0, "Simple Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10526.599609375, 778.08599853516, 1329.5993652344, "Alyissia", 0, 0, 0, 0, 0, 0, "Read the Simple Sigil and speak to Alyissia in Shadowglen.", 0, 1);
+	_questDB:addQuest("no", 0, "Simple Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10526.599609375, 778.08599853516, 1329.5993652344, "Alyissia", 0, 0, 0, 0, 0, 0, "Read the Simple Sigil and speak to Alyissia in Shadowglen.", 0, 1);
+end
+if GetMyClass() == "HUNTER" then
+	_questDB:addQuest("no", 0, "", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, , , 0, 0, 0, 0, 0, 0, , 0, 1);
+end
+if GetMyClass() == "PRIEST" then
+	_questDB:addQuest("no", 0, "", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, , , 0, 0, 0, 0, 0, 0, , 0, 1);
+end
+if GetMyClass() == "DRUID" then
+	_questDB:addQuest("no", 0, "", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, , , 0, 0, 0, 0, 0, 0, , 0, 1);
 end
 
 -- level 1 night elf starter quest # 2

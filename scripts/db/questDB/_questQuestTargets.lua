@@ -15,12 +15,14 @@ _questQuestTargets = {
 
 function _questQuestTargets:isUnitQuestTarget(target)
 
-	for i = 1, self.numTargets do
+	if target ~= nil and target ~= 0 then
+		for i = 1, self.numTargets do
 
-		if target:GetUnitName() == _questQuestTargets.names[i] then
+			if target:GetUnitName() == _questQuestTargets.names[i] then
 		
-			return true;
+				return true;
 
+			end
 		end
 	end
 

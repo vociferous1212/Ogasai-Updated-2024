@@ -10,7 +10,7 @@ function _questDB_Mulgore_CampNarache:setup()
 
 _questDB:addQuest("no", 1, "Rites of the Earthmother", "Chief Hawkwind", -2877.9499511719, -221.83000183105, 54.820861816406, 215, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2333.5400390625, -393.07299804688, -8.0124425888062, "Baine Bloodhoof", 0, 0, 0, 0, 0, 2, "Take the Totem of Hawkwind to Baine Bloodhoof in Bloodhoof Village. Follow the road out of Camp Narache.", 0, 1);
 
-_questDB:addQuest("no", 1, "Break Sharptusk!", "Brave Windfeather", -2938.1630859375, -1226.8836669922, 63.937282562256,  215, 4, 8, -2940.2119140625, -1217.6257324219, 61.54547882080, 1, 1, 0, 0, 0, 0, -2920.3586425781, -254.90600585938, 52.97253036499, "Brave Windfeather", "Chief Sharptusk Thornmantle", 0, 0, 0, 0, 2, "Bring the head of Chief Sharptusk Thornmantle to Brave Windfeather in Red Cloud Mesa.", 0, 1);
+_questDB:addQuest("no", 1, "Break Sharptusk!", "Brave Windfeather", -2908.9465332031, -262.12954711914, 53.009628295898,  215, 4, 8, -2940.2119140625, -1217.6257324219, 61.54547882080, 1, 1, 0, 0, 0, 0, -2920.3586425781, -254.90600585938, 52.97253036499, "Brave Windfeather", "Chief Sharptusk Thornmantle", 0, 0, 0, 0, 2, "Bring the head of Chief Sharptusk Thornmantle to Brave Windfeather in Red Cloud Mesa.", 0, 1);
 
 if GetMyClass() == "SHAMAN" then
 
@@ -34,8 +34,13 @@ _questDB:addQuest("no", 1, "A Humble Task", "Chief Hawkwind", -2877.9499511719, 
 
 _questDB:addQuest("no", 1, "The Hunt Continues", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940914154053, 215, 1, 6, -3400.8754882813, -299.08343505859, 68.37378692627,  1, 20, 0, 0, 0, 0, -2912.6999511719, -257.54000854492, 52.94091415405, "Grull Hawkwind", "Mountain Cougar", 0, 0, 0, 0, 2, "Grull Hawkwind in Camp Narache wants you to bring him 10 Mountain Cougar Pelts.", 0, 1);
 
+-- does not work? description issue
+--if GetMyClass() == "WARRIOR" then
+--	_questDB:addQuest("no", 1, "Simple Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2880.4299316406, -213.02000427246, 54.821006774902, "Harutt Thunderhorn", 0, 0, 0, 0, 0, 0, "Read the Simple Note and speak to Harutt Thunderhorn in Camp Narache.", 0, 2);
+--end
+
 if GetMyClass() == "DRUID" then
-_questDB:addQuest("no", 1, "Verdant Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.5700683594, -268.59100341797, 53.916873931885, "Gart Mistrunner", 0, 0, 0, 0, 0, 0, "Read the Verdant Note and speak to Gart Mistrunner in Camp Narache.", 0, 2);
+_questDB:addQuest("no", 1, "Verdant Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.5700683594, -268.59100341797, 53.916873931885, "Gart Mistrunner", 0, 0, 0, 0, 0, 0, "Read the Verdant Note and speak to Gart Mistrunner in Camp Narache. \n", 0, 2);
 end
 if GetMyClass() == "SHAMAN" then
 	_questDB:addQuest("no", 1, "Rune-Inscribed Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940914154053, 215, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.8798828125, -264.70901489258, 53.916511535645, "Meela Dawnstrider", 0, 0, 0, 0, 0, 0, "Read the Rune-Inscribed Note and speak to Meela Dawnstrider in Camp Narache.", 0, 2);

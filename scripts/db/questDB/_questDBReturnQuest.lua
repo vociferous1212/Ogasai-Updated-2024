@@ -12,8 +12,12 @@ function _questDBReturnQuest:returnAQuest()
 	local px, py, pz = GetLocalPlayer():GetPosition();
 	local x, y, z = 0, 0, 0;
 
+	if IsInCombat() then
+		return;
+	end
+
 	-- return a quest
-	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete then
+	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete and not IsInCombat() then
 
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
 		for i=0, _questDB.numQuests -1 do
@@ -53,6 +57,11 @@ function _questDBReturnQuest:returnAQuest()
 		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
 
 				if HasForm() then RemoveForm(); end
+
+				-- close trainer window if we are targeting a trainer npc.. levelss 1-6 mainly
+				if PlayerLevel() <= 6 then
+					CloseTrainer();
+				end
 
 				-- set return target name
 				local name = _questDB:getReturnTargetName();
@@ -98,6 +107,7 @@ function _questDBReturnQuest:returnAQuest()
 
 						CompleteQuest();
 						SelectGossipActiveQuest(1);
+						QuestRewardCompleteButton_OnClick()
 						--SelectActiveQuest(1);
 
 						
@@ -261,7 +271,7 @@ end
 					end
 			return true;
 			end
-		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and ((script_grind.lootObj == nil or script_grind.skipLooting) or (script_grind.lootObj ~= nil and script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()))) then
+		elseif (x ~= 0) and (GetDistance3D(px, py, pz, x, y, z) > 4) and ((script_grind.lootObj == nil or script_grind.skipLooting) or (script_grind.lootObj ~= nil and script_grind:isTargetLootBlacklisted(script_grind.lootObj:GetGUID()))) and not IsInCombat() and _quest.enemyTarget == nil and not IsAnyTargetTargetingPlayer() then
 			local name = _questDB:getReturnTargetName();
 			local dist = math.floor(GetDistance3D(px, py, pz, x, y, z));
 			if (not IsInCombat()) and PlayerHasTarget() and GetTarget():GetUnitName() ~= name then
@@ -274,9 +284,8 @@ end
 				--script_runner:run(x, y, z)
 			--end
 			if not IsMoving() then Move(x, y, z); end
-		return;
+		
 		end
-	return true;
 	end
 return false;	
 end

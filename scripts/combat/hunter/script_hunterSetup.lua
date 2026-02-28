@@ -7,6 +7,10 @@ function script_hunterSetup:setup()
 	script_hunter.feedTimer = GetTimeEX();
 	script_hunter.waitTimer = GetTimeEX();
 
+	if GetMyClass() == "HUNTER" then
+		itemsList:pickupAmmoSlotFromBag1AndPlaceInBag4()
+	end
+
 -- Save the name of pet food we use
 	if (GetContainerItemLink(script_hunter.bagWithPetFood-1, script_hunter.slotWithPetFood)  ~= nil) then
 		local _, _, iLink = string.find(GetContainerItemLink(script_hunter.bagWithPetFood-1, script_hunter.slotWithPetFood), "(item:%d+)");

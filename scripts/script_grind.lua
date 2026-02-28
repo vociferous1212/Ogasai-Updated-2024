@@ -2203,10 +2203,12 @@ end
 
 function script_grind:isTargetingMe(target) 
 	local localPlayer = GetLocalPlayer();
-	if (localPlayer ~= nil and localPlayer ~= 0 and not localPlayer:IsDead()) then
-		if (target) ~= nil and target ~= 0 then
-			if (target:GetUnitsTarget() ~= nil and target:GetUnitsTarget() ~= 0) then
-				return target:GetUnitsTarget():GetGUID() == localPlayer:GetGUID();
+	if target ~= nil and target ~= 0 then
+		if (localPlayer ~= nil and localPlayer ~= 0 and not localPlayer:IsDead()) then
+			if (target) ~= nil and target ~= 0 then
+				if (target:GetUnitsTarget() ~= nil and target:GetUnitsTarget() ~= 0) then
+					return target:GetUnitsTarget():GetGUID() == localPlayer:GetGUID();
+				end
 			end
 		end
 	end

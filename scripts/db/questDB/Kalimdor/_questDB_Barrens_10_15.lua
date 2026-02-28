@@ -52,8 +52,9 @@ end
 
 if GetFaction() == 6 then
 	-- using use item to tell bot to return to barrens FP
-	_questDB:addQuest("no", 1, "Return to Jahan", "Tal", -1196.75, 26.077699661255, 176.94958496094, 17, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -350.07901000977, -2566.5900878906, 97.358093261719, "Jahan Hawkwing", 0, 0, 0, 0, 0, 0, "Buy a wind rider to the Crossroads from the wind rider master Tal, then bring Ahanu's Leather Goods to Jahan Hawkwing.", "Ahanu's Leather Goods", 1);
-	
+	_questDB:addQuest("no", 1, "Return to Jahan", "Tal", -1196.75, 26.077699661255, 176.94958496094, 1638, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -350.07901000977, -2566.5900878906, 97.358093261719, "Jahan Hawkwing", 0, 0, 0, 0, 0, 0, "Buy a wind rider to the Crossroads from the wind rider master Tal, then bring Ahanu's Leather Goods to Jahan Hawkwing.", "Ahanu's Leather Goods", 1);
+	_questDB:addQuest("no", 1, "Tal the Wind Rider Master", "Ahanu", -1238.5799560547, 38.971000671387, 127.06378173828, 1638, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1196.75, 26.077699661255, 176.94958496094, "Tal", 0, 0, 0, 0, 0, 0, "Bring Ahanu's Leather Goods to Tal in Thunder Bluff.", 0, 1);
+	--_questDB:addQuest("no", 1, "Return to Jahan", "Tal", -1196.75, 26.077699661255, 176.94958496094, 17, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -350.07901000977, -2566.5900878906, 97.358093261719, "Jahan Hawkwing", 0, 0, 0, 0, 0, 0, "Buy a wind rider to the Crossroads from the wind rider master Tal, then bring Ahanu's Leather Goods to Jahan Hawkwing.", "Ahanu's Leather Goods", 1);
 	_questDB:addQuest("no", 1, "Tal the Wind Rider Master", "Ahanu", -1238.5799560547, 38.971000671387, 127.06378173828, 17, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1196.75, 26.077699661255, 176.94958496094, "Tal", 0, 0, 0, 0, 0, 0, "Bring Ahanu's Leather Goods to Tal in Thunder Bluff.", 0, 1);
 	
 	_questDB:addQuest("no", 1, "Ride to Thunder Bluff", "Devrak", -437.1369934082, -2596, 95.787612915039, 17, 10, 20, 0, 0, 0, 10, 0, 0, 0, 0, 0, -1238.5799560547, 38.971000671387, 127.06378173828, "Ahanu", 0, 0, 0, 0, 0, 0, "Buy a wind rider to Thunder Bluff from the wind rider master Devrak, then bring the Bundle of Hides to Ahanu in Thunder Bluff.", 0, 1);

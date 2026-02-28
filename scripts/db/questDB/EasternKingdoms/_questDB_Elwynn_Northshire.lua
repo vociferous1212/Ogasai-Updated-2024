@@ -35,6 +35,8 @@ _questDB:addQuest("no", 0, "Skirmish at Echo Ridge", "Marshal McBride", -8902.58
 --level 1 human quest # 5
 _questDB:addQuest("no", 0, "Investigate Echo Ridge", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939300537109, 12, 1, 6, -8716.78515625, -142.43266296387 ,86.455268859863, 1, 10, 0, 0, 0, 0, -8902.58984375, -162.60600280762, 81.939300537109, "Marshal McBride", "Kobold Worker", 0, 0, 0, 0, 0, "Kill 10 Kobold Workers, then report back to Marshal McBride.", 0, 1);
 
+
+-- class quests
 if GetMyClass() == "ROGUE" then
 _questDB:addQuest("no", 0, "Encrypted Letter", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939300537109, 12, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8863.4697265625, -210.9049987793, 80.572006225586, "Jorik Kerridan", 0, 0, 0, 0, 0, 0, "Read the Encrypted Letter and speak to Jorik Kerridan in the stable behind Northshire Abbey.", 0, 2);
 end
@@ -50,6 +52,10 @@ end
 if GetMyClass() == "MAGE" then
 _questDB:addQuest("no", 0, "Glyphic Letter", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939643859863, 12, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8851.5703125, -188.23399353027, 89.314559936523, "Khelden Bremen", 0, 0, 0, 0, 0, 0, "Read the Glyphic Letter and speak to Khelden Bremen inside Northshire Abbey.", 0, 1);
 end
+if GetMyClass() == "PRIEST" then
+_questDB:addQuest("no", 0, "Hallowed Letter", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939643859863, 12, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8853.58984375, -193.33599853516, 81.933769226074, "Priestess Anetta", 0, 0, 0, 0, 0, 0, "Read the Hallowed Letter and speak to Priestess Anetta in Northshire Abbey.", 0, 1);
+end
+
 
 --level 1 human quest # 4
 _questDB:addQuest("no", 0, "Kobold Camp Cleanup", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939300537109, 12, 1, 6, -8765.392578125, -189.02615356445, 84.626686096191, 1, 20, 0, 0, 0, 0, -8902.58984375, -162.60600280762, 81.939300537109, "Marshal McBride", "Kobold Vermin", 0, 0, 0, 0, 0, "Kill 10 Kobold Vermin, then return to Marshal McBride.", 0, 1);

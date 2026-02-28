@@ -561,3 +561,61 @@ SPELL_FAILED_REPUTATION = 0x8F,
 SPELL_FAILED_MIN_SKILL = 0x90,
 SPELL_FAILED_UNKNOWN = 0x91,
 SPELL_CAST_OK = 0xFF,
+
+
+
+
+--[[
+
+CHECK ENVRIONMENT FOR PROTECTED API
+local env = getfenv(0)
+
+local funcs = {
+    "CastSpell",
+    "CastSpellByName",
+    "UseAction",
+    "TargetUnit",
+    "TargetNearestEnemy",
+    "TargetNearestFriend",
+    "AssistUnit",
+    "UseItemByName",
+    "UseInventoryItem",
+    "PetAttack",
+    "PetFollow",
+    "PetStay",
+    "PetPassiveMode",
+    "PetDefensiveMode",
+    "PetAggressiveMode",
+    "MoveForwardStart",
+    "MoveForwardStop",
+    "TurnLeftStart",
+    "TurnLeftStop",
+    "CameraOrSelectOrMoveStart",
+    "CameraOrSelectOrMoveStop",
+    "RunMacro",
+    "RunScript",
+    "SpellTargetUnit",
+    "SpellStopTargeting",
+}
+
+DEFAULT_CHAT_FRAME:AddMessage("Testing protected functions...")
+
+for _, name in ipairs(funcs) do
+    local f = env[name]
+    if type(f) == "function" then
+        local ok, err = pcall(f)
+        if ok then
+            DEFAULT_CHAT_FRAME:AddMessage(name .. ": |cff00ff00UNPROTECTED|r")
+        else
+            if string.find(err, "protected") or string.find(err, "secure") then
+                DEFAULT_CHAT_FRAME:AddMessage(name .. ": |cffff0000PROTECTED|r")
+            else
+                DEFAULT_CHAT_FRAME:AddMessage(name .. ": |cffffff00ERROR|r (" .. err .. ")")
+            end
+        end
+    else
+        DEFAULT_CHAT_FRAME:AddMessage(name .. ": |cffff8800NOT FOUND|r")
+    end
+end
+
+--]]

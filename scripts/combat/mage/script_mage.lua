@@ -806,14 +806,14 @@ function script_mage:run(targetGUID)
 					local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Frostbolt");
 				
 					-- if not targetobj is in line of sight and it has frost nova or frost bite then try to attack out of line of sight target
-					if localMana >= script_mage.frostboltMana and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and not targetObj:IsInLineOfSight() and (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova")) then
+					if localMana >= script_mage.frostboltMana and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and not targetObj:IsInLineOfSight() and (targetObj:HasDebuff("Frostbite") or targetObj:HasDebuff("Frost Nova")) then
 						CastSpellByName("Frostbolt", targetObj);
 						script_mage.waitTimer = GetTimeEX() + 2500;
 						script_grind:setWaitTimer(1500);
 					end
 
 					-- frost bolt main damage source
-					if localMana >= script_mage.frostboltMana and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and targetObj:IsInLineOfSight() then
+					if localMana >= script_mage.frostboltMana and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) and (not IsMoving()) and (not IsSpellOnCD("Frostbolt")) and targetObj:IsInLineOfSight() then
 						if (CastSpellByName("Frostbolt", targetObj)) then
 							script_mage.waitTimer = GetTimeEX() + 500;
 							script_grind:setWaitTimer(300);
@@ -883,7 +883,7 @@ function script_mage:run(targetGUID)
 				local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Frostbolt");
 				
 				-- cast frostbolt
-				if targetObj:IsInLineOfSight() and not IsMoving() and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) then
+				if targetObj:IsInLineOfSight() and not IsMoving() and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana >= 10) then
 					if (CastSpellByName("Frostbolt", targetObj)) then
 						script_grind:setWaitTimer(1650);
 						script_mage.waitTimer = GetTimeEX() + 1650;

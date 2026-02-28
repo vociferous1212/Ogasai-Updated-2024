@@ -371,13 +371,14 @@ function script_vendor:sell()
 		
 		if (GetDistance3D(x, y, z, vX, vY, vZ) > 3.5) then
 			self.status = 2; -- moving to sell at a vendor
-			if not IsSwimming() and not grind2.usingGrinder2 then
+			if not IsSwimming() and not grind2.usingGrinder2 and not _quest.usingQuester then
 				script_navEX:moveToTarget(localObj, vX, vY, vZ);
 			elseif IsSwimming() and not grind2.usingGrinder2 then
 				Move(vX, vY, vZ);
-			elseif grind2.usingGrinder2 then
+			elseif grind2.usingGrinder2 or _quest.usingQuester then
 				grind2MoveToTarget:run(Player(), vX, vY, vZ);
 			end
+			if not IsPathLoaded(5) then Move(vX, vY, vZ); end
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;

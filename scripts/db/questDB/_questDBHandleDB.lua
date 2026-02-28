@@ -1,4 +1,4 @@
-_questDBHandleDB = {}
+﻿_questDBHandleDB = {}
 
 function _questDBHandleDB:turnQuestCompleted()
 
@@ -52,11 +52,12 @@ end
 function _questDBHandleDB:turnOldQuestCompleted()
 	local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
 
-	local questDescription, questObjectives = GetQuestLogQuestText();
 
 	if (not _quest.isQuestCompleted) then
 
 		for i=0, _questDB.numQuests -1 do
+
+		local questDescription, questObjectives = GetQuestLogQuestText(i);
 
 			if _questDB.questList[i]['completed'] == "no" then
 
@@ -64,7 +65,7 @@ function _questDBHandleDB:turnOldQuestCompleted()
 
 					if _questDB.questList[i]['questName'] == _questDB.curListQuest then
 
-						if _questDB.questList[i]['desc'] == _questDB.curDesc then
+						if _questDB.questList[i]['desc'] == _questDB.curDesc and _quest.currentDesc ~= questObjectives then
 
 							if _questDB.questList[i]['questName'] ~= title then
 
@@ -72,21 +73,15 @@ function _questDBHandleDB:turnOldQuestCompleted()
 
 									if _questDB.questList[i]['desc'] ~= _quest.currentDesc and GetNumQuestLogEntries() > 0 then
 
-										if questObjectives ~= _questDB.questList[i]['desc'] and GetObjectiveText(1) ~= _questDB.questList[i]['desc'] then
+										if questObjectives ~= _questDB.questList[i]['desc'] and GetObjectiveText(i) ~= _questDB.questList[i]['desc'] and questObjectives ~= _questDB.questList[i]['desc'] then
+
+											local questToComplete = i
 
 											DEFAULT_CHAT_FRAME:AddMessage("Old quest marked as complete - ".._questDB.curListQuest);
 
-											_questDB.questList[i]['completed'] = "nnil";
+											_questDB.questList[questToComplete]['completed'] = "nnil";
 
-											_questDB.curListQuest = nil;
-
-											_questDB.curDesc = nil;
-
-											_quest.currentQuest = nil;
-	
-											_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
-
-											_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
+											_quest:setTimer(25)
 
 										return true;
 										end

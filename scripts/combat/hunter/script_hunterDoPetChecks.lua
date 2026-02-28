@@ -185,7 +185,7 @@ function script_hunterDoPetChecks:doPetChecks()
 			local castTime, maxRange, minRange, powerType, cost, spellID, spellObj = GetSpellInfo("Mend Pet");
 
 
-			if GetPet():GetDistance() < 20 and ((PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) and not IsInCombat() then
+			if GetPet():GetDistance() < 20 and ((cost ~= nil and PlayerManaTotal() >= cost and cost ~= 0) or PlayerMana() >= 20) and not IsInCombat() then
 
 				script_hunter.message = "Pet has lower than 60% HP, waiting for HP or mana...";
 

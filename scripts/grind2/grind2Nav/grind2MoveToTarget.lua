@@ -66,9 +66,8 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	end
 	
 -- set nav smoothness
-	if not _quest.usingQuester then
-		NavmeshSmooth(self.nextNavNodeDistance/2);
-	end
+	NavmeshSmooth(self.nextNavNodeDistance/2);
+
 -- get current position
 	local myX, myY, myZ = PlayerPosition();
 

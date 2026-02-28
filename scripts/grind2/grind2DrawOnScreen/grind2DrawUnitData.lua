@@ -39,7 +39,14 @@ function grind2DrawUnitData:drawUnitsOnScreen()
 			end
 		end
 
-		if self.drawNPC then
+		local targetDistance = 300;
+
+		--limit distance
+		if GetMapID() == 12 then
+			targetDistance = 100;
+		end
+
+		if self.drawNPC and target:GetDistance() <= targetDistance then
 		
 			-- NPC enemy targets
 			if self.drawEnemies and targetType == 3 and not target:IsCritter() and not target:IsDead() and target:CanAttack() then

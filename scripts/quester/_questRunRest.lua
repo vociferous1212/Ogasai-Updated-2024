@@ -69,6 +69,12 @@ function _questRunRest:runRest()
 			return false;
 			end
 		end
+
+		if not IsInCombat() and (PlayerHasTarget() or _quest.enemyTarget ~= nil) then
+			ClearTarget();
+			_quest.enemyTarget = nil;
+		end
+
 	return true;
 	end
 

@@ -24,23 +24,34 @@ _questDB:addQuest("no", 1, "The Damned", "Novice Elreth", 1846.7763671875, 1638.
 
 _questDB:addQuest("no", 1, "Rattling the Rattlecages", "Shadow Priest Sarvis", 1843.1867675781, 1638.1273193359, 97.230392456055, 85, 1, 6, 1995.5382080078, 1557.5123291016, 78.250221252441, 1, 12, 0, 0, 0, 0, 1843.1867675781, 1638.1273193359, 97.230392456055, "Shadow Priest Sarvis", "Rattlecage Skeleton", 0, 0, 0, 0, 3, "Kill 12 Rattlecage Skeletons, and then return to Shadow Priest Sarvis in Deathknell when you are done.", 0, 1);
 
-	-- class starter quests
-	if GetMyClass() == "ROGUE" then
+
+-- class starter quests
+if GetMyClass() == "PRIEST" then
+	_questDB:addQuest("no", 1, "Hallowed Scroll", "Shadow Priest Sarvis", 1843.3199462891, 1639.9000244141, 97.628234863281, 85, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1848.3199462891, 1627.6300048828, 96.933631896973, "Dark Cleric Duesten", 0, 0, 0, 0, 0, 0, "Read the Hallowed Scroll and speak to Dark Cleric Duesten in the church in Deathknell.", 0, 1);
+end
+if GetMyClass() == "MAGE" then
+	_questDB:addQuest("no", 1, "Glyphic Scroll", "Shadow Priest Sarvis", 1843.3199462891, 1639.9000244141, 97.628234863281, 85, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1847.3900146484, 1635.5200195313, 96.933586120605, "Isabella", 0, 0, 0, 0, 0, 0, "Read the Glyphic Scroll and speak to Isabella in the church in Deathknell.", 0, 1);
+end
+if GetMyClass() == "WARRIOR" then
+	_questDB:addQuest("no", 1, "Simple Scroll", "Shadow Priest Sarvis", 1843.3199462891, 1639.9000244141, 97.628234863281, 85, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1861.1032714844, 1558.7862548828, 94.49259185791, "Dannal Stern", 0, 0, 0, 0, 0, 0, "Read the Simple Scroll and speak to Dannal Stern in Deathknell.", 0, 1);
+end
+if GetMyClass() == "ROGUE" then
 	_questDB:addQuest("no", 1, "Encrypted Scroll", "Shadow Priest Sarvis", 1843.1867675781, 1638.1273193359, 97.230392456055, 85, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1860.6556396484, 1565.6350097656, 94.313667297363, "David Trias", 0, 0, 0, 0, 0, 0, "Read the Encrypted Scroll and speak to David Trias in Deathknell.", 0, 1);
-	end
-	if GetMyClass() == "WARLOCK" then
+end
+if GetMyClass() == "WARLOCK" then
 	_questDB:addQuest("no", 1, "Tainted Scroll", "Shadow Priest Sarvis", 1843.3199462891, 1639.9000244141, 97.628211975098, 85, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1839.0300292969, 1636.5400390625, 96.933578491211, "Maximillion", 0, 0, 0, 0, 0, 0, "Read the Tainted Scroll and speak to Maximillion in Deathknell.", 0, 1);
 end
 
 
 _questDB:addQuest("no", 1, "The Mindless Ones", "Shadow Priest Sarvis", 1843.1867675781, 1638.1273193359, 97.230392456055, 85, 1, 6, 1934.5037841797, 1576.1915283203, 82.858383178711, 1, 8, 8, 0, 0, 0, 1843.1867675781, 1638.1273193359, 97.230392456055, "Shadow Priest Sarvis", "Wretched Zombie", "Mindless Zombie", 0, 0, 0, 2, "Shadow Priest Sarvis wants you to kill 8 Mindless Zombies and 8 Wretched Zombies.", 0, 1);
 
-	-- class pet quest
-	if GetMyClass() == "WARLOCK" then
+-- class pet quest
+if GetMyClass() == "WARLOCK" then
 	_questDB:addQuest("no", 1, "Piercing the Veil", "Venya Marthand", 1836.9399414063, 1633.4300537109, 96.933525085449, 85, 1, 6, 1976.2431640625, 1560.8590087891, 79.482109069824, 1, 3, 0, 0, 0, 0, 1836.9399414063, 1633.4300537109, 96.933525085449, "Venya Marthand", "Rattlecage Skeleton", 0, 0, 0, 0, 0, "Bring Venya Marthand 3 Rattlecage Skulls.", 0, 1);
-	end
+end
 
 _questDB:addQuest("no", 1, "Rude Awakening", "Undertaker Mordo", 1679.4172363281, 1666.1722412109, 135.3966217041, 85, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1843.1867675781, 1638.1273193359, 97.230392456055, "Shadow Priest Sarvis", 0, 0, 0, 0, 0, 0, "Speak with Shadow Priest Sarvis.", 0, 0);
 
 self.isSetup = true;
+
 end

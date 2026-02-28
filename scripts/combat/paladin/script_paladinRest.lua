@@ -67,7 +67,7 @@ function script_paladinRest:rest()
 	end
 
 	-- Eat and Drink
-	if (not IsDrinking() and mana < script_paladin.drinkMana) and not IsSwimming() and not IsCasting() and not IsSpellOnCD("Drink") and IsStanding() then
+	if PlayerLevel() >= 2 and (not IsDrinking() and mana < script_paladin.drinkMana) and not IsSwimming() and not IsCasting() and not IsSpellOnCD("Drink") and IsStanding() then
 
 		script_paladin.message = "Need to drink...";
 
