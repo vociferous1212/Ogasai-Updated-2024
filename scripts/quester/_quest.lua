@@ -1,10 +1,15 @@
 _quest = {
+
 	message = "Quester",
+
 	usingQuester = false,
+
 	pause = true,
+
 	isSetup = false,
-	waitTimer = GetTimeEX(),
+
 	tickRate = .5,
+
 	currentQuest = nil,
 	enemyTarget = nil,
 	targetKilledNum = 0,
@@ -29,7 +34,7 @@ _quest = {
 	currentType = nil,
 	usingItem = nil,
 	gossipOption = nil,
-	distToGrindFromHotspot = 200,
+	distToGrindFromHotspot = 275,
 	currentMapID = 0,
 	killStuffOnRoute = true,
 	curQuestGiver = nil,
@@ -37,13 +42,17 @@ _quest = {
 	distToGiver = 0,
 	distToGrind = 0,
 	unstuckTimer = 0,
+
 	lootTimer = GetTimeEX(),
 	faceTargetTimer = GetTimeEX(),
-	deletememessage = false,
 	targetingTimer2 = GetTimeEX(),
 	setQuestTimer = GetTimeEX(),
 	sortQuestTimer = GetTimeEX(),
 	turnQuestCompleteTimer = GetTimeEX(),
+	getQuestGiverTimer = GetTimeEX(),
+	checkBagTimer = GetTimeEX(),
+		waitTimer = GetTimeEX(),
+
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 }
@@ -53,7 +62,11 @@ end
 
 function _quest:window()
 	_questWindow:window();
-	--grind2DrawNavPath:drawPath()
+
+	if grind2DrawDataMenu.drawPath or script_grind.drawPath then
+		grind2DrawNavPath:drawPath()
+	end
+
 end
 
 function _quest:setTimer(miliSeconds)
@@ -76,8 +89,11 @@ local localObj = GetLocalPlayer();
 	if not runOgasai.usingRunOgasai then
 		script_drawStatusEX:drawSetup(); 
 	else
+
+	-- run grind 2 draw when running runOgasai script
 		grind2Draw:run();
 	end
+
 	if (script_radar.showRadar) then
 		script_radar:draw()
 	end
@@ -94,6 +110,15 @@ local localObj = GetLocalPlayer();
 		script_gatherEX:drawFishNodes();
 	end
 
+	if runOgasai.usedFisher then
+		if script_fish.weaponMainHand ~= nil then
+			UseItem(script_fish.weaponMainHand);
+		end
+		if script_fish.weaponOffHand ~= nil then
+			UseItem(script_fish.weaponOffHand);
+		end
+		runOgasai.usedFisher = false;
+	end
 
 --[[
 
@@ -132,7 +157,9 @@ local localObj = GetLocalPlayer();
 		if IsInCombat() and self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
 			if self.enemyTarget:GetHealthPercentage() >= 25 and not script_checkDebuffs:hasDisabledMovement() then
 				if script_checkAdds:checkAdds() then
-					_quest.waitTimer = GetTimeEX() + 1500;
+					if IsMoving() then
+						self.waitTimer = GetTimeEX() + 500;
+					end
 					script_om:FORCEOM();
 				end
 			end
@@ -140,12 +167,12 @@ local localObj = GetLocalPlayer();
 
 		--reset blacklist quest timer
 		if IsInCombat() or IsMoving() then
-			_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
+			_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
 		end
 		if not IsInCombat() and not PlayerHasTarget() then
-			_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
+			_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
 		end
- 		-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
+		-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
 		-- mainly for hardcore
 	if not self.pause and IsInCombat() and grind2FleeCombat.fleeCombat then 
 		if grind2SaveCoordinates.numberOfLocations >= 3 and PlayerLevel() >= 6 and not Player():IsDead() then
@@ -168,8 +195,8 @@ local localObj = GetLocalPlayer();
 	end
 
 	-- flee combat
-	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() then
-		if PlayerLevel() >= 6 and (GetTarget():GetHealthPercentage() > GetLocalPlayer():GetHealthPercentage() and PlayerHealth() <= 60) or (script_grind:enemiesAttackingUs() > 2 or script_grindEX:howManyEnemiesTargetingMe() > 2) and GetLocalPlayer():GetHealthPercentage() <= 60 then
+	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() and IsInCombat() then
+		if IsInCombat() and PlayerLevel() >= 6 and ((GetTarget():GetHealthPercentage() > PlayerHealth() and PlayerHealth() <= 60) or (NumberTargetsAttackingPlayer() > 2) and PlayerHealth() <= 75) then
 		
 			local x, y z = 0, 0, 0;
 			_quest.enemyTarget = nil;
@@ -188,7 +215,7 @@ local localObj = GetLocalPlayer();
 					return true;
 				end
 			end
-		return true;
+		return;
 		end
 	end
 
@@ -243,6 +270,12 @@ local localObj = GetLocalPlayer();
 		self.lootTimer = GetTimeEX() + 500;
 	end
 
+	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
+		--CheckBagsForBetterGear()
+		_questEquipItems:checkInventoryForBags()
+		self.checkBagTimer = GetTimeEX() + 60000
+	end
+
 -- run vendor
 	if not self.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
 		local vendorStatus = script_vendor:getStatus();
@@ -269,11 +302,11 @@ local localObj = GetLocalPlayer();
 -- avoid elites...
 -- if not on way to vendor and already running and not if we are mounted and running
 	if script_vendor.status == 0 and not IsMounted() then 
-		if (script_aggro:avoidElite()) then
+		if (script_aggro:avoidElite(30)) then
 			_quest.waitTimer = GetTimeEX() + 1500;
 			_quest.message = "Elite within range... running away...";
 			grind2MoveToTarget.GenerateANewPath = true;
-			return; 
+			return true; 
 		end
 	end
 
@@ -383,11 +416,14 @@ local localObj = GetLocalPlayer();
 
 --]]
 	-- clear dead targets tapped killed counter
-	if self.enemyTarget ~= 0 and self.enemyTarget ~= nil and self.enemyTarget:IsDead() then
-		script_grind.monsterKillCount = script_grind.monsterKillCount + 1;
-		grind2SaveCoordinates:saveTargetsLocation(self.enemyTarget);
-		_quest.waitTimer = GetTimeEX() + 1200;
-		self.enemyTarget = nil
+	if (self.enemyTarget ~= 0 and self.enemyTarget ~= nil and self.enemyTarget:IsDead()) or (PlayerHasTarget() and GetTarget():IsDead()) then
+		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
+			script_grind.monsterKillCount = script_grind.monsterKillCount + 1;
+			grind2SaveCoordinates:saveTargetsLocation(self.enemyTarget);
+			_quest.waitTimer = GetTimeEX() + 1200;
+		end
+		self.enemyTarget = nil;
+		ClearTarget();
 	end
 
 	if IsInCombat() then
@@ -425,7 +461,7 @@ local localObj = GetLocalPlayer();
 -- run combat
 	if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
 
-		if not IsAutoCasting("Attack") then
+		if not IsAutoCasting("Attack") and not self.enemyTarget:IsDead() then
 			self.enemyTarget:AutoAttack();
 		end
 
@@ -446,15 +482,31 @@ local localObj = GetLocalPlayer();
 					ClearTarget();
 				end
 			end
+			if PlayerHasTarget() then
+				if GetTarget():IsDead() then
+					ClearTarget();
+					self.enemyTarget = nil;
+				end
+			end
 
 			if script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil and not IsInCombat() then
+				if not script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange():IsDead() then
 					_quest.enemyTarget = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
+				end
 			end
 		end
 		
 		if (IsInCombat() or _quest.grindSpotReached or self.enemyTarget ~= nil) and PlayerHasTarget() then
-			_questDoCombat:doCombat();
-			return true;
+			if PlayerHasTarget() then
+				if GetTarget():IsDead() then
+					ClearTarget();
+					self.enemyTarget = nil;
+				end
+			end
+			if not GetTarget():IsDead() then
+				_questDoCombat:doCombat();
+				return true;
+			end
 		end
 	end
 
@@ -604,7 +656,7 @@ end
 			if _questDBReturnQuest:returnAQuest() then
 				self.enemyTarget = nil;
 				self.message = "Returning quest!";
-				_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
+				_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
 			return true;
 			end
 		end
@@ -628,8 +680,9 @@ end
 
 
 -- get quest giver
-if not IsInCombat() then
+if not IsInCombat() and GetTimeEX() > self.getQuestGiverTimer then
 	_questGetQuestGiver:run()
+	self.getQuestGiverTimer = GetTimeEX() + 2000;
 end
 
 

@@ -1,5 +1,4 @@
 _questEX2 = {
-	checkBagTimer = 0,
 	checkInvTimer = 0,
 	flipVendor = true,
 	vendorBetweenQuests = true,
@@ -19,6 +18,10 @@ function _questEX2:doChecks()
 	if GetMapID() == 400 then
 		_quest.distToGrindFromHotspot = 500;
 	end
+	-- mulgore
+	if GetMapID() == 215 then
+		_quest.distToGrindFromHotspot = 375;
+	end
 
 	if localObj:HasDebuff("Ressurection Sickness") then
 		if IsMoving() then
@@ -34,13 +37,6 @@ function _questEX2:doChecks()
 	local myMoney = GetMoney()
 	if (myMoney ~= script_grind.currentMoney) then
 		script_grind.moneyObtainedCount = myMoney - script_grind.currentMoney
-	end
-
-	if IsInCombat() then
-		if (script_checkAdds:checkAdds()) then
-			script_om:FORCEOM()
-			return true
-		end
 	end
 
 	if _quest.waitTimer > GetTimeEX() then
@@ -73,11 +69,7 @@ function _questEX2:doChecks()
 			end
 		end
 
-	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
-		--CheckBagsForBetterGear()
-		_questEquipItems:checkInventoryForBags()
-		self.checkBagTimer = GetTimeEX() + 60000
-	end
+
 
 	-- delete items
 	if (not IsInCombat()) and (not IsMoving()) and (script_grind.deleteItems) then

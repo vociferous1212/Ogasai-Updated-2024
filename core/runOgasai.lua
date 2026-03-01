@@ -2,6 +2,8 @@ runOgasai = {
 
 	useFisher = false,
 
+	usedFisher = false,
+
 	lootTargets = false,
 
 	isSetup = false,
@@ -201,6 +203,8 @@ end
 
 function runOgasai:runFisher()
 
+	self.usedFisher = true;
+
 	self.manuallyRunGrinder = false;
 
 	self.manuallyRunQuester = false;
@@ -301,7 +305,7 @@ function runOgasai:menu()
 		end
 
 		if GetMapID() == 215 then
-			wasClicked, self.useFisher = Checkbox("auto use fishing in mulgore to level 50 - doesn't re-equip weapon", self.useFisher);
+			wasClicked, self.useFisher = Checkbox("auto use fishing in mulgore to level 50", self.useFisher);
 		end
 
 		self.stopLevel = SliderInt("Stop Bot At Level", 1, 60, self.stopLevel);
@@ -387,9 +391,11 @@ function runOgasai:menu()
 				script_fish:run()
 			end
 		end
+
 	else
 		self.showingWindow = false;
 	end
+
 end
 
 
@@ -559,12 +565,12 @@ function runOgasai:run()
 				end
 			end
 		end
-		if skillLevel < 50 and (GetMinimapZoneText() == "Bloodhoof Village" or (HasSpell("Fishing") and GetZoneText() == "Mulgore")) then
+		if skillLevel < 50 and ((GetMinimapZoneText() == "Bloodhoof Village" or GetMinimapZoneText() == "Stonebull Lake") or (HasSpell("Fishing") and GetZoneText() == "Mulgore")) then
 			local myX, myY, myZ = PlayerPosition();
 			local fishX, fishY, fishZ = -2134.5583496094, -329.17123413086, -14.048094749451;
 			local distanceToFish = GetDistance3D(myX, myY, myZ, fishX, fishY, fishZ);
 
-			if HasSpell("Fishing") and HasItem("Fishing Pole") and distanceToFish <= 2 then
+			if HasSpell("Fishing") and (HasItem("Fishing Pole") or script_fish:doWeHaveFishingPoleEquipped()) and distanceToFish <= 2 then
 				runOgasai:runFisher();
 				if not IsMoving() then
 					if Player():GetAngle() < .75 or Player():GetAngle() > 1.5 then
@@ -597,7 +603,7 @@ function runOgasai:run()
 					end
 				end
 
-			elseif not HasItem("Fishing Pole") and GetMoney() >= 23 then
+			elseif (not HasItem("Fishing Pole") and not script_fish:doWeHaveFishingPoleEquipped()) and GetMoney() >= 23 then
 
 				local target = "Harn Longcast"
 				local x, y, z = -2158.6000976563, -392.94799804688, -3.0308721065521;
@@ -630,6 +636,25 @@ function runOgasai:run()
 			end
 		return;
 		end
+	elseif self.usedFisher then
+		-- turn item link from game into a useable text string
+		local itemLink = GetInventoryItemLink("player", 16)	-- 16 is main hand inventory slot... 17 is offhand
+		if itemLink then
+			local startPos, endPos = string.find(itemLink, "%[.+%]")
+			if startPos and endPos then
+				local itemName = string.sub(itemLink, startPos + 1, endPos - 1)
+				if itemName ~= script_fish.weaponMainHand then
+					if script_fish.weaponMainHand ~= "nil" then
+						UseItem(script_fish.weaponMainHand);
+					end
+					if script_fish.offHandWeapon ~= "nil" then
+						UseItem(script_fish.weaponOffHand)
+					end
+				end
+			end
+		end	
+
+	self.usedFisher = false;
 	end
 
 -- if we have no quest and current quest in quester is nil then get a quest to check
@@ -661,6 +686,12 @@ function runOgasai:run()
 	--end
 
 --[[
+
+
+-- the quester automatically starts the quest sequence when you enter a new area
+-- need to figure out pathing here
+-- for example, a level 10 cow shouldn't be in eastern kingdoms. if it is, we used the zeppelin
+
 
 
 -- this is a little confusing....

@@ -324,7 +324,7 @@ function grind2:run()
 -- avoid elites...
 -- if not on way to vendor and already running and not if we are mounted and running
 			if script_vendor.status == 0 and not IsMounted() and grind2IsTargetValid.skipElites then 
-				if (script_aggro:avoidElite()) then
+				if (script_aggro:avoidElite(30)) then
 					grind2:setTimer(1500);
 					grind2PreChecks.jumpTimer = currentTime + 7500;
 					grind2.grinderMessage = "Elite within range... running away...";

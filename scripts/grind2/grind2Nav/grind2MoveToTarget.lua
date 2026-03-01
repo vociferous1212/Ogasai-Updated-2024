@@ -122,7 +122,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 
 		-- + 1 each z move
 		myX, myY, myZ = localObj:GetPosition();
-		_iz = _lz + 1;
+		pathZ = myZ + 1;
 	end
 
 -- Move to the next destination in the path

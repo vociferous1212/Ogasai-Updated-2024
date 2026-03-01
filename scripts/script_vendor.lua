@@ -373,7 +373,7 @@ function script_vendor:sell()
 			self.status = 2; -- moving to sell at a vendor
 			if not IsSwimming() and not grind2.usingGrinder2 and not _quest.usingQuester then
 				script_navEX:moveToTarget(localObj, vX, vY, vZ);
-			elseif IsSwimming() and not grind2.usingGrinder2 then
+			elseif IsSwimming() and not grind2.usingGrinder2 and not _quest.usingQuester then
 				Move(vX, vY, vZ);
 			elseif grind2.usingGrinder2 or _quest.usingQuester then
 				grind2MoveToTarget:run(Player(), vX, vY, vZ);

@@ -37,7 +37,7 @@ function _questEX:doChecks()
 	local localObj = GetLocalPlayer();
 
 -- random jump
-	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() and script_grind.jump then
+	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() and script_grind.jump and ((not IsCasting() and not IsChanneling()) or instantCastSpells:isSpellInstantCast()) then
 		local jumpRandom = random(0, 100);
 
 		if (jumpRandom == 100 and IsMoving() and not IsInCombat()) then

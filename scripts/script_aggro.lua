@@ -615,36 +615,35 @@ function script_aggro:returnClosestAddsTarget()
 return bestTarget;
 end
 
-function script_aggro:avoidElite() -- Runs away if there is atleast one elite within range
+function script_aggro:avoidElite(range) -- Runs away if there is atleast one elite within range
 	local currentObj, typeObj = GetFirstObject();
 	local localObj = GetLocalPlayer();
 	local x, y, z = GetLocalPlayer():GetPosition();
 	local tX, tY, tZ = 0, 0, 0;
-	local range = 25;	-- default
+	--local range = 25;	-- default
+	if range == 0 or range == nil then
+		range = 25;
+	end
+	local currentObj, typeObj = GetFirstObject();
+
 	while currentObj ~= 0 do
-		if typeObj == 3 and (currentObj:GetClassification() >= 1) and currentObj:GetUnitName() ~= "Sewer Beast" and currentObj:GetUnitName() ~= "Swiftmane" and currentObj:CanAttack() then
-			local tX, tY, tZ = GetDistance3D(x, y, z, tX, tY, tZ);
-			range = currentObj:GetLevel() - localObj:GetLevel() + 35;
-			if currentObj:CanAttack() and (currentObj:GetDistance() <= range or grind2IsTargetingMe:target(currentObj)) and not currentObj:IsDead() then	
+
+		if typeObj == 3 and currentObj:CanAttack() and (currentObj:GetClassification() >= 1) and currentObj:GetUnitName() ~= "Sewer Beast"
+		 and currentObj:GetUnitName() ~= "Swiftmane" then
+
+			if currentObj:CanAttack() and currentObj:GetDistance() < range and not currentObj:IsDead() then
+			
 				local xT, yT, zT = currentObj:GetPosition();
 				local xP, yP, zP = localObj:GetPosition();
 				local xV, yV, zV = xP - xT, yP - yT, zP - zT;	
 				local vectorLength = math.sqrt(xV^2 + yV^2 + zV^2);
 				local xUV, yUV, zUV = (1/vectorLength)*xV, (1/vectorLength)*yV, (1/vectorLength)*zV;		
-				local moveX, moveY, moveZ = xT + xUV*30, yT + yUV*30, zT + zUV;	
-				if not grind2.usingGrinder2 then
-					script_navEX:moveToTarget(localObj, moveX, moveY, moveZ);
-				elseif grind2.usingGrinder2 then
-					grind2MoveToTarget:run(Player(), moveX, moveY, moveZ);
-				end
-				if HasPet() then
-					PetFollow();
-				end
-			return true;
+				local moveX, moveY, moveZ = xT + xUV*100, yT + yUV*100, zT + zUV;			
+				grind2MoveToTarget:run(localObj, moveX, moveY, moveZ);
+				return true;
 			end
 		end
 		currentObj, typeObj = GetNextObject(currentObj);
 	end
-
-return false;
+	return false;
 end

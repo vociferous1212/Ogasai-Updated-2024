@@ -92,7 +92,6 @@ function script_checkAdds:avoidToAggro(safeMargin)
 			local centerX, centerY = (x + xx), (y + yy)
 			self:avoid(centerX, centerY, zP, self.addsRange, self.checkAddsRange)
 			PetFollow()
-			return true
 		else
 			self:avoid(xT, yT, zP, self.addsRange, self.checkAddsRange)
 			PetFollow()
@@ -134,10 +133,7 @@ function script_checkAdds:avoid(pointX, pointY, pointZ, radius, safeDist)
 	end
 
 	if farthestPoint ~= 0 and pointsTwo[farthestPoint] and pointZ then
-		if not script_unstuck:pathClearAuto(2) then
-			script_unstuck:unstuck()
-			return true
-		end
+	
 		local grindEnemy = script_grind.enemyObj
 		if grindEnemy and not grindEnemy:IsCasting() then
 			if not script_grind.adjustTickRate and PlayerHasTarget() then

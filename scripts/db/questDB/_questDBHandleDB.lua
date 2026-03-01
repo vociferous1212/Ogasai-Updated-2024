@@ -4,6 +4,8 @@
 
 	waitTimer = GetTimeEX(),
 
+	currentQuestBeingChecked = nil,
+
 }
 
 function _questDBHandleDB:turnQuestCompleted()
@@ -27,8 +29,11 @@ function _questDBHandleDB:turnQuestCompleted()
 
 				if _questDB.questList[i]['questName'] == _questDB.curListQuest and _questDB.questList[i]['desc'] == _questDB.curDesc then
 					if _questDB.questList[i]['completed'] == "no" and _questDB.questList[i]['questName'] ~= "nnil" then
-						DEFAULT_CHAT_FRAME:AddMessage("Quest marked as complete - ".._questDB.curListQuest);
-
+					DEFAULT_CHAT_FRAME:AddMessage(
+					"Quest marked as complete - |cffff0000" .. 
+					(_questDB.curListQuest or "Unknown") .. 
+					"|r  (index |cff00aaff" .. i .. "|r)"
+					)
 						--ToFile("".._questDB.curListQuest.." - completed");
 
 						_questDB.curListQuest = nil;
@@ -87,11 +92,11 @@ function _questDBHandleDB:turnOldQuestCompleted()
 
 										if questObjectives ~= _questDB.questList[i]['desc'] and GetObjectiveText(i) ~= _questDB.questList[i]['desc'] then
 
-											local questToComplete = i
+											self.currentQuestBeingChecked = dbQuest.name;
 
-											DEFAULT_CHAT_FRAME:AddMessage("Old quest marked as complete - ".._questDB.questList[i]['questName']);
-
-											_questDB.questList[questToComplete]['completed'] = "nnil";
+											DEFAULT_CHAT_FRAME:AddMessage("Old quest marked as complete - |cffff0000" .. _questDB.questList[i]['questName'] .. "|r")
+											
+											_questDB.questList[i]['completed'] = "nnil";
 
 											_questDB.curListQuest = nil;
 
@@ -216,12 +221,14 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 			   and GetMapID() == dbMapID
 			then
 				DEFAULT_CHAT_FRAME:AddMessage(
-					"Current Index == " .. self.currentIndexQuest ..
-					" | Quest doesn't matches any log entry → marking complete: " ..
-					"|cffff0000" .. dbName .. "|r" ..
-					" (table index - " .. i .. ")"
+				"|cffff9900" .. _quest.currentQuest .. "|r  " ..
+				"Index == |cff00ff00" .. self.currentIndexQuest .. "|r" ..
+				" | Quest in DB index order doesn't match any quest log entry → marking previous quests complete in numerical order: " ..
+				"Completed |cffff0000" .. dbName .. "|r" ..
+				" Index == |cff00aaff" .. i .. "|r"
 				)
 
+				self.currentQuestBeingChecked = dbQuest.name;
 				dbQuest.completed = "nnil"
 
 				_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos()

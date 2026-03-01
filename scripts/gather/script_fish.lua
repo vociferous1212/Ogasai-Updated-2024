@@ -4,8 +4,8 @@ script_fish = {
 	poleName = 'Fishing Pole', 
 	useVendor = false,
 	wasInCombat = false,
-	weaponMainHand = '',
-	weaponOffHand = '',
+	weaponMainHand = "nil",
+	weaponOffHand = "nil",
 	lureName = 'Shiny Bauble',
 	timer = 0,
 	bobberInfo = {},
@@ -88,6 +88,25 @@ function script_fish:draw()
 end
 
 function script_fish:setup()
+
+	--set weapon main hand
+	local itemLink = GetInventoryItemLink("player", 16)
+	if itemLink then
+		local startPos, endPos = string.find(itemLink, "%[.+%]")
+		if startPos and endPos then
+			local itemName = string.sub(itemLink, startPos + 1, endPos - 1)
+			self.weaponMainHand = itemName;
+		end
+	end	
+	-- set weapon off-hand
+	local itemLink = GetInventoryItemLink("player", 17)
+	if itemLink then
+		local startPos, endPos = string.find(itemLink, "%[.+%]")
+		if startPos and endPos then
+			local itemName = string.sub(itemLink, startPos + 1, endPos - 1)
+			self.weaponOffHand = itemName;
+		end
+	end	
 
 	script_vendor:setup();
 	script_gatherEX:setup();
@@ -178,7 +197,7 @@ function script_fish:run()
 			return;
 		end
 		-- 5 mins, bot should return until done
-	script_grind.useItemsTimer = GetTimeEX() + 300000;
+		script_grind.useItemsTimer = GetTimeEX() + 300000;
 	end
 
 	--[[Spawn Weapon]]--
@@ -233,8 +252,8 @@ function script_fish:run()
 		return;
 	end
 
-	if (script_vendor.status == 2) then
-		if(script_vendor:sell()) then
+	if (script_vendor.status == 2) and self.useVendor then
+		if (script_vendor:sell()) then
 			self.timer = GetTime() + 0.2;
 			self.message = script_vendor.message;
 			return;
@@ -244,7 +263,7 @@ function script_fish:run()
 	
 	if (AreBagsFull()) then
 	
-		if(self.useVendor) then
+		if (self.useVendor) then
 			if (script_vendor.sellVendor ~= 0) then
 				script_vendor:sell();
 				return;
@@ -290,7 +309,16 @@ function script_fish:run()
 
 		self.message = "Casting Fishing!";
 
-		UseItem(self.poleName);
+		local itemLink = GetInventoryItemLink("player", 16)
+		if itemLink then
+			local startPos, endPos = string.find(itemLink, "%[.+%]")
+			if startPos and endPos then
+				local itemName = string.sub(itemLink, startPos + 1, endPos - 1)
+				if itemName ~= self.poleName then
+					UseItem(self.poleName);
+				end
+			end
+		end		
 
 		if (script_fish:checkLure(self.lureName)) then
 			self.timer = GetTime() + 6;
@@ -580,5 +608,22 @@ function script_fish:moveToLocation()
 			self.currentGoToLocation = 1;
 		end
 		script_navEX:moveToTarget(GetLocalPlayer(), self.savedLocations[self.currentGoToLocation]['x'], self.savedLocations[self.currentGoToLocation]['y'], self.savedLocations[self.currentGoToLocation]['z']);
+return false;
+end
+
+function script_fish:doWeHaveFishingPoleEquipped()
+
+-- turn item link from game into a useable text string
+	local itemLink = GetInventoryItemLink("player", 16)	-- 16 is main hand inventory slot... 17 is offhand
+	if itemLink then
+		local startPos, endPos = string.find(itemLink, "%[.+%]")
+		if startPos and endPos then
+			local itemName = string.sub(itemLink, startPos + 1, endPos - 1)
+			if itemName == "Fishing Pole" then
+				return true;
+			end
+		end
+	end	
+
 return false;
 end

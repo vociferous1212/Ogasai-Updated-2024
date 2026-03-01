@@ -115,7 +115,7 @@ function script_grindDoLoot:doLoot(localObj)
 			JumpOrAscendStart();
 		end
 
-		if (GetTimeEX() >= script_grind.blacklistLootTimeCheck) and not _quest.usingQuester then
+		if (GetTimeEX() >= script_grind.blacklistLootTimeCheck) or script_grind.lootObj:GetDistance() <= 3 and not script_grind.lootObj:IsInLineOfSight() then
 
 			-- add to blacklist
 			if (script_grind.lootObj ~= nil and script_grind.loobObj ~= 0) then

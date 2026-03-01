@@ -5,7 +5,37 @@ _questMenu = {
 
 function _questMenu:menu()
 
+	local x, y, z = PlayerPosition();
+	if _quest.currentQuest ~= nil and not _quest.isQuestComplete and _quest.curGrindX ~= 0 then
+		local target = "";
+		if _questDBTargets.target ~= nil then
+			target = _questDBTargets.target;
+		end
+		local dist = math.floor(GetDistance3D(x, y, z, _quest.curGrindX, _quest.curGrindY, _quest.curGrinz));
+		Text("Current Quest To Complete = ".._quest.currentQuest.. " | "..dist.." (yds) "..target)
+
+
+	elseif _quest.currentQuest ~= nil and _quest.isQuestComplete and _quest.distToGiver ~= 0 then
+		local xx, yy, zz = _questDB:getReturnTargetPos();
+		local name = "";
+		if _questDB:getReturnTargetName() ~= nil and _questDB:getReturnTargetName() ~= 0 then
+			name = _questDB:getReturnTargetName()
+		end
+		local dist = math.floor(GetDistance3D(x, y, z, xx, yy, zz));
+		Text("Current Quest To Complete = ".._quest.currentQuest.. " | "..dist.." (yds) "..name)
+
+
+	elseif _questDB.curListQuest ~= nil then
+		local dist = math.floor(GetDistance3D(x, y, z, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ))
+		local name = "";
+		if _quest.curQuestGiver ~= nil and _quest.curQuestGiver ~= 0 then
+			name = _quest.curQuestGiver;
+		end
+		Text("Current Quest To Obtain = ".._questDB.curListQuest.. " | "..dist.." (yds) "..name)	
+	end
 		
+	Separator();
+
 	local wasClicked = false;
 
 	-- show rested exp if we have any
@@ -112,8 +142,6 @@ function _questMenu:menu()
 		wasClicked, script_grindMenu.useOtherWarlockScript = Checkbox("Use Warlock 2", script_grindMenu.useOtherWarlockScript);
 		if (not script_grindMenu.useOtherWarlockScript) then
 			script_warlockEX:menu();
-		elseif (script_grindMenu.useOtherWarlockScript) then
-			script_warlock2:menu();
 		end
 	elseif (class == 'PRIEST') then
 		script_priestMenu:menu();
@@ -127,53 +155,70 @@ function _questMenu:menu()
 	
 	if (CollapsingHeader("Quester")) then
 
-	if Button("Add Quest Info To File... Must Have Target!") then
-		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1)
-		local questDescription, descr = GetQuestLogQuestText();
-		ToFile(""..title.."");
-		local x, y, z = GetTarget():GetPosition();
-		ToFile(x..", "..y..", "..z);
-		ToFile(GetMapID());
-		ToFile('"'..GetTarget():GetUnitName()..'"')
-		ToFile('"'..descr..'"');
-		ToFile(" ________________________________________________ ");
+		if Button("Add Quest Info To File... Must Have Target!") then
+			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1)
+			local questDescription, descr = GetQuestLogQuestText();
+			ToFile(""..title.."");
+			local x, y, z = GetTarget():GetPosition();
+			ToFile(x..", "..y..", "..z);
+			ToFile(GetMapID());
+			ToFile('"'..GetTarget():GetUnitName()..'"')
+			ToFile('"'..descr..'"');
+			ToFile(" ________________________________________________ ");
+			Text("");
+		end
+		Separator();
+
+
+
 		Text("");
-	end
-	Separator();
-	Text("");
-	Text("Auto Remove Quest Entry Timer - ");
-	local removeQuestEntryTime = math.floor((_questAcceptQuest.noQuestTimer - GetTimeEX()) / 1000);
-	SameLine();
-	Text(removeQuestEntryTime.." seconds")
-	Separator();
+		Text("Auto Complete Quest In DB Timer - ");
+		local removeQuestEntryTime = math.floor((_questAcceptQuest.noQuestTimer - GetTimeEX()) / 1000);
+		SameLine();
+		Text(removeQuestEntryTime.." seconds")
+		Separator();
 
-	local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
-	local questDescription, desc = GetQuestLogQuestText(1);
 
-	if (Button("Mark Current DB Quest As Complete")) then
-		_questDBHandleDB:turnQuestCompleted();
-	end
+
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
+		local questDescription, desc = GetQuestLogQuestText(1);
+
+		if (Button("Mark Current DB Quest As Complete")) then
+			if _quest.currentDesc ~= desc then
+				_questDBHandleDB:turnQuestCompleted();
+			end
+			if _quest.currentDesc == desc then
+				DEFAULT_CHAT_FRAME:AddMessage("Cannot remove - current quest is in progress - change quest in quest log");
+			end
+		end
+
 		Separator();
 
 	
 
 		Separator();
-		if (Button("Current Spot Is Grind Spot")) then
-			_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
-			_quest.grindSpotReached = true;
 
+		if _quest.currentQuest == _questDB.curListQuest then
+			if (Button("Current Spot Is Grind Spot")) then
+				_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
+				_quest.grindSpotReached = true;
+
+			end
 		end
 
 		local distToHotspot = 0;
 		local x, y, z = PlayerPosition();
+
 		if _quest.curGrindX ~= 0 then
 			distToHotspot = math.floor(GetDistance3D(x, y, z, _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ));
 		end
+
 		if _quest.grindSpotReached then
 			Text("Grind Spot Reached! | "..distToHotspot.." (yds)");
 		elseif not _quest.grindSpotReached then
 			Text("Grind Spot NOT Reached! | "..distToHotspot.." (yds)");
 		end
+
 		Separator();
 
 		Text("Distance To Travel From Grindspot");
@@ -185,25 +230,44 @@ function _questMenu:menu()
 		
 
 
-if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_quest.currentQuest - ".._quest.currentQuest); else Text("Current quester quest to run"); Text("_quest.currentQuest - NIL"); end if _quest.currentDesc ~= nil then Text("_quest.currentDesc - ".._quest.currentDesc); else Text("_quest.currentDesc - NIL"); end Text(""); Text("Current questDB quest being checked"); if _questDB.curListQuest ~= nil then Text("_questDB.curListQuest - ".._questDB.curListQuest); if _questDB.curDesc ~= nil then Text("_questDB.curDesc - ".._questDB.curDesc); else Text("_questDB.curDesc - NIL"); end end
-			Text("");
-		if _quest.isQuestComplete then
-		Text("_quest.isQuestComplete - true");
+		if _quest.currentQuest ~= nil then
+			Text("Current quester quest to run");
+			Text("_quest.currentQuest - ".._quest.currentQuest);
 		else
-		Text("_quest.isQuestComplete - false");
-		end		
+			Text("Current quester quest to run");
+			Text("_quest.currentQuest - NIL");
+		end
+
+		if _quest.currentDesc ~= nil then
+			Text("_quest.currentDesc - ".._quest.currentDesc);
+		else
+			Text("_quest.currentDesc - NIL");
+		end
+
+		Text("");
+
+		Text("Current questDB quest being checked");
+		if _questDB.curListQuest ~= nil then
+			Text("_questDB.curListQuest - ".._questDB.curListQuest);
+			if _questDB.curDesc ~= nil then
+				Text("_questDB.curDesc - ".._questDB.curDesc);
+			else
+				Text("_questDB.curDesc - NIL");
+			end
+		end
+
+		Text("");
+
+		if _quest.isQuestComplete then
+			Text("_quest.isQuestComplete - true");
+		else
+			Text("_quest.isQuestComplete - false");
+		end	
+	
 	end
-
-	--if (CollapsingHeader(">>> |+| DB info")) then
-
-
-	--	_questDBSetup:menu();
-	--end
 			
--- end quest options
 
-
-	script_targetMenu:menu();
+	--script_targetMenu:menu();
 
 	if not _quest.usingQuester then
 		script_miscMenu:menu();
@@ -217,7 +281,11 @@ if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_
 		script_vendorMenu:menu();
 	end
 
-	script_displayOptionsMenu:menu();
+	if not runOgasai.usingRunOgasai then
+		script_displayOptionsMenu:menu();
+	else
+		grind2DrawDataMenu:run()
+	end
 
 	if (CollapsingHeader("Trainers and Flight Path Options")) then
 		wasClicked, script_grind.getSpells = Checkbox("Get Class Spells (level 22 and under)", script_grind.getSpells);

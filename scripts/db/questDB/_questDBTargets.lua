@@ -77,13 +77,48 @@ function _questDBTargets:getTarget()
 		end
 	end
 
-	if _quest.grindSpotReached or IsInCombat() then
+	-- get a quest target
+	local i, t = GetFirstObject();
+	local haveQuestTarget = false;
+	while i ~= 0 do
+		if t == 3 then
+			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() and self.target ~= nil then
+				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) and (not grind2SafePull:targetHasAdds(i) or _questQuestTargets:isUnitQuestTarget(i)) then
+					if (i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3) or i:IsTappedByMe() or grind2IsTargetingMe:target(i) then
+
+						if grind2IsTargetingMe:target(i) then
+							return i;
+						end
+
+						local dist = i:GetDistance();
+
+						if bestDist > dist then
+
+							bestDist = dist;
+
+							bestTarget = i;
+
+							haveQuestTarget = true;
+
+						end
+					end
+				end
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+
+	if not IsInCombat() and haveQuestTarget then
+		return bestTarget;
+	end
+
+	if _quest.grindSpotReached or IsInCombat() or not haveQuestTarget then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 and i:GetDistance() <= 200 then
 				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
 
-					if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_aggro:safePullRecheck(i) then
+					if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and not i:IsCritter() and i:CanAttack() and (not grind2SafePull:targetHasAdds(i) or _questQuestTargets:isUnitQuestTarget(i)) then
 					
 						if grind2IsTargetingMe:target(i) then
 							return i;
@@ -105,36 +140,10 @@ function _questDBTargets:getTarget()
 		end
 	end
 
-	-- get a quest target
-	local i, t = GetFirstObject();
-
-	while i ~= 0 do
-		if t == 3 then
-			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() then
-				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
-					if (i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3) then
-
-						local dist = i:GetDistance();
-
-						if bestDist > dist then
-
-							bestDist = dist;
-							bestTarget = i;
-						end
-					end
-				end
-			end
-		end
-	i, t = GetNextObject(i);
-	end
-
 	--_quest.currentType == 2 and
 	if bestTarget == nil then
 		_quest.message = "No quest targets in range!";
-		if not _quest.needRest then
-			grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
-			--grind2AssignATarget:run();
-		end
+		_quest.grindSpotReached = false;
 	end
 
 return bestTarget;

@@ -413,7 +413,7 @@ function script_vendorMenu:sellLogic()
 				_,_,itemLink=string.find(GetContainerItemLink(i,y),"(item:%d+)");
 				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
 				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
-				if (not script_vendor:keepItem(itemName) and itemRarity <= script_vendor.sellQuality
+				if (not script_vendor:keepItem(itemName) and itemName ~= script_fish.weaponMainHand and itemName ~= script_fish.weaponOffHand and itemName ~= script_fish.poleName and itemRarity <= script_vendor.sellQuality
 					and itemName ~= script_vendor.foodName and itemName ~= script_vendor.drinkName)
 					and itemName ~= script_vendor.ammoName then
 					UseContainerItem(i,y);
