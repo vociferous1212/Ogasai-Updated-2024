@@ -27,11 +27,7 @@ function _questMenu:menu()
 
 	elseif _questDB.curListQuest ~= nil then
 		local dist = math.floor(GetDistance3D(x, y, z, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ))
-		local name = "";
-		if _quest.curQuestGiver ~= nil and _quest.curQuestGiver ~= 0 then
-			name = _quest.curQuestGiver;
-		end
-		Text("Current Quest To Obtain = ".._questDB.curListQuest.. " | "..dist.." (yds) "..name)	
+			Text("Current Quest To Obtain = ".._questDB.curListQuest.. " | "..dist.." (yds)")	
 	end
 		
 	Separator();
