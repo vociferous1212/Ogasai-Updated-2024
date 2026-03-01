@@ -138,7 +138,14 @@ local localObj = GetLocalPlayer();
 			end
 		end
 
-		-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
+		--reset blacklist quest timer
+		if IsInCombat() or IsMoving() then
+			_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
+		end
+		if not IsInCombat() and not PlayerHasTarget() then
+			_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
+		end
+ 		-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
 		-- mainly for hardcore
 	if not self.pause and IsInCombat() and grind2FleeCombat.fleeCombat then 
 		if grind2SaveCoordinates.numberOfLocations >= 3 and PlayerLevel() >= 6 and not Player():IsDead() then
@@ -283,14 +290,7 @@ local localObj = GetLocalPlayer();
 		end
 	end
 
-	if PlayerHasTarget() and not IsMoving() and _quest.curQuestGiver ~= nil then
-		if GetTarget():GetUnitName() == _quest.curQuestGiver then
-			if GetTimeEX() >= _questAcceptQuest.noQuestTimer then
-				_questDBHandleDB:turnQuestCompleted();
-				_questAcceptQuest.noQuestTimer = GetTimeEX() + 10000;
-			end
-		end
-	end
+
 
 
 -- return for timer
@@ -604,7 +604,7 @@ end
 			if _questDBReturnQuest:returnAQuest() then
 				self.enemyTarget = nil;
 				self.message = "Returning quest!";
-				_questAcceptQuest.noQuestTimer = GetTimeEX() + 10000;
+				_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
 			return true;
 			end
 		end

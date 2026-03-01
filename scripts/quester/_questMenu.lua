@@ -139,39 +139,24 @@ function _questMenu:menu()
 		ToFile(" ________________________________________________ ");
 		Text("");
 	end
+	Separator();
 	Text("");
-	if (CollapsingHeader(">>> |+| Quest Options")) then
+	Text("Auto Remove Quest Entry Timer - ");
+	local removeQuestEntryTime = math.floor((_questAcceptQuest.noQuestTimer - GetTimeEX()) / 1000);
+	SameLine();
+	Text(removeQuestEntryTime.." seconds")
+	Separator();
 
-local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
-local questDescription, desc = GetQuestLogQuestText(1);
+	local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
+	local questDescription, desc = GetQuestLogQuestText(1);
 
-if (Button("Mark Current DB Quest As Complete")) then
-			_questDBHandleDB:turnQuestCompleted();
-		end
-		Text("Mark current DB quest as completed");
-Separator();
-
-		-- quest auto complete button
-		wasClicked, _quest.autoComplete = Checkbox("Auto Complete Quests In Order", _quest.autoComplete);
-		Text("Until bot reaches current quest in quest log");
-		Text("YOU MUST HAVE A QUEST IN QUEST LOG");
-		
+	if (Button("Mark Current DB Quest As Complete")) then
+		_questDBHandleDB:turnQuestCompleted();
+	end
 		Separator();
 
-		if _quest.killStuffOnRoute then
-			Text("Min Level to Grind");
-			script_grind.minLevel = SliderInt("Min Level to Grind", 0, 60, script_grind.minLevel);
-		end
-		--Text("Grind targets moving from quest to quest");
-		wasClicked, _quest.killStuffOnRoute = Checkbox("Grind En Route", _quest.killStuffOnRoute);
-		SameLine();
-		wasClicked, _questDB.minMaxLevel = Checkbox("Disable Level Req", _questDB.minMaxLevel);
-		SameLine();
-		wasClicked, _questEX2.vendorBetweenQuests = Checkbox("Vendor Between Quests", _questEX2.vendorBetweenQuests);
+	
 
-		Text("It is best to complete low level quests.");
-		Text("Start your new zone ~5 levels higher than required.");
-		-- grind spot reached
 		Separator();
 		if (Button("Current Spot Is Grind Spot")) then
 			_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();
@@ -216,7 +201,7 @@ if _quest.currentQuest ~= nil then Text("Current quester quest to run"); Text("_
 	--end
 			
 -- end quest options
-end
+
 
 	script_targetMenu:menu();
 

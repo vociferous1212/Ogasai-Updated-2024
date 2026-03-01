@@ -7,15 +7,16 @@ function _questAcceptQuest:run()
 
 	if IsMoving() or not PlayerHasTarget() or _quest.curQuestGiver == nil then
 
-		self.noQuestTimer = GetTimeEX() + 8000;
+		self.noQuestTimer = GetTimeEX() + 20000;
 	end
 
-	if _quest.curQuestGiver ~= nil then
+	if _quest.curQuestGiver ~= nil and PlayerLevel() > 1 then
 		if PlayerHasTarget() then
 			if GetTarget():GetUnitName() == _quest.curQuestGiver then
 				if GetTimeEX() >= self.noQuestTimer then
 					_questDBHandleDB:turnQuestCompleted();
-					self.noQuestTimer = GetTimeEX() + 10000;
+					DEFAULT_CHAT_FRAME:AddMessage("Accept Quest script");
+					self.noQuestTimer = GetTimeEX() + 20000;
 				end
 			end
 		end
@@ -75,7 +76,7 @@ function _questAcceptQuest:run()
 							CloseQuest();
 						--	_questDBHandleDB:turnQuestCompleted();
 							--_quest.waitTimer = GetTimeEX() + 3000;
-						_questAcceptQuest.noQuestTimer = 7000;
+						--_questAcceptQuest.noQuestTimer = 20000;
 						end
 
 						if GetGossipAvailableQuests() ~= nil and quest2 == nil then
@@ -99,6 +100,8 @@ function _questAcceptQuest:run()
 
 					if PlayerHasTarget() then 
 						if (AcceptQuest()) then
+
+							_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
 
 							local questDescription, questObjectives = GetQuestLogQuestText(1);
 							_quest.currentQuest = _quest.curQuestName;

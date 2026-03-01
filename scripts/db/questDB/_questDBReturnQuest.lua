@@ -20,7 +20,7 @@ function _questDBReturnQuest:returnAQuest()
 	-- return a quest
 	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete and not IsInCombat() then
 
-					_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
+					_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
 
 
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
@@ -112,6 +112,8 @@ function _questDBReturnQuest:returnAQuest()
 						CompleteQuest();
 						SelectGossipActiveQuest(1);
 						QuestRewardCompleteButton_OnClick()
+						_questAcceptQuest.noQuestTimer = GetTimeEX() + 20000;
+
 						--SelectActiveQuest(1);
 
 						
