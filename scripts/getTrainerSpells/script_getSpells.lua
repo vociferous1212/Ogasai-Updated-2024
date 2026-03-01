@@ -182,7 +182,7 @@ if (not script_unstuck:pathClearAuto(2)) then
 			if not IsMoving() then
 				if (GetTarget():UnitInteract()) then
 					SelectGossipOption(1)
-					for i = 1, 5 do
+					for i = 1, 10 do
 						-- buy from trainer spell index
 						BuyTrainerService(i)
 					end
