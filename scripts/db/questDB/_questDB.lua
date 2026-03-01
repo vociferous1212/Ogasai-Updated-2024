@@ -192,25 +192,30 @@ function _questDB:getQuestStartPos()
 
 	_questDB:getCurrentQuestMapID();
 
-	
-	_questDBHandleDB:turnOldQuestCompleted()
+
 
 	for i=0, self.numQuests -1 do
 
 		local questDescription, questObjectives = GetQuestLogQuestText(i);
 
 		if GetNumQuestLogEntries() ~= nil and GetNumQuestLogEntries() ~= 0 then
-			_questDB.curDesc = questObjectives;
-			if self.questList[i]['desc'] == _questDB.curDesc then
-				_questDB.curListQuest = self.questList[i]['questName'];
-				_quest.currentQuest = self.questList[i]['questName']
-				_quest.currentType = _questDB.questList[i]['type'];
-				_quest.usingItem = _questDB.questList[i]['useItem'];
-				_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-				_quest.currentMapID = _questDB.questList[i]['mapID'];
-				x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
-
-				return x, y, z;
+			for u=0, GetNumQuestLogEntries() do
+					local questDescription, questObjectives2 = GetQuestLogQuestText(u);
+					
+					
+					_questDB.curDesc = questObjectives;
+				if self.questList[i]['desc'] == _questDB.curDesc then
+					_questDB.curListQuest = self.questList[i]['questName'];
+					_quest.currentQuest = self.questList[i]['questName']
+					_quest.currentType = _questDB.questList[i]['type'];
+					_quest.usingItem = _questDB.questList[i]['useItem'];
+					_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+					_quest.currentMapID = _questDB.questList[i]['mapID'];
+					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
+					SelectQuestLogEntry(u)
+					SelectQuestLogEntry(u)
+					return x, y, z;
+				end
 			end
 		end
 

@@ -7,7 +7,7 @@ function coremenu:reload()
 
 	self.isSetup = false;
 
-	runOgasai:setup();
+	runOgasai.isSetup = false;
 
 	coremenu:draw();
 end

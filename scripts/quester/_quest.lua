@@ -41,6 +41,9 @@ _quest = {
 	faceTargetTimer = GetTimeEX(),
 	deletememessage = false,
 	targetingTimer2 = GetTimeEX(),
+	setQuestTimer = GetTimeEX(),
+	sortQuestTimer = GetTimeEX(),
+	turnQuestCompleteTimer = GetTimeEX(),
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
 }
@@ -131,7 +134,6 @@ local localObj = GetLocalPlayer();
 				if script_checkAdds:checkAdds() then
 					_quest.waitTimer = GetTimeEX() + 1500;
 					script_om:FORCEOM();
-				return;
 				end
 			end
 		end
@@ -209,7 +211,7 @@ local localObj = GetLocalPlayer();
 	if (self.pause) then
 		self.usingQuester = false;
 		script_grind.pause = true;
-		_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
+		_questDoCombat.blacklistTimer = GetTimeEX() * 2;
 		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 	return;
 	end
@@ -285,7 +287,7 @@ local localObj = GetLocalPlayer();
 		if GetTarget():GetUnitName() == _quest.curQuestGiver then
 			if GetTimeEX() >= _questAcceptQuest.noQuestTimer then
 				_questDBHandleDB:turnQuestCompleted();
-				_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
+				_questAcceptQuest.noQuestTimer = GetTimeEX() + 10000;
 			end
 		end
 	end
@@ -296,6 +298,12 @@ local localObj = GetLocalPlayer();
 	or ((IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast())
 	or Player():IsStunned() or Player():IsConfused() or Player():IsFleeing() then 
 		return;
+	end
+
+	if not IsInCombat() then
+		if _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest() then
+			return;
+		end
 	end
 
 	-- reset blacklist target timer
@@ -383,7 +391,7 @@ local localObj = GetLocalPlayer();
 	end
 
 	if IsInCombat() then
-		self.tickRate = .5;
+		self.tickRate = 0;
 	elseif not IsInCombat() then
 		self.tickRate = .25;
 	end
@@ -426,10 +434,17 @@ local localObj = GetLocalPlayer();
 
 			self.enemyTarget = _questDBTargets:getTarget();
 
-			_questDoCombat.targetingTimer = GetTimeEX() + 2500;
+			_questDoCombat.targetingTimer = GetTimeEX() + 4000;
 
 			if (IsInCombat()) and (self.enemyTarget == 0 or self.enemyTarget == nil) then
 				self.enemyTarget = _questDBTargets:getTarget()
+			end
+
+			if IsInCombat() and self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
+				if not grind2IsTargetingMe:target(self.enemyTarget) and self.enemyTarget:GetHealthPercentage() >= 99 then
+					self.enemyTarget = nil;
+					ClearTarget();
+				end
 			end
 
 			if script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil and not IsInCombat() then
@@ -516,6 +531,7 @@ end
 --]]
 
 -- quest is complete
+	if GetTimeEX() > self.turnQuestCompleteTimer then
 	if _quest.weCompletedQuest and _quest.isQuestComplete then
 		for i=0, GetNumQuestLogEntries() do
 			local questDescription, questObjectives = GetQuestLogQuestText(i);
@@ -528,9 +544,11 @@ end
 					_quest.currentDesc = nil;
 					_questDB.curDesc = nil;
 					_questEX2.flipVendor = true;
+					self.turnQuestCompleteTimer = GetTimeEX() + 7000;
 				end
 			end
 		end
+	end
 	end
 	
 
@@ -540,11 +558,13 @@ end
 --]]
 
 -- sort current quest
-	if _questSortCurrentQuest:run() then
-		self.waitTimer = GetTimeEX() + 500;
-		return;
+	if GetTimeEX() > self.sortQuestTimer then
+		if _questSortCurrentQuest:run() then
+			self.waitTimer = GetTimeEX() + 500;
+			self.sortQuestTimer = GetTimeEX() + 2000;
+			return;
+		end
 	end
-
 --[[
 
 
@@ -584,7 +604,7 @@ end
 			if _questDBReturnQuest:returnAQuest() then
 				self.enemyTarget = nil;
 				self.message = "Returning quest!";
-				_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
+				_questAcceptQuest.noQuestTimer = GetTimeEX() + 10000;
 			return true;
 			end
 		end
@@ -595,9 +615,11 @@ end
 
 --]]
 
+if GetTimeEX() > self.setQuestTimer then
 -- sort current quest
 	_questSetQuest:setOurCurrentQuest();
-
+	self.setQuestTimer = GetTimeEX() + 2000;
+end
 
 --[[
 
@@ -619,14 +641,13 @@ end
 	if not IsInCombat() then
 
 		if _questDBHandleDB:turnOldQuestCompleted() then
-			self.tickRate = .10;
+			self.tickRate = .5;
 			return true;
 		end
 	end
 	
 	if script_grind.lootObj == nil and script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
 		if script_gatherRun:gather() then
-			script_gatherRun:gather();
 			_quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder.."";
 		return true;
 		end
@@ -702,8 +723,8 @@ end
 
 	if not GetLocalPlayer():IsDead() and not _quest.needRest and GetTimeEX() > _questDoCombat.targetingTimer then
 		if (_quest.currentQuest ~= nil and _quest.curGrindX ~= 0 and _quest.grindSpotReached and _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5 and _quest.currentType ~= 11)
-		or (IsInCombat()) or (not IsInCombat() and script_grind.lootObj == nil and _quest.grindSpotReached and _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5 and _quest.currentType ~= 11) then
-			if (not _quest.isQuestComplete) then
+		or (not IsInCombat() and script_grind.lootObj == nil and _quest.grindSpotReached and _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5 and _quest.currentType ~= 11) then
+			if (not _quest.isQuestComplete) and GetNumQuestLogEntries() > 0 then
 				_quest.enemyTarget = _questDBTargets:getTarget();
 				_questDoCombat.targetingTimer = GetTimeEX() + 5000;
 			end
@@ -733,7 +754,7 @@ end
 					_quest.enemyTarget = nil;
 				end
 
-			if not IsInCombat() and _quest.enemyTarget == nil then
+			if not IsInCombat() then
 				grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 			end
 			if not IsMoving() and not IsPathLoaded(5) and not IsInCombat() then

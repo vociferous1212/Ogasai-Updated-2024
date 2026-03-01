@@ -622,7 +622,7 @@ function script_aggro:avoidElite() -- Runs away if there is atleast one elite wi
 	local tX, tY, tZ = 0, 0, 0;
 	local range = 25;	-- default
 	while currentObj ~= 0 do
-		if typeObj == 3 and (currentObj:GetClassification() >= 1) and currentObj:GetUnitName() ~= "Swiftmane" then
+		if typeObj == 3 and (currentObj:GetClassification() >= 1) and currentObj:GetUnitName() ~= "Sewer Beast" and currentObj:GetUnitName() ~= "Swiftmane" and currentObj:CanAttack() then
 			local tX, tY, tZ = GetDistance3D(x, y, z, tX, tY, tZ);
 			range = currentObj:GetLevel() - localObj:GetLevel() + 35;
 			if currentObj:CanAttack() and (currentObj:GetDistance() <= range or grind2IsTargetingMe:target(currentObj)) and not currentObj:IsDead() then	
@@ -645,5 +645,6 @@ function script_aggro:avoidElite() -- Runs away if there is atleast one elite wi
 		end
 		currentObj, typeObj = GetNextObject(currentObj);
 	end
-	return false;
+
+return false;
 end

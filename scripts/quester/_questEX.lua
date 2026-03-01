@@ -24,7 +24,7 @@ function _questEX:doStartChecks()
 	end
 
 -- move away from fire if we are standing in it
-	if GetTimeEX() > self.standingInFireTimer and not IsInCombat() then
+	if GetTimeEX() > self.standingInFireTimer then
 		script_helper:areWeStandingInFire()
 		self.standingInFireTimer = GetTimeEX() + 5000;
 	end

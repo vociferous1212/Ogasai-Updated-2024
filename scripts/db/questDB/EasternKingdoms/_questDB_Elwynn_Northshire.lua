@@ -26,9 +26,8 @@ if GetMyClass() == "WARLOCK" then
 	_questDB:addQuest("no", 0, "The Stolen Tome", "Drusilla La Salle", -8926.740234375, -195.5890045166, 80.588661193848, 12, 4, 6, -8957.1142578125, -431.03259277344, 64.767768859863, 2, 0, 0, 0, 1, 0, -8926.740234375, -195.5890045166, 80.588661193848, "Drusilla La Salle", 0, 0, 0, 107, 0, 0, "Retrieve the Powers of the Void for Drusilla La Salle.", 0, 1);
 end
 
--- added extra kills
-_questDB:addQuest("no", 0, "Brotherhood of Thieves", "Deputy Willem", -8933.5400390625, -136.52299499512, 83.262565612793, 12, 1, 6, -9034.2412109375, -252.53915405273, 72.35909271240, 1, 20, 0, 0, 0, 0, 
--8933.5400390625, -136.52299499512, 83.262565612793, "Deputy Willem", "Defias Thug", 0, 0, 0, 0, 5, "Bring 12 Red Burlap Bandanas to Deputy Willem outside the Northshire Abbey.", 0, 1);
+
+_questDB:addQuest("no", 0, "Brotherhood of Thieves", "Deputy Willem", -8933.5400390625, -136.52299499512, 83.262565612793, 12, 1, 6, -9068.671875, -287.70877075195, 73.667877197266, 1, 12, 0, 0, 0, 0, -8933.5400390625, -136.52299499512, 83.262565612793, "Deputy Willem", "Defias Thug", 0, 0, 0, 0, 5, "Bring 12 Red Burlap Bandanas to Deputy Willem outside the Northshire Abbey.", 0, 1);
 --level 1 human quest # 6
 _questDB:addQuest("no", 0, "Skirmish at Echo Ridge", "Marshal McBride", -8902.58984375, -162.60600280762, 81.939300537109, 12, 1, 6, -8579.986328125, -148.39659118652, 91.347053527832, 1, 12, 0, 0, 0, 0, -8902.58984375, -162.60600280762, 81.939300537109, "Marshal McBride", "Kobold Laborer", 0, 0, 0, 0, 3, "Kill 12 Kobold Laborers, then return to Marshal McBride at Northshire Abbey.", 0, 1);
 

@@ -126,6 +126,10 @@ function _questDoOtherQuestTypes2:run()
 			-- westfall
 			elseif _quest.currentQuest == "Continue to Stormwind" then
 				x, y, z = -10628.299804688, 1037.2700195313, 34.110454559326;
+
+			-- stormwind
+			elseif _quest.currentQuest == "Return to Lewis" then
+				x, y, z = -8835.759765625, 490.08401489258, 109.6155166626;
 			end
 
 			if GetDistance3D(px, py, pz, x, y, z) > 4 then
@@ -139,6 +143,8 @@ function _questDoOtherQuestTypes2:run()
 					name = "Devrak";
 				elseif _quest.currentQuest == "Continue to Stormwind" then
 					name = "Thor";
+
+				-- stormind quest name dungar longdrink
 				end
 				if GetTarget() ~= nil and GetTarget() ~= 0 then
 					if GetTarget():GetUnitName() ~= name then

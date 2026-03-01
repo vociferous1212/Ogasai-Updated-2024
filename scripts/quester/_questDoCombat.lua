@@ -1,4 +1,4 @@
-_questDoCombat = {waitTimer = 0, blacklistTimer = 0, targetingTimer = 0}
+_questDoCombat = {waitTimer = 0, blacklistTimer = GetTimeEX() * 2, targetingTimer = 0}
 
 function _questDoCombat:doCombat()
 	local localObj = GetLocalPlayer():GetHealthPercentage();
@@ -54,7 +54,11 @@ function _questDoCombat:doCombat()
 
 		--end
 
-		
+		if PlayerHasTarget() then
+			if GetTarget():IsDead() then
+				ClearTarget();
+			end
+		end
 
 -- move away from adds script conditions
 		if (IsInCombat()) and (_quest.enemyTarget ~= nil) and (GetLocalPlayer():GetHealthPercentage() >= 1) and (script_grind:isTargetingMe2(_quest.enemyTarget)) and (_quest.enemyTarget:IsInLineOfSight()) and (not _quest.enemyTarget:IsCasting()) and (not _quest.enemyTarget:IsFleeing()) and (_quest.enemyTarget:GetHealthPercentage() >= 20) then
@@ -277,6 +281,10 @@ function _questDoCombat:doCombat()
 				end
 			end
 				
+			if _quest.enemyTarget:IsDead() or GetTarget():IsDead() then
+				self.enemyTarget = nil;
+				ClearTarget();
+			end
 				
 			script_grind.combatError = RunCombatScript(_quest.enemyTarget:GetGUID());
 			--grind2.enemyTarget = _quest.enemyTarget;

@@ -28,6 +28,10 @@ runOgasai = {
 
 	usedVendor2 = true,		-- use vendor when switching between grinder and quester
 
+	currentLevel = PlayerLevel(),
+
+	stopLevel = 10,
+
 	-- quests to allow breaks and pauses between quester and grinder sequences
 	quests = {
 
@@ -37,6 +41,13 @@ runOgasai = {
 		-- _questEX flip vendor var
 		--
 		starterForceVendorQuests = {
+
+		},
+
+
+		-- unit name of innkeepers, and locations, to set hearthstone
+		starterSetHearthstoneInnkeepers = {
+
 
 		},
 
@@ -120,6 +131,7 @@ function runOgasai:runGrinder()
 	if self.showingWindow then
 		grind2:draw();
 	end
+
 end
 
 
@@ -292,6 +304,8 @@ function runOgasai:menu()
 			wasClicked, self.useFisher = Checkbox("auto use fishing in mulgore to level 50 - doesn't re-equip weapon", self.useFisher);
 		end
 
+		self.stopLevel = SliderInt("Stop Bot At Level", 1, 60, self.stopLevel);
+
 		if _quest.pause then
 			Text("quester paused")
 		else 
@@ -312,7 +326,7 @@ function runOgasai:menu()
 
 		Separator();
 		if script_fish.pause then
-			Text("fisher pause");
+			Text("fisher paused");
 		else
 			Text("RUNNING fisher");
 		end
@@ -388,20 +402,26 @@ end
 
 function runOgasai:setup()
 
-	_questDB:setup();
+	if not self.isSetup then
 
-	_questDB:getQuestStartPos();
+		ClearTarget();
 
-	_questSetQuest:setOurCurrentQuest();
+		_quest.enemyTarget = nil;
+		
+		_questDB:setup();
 
-	ClearTarget();
+		_questDB:getQuestStartPos();
 
-	-- don't start at level 1 without a quest
-	if PlayerLevel() > 1 or GetNumQuestLogEntries() > 0 then
-		self.pause = false;
+		_questSetQuest:setOurCurrentQuest();
+
+		-- don't start at level 1 without a quest
+		if PlayerLevel() > 1 or GetNumQuestLogEntries() > 0 then
+			self.pause = false;
+		end
 	end
 
-self.isSetup = true;
+	self.isSetup = true;
+
 return false;
 end
 
@@ -513,6 +533,11 @@ function runOgasai:run()
 			ShowBar();
 		end
 		return;
+	end
+
+	if PlayerLevel() >= self.stopLevel then
+		self.stopLevel = PlayerLevel() + 1;
+		self.pause = true;
 	end
 
 --[[
@@ -650,7 +675,7 @@ PLAYER LEVEL 10 - 20
 --]]
 
 
-	if PlayerLevel() >= 10 and PlayerLevel() < 20 then
+	if PlayerLevel() >= 10 then
 
 		-- why does this need to be 2 for it to not return anything?
 		-- add more entries...
@@ -706,7 +731,6 @@ PLAYER LEVEL 6 - 10
 	-- run transition quests heading to new area
 	if PlayerLevel() >= 6 and PlayerLevel() < 10 then
 
-		
 		for i = 0, 5 do
 			if quest == self.quests.leaveStarterZoneQuests[i] then
 				self.currentQuest = self.quests.leaveStarterZoneQuests[i]
@@ -728,8 +752,8 @@ PLAYER LEVEL 6 - 10
 			return;
 		end
 			
-		-- we have transition quest and level 10 is not reached, run grinder
-		if quest == self.currentQuest then
+		-- we have transition quest and level 6 is not reached, run grinder
+		if quest == self.currentQuest and PlayerLevel() < 6 then
 
 			if not self.usedVendor then
 				script_vendor.status = 1;
@@ -741,7 +765,20 @@ PLAYER LEVEL 6 - 10
 			runOgasai:runGrinder();
 		end
 
-		-- run quester until transtion quest is reached
+		-- run quester if we have the right quest and level is greater than 6
+		if quest == self.currentQuest and PlayerLevel() >= 6 then
+
+			if not self.usedVendor then
+				script_vendor.status = 1;
+				self.usedVendor = true;
+			end
+
+			self.usedVendor2 = false;
+
+			runOgasai:runQuester();
+		end
+
+		-- if our quest is not the quest to leave zone 1, then run quester
 		if quest ~= self.currentQuest then
 			if not self.usedVendor2 then
 				script_vendor.status = 1;
@@ -764,12 +801,16 @@ PLAYER LEVEL LESS THAN 6
 	-- if player level is less than 6 and we have the end quest for the starter area then run the griner until level 6 is reached
 	elseif PlayerLevel() < 6 then
 
+		-- get our current quest to check from table
+			-- check to leave starter zone table entry 6 by description - 2 quests of the same name
 		if quest == self.quests.leaveStarterZoneQuests[6].name then
 			if questDesc == self.quests.leaveStarterZoneQuests[6].desc then
 				self.currentQuest = self.quests.leaveStarterZoneQuests[6].name;
 			end
 		end
 
+		-- get our current quest to check from table
+			-- check to leave starter zone
 		for i = 0, 5 do
 			if quest == self.quests.leaveStarterZoneQuests[i] then
 				self.currentQuest = self.quests.leaveStarterZoneQuests[i]
@@ -783,7 +824,7 @@ PLAYER LEVEL LESS THAN 6
 			return;
 		end
 
-		-- we have the right quest and are not high enough level to run previous conditions, run grinder
+		-- we have quest to leave starter zones, but not high enough level yet, run grinder
 		if quest == self.currentQuest then
 
 			if not self.usedVendor then
@@ -825,11 +866,13 @@ function runOgasai:checkHearthstoneStartAreas()
 								if (GetContainerItemCooldown(u, t) == 0) then
 									if IsMoving() then
 										StopMoving();
-									return;
+									return true;
 									end
 									if not IsMoving() then
-										UseItem('Hearthstone'); 
-										return true;
+										if UseItem('Hearthstone') then
+											runOgasai.waitTimer = GetTimeEX() + 20000;
+											return true;
+										end
 									end
 								end
 							end

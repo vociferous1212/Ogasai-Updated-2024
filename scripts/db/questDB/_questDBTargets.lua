@@ -52,9 +52,10 @@ end
 
 function _questDBTargets:getTarget()
 
-	local i, t = GetFirstObject();
+	local target, target2, target3, numKill, numKill, numKill = nil, nil, nil, nil, nil, nil;
 	local bestDist = 1000;
 	local bestTarget = nil;
+
 
 	-- get targets to kill and number of targets to kill for each quest we are on
 	if _questDB.curListQuest ~= nil then 
@@ -76,20 +77,27 @@ function _questDBTargets:getTarget()
 		end
 	end
 
-
 	if _quest.grindSpotReached or IsInCombat() then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 and i:GetDistance() <= 200 then
-				if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_aggro:safePullRecheck(i) then
+				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) then
+
+					if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and not i:IsCritter() and i:CanAttack() and script_aggro:safePullRecheck(i) then
 					
-					local dist = i:GetDistance();
+						if grind2IsTargetingMe:target(i) then
+							return i;
+						end
 
-					if bestDist > dist then
+						local dist = i:GetDistance();
 
-						bestDist = dist;
-						bestTarget = i;
+						if bestDist > dist then
 
+							bestDist = dist;
+
+							bestTarget = i;
+
+						end
 					end
 				end
 			end
@@ -98,6 +106,8 @@ function _questDBTargets:getTarget()
 	end
 
 	-- get a quest target
+	local i, t = GetFirstObject();
+
 	while i ~= 0 do
 		if t == 3 then
 			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() then

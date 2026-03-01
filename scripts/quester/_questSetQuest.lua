@@ -5,8 +5,15 @@ function _questSetQuest:setOurCurrentQuest()
 	-- set our current quest
 	for y=0, _questDB.numQuests -1 do
 
-
-
+		if GetNumQuestLogEntries() ~= nil and GetNumQuestLogEntries() ~= 0 then
+			for u=0, GetNumQuestLogEntries() do
+				local questDescription, questObjectives2 = GetQuestLogQuestText(u);				
+					if _questDB.questList[y]['desc'] == _questDB.curDesc then
+						SelectQuestLogEntry(u)
+						SelectQuestLogEntry(u)
+					end
+			end
+		end
 			-- get the objectives for the quest to match in DB
 			local questDescription, questObjectives = GetQuestLogQuestText(y);
 
@@ -24,7 +31,6 @@ function _questSetQuest:setOurCurrentQuest()
 
 						-- if quest log title
 						if title == _questDB.questList[y]['questName'] then
-
 
 							-- set our variables for bot to run quester on ( it may already do this )
 

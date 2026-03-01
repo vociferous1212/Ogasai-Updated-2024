@@ -165,7 +165,7 @@ function script_vendor:setup()
 	self.foodName = script_vendor:findFood();
 	self.drinkName = script_vendor:findDrink();
 
-	if PlayerLevel() > 4 then
+	if PlayerLevel() > 6 then
 		-- Put everything in our inventory at startup as "keep items" (won't be sold)
 		for i = 0,4 do 
 			for y=0,GetContainerNumSlots(i) do 

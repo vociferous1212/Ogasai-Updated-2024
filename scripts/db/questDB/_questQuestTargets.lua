@@ -1,11 +1,9 @@
 _questQuestTargets = {
 
-	numTargets = 2,
-
 	names = {
 
-		[1] = "Chief Sharptusk Thornmantle",
-		[2] = "Garrick Padfoot",
+		["Chief Sharptusk Thornmantle"] = true,
+		[ "Garrick Padfoot"] = true,
 	},
 
 }
@@ -16,13 +14,11 @@ _questQuestTargets = {
 function _questQuestTargets:isUnitQuestTarget(target)
 
 	if target ~= nil and target ~= 0 then
-		for i = 1, self.numTargets do
-
-			if target:GetUnitName() == _questQuestTargets.names[i] then
+	
+		if _questQuestTargets.names[target:GetUnitName()] then
 		
-				return true;
+			return true;
 
-			end
 		end
 	end
 

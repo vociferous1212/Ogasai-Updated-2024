@@ -2,6 +2,7 @@ _questDBReturnQuest = {waitTimer = 0}
 
 function _questDBReturnQuest:returnAQuest()
 
+
 	local id = _questDBReturnQuest:getReturnTargetID();
 
 
@@ -18,6 +19,9 @@ function _questDBReturnQuest:returnAQuest()
 
 	-- return a quest
 	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete and not IsInCombat() then
+
+					_questAcceptQuest.noQuestTimer = GetTimeEX() + 7000;
+
 
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
 		for i=0, _questDB.numQuests -1 do

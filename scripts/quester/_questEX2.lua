@@ -67,6 +67,7 @@ function _questEX2:doChecks()
 						script_vendor.status = 2
 						_questEX2.flipVendor = false
 						self.lastVendorTime = GetTimeEX() + 240000;
+						_quest.grindSpotReached = false;
 					end
 				end
 			end

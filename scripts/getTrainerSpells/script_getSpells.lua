@@ -74,7 +74,7 @@ function script_getSpells:run()
 
 		if (self.timer > GetTimeEX()) then
 
-			return;
+			return false;
 		end
 
 		self.getSpellsStatus = 1;
@@ -181,24 +181,16 @@ if (not script_unstuck:pathClearAuto(2)) then
 
 			if not IsMoving() then
 				if (GetTarget():UnitInteract()) then
-					SelectGossipOption(1);
+					SelectGossipOption(1)
+					for i = 1, 5 do
+						-- buy from trainer spell index
+						BuyTrainerService(i)
+					end
+					ClearTarget();
+					
 				end
-
-				ClearTarget();
-			
-				-- need to do check for spells? this just buys anything available
-				for i = 1, 15 do
-				-- buy from trainer spell index
-					BuyTrainerService(i);
-
-				end
-			end
-
-			
-				
-			
+			end	
 		end
-		
 
 	if (script_getSpells:checkForSpellsNeeded()) then
 		return true;

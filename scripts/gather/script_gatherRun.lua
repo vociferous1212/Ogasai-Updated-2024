@@ -43,6 +43,9 @@ function script_gatherRun:gather()
 			if grind2.usingGrinder2 then
 				grind2.enemyTarget = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
 			end
+			if _quest.usingQuester then
+				_quest.enemyTarget = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
+			end
 		end
 	end
 
