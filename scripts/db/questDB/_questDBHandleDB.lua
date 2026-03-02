@@ -67,7 +67,9 @@ end
 
 function _questDBHandleDB:turnOldQuestCompleted()
 
-	_questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
+	if _questMenuEX.questToRunByIndex == -1 then
+		_questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
+	end
 
 	if (not _quest.isQuestCompleted) then
 
@@ -77,8 +79,8 @@ function _questDBHandleDB:turnOldQuestCompleted()
 			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(i);
 
 
-
-				if _questDB.questList[i]['questName'] ~= "nnil" then
+				if _questMenuEX.questToRunByIndex ~= i then
+				if _questDB.questList[i]['completed'] ~= "nnil" then
 
 					if _questDB.questList[i]['questName'] == _questDB.curListQuest then
 
@@ -92,7 +94,7 @@ function _questDBHandleDB:turnOldQuestCompleted()
 
 										if questObjectives ~= _questDB.questList[i]['desc'] and GetObjectiveText(i) ~= _questDB.questList[i]['desc'] then
 
-											self.currentQuestBeingChecked = dbQuest.name;
+											self.currentQuestBeingChecked = _questDB.questList[i]['name'];
 
 											DEFAULT_CHAT_FRAME:AddMessage("Old quest marked as complete - |cffff0000" .. _questDB.questList[i]['questName'] .. "|r")
 											
@@ -118,7 +120,7 @@ function _questDBHandleDB:turnOldQuestCompleted()
 						end
 					end
 				end
-			
+			end	
 		end
 	end
 return false;

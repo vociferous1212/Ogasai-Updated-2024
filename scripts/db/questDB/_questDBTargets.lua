@@ -77,12 +77,28 @@ function _questDBTargets:getTarget()
 		end
 	end
 
+	if IsInCombat() then
+		if _quest.enemyTarget ~= nil and NumberTargetsAttackingPlayer() > 0 then
+			if not grind2IsTargetingMe:target(_quest.enemyTarget) and _quest.enemyTarget:GetHealthPercentage() >= 99 then
+				local i, t = GetFirstObject();
+				while i ~= 0 do
+					if t == 3 then
+						if grind2IsTargetingMe:target(i) then
+							return i;
+						end
+					end
+				i, t = GetNextObject(i);
+				end
+			end
+		end
+	end
+
 	-- get a quest target
 	local i, t = GetFirstObject();
 	local haveQuestTarget = false;
 	while i ~= 0 do
 		if t == 3 then
-			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() and self.target ~= nil then
+			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() and self.target ~= 0 then
 				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) and (not grind2SafePull:targetHasAdds(i) or _questQuestTargets:isUnitQuestTarget(i)) then
 					if (i:GetUnitName() == self.target and _quest.targetKilledNum < numKill) or (i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2) or (i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3) or i:IsTappedByMe() or grind2IsTargetingMe:target(i) then
 

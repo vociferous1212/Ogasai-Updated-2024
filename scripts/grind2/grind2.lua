@@ -790,6 +790,9 @@ function grind2:clearTarget()
 	-- reset grind enemy target
 	grind2.enemyTarget = nil;
 
+	-- reset quester target
+	_quest.enemyTarget = nil;
+
 	-- reset grind last target
 	grind2.lastTargetTargeted = nil;
 

@@ -1,4 +1,10 @@
-_questDBReturnQuest = {waitTimer = 0}
+_questDBReturnQuest = {
+	
+	waitTimer = 0,
+
+	bestItemName = nil,
+
+}
 
 function _questDBReturnQuest:returnAQuest()
 
@@ -7,20 +13,24 @@ function _questDBReturnQuest:returnAQuest()
 
 
 	if (not _questDB.isSetup) then
+
 		_questDB:setup();
 	end
 
 	local px, py, pz = GetLocalPlayer():GetPosition();
+
 	local x, y, z = 0, 0, 0;
 
 	if IsInCombat() then
+
 		return;
 	end
 
 	-- return a quest
 	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete and not IsInCombat() then
 
-					_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
+		-- reset blacklist quest timer
+		_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
 
 
 		-- if get type == 0 and we can return a quest without doing anything then move to quest return target
@@ -30,7 +40,10 @@ function _questDBReturnQuest:returnAQuest()
 				--	x, y, z = _questDB:getReturnTargetPos();
 				--end
 				--if _quest.currentDesc == nil and _questDB.questList[i]['desc'] ~= nil then
-
+				if _questMenuEX.questToRunByIndex ~= -1 then
+					i = _questMenuEX.questToRunByIndex;
+					_quest.currentQuest = _questDB.questList[i]['questName']
+				end
 		
 		x, y, z = _questDB:getReturnTargetPos();
 
@@ -40,6 +53,12 @@ function _questDBReturnQuest:returnAQuest()
 		if id ~= nil then
 			if _questDBReturnQuest:getReturnTargetID():GetDistance() <= 10 then
 			x, y, z = _questDBReturnQuest:getReturnTargetID():GetPosition();
+			end
+		end
+
+		if GetDistance3D(px, py, pz, x, y, z) <= 4 then
+			if IsMoving() then
+				StopMoving();
 			end
 		end
 
@@ -109,14 +128,12 @@ function _questDBReturnQuest:returnAQuest()
 					
 					self.waitTimer = GetTimeEX() + 1000;
 
+							
 						CompleteQuest();
 						SelectGossipActiveQuest(1);
-						QuestRewardCompleteButton_OnClick()
-						_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
-
-						--SelectActiveQuest(1);
-
-						
+						--QuestRewardCompleteButton_OnClick()
+						--_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
+					_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;						
 
 					-- Class-specific reward selection
 local _, playerClass = UnitClass("player")
@@ -239,11 +256,13 @@ if numChoices > 0 then
 
 					if isEquippable then
 						local statScore = GetStatScore(itemName, priorityStat)
+						self.bestItemName = itemName
 						if statScore > bestScore or (statScore == bestScore and itemRarity > bestRarity) then
 							bestScore = statScore
 							bestRarity = itemRarity
 							bestRewardIndex = i
 							bestItemName = itemName
+							self.bestItemName = itemName
 						end
 					end
 				end
@@ -252,18 +271,84 @@ if numChoices > 0 then
 	end
 end
 
+if self.bestItemName == nil then
+	local numChoices = GetNumQuestChoices()
+	if numChoices > 0 then
+		for i = 1, numChoices do
+			itemLink = GetQuestItemLink("reward", i);
+			if itemLink then
+			local _, _, parsedItemLink = string.find(itemLink, "(item:%d+)")
+			if parsedItemLink then
+				local itemName, _, itemRarity, _, _, _, _, itemStackCount = GetItemInfo(parsedItemLink)
+				if itemName and itemRarity and itemStackCount and itemStackCount ~= "" and validEquipTypes[itemStackCount] then
+					local isEquippable = false
+
+					if itemStackCount == "INVTYPE_HEAD" or itemStackCount == "INVTYPE_SHOULDER" or itemStackCount == "INVTYPE_CHEST" or
+					   itemStackCount == "INVTYPE_WAIST" or itemStackCount == "INVTYPE_LEGS" or itemStackCount == "INVTYPE_FEET" or
+					   itemStackCount == "INVTYPE_WRIST" or itemStackCount == "INVTYPE_HAND" then
+						if classArmorProfs["Leather"] or classArmorProfs["Mail"] or classArmorProfs["Plate"] or classArmorProfs["Cloth"] then
+							isEquippable = true
+						end
+					elseif itemStackCount == "INVTYPE_CLOAK" and classArmorProfs["Cloth"] then
+						isEquippable = true
+					elseif itemStackCount == "INVTYPE_SHIELD" and classArmorProfs["Shield"] then
+						isEquippable = true
+					elseif itemStackCount == "INVTYPE_WEAPON" or itemStackCount == "INVTYPE_WEAPONMAINHAND" or itemStackCount == "INVTYPE_WEAPONOFFHAND" or
+						   itemStackCount == "INVTYPE_2HWEAPON" or itemStackCount == "INVTYPE_RANGED" or itemStackCount == "INVTYPE_THROWN" then
+						if (string.find(itemName, "Dagger") and classWeaponProfs["Dagger"]) or
+						   (string.find(itemName, "Sword") and classWeaponProfs["Sword"]) or
+						   (string.find(itemName, "Mace") and classWeaponProfs["Mace"]) or
+						   (string.find(itemName, "Axe") and classWeaponProfs["Axe"]) or
+						   (string.find(itemName, "Polearm") and classWeaponProfs["Polearm"]) or
+						   (string.find(itemName, "Staff") and classWeaponProfs["Staff"]) or
+						   (string.find(itemName, "Bow") and classWeaponProfs["Bow"]) or
+						   (string.find(itemName, "Crossbow") and classWeaponProfs["Crossbow"]) or
+						   (string.find(itemName, "Gun") and classWeaponProfs["Gun"]) or
+						   (string.find(itemName, "Wand") and classWeaponProfs["Wand"]) or
+						   (string.find(itemName, "Fist") and classWeaponProfs["Fist"]) or
+						   (string.find(itemName, "Thrown") and classWeaponProfs["Thrown"]) or
+						   ((itemStackCount == "INVTYPE_2HWEAPON") and (
+								(string.find(itemName, "Sword") and classWeaponProfs["Two-Handed Sword"]) or
+								(string.find(itemName, "Mace") and classWeaponProfs["Two-Handed Mace"]) or
+								(string.find(itemName, "Axe") and classWeaponProfs["Two-Handed Axe"])
+							)) then
+							isEquippable = true
+						end
+					elseif itemStackCount == "INVTYPE_FINGER" or itemStackCount == "INVTYPE_TRINKET" then
+						isEquippable = true
+					end
+
+					if isEquippable then
+						local statScore = GetStatScore(itemName, priorityStat)
+						self.bestItemName = itemName
+						if statScore > bestScore or (statScore == bestScore and itemRarity > bestRarity) then
+							bestScore = statScore
+							bestRarity = itemRarity
+							bestRewardIndex = i
+							bestItemName = itemName
+							self.bestItemName = itemName
+						end
+					end
+				end
+			end
+		end
+	end end
+end
+
 if bestRewardIndex > 0 and bestItemName then
 	GetQuestReward(bestRewardIndex)
 	GetQuestReward(QuestFrameRewardPanel, bestRewardIndex)
 	CompleteQuest()
 	self.waitTimer = GetTimeEX() + 1000
-	UseItem(bestItemName)
+	UseItem(self.bestItemName)
+	QuestRewardCompleteButton_OnClick()
 else
 	GetQuestReward(1)
 	GetQuestReward(QuestFrameRewardPanel, 1)
 	CompleteQuest()
 	self.waitTimer = GetTimeEX() + 1000
-	UseItem(bestItemName)
+	UseItem(self.bestItemName)
+	QuestRewardCompleteButton_OnClick()
 end
 						
 						if (not GetQuestReward(rewardNum)) then
@@ -272,7 +357,15 @@ end
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
 							CompleteQuest();
-							UseItem(bestItemName)
+							UseItem(self.bestItemName)
+							QuestRewardCompleteButton_OnClick()
+							
+						--CompleteQuest();
+						--SelectGossipActiveQuest(1);
+						--QuestRewardCompleteButton_OnClick()
+						--_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
+
+						--SelectActiveQuest(1);
 							--ClearTarget();
 						end
 					return true;	
@@ -285,15 +378,18 @@ end
 			if (not IsInCombat()) and PlayerHasTarget() and GetTarget():GetUnitName() ~= name then
 				ClearTarget();
 			end
+
+
 			_quest.message = "Moving to quest return target - "..name.." : "..dist.." (yd)";
 			--if (GetDistance3D(px, py, pz, x, y, z) < 25) then
 				grind2MoveToTarget:run(GetLocalPlayer(), x, y, z);
 			--else
 				--script_runner:run(x, y, z)
 			--end
-			if not IsMoving() then Move(x, y, z); end
+			if not IsMoving() and GetDistance3D(px, py, pz, x, y, z) > 4 then Move(x, y, z); end
 		
 		end
+	return true;
 	end
 return false;	
 end

@@ -85,14 +85,6 @@ function _questEX2:doChecks()
 		end
 	end
 
-	if _quest.killStuffOnRoute and IsInCombat() and not _quest.isQuestComplete and GetTarget() == 0 or GetTarget() == nil then
-		if GetPet() ~= 0 and GetPet() ~= nil then
-			if GetPet():GetUnitsTarget() ~= 0 and GetPet():GetUnitsTarget() ~= nil then
-				_quest.enemyTarget = GetPet():GetUnitsTarget()
-			end
-		end
-	end
-
 	-- buff other players
 	if not script_getSpells:cityZones() and not IsInCombat() and GetTimeEX() > script_grind.buffTimer and script_buffOtherPlayers.enableBuffs
 		and localObj:GetManaPercentage() >= 40 and script_vendor.status == 0 and IsStanding() then
@@ -226,7 +218,7 @@ function _questEX2:doChecks()
 					self.currentLootGUID = nil
 				end
 				return true
-			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting then
+			elseif PlayerHasTarget() and GetTarget():IsDead() and not IsLooting() then
 				ClearTarget()
 			end
 		return;

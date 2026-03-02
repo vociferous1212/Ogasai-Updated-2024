@@ -48,6 +48,9 @@ function _questSetQuest:setOurCurrentQuest()
 
 							_quest.weHaveQuest = true;
 
+							_questDBGatherGetInventory:getItemsInInventory();
+
+
 
 						end
 					end

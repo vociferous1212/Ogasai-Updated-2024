@@ -1,6 +1,8 @@
 _questMenu = { 
 	
-	addSetupFile = include("scripts\\db\\questDB\\_questDBSetup.lua"), showDBInfo = false,
+	addSetupFile = include("scripts\\db\\questDB\\_questDBSetup.lua"),
+	
+	showDBInfo = true,	-- show all quests window
 }
 
 function _questMenu:menu()
@@ -27,7 +29,7 @@ function _questMenu:menu()
 
 	elseif _questDB.curListQuest ~= nil then
 		local dist = math.floor(GetDistance3D(x, y, z, _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ))
-			Text("Current Quest To Obtain = ".._questDB.curListQuest.. " | "..dist.." (yds)")	
+		Text("Current Quest To Obtain = ".._questDB.curListQuest.. " | "..dist.." (yds)");
 	end
 		
 	Separator();

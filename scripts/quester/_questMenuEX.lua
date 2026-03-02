@@ -1,4 +1,9 @@
-_questMenuEX = {}
+﻿_questMenuEX = {
+
+	questToRunByIndex = -1,
+
+
+}
 
 
 function _questMenuEX:menu()
@@ -11,7 +16,13 @@ function _questMenuEX:menu()
 
 		if NewWindow("Quest Info", 320, 320) then
 
-			Text("	*Not all of these have been tested!*");
+			if Button("Reset Quest Index") then
+				self.questToRunByIndex = -1;
+			end
+
+			Text("Run button not working yet... grind spot / quest giver coords complication?")
+			Text("	* Not all of these have been tested! *");
+			Text("	* Ordered by number to complete *")
 
 			local x, y, z = GetLocalPlayer():GetPosition();
 
@@ -25,8 +36,17 @@ function _questMenuEX:menu()
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 85 then
+							if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -41,11 +61,15 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
@@ -54,8 +78,17 @@ function _questMenuEX:menu()
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 1 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -70,21 +103,34 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
 				end
-				if CollapsingHeader(">>> |+| Elywnn Forest") then
+				if CollapsingHeader(">>> |+| Elwynn Forest") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 12 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -99,11 +145,15 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
@@ -112,8 +162,17 @@ function _questMenuEX:menu()
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 40 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -128,11 +187,15 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
@@ -141,8 +204,17 @@ function _questMenuEX:menu()
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 38 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -157,11 +229,15 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
@@ -170,8 +246,17 @@ function _questMenuEX:menu()
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 130 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -186,22 +271,35 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
 				end
 				
-		if CollapsingHeader(">>> |+| Redridge Mountains") then
+				if CollapsingHeader(">>> |+| Redridge Mountains") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 44 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -216,23 +314,36 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
 				end
 
 
-	if CollapsingHeader(">>> |+| Duskwood") then
+				if CollapsingHeader(">>> |+| Duskwood") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 10 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -247,22 +358,35 @@ function _questMenuEX:menu()
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
 				end
 
-if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
+				if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 267 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -277,11 +401,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
@@ -291,8 +419,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 33 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -307,11 +444,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 
 						end
 					end
@@ -321,8 +462,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 51 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -337,11 +487,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -360,8 +514,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 141 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -376,11 +539,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -388,8 +555,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 215 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -404,11 +580,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -416,8 +596,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 14 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -432,11 +621,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -444,8 +637,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 17 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -460,11 +662,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -472,8 +678,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 148 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -488,11 +703,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -500,8 +719,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 406 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -516,11 +744,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -528,8 +760,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 400 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -544,11 +785,15 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
@@ -556,8 +801,17 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 					local num = 0;
 					local minlevel = 0;
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 440 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
 							local factiontemp = _questDB.questList[i]['faction'];
 							local faction = "";
@@ -572,45 +826,79 @@ if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
 							local max = _questDB.questList[i]['maxLevel'];
 							local compltemp = _questDB.questList[i]['completed'];
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Completed";
 							else
-								compl = "No";
+								compl = "Not Complete";
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
 				if CollapsingHeader(">>> |+| Un'Goro Crater") then
-					local num = 0;
-					local minlevel = 0;
+					local num = 0
+					local minlevel = 0
 					local maxlevel = 0
-					for i=0, _questDB.numQuests -1 do
+
+					for i = _questDB.numQuests - 1, 0, -1 do
 						if _questDB.questList[i]['mapID'] == 490 then
+						if Button("Run ".. i) then self.questToRunByIndex = i;
+								_questDB.curListQuest = _questDB.questList[i]['questName'];
+								_quest.currentQuest = _questDB.questList[i]['questName']
+								_quest.currentType = _questDB.questList[i]['type'];
+								_quest.usingItem = _questDB.questList[i]['useItem'];
+								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
+								_quest.currentMapID = _questDB.questList[i]['mapID'];
+							end
+							SameLine();
 							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
+							local factiontemp = _questDB.questList[i]['faction']
+							local faction = ""
+							local type = _questDB.questList[i]['type']
+
 							if factiontemp == 0 then
-								faction = "Alliance";
+								faction = "Alliance"
 							else
-								faction = "Horde";
+								faction = "Horde"
 							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
+
+							name = _questDB.questList[i]['questName']
+							local min = _questDB.questList[i]['minLevel']
+							local max = _questDB.questList[i]['maxLevel']
+							local compltemp = _questDB.questList[i]['completed']
+
 							if compltemp == "nnil" then
-								compl = "Yes";
+								compl = "Yes"
 							else
-								compl = "No";
+								compl = "No"
 							end
-							Text(num.." - Complete - "..compl.." - "..faction.." | "..name.." | Level "..min.." - "..max.." | Type - "..type); Separator();
+
+							local space = " ";
+							if num < 10 then
+								space = " "; elseif num > 100 then space = "  ";
+							end
+							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
 						end
 					end
 				end
+			end --end of kalimdor
+	
 
 
+			Separator();
+
+
+			Text("			Completed Quests")
+			Text("__________________________________________________________")
+			for i = 0, _questDB.numQuests - 1 do
+				if _questDB.questList[i]['completed'] == "nnil" then
+					Text("Completed - " .._questDB.questList[i]['questName'].. " || Index "..i);
+				end
 			end
-		end
+
+		end --end of new window
 	end
 end

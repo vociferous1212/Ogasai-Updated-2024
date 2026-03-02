@@ -40,7 +40,18 @@ function _questAcceptQuest:run()
 			-- set return target name
 			local name = _quest.curQuestGiver;
 		
-			
+			-- target the questgiver
+			if not PlayerHasTarget() then
+				TargetByName(_quest.curQuestGiver);
+			end
+
+			if PlayerHasTarget() then
+				if GetTarget():GetUnitName() ~= name then
+					ClearTarget();
+					return;
+				end
+			end
+
 			if PlayerHasTarget() then
 	
 				-- if target is quest return target and it is in line of sight then
@@ -55,16 +66,12 @@ function _questAcceptQuest:run()
 		-- we have a quest giver
 		if _quest.curQuestGiver ~= nil then
 
-			-- target the questgiver
-			if not PlayerHasTarget() then
-				TargetByName(_quest.curQuestGiver);
-			end
+			
 
 			-- short timer
 			_quest:setTimer(600); 
 
-			-- if we have a target then set our target as quest target - if all else fails above but the rest of conditions are ok in DB
-			_quest.curQuestGiver = GetTarget();
+		
 
 			if PlayerHasTarget() then
 

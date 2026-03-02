@@ -31,27 +31,32 @@ function _questWindow:window()
 	end
 
 		
-		DrawText("Quester", x, y-4, r+255, g+255, b+0) y = y + 15;
+		--DrawText("Quester", x, y-4, r+255, g+255, b+0) y = y + 15;
 
-		DrawText("Quester Status:", x, y, r+255, g+255, b+0);
+		--DrawText("Quester Status:", x, y, r+255, g+255, b+0);
 
 		DrawText(_quest.message or "error", x + 115, y, 255, 255, 255);
 
-		DrawText("_______________", x, y+3, r+255, g+255, b);
+		--DrawText("_______________", x, y+3, r+255, g+255, b);
 
-		y = y + 20; DrawText('Combat Script Status:', x, y, r+255, g+255, b+0); y = y + 15;
+		--y = y + 20; DrawText('Combat Script Status:', x, y, r+255, g+255, b+0); y = y + 15;
 
-		-- show combat script text
+		---- show combat script text
 		if (script_grind.showClassOptions) then
 			RunCombatDraw();
 		end
 
-		DrawText("_____________________", x, y-12, r+255, g+255, b);
+		--DrawText("_____________________", x, y-12, r+255, g+255, b);
 
-		DrawText('Vendor - ' .. script_vendorMenu:getInfo(), x, y, r+255, g+255, b+0); y = y + 15;
+		--DrawText('Vendor - ' .. script_vendorMenu:getInfo(), x, y, r+255, g+255, b+0); y = y + 15;
 
-		DrawText('Vendor Status: ', x, y, r+255, g+255, b+0);
+		--DrawText('Vendor Status: ', x, y, r+255, g+255, b+0);
 
-		DrawText(script_vendor:getMessage(), x+105, y, 0, 255, 255);
+		--DrawText(script_vendor:getMessage(), x+105, y, 0, 255, 255);
+
+		tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
+	
+		DrawText("Current Quest - _questDB", x+105, y-50, r+255, g+0, b+0);
+		DrawText("".._questDB.curListQuest, x+105, y-60, r+255, g+0, b+0);
 
 end

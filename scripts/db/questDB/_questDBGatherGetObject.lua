@@ -30,7 +30,11 @@ function _questDBGatherGetObject:getObject()
 
 			if t == 5 then
 
-				if not _questDBGather:isNodeBlacklisted(i:GetGUID()) and (_questDBGather.gatherTarget == i:GetObjectDisplayID() and _quest.gatheredNum < _questDBGather.gatherNum) or (_questDBGather.gatherTarget2 == i:GetObjectDisplayID() and _quest.gatheredNum2 < _questDBGather.gatherNum2) or (_quest.currentQuest == "Rocket Car Parts" and i:GetObjectDisplayID() >= 449 and i:GetObjectDisplayID() <= 554) and script_gatherEX2:isNodeSafeToGather(i) then
+				if not _questDBGather:isNodeBlacklisted(i:GetGUID()) and script_gatherEX2:isNodeSafeToGather(i)
+				and ((_questDBGather.gatherTarget == i:GetObjectDisplayID() and _quest.gatheredNum < _questDBGather.gatherNum)
+				or (_questDBGather.gatherTarget2 == i:GetObjectDisplayID() and _quest.gatheredNum2 < _questDBGather.gatherNum2)
+				or (_quest.currentQuest == "Rocket Car Parts" and i:GetObjectDisplayID() >= 449 and i:GetObjectDisplayID() <= 554))
+				then
 
 					if _questDBGather.gatherTarget == i:GetObjectDisplayID() then
 

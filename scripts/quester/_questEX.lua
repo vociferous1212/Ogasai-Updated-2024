@@ -1,4 +1,16 @@
-_questEX = {bagsFull = false, jumpTimer = 6000, breathTimer = 0, standingInFireTimer = 0}
+_questEX = {
+	
+	bagsFull = false,
+	
+	jumpTimer = 10000,
+	
+	breathTimer = 0,
+	
+	standingInFireTimer = 0,
+
+	retrieveCorpseTimer = GetTimeEX(),
+
+}
 
 function _questEX:doStartChecks()
 
@@ -16,12 +28,6 @@ function _questEX:doStartChecks()
 		self.message = "Loading Nav Mesh! Please Wait!";
 		return true;
 	end
-	
-	if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
-		if not _quest.enemyTarget:CanAttack() then
-			_quest.enemyTarget = nil;
-		end
-	end
 
 -- move away from fire if we are standing in it
 	if GetTimeEX() > self.standingInFireTimer then
@@ -38,10 +44,10 @@ function _questEX:doChecks()
 
 -- random jump
 	if GetTimeEX() > (_quest.tickRate*2000) + self.jumpTimer and IsMoving() and script_grind.jump and ((not IsCasting() and not IsChanneling()) or instantCastSpells:isSpellInstantCast()) then
-		local jumpRandom = random(0, 100);
+		local jumpRandom = random(-100, 100);
 
 		if (jumpRandom == 100 and IsMoving() and not IsInCombat()) then
-			local randomTimer = math.random(6000, 12000);
+			local randomTimer = math.random(10000, 17000);
 			self.jumpTimer = GetTimeEX() + randomTimer;
 			JumpOrAscendStart();
 		end
@@ -130,8 +136,8 @@ function _questEX:doChecks()
 					grind2MoveToTarget:run(Player(), x, y, z);
 					return true;
 				else
+					local rx, ry, rz = GetCorpsePosition();
 					if (script_grind.safeRess) then
-						local rx, ry, rz = GetCorpsePosition();
 						if (script_aggro:safeRess(rx, ry, rz, script_grind.ressDistance)) then
 							script_grind.message = "Finding a safe spot to ress...";
 						else
@@ -142,7 +148,10 @@ function _questEX:doChecks()
 							end
 						end
 					end
-					RetrieveCorpse();
+					if GetDistance3D(_lx, _ly, _lz, rx, ry, rz) <= script_grind.ressDistance and GetTimeEX() > self.retrieveCorpseTimer then
+						RetrieveCorpse();
+						self.retrieveCorpseTimer = GetTimeEX() + 2500;
+					end
 					script_grindEX.useThisVar = true;
 				end
 				return true;

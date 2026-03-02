@@ -79,6 +79,10 @@ function script_warrior:setup()
 		self.eatHealth = 70;
 	end
 
+	if _quest.usingQuester then
+		self.eatHealth = 75;
+	end
+
 	self.isSetup = true;
 end
 
@@ -786,7 +790,7 @@ function script_warrior:run(targetGUID)	-- main content of script
 	
 			-- War Stomp Tauren Racial
 			if (HasSpell("War Stomp")) and (not IsSpellOnCD("War Stomp")) and (not IsMoving()) and (targetObj:GetDistance() <= 6) and (not targetObj:HasDebuff("Concussive Blow")) then
-				if (targetObj:IsCasting()) or (script_warrior:enemiesAttackingUs(2)) or (targetObj:IsFleeing()) then
+				if script_grindNumEnemiesInRange:numEnemiesInRange(10) == 1 or targetObj:IsCasting() or script_warrior:enemiesAttackingUs(2) or targetObj:IsFleeing() or targetObj:IsChanneling() then
 					if not CastSpellByName("War Stomp") then
 						self.waitTimer = GetTimeEX() + 500;
 					end

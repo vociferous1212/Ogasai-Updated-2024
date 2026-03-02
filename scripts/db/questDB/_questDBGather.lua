@@ -1,13 +1,24 @@
-_questDBGather = {	waitTimer = 0,
-			gatherTarget = 0,
-			gatherTarget2 = 0,
-			gatheringTarget = 0,
-			gatherNum = 0,
-			gatherNum2 = 0,
-			gatherTargetName = nil,
-			gatherTargetName2 = nil,
-			blacklistTable = {},
-			blacklistTableNum = 0,
+_questDBGather = {
+		
+	waitTimer = 0,
+
+	gatherTarget = 0,
+
+	gatherTarget2 = 0,
+
+	gatheringTarget = 0,
+
+	gatherNum = 0,
+
+	gatherNum2 = 0,
+
+	gatherTargetName = nil,
+
+	gatherTargetName2 = nil,
+
+	blacklistTable = {},
+
+	blacklistTableNum = 0,
 
 }
 
@@ -95,23 +106,7 @@ function _questDBGather:run()
 
 			if (HasForm()) then
 
-				if (IsCatForm()) then
-
-					script_druidEX:removeCatForm();
-
-				end
-
-				if (IsBearForm()) then
-
-					script_druidEX:removeBearForm();
-
-				end
-
-				if (IsTravelForm) then
-
-					script_druidEX:removeTravelForm();
-
-				end
+				RemoveForm();
 
 			end		
 
@@ -138,14 +133,21 @@ function _questDBGather:run()
 				end
 
 
-if self.gatheringTarget:GetObjectDisplayID() == 210 or self.gatheringTarget:GetObjectDisplayID() == 347 or self.gatheringTarget:GetObjectDisplayID() == 31 or self.gatheringTarget:GetUnitName() == "The Fall of Ameth'Aran" or self.gatheringTarget:GetUnitName() == "The Lay of Ameth'Aran" and not IsInCombat() and not IsChanneling() and not IsCasting() then
+				-- some quest specific items that don't disappear when collected
+				if (self.gatheringTarget:GetObjectDisplayID() == 210
+				or self.gatheringTarget:GetObjectDisplayID() == 347
+				or self.gatheringTarget:GetObjectDisplayID() == 31
+				or self.gatheringTarget:GetUnitName() == "The Fall of Ameth'Aran"
+				or self.gatheringTarget:GetUnitName() == "The Lay of Ameth'Aran")
+				and not IsInCombat() and not IsChanneling() and not IsCasting() then
 					_questDBGather:addNodeToBlacklist(self.gatheringTarget:GetGUID());
 				end
+			
 				_quest:setTimer(1650);
 
 
 
-			return true;
+				return true;
 
 			end
 
