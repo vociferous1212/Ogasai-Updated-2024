@@ -1,4 +1,6 @@
 _questDB = {
+
+	currentIndex = -1,
 	
 	isSetup = false,
 
@@ -275,14 +277,13 @@ function _questDB:getQuestStartPos()
 
 		i = _questMenuEX.questToRunByIndex;
 		_questDB.curListQuest = self.questList[i]['questName'];
-		_quest.currentQuest = self.questList[i]['questName']
 		_quest.currentType = _questDB.questList[i]['type'];
 		_quest.usingItem = _questDB.questList[i]['useItem'];
 		_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 		_quest.currentMapID = _questDB.questList[i]['mapID'];
 		_questDB.curDesc = _questDB.questList[i]['desc'];
 		_quest.currentDesc = _questDB.questList[i]['desc'];
-
+		self.currentIndex = i;
 		x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 
 		return x, y, z;
@@ -311,6 +312,7 @@ function _questDB:getQuestStartPos()
 					_quest.usingItem = _questDB.questList[i]['useItem'];
 					_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 					_quest.currentMapID = _questDB.questList[i]['mapID'];
+					self.currentIndex = i;
 
 					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 
@@ -357,6 +359,7 @@ function _questDB:getQuestStartPos()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								self.currentIndex = i;
 
 
 								_questDBGatherGetInventory:getItemsInInventory()

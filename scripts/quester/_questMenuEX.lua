@@ -2,6 +2,8 @@
 
 	questToRunByIndex = -1,
 
+	startAtQuestIndexNum = -1,
+
 
 }
 
@@ -16,9 +18,47 @@ function _questMenuEX:menu()
 
 		if NewWindow("Quest Info", 320, 320) then
 
+			if _quest.currentQuest ~= nil then
+				Text("Current Quest - ".._quest.currentQuest.." | ID : ".._questDB.currentIndex);
+			elseif _questDB.curListQuest ~= nil then
+				Text("Quest To Obtain - ".._questDB.curListQuest.." | ID: ".._questDB.currentIndex);
+			end
+			Separator();
+
+			Text("			")
+			SameLine();
 			if Button("Reset Quest Index") then
 				self.questToRunByIndex = -1;
+				self.startAtQuestIndexNum = -1;
+				_questDB.curListQuest = 0
+				_quest.currentQuest = nil
+				--_quest.currentDesc = nil
+				_questDB.curDesc = nil
+				_quest.currentMapID = nil
+								
+				
+				_questDB:getQuestStartPos()
+
 			end
+
+			
+			Text("Start Quest Index");
+			SameLine();
+			self.startAtQuestIndexNum = SliderInt("", -1, _questDB.numQuests, self.startAtQuestIndexNum);
+
+			if self.startAtQuestIndexNum ~= -1 then
+				if Button("Start At Quest Index") then
+					self.questToRunByIndex = self.startAtQuestIndexNum;
+					_questDB:getQuestStartPos()
+					self.startAtQuestIndexNum = -1;
+				end
+			end
+			if self.startAtQuestIndexNum ~= -1 and self.startAtQuestIndexNum ~= nil then
+				SameLine();
+				Text("Quest Name - ".._questDB.questList[self.startAtQuestIndexNum]['questName'])
+				Separator();
+			end
+
 
 			Text("Run button not working yet... grind spot / quest giver coords complication?")
 			Text("	* Not all of these have been tested! *");
@@ -45,6 +85,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -87,6 +129,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -129,6 +173,11 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
+								self.questToRunByIndex = i;
+								
+								--_questDB:getQuestStartPos()
 							end
 							SameLine();
 							num = num + 1
@@ -171,6 +220,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -213,6 +264,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -255,6 +308,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -298,6 +353,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -342,6 +399,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -385,6 +444,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -428,6 +489,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -471,6 +534,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -523,6 +588,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -564,6 +631,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -605,6 +674,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -646,6 +717,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -687,6 +760,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -728,6 +803,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -769,6 +846,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -810,6 +889,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1
@@ -852,6 +933,8 @@ function _questMenuEX:menu()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_quest.currentDesc = _questDB.questList[i]['desc'];
+								_questDB.curDesc = _questDB.questList[i]['desc'];
 							end
 							SameLine();
 							num = num + 1

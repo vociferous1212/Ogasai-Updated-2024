@@ -42,7 +42,7 @@ function _questAcceptQuest:run()
 		
 			-- target the questgiver
 			if not PlayerHasTarget() then
-				TargetByName(_quest.curQuestGiver);
+				TargetByName(name);
 			end
 
 			if PlayerHasTarget() then

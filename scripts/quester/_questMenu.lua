@@ -13,7 +13,7 @@ function _questMenu:menu()
 		if _questDBTargets.target ~= nil then
 			target = _questDBTargets.target;
 		end
-		local dist = math.floor(GetDistance3D(x, y, z, _quest.curGrindX, _quest.curGrindY, _quest.curGrinz));
+		local dist = math.floor(GetDistance3D(x, y, z, _quest.curGrindX, _quest.curGrindY, _quest.curGrindz));
 		Text("Current Quest To Complete = ".._quest.currentQuest.. " | "..dist.." (yds) "..target)
 
 
