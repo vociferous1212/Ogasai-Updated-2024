@@ -1,6 +1,8 @@
 _questAcceptQuest = {
 
-	noQuestTimer = GetTimeEX();
+	noQuestTimer = GetTimeEX(),
+
+	returnQuestToGameObjectTarget = nil,
 }
 
 function _questAcceptQuest:run()
@@ -45,7 +47,12 @@ function _questAcceptQuest:run()
 	end
 
 	-- if we are close enough to quest giver
-	if (_quest.distToGiver <= 4) and (not questIsInQuestLog) and not IsMoving() then
+	if (_quest.distToGiver <= 4) and (not questIsInQuestLog) then
+
+		if IsMoving() then
+			StopMoving();
+			return true;
+		end
 
 		-- grind spot reached is false
 		_quest.grindSpotReached = false;
@@ -60,9 +67,24 @@ function _questAcceptQuest:run()
 
 		-- set return target name
 		local name = _quest.curQuestGiver;
+		local id = _questAcceptQuest:getGiverTargetID();
+
+		-- get a game object to interact with
+		if id ~= nil then
+			local i, t = GetFirstObject()
+			while i ~= 0 do
+				if t == 5 then
+					if i:GetObjectDisplayID() == id then
+						_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = i:GetPosition();
+						self.returnQuestToGameObjectTarget = i;
+					end
+				end
+			i, t = GetNextObject(i);
+			end
+		end
 		
 		-- target the questgiver
-		if not PlayerHasTarget() and name ~= nil then
+		if not PlayerHasTarget() and _questAcceptQuest:getGiverTargetID() == nil then
 			TargetByName(name);
 		end
 
@@ -86,19 +108,17 @@ function _questAcceptQuest:run()
 		end
 
 		-- we have a quest giver
-		if _quest.curQuestGiver ~= nil then
-
-			
+		if _quest.curQuestGiver ~= nil then	
 
 			-- short timer
 			_quest:setTimer(600); 
 
 		
 
-			if PlayerHasTarget() then
+			if (PlayerHasTarget() or _questAcceptQuest:getGiverTargetID() ~= nil) and _quest.curQuestGiver ~= nil then
 
 				-- interact with the quest giver
-				if (GetTarget():UnitInteract()) then
+				if (PlayerHasTarget() and GetTarget():UnitInteract()) or (_questAcceptQuest:getGiverTargetID() ~= nil and self.returnQuestToGameObjectTarget:GameObjectInteract()) then
 
 					-- short timer
 					_quest:setTimer(1000);
@@ -110,13 +130,18 @@ function _questAcceptQuest:run()
 					return;
 					end
 
-					_quest.curQuestGiver = GetTarget();
+					if IsMoving() then
+						StopMoving();
+						return true;
+					end
+
+					--_quest.curQuestGiver = GetTarget();
 
 					-- check how many quests the quest giver has and sort the gossip options to match quest name
 					local quest1, quest1Level, quest2, quest2Level, quest3, quest3Level, _, _, _, _ = GetGossipAvailableQuests()
 					local gossipOption = 1;
 
-					if PlayerHasTarget() then
+					if (PlayerHasTarget()) or _questAcceptQuest:getGiverTargetID() ~= nil then
 
 						-- close the quest window and turn quest complete if quest is not available
 						if (quest1 ~= nil and (quest1 and quest2 and quest3) ~= _questDB.curListQuest)
@@ -153,7 +178,7 @@ function _questAcceptQuest:run()
 						gossipOption = _quest.gossipOption
 					end
 
-					if PlayerHasTarget() then 
+					if PlayerHasTarget() or _questAcceptQuest:getGiverTargetID() ~= nil then
 
 						-- accept the quest
 						if (AcceptQuest()) then
@@ -206,4 +231,35 @@ function _questAcceptQuest:run()
 	end
 
 return false;
+end
+
+function _questAcceptQuest:getGiverTargetID()
+
+	local id = nil;
+
+	for i=0, _questDB.numQuests -1 do
+
+		if _questDB.questList[i]['completed'] == "no" then
+
+			if _questDB.questList[i]['questName'] ~= "nil" then
+
+				if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+				
+					if _questDB.questList[i]['desc'] == _questDB.curDesc then
+						id = _questDB.questList[i]['giverName'];
+					end
+				end
+			end
+		end
+	end
+
+	local i, t = GetFirstObject();
+	while i ~= 0 do
+		if id == i:GetObjectDisplayID() then
+			return i;
+		end
+	i, t = GetNextObject(i);
+	end
+
+return nil;
 end

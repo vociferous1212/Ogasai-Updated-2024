@@ -179,14 +179,13 @@ function _questMenu:menu()
 
 
 		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
-		local questDescription, desc = GetQuestLogQuestText(1);
 
 		if (Button("Mark Current DB Quest As Complete")) then
-			if _quest.currentDesc ~= desc then
-				_questDBHandleDB:turnQuestCompleted();
-			end
-			if _quest.currentDesc == desc then
-				DEFAULT_CHAT_FRAME:AddMessage("Cannot remove - current quest is in progress - change quest in quest log");
+			for a = 0, GetNumQuestLogEntries() do
+				local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+				if title ~= _questDB.curListQuest then
+					_questDBHandleDB:turnQuestCompleted();
+				end
 			end
 		end
 

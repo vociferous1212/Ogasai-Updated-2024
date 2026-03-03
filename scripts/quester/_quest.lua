@@ -797,6 +797,10 @@ end
 					end
 				end
 
+				if IsInCombat() then
+					return;
+				end
+
 				if _quest.distToGiver <= 10 then
 					if not PlayerHasTarget() then
 						TargetByName(_quest.curQuestGiver);

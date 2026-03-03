@@ -69,6 +69,20 @@ function _questMenuEX:menu()
 
 			end
 
+			SameLine();
+
+			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
+
+		if (Button("Mark Current DB Quest As Complete")) then
+			for a = 0, GetNumQuestLogEntries() do
+				local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+				if title ~= _questDB.curListQuest then
+					_questDBHandleDB:turnQuestCompleted();
+				end
+			end
+		end
+
+
 			if self.startAtQuestIndexNum < 100 then
 				Text("[ Start Quest Index ] "..self.startAtQuestIndexNum.." ");
 			else
@@ -310,161 +324,161 @@ function _questMenuEX:menu()
 end
 
 function _questMenuEX:drawZoneByID(mapID)
-    local num = 0
-    self.showDesc = self.showDesc or {}   -- store checkbox states
+	local num = 0
+	self.showDesc = self.showDesc or {}   -- store checkbox states
 
-    for i = _questDB.numQuests - 1, 0, -1 do
-        local quest = _questDB.questList[i]
+	for i = _questDB.numQuests - 1, 0, -1 do
+		local quest = _questDB.questList[i]
 
-        if quest['mapID'] == mapID then
-            if Button("Run " .. i) then
-                self.questToRunByIndex = i
-                _questDB.curListQuest = quest['questName']
-                _quest.currentQuest = quest['questName']
-                _quest.currentType = quest['type']
-                _quest.usingItem = quest['useItem']
-                _quest.gossipOption = quest['gossipOption']
-                _quest.currentMapID = quest['mapID']
-                _quest.currentDesc = quest['desc']
-                _questDB.curDesc = quest['desc']
-            end
+		if quest['mapID'] == mapID then
+			if Button("Run " .. i) then
+				self.questToRunByIndex = i
+				_questDB.curListQuest = quest['questName']
+				_quest.currentQuest = quest['questName']
+				_quest.currentType = quest['type']
+				_quest.usingItem = quest['useItem']
+				_quest.gossipOption = quest['gossipOption']
+				_quest.currentMapID = quest['mapID']
+				_quest.currentDesc = quest['desc']
+				_questDB.curDesc = quest['desc']
+			end
 
-            SameLine()
-            num = num + 1
+			SameLine()
+			num = num + 1
 
-            local faction = (quest['faction'] == 0) and "Alliance" or "Horde"
-            local compl = (quest['completed'] == "nnil") and "Completed" or "Not Complete"
-            local x, y, z = PlayerPosition()
-            local dist = math.floor(GetDistance3D(x, y, z, quest['pos']['x'], quest['pos']['y'], quest['pos']['z']))
+			local faction = (quest['faction'] == 0) and "Alliance" or "Horde"
+			local compl = (quest['completed'] == "nnil") and "Completed" or "Not Complete"
+			local x, y, z = PlayerPosition()
+			local dist = math.floor(GetDistance3D(x, y, z, quest['pos']['x'], quest['pos']['y'], quest['pos']['z']))
 
-            if self.menuStyle1 then
-                Text(num .. " " .. compl .. " - " .. faction ..
-                     " | Type - " .. quest['type'] ..
-                     " | " .. quest['questName'] ..
-                     " " .. dist .. " (yds)")
+			if self.menuStyle1 then
+				Text(num .. " " .. compl .. " - " .. faction ..
+					 " | Type - " .. quest['type'] ..
+					 " | " .. quest['questName'] ..
+					 " " .. dist .. " (yds)")
 
-                SameLine()
+				SameLine()
 
-                -- Unique checkbox per quest
-                self.showDesc[i] = self.showDesc[i] or false
-                local clicked
-                clicked, self.showDesc[i] = Checkbox("##"..i, self.showDesc[i])
+				-- Unique checkbox per quest
+				self.showDesc[i] = self.showDesc[i] or false
+				local clicked
+				clicked, self.showDesc[i] = Checkbox("##"..i, self.showDesc[i])
 
-                if self.showDesc[i] then
-                    Text(quest['desc'])
-                end
+				if self.showDesc[i] then
+					Text(quest['desc'])
+				end
 
-                Separator()
+				Separator()
 
-            elseif self.menuStyle2 then
-                Text(
-                    num .. " " ..
-                    compl .. " - " ..
-                    faction ..
-                    " | Type - " .. quest['type'] ..
-                    " | " .. quest['questName'] ..
-                    " | " .. dist .. " (yds)\n"
-                )
-                Separator()
-                Text(quest['desc'])
-                Text(" ")
-                Separator()
-            end
-        end
-    end
+			elseif self.menuStyle2 then
+				Text(
+					num .. " " ..
+					compl .. " - " ..
+					faction ..
+					" | Type - " .. quest['type'] ..
+					" | " .. quest['questName'] ..
+					" | " .. dist .. " (yds)\n"
+				)
+				Separator()
+				Text(quest['desc'])
+				Text(" ")
+				Separator()
+			end
+		end
+	end
 end
 
 
 
 function _questMenuEX:sortMaps(mapID)
 
-    if not mapID then
+	if not mapID then
 		return "Unknown"
 	end
 
-    local mapNames = {
-        -- Eastern Kingdoms
-        [1]    = "Dun Morogh",
-        [3]    = "Badlands",
-        [4]    = "Blasted Lands",
-        [8]    = "Swamp of Sorrows",
-        [10]   = "Duskwood",
-        [11]   = "Wetlands",
-        [12]   = "Elwynn Forest",
-        [14]   = "Durotar",
-        [15]   = "Dustwallow Marsh",
-        [17]   = "Barrens",
-        [28]   = "Western Plaguelands",
-        [33]   = "Stranglethorn Vale",
-        [36]   = "Alterac Mountains",
-        [38]   = "Loch Modan",
-        [40]   = "Westfall",
-        [41]   = "Deadwind Pass",
-        [44]   = "Redridge Mountains",
-        [45]   = "Arathi Highlands",
-        [46]   = "Burning Steppes",
-        [47]   = "The Hinterlands",
-        [51]   = "Searing Gorge",
-        [85]   = "Tirisfal Glades",
-        [130]  = "Silverpine Forest",
-        [139]  = "Eastern Plaguelands",
-        [267]  = "Hillsbrad Foothills",
+	local mapNames = {
+		-- Eastern Kingdoms
+		[1]    = "Dun Morogh",
+		[3]    = "Badlands",
+		[4]    = "Blasted Lands",
+		[8]    = "Swamp of Sorrows",
+		[10]   = "Duskwood",
+		[11]   = "Wetlands",
+		[12]   = "Elwynn Forest",
+		[14]   = "Durotar",
+		[15]   = "Dustwallow Marsh",
+		[17]   = "Barrens",
+		[28]   = "Western Plaguelands",
+		[33]   = "Stranglethorn Vale",
+		[36]   = "Alterac Mountains",
+		[38]   = "Loch Modan",
+		[40]   = "Westfall",
+		[41]   = "Deadwind Pass",
+		[44]   = "Redridge Mountains",
+		[45]   = "Arathi Highlands",
+		[46]   = "Burning Steppes",
+		[47]   = "The Hinterlands",
+		[51]   = "Searing Gorge",
+		[85]   = "Tirisfal Glades",
+		[130]  = "Silverpine Forest",
+		[139]  = "Eastern Plaguelands",
+		[267]  = "Hillsbrad Foothills",
 
-        -- Kalimdor
-        [1377] = "Silithus",
-        [141]  = "Teldrassil",
-        [148]  = "Darkshore",
-        [215]  = "Mulgore",
-        [331]  = "Ashenvale",
-        [357]  = "Feralas",
-        [361]  = "Felwood",
-        [400]  = "Thousand Needles",
-        [405]  = "Desolace",
-        [406]  = "Stonetalon Mountains",
-        [440]  = "Tanaris",
-        [490]  = "Un'Goro Crater",
-        [493]  = "Moonglade",
-        [618]  = "Winterspring",
-        [16]   = "Azshara",
-        [1637] = "Orgrimmar",
-        [1638] = "Thunder Bluff",
-        [1657] = "Darnassus",
+		-- Kalimdor
+		[1377] = "Silithus",
+		[141]  = "Teldrassil",
+		[148]  = "Darkshore",
+		[215]  = "Mulgore",
+		[331]  = "Ashenvale",
+		[357]  = "Feralas",
+		[361]  = "Felwood",
+		[400]  = "Thousand Needles",
+		[405]  = "Desolace",
+		[406]  = "Stonetalon Mountains",
+		[440]  = "Tanaris",
+		[490]  = "Un'Goro Crater",
+		[493]  = "Moonglade",
+		[618]  = "Winterspring",
+		[16]   = "Azshara",
+		[1637] = "Orgrimmar",
+		[1638] = "Thunder Bluff",
+		[1657] = "Darnassus",
 
-        -- Capitals
-        [1519] = "Stormwind City",
-        [1537] = "Ironforge",
-        [1497] = "Undercity",
+		-- Capitals
+		[1519] = "Stormwind City",
+		[1537] = "Ironforge",
+		[1497] = "Undercity",
 		[1637] = "Orgrimmar",
 		[1638] = "Thunder Bluff",
 		[1657] = "Darnassus",
 
 
-        -- Dungeons & Raids (Classic)
-        [209]  = "Shadowfang Keep",
-        [389]  = "Ragefire Chasm",
-        [43]   = "Wailing Caverns",
-        [47]   = "Razorfen Kraul",
-        [129]  = "Razorfen Downs",
-        [70]   = "Uldaman",
-        [90]   = "Gnomeregan",
-        [189]  = "Scarlet Monastery",
-        [289]  = "Scholomance",
-        [329]  = "Stratholme",
-        [229]  = "Blackrock Spire",
-        [230]  = "Blackrock Depths",
-        [409]  = "Molten Core",
-        [469]  = "Blackwing Lair",
-        [249]  = "Onyxia's Lair",
-        [309]  = "Zul'Gurub",
-        [509]  = "Ruins of Ahn'Qiraj",
-        [531]  = "Temple of Ahn'Qiraj",
-        [2557] = "Dire Maul",
+		-- Dungeons & Raids (Classic)
+		[209]  = "Shadowfang Keep",
+		[389]  = "Ragefire Chasm",
+		[43]   = "Wailing Caverns",
+		[47]   = "Razorfen Kraul",
+		[129]  = "Razorfen Downs",
+		[70]   = "Uldaman",
+		[90]   = "Gnomeregan",
+		[189]  = "Scarlet Monastery",
+		[289]  = "Scholomance",
+		[329]  = "Stratholme",
+		[229]  = "Blackrock Spire",
+		[230]  = "Blackrock Depths",
+		[409]  = "Molten Core",
+		[469]  = "Blackwing Lair",
+		[249]  = "Onyxia's Lair",
+		[309]  = "Zul'Gurub",
+		[509]  = "Ruins of Ahn'Qiraj",
+		[531]  = "Temple of Ahn'Qiraj",
+		[2557] = "Dire Maul",
 
-        -- Battlegrounds
-        [2597] = "Alterac Valley",
-        [3277] = "Warsong Gulch",
-        [3358] = "Arathi Basin",
-    }
+		-- Battlegrounds
+		[2597] = "Alterac Valley",
+		[3277] = "Warsong Gulch",
+		[3358] = "Arathi Basin",
+	}
 
-    return mapNames[mapID] or ("Unknown Map (" .. mapID .. ")")
+	return mapNames[mapID] or ("Unknown Map (" .. mapID .. ")")
 end

@@ -6,7 +6,7 @@ function _questDB_Darkshore:setup()
 --_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
 --_questDB:addQuest("no", 0, "", "", xyz, 148, 10, 20, xyz, type
 
-_questDB:addQuest("no", 0, "The Fragments Within", 4612, 6206.6669921875, -158.9248046875, 80.923851013184, 148, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6437.8706054688, 473.11392211914, 7.8072023391724, "Sentinel Glynda Nal'Shea", 0, 0, 0, 0, 0, 3, "Report back what you have found to Sentinel Glynda Nal'Shea in Auberdine.", 0, 1);
+_questDB:addQuest("no", 0, "The Fragments Within", 4612, 6197.1791992188, -148.30267333984, 72.640937805176, 148, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6437.8706054688, 473.11392211914, 7.8072023391724, "Sentinel Glynda Nal'Shea", 0, 0, 0, 0, 0, 3, "Report back what you have found to Sentinel Glynda Nal'Shea in Auberdine.", 0, 1);
 
 _questDB:addQuest("no", 0, "As Water Cascades", "Sentinel Glynda Nal'Shea", 6437.8706054688, 473.11392211914, 7.8072023391724, 148, 10, 20, 6412.5942382813, 467.15744018555, 8.1310997009277, 3, 0, 0, 0, 0, 0, 6197.1791992188, -148.30267333984, 72.640937805176, 4612, 0, 0, 0, 0, 0, 0, "Fill the Empty Water Tube at the Auberdine moonwell, and then investigate the red crystal along Darkshore's eastern mountain wall.", "Empty Water Tube", 1);
 
