@@ -17,6 +17,8 @@ function _questSetup:run()
 		_quest.weHaveQuest = false;
 		_quest.isQuestComplete = false;
 	end
+
+	grind2MoveToTarget.adjustMeshSmoothness = true;
 	
 	script_grind:setup();
 

@@ -34,11 +34,8 @@ function _questCheckQuestCompletion:checkQuestForCompletion()
 
 						if title == _questDB.questList[i]['questName'] then
 							if isComplete == -1 then
-								AbandonQuest();
-								_quest.currentQuest = nil
-								_quest.currentDesc = nil
-								_questDB.curDesc = nil;
-								_questDB.curListQuest = nil;
+								AbandonQuest(y);
+								return;
 							end
 							if (isComplete == 1) or (_questDB.questList[i]['type'] == 0) or (_quest.currentType == 5 and not HasItem(_quest.usingItem) and _quest.currentQuest == title) then
 

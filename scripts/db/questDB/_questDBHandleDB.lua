@@ -37,9 +37,9 @@ function _questDBHandleDB:turnQuestCompleted()
 						DEFAULT_CHAT_FRAME:AddMessage(
 						"Quest marked as complete - |cffff0000" .. 
 						(_questDB.curListQuest or "Unknown") .. 
-						"|r  (index |cff00aaff" .. i .. "|r)"
+						"|r  (index |cff00aaff" .. i .. "|r) - Check Log Files"
 						)
-							--ToFile("".._questDB.curListQuest.." - completed");
+							ToFile("	QUESTER - Completed - ".._questDB.curListQuest);
 
 							_questDB.curListQuest = nil;
 

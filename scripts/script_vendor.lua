@@ -378,7 +378,7 @@ function script_vendor:sell()
 			elseif grind2.usingGrinder2 or _quest.usingQuester then
 				grind2MoveToTarget:run(Player(), vX, vY, vZ);
 			end
-			if not IsPathLoaded(5) then Move(vX, vY, vZ); end
+			if not IsPathLoaded(5) and not IsMoving() then Move(vX, vY, vZ); end
 			self.message = 'Moving to ' .. vendor['name'] .. '...';
 			-- Reset bag and slot numbers before we sell
 			self.currentBag = 0;

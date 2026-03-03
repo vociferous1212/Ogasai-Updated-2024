@@ -9,6 +9,8 @@ function grind2NavMenu:run()
 
 		wasClicked, grind2HotSpot.useHotSpots = Checkbox("Use Auto Hot Spots", grind2HotSpot.useHotSpots);
 
+		wasClicked, grind2MoveToTarget.adjustMeshSmoothness = Checkbox("Bot getting stuck around walls? Check to change nav.", grind2MoveToTarget.adjustMeshSmoothness);
+
 
 		Text("Distance to hotspot - "..math.floor(grind2HotSpot:distanceToHotspot()).." (yd)")
 

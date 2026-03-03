@@ -16,6 +16,8 @@ function _questMenuEX:menu()
 
 	wasClicked, _questMenu.showDBInfo = Checkbox("Show All Quests", _questMenu.showDBInfo);
 
+	wasClicked, grind2MoveToTarget.adjustMeshSmoothness = Checkbox("Bot getting stuck around walls? Check to make longer path nodes.", grind2MoveToTarget.adjustMeshSmoothness);
+
 	if _questMenu.showDBInfo then
 
 		EndWindow()
@@ -52,6 +54,12 @@ function _questMenuEX:menu()
 				self.startAtQuestIndexNum = -1;
 				_questDB.curListQuest = 0
 				_quest.currentQuest = nil
+				for a = 0, GetNumQuestLogEntries() do
+					local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+					if title == _questDB.curListQuest then
+					_quest.currentDesc = _questDB.curDesc;
+					end
+				end
 				_quest.currentDesc = nil
 				_questDB.curDesc = nil
 				_quest.currentMapID = nil
@@ -82,7 +90,9 @@ function _questMenuEX:menu()
 
 			if self.startAtQuestIndexNum ~= -1 and self.startAtQuestIndexNum ~= nil then
 				SameLine();
+				local mapName = _questMenuEX:sortMaps(_questDB.questList[self.startAtQuestIndexNum]['mapID'])
 				Text("[ Quest Name ] - ".._questDB.questList[self.startAtQuestIndexNum]['questName'])
+				Text("					  [ Quest Zone ] - "..mapName);
 				Separator();
 			end
 
@@ -290,7 +300,7 @@ function _questMenuEX:menu()
 			local num = 1
 			for i = _questDB.numQuests - 1, 0, -1 do
 				if _questDB.questList[i]['completed'] == "nnil" then
-					Text(num.." " .._questDB.questList[i]['questName'].. " || Index "..i);
+					Text(num.. " | Index " .. i .. " || " .. _questDB.questList[i]['questName']);
 					num = num + 1;
 				end
 			end
@@ -299,88 +309,162 @@ function _questMenuEX:menu()
 	end
 end
 
--- Reusable function that draws all quests for a given mapID
 function _questMenuEX:drawZoneByID(mapID)
-	local num = 0
+    local num = 0
+    self.showDesc = self.showDesc or {}   -- store checkbox states
 
-	for i = _questDB.numQuests - 1, 0, -1 do
-		local quest = _questDB.questList[i]
+    for i = _questDB.numQuests - 1, 0, -1 do
+        local quest = _questDB.questList[i]
 
-		if quest['mapID'] == mapID then
+        if quest['mapID'] == mapID then
+            if Button("Run " .. i) then
+                self.questToRunByIndex = i
+                _questDB.curListQuest = quest['questName']
+                _quest.currentQuest = quest['questName']
+                _quest.currentType = quest['type']
+                _quest.usingItem = quest['useItem']
+                _quest.gossipOption = quest['gossipOption']
+                _quest.currentMapID = quest['mapID']
+                _quest.currentDesc = quest['desc']
+                _questDB.curDesc = quest['desc']
+            end
 
-			if Button("Run " .. i) then
-				self.questToRunByIndex = i
-				_questDB.curListQuest = quest['questName']
-				_quest.currentQuest = quest['questName']
-				_quest.currentType = quest['type']
-				_quest.usingItem = quest['useItem']
-				_quest.gossipOption = quest['gossipOption']
-				_quest.currentMapID = quest['mapID']
-				_quest.currentDesc = quest['desc']
-				_questDB.curDesc = quest['desc']
-			end
+            SameLine()
+            num = num + 1
 
-			SameLine()
-			num = num + 1
+            local faction = (quest['faction'] == 0) and "Alliance" or "Horde"
+            local compl = (quest['completed'] == "nnil") and "Completed" or "Not Complete"
+            local x, y, z = PlayerPosition()
+            local dist = math.floor(GetDistance3D(x, y, z, quest['pos']['x'], quest['pos']['y'], quest['pos']['z']))
 
-			local faction = (quest['faction'] == 0) and "Alliance" or "Horde"
-			local compl = (quest['completed'] == "nnil") and "Completed" or "Not Complete"
-			local x, y, z = PlayerPosition();
-			local dist = math.floor(GetDistance3D(x, y, z, quest['pos']['x'], quest['pos']['y'], quest['pos']['z']));
+            if self.menuStyle1 then
+                Text(num .. " " .. compl .. " - " .. faction ..
+                     " | Type - " .. quest['type'] ..
+                     " | " .. quest['questName'] ..
+                     " " .. dist .. " (yds)")
 
-			local space = " "
-			if num < 10 then
-				space = " "
-			elseif num > 100 then
-				space = "  "
-			end
+                SameLine()
 
-			local space2 = "";
-			if quest['completed'] == "nnil" then
-				space2 = "   ";
-			end
+                -- Unique checkbox per quest
+                self.showDesc[i] = self.showDesc[i] or false
+                local clicked
+                clicked, self.showDesc[i] = Checkbox("##"..i, self.showDesc[i])
 
-			if self.menuStyle1 then
-				Text(
-					num .. space ..
-					compl .. " - " ..
-					space2 ..
-					faction ..
-					" | Type - " .. quest['type'] ..
-					" | " ..
-					quest['questName'] .. " " ..
-					dist .. " (yds)"
-				)
-				Separator();
-			elseif self.menuStyle2 then
-				Text(
-					num .. space ..
-					compl .. " - " ..
-					faction ..
-					" | Type - " .. quest['type'] ..
-					" | " ..
-					quest['questName'] ..
-					" | " .. dist .. " (yds) \n "
-				)
-				Separator();
-				Text("" .. quest['desc'])
-				Text(" ")
-				Separator()
-			end
-		end
+                if self.showDesc[i] then
+                    Text(quest['desc'])
+                end
+
+                Separator()
+
+            elseif self.menuStyle2 then
+                Text(
+                    num .. " " ..
+                    compl .. " - " ..
+                    faction ..
+                    " | Type - " .. quest['type'] ..
+                    " | " .. quest['questName'] ..
+                    " | " .. dist .. " (yds)\n"
+                )
+                Separator()
+                Text(quest['desc'])
+                Text(" ")
+                Separator()
+            end
+        end
+    end
+end
+
+
+
+function _questMenuEX:sortMaps(mapID)
+
+    if not mapID then
+		return "Unknown"
 	end
-end
+
+    local mapNames = {
+        -- Eastern Kingdoms
+        [1]    = "Dun Morogh",
+        [3]    = "Badlands",
+        [4]    = "Blasted Lands",
+        [8]    = "Swamp of Sorrows",
+        [10]   = "Duskwood",
+        [11]   = "Wetlands",
+        [12]   = "Elwynn Forest",
+        [14]   = "Durotar",
+        [15]   = "Dustwallow Marsh",
+        [17]   = "Barrens",
+        [28]   = "Western Plaguelands",
+        [33]   = "Stranglethorn Vale",
+        [36]   = "Alterac Mountains",
+        [38]   = "Loch Modan",
+        [40]   = "Westfall",
+        [41]   = "Deadwind Pass",
+        [44]   = "Redridge Mountains",
+        [45]   = "Arathi Highlands",
+        [46]   = "Burning Steppes",
+        [47]   = "The Hinterlands",
+        [51]   = "Searing Gorge",
+        [85]   = "Tirisfal Glades",
+        [130]  = "Silverpine Forest",
+        [139]  = "Eastern Plaguelands",
+        [267]  = "Hillsbrad Foothills",
+
+        -- Kalimdor
+        [1377] = "Silithus",
+        [141]  = "Teldrassil",
+        [148]  = "Darkshore",
+        [215]  = "Mulgore",
+        [331]  = "Ashenvale",
+        [357]  = "Feralas",
+        [361]  = "Felwood",
+        [400]  = "Thousand Needles",
+        [405]  = "Desolace",
+        [406]  = "Stonetalon Mountains",
+        [440]  = "Tanaris",
+        [490]  = "Un'Goro Crater",
+        [493]  = "Moonglade",
+        [618]  = "Winterspring",
+        [16]   = "Azshara",
+        [1637] = "Orgrimmar",
+        [1638] = "Thunder Bluff",
+        [1657] = "Darnassus",
+
+        -- Capitals
+        [1519] = "Stormwind City",
+        [1537] = "Ironforge",
+        [1497] = "Undercity",
+		[1637] = "Orgrimmar",
+		[1638] = "Thunder Bluff",
+		[1657] = "Darnassus",
 
 
--- Your UI stays clean and readable:
-if CollapsingHeader(">>> |+| Tirisfal Glades") then
-	DrawQuestListForMap(85)
-end
+        -- Dungeons & Raids (Classic)
+        [209]  = "Shadowfang Keep",
+        [389]  = "Ragefire Chasm",
+        [43]   = "Wailing Caverns",
+        [47]   = "Razorfen Kraul",
+        [129]  = "Razorfen Downs",
+        [70]   = "Uldaman",
+        [90]   = "Gnomeregan",
+        [189]  = "Scarlet Monastery",
+        [289]  = "Scholomance",
+        [329]  = "Stratholme",
+        [229]  = "Blackrock Spire",
+        [230]  = "Blackrock Depths",
+        [409]  = "Molten Core",
+        [469]  = "Blackwing Lair",
+        [249]  = "Onyxia's Lair",
+        [309]  = "Zul'Gurub",
+        [509]  = "Ruins of Ahn'Qiraj",
+        [531]  = "Temple of Ahn'Qiraj",
+        [2557] = "Dire Maul",
 
-if CollapsingHeader(">>> |+| Dun Morogh") then
-	DrawQuestListForMap(1)
-end
+        -- Battlegrounds
+        [2597] = "Alterac Valley",
+        [3277] = "Warsong Gulch",
+        [3358] = "Arathi Basin",
+    }
 
-if CollapsingHeader(">>> |+| Elwynn Forest") then
-	DrawQuestListForMap(12)
+    return mapNames[mapID] or ("Unknown Map (" .. mapID .. ")")
 end

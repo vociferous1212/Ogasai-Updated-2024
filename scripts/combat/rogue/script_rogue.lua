@@ -210,7 +210,7 @@ function script_rogue:run(targetGUID)
 		if (targetObj ~= 0) and (not localObj:IsStunned()) then
 
 			-- primitive throw if target has adds
-			if self.useThrow and GetLocalPlayer():HasRangedWeapon() and script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
+			if self.useThrow and GetLocalPlayer():HasRangedWeapon() and not script_grind:isTargetBlacklisted(targetObj:GetGUID()) and not IsInCombat() then 
 				if targetObj:GetDistance() <= 30 and targetObj:GetDistance() > 13 and targetObj:IsInLineOfSight()  then
 					if IsMoving() then
 						StopMoving();

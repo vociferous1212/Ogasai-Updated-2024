@@ -17,6 +17,8 @@ grind2MoveToTarget = {
 	goToX = 0,
 	goToY = 0,
 	goToZ = 0,
+
+	adjustMeshSmoothness = false,
 	
 
 }
@@ -72,7 +74,11 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	end
 	
 -- set nav smoothness
-	NavmeshSmooth(self.nextNavNodeDistance/2);
+	if not self.adjustMeshSmoothness then
+		NavmeshSmooth(self.nextNavNodeDistance/2);
+	else
+		NavmeshSmooth(self.nextNavNodeDistance+1);
+	end
 
 -- get current position
 	local myX, myY, myZ = PlayerPosition();

@@ -323,9 +323,8 @@ local localObj = GetLocalPlayer();
 		end
 		if (vendorStatus == 0) then
 			script_vendor:sell();
-			return true;
 		end
-	return true;
+	return;
 	end
 
 -- avoid elites...
@@ -497,7 +496,7 @@ local localObj = GetLocalPlayer();
 
 	-- get a target to run combat
 		-- only get a target if at the grind spot and quest is complete , or in combat already
-	if (_quest.currentType == 1 or _quest.currentType == 12) or IsInCombat() then
+	if ((_quest.currentType == 1 or _quest.currentType == 12) or _quest.currentType == 2 and _questDBTargets.target ~= nil) or IsInCombat() then
 		if (_quest.grindSpotReached and not _quest.isQuestComplete) or IsInCombat() then
 			if not Player():IsDead() and not _quest.needRest and GetTimeEX() > _questDoCombat.targetingTimer then
 				if IsInCombat() or (_quest.currentQuest ~= nil and _quest.curGrindX ~= 0) then
@@ -689,7 +688,7 @@ end
 --]]
 
 
-	-- return a completed quest to quest return target
+	-- return a completed quest to quest return target - return a quest - return quest
 	if self.currentQuest ~= nil and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil and not IsInCombat() then
 		if (AreBagsFull()) then
 			_questEX.bagsFull = true

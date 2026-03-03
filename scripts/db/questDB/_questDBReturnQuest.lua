@@ -29,12 +29,16 @@ function _questDBReturnQuest:returnAQuest()
 	local questIsComplete = false;
 	local hasQuest = false;
 
-		for a = 0, GetNumQuestLogEntries() do
+		for a = 0, GetNumQuestLogEntries() + 10 do
 			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
-			if title == _questDB.curListQuest then
+			if title == _quest.currentQuest then
 				hasQuest = true;
-				if isComplete then
+				if isComplete == 1 then
 					questIsComplete = true;
+				end
+				if isComplete == -1 then
+					SetAbandonQuest(a);
+					AbandonQuest(a);
 				end
 			end
 		end
