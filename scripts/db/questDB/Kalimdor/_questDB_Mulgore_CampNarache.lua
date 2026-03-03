@@ -38,7 +38,7 @@ if GetMyClass() == "WARRIOR" then
 	_questDB:addQuest("no", 1, "Simple Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2880.4299316406, -213.02000427246, 54.821006774902, "Harutt Thunderhorn", 0, 0, 0, 0, 0, 0, "Read the Simple Note and speak to Harutt Thunderhorn in Camp Narache.", 0, 2);
 end
 if GetMyClass() == "DRUID" then
-_questDB:addQuest("no", 1, "Verdant Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.5700683594, -268.59100341797, 53.916873931885, "Gart Mistrunner", 0, 0, 0, 0, 0, 0, "Read the Verdant Note and speak to Gart Mistrunner in Camp Narache. \n", 0, 2);
+	_questDB:addQuest("no", 1, "Verdant Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940937042236, 215, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.5700683594, -268.59100341797, 53.916873931885, "Gart Mistrunner", 0, 0, 0, 0, 0, 0, "Read the Verdant Note and speak to Gart Mistrunner in Camp Narache.", 0, 2);
 end
 if GetMyClass() == "SHAMAN" then
 	_questDB:addQuest("no", 1, "Rune-Inscribed Note", "Grull Hawkwind", -2912.6999511719, -257.54000854492, 52.940914154053, 215, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2873.8798828125, -264.70901489258, 53.916511535645, "Meela Dawnstrider", 0, 0, 0, 0, 0, 0, "Read the Rune-Inscribed Note and speak to Meela Dawnstrider in Camp Narache.", 0, 2);

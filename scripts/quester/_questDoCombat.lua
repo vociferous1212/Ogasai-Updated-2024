@@ -17,7 +17,7 @@ function _questDoCombat:doCombat()
 
 	-- flee combat
 	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() and IsInCombat() then
-		if grind2IsTargetingMe:target(GetTarget()) and PlayerHealth() >= 15 and IsInCombat() and PlayerLevel() >= 6 and ((GetTarget():GetHealthPercentage() > PlayerHealth() and PlayerHealth() <= 60) or (NumberTargetsAttackingPlayer() > 2) and PlayerHealth() <= 75) then
+		if grind2IsTargetingMe:target(GetTarget()) and PlayerHealth() >= 15 and IsInCombat() and (PlayerLevel() >= 6 or GetRealmName() == "Permadeath - EU") and ((GetTarget():GetHealthPercentage() > PlayerHealth() and PlayerHealth() <= 60) or (NumberTargetsAttackingPlayer() > 2) and PlayerHealth() <= 75) then
 		
 			local x, y z = 0, 0, 0;
 			_quest.enemyTarget = nil;

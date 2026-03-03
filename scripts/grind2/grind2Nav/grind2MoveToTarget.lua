@@ -52,6 +52,12 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 		if player:GetSpeed() >= 10 or IsMounted() then
 			self.nextNavNodeDistance = 8;
 		end
+
+		local a, b = Player():GetSpeed();
+		if b == 70 then
+			self.nextNavNodeDistance = 30;
+		end
+		
 	end
 
 -- set timer

@@ -181,14 +181,20 @@ if (not script_unstuck:pathClearAuto(2)) then
 
 			if not IsMoving() then
 				if (GetTarget():UnitInteract()) then
-					SelectGossipOption(1)
-					if ClassTrainerFrame:IsVisible() then
-						for i = 1, GetNumTrainerServices() do
-							BuyTrainerService(i);
+					if PlayerHasTarget() then
+						SelectGossipOption(1)
+						if ClassTrainerFrame:IsVisible() then
+							self.waitTimer = GetTimeEX() + 1000;
+							_quest.waitTimer = GetTimeEX() + 1000;
+							for i = 1, GetNumTrainerServices() do
+								BuyTrainerService(i);
+								_quest.waitTimer = GetTimeEX() + 1000;
+
+							end
 						end
 					end
-					ClearTarget();
 				end
+				ClearTarget();
 			end	
 		end
 

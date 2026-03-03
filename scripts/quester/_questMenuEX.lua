@@ -4,6 +4,10 @@
 
 	startAtQuestIndexNum = -1,
 
+	menuStyle1 = true,
+
+	menuStyle2 = false,
+
 
 }
 
@@ -18,15 +22,31 @@ function _questMenuEX:menu()
 
 		if NewWindow("Quest Info", 320, 320) then
 
+			if PlayerLevel() <= 6 then
+				Text("Quest givers in starter areas levels 1-6 are missing server-side function arugments.");
+				Text("Cannot reliably auto-complete these quests in order if quest order is disturbed!");
+				Text("Coded specific options to select each quest different from the rest.")
+				Text(" ");
+				Separator();
+			end
+
 			if _quest.currentQuest ~= nil then
-				Text("Current Quest - ".._quest.currentQuest.." | ID : ".._questDB.currentIndex);
-			elseif _questDB.curListQuest ~= nil then
-				Text("Quest To Obtain - ".._questDB.curListQuest.." | ID: ".._questDB.currentIndex);
+				Text("[ Current Quest ] - ".._quest.currentQuest.." - [ Index ID ] : ".._questDB.currentIndex);
+			elseif _questDB.curListQuest ~= nil and _questDB.currentIndex >= 0 then
+				local x, y, z = PlayerPosition();
+				local dist = math.floor(GetDistance3D(x, y, z, _questDB.questList[_questDB.currentIndex]['pos']['x'],  _questDB.questList[_questDB.currentIndex]['pos']['y'],  _questDB.questList[_questDB.currentIndex]['pos']['z']));
+				Text("[ Quest To Obtain ] - ".._questDB.curListQuest.." - " .. dist .. " (yds) - [ Index ID ] : ".._questDB.currentIndex);
 			end
 			Separator();
 
-			Text("			")
-			SameLine();
+			if not _quest.weHaveQuest then
+				Text(" ");
+				Text("Auto Complete Quest In DB Timer - ");
+				local removeQuestEntryTime = math.floor((_questAcceptQuest.noQuestTimer - GetTimeEX()) / 1000);
+				SameLine();
+				Text(removeQuestEntryTime.." seconds")
+			end
+
 			if Button("Reset Quest Index") then
 				self.questToRunByIndex = -1;
 				self.startAtQuestIndexNum = -1;
@@ -41,8 +61,12 @@ function _questMenuEX:menu()
 
 			end
 
-			
-			Text("Start Quest Index");
+			if self.startAtQuestIndexNum < 100 then
+				Text("[ Start Quest Index ] "..self.startAtQuestIndexNum.." ");
+			else
+				Text("[ Start Quest Index ] "..self.startAtQuestIndexNum);
+			end
+
 			SameLine();
 			self.startAtQuestIndexNum = SliderInt("", -1, _questDB.numQuests -1, self.startAtQuestIndexNum);
 
@@ -52,16 +76,30 @@ function _questMenuEX:menu()
 					_questDB:getQuestStartPos()
 					self.startAtQuestIndexNum = -1;
 				end
+			else
+				Separator();
 			end
+
 			if self.startAtQuestIndexNum ~= -1 and self.startAtQuestIndexNum ~= nil then
 				SameLine();
-				Text("Quest Name - ".._questDB.questList[self.startAtQuestIndexNum]['questName'])
+				Text("[ Quest Name ] - ".._questDB.questList[self.startAtQuestIndexNum]['questName'])
 				Separator();
 			end
 
 
 			Text("	* Not all of these have been tested! *");
 			Text("	* Ordered by number to complete *")
+
+			Separator();
+
+			wasClicked, self.menuStyle1 = Checkbox("[ Compact Menu Style ]", self.menuStyle1);
+
+			if not self.menuStyle1 then
+				self.menuStyle2 = true;
+			end
+			if not self.menuStyle2 then
+				self.menuStyle1 = true;
+			end
 
 			local x, y, z = GetLocalPlayer():GetPosition();
 
@@ -249,9 +287,11 @@ function _questMenuEX:menu()
 
 			Text("			Completed Quests")
 			Text("__________________________________________________________")
-			for i = 0, _questDB.numQuests - 1 do
+			local num = 1
+			for i = _questDB.numQuests - 1, 0, -1 do
 				if _questDB.questList[i]['completed'] == "nnil" then
-					Text("Completed - " .._questDB.questList[i]['questName'].. " || Index "..i);
+					Text(num.." " .._questDB.questList[i]['questName'].. " || Index "..i);
+					num = num + 1;
 				end
 			end
 
@@ -285,6 +325,8 @@ function _questMenuEX:drawZoneByID(mapID)
 
 			local faction = (quest['faction'] == 0) and "Alliance" or "Horde"
 			local compl = (quest['completed'] == "nnil") and "Completed" or "Not Complete"
+			local x, y, z = PlayerPosition();
+			local dist = math.floor(GetDistance3D(x, y, z, quest['pos']['x'], quest['pos']['y'], quest['pos']['z']));
 
 			local space = " "
 			if num < 10 then
@@ -293,14 +335,38 @@ function _questMenuEX:drawZoneByID(mapID)
 				space = "  "
 			end
 
-			Text(
-				num .. space ..
-				compl .. " - " ..
-				faction .. " | " ..
-				quest['questName'] ..
-				" | Type - " .. quest['type']
-			)
-			Separator()
+			local space2 = "";
+			if quest['completed'] == "nnil" then
+				space2 = "   ";
+			end
+
+			if self.menuStyle1 then
+				Text(
+					num .. space ..
+					compl .. " - " ..
+					space2 ..
+					faction ..
+					" | Type - " .. quest['type'] ..
+					" | " ..
+					quest['questName'] .. " " ..
+					dist .. " (yds)"
+				)
+				Separator();
+			elseif self.menuStyle2 then
+				Text(
+					num .. space ..
+					compl .. " - " ..
+					faction ..
+					" | Type - " .. quest['type'] ..
+					" | " ..
+					quest['questName'] ..
+					" | " .. dist .. " (yds) \n "
+				)
+				Separator();
+				Text("" .. quest['desc'])
+				Text(" ")
+				Separator()
+			end
 		end
 	end
 end

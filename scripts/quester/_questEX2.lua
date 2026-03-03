@@ -256,7 +256,8 @@ function _questEX2:doChecks()
 	if (script_grind.getSpells) and (not IsInCombat()) then
 		if script_getSpells.getSpellsStatus > 0 then
 		if (PlayerHasTarget()) and not IsInCombat() then
-				ClearTarget()
+				ClearTarget();
+				_quest.enemyTarget = nil;
 			end
 			return true
 		end

@@ -14,10 +14,16 @@ function _questAcceptQuest:run()
 	if _quest.curQuestGiver ~= nil and PlayerLevel() > 1 then
 		if PlayerHasTarget() then
 			if GetTarget():GetUnitName() == _quest.curQuestGiver then
-				if GetTimeEX() >= self.noQuestTimer then
-					DEFAULT_CHAT_FRAME:AddMessage("Timer ran out - Removing quest entry");
-					_questDBHandleDB:turnQuestCompleted();
-					self.noQuestTimer = GetTimeEX() + 15000;
+				local title = nil;
+				for a = 0, GetNumQuestLogEntries() do
+					title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+				end
+				if title ~= _questDB.curListQuest then
+					if GetTimeEX() >= self.noQuestTimer then
+						DEFAULT_CHAT_FRAME:AddMessage("Timer ran out - Removing quest entry");
+						_questDBHandleDB:turnQuestCompleted();
+						self.noQuestTimer = GetTimeEX() + 15000;
+					end
 				end
 			end
 		end
@@ -28,6 +34,13 @@ function _questAcceptQuest:run()
 		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
 		if title == _questDB.curListQuest then
 			questIsInQuestLog = true;
+		end
+	end
+
+	if _quest.distToGiver <= 4 and not questIsInQuestLog then
+		if IsMoving() then
+			StopMoving();
+			return true;
 		end
 	end
 
@@ -45,31 +58,32 @@ function _questAcceptQuest:run()
 
 		local px, py, pz = PlayerPosition();
 
-			-- set return target name
-			local name = _quest.curQuestGiver;
+		-- set return target name
+		local name = _quest.curQuestGiver;
 		
-			-- target the questgiver
-			if not PlayerHasTarget() and name ~= nil then
-				TargetByName(name);
-			end
+		-- target the questgiver
+		if not PlayerHasTarget() and name ~= nil then
+			TargetByName(name);
+		end
 
-			if PlayerHasTarget() then
-				if GetTarget():GetUnitName() ~= name then
-					ClearTarget();
-					return;
-				end
+		--[[
+		if PlayerHasTarget() and name ~= nil then
+			if GetTarget():GetUnitName() ~= name then
+				ClearTarget();
 			end
+		end
+		--]]
 
-			if PlayerHasTarget() then
+		if PlayerHasTarget() then
 	
-				-- if target is quest return target and it is in line of sight then
-						-- check line of sight because nav is messy and some quests move just close enough to do Move() function instead of nav
-				if GetTarget():GetUnitName() == name and GetTarget():IsInLineOfSight() then
+			-- if target is quest return target and it is in line of sight then
+					-- check line of sight because nav is messy and some quests move just close enough to do Move() function instead of nav
+			if GetTarget():GetUnitName() == name and GetTarget():IsInLineOfSight() then
 	
-					-- chase moving quest targets... get their position again
-					_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = GetTarget():GetPosition();
-				end
+				-- chase moving quest targets... get their position again
+				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = GetTarget():GetPosition();
 			end
+		end
 
 		-- we have a quest giver
 		if _quest.curQuestGiver ~= nil then
@@ -96,6 +110,8 @@ function _questAcceptQuest:run()
 					return;
 					end
 
+					_quest.curQuestGiver = GetTarget();
+
 					-- check how many quests the quest giver has and sort the gossip options to match quest name
 					local quest1, quest1Level, quest2, quest2Level, quest3, quest3Level, _, _, _, _ = GetGossipAvailableQuests()
 					local gossipOption = 1;
@@ -111,9 +127,13 @@ function _questAcceptQuest:run()
 						--_questAcceptQuest.noQuestTimer = 20000;
 						end
 
-						-- if there is only 1 quest then make sure to use gossip option 1
-						if GetGossipAvailableQuests() ~= nil and quest2 == nil then
-							gossipOption = 1;
+						if _questDB.curDesc ~= GetObjectiveText() and GetObjectiveText() ~= nil and GetObjectiveText() ~= "" and GetObjectiveText() ~= 0 then
+							CloseQuest();
+							_quest.waitTimer = GetTimeEX() + 2500;
+							-- shorten then timer
+							if _questAcceptQuest.noQuestTimer > GetTimeEX() + 9000 then
+								_questAcceptQuest.noQuestTimer = GetTimeEX() + 9000;
+							end
 						end
 
 						-- set gossip option for the quest that matches current quest

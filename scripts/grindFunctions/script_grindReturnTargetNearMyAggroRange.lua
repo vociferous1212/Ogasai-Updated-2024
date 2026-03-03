@@ -24,7 +24,7 @@ function script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange()
 
 				local range = GetDistance3D(mx, my, mz, tx, ty, tz);
 
-				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 21;
+				local aggro = i:GetLevel() - GetLocalPlayer():GetLevel() + 19.5;
 
 				if GetRealmName() == "Permadeath - EU" then
 
@@ -36,7 +36,7 @@ function script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange()
 				end
 
 				if GetRealmName() == "Kalidar" or GetRealmName() == "Ashen Vanilla" then
-					aggro = i:GetLevel() - PlayerLevel() + 19.5;
+					aggro = i:GetLevel() - PlayerLevel() + 19.1;
 				end
 
 				if range <= aggro then

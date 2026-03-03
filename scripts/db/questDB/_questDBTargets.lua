@@ -82,12 +82,14 @@ function _questDBTargets:getTarget()
 			local i, t = GetFirstObject();
 			while i ~= 0 do
 				if t == 3 then
-					if grind2IsTargetingMe:target(i) then
-						hp = i:GetHealthPercentage();
+					if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
+						if i:GetUnitsTarget():GetGUID() == Player():GetGUID() then
+							hp = i:GetHealthPercentage();
 
-						if bestHealth > hp then
-							bestHealth = hp;
-							bestTarget = i;
+							if bestHealth > hp then
+								bestHealth = hp;
+								bestTarget = i;
+							end
 						end
 					end
 				end

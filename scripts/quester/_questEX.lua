@@ -59,7 +59,7 @@ function _questEX:doChecks()
 			if not PlayerHasTarget() then
 				_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
 			end
-			_quest:setTimer(2000);
+			_quest:setTimer(500);
 			return true;
 		end
 	end

@@ -27,36 +27,42 @@ function _questDBHandleDB:turnQuestCompleted()
 
 			or (_quest.isQuestCompleted and GetNumQuestLogEntries() < 1) then
 
-				if _questDB.questList[i]['questName'] == _questDB.curListQuest and _questDB.questList[i]['desc'] == _questDB.curDesc then
-					if _questDB.questList[i]['completed'] == "no" and _questDB.questList[i]['questName'] ~= "nnil" then
-					DEFAULT_CHAT_FRAME:AddMessage(
-					"Quest marked as complete - |cffff0000" .. 
-					(_questDB.curListQuest or "Unknown") .. 
-					"|r  (index |cff00aaff" .. i .. "|r)"
-					)
-						--ToFile("".._questDB.curListQuest.." - completed");
+				local title = nil;
+				for a = 0, GetNumQuestLogEntries() do
+					title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+				end
+				if title ~= _questDB.curListQuest then
+					if _questDB.questList[i]['questName'] == _questDB.curListQuest and _questDB.questList[i]['desc'] == _questDB.curDesc then
+						if _questDB.questList[i]['completed'] == "no" and _questDB.questList[i]['questName'] ~= "nnil" then
+						DEFAULT_CHAT_FRAME:AddMessage(
+						"Quest marked as complete - |cffff0000" .. 
+						(_questDB.curListQuest or "Unknown") .. 
+						"|r  (index |cff00aaff" .. i .. "|r)"
+						)
+							--ToFile("".._questDB.curListQuest.." - completed");
 
-						_questDB.curListQuest = nil;
+							_questDB.curListQuest = nil;
 
-						_questDB.curDesc = nil;
+							_questDB.curDesc = nil;
 
-						_quest.currentQuest = nil;
+							_quest.currentQuest = nil;
 
-						_questDB.questList[i]['completed'] = "nnil";
+							_questDB.questList[i]['completed'] = "nnil";
 			
-						CloseQuest();
+							CloseQuest();
 
-						_quest.weHaveQuest = false;
+							_quest.weHaveQuest = false;
 
-						_quest.questIsComplete = false;
+							_quest.questIsComplete = false;
 
-						_quest.grindSpotReached = false;
+							_quest.grindSpotReached = false;
 
-						--_questDB.questList[i]['questName'] = "nnil";
-						_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
-						_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
+							--_questDB.questList[i]['questName'] = "nnil";
+							_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = _questDB:getQuestGrindPos();
+							_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos();
 
-					return true;
+						return true;
+						end
 					end
 				end
 			end

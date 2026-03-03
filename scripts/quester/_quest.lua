@@ -2,27 +2,21 @@ _quest = {
 
 	message = "Quester",
 
-	usingQuester = false,
+	usingQuester = false,	-- using this script - tell other scripts
 
-	pause = true,
+	pause = true,	-- pause script
 
-	isSetup = false,
+	isSetup = false,	-- run setup function once
 
-	tickRate = .5,
+	tickRate = .5,	-- script speed - currently set to 0 in script
 
-	currentQuest = nil,
+	currentQuest = nil,	-- current quest chosen to run
 
-	enemyTarget = nil,
+	enemyTarget = nil,	-- enemy target
 
-	targetKilledNum = 0,
+	targetKilledNum = 0, targetKilledNum2 = 0, targetKilledNum3 = 0,	-- DB targets to kill for quests
 
-	targetKilledNum2 = 0,
-
-	targetKilledNum3 = 0,
-
-	gatheredNum = 0,
-
-	gatheredNum2 = 0,
+	gatheredNum = 0, gatheredNum2 = 0,
 
 	isQuestComplete = false,
 
@@ -30,42 +24,55 @@ _quest = {
 
 	grindSpotReached = false,
 
-	curGrindX = 0,
+	curGrindX = 0, curGrindY = 0, curGrindz = 0,
 
-	curGrindY = 0,
+	curQuestX = 0, curQuestY = 0, curQuestZ = 0,
 
-	curGrindz = 0,
-
-	curQuestX = 0,
-
-	curQuestY = 0,
-	curQuestZ = 0,
 	weHaveQuest = false, 
+
 	autoComplete = true,
+
 	currentDesc = nil,
-	returningQuest = false,
-	xp = 0,
+
 	currentType = nil,
+
 	usingItem = nil,
+
 	gossipOption = nil,
+
 	distToGrindFromHotspot = 275,
+
 	currentMapID = 0,
+
 	killStuffOnRoute = true,
+
 	curQuestGiver = nil,
+
 	curQuestName = nil,
+
 	distToGiver = 0,
+
 	distToGrind = 0,
-	unstuckTimer = 0,
+
+	unstuckTimer = GetTimeEX(),
 
 	lootTimer = GetTimeEX(),
+
 	faceTargetTimer = GetTimeEX(),
+
 	targetingTimer2 = GetTimeEX(),
+
 	setQuestTimer = GetTimeEX(),
+
 	sortQuestTimer = GetTimeEX(),
+
 	turnQuestCompleteTimer = GetTimeEX(),
+
 	getQuestGiverTimer = GetTimeEX(),
+
 	checkBagTimer = GetTimeEX(),
-		waitTimer = GetTimeEX(),
+
+	waitTimer = GetTimeEX(),
 
 
 	includeAllFilesIncluded = include("scripts\\quester\\_questIncludeFiles.lua"),
@@ -187,7 +194,7 @@ local localObj = GetLocalPlayer();
 		-- flee combat if PlayerHealth() and PlayerMana() are low, or being attacking by too many targets
 		-- mainly for hardcore
 	if not self.pause and IsInCombat() and grind2FleeCombat.fleeCombat then 
-		if grind2SaveCoordinates.numberOfLocations >= 3 and PlayerLevel() >= 6 and not Player():IsDead() then
+		if grind2SaveCoordinates.numberOfLocations >= 3 and (PlayerLevel() >= 6 or GetRealmName() == "Permadeath - EU") and not Player():IsDead() then
 			if (grind2FleeCombat.healthToFlee >= PlayerHealth() and grind2FleeCombat.manaToFlee >= PlayerMana()) or (NumberTargetsAttackingPlayer() >= 2 and grind2FleeCombat.fleeWithAdds) then
 				grind2FleeCombat:run();
 				self.message = "Fleeing combat";
@@ -214,7 +221,7 @@ local localObj = GetLocalPlayer();
 
 	-- flee combat
 	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() and IsInCombat() then
-		if grind2IsTargetingMe:target(GetTarget()) and PlayerHealth() >= 15 and IsInCombat() and PlayerLevel() >= 6
+		if grind2IsTargetingMe:target(GetTarget()) and PlayerHealth() >= 15 and IsInCombat() and (PlayerLevel() >= 6 or GetRealmName() == "Permadeath - EU")
 		and ((GetTarget():GetHealthPercentage() > PlayerHealth() and PlayerHealth() <= 60) or (NumberTargetsAttackingPlayer() > 2)
 		and PlayerHealth() <= 75) then
 		
@@ -262,7 +269,7 @@ local localObj = GetLocalPlayer();
 	if _questDB.curListQuest == nil then
 	--	coremenu:reload();
 		if not self.noQuestsToRun then
-			DEFAULT_CHAT_FRAME:AddMessage("No quest found to run");
+			DEFAULT_CHAT_FRAME:AddMessage("No quest found to run, or current quest in quest log is not enetered into DB correctly");
 			if runOgasai.usingRunOgasai then
 				DEFAULT_CHAT_FRAME:AddMessage("Running grinder");
 			end
@@ -451,7 +458,9 @@ local localObj = GetLocalPlayer();
 		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
 			script_grind.monsterKillCount = script_grind.monsterKillCount + 1;
 			grind2SaveCoordinates:saveTargetsLocation(self.enemyTarget);
-			_quest.waitTimer = GetTimeEX() + 750;
+			if not IsAnyTargetTargetingPlayer() then
+				_quest.waitTimer = GetTimeEX() + 750;
+			end
 		end
 		self.enemyTarget = nil;
 		ClearTarget();
@@ -460,7 +469,7 @@ local localObj = GetLocalPlayer();
 	if IsInCombat() then
 		self.tickRate = 0;
 	elseif not IsInCombat() then
-		self.tickRate = .1;
+		self.tickRate = .05;
 	end
 
 	_questEX:doChecks();
@@ -488,11 +497,13 @@ local localObj = GetLocalPlayer();
 
 	-- get a target to run combat
 		-- only get a target if at the grind spot and quest is complete , or in combat already
-	if (_quest.grindSpotReached and not _quest.isQuestComplete) or IsInCombat() then
-		if not Player():IsDead() and not _quest.needRest and GetTimeEX() > _questDoCombat.targetingTimer then
-			if IsInCombat() or (_quest.currentQuest ~= nil and _quest.curGrindX ~= 0 and _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5 and _quest.currentType ~= 11) then
-				_quest.enemyTarget = _questDBTargets:getTarget();
-				_questDoCombat.targetingTimer = GetTimeEX() + 1500;
+	if (_quest.currentType == 1 or _quest.currentType == 12) or IsInCombat() then
+		if (_quest.grindSpotReached and not _quest.isQuestComplete) or IsInCombat() then
+			if not Player():IsDead() and not _quest.needRest and GetTimeEX() > _questDoCombat.targetingTimer then
+				if IsInCombat() or (_quest.currentQuest ~= nil and _quest.curGrindX ~= 0) then
+					_quest.enemyTarget = _questDBTargets:getTarget();
+					_questDoCombat.targetingTimer = GetTimeEX() + 1500;
+				end
 			end
 		end
 	end
@@ -640,7 +651,7 @@ end
 --]]
 
 -- sort current quest
-	if GetTimeEX() > self.sortQuestTimer then
+	if GetTimeEX() > self.sortQuestTimer and not IsInCombat() then
 		if _questSortCurrentQuest:run() then
 			self.waitTimer = GetTimeEX() + 500;
 			self.sortQuestTimer = GetTimeEX() + 2000;
@@ -793,13 +804,13 @@ end
 					end
 				end
 
-				if PlayerHasTarget() then
-					if GetTarget():GetUnitName() == _quest.curQuestGiver and GetTarget():GetDistance() <= 2 then
-						if IsMoving() then
-							StopMoving();
-						end
-					end
-				end
+				-- PlayerHasTarget() then
+				--	if GetTarget():GetUnitName() == _quest.curQuestGiver and GetTarget():GetDistance() <= 2 then
+				--		if IsMoving() then
+				--			StopMoving();
+				--		end
+				--	end
+				--end
 
 				if _quest.distToGiver >= 4 then
 					grind2MoveToTarget:run(GetLocalPlayer(), _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
@@ -807,6 +818,7 @@ end
 
 				if not IsInCombat() and not IsMoving() and not IsPathLoaded(5) and _quest.distToGiver > 4 then
 					Move(_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
+					return false;
 				end
 			end
 		end
@@ -827,7 +839,7 @@ end
 	end	
 
 -- run quester gather for quest items
-	if _quest.currentType == 2 and not IsInCombat() and script_grind.lootObj == nil then
+	if _quest.currentType == 2 and not IsInCombat() and script_grind.lootObj == nil and questIsInQuestLog then
 		
 		_questDBGatherGetInventory:getItemsInInventory()
 
@@ -842,7 +854,7 @@ end
 	end
 	--if IsInCombat() then if IsMoving() then StopMoving(); return true; end return; end
 	-- we have a quest so go to grind spot
-	if _quest.questType ~= 0 and not IsAnyTargetTargetingPlayer() and _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not IsLooting()
+	if questIsInQuestLog and _quest.questType ~= 0 and not IsAnyTargetTargetingPlayer() and _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not IsLooting()
 	and (script_grind.lootObj == nil or script_grind.skipLooting or AreBagsFull()) and not IsCasting() and not IsChanneling() then
 		if (_quest.distToGrind > 40 and _quest.currentType ~= 3 and _quest.currentType ~= 4 and not _quest.grindSpotReached)
 		or (_quest.currentType == 3 or _quest.currentType == 4 or _quest.curentType == 5 or _quest.currentType == 11 and _quest.distToGrind > 5) then
@@ -859,7 +871,7 @@ end
 			if not IsInCombat() then
 				grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 			end
-			if not IsMoving() and not IsPathLoaded(5) and not IsInCombat() then
+			if not IsMoving() and not IsPathLoaded(5) and not IsInCombat() and script_grind.lootObj ~= nil then
 				Move(_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
 			end
 			if PlayerHasTarget() and not IsInCombat() then
