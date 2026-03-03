@@ -70,497 +70,91 @@ function _questMenuEX:menu()
 			end
 			
 			local wasClicked = false;
+
 			if CollapsingHeader("Eastern Kingdoms") then
+
 				if CollapsingHeader(">>> |+| Tirisfal Glades") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 85 then
-							if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(85)
 				end
+
 				if CollapsingHeader(">>> |+| Dun Morogh") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 1 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(1)
 				end
+
 				if CollapsingHeader(">>> |+| Elwynn Forest") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 12 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-								
-								--_questDB:getQuestStartPos()
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(12)
 				end
+
 				if CollapsingHeader(">>> |+| Westfall") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 40 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(40)
 				end
+
 				if CollapsingHeader(">>> |+| Loch Modan") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 38 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(38)
 				end
+
 				if CollapsingHeader(">>> |+| Silverpine Forest") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 130 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(130)
 				end
-				
+
 				if CollapsingHeader(">>> |+| Redridge Mountains") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 44 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(44)
 				end
-
 
 				if CollapsingHeader(">>> |+| Duskwood") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 10 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-
-						end
-					end
+					_questMenuEX:drawZoneByID(10)
 				end
 
 				if CollapsingHeader(">>> |+| Hillsbrad Foothills") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 267 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
+					_questMenuEX:drawZoneByID(267)
+				end
 
-						end
-					end
+				if CollapsingHeader(">>> |+| Wetlands") then
+					_questMenuEX:drawZoneByID(11)
+				end
+
+				if CollapsingHeader(">>> |+| Alterac Mountains") then
+					_questMenuEX:drawZoneByID(36)
+				end
+
+				if CollapsingHeader(">>> |+| Arathi Highlands") then
+					_questMenuEX:drawZoneByID(45)
 				end
 
 				if CollapsingHeader(">>> |+| Stranglethorn Vale") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 33 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
+					_questMenuEX:drawZoneByID(33)
+				end
 
-						end
-					end
+				if CollapsingHeader(">>> |+| Swamp of Sorrows") then
+					_questMenuEX:drawZoneByID(8)
+				end
+
+				if CollapsingHeader(">>> |+| Badlands") then
+					_questMenuEX:drawZoneByID(3)
 				end
 
 				if CollapsingHeader(">>> |+| Searing Gorge") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 51 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(51)
+				end
+
+				if CollapsingHeader(">>> |+| Burning Steppes") then
+					_questMenuEX:drawZoneByID(46)
+				end
+
+				if CollapsingHeader(">>> |+| Blasted Lands") then
+					_questMenuEX:drawZoneByID(4)
+				end
+
+				if CollapsingHeader(">>> |+| Deadwind Pass") then
+					_questMenuEX:drawZoneByID(41)
+				end
+
+				if CollapsingHeader(">>> |+| Eastern Plaguelands") then
+					_questMenuEX:drawZoneByID(23)
+				end
+
+				if CollapsingHeader(">>> |+| Western Plaguelands") then
+					_questMenuEX:drawZoneByID(22)
 				end
 
 
@@ -574,397 +168,78 @@ function _questMenuEX:menu()
 			if CollapsingHeader("Kalimdor") then
 
 				if CollapsingHeader(">>> |+| Teldrassil") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 141 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(141)
 				end
+
 				if CollapsingHeader(">>> |+| Mulgore") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 215 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(215)
 				end
+
 				if CollapsingHeader(">>> |+| Durotar") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 14 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(14)
 				end
-				if CollapsingHeader(">>> |+| The Barrens") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 17 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
-				end
+
 				if CollapsingHeader(">>> |+| Darkshore") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 148 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(148)
 				end
+
+				if CollapsingHeader(">>> |+| The Barrens") then
+					_questMenuEX:drawZoneByID(17)
+				end
+
 				if CollapsingHeader(">>> |+| Stonetalon Mountains") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 406 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(406)
 				end
+
+				if CollapsingHeader(">>> |+| Ashenvale") then
+					_questMenuEX:drawZoneByID(331)
+				end
+
 				if CollapsingHeader(">>> |+| Thousand Needles") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 400 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(400)
 				end
+
+				if CollapsingHeader(">>> |+| Desolace") then
+					_questMenuEX:drawZoneByID(405)
+				end
+
+				if CollapsingHeader(">>> |+| Dustwallow Marsh") then
+					_questMenuEX:drawZoneByID(15)
+				end
+
+				if CollapsingHeader(">>> |+| Feralas") then
+					_questMenuEX:drawZoneByID(357)
+				end
+
 				if CollapsingHeader(">>> |+| Tanaris") then
-					local num = 0;
-					local minlevel = 0;
-					local maxlevel = 0
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 440 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction'];
-							local faction = "";
-							local type = _questDB.questList[i]['type'];
-							if factiontemp == 0 then
-								faction = "Alliance";
-							else
-								faction = "Horde";
-							end
-							name = _questDB.questList[i]['questName'];
-							local min = _questDB.questList[i]['minLevel'];
-							local max = _questDB.questList[i]['maxLevel'];
-							local compltemp = _questDB.questList[i]['completed'];
-							if compltemp == "nnil" then
-								compl = "Completed";
-							else
-								compl = "Not Complete";
-							end
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(440)
 				end
+
+				if CollapsingHeader(">>> |+| Azshara") then
+					_questMenuEX:drawZoneByID(16)
+				end
+
+				if CollapsingHeader(">>> |+| Felwood") then
+					_questMenuEX:drawZoneByID(361)
+				end
+
 				if CollapsingHeader(">>> |+| Un'Goro Crater") then
-					local num = 0
-					local minlevel = 0
-					local maxlevel = 0
-
-					for i = _questDB.numQuests - 1, 0, -1 do
-						if _questDB.questList[i]['mapID'] == 490 then
-						if Button("Run ".. i) then self.questToRunByIndex = i;
-								_questDB.curListQuest = _questDB.questList[i]['questName'];
-								_quest.currentQuest = _questDB.questList[i]['questName']
-								_quest.currentType = _questDB.questList[i]['type'];
-								_quest.usingItem = _questDB.questList[i]['useItem'];
-								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
-								_quest.currentMapID = _questDB.questList[i]['mapID'];
-								_quest.currentDesc = _questDB.questList[i]['desc'];
-								_questDB.curDesc = _questDB.questList[i]['desc'];
-							end
-							SameLine();
-							num = num + 1
-							local factiontemp = _questDB.questList[i]['faction']
-							local faction = ""
-							local type = _questDB.questList[i]['type']
-
-							if factiontemp == 0 then
-								faction = "Alliance"
-							else
-								faction = "Horde"
-							end
-
-							name = _questDB.questList[i]['questName']
-							local min = _questDB.questList[i]['minLevel']
-							local max = _questDB.questList[i]['maxLevel']
-							local compltemp = _questDB.questList[i]['completed']
-
-							if compltemp == "nnil" then
-								compl = "Yes"
-							else
-								compl = "No"
-							end
-
-							local space = " ";
-							if num < 10 then
-								space = " "; elseif num > 100 then space = "  ";
-							end
-							Text(num..space..compl.." - "..faction.." | "..name.." | Type - "..type); Separator();
-						end
-					end
+					_questMenuEX:drawZoneByID(490)
 				end
+
+				if CollapsingHeader(">>> |+| Silithus") then
+					_questMenuEX:drawZoneByID(1377)
+				end
+
+				if CollapsingHeader(">>> |+| Moonglade") then
+					_questMenuEX:drawZoneByID(493)
+				end
+
+				if CollapsingHeader(">>> |+| Winterspring") then
+					_questMenuEX:drawZoneByID(618)
+				end
+
+
 			end --end of kalimdor
 	
 
@@ -982,4 +257,64 @@ function _questMenuEX:menu()
 
 		end --end of new window
 	end
+end
+
+-- Reusable function that draws all quests for a given mapID
+function _questMenuEX:drawZoneByID(mapID)
+	local num = 0
+
+	for i = _questDB.numQuests - 1, 0, -1 do
+		local quest = _questDB.questList[i]
+
+		if quest['mapID'] == mapID then
+
+			if Button("Run " .. i) then
+				self.questToRunByIndex = i
+				_questDB.curListQuest = quest['questName']
+				_quest.currentQuest = quest['questName']
+				_quest.currentType = quest['type']
+				_quest.usingItem = quest['useItem']
+				_quest.gossipOption = quest['gossipOption']
+				_quest.currentMapID = quest['mapID']
+				_quest.currentDesc = quest['desc']
+				_questDB.curDesc = quest['desc']
+			end
+
+			SameLine()
+			num = num + 1
+
+			local faction = (quest['faction'] == 0) and "Alliance" or "Horde"
+			local compl = (quest['completed'] == "nnil") and "Completed" or "Not Complete"
+
+			local space = " "
+			if num < 10 then
+				space = " "
+			elseif num > 100 then
+				space = "  "
+			end
+
+			Text(
+				num .. space ..
+				compl .. " - " ..
+				faction .. " | " ..
+				quest['questName'] ..
+				" | Type - " .. quest['type']
+			)
+			Separator()
+		end
+	end
+end
+
+
+-- Your UI stays clean and readable:
+if CollapsingHeader(">>> |+| Tirisfal Glades") then
+	DrawQuestListForMap(85)
+end
+
+if CollapsingHeader(">>> |+| Dun Morogh") then
+	DrawQuestListForMap(1)
+end
+
+if CollapsingHeader(">>> |+| Elwynn Forest") then
+	DrawQuestListForMap(12)
 end

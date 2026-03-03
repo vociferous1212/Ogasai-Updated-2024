@@ -524,7 +524,7 @@ local localObj = GetLocalPlayer();
 	end
 
 	-- get a target just outside of aggro range
-	if script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil and not IsInCombat() then
+	if script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil and (not IsInCombat() or self.enemyTarget == nil) then
 		if GetTimeEX() > self.targetingTimer2 then
 			_quest.enemyTarget = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
 			self.targetingTimer2 = GetTimeEX() + 5000;

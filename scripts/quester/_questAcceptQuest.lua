@@ -49,7 +49,7 @@ function _questAcceptQuest:run()
 			local name = _quest.curQuestGiver;
 		
 			-- target the questgiver
-			if not PlayerHasTarget() then
+			if not PlayerHasTarget() and name ~= nil then
 				TargetByName(name);
 			end
 

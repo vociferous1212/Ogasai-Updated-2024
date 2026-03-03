@@ -78,19 +78,22 @@ function _questDBTargets:getTarget()
 	end
 
 	if IsInCombat() then
-		if _quest.enemyTarget ~= nil and NumberTargetsAttackingPlayer() > 0 then
-			if not grind2IsTargetingMe:target(_quest.enemyTarget) and _quest.enemyTarget:GetHealthPercentage() >= 99 then
-				local i, t = GetFirstObject();
-				while i ~= 0 do
-					if t == 3 then
-						if grind2IsTargetingMe:target(i) then
-							return i;
+			local bestHealth = 100;
+			local i, t = GetFirstObject();
+			while i ~= 0 do
+				if t == 3 then
+					if grind2IsTargetingMe:target(i) then
+						hp = i:GetHealthPercentage();
+
+						if bestHealth > hp then
+							bestHealth = hp;
+							bestTarget = i;
 						end
 					end
-				i, t = GetNextObject(i);
 				end
+			i, t = GetNextObject(i);
 			end
-		end
+	return bestTarget;
 	end
 
 	-- get a quest target
