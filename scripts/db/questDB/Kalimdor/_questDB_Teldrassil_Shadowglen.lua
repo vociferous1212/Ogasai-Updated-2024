@@ -44,8 +44,9 @@ end
 if GetMyClass() == "DRUID" then
 	_questDB:addQuest("no", 0, "Verdant Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10464, 829.53802490234, 1380.9409179688, "Mardant Strongoak", 0, 0, 0, 0, 0, 0, "Read the Verdant Sigil and speak to Mardant Strongoak, in the tree Aldrassil in Shadowglen.", 0, 1);
 end
-
-
+if GetMyClass() == "HUNTER" then
+	_questDB:addQuest("no", 0, "Etched Sigil", "Conservator Ilthalaine", 10328.900390625, 826.05200195313, 1326.380859375, 141, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10458.5, 827.86798095703, 1380.9385986328, "Ayanna Everstride", 0, 0, 0, 0, 0, 0, "Read the Etched Sigil and speak to Ayanna Everstride at the top of Aldrassil in Shadowglen.", 0, 1);
+end
 
 
 

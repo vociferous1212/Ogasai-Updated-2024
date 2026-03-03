@@ -275,20 +275,37 @@ function _questDB:getQuestStartPos()
 
 	if _questMenuEX.questToRunByIndex ~= -1 then
 
+		for e = 0, self.numQuests -1 do
+			if self.questList[_questMenuEX.questToRunByIndex]['completed'] == "nnil" then
+				_questMenuEX.questToRunByIndex = _questMenuEX.questToRunByIndex - 1;
+			end
+		end
+		
 		i = _questMenuEX.questToRunByIndex;
+
 		_questDB.curListQuest = self.questList[i]['questName'];
 		_quest.currentType = _questDB.questList[i]['type'];
 		_quest.usingItem = _questDB.questList[i]['useItem'];
 		_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 		_quest.currentMapID = _questDB.questList[i]['mapID'];
+
+		if self.currentIndex ~= i then
+			DEFAULT_CHAT_FRAME:AddMessage(
+				"3Quest Started - |cffffa500" ..
+						(_questDB.curListQuest or "Unknown") ..
+						"|r  (index |cffffff00" .. i .. "|r)"
+					)
+					end
 		_questDB.curDesc = _questDB.questList[i]['desc'];
 		_quest.currentDesc = _questDB.questList[i]['desc'];
+		
 		self.currentIndex = i;
 		x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
 
 		return x, y, z;
 	end
 
+	if _questMenuEX.questToRunByIndex == -1 then
 	for i=0, self.numQuests -1 do
 
 		-- get quest log description
@@ -300,7 +317,7 @@ function _questDB:getQuestStartPos()
 
 				-- check objectives for each quest log entry
 				local questDescription, questObjectives2 = GetQuestLogQuestText(u);
-					
+
 				_questDB.curDesc = questObjectives;
 
 				-- if questDB description == quest log description then set quest parameters
@@ -312,19 +329,24 @@ function _questDB:getQuestStartPos()
 					_quest.usingItem = _questDB.questList[i]['useItem'];
 					_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 					_quest.currentMapID = _questDB.questList[i]['mapID'];
+
+					if self.currentIndex ~= i then
+					DEFAULT_CHAT_FRAME:AddMessage(
+						"Quest Started - |cffffa500" ..
+						(_quest.currentQuest or "Unknown") ..
+						"|r  (index |cffffff00" .. i .. "|r)"
+					)
+					end
 					self.currentIndex = i;
 
 					x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];
-
-					-- try to select quest log entry
-					SelectQuestLogEntry(u)
-					SelectQuestLogEntry(u)
 
 					return x, y, z;
 				end
 			end
 		end
 
+		if GetNumQuestLogEntries() == nil or GetNumQuestLogEntries() == 0 then
 		-- we don't have a quest in quest log so continue searching DB
 		if self.questList[i]['completed'] ~= "nnil" then
 
@@ -371,7 +393,8 @@ function _questDB:getQuestStartPos()
 			end
 		end
 	end 
-
+	end
+	end
 return x, y, z;
 end
 

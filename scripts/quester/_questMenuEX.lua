@@ -32,7 +32,7 @@ function _questMenuEX:menu()
 				self.startAtQuestIndexNum = -1;
 				_questDB.curListQuest = 0
 				_quest.currentQuest = nil
-				--_quest.currentDesc = nil
+				_quest.currentDesc = nil
 				_questDB.curDesc = nil
 				_quest.currentMapID = nil
 								
@@ -44,7 +44,7 @@ function _questMenuEX:menu()
 			
 			Text("Start Quest Index");
 			SameLine();
-			self.startAtQuestIndexNum = SliderInt("", -1, _questDB.numQuests, self.startAtQuestIndexNum);
+			self.startAtQuestIndexNum = SliderInt("", -1, _questDB.numQuests -1, self.startAtQuestIndexNum);
 
 			if self.startAtQuestIndexNum ~= -1 then
 				if Button("Start At Quest Index") then
@@ -60,7 +60,6 @@ function _questMenuEX:menu()
 			end
 
 
-			Text("Run button not working yet... grind spot / quest giver coords complication?")
 			Text("	* Not all of these have been tested! *");
 			Text("	* Ordered by number to complete *")
 
@@ -175,7 +174,6 @@ function _questMenuEX:menu()
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
 								_quest.currentDesc = _questDB.questList[i]['desc'];
 								_questDB.curDesc = _questDB.questList[i]['desc'];
-								self.questToRunByIndex = i;
 								
 								--_questDB:getQuestStartPos()
 							end

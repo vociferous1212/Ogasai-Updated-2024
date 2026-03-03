@@ -57,6 +57,6 @@ function _questWindow:window()
 		tX, tY, onScreen = WorldToScreen(GetLocalPlayer():GetPosition());
 	
 		DrawText("Current Quest - _questDB", x+105, y-50, r+255, g+0, b+0);
-		DrawText("".._questDB.curListQuest, x+105, y-60, r+255, g+0, b+0);
+		DrawText(""..(_questDB.curListQuest or "Unknown"), x+105, y-60, r+255, g+0, b+0);
 
 end

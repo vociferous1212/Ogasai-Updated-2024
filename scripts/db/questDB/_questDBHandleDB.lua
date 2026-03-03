@@ -131,19 +131,7 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 	if self.waitTimer > GetTimeEX() then return; end
 	local currentIndex = -1
 
-	-- Safety checks
-	if not _questDB or type(_questDB) ~= "table" then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffff0000ERROR: _questDB missing/invalid|r")
-		return
-	end
-	if not _questDB.questList or type(_questDB.questList) ~= "table" then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffff0000ERROR: questList missing/invalid|r")
-		return
-	end
-	if not _questDB.numQuests or _questDB.numQuests < 1 then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffff0000ERROR: No quests in DB|r")
-		return
-	end
+
 
 	-- Helper: safe normalize (collapse whitespace, trim)
 	local function normalize_text(text)
@@ -173,6 +161,7 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 	local numLogEntries = GetNumQuestLogEntries()
 
 	for logIdx = 1, numLogEntries do
+		SelectQuestLogEntry(logIdx)
 		local title, _, _, isHeader = GetQuestLogTitle(logIdx)
 		if title and title ~= "" and not isHeader then
 			local _, objectives = GetQuestLogQuestText(logIdx)
@@ -219,6 +208,7 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 			end
 
 			if not isStillInLog
+				and _quest.currentQuest ~= nil
 			   and (dbQuest.completed or "") ~= "nnil"
 			   and GetMapID() == dbMapID
 			then

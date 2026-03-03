@@ -9,9 +9,7 @@ function _questSetQuest:setOurCurrentQuest()
 			for u=0, GetNumQuestLogEntries() do
 				local questDescription, questObjectives2 = GetQuestLogQuestText(u);				
 					if _questDB.questList[y]['desc'] == _questDB.curDesc then
-						SelectQuestLogEntry(u)
-						SelectQuestLogEntry(u)
-					end
+				end
 			end
 		end
 			-- get the objectives for the quest to match in DB
@@ -44,13 +42,45 @@ function _questSetQuest:setOurCurrentQuest()
 
 							_quest.usingItem = _questDB.questList[i]['useItem'];
 
-							_quest.currentQuest = title;
+							if _questMenuEX.questToRunByIndex == -1 then
+								if _quest.currentQuest ~= title then
+									DEFAULT_CHAT_FRAME:AddMessage(
+									"1Quest Started - |cffffa500" ..
+									(title or "Unknown") ..
+									"|r  (index |cffffff00" .. y .. "|r)"
+								)
+								end
+
+								_quest.currentQuest = title;
+								_questDB.currentIndex = y;
+							elseif _questMenuEX.questToRunByIndex ~= -1 then
+								if _questDB.curDesc ~= _questDB.questList[_questMenuEX.questToRunByIndex]['desc'] then
+									DEFAULT_CHAT_FRAME:AddMessage(
+									"2Quest Started - |cffffa500" ..
+									(_questDB.questList[_questMenuEX.questToRunByIndex]['questName'] or "Unknown") ..
+									"|r  (index |cffffff00" .. _questMenuEX.questToRunByIndex .. "|r)"
+								)
+								end
+
+							_quest.currentQuest = _questDB.questList[_questMenuEX.questToRunByIndex]['questName'];
+							_questDB.currentIndex = _questMenuEX.questToRunByIndex;
+							end
+
+							
+
+							--[[
+							if not _quest.weHaveQuest then
+								DEFAULT_CHAT_FRAME:AddMessage(
+								"Quest Started - |cffffa500" ..
+								(_quest.currentQuest or "Unknown") ..
+								"|r  (index |cffffff00" .. _questDB.currentIndex .. "|r)"
+								)
+							end
+							--]]
 
 							_quest.weHaveQuest = true;
 
 							_questDBGatherGetInventory:getItemsInInventory();
-
-
 
 						end
 					end

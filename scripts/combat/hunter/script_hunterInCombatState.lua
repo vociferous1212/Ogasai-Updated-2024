@@ -432,6 +432,7 @@ function script_hunterInCombatState:run(targetObj)
 					if not CastSpellByName("Raptor Strike") then
 						script_hunter.waitTimer = GetTimeEX() + 500;
 					end
+				return;
 				end
 			end
 		end

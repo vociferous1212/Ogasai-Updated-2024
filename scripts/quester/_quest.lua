@@ -244,6 +244,9 @@ local localObj = GetLocalPlayer();
 
 --]]
 
+
+
+
 -- setup bot / do start checks
 	if _questEX:doStartChecks() then
 		return;
@@ -563,8 +566,17 @@ end
 		return;
 	end
 
+	local questIsInQuestLog = false;
+	for a = 0, GetNumQuestLogEntries() do
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+		if title == _questDB.curListQuest then
+		SelectQuestLogEntry(1)
+			questIsInQuestLog = true;
+		end
+	end
 		
-	if (not self.grindSpotReached) then
+	if questIsInQuestLog and (not self.grindSpotReached) then
+		
 		self.curGrindX, self.curGrindY, self.curGrindZ = _questDB:getQuestGrindPos();
 	end
 
@@ -667,12 +679,19 @@ end
 
 
 	-- return a completed quest to quest return target
-	if self.currentQuest ~= nil and self.isQuestComplete and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil and not IsInCombat() then
+	if self.currentQuest ~= nil and not IsLooting() and not IsCasting() and not IsChanneling() and script_grind.lootObj == nil and not IsInCombat() then
 		if (AreBagsFull()) then
 			_questEX.bagsFull = true
 			script_vendor.status = 1;
 		end
-		if not AreBagsFull() and not IsInCombat() and not IsAnyTargetTargetingPlayer() then
+		local questIsInQuestLog = false;
+	for a = 0, GetNumQuestLogEntries() do
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+		if title == _questDB.curListQuest then
+			questIsInQuestLog = true;
+		end
+	end
+		if questIsInQuestLog and not AreBagsFull() and not IsInCombat() and not IsAnyTargetTargetingPlayer() then
 			if _questDBReturnQuest:returnAQuest() then
 				self.enemyTarget = nil;
 				self.message = "Returning quest!";
@@ -745,9 +764,17 @@ end
 -- retrieve a quest
 	-- chase a moving target
 	if not IsInCombat() and _quest.distToGiver ~= 0 then
+
+	local questIsInQuestLog = false;
+	for a = 0, GetNumQuestLogEntries() do
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+		if title == _questDB.curListQuest then
+			questIsInQuestLog = true;
+		end
+	end
 		
 		-- move to quest giver
-		if (_quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsInCombat() and (_quest.curQuestX ~= 0) and (_quest.distToGiver > 4) and (_quest.currentQuest == nil) then
+		if not questIsInQuestLog and not IsInCombat() and (_quest.curQuestX ~= 0) and (_quest.distToGiver > 4) then
 			
 			if ((script_grind.lootObj == nil and not script_grindEX.bagsFull) or (script_grind.lootObj ~= nil and script_grind.skipLooting) or (script_grind.lootObj ~= nil and _questEX.bagsFull) or (script_grind.lootObj == nil and not script_grind.skipLooting) or script_grind.lootObj == nil) and not IsCasting() and not IsChanneling() then
 
@@ -793,7 +820,7 @@ end
 
 
 -- move to grind spot
-	if _quest.currentType ~= 1 and _quest.currentType ~= 2 and not IsInCombat() and not _quest.isQuestComplete and not IsLooting() then
+	if _quest.currentType ~= nil and _quest.currentType > 2 and not IsInCombat() and not IsLooting() then
 		if _questDoOtherQuestTypes() then
 			return true;
 		end
@@ -815,11 +842,11 @@ end
 	end
 	--if IsInCombat() then if IsMoving() then StopMoving(); return true; end return; end
 	-- we have a quest so go to grind spot
-	if not IsAnyTargetTargetingPlayer() and _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not IsLooting()
+	if _quest.questType ~= 0 and not IsAnyTargetTargetingPlayer() and _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not IsLooting()
 	and (script_grind.lootObj == nil or script_grind.skipLooting or AreBagsFull()) and not IsCasting() and not IsChanneling() then
 		if (_quest.distToGrind > 40 and _quest.currentType ~= 3 and _quest.currentType ~= 4 and not _quest.grindSpotReached)
 		or (_quest.currentType == 3 or _quest.currentType == 4 or _quest.curentType == 5 or _quest.currentType == 11 and _quest.distToGrind > 5) then
-			if _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5 and not _quest.isQuestComplete and _quest.enemyTarget == nil then
+			if _quest.currentType ~= 3 and _quest.currentType ~= 4 and _quest.currentType ~= 5  and _quest.enemyTarget == nil then
 			end
 
 			_quest.message = "Moving to grind spot";

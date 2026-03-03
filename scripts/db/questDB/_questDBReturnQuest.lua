@@ -25,9 +25,23 @@ function _questDBReturnQuest:returnAQuest()
 
 		return;
 	end
+	
+	local questIsComplete = false;
+	local hasQuest = false;
 
+		for a = 0, GetNumQuestLogEntries() do
+			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+			if title == _questDB.curListQuest then
+				hasQuest = true;
+				if isComplete then
+					questIsComplete = true;
+				end
+			end
+		end
+
+	if questIsComplete or (_quest.currentType == 0 and hasQuest) then
 	-- return a quest
-	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and _quest.isQuestComplete and not IsInCombat() then
+	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and not IsInCombat() then
 
 		-- reset blacklist quest timer
 		_questAcceptQuest.noQuestTimer = GetTimeEX() + 15000;
@@ -77,7 +91,7 @@ function _questDBReturnQuest:returnAQuest()
 		end
 
 
-		if (GetDistance3D(px, py, pz, x, y, z) <= 4) and (_quest.isQuestComplete) then
+		if (GetDistance3D(px, py, pz, x, y, z) <= 4) then
 
 				if HasForm() then RemoveForm(); end
 
@@ -391,8 +405,10 @@ end
 		end
 	return true;
 	end
+	end
 return false;	
 end
+
 
 function _questDBReturnQuest:getReturnTargetID()
 

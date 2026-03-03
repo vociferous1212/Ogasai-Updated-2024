@@ -23,8 +23,16 @@ function _questAcceptQuest:run()
 		end
 	end
 
+	local questIsInQuestLog = false;
+	for a = 0, GetNumQuestLogEntries() do
+		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+		if title == _questDB.curListQuest then
+			questIsInQuestLog = true;
+		end
+	end
+
 	-- if we are close enough to quest giver
-	if (_quest.distToGiver <= 4) and (_quest.currentQuest == nil) and not IsMoving() then
+	if (_quest.distToGiver <= 4) and (not questIsInQuestLog) and not IsMoving() then
 
 		-- grind spot reached is false
 		_quest.grindSpotReached = false;
