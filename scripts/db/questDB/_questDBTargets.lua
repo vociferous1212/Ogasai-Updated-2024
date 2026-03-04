@@ -129,7 +129,7 @@ function _questDBTargets:getTarget()
 		return bestTarget;
 	end
 
-	if _quest.grindSpotReached or IsInCombat() or not haveQuestTarget then
+	if (_quest.grindSpotReached and not haveQuestTarget) or (IsInCombat() and isAnyTargetTargetingPlayer() and not haveQuestTarget) then
 		local i, t = GetFirstObject();
 		while i ~= 0 do
 			if t == 3 and i:GetDistance() <= 200 then
