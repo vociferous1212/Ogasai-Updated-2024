@@ -289,6 +289,11 @@ function _questDB:getQuestStartPos()
 		_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 		_quest.currentMapID = _questDB.questList[i]['mapID'];
 
+		_questDBTargets.target = _questDB.questList[i]['targetName'];
+		_questDBTargets.target2 = _questDB.questList[i]['targetName2'];
+		_questDBTargets.target3 = _questDB.questList[i]['targetName3'];
+						
+
 		if self.currentIndex ~= i then
 			DEFAULT_CHAT_FRAME:AddMessage(
 				"3Quest Started - |cffffa500" ..
@@ -327,6 +332,9 @@ function _questDB:getQuestStartPos()
 					_quest.usingItem = _questDB.questList[i]['useItem'];
 					_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 					_quest.currentMapID = _questDB.questList[i]['mapID'];
+					_questDBTargets.target = _questDB.questList[i]['targetName'];
+					_questDBTargets.target2 = _questDB.questList[i]['targetName2'];
+					_questDBTargets.target3 = _questDB.questList[i]['targetName3'];
 
 					if self.currentIndex ~= i then
 					DEFAULT_CHAT_FRAME:AddMessage(
@@ -379,6 +387,9 @@ function _questDB:getQuestStartPos()
 								_quest.usingItem = _questDB.questList[i]['useItem'];
 								_quest.gossipOption = _questDB.questList[i]['gossipOption'];
 								_quest.currentMapID = _questDB.questList[i]['mapID'];
+								_questDBTargets.target = _questDB.questList[i]['targetName'];
+								_questDBTargets.target2 = _questDB.questList[i]['targetName2'];
+								_questDBTargets.target3 = _questDB.questList[i]['targetName3'];
 								self.currentIndex = i;
 
 

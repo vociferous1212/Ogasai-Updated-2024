@@ -355,7 +355,7 @@ local localObj = GetLocalPlayer();
 
 
 -- return for timer
-	if ((self.waitTimer + self.tickRate * 1000) > GetTimeEX()) or self.pause
+	if ((self.waitTimer + self.tickRate) > GetTimeEX()) or self.pause
 	or ((IsChanneling() or IsCasting()) and not instantCastSpells:isSpellInstantCast())
 	or Player():IsStunned() or Player():IsConfused() or Player():IsFleeing() then 
 		return;
@@ -451,24 +451,14 @@ local localObj = GetLocalPlayer();
 
 
 --]]
-	-- clear dead targets tapped killed counter
-	if (self.enemyTarget ~= 0 and self.enemyTarget ~= nil and self.enemyTarget:IsDead()) or (PlayerHasTarget() and GetTarget():IsDead()) then
-		if self.enemyTarget ~= nil and self.enemyTarget ~= 0 then
-			script_grind.monsterKillCount = script_grind.monsterKillCount + 1;
-			grind2SaveCoordinates:saveTargetsLocation(self.enemyTarget);
-			if not IsAnyTargetTargetingPlayer() then
-				_quest.waitTimer = GetTimeEX() + 750;
-			end
-		end
-		self.enemyTarget = nil;
-		ClearTarget();
-	end
 
 	if IsInCombat() then
 		self.tickRate = 0;
 	elseif not IsInCombat() then
 		self.tickRate = .05;
 	end
+
+	_questDoCombat:clearTarget();
 
 	_questEX:doChecks();
 
@@ -750,7 +740,7 @@ end
 	if script_grind.lootObj == nil and script_grind.gather and not _quest.isQuestComplete and not IsInCombat() and not _questEX.bagsFull and not GetLocalPlayer():IsDead() then
 		if script_gatherRun:gather() then
 			_quest.message =  'Gathering ' .. script_gather:currentGatherName() .. ' ' ..script_gather.messageToGrinder.."";
-		return true;
+		return;
 		end
 	end
 
@@ -846,7 +836,7 @@ end
 
 		if _questDBGather:run() then
 			_quest.message = "Gathering quest item - ".._questDBGather.gatheringTarget:GetUnitName()..", "..math.floor(_questDBGather.gatheringTarget:GetDistance()).." (yd)";
-			return true;
+			return;
 		end
 	end
 

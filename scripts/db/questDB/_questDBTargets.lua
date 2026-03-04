@@ -5,6 +5,9 @@ _questDBTargets = {
 	target = 0,
 	target2 = 0,
 	target3 = 0,
+	numKill = 0,
+	numKill2 = 0,
+	numKill3 = 0,
 
 }
 
@@ -52,49 +55,33 @@ end
 
 function _questDBTargets:getTarget()
 
-	local target, target2, target3, numKill, numKill, numKill = nil, nil, nil, nil, nil, nil;
 	local bestDist = 1000;
 	local bestTarget = nil;
 
 
-	-- get targets to kill and number of targets to kill for each quest we are on
-	if _questDB.curListQuest ~= nil then 
-		for i=0, _questDB.numQuests -1 do
-			if _questDB.questList[i]['completed'] == "no" then
-				if _questDB.questList[i]['questName'] ~= "nnil" then
-					if _questDB.questList[i]['questName'] == _questDB.curListQuest then
-						if _questDB.questList[i]['desc'] == _quest.currentDesc then
-							self.target = _questDB.questList[i]['targetName'];
-							self.target2 = _questDB.questList[i]['targetName2'];
-							self.target3 = _questDB.questList[i]['targetName3'];
-							numKill = _questDB.questList[i]['numKill'];
-							numKill2 = _questDB.questList[i]['numKill2'];
-							numKill3 = _questDB.questList[i]['numKill3'];
-						end
-					end
-				end
-			end
-		end
-	end
+
 
 	if IsInCombat() then
-			local bestHealth = 100;
-			local i, t = GetFirstObject();
-			while i ~= 0 do
-				if t == 3 then
-					if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
-						if i:GetUnitsTarget():GetGUID() == Player():GetGUID() then
-							hp = i:GetHealthPercentage();
+		local bestHealth = 100;
+		local i, t = GetFirstObject();
+		while i ~= 0 do
+			if t == 3 then
+				if i:GetUnitsTarget() ~= nil and i:GetUnitsTarget() ~= 0 then
+					if i:GetUnitsTarget():GetGUID() == Player():GetGUID() or i:IsTappedByMe() then
 
-							if bestHealth > hp then
-								bestHealth = hp;
-								bestTarget = i;
-							end
+						hp = i:GetHealthPercentage();
+
+						if bestHealth > hp then
+
+							bestHealth = hp;
+								
+							bestTarget = i;
 						end
 					end
 				end
-			i, t = GetNextObject(i);
 			end
+		i, t = GetNextObject(i);
+		end
 	return bestTarget;
 	end
 
@@ -104,10 +91,11 @@ function _questDBTargets:getTarget()
 	while i ~= 0 do
 		if t == 3 then
 			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() and self.target ~= 0 then
-				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) and (not grind2SafePull:targetHasAdds(i) or _questQuestTargets:isUnitQuestTarget(i)) then
-					if (self.target ~= nil and self.target ~= 0 and i:GetUnitName() == self.target and _quest.targetKilledNum < numKill)
-					or (self.target2 ~= nil and self.target2 ~= 0 and i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2)
-					or (self.target3 ~= nil and self.target3 ~= 0 and i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)
+				if not script_grind:isTargetHardBlacklisted(i:GetGUID())
+				and (not grind2SafePull:targetHasAdds(i) or _questQuestTargets:isUnitQuestTarget(i)) then
+					if (i:GetUnitName() == self.target and (_quest.targetKilledNum < self.numKill or numKill == 0))
+					or (i:GetUnitName() == self.target2 and (_quest.targetKilledNum2 < self.numKill2 or numKill == 0))
+					or (i:GetUnitName() == self.target3 and (_quest.targetKilledNum3 < self.numKill3 or numKill == 0))
 					or i:IsTappedByMe() or grind2IsTargetingMe:target(i) then
 
 						if grind2IsTargetingMe:target(i) then
@@ -245,6 +233,8 @@ end
 
 function _questDBTargets:isAnyQuestTargetInRange()
 
+	_questDBTargets:setTargets();
+
 	local i, t = GetFirstObject()
 	
 	while i ~= 0 do
@@ -259,4 +249,29 @@ function _questDBTargets:isAnyQuestTargetInRange()
 	end
 
 return false;
+end
+
+function _questDBTargets:setTargets()
+
+-- get targets to kill and number of targets to kill for each quest we are on
+	if _questDB.curListQuest ~= nil then 
+		for i=0, _questDB.numQuests -1 do
+			if _questDB.questList[i]['completed'] == "no" then
+				if _questDB.questList[i]['questName'] ~= "nnil" then
+					if _questDB.questList[i]['questName'] == _questDB.curListQuest then
+						if _questDB.questList[i]['desc'] == _quest.currentDesc then
+							if self.target ~= _questDB.questList[i]['targetName'] then
+								self.target = _questDB.questList[i]['targetName'];
+								self.target2 = _questDB.questList[i]['targetName2'];
+								self.target3 = _questDB.questList[i]['targetName3'];
+								self.numKill = _questDB.questList[i]['numKill'];
+								self.numKill2 = _questDB.questList[i]['numKill2'];
+								self.numKill3 = _questDB.questList[i]['numKill3'];
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end

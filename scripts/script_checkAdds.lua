@@ -95,7 +95,6 @@ function script_checkAdds:avoidToAggro(safeMargin)
 		else
 			self:avoid(xT, yT, zP, self.addsRange, self.checkAddsRange)
 			PetFollow()
-			return true
 		end
 	end
 	return false

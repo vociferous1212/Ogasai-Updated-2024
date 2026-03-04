@@ -62,37 +62,12 @@ function _questDoCombat:doCombat()
 		end
 
 
-		-- if target is a quest target then count +1
-		if _quest.currentQuest ~= 0 and _quest.enemyTarget ~= nil then
-			for i=0, _questDB.numQuests -1 do
-				if _quest.currentQuest == _questDB.questList[i]['questName'] then
-					if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName']
-						or _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2'] then
-						if _quest.enemyTarget:IsDead() and not _questDBTargets:isTargetAddedToKilledTable(_quest.enemyTarget:GetGUID()) then
-							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName'] then
-								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
-								_quest.targetKilledNum = _quest.targetKilledNum + 1;
-							end
-							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2'] then
-								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
-								_quest.targetKilledNum2 = _quest.targetKilledNum2 + 1;
-							end
-							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName3'] then
-								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
-								_quest.targetKilledNum3 = _quest.targetKilledNum3 + 1;
-							end
-						end
-					end
-				end
-			end
-		end
-
-
+		_questDoCombat:clearTarget();
 		
 
 
 		-- move to target
-		if _quest_enemeyTarget ~= nil and _quest.enemyTarget ~= 0 then
+		if _quest.enemeyTarget ~= nil and _quest.enemyTarget ~= 0 then
 			
 			if IsChanneling() or IsCasting() then
 				self.blacklistTimer = GetTimeEX() + 10000;
@@ -197,11 +172,15 @@ function _questDoCombat:doCombat()
 			script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 
 			if _quest.enemyTarget ~= nil and _quest.enemyTarget ~= 0 then
-			local x, y, z = _quest.enemyTarget:GetPosition();
+				local x, y, z = _quest.enemyTarget:GetPosition();
 				if x ~= 0 and ((script_grind.combatError == 3 and _quest.enemyTarget:GetDistance() >= script_grind.combatScriptRange) or (_quest.enemyTarget:GetDistance() > script_grind.combatScriptRange or not _quest.enemyTarget:IsInLineOfSight())) and _quest.enemyTarget:GetDistance() > 2 then
 					grind2MoveToTarget:run(GetLocalPlayer(), x, y, z);
-					
 				return false;
+				end
+
+				
+				if _quest.enemyTarget:IsFleeing() and _quest.enemyTarget:GetDistance() > script_grind.combatScriptRange and not IsMoving() then
+					Move(x, y, z);
 				end
 			end
 			return;
@@ -227,4 +206,46 @@ function _questDoCombat:getLowestHealthTargetAttackingUs()
 	i, t = GetNextObject(i);
 	end
 return bestTarget;
+end
+
+function _questDoCombat:clearTarget()
+
+-- if target is a quest target then count +1
+		if _quest.currentQuest ~= 0 and _quest.enemyTarget ~= nil then
+			for i=0, _questDB.numQuests -1 do
+				if _quest.currentQuest == _questDB.questList[i]['questName'] then
+					if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName']
+						or _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2']
+						or _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName3'] then
+						if _quest.enemyTarget:IsDead() and not _questDBTargets:isTargetAddedToKilledTable(_quest.enemyTarget:GetGUID()) then
+							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName'] then
+								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
+								_quest.targetKilledNum = _quest.targetKilledNum + 1;
+							end
+							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName2'] then
+								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
+								_quest.targetKilledNum2 = _quest.targetKilledNum2 + 1;
+							end
+							if _quest.enemyTarget:GetUnitName() == _questDB.questList[i]['targetName3'] then
+								_questDBTargets:addTargetToKilledTable(_quest.enemyTarget:GetGUID());
+								_quest.targetKilledNum3 = _quest.targetKilledNum3 + 1;
+							end
+						end
+					end
+				end
+			end
+		end
+
+			-- clear dead targets tapped killed counter
+	if (_questDoCombat.enemyTarget ~= 0 and _questDoCombat.enemyTarget ~= nil and _questDoCombat.enemyTarget:IsDead()) or (PlayerHasTarget() and GetTarget():IsDead()) then
+		if _questDoCombat.enemyTarget ~= nil and _questDoCombat.enemyTarget ~= 0 then
+			script_grind.monsterKillCount = script_grind.monsterKillCount + 1;
+			grind2SaveCoordinates:saveTargetsLocation(_questDoCombat.enemyTarget);
+			if not IsAnyTargetTargetingPlayer() and not IsInCombat() then
+				_quest.waitTimer = GetTimeEX() + 750;
+			end
+		end
+		_questDoCombat.enemyTarget = nil;
+		ClearTarget();
+	end
 end
