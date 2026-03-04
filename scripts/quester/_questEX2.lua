@@ -241,7 +241,7 @@ function _questEX2:doChecks()
 	end
 
 	if IsInCombat() then return; end
-	if (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() and not IsInCombat() then
+	if _quest.enemyTarget == nil and (script_grind.getSpells) and (not _quest.pause) and (not IsInCombat()) and (_quest.weHaveQuest and _quest.isQuestComplete or GetNumQuestLogEntries() == 0) and not IsEating() and not IsDrinking() and not IsInCombat() then
 		if script_grind.getSpells and (script_getSpells:checkForSpellsNeeded()) then
 			_questEX2.flipVendor = false;
 			_quest.message = "Moving to class trainer for spells"

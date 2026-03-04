@@ -166,6 +166,7 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 	local logByTitle = {}
 	local numLogEntries = GetNumQuestLogEntries()
 
+	if GetNumQuestLogEntries ~= 0 then
 	for logIdx = 1, numLogEntries do
 		SelectQuestLogEntry(logIdx)
 		local title, _, _, isHeader = GetQuestLogTitle(logIdx)
@@ -185,7 +186,7 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 			end
 		end
 	end
-
+	end
 	-- Check DB quests after current
 	for i = currentIndex + 1, _questDB.numQuests - 1 do
 		local dbQuest = _questDB.questList[i]

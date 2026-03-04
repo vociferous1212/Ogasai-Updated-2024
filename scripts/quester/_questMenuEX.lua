@@ -120,6 +120,12 @@ function _questMenuEX:menu()
 
 			wasClicked, self.menuStyle1 = Checkbox("[ Compact Menu Style ]", self.menuStyle1);
 
+			SameLine();
+			Text("		");
+			SameLine();
+			if Button("TODO: Do Quests In Set Order") then
+			end
+
 			if not self.menuStyle1 then
 				self.menuStyle2 = true;
 			end
@@ -339,21 +345,30 @@ function _questMenuEX:drawZoneByID(mapID)
 		local quest = _questDB.questList[i]
 
 		if quest['mapID'] == mapID then
-			if Button("Run " .. i) then
+			if quest['desc'] ~= _questDB.curDesc then
+				if Button("Run " .. i) then
 				
-				--if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
-					self.questToRunByIndex = i
-					_questDB.curListQuest = quest['questName']
-					_quest.currentQuest = quest['questName']
-					_quest.currentType = quest['type']
-					_quest.usingItem = quest['useItem']
-					_quest.gossipOption = quest['gossipOption']
-					_quest.currentMapID = quest['mapID']
-					_quest.currentDesc = quest['desc']
-					_questDB.curDesc = quest['desc']
-				--end
-			end
+					--if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
+						self.questToRunByIndex = i
+						_questDB.curListQuest = quest['questName']
+						_quest.currentQuest = quest['questName']
+						_quest.currentType = quest['type']
+						_quest.usingItem = quest['useItem']
+						_quest.gossipOption = quest['gossipOption']
+						_quest.currentMapID = quest['mapID']
+						_quest.currentDesc = quest['desc']
+						_questDB.curDesc = quest['desc']
+					--end
+				end
+			elseif not self.menyStle1 then
+				Text("\n");
+				Text("CURRENT |\n \n");
+				self.showDesc[i] = true;
+			else
 
+				Text("CURRENT");
+				Separator();
+			end
 			SameLine()
 			num = num + 1
 

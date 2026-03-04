@@ -187,8 +187,9 @@ if (not script_unstuck:pathClearAuto(2)) then
 							self.waitTimer = GetTimeEX() + 1000;
 							_quest.waitTimer = GetTimeEX() + 1000;
 							for i = 1, GetNumTrainerServices() do
-								BuyTrainerService(i);
 								_quest.waitTimer = GetTimeEX() + 1000;
+								self.timer = GetTimeEX() + 250;
+								BuyTrainerService(i);
 
 							end
 						end

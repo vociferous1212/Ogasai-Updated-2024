@@ -2,6 +2,8 @@ _quest = {
 
 	message = "Quester",
 
+	checkAddsTimer = GetTimeEX(),
+
 	usingQuester = false,	-- using this script - tell other scripts
 
 	pause = true,	-- pause script
@@ -175,9 +177,10 @@ local localObj = GetLocalPlayer();
 
 
 	-- move away from additional targets in combat
-		if IsInCombat() and self.enemyTarget ~= 0 and self.enemyTarget ~= nil then
+		if IsInCombat() and self.enemyTarget ~= 0 and self.enemyTarget ~= nil and GetTimeEX() > self.checkAddsTimer then
 			if self.enemyTarget:GetHealthPercentage() >= 25 and not script_checkDebuffs:hasDisabledMovement() then
 				if script_checkAdds:checkAdds() then
+					self.checkAddsTimer = GetTimeEX() + 500;
 				
 					script_om:FORCEOM();
 				end
@@ -280,7 +283,7 @@ local localObj = GetLocalPlayer();
 	if (self.pause) then
 		self.usingQuester = false;
 		script_grind.pause = true;
-		_questDoCombat.blacklistTimer = GetTimeEX() * 2;
+		_questDoCombat.blacklistTimer = GetTimeEX() + 20000;
 		script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 	return;
 	end
@@ -309,6 +312,14 @@ local localObj = GetLocalPlayer();
 	if not self.pause and (not IsInCombat()) and (_questEX.bagsFull or script_vendor.status > 0) and (not GetLocalPlayer():IsDead()) then
 		local vendorStatus = script_vendor:getStatus();
 		if (vendorStatus > 0) then
+
+		-- get a target just outside of aggro range
+		if script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil then
+			if GetTimeEX() > self.targetingTimer2 then
+				_quest.enemyTarget = script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
+				self.targetingTimer2 = GetTimeEX() + 5000;
+			end
+		end
 
 			if not IsInCombat() then
 				self.enemyTarget = nil;
@@ -482,6 +493,7 @@ local localObj = GetLocalPlayer();
 	if not IsInCombat() and script_grind.lootObj ~= nil then
 		return;
 	end
+
 
 	-- get a target to run combat
 		-- only get a target if at the grind spot and quest is complete , or in combat already
@@ -683,13 +695,6 @@ end
 			_questEX.bagsFull = true
 			script_vendor.status = 1;
 		end
-		local questIsInQuestLog = false;
-	for a = 0, GetNumQuestLogEntries() do
-		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
-		if title == _questDB.curListQuest then
-			questIsInQuestLog = true;
-		end
-	end
 		if questIsInQuestLog and _quest.isQuestComplete and not AreBagsFull() and not IsInCombat() and not IsAnyTargetTargetingPlayer() then
 			if _questDBReturnQuest:returnAQuest() then
 				self.enemyTarget = nil;
@@ -763,22 +768,15 @@ end
 -- retrieve a quest
 	-- chase a moving target
 	if not IsInCombat() and _quest.distToGiver ~= 0 then
-
-	local questIsInQuestLog = false;
-	for a = 0, GetNumQuestLogEntries() do
-		local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
-		if title == _questDB.curListQuest then
-			questIsInQuestLog = true;
-		end
-	end
 		
 		-- move to quest giver
 		if not questIsInQuestLog and not IsInCombat() and (_quest.curQuestX ~= 0) and (_quest.distToGiver > 4) then
 			
 			if ((script_grind.lootObj == nil and not script_grindEX.bagsFull) or (script_grind.lootObj ~= nil and script_grind.skipLooting) or (script_grind.lootObj ~= nil and _questEX.bagsFull) or (script_grind.lootObj == nil and not script_grind.skipLooting) or script_grind.lootObj == nil) and not IsCasting() and not IsChanneling() then
 
-
-				_quest.message = "Retrieving a quest, "..math.floor(_quest.distToGiver).." (yd)";
+				if _quest.distToGiver ~= nil then
+					_quest.message = "Retrieving a quest, "..math.floor(_quest.distToGiver).." (yd)";
+				end
 
 				if PlayerHasTarget() then
 					if GetTarget():GetUnitName() ~= _quest.curQuestGiver then
@@ -806,10 +804,15 @@ end
 
 				if _quest.distToGiver > 4 then
 					grind2MoveToTarget:run(GetLocalPlayer(), _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
+				elseif PlayerHasTarget() and _quest.distToGiver <= 5 then
+					if IsMoving() then
+						StopMoving();
+					end
 				end
 
 				if not IsInCombat() and not IsMoving() and not IsPathLoaded(5) and _quest.distToGiver > 5 then
 					Move(_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
+					return false;
 				end
 			end
 		end
@@ -854,7 +857,7 @@ end
 			end
 
 			_quest.message = "Moving to grind spot";
-			if not _quest.grindSpotReached then
+			if not _quest.grindSpotReached and _quest.enemyTarget == nil then
 				_questDoCombat.blacklistTimer = GetTimeEX() + 10000;
 				script_grind.blacklistLootTimeCheck = GetTimeEX() + (script_grind.blacklistLootTimeVar * 1000);
 			end
@@ -862,10 +865,11 @@ end
 			
 			if not IsInCombat() then
 				grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+				if not IsMoving() and not IsPathLoaded(5) and not IsInCombat() and script_grind.lootObj ~= nil then
+					Move(_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+				end
 			end
-			if not IsMoving() and not IsPathLoaded(5) and not IsInCombat() and script_grind.lootObj ~= nil then
-				Move(_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
-			end
+			
 			if PlayerHasTarget() and not IsInCombat() then
 				if GetTarget():GetUnitName() == self.curQuestGiver and self.distToGiver >= 10 then
 					ClearTarget();

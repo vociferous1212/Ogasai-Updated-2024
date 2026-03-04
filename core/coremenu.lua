@@ -31,10 +31,14 @@ function coremenu:draw()
 		end
 	end
 
-	-- if we started a new character, and leveled up, then last level is new level - run class setups
-	if self.startedNewCharacter and GetLocalPlayer():GetLevel() ~= self.lastPlayerLevel then
-		coremenu:runClassSetups();
-		self.lastPlayerLevel = GetLocalPlayer():GetLevel();
+	-- force reset the bot if we get new spells - sometimes it doesn't reset
+	if script_getSpells ~= nil then
+		if not script_getSpells:checkForSpellsNeeded() then
+			if self.startedNewCharacter and GetLocalPlayer():GetLevel() ~= self.lastPlayerLevel then
+				coremenu:runClassSetups();
+				self.lastPlayerLevel = PlayerLevel();
+			end
+		end
 	end
 
 
