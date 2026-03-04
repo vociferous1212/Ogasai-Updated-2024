@@ -6,8 +6,9 @@ _questEX2 = {
 	sellVendorX = 0,
 	sellVendorY = 0,
 	sellVendorZ = 0,
-	lootTimeout = 0, -- New: Timer for loot timeout
-	currentLootGUID = nil -- New: Tracks current loot target GUID
+	lootTimeout = 0,
+	currentLootGUID = nil,
+	timeSinceLastReload = GetTimeEX(),
 }
 
 function _questEX2:doChecks()
@@ -54,7 +55,7 @@ function _questEX2:doChecks()
 		end
 	end
 --]]
-		if GetTimeEX() > self.lastVendorTime and PlayerLevel() > 2 then
+		if GetTimeEX() > self.lastVendorTime and PlayerLevel() > 2 and GetTimeEX() > self.timeSinceLastReload + 60000 then
 			if _questEX2.vendorBetweenQuests and _quest.isQuestComplete and _questEX2.flipVendor and script_vendor.sellVendor ~= 0 and script_vendor.sellVendor ~= nil then
 				self.sellVendorX, self.sellVendorY, self.sellVendorZ = script_vendor.sellVendor['pos']['x'],  script_vendor.sellVendor['pos']['y'],  script_vendor.sellVendor['pos']['z'];
 				local x, y, z = GetLocalPlayer():GetPosition()

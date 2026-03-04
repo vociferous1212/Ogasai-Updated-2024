@@ -275,15 +275,15 @@ function _questDB:getQuestStartPos()
 
 	if _questMenuEX.questToRunByIndex ~= -1 then
 
-		for e = 0, self.numQuests -1 do
-			if self.questList[_questMenuEX.questToRunByIndex]['completed'] == "nnil" then
-				_questMenuEX.questToRunByIndex = _questMenuEX.questToRunByIndex - 1;
-			end
+		-- quest completed
+		if _questDB.questList[_questMenuEX.questToRunByIndex]['completed'] == "nnil" then
+			_questMenuEX.questToRunByIndex = _questMenuEX.questToRunByIndex - 1;
 		end
 		
 		i = _questMenuEX.questToRunByIndex;
 
 		_questDB.curListQuest = self.questList[i]['questName'];
+		_questDB.curDesc = self.questList[i]['desc'];
 		_quest.currentType = _questDB.questList[i]['type'];
 		_quest.usingItem = _questDB.questList[i]['useItem'];
 		_quest.gossipOption = _questDB.questList[i]['gossipOption'];
@@ -296,8 +296,6 @@ function _questDB:getQuestStartPos()
 						"|r  (index |cffffff00" .. i .. "|r)"
 					)
 					end
-		_questDB.curDesc = _questDB.questList[i]['desc'];
-		_quest.currentDesc = _questDB.questList[i]['desc'];
 		
 		self.currentIndex = i;
 		x, y, z = self.questList[i]['pos']['x'], self.questList[i]['pos']['y'], self.questList[i]['pos']['z'];

@@ -29,21 +29,23 @@ function _questDBReturnQuest:returnAQuest()
 	local questIsComplete = false;
 	local hasQuest = false;
 
-		for a = 0, GetNumQuestLogEntries() + 10 do
+		for a = 0, GetNumQuestLogEntries() do
 			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
 			if title == _quest.currentQuest then
 				hasQuest = true;
 				if isComplete == 1 then
 					questIsComplete = true;
+					_quest.isQuestComplete = true;
 				end
 				if isComplete == -1 then
 					SetAbandonQuest(a);
 					AbandonQuest(a);
+					_quest.isQuestComplete = false;
 				end
 			end
 		end
 
-	if questIsComplete or (_quest.currentType == 0 and hasQuest) then
+	if (questIsComplete or _quest.isQuestComplete) or (_quest.currentType == 0 and hasQuest) then
 	-- return a quest
 	if (_quest.currentQuest ~= nil and _questDB.curListQuest ~= nil) and not IsInCombat() then
 
@@ -59,8 +61,7 @@ function _questDBReturnQuest:returnAQuest()
 				--end
 				--if _quest.currentDesc == nil and _questDB.questList[i]['desc'] ~= nil then
 				if _questMenuEX.questToRunByIndex ~= -1 then
-					i = _questMenuEX.questToRunByIndex;
-					_quest.currentQuest = _questDB.questList[i]['questName']
+					_quest.currentQuest = _questDB.questList[_questMenuEX.questToRunByIndex]['questName']
 				end
 		
 		x, y, z = _questDB:getReturnTargetPos();
@@ -71,12 +72,6 @@ function _questDBReturnQuest:returnAQuest()
 		if id ~= nil then
 			if _questDBReturnQuest:getReturnTargetID():GetDistance() <= 10 then
 			x, y, z = _questDBReturnQuest:getReturnTargetID():GetPosition();
-			end
-		end
-
-		if GetDistance3D(px, py, pz, x, y, z) <= 4 then
-			if IsMoving() then
-				StopMoving();
 			end
 		end
 
@@ -95,7 +90,7 @@ function _questDBReturnQuest:returnAQuest()
 		end
 
 
-		if (GetDistance3D(px, py, pz, x, y, z) <= 4) then
+		if (GetDistance3D(px, py, pz, x, y, z) <= 5) then
 
 				if HasForm() then RemoveForm(); end
 
@@ -274,7 +269,6 @@ if numChoices > 0 then
 
 					if isEquippable then
 						local statScore = GetStatScore(itemName, priorityStat)
-						self.bestItemName = itemName
 						if statScore > bestScore or (statScore == bestScore and itemRarity > bestRarity) then
 							bestScore = statScore
 							bestRarity = itemRarity
@@ -338,7 +332,6 @@ if self.bestItemName == nil then
 
 					if isEquippable then
 						local statScore = GetStatScore(itemName, priorityStat)
-						self.bestItemName = itemName
 						if statScore > bestScore or (statScore == bestScore and itemRarity > bestRarity) then
 							bestScore = statScore
 							bestRarity = itemRarity
@@ -357,26 +350,28 @@ if bestRewardIndex > 0 and bestItemName then
 	GetQuestReward(bestRewardIndex)
 	GetQuestReward(QuestFrameRewardPanel, bestRewardIndex)
 	CompleteQuest()
-	self.waitTimer = GetTimeEX() + 1000
-	UseItem(self.bestItemName)
+	--UseItem(self.bestItemName)
 	QuestRewardCompleteButton_OnClick()
+	self.waitTimer = GetTimeEX() + 1500
 else
 	GetQuestReward(1)
 	GetQuestReward(QuestFrameRewardPanel, 1)
 	CompleteQuest()
-	self.waitTimer = GetTimeEX() + 1000
-	UseItem(self.bestItemName)
+	--UseItem(self.bestItemName)
 	QuestRewardCompleteButton_OnClick()
+	self.waitTimer = GetTimeEX() + 1500
+
 end
 						
 						if (not GetQuestReward(rewardNum)) then
 							SelectActiveQuest(1);
-							self.waitTimer = GetTimeEX() + 1000;
 							GetQuestReward(rewardNum)
 							GetQuestReward(QuestFrameRewardPanel, rewardNum);
 							CompleteQuest();
-							UseItem(self.bestItemName)
+							--UseItem(self.bestItemName)
 							QuestRewardCompleteButton_OnClick()
+							self.waitTimer = GetTimeEX() + 1500;
+
 							
 						--CompleteQuest();
 						--SelectGossipActiveQuest(1);
@@ -404,7 +399,7 @@ end
 			--else
 				--script_runner:run(x, y, z)
 			--end
-			if not IsMoving() and GetDistance3D(px, py, pz, x, y, z) > 4 then Move(x, y, z); end
+			if not IsMoving() and GetDistance3D(px, py, pz, x, y, z) > 5 then Move(x, y, z); end
 		
 		end
 	return true;

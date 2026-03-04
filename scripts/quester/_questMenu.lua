@@ -62,7 +62,7 @@ function _questMenu:menu()
 	if navProgress == 100 then
 
 		-- resume / pause / reload buttons
-		if not _quest.grindSpotReached and _quest.weHaveQuest and not _quest.questIsComplete then
+		if not _quest.grindSpotReached and _quest.weHaveQuest and not _quest.isQuestComplete then
 			if (Button("Current Spot Is Grind Spot")) then
 				_quest.grindSpotReached = true;
 				_quest.curGrindX, _quest.curGrindY, _quest.curGrindZ = GetLocalPlayer():GetPosition();

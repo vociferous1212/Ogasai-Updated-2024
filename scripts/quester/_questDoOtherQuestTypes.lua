@@ -113,7 +113,7 @@ function _questDoOtherQuestTypes()
 
 		local x, y, z = _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ;
 
-		if GetDistance3D(px, py, pz, x, y, z) < 10 and HasItem(_quest.usingItem) then
+		if distToGrind < 10 and HasItem(_quest.usingItem) then
 			if HasForm() then
 				RemoveForm();
 				return true;
@@ -123,10 +123,9 @@ function _questDoOtherQuestTypes()
 			end
 			--return true;
 
-		return true;
-		elseif distToGrind > 5 then
+		elseif distToGrind > 7 then
 		
-			grind2MoveToTarget:run(GetLocalPlayer(), _quest.curGrindX, _quest.curGrindY, _quest.curGrindZ);
+			grind2MoveToTarget:run(GetLocalPlayer(), x, y, z);
 	
 				
 			if not IsMoving() then
@@ -135,13 +134,14 @@ function _questDoOtherQuestTypes()
 
 			end
 
-		return true;
+			return true;
+
 		elseif distToGrind <= 10 and not HasItem(_quest.usingItem) then
 
-			_quest.isQuestComplete = true;
+		_quest.isQuestComplete = true;
 
 		end
-
+		return false;
 	end
 
 	if (_questDoOtherQuestTypes2:run()) then

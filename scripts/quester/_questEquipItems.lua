@@ -100,7 +100,10 @@ function CheckBagsForBetterGear()
 
 	local _, playerClass = UnitClass("player")
 	local playerLevel = UnitLevel("player")
-	local isLowLevel = playerLevel <= 8
+
+	-- don't equip grey armor that is better than white armor after level 3... starter armor is white with no stats. fuck you blizzard
+	-- can't seem to get a good point to set it without adding a table of all starter items....
+	local isLowLevel = playerLevel <= 3
 
 	local slotNames = {
 		[1] = "Head", [3] = "Shoulders", [5] = "Chest", [6] = "Waist",
@@ -181,7 +184,7 @@ function CheckBagsForBetterGear()
 		return score
 	end
 
-	OpenAllBags()
+	--OpenAllBags()
 
 	for bagID = 0, 4 do
 		local numSlots = GetContainerNumSlots(bagID)

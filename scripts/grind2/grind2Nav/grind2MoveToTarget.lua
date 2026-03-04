@@ -77,7 +77,7 @@ function grind2MoveToTarget:run(player, _x, _y, _z)
 	if not self.adjustMeshSmoothness then
 		NavmeshSmooth(self.nextNavNodeDistance/2);
 	else
-		NavmeshSmooth(self.nextNavNodeDistance+1);
+		NavmeshSmooth(self.nextNavNodeDistance/1.4);
 	end
 
 -- get current position

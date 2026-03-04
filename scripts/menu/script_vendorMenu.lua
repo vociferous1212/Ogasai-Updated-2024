@@ -414,6 +414,7 @@ function script_vendorMenu:sellLogic()
 				itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
 				itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(itemLink);
 				if (not script_vendor:keepItem(itemName)
+					and itemName ~= ("Earth Totem" or "Fire Totem" or "Air Totem" or "Water Totem")
 					and itemName ~= (script_fish.weaponMainHand or script_fish.weaponOffHand or script_fish.poleName)
 					and itemName ~= "Hearthstone"
 					and itemName ~= (_questDBGather.gatherTarget or _questDBGather.gatherTarget2)

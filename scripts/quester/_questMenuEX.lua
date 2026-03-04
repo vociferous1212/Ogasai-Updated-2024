@@ -16,7 +16,7 @@ function _questMenuEX:menu()
 
 	wasClicked, _questMenu.showDBInfo = Checkbox("Show All Quests", _questMenu.showDBInfo);
 
-	wasClicked, grind2MoveToTarget.adjustMeshSmoothness = Checkbox("Bot getting stuck around walls? Check to make longer path nodes.", grind2MoveToTarget.adjustMeshSmoothness);
+	wasClicked, grind2MoveToTarget.adjustMeshSmoothness = Checkbox("Bot getting stuck around walls? Make longer path nodes.", grind2MoveToTarget.adjustMeshSmoothness);
 
 	if _questMenu.showDBInfo then
 
@@ -53,18 +53,19 @@ function _questMenuEX:menu()
 				self.questToRunByIndex = -1;
 				self.startAtQuestIndexNum = -1;
 				_questDB.curListQuest = 0
-				_quest.currentQuest = nil
+				DEFAULT_CHAT_FRAME:AddMessage("Default indexing reset - returning to previous quests in DB order.");
+				
 				for a = 0, GetNumQuestLogEntries() do
 					local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
-					if title == _questDB.curListQuest then
-					_quest.currentDesc = _questDB.curDesc;
+					if title ~= _questDB.curListQuest and not zoneNamesList:isZoneAQuestHeaderInQuestLog(title) then
+						_quest.currentDesc = _questDB.curDesc;
+						_quest.currentDesc = nil
 					end
 				end
-				_quest.currentDesc = nil
+				_quest.currentQuest = nil
 				_questDB.curDesc = nil
 				_quest.currentMapID = nil
 								
-				
 				_questDB:getQuestStartPos()
 
 			end
@@ -73,15 +74,16 @@ function _questMenuEX:menu()
 
 			local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(1);
 
-		if (Button("Mark Current DB Quest As Complete")) then
-			for a = 0, GetNumQuestLogEntries() do
-				local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
-				if title ~= _questDB.curListQuest then
-					_questDBHandleDB:turnQuestCompleted();
+			if not _quest.weHaveQuest then
+				if (Button("Mark Current DB Quest As Complete")) then
+					for a = 0, GetNumQuestLogEntries() do
+						local title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory = GetQuestLogTitle(a);
+						if title ~= _questDB.curListQuest then
+							_questDBHandleDB:turnQuestCompleted();
+						end
+					end
 				end
 			end
-		end
-
 
 			if self.startAtQuestIndexNum < 100 then
 				Text("[ Start Quest Index ] "..self.startAtQuestIndexNum.." ");
@@ -132,6 +134,12 @@ function _questMenuEX:menu()
 			end
 			
 			local wasClicked = false;
+
+			if CollapsingHeader(GetZoneText()) then
+				_questMenuEX:drawZoneByID(GetMapID());
+			end
+
+			Separator();
 
 			if CollapsingHeader("Eastern Kingdoms") then
 
@@ -332,15 +340,18 @@ function _questMenuEX:drawZoneByID(mapID)
 
 		if quest['mapID'] == mapID then
 			if Button("Run " .. i) then
-				self.questToRunByIndex = i
-				_questDB.curListQuest = quest['questName']
-				_quest.currentQuest = quest['questName']
-				_quest.currentType = quest['type']
-				_quest.usingItem = quest['useItem']
-				_quest.gossipOption = quest['gossipOption']
-				_quest.currentMapID = quest['mapID']
-				_quest.currentDesc = quest['desc']
-				_questDB.curDesc = quest['desc']
+				
+				--if GetNumQuestLogEntries() == 0 or GetNumQuestLogEntries() == nil then
+					self.questToRunByIndex = i
+					_questDB.curListQuest = quest['questName']
+					_quest.currentQuest = quest['questName']
+					_quest.currentType = quest['type']
+					_quest.usingItem = quest['useItem']
+					_quest.gossipOption = quest['gossipOption']
+					_quest.currentMapID = quest['mapID']
+					_quest.currentDesc = quest['desc']
+					_questDB.curDesc = quest['desc']
+				--end
 			end
 
 			SameLine()
@@ -354,8 +365,8 @@ function _questMenuEX:drawZoneByID(mapID)
 			if self.menuStyle1 then
 				Text(num .. " " .. compl .. " - " .. faction ..
 					 " | Type - " .. quest['type'] ..
-					 " | " .. quest['questName'] ..
-					 " " .. dist .. " (yds)")
+					 " | [ " .. quest['questName'] ..
+					 " ] | " .. dist .. " (yds)")
 
 				SameLine()
 

@@ -1,6 +1,10 @@
 coremenu = {
 
 	isSetup = false,
+
+	startedNewCharacter = false,		-- stared a new character? run setup each levelup to check for different conditions
+
+	lastPlayerLevel = 0,	-- last level of player
 }
 
 function coremenu:reload()
@@ -13,6 +17,25 @@ function coremenu:reload()
 end
 
 function coremenu:draw()
+
+	if self.lastPlayerLevel == 0 then
+		if GetLocalPlayer() ~= nil then
+			self.lastPlayerLevel = GetLocalPlayer():GetLevel();
+		end
+	end
+
+	-- if player level is level 6 or lower then we started a new character
+	if GetLocalPlayer() ~= nil and GetLocalPlayer() ~= 0 then
+		if GetLocalPlayer():GetLevel() <= 6 then
+			self.startedNewCharacter = true;
+		end
+	end
+
+	-- if we started a new character, and leveled up, then last level is new level - run class setups
+	if self.startedNewCharacter and GetLocalPlayer():GetLevel() ~= self.lastPlayerLevel then
+		coremenu:runClassSetups();
+		self.lastPlayerLevel = GetLocalPlayer():GetLevel();
+	end
 
 
 	if self.isSetup == false and coremenu ~= nil then
@@ -30,6 +53,7 @@ function coremenu:draw()
 		include("core\\totemsList.lua");
 		include("core\\itemsList.lua");
 		include("core\\friendlyEnemiesList.lua");
+		include("core\\zoneNamesList.lua");
 
 		-- Load DBs
 		include("scripts\\db\\vendorDB.lua");
@@ -114,5 +138,19 @@ function coremenu:draw()
 	self.isSetup = true;
 
 	end
+
+end
+
+function coremenu:runClassSetups()
+
+	script_druid.isSetup = false; script_druid:setup();
+	script_hunter.isSetup = false; script_hunterSetup:setup();
+	script_mage.isSetup = false; script_mageSetup:setup();
+	script_paladin.isSetup = false; script_paladinSetup:setup();
+	script_priest.isSetup = false; script_priest:setup();
+	script_rogue.isSetup = false; script_rogueSetup:setup();
+	script_shaman.isSetup = false; script_shaman:setup();
+	script_warlock.isSetup = false; script_warlock:setup();
+	script_warrior.isSetup = false; script_warrior:setup();
 
 end

@@ -105,9 +105,9 @@ function _questDBTargets:getTarget()
 		if t == 3 then
 			if (not i:IsTapped() or i:IsTappedByMe()) and not i:IsDead() and i:CanAttack() and self.target ~= 0 then
 				if not script_grind:isTargetHardBlacklisted(i:GetGUID()) and (not grind2SafePull:targetHasAdds(i) or _questQuestTargets:isUnitQuestTarget(i)) then
-					if (self.target ~= nil and i:GetUnitName() == self.target and _quest.targetKilledNum < numKill)
-					or (self.target2 ~= nil and i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2)
-					or (self.target3 ~= nil and i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)
+					if (self.target ~= nil and self.target ~= 0 and i:GetUnitName() == self.target and _quest.targetKilledNum < numKill)
+					or (self.target2 ~= nil and self.target2 ~= 0 and i:GetUnitName() == self.target2 and _quest.targetKilledNum2 < numKill2)
+					or (self.target3 ~= nil and self.target3 ~= 0 and i:GetUnitName() == self.target3 and _quest.targetKilledNum3 < numKill3)
 					or i:IsTappedByMe() or grind2IsTargetingMe:target(i) then
 
 						if grind2IsTargetingMe:target(i) then
@@ -125,6 +125,11 @@ function _questDBTargets:getTarget()
 							haveQuestTarget = true;
 
 						end
+						
+						if script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange() ~= nil then
+							return script_grindReturnTargetNearMyAggroRange:returnTargetNearMyAggroRange();
+						end
+
 					end
 				end
 			end
@@ -236,4 +241,22 @@ function _questDBTargets:killStuffAroundUs()
 		i, t = GetNextObject(i);
 		end
 	end
+end
+
+function _questDBTargets:isAnyQuestTargetInRange()
+
+	local i, t = GetFirstObject()
+	
+	while i ~= 0 do
+		if t == 3 then
+			if (self.target ~= nil and self.target ~= 0 and i:GetUnitName() == self.target)
+			or (self.target2 ~= nil and self.target2 ~= 0 and i:GetUnitName() == self.target2)
+			or (self.target3 ~= nil and self.target3 ~= 0 and i:GetUnitName() == self.target3) then
+				return true;
+			end
+		end
+	i, t = GetNextObject(i);
+	end
+
+return false;
 end

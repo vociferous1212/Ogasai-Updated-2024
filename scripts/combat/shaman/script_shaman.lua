@@ -132,6 +132,7 @@ function script_shaman:setup()
 	end
 	if (localLevel < 6) then
 		self.drinkMana = 25;
+		self.lightningBoltMana = 55;
 	end
 	if (localLevel >= 10) then
 		self.drinkMana = 40;

@@ -53,7 +53,7 @@ function _questDBHandleDB:turnQuestCompleted()
 
 							_quest.weHaveQuest = false;
 
-							_quest.questIsComplete = false;
+							_quest.isQuestComplete = false;
 
 							_quest.grindSpotReached = false;
 
@@ -233,8 +233,8 @@ function _questDBHandleDB:sortThroughQuestBasedOnCurrentQuestLogQuest()
 				_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ = _questDB:getQuestStartPos()
 				_quest.grindSpotReached = false;
 
-				_quest.waitTimer = GetTimeEX() + 200;
-				self.waitTimer = GetTimeEX() + 200;
+				_quest.waitTimer = GetTimeEX() + 25;
+				self.waitTimer = GetTimeEX() + 25;
 				_quest.tickRate = 0
 				return true
 			end

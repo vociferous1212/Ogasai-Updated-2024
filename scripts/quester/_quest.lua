@@ -222,7 +222,7 @@ local localObj = GetLocalPlayer();
 	-- flee combat
 	if _quest.currentQuest ~= "Princess Must Die!" and PlayerHasTarget() and IsInCombat() then
 		if grind2IsTargetingMe:target(GetTarget()) and PlayerHealth() >= 15 and IsInCombat() and (PlayerLevel() >= 6 or GetRealmName() == "Permadeath - EU")
-		and ((GetTarget():GetHealthPercentage() > PlayerHealth() and PlayerHealth() <= 60) or (NumberTargetsAttackingPlayer() > 2)
+		and ((GetTarget():GetHealthPercentage() > PlayerHealth() and PlayerHealth() <= 60 and PlayerMana() < 35) or (NumberTargetsAttackingPlayer() > 2)
 		and PlayerHealth() <= 75) then
 		
 			local x, y z = 0, 0, 0;
@@ -300,7 +300,7 @@ local localObj = GetLocalPlayer();
 
 	-- check bags for new bags to equip
 	if not IsInCombat() and not IsMoving() and not GetLocalPlayer():IsDead() and GetTimeEX() > self.checkBagTimer and GetBagName(4) == nil then
-		--CheckBagsForBetterGear()
+		CheckBagsForBetterGear()
 		_questEquipItems:checkInventoryForBags()
 		self.checkBagTimer = GetTimeEX() + 60000
 	end
@@ -441,9 +441,8 @@ local localObj = GetLocalPlayer();
 	if PlayerLevel() <= 10 then
 		if _questDBReturnQuest.bestItemName ~= nil then
 			if HasItem(_questDBReturnQuest.bestItemName) then
-				if UseItem(_questDBReturnQuest.bestItemName) then
-					_questDBReturnQuest.bestItemName = nil;
-				end
+				UseItem(_questDBReturnQuest.bestItemName);
+				_questDBReturnQuest.bestItemName = nil;
 			end
 		end
 	end
@@ -496,8 +495,8 @@ local localObj = GetLocalPlayer();
 
 	-- get a target to run combat
 		-- only get a target if at the grind spot and quest is complete , or in combat already
-	if ((_quest.currentType == 1 or _quest.currentType == 12) or _quest.currentType == 2 and _questDBTargets.target ~= nil) or IsInCombat() then
-		if (_quest.grindSpotReached and not _quest.isQuestComplete) or IsInCombat() then
+	if ((_quest.currentType == 1 or _quest.currentType == 12) or _quest.currentType == 2 and _questDBTargets.target ~= nil and _questDBTargets.target ~= 0) or IsInCombat() then
+		if ((_quest.grindSpotReached or _questDBTargets:isAnyQuestTargetInRange()) and not _quest.isQuestComplete) or IsInCombat() then
 			if not Player():IsDead() and not _quest.needRest and GetTimeEX() > _questDoCombat.targetingTimer then
 				if IsInCombat() or (_quest.currentQuest ~= nil and _quest.curGrindX ~= 0) then
 					_quest.enemyTarget = _questDBTargets:getTarget();
@@ -701,7 +700,7 @@ end
 			questIsInQuestLog = true;
 		end
 	end
-		if questIsInQuestLog and not AreBagsFull() and not IsInCombat() and not IsAnyTargetTargetingPlayer() then
+		if questIsInQuestLog and _quest.isQuestComplete and not AreBagsFull() and not IsInCombat() and not IsAnyTargetTargetingPlayer() then
 			if _questDBReturnQuest:returnAQuest() then
 				self.enemyTarget = nil;
 				self.message = "Returning quest!";
@@ -815,13 +814,12 @@ end
 				--	end
 				--end
 
-				if _quest.distToGiver >= 4 then
+				if _quest.distToGiver > 4 then
 					grind2MoveToTarget:run(GetLocalPlayer(), _quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
 				end
 
-				if not IsInCombat() and not IsMoving() and not IsPathLoaded(5) and _quest.distToGiver > 4 then
+				if not IsInCombat() and not IsMoving() and not IsPathLoaded(5) and _quest.distToGiver > 5 then
 					Move(_quest.curQuestX, _quest.curQuestY, _quest.curQuestZ);
-					return false;
 				end
 			end
 		end
@@ -855,9 +853,10 @@ end
 	if script_grind.lootObj ~= nil then
 		return;
 	end
-	--if IsInCombat() then if IsMoving() then StopMoving(); return true; end return; end
+
+
 	-- we have a quest so go to grind spot
-	if questIsInQuestLog and _quest.questType ~= 0 and not IsAnyTargetTargetingPlayer() and _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not IsLooting()
+	if questIsInQuestLog and not self.isQuestComplete and _quest.questType ~= 0 and not IsAnyTargetTargetingPlayer() and _quest.curGrindX ~= 0 and _quest.currentQuest ~= nil and not IsInCombat() and not IsLooting()
 	and (script_grind.lootObj == nil or script_grind.skipLooting or AreBagsFull()) and not IsCasting() and not IsChanneling() then
 		if (_quest.distToGrind > 40 and _quest.currentType ~= 3 and _quest.currentType ~= 4 and not _quest.grindSpotReached)
 		or (_quest.currentType == 3 or _quest.currentType == 4 or _quest.curentType == 5 or _quest.currentType == 11 and _quest.distToGrind > 5) then
